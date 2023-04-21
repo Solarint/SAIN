@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33328.57
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Combat", "SAIN Combat\SAIN Combat.csproj", "{89E1011E-37C3-4CF5-8128-8B6945360824}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Audio", "SAIN Audio\SAIN Audio.csproj", "{ECE08BE1-04F9-4C83-B08D-ACE6BDA11885}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Flashlights", "SAIN Flashlights\SAIN Flashlights.csproj", "{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Movement", "SAIN Movement\SAIN Movement.csproj", "{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Vision", "SAIN Vision\SAIN Vision.csproj", "{897900E4-B305-4B15-8C8D-91B481296EE2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		3.5.5|x86 = 3.5.5|x86
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{89E1011E-37C3-4CF5-8128-8B6945360824}.3.5.5|x86.ActiveCfg = 3.5.5|x86
+		{89E1011E-37C3-4CF5-8128-8B6945360824}.3.5.5|x86.Build.0 = 3.5.5|x86
+		{89E1011E-37C3-4CF5-8128-8B6945360824}.Debug|x86.ActiveCfg = Debug|x86
+		{89E1011E-37C3-4CF5-8128-8B6945360824}.Debug|x86.Build.0 = Debug|x86
+		{89E1011E-37C3-4CF5-8128-8B6945360824}.Release|x86.ActiveCfg = Release|x86
+		{89E1011E-37C3-4CF5-8128-8B6945360824}.Release|x86.Build.0 = Release|x86
+		{ECE08BE1-04F9-4C83-B08D-ACE6BDA11885}.3.5.5|x86.ActiveCfg = 3.5.5|x86
+		{ECE08BE1-04F9-4C83-B08D-ACE6BDA11885}.3.5.5|x86.Build.0 = 3.5.5|x86
+		{ECE08BE1-04F9-4C83-B08D-ACE6BDA11885}.Debug|x86.ActiveCfg = Debug|x86
+		{ECE08BE1-04F9-4C83-B08D-ACE6BDA11885}.Debug|x86.Build.0 = Debug|x86
+		{ECE08BE1-04F9-4C83-B08D-ACE6BDA11885}.Release|x86.ActiveCfg = Release|x86
+		{ECE08BE1-04F9-4C83-B08D-ACE6BDA11885}.Release|x86.Build.0 = Release|x86
+		{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}.3.5.5|x86.ActiveCfg = 3.5.5|x86
+		{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}.3.5.5|x86.Build.0 = 3.5.5|x86
+		{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}.Debug|x86.ActiveCfg = Debug|x86
+		{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}.Debug|x86.Build.0 = Debug|x86
+		{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}.Release|x86.ActiveCfg = Release|x86
+		{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}.Release|x86.Build.0 = Release|x86
+		{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}.3.5.5|x86.ActiveCfg = 3.5.5|x86
+		{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}.3.5.5|x86.Build.0 = 3.5.5|x86
+		{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}.Debug|x86.ActiveCfg = Debug|x86
+		{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}.Debug|x86.Build.0 = Debug|x86
+		{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}.Release|x86.ActiveCfg = Release|x86
+		{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}.Release|x86.Build.0 = Release|x86
+		{897900E4-B305-4B15-8C8D-91B481296EE2}.3.5.5|x86.ActiveCfg = 3.5.5|x86
+		{897900E4-B305-4B15-8C8D-91B481296EE2}.3.5.5|x86.Build.0 = 3.5.5|x86
+		{897900E4-B305-4B15-8C8D-91B481296EE2}.Debug|x86.ActiveCfg = Debug|x86
+		{897900E4-B305-4B15-8C8D-91B481296EE2}.Debug|x86.Build.0 = Debug|x86
+		{897900E4-B305-4B15-8C8D-91B481296EE2}.Release|x86.ActiveCfg = Release|x86
+		{897900E4-B305-4B15-8C8D-91B481296EE2}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E87EA56-89A9-4B81-AD52-363803DACD8F}
+	EndGlobalSection
+EndGlobal
