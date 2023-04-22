@@ -54,10 +54,10 @@ namespace SAIN.Combat.Components
         public Vector3 NewRecoil()
         {
             WeaponInfo stats = bot.gameObject.GetComponent<WeaponInfo>();
-            float modifier = stats.ShootModifier;
+            float modifier = stats.FinalModifier;
             Weapon weapon = bot.WeaponManager.CurrentWeapon;
 
-            Vector3 recoilVector = ShootPatchHelpers.Recoil(NewRecoilPoint, weapon.RecoilTotal, modifier);
+            Vector3 recoilVector = Helpers.Shoot.Recoil(NewRecoilPoint, weapon.RecoilTotal, modifier);
 
             float firerate = 1f / (bot.WeaponManager.CurrentWeapon.Template.bFirerate / 60);
             RecoilTimeNormalize += firerate;

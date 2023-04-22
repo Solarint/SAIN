@@ -2,7 +2,7 @@
 
 namespace SAIN.Combat.Configs
 {
-    internal class Firerate
+    internal class SemiAutoConfig
     {
         public static ConfigEntry<bool> SemiROFToggle { get; private set; }
         public static ConfigEntry<float> RateofFire { get; private set; }
@@ -13,11 +13,11 @@ namespace SAIN.Combat.Configs
             string scaling = "3. Distance Scaling Settings";
 
             SemiROFToggle = Config.Bind(scaling, "Distance Scaling", true,
-                new ConfigDescription("Bots shoot slower the further away their target is. Firerate depends on weapon type, bot type, and weapon build.", null,
+                new ConfigDescription("Bots shoot slower the further away their target is. SemiAutoConfig depends on weapon type, bot type, and weapon build.", null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 14 }));
 
             RateofFire = Config.Bind(scaling, "Rate of Fire", 1f,
-                new ConfigDescription("Adjusts bot's base rate of fire value.",
+                new ConfigDescription("Adjusts bot's base rate of fire value. Higher is faster overall rate of fire.",
                 new AcceptableValueRange<float>(0.01f, 2.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
 

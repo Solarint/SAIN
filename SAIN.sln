@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Movement", "SAIN Movem
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Vision", "SAIN Vision\SAIN Vision.csproj", "{897900E4-B305-4B15-8C8D-91B481296EE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Talk", "Angry Bots\SAIN Talk.csproj", "{7B759B9D-0130-40AF-8AF1-D91C2088BA56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		3.5.5|x86 = 3.5.5|x86
@@ -50,6 +52,12 @@ Global
 		{897900E4-B305-4B15-8C8D-91B481296EE2}.Debug|x86.Build.0 = Debug|x86
 		{897900E4-B305-4B15-8C8D-91B481296EE2}.Release|x86.ActiveCfg = Release|x86
 		{897900E4-B305-4B15-8C8D-91B481296EE2}.Release|x86.Build.0 = Release|x86
+		{7B759B9D-0130-40AF-8AF1-D91C2088BA56}.3.5.5|x86.ActiveCfg = Debug|x86
+		{7B759B9D-0130-40AF-8AF1-D91C2088BA56}.3.5.5|x86.Build.0 = Debug|x86
+		{7B759B9D-0130-40AF-8AF1-D91C2088BA56}.Debug|x86.ActiveCfg = Debug|x86
+		{7B759B9D-0130-40AF-8AF1-D91C2088BA56}.Debug|x86.Build.0 = Debug|x86
+		{7B759B9D-0130-40AF-8AF1-D91C2088BA56}.Release|x86.ActiveCfg = Release|x86
+		{7B759B9D-0130-40AF-8AF1-D91C2088BA56}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

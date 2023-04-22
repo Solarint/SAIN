@@ -9,7 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.Combat.Configs.AimingConfig;
+using static SAIN.Combat.Configs.RecoilScatterConfig;
 using static SAIN.Combat.Configs.DebugConfig;
 
 namespace SAIN.Combat.Patches
@@ -26,20 +26,6 @@ namespace SAIN.Combat.Patches
         {
             __instance.EndTargetPoint = __instance.RealTargetPoint + ___vector3_5 + ___float_13 * (___vector3_4 + (___botOwner_0.RecoilData.RecoilOffset * ScatterMultiplier.Value));
 
-            if (DebugRecoil.Value && ___botOwner_0.ShootData.Shooting)
-            {
-                GameObject lineObject = new GameObject();
-                float sphereSize = 0.05f;
-                GameObject sphereObject = DebugDrawer.Sphere(__instance.EndTargetPoint, sphereSize, Color.red);
-
-                float lineWidth = 0.005f;
-                GameObject lineObjectSegment = DebugDrawer.Line(___botOwner_0.WeaponRoot.position, __instance.EndTargetPoint, lineWidth, Color.blue);
-                lineObjectSegment.transform.parent = lineObject.transform;
-
-                sphereObject.transform.parent = lineObject.transform;
-
-                DebugDrawer.DestroyAfterDelay(lineObject, 2f);
-            }
             return false;
         }
     }
@@ -51,15 +37,33 @@ namespace SAIN.Combat.Patches
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(GClass545 __instance, ref Vector3 ___vector3_0, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_1, ref float ___float_0, ref float ___float_1, ref float ___float_2)
+        public static bool PatchPrefix(ref Vector3 ___vector3_0, ref BotOwner ___botOwner_0, ref float ___float_0)
         {
             WeaponInfo stats = ___botOwner_0.gameObject.GetComponent<WeaponInfo>();
-            float modifier = stats.ShootModifier;
-            float recoil = ___botOwner_0.WeaponManager.CurrentWeapon.RecoilTotal;
+            float modifier = stats.FinalModifier;
 
-            Vector3 recoilVector = ShootPatchHelpers.Recoil(___vector3_0, recoil, modifier);
-            ___vector3_0 = recoilVector;
+            Vector3 recoilVector;
+            if (___float_0 < Time.time)
+            {
+                Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
 
+                if (weapon.SelectedFireMode == Weapon.EFireMode.fullauto || weapon.SelectedFireMode == Weapon.EFireMode.burst)
+                {
+                    ___float_0 = Time.time + Shoot.FullAutoTimePerShot(weapon.Template.bFirerate) * 0.8f;
+                }
+                else
+                {
+                    ___float_0 = Time.time + (1f / (weapon.Template.SingleFireRate / 60f)) * 0.8f;
+                }
+
+                recoilVector = Shoot.Recoil(___vector3_0, weapon.Template.RecoilForceBack, weapon.Template.RecoilForceUp, modifier, ___botOwner_0.AimingData.LastDist2Target);
+                ___vector3_0 = recoilVector;
+
+                if (DebugRecoil.Value)
+                {
+                    DebugDrawer.DrawAimLine(___botOwner_0, recoilVector, Color.red, 0.025f, Color.red, 0.05f, 3f);
+                }
+            }
             return false;
         }
     }
@@ -72,9 +76,27 @@ namespace SAIN.Combat.Patches
         [PatchPrefix]
         public static bool PatchPrefix(GClass545 __instance, ref Vector3 ___vector3_0, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_1, ref float ___float_0, ref float ___float_1, ref float ___float_2)
         {
-            ___vector3_1 = Vector3.Lerp(Vector3.zero, ___vector3_0, 0.5f);
-            ___vector3_0 = ___vector3_1;
+            // Repurposing float_1 as a recoil reset timer
+            if (___float_1 < Time.time)
+            {
+                Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
+                if (weapon.SelectedFireMode == Weapon.EFireMode.fullauto || weapon.SelectedFireMode == Weapon.EFireMode.burst)
+                {
+                    ___float_1 = Time.time + (Shoot.FullAutoTimePerShot(weapon.Template.bFirerate) / 3f);
+                }
+                else
+                {
+                    ___float_1 = Time.time + ((1f / (weapon.Template.SingleFireRate / 60f)) / 3f);
+                }
+                ___vector3_0 = Vector3.Lerp(Vector3.zero, ___vector3_0, LerpRecoil.Value);
 
+                if (DebugRecoil.Value && ___float_2 < Time.time)
+                {
+                    // Reusing float_2 as a debug timer to limit the line draws
+                    ___float_2 = Time.time + 0.1f;
+                    DebugDrawer.DrawAimLine(___botOwner_0, ___vector3_0, Color.gray, 0.015f, Color.gray, 0.025f, 3f);
+                }
+            }
             return false;
         }
     }
@@ -87,7 +109,7 @@ namespace SAIN.Combat.Patches
         [PatchPrefix]
         public static bool PatchPrefix()
         {
-            return true;
+            return false;
         }
     }
 }

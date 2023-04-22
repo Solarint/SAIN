@@ -14,26 +14,22 @@ namespace SAIN.Combat
         {
             CheckEftVersion();
 
-            GClassReferences.CheckBuildVersion();
+            //GClassReferences.CheckBuildVersion();
 
             FullAutoConfig.Init(Config);
-            Firerate.Init(Config);
+            SemiAutoConfig.Init(Config);
             DebugConfig.Init(Config);
             AimingConfig.Init(Config);
+            RecoilScatterConfig.Init(Config);
 
             try
             {
-                new Components.AddComponentPatch().Enable();
+                new Patches.AddComponentPatch().Enable();
 
                 new Patches.BotGlobalScatterPatch().Enable();
                 new Patches.BotGlobalShootDataPatch().Enable();
                 new Patches.BotGlobalCorePatch().Enable();
                 new Patches.BotGlobalAimingSettingsPatch().Enable();
-
-                new Patches.TalkPatch().Enable();
-                //new Patches.SetVisiblePatch().Enable();
-                new Patches.BotTalkPatch().Enable();
-                //new Patches.UpdateRatePatch().Enable();
 
                 //new Patches.AimPatch().Enable();
                 //new Patches.ScatterPatch().Enable();
@@ -44,11 +40,10 @@ namespace SAIN.Combat
                 new Patches.LoseRecoilPatch().Enable();
                 new Patches.EndRecoilPatch().Enable();
 
-
-                new Patches.FullAutoPatch_1().Enable();
-                new Patches.FullAutoPatch_2().Enable();
-                new Patches.FiremodeSwapPatch().Enable();
+                new Patches.FullAutoPatch().Enable();
                 new Patches.SemiAutoPatch().Enable();
+
+                new Patches.FiremodePatch().Enable();
             }
             catch (Exception ex)
             {

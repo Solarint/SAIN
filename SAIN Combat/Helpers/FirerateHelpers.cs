@@ -10,7 +10,6 @@
 
             return firerate;
         }
-
         // Selects a the time for 1 second of wait time for every x meters
         public static float WeaponClassFirerate(string weaponclass, string ammotype, out float firerate)
         {
@@ -56,7 +55,6 @@
             }
             return firerate;
         }
-
         // Sets the final firerate based on our selected min and max values, and scales the modifier between the two.
         public static float FirerateScaling(float firerate, out float scaledfirerate)
         {

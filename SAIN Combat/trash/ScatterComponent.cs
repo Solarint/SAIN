@@ -13,20 +13,6 @@ using UnityEngine;
 
 namespace SAIN.Combat.Components
 {
-    public class AddComponentPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotOwner), "PreActivate");
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(ref BotOwner __instance)
-        {
-            __instance.gameObject.AddComponent<WeaponInfo>();
-            //__instance.gameObject.AddComponent<WeaponScatter>();
-        }
-    }
     public class WeaponScatter
     {
         public Transform aimTarget;

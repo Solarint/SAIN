@@ -1,25 +1,23 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Vision.Config;
+using SAIN.Config;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Vision
+namespace SAIN
 {
-    [BepInPlugin("me.sol.sainvision", "SAIN Vision", "1.2")]
-    public class VisionPlugin : BaseUnityPlugin
+    [BepInPlugin("me.sol.saincore", "SAIN Core", "1.6")]
+    public class SAINCorePlugin : BaseUnityPlugin
     {
         private void Awake()
         {
-            //CheckEftVersion();
-
-            VisionConfig.Init(Config);
+            CheckEftVersion();
+            Template.Init(Config);
 
             try
             {
-                new Patches.VisibleDistancePatch().Enable();
-                new Patches.GainSightPatch().Enable();
-                new Patches.VisionOverridesPatch().Enable();
+                new Patches.TemplatePatch().Enable();
+                new Patches.TemplatePatch2().Enable();
             }
             catch (Exception ex)
             {

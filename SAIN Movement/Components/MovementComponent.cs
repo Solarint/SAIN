@@ -31,6 +31,12 @@ namespace SAIN.Movement.Components
                     yield break;
                 }
 
+                if (bot.IsRole(WildSpawnType.marksman))
+                {
+                    StopAllCoroutines();
+                    yield break;
+                }
+
                 if (ShouldIChange()) WhatSpeedShouldIPick();
 
                 // Overall Check Frequency

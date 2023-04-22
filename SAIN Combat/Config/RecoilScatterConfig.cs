@@ -1,31 +1,39 @@
 ﻿using BepInEx.Configuration;
 
-
 namespace SAIN.Combat.Configs
 {
-    internal class FullAutoConfig
+    internal class RecoilScatterConfig
     {
-        public static ConfigEntry<bool> BurstLengthToggle { get; private set; }
-        public static ConfigEntry<float> BurstLengthModifier { get; private set; }
-        public static ConfigEntry<bool> SimpleModeBurst { get; private set; }
+
+        // recoil
+        public static ConfigEntry<float> ScatterMultiplier { get; private set; }
+        public static ConfigEntry<float> MaxScatter { get; private set; }
+        public static ConfigEntry<float> AddRecoil { get; private set; }
+        public static ConfigEntry<float> LerpRecoil { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
-            string modeswap = "2. Fullauto Settings";
+            string recoil = "1. Recoil";
 
-            BurstLengthToggle = Config.Bind(modeswap, "Burst Length Scaling", true,
-                new ConfigDescription("Bots will slow down their burst length depending on distance, eventually reaching single-fire on targets at range.",
-                null,
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 92 }));
+            ScatterMultiplier = Config.Bind(recoil, "Scatter Multiplier", 1f,
+                new ConfigDescription("Increases or decreases scatter from recoil",
+                new AcceptableValueRange<float>(0.01f, 5.0f),
+                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
 
-            BurstLengthModifier = Config.Bind(modeswap, "Burst Length Modifier", 1.0f,
-                new ConfigDescription("Adjusts the length of full auto bursts. A higher number means that they will shoot longer bursts.",
-                new AcceptableValueRange<float>(0.1f, 3.0f),
-                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 7 }));
+            MaxScatter = Config.Bind(recoil, "Max Scatter", 2f,
+                new ConfigDescription("Upper Limit for how far from a target the recoil scatter can go",
+                new AcceptableValueRange<float>(0.5f, 10.0f),
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
 
-            SimpleModeBurst = Config.Bind(modeswap, "Simple Mode", false,
-                new ConfigDescription("For those who HATE nuance. Bots will not take into consideration weapon build, bot type, ammo stats, recoil, or ergo when adjusting their burst length.", null,
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 5 }));
+            AddRecoil = Config.Bind(recoil, "Add Recoil Scatter", 0.35f,
+                new ConfigDescription("Adds or subtracts from the recoil felt per shot",
+                new AcceptableValueRange<float>(-1.0f, 5.0f),
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
+
+            LerpRecoil = Config.Bind(recoil, "Recoil Reduction", 0.9f,
+                new ConfigDescription("How much to reduce recoil per frame when not shooting",
+                new AcceptableValueRange<float>(0.1f, 0.99f),
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
         }
     }
 }

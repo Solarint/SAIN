@@ -4,13 +4,6 @@ namespace SAIN.Combat.Configs
 {
     internal class AimingConfig
     {
-
-        // recoil
-        public static ConfigEntry<float> ScatterMultiplier { get; private set; }
-        public static ConfigEntry<float> MaxScatter { get; private set; }
-        public static ConfigEntry<float> AddRecoil { get; private set; }
-        public static ConfigEntry<float> HorizontalRecoilCoef { get; private set; }
-
         // aim
         public static ConfigEntry<float> TIME_COEF_IF_MOVE { get; private set; }
         public static ConfigEntry<float> PANIC_COEF { get; private set; }
@@ -40,24 +33,7 @@ namespace SAIN.Combat.Configs
 
         public static void Init(ConfigFile Config)
         {
-            string recoil = "1. Recoil";
-
-            ScatterMultiplier = Config.Bind(recoil, "Scatter Multiplier", 1f,
-                new ConfigDescription("",
-                new AcceptableValueRange<float>(0.01f, 2.0f),
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
-
-            MaxScatter = Config.Bind(recoil, "Max Scatter", 2f,
-                new ConfigDescription("",
-                new AcceptableValueRange<float>(0.5f, 5.0f),
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
-
-            AddRecoil = Config.Bind(recoil, "Add Recoil Scatter", 0f,
-                new ConfigDescription("",
-                new AcceptableValueRange<float>(-0.5f, 0.5f),
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
-
-
+            /*
             string aim = "1. Aim";
 
             TIME_COEF_IF_MOVE = Config.Bind(aim, "TIME_COEF_IF_MOVE", 1.5f,
@@ -152,6 +128,7 @@ namespace SAIN.Combat.Configs
                 new ConfigDescription("Translate: Scope bottom compression level",
                 new AcceptableValueRange<float>(0.01f, 1.0f),
               new ConfigurationManagerAttributes { IsAdvanced = false, Order = 1, Browsable = false }));
+            */
         }
     }
 }

@@ -165,9 +165,11 @@
     <Compile Include="Helpers\AudioHelpers.cs" />
     <Compile Include="Components\AudioComponent.cs" />
     <Compile Include="Config\AudioConfig.cs" />
+    <Compile Include="Patches\OnEnemySoundHeardPatches.cs" />
+    <Compile Include="Patches\StepNoisePatch.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
     <Compile Include="Helpers\DrawHelpers.cs" />
-    <Compile Include="Patches\AudioPatch.cs" />
+    <Compile Include="Patches\ShootNoisePatch.cs" />
     <Compile Include="Patches\AddComponentPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

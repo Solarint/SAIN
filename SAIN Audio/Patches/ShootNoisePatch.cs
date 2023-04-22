@@ -18,9 +18,7 @@ namespace SAIN.Audio.Patches
         public static void PatchPrefix(Player.FirearmController __instance, IWeapon weapon, BulletClass ammo)
         {
             Player playerInstance = AccessTools.FieldRefAccess<Player.FirearmController, Player>(__instance, "_player");
-
             GunshotRange playsound = new GunshotRange();
-
             playerInstance.StartCoroutine(playsound.OnMakingShotCoroutine(weapon, playerInstance, ammo));
         }
     }
@@ -45,18 +43,6 @@ namespace SAIN.Audio.Patches
                 ___float_0 = Time.time + 1f;
             }
 
-            return false;
-        }
-    }
-    public class HearingSensorDisablePatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(BotOwner)?.GetProperty("HearingSensor")?.PropertyType?.GetMethod("Init");
-        }
-        [PatchPrefix]
-        public static bool PatchPrefix()
-        {
             return false;
         }
     }

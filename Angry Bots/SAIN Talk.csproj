@@ -2,10 +2,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{89E1011E-37C3-4CF5-8128-8B6945360824}</ProjectGuid>
+    <ProjectGuid>{7B759B9D-0130-40AF-8AF1-D91C2088BA56}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <AssemblyName>SAIN-Combat</AssemblyName>
+    <AssemblyName>SAIN-Angry-Bots</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -48,19 +48,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>SAIN.Combat</RootNamespace>
+    <RootNamespace>Angry_Bots</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '3.5.5|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\3.5.5\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -85,10 +76,6 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="bsg.console.core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EscapeFromTarkov_Data\Managed\bsg.console.core.dll</HintPath>
-    </Reference>
     <Reference Include="Comfort, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Comfort.dll</HintPath>
@@ -97,6 +84,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\spt 3.5.4\EscapeFromTarkov_Data\Managed\Mono.Data.Sqlite.dll</HintPath>
@@ -141,29 +129,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestAudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -179,31 +147,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Properties\.vs\MyFirstPlugin\v16\.suo" />
     <None Include="Properties\.vs\slnx.sqlite" />
     <None Include="Properties\.vs\VSWorkspaceState.json" />
     <None Include="Properties\NuGet.Config" />
+    <None Include="README.md" />
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\RecoilScatterConfig.cs" />
-    <Compile Include="Components\WeaponInfo\WeaponInfoPatch.cs" />
-    <Compile Include="Patches\FiremodePatch.cs" />
-    <Compile Include="GClassReferences.cs" />
-    <Compile Include="Patches\RecoilPatch.cs" />
-    <Compile Include="Components\WeaponInfo\WeaponInfoComponent.cs" />
-    <Compile Include="Config\DebugConfigs.cs" />
-    <Compile Include="Config\AimConfig.cs" />
-    <Compile Include="Config\FullAutoConfig.cs" />
-    <Compile Include="Helpers\MathHelpers.cs" />
-    <Compile Include="Helpers\ShootHelpers.cs" />
-    <Compile Include="Helpers\FirerateHelpers.cs" />
-    <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
-    <Compile Include="Config\SemiAutoConfig.cs" />
-    <Compile Include="Helpers\DrawHelpers.cs" />
-    <Compile Include="Patches\BotGlobalSettingsPatch.cs" />
-    <Compile Include="Patches\RateofFirePatch.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Patch.cs" />
     <Compile Include="Plugin.cs" />
+    <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VersionChecker\TarkovVersion.cs" />
   </ItemGroup>
@@ -220,10 +174,6 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\..\..\BepInEx\plugins\$(SolutionName)\$(TargetName)-$(ConfigurationName).dll"
-
-copy "$(TargetPath)" "$(SolutionDir)Release\$(TargetName)\BepInEx\plugins\$(SolutionName)\$(TargetName)-$(ConfigurationName).dll"
-
-copy "$(TargetPath)" "$(SolutionDir)Release\$(SolutionName)-AIO\BepInEx\plugins\$(SolutionName)\$(TargetName)-$(ConfigurationName).dll"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\spt 3.5.5\BepInEx\plugins\SAIN\SAIN-Angry-Bots-3.5.5.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

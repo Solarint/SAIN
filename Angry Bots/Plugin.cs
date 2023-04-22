@@ -1,25 +1,24 @@
-﻿using BepInEx;
+﻿using SAIN_AngryBots.Config;
+using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Vision.Config;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Vision
+namespace SAIN_AngryBots
 {
-    [BepInPlugin("me.sol.sainvision", "SAIN Vision", "1.2")]
-    public class VisionPlugin : BaseUnityPlugin
+    [BepInPlugin("me.sol.sainangrybots", "SAIN Angry Bots", "1.0")]
+    public class AngryBotsPlugin : BaseUnityPlugin
     {
         private void Awake()
         {
             //CheckEftVersion();
-
-            VisionConfig.Init(Config);
+            AngryConfig.Init(Config);
 
             try
             {
-                new Patches.VisibleDistancePatch().Enable();
-                new Patches.GainSightPatch().Enable();
-                new Patches.VisionOverridesPatch().Enable();
+                new Patches.PlayerTalkPatch().Enable();
+                //new Patches.SetVisiblePatch().Enable();
+                new Patches.GlobalTalkSettingsPatch().Enable();
             }
             catch (Exception ex)
             {

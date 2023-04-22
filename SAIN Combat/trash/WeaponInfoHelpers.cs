@@ -5,7 +5,7 @@ using static SAIN.Combat.Configs.DebugConfig;
 
 namespace SAIN.Combat.Helpers
 {
-    public static class EquipmentModifiers
+    public static class WeaponInfoHelpers
     {
         // Calculates a modifier to apply to the bot when shooting for fire-rate, accuracy, and scatter
         public static float ShootModifier(Weapon weapon, WildSpawnType bottype, out float shootmodifier)
@@ -19,23 +19,23 @@ namespace SAIN.Combat.Helpers
 
             // Calculates and Applies Scaling
             WeaponClass(weapon.Template.weapClass, weapon.AmmoCaliber, out float classModifier);
-            classModifier = Scale(classModifier, 0f, 1f, 1 - classScaling, 1 + classScaling);
+            classModifier = Scaling(classModifier, 0f, 1f, 1 - classScaling, 1 + classScaling);
 
             // Calculates and Applies Scaling
             Recoil(weapon, out float recoilModifier);
-            recoilModifier = Scale(recoilModifier, 0f, 1f, 1 - recoilScaling, 1 + recoilScaling);
+            recoilModifier = Scaling(recoilModifier, 0f, 1f, 1 - recoilScaling, 1 + recoilScaling);
 
             // Calculates and Applies Scaling
             Ergo(weapon, out float ergoModifier);
-            ergoModifier = Scale(ergoModifier, 0f, 1f, 1 - ergoScaling, 1 + ergoScaling);
+            ergoModifier = Scaling(ergoModifier, 0f, 1f, 1 - ergoScaling, 1 + ergoScaling);
 
             // Calculates and Applies Scaling
             Ammo(weapon.CurrentAmmoTemplate.Caliber, out float ammoModifier);
-            ammoModifier = Scale(ammoModifier, 0f, 1f, 1 - ammoScaling, 1 + ammoScaling);
+            ammoModifier = Scaling(ammoModifier, 0f, 1f, 1 - ammoScaling, 1 + ammoScaling);
 
             // Calculates and Applies Scaling
             BotType(bottype, out float botTypeModifier);
-            botTypeModifier = Scale(botTypeModifier, 0f, 1f, 1 - botTypeScaling, 1 + botTypeScaling);
+            botTypeModifier = Scaling(botTypeModifier, 0f, 1f, 1 - botTypeScaling, 1 + botTypeScaling);
 
             // Final Modifier
             shootmodifier = classModifier * recoilModifier * ergoModifier * ammoModifier * botTypeModifier;
@@ -320,10 +320,9 @@ namespace SAIN.Combat.Helpers
         }
 
         // Scales numbers between 0 and 1 to specified ranges.
-        public static float Scale(float value, float inputMin, float inputMax, float outputMin, float outputMax)
+        public static float Scaling(float value, float inputMin, float inputMax, float outputMin, float outputMax)
         {
             return outputMin + (outputMax - outputMin) * ((value - inputMin) / (inputMax - inputMin));
         }
-
     }
 }

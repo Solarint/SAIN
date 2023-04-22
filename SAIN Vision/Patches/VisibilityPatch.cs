@@ -1,6 +1,5 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
-using EFT.Weather;
 using HarmonyLib;
 using SAIN.Vision.Helpers;
 using System;
@@ -13,16 +12,25 @@ namespace SAIN.Vision.Patches
     public class VisibleDistancePatch : ModulePatch
     {
         private static float DebugTimer = 0f;
+        private static PropertyInfo _LookSensor;
         private static PropertyInfo _clearVisibleDistProperty;
         private static PropertyInfo _visibleDistProperty;
+        private static PropertyInfo _HourServerProperty;
+
         protected override MethodBase GetTargetMethod()
         {
-            _clearVisibleDistProperty = AccessTools.Property(typeof(GClass550), "ClearVisibleDist");
-            _visibleDistProperty = AccessTools.Property(typeof(GClass550), "VisibleDist");
-            return AccessTools.Method(typeof(GClass550), "method_2");
+            _LookSensor = AccessTools.Property(typeof(BotOwner), "LookSensor");
+            Type lookSensorType = _LookSensor.PropertyType;
+
+            _clearVisibleDistProperty = lookSensorType.GetProperty("ClearVisibleDist");
+            _visibleDistProperty = lookSensorType.GetProperty("VisibleDist");
+            _HourServerProperty = lookSensorType.GetProperty("HourServer");
+
+            return AccessTools.Method(lookSensorType, "method_2");
         }
+
         [PatchPrefix]
-        public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_3, GClass550 __instance)
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_3, object __instance)
         {
             if (!EnableMod.Value)
             {
@@ -32,7 +40,6 @@ namespace SAIN.Vision.Patches
             if (___float_3 < Time.time)
             {
                 float timeMod = 1f;
-                float weatherMod = 1f;
 
                 // Checks to make sure a date and time is present
                 if (___botOwner_0.GameDateTime != null)
@@ -41,19 +48,17 @@ namespace SAIN.Vision.Patches
 
                     timeMod = Modifiers.Time.Visibilty(dateTime);
 
-                    __instance.HourServer = (int)((short)dateTime.Hour);
+                    // Set the value of the "HourServer" property to the hour from the DateTime object
+                    _HourServerProperty.SetValue(__instance, (int)((short)dateTime.Hour));
                 }
 
-                if (WeatherController.Instance?.WeatherCurve != null)
-                {
-                    weatherMod = Modifiers.Weather.Visibility();
-                }
+                float weatherMod = Modifiers.Weather.Visibility();
 
-                float MaxVision;
-                float currentVisionDistance;
                 float visdistcoef = ___botOwner_0.Settings.Current._visibleDistCoef;
                 float defaultvision = ___botOwner_0.Settings.Current.CurrentVisibleDistance;
 
+                float MaxVision;
+                float currentVisionDistance;
                 // User Toggle for if Global Fog is disabled
                 if (NoGlobalFog.Value)
                 {
@@ -86,17 +91,14 @@ namespace SAIN.Vision.Patches
                 float finalVisionDistance = currentVisionDistanceCapped * timeMod;
 
                 _clearVisibleDistProperty.SetValue(__instance, finalVisionDistance);
-
-                _visibleDistProperty.SetValue(__instance, ___botOwner_0.NightVision.UpdateVision(__instance.ClearVisibleDist));
-
-                _visibleDistProperty.SetValue(__instance, ___botOwner_0.BotLight.UpdateLightEnable(__instance.VisibleDist));
-
+                _visibleDistProperty.SetValue(__instance, ___botOwner_0.NightVision.UpdateVision(finalVisionDistance));
+                _visibleDistProperty.SetValue(__instance, ___botOwner_0.BotLight.UpdateLightEnable(finalVisionDistance));
 
                 // Log Everything!
                 if (DebugWeather.Value && DebugTimer < Time.time)
                 {
                     DebugTimer = Time.time + 5f;
-                    System.Console.WriteLine($"SAIN Weather: VisibleDist: [{__instance.VisibleDist}], ClearVisibleDist: [{__instance.ClearVisibleDist}]");
+                    System.Console.WriteLine($"SAIN Weather: VisibleDist: [{finalVisionDistance}]");
                 }
 
                 // Original Logic. Update Frequency - once a minute
@@ -108,10 +110,15 @@ namespace SAIN.Vision.Patches
     public class GainSightPatch : ModulePatch
     {
         //static float Timer = 0f;
+        private static PropertyInfo _GoalEnemy;
+
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass475), "method_7");
+            _GoalEnemy = AccessTools.Property(typeof(BotMemoryClass), "GoalEnemy");
+            Type goalEnemyType = _GoalEnemy.PropertyType;
+            return AccessTools.Method(goalEnemyType, "method_7");
         }
+
         [PatchPostfix]
         public static void PatchPostfix(ref float __result)
         {
@@ -120,11 +127,7 @@ namespace SAIN.Vision.Patches
                 return;
             }
 
-            float weatherModifier = 1f;
-            if (WeatherController.Instance?.WeatherCurve != null)
-            {
-                weatherModifier = Modifiers.Weather.Visibility();
-            }
+            float weatherModifier = Modifiers.Weather.Visibility();
 
             float inverseMod = Mathf.Sqrt(2f - weatherModifier);
 
@@ -139,8 +142,9 @@ namespace SAIN.Vision.Patches
         {
             return AccessTools.Method(typeof(BotGlobalLookData), "Update");
         }
+
         [PatchPostfix]
-        public static void PatchPostfix(ref BotGlobalLookData __instance)
+        public static void PatchPostfix(BotGlobalLookData __instance)
         {
             if (!EnableMod.Value)
             {

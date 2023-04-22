@@ -1,13 +1,36 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using Aki.Reflection.Patching;
+using ChatShared;
+using Comfort.Common;
 using EFT;
+using EFT.Communications;
+using EFT.HandBook;
+using EFT.Interactive;
+using EFT.InventoryLogic;
+using EFT.Weather;
+using HarmonyLib;
+using JetBrains.Annotations;
+using SAIN.Config;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.Networking;
+using System.Collections;
 
-namespace SAIN.Combat.Helpers
+namespace SAIN.Helpers
 {
     public class DebugDrawer : MonoBehaviour
     {
         private class TempCoroutineRunner : MonoBehaviour { }
-        private static void DestroyAfterDelay(GameObject obj, float delay)
+        public static void DestroyAfterDelay(GameObject obj, float delay)
         {
             if (obj != null)
             {
@@ -29,7 +52,7 @@ namespace SAIN.Combat.Helpers
             }
         }
 
-        public static GameObject Sphere(Vector3 position, float size, Color color, float expiretime)
+        public static GameObject Sphere(Vector3 position, float size, Color color)
         {
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             sphere.GetComponent<Renderer>().material.color = color;
@@ -37,12 +60,10 @@ namespace SAIN.Combat.Helpers
             sphere.transform.position = new Vector3(position.x, position.y, position.z); ;
             sphere.transform.localScale = new Vector3(size, size, size);
 
-            DestroyAfterDelay(sphere, expiretime);
-
             return sphere;
         }
 
-        public static GameObject Line(Vector3 startPoint, Vector3 endPoint, float lineWidth, Color color, float expiretime)
+        public static GameObject Line(Vector3 startPoint, Vector3 endPoint, float lineWidth, Color color)
         {
             var lineObject = new GameObject();
             var lineRenderer = lineObject.AddComponent<LineRenderer>();
@@ -56,23 +77,7 @@ namespace SAIN.Combat.Helpers
             lineRenderer.SetPosition(0, startPoint);
             lineRenderer.SetPosition(1, endPoint);
 
-            DestroyAfterDelay(lineObject, expiretime);
-
             return lineObject;
-        }
-        public static void DrawAimLine(BotOwner bot, Vector3 recoilvector, Color linecolor, float linewidth, Color spherecolor, float sphereradius, float expiretime)
-        {
-            GameObject lineObject = new GameObject();
-
-            GameObject sphereObject = Sphere(bot.AimingData.RealTargetPoint + recoilvector, sphereradius, spherecolor, expiretime);
-
-            GameObject lineObjectSegment = Line(bot.WeaponRoot.position, bot.AimingData.RealTargetPoint + recoilvector, linewidth, linecolor, expiretime);
-
-            lineObjectSegment.transform.parent = lineObject.transform;
-
-            sphereObject.transform.parent = lineObject.transform;
-
-            DestroyAfterDelay(lineObject, expiretime);
         }
     }
 }

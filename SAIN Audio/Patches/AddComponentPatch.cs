@@ -23,4 +23,16 @@ namespace SAIN.Audio.Patches
             }
         }
     }
+    public class HearingSensorDisablePatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("HearingSensor")?.PropertyType?.GetMethod("Init");
+        }
+        [PatchPrefix]
+        public static bool PatchPrefix()
+        {
+            return false;
+        }
+    }
 }

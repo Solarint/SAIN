@@ -8,9 +8,6 @@ namespace SAIN.Movement.Config
         public static ConfigEntry<bool> DebugLean { get; private set; }
         //public static ConfigEntry<bool> DebugDoor { get; private set; }
         public static ConfigEntry<bool> DebugNavMesh { get; private set; }
-        public static ConfigEntry<bool> DebugBurst { get; private set; }
-        public static ConfigEntry<bool> DebugFire { get; private set; }
-        public static ConfigEntry<bool> DebugShootHelpers { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
@@ -26,21 +23,6 @@ namespace SAIN.Movement.Config
                 "Lean", false, new ConfigDescription(
                     "", null, new ConfigurationManagerAttributes
                     { IsAdvanced = true, Order = 10 }));
-
-            DebugBurst = Config.Bind(debugmode,
-                "Burst Length", false, new ConfigDescription(
-                    "", null, new ConfigurationManagerAttributes
-                    { IsAdvanced = true, Order = 8 }));
-
-            DebugFire = Config.Bind(debugmode,
-                "Firerate", false, new ConfigDescription(
-                    "", null, new ConfigurationManagerAttributes
-                    { IsAdvanced = true, Order = 7 }));
-
-            DebugShootHelpers = Config.Bind(debugmode,
-                "Weapon Helpers", false, new ConfigDescription(
-                    "Recoil and Ergo Modifiers Calculations", null, new ConfigurationManagerAttributes
-                    { IsAdvanced = true, Order = 6 }));
 
             DebugNavMesh = Config.Bind(debugmode,
                 "Draw Corners",

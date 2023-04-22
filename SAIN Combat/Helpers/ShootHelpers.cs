@@ -2,13 +2,13 @@
 using EFT.InventoryLogic;
 using SAIN.Combat.Components;
 using UnityEngine;
-using static SAIN.Combat.Configs.Firerate;
+using static SAIN.Combat.Configs.SemiAutoConfig;
 using static SAIN.Combat.Configs.FullAutoConfig;
-using static SAIN.Combat.Configs.AimingConfig;
+using static SAIN.Combat.Configs.RecoilScatterConfig;
 
 namespace SAIN.Combat.Helpers
 {
-    public class ShootPatchHelpers
+    public class Shoot
     {
         public static float SemiAutoROF(float EnemyDistance, float permeter, Weapon.EFireMode firemode)
         {
@@ -35,7 +35,7 @@ namespace SAIN.Combat.Helpers
             if (!SimpleModeBurst.Value)
             {
                 WeaponInfo weaponinfo = bot.gameObject.GetComponent<WeaponInfo>();
-                modifier = weaponinfo.ShootModifier;
+                modifier = weaponinfo.FinalModifier;
             }
 
             float k = 0.08f * modifier; // How fast for the burst length to falloff with distance
@@ -48,29 +48,37 @@ namespace SAIN.Combat.Helpers
 
             return scaledDistance * BurstLengthModifier.Value;
         }
-        public static Vector3 Recoil(Vector3 targetpoint, float recoiltotal, float modifier)
+        public static Vector3 Recoil(Vector3 targetpoint, float horizrecoil, float vertrecoil, float modifier, float distance)
         {
-            float vertRecoil = 0.5f * modifier + AddRecoil.Value;
-            float horizRecoil = 0.5f * modifier + AddRecoil.Value;
-            float maxrecoil = MaxScatter.Value;
+            // Reduces scatter recoil at very close range. Clamps distance between 3 and 20 then scale to 0.25 to 1.
+            // So if a target is 3m or less distance, their recoil scaling will be 25% its original value
+            distance = Mathf.Clamp(distance, 3f, 20f);
+            distance = distance / 20f;
+            distance = distance * 0.75f + 0.25f;
+
+            float weaponhorizrecoil = (horizrecoil / 300f) * modifier;
+            float weaponvertrecoil = (vertrecoil / 300f) * modifier;
+
+            float horizRecoil = (1f * weaponhorizrecoil + AddRecoil.Value) * distance;
+            float vertRecoil = (1f * weaponvertrecoil + AddRecoil.Value) * distance;
+
+            float maxrecoil = MaxScatter.Value * distance;
 
             float randomHorizRecoil = UnityEngine.Random.Range(-horizRecoil, horizRecoil);
             float randomvertRecoil = UnityEngine.Random.Range(-vertRecoil, vertRecoil);
 
-            targetpoint = Vector3.Lerp(Vector3.zero, targetpoint, 0.66f);
             Vector3 vector = new Vector3(targetpoint.x + randomHorizRecoil, targetpoint.y + randomvertRecoil, targetpoint.z + randomHorizRecoil);
             Vector3 clamped = new Vector3(Mathf.Clamp(vector.x, -maxrecoil, maxrecoil), Mathf.Clamp(vector.y, -maxrecoil, maxrecoil), Mathf.Clamp(vector.z, -maxrecoil, maxrecoil));
 
             return clamped;
         }
-
-        public static float FullAutoROF(int bFirerate)
+        public static float FullAutoTimePerShot(int bFirerate)
         {
-            float roundspersecond = bFirerate / 60f;
+            float roundspersecond = bFirerate / 60;
 
-            float roundspermilsec = roundspersecond / 1000f;
+            float secondsPerShot = 1f / roundspersecond;
 
-            return roundspermilsec;
+            return secondsPerShot;
         }
         public static float InverseScaleWithLogisticFunction(float originalValue, float k, float x0 = 20f)
         {

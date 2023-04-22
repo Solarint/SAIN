@@ -52,16 +52,18 @@ namespace SAIN.Movement.Components
                     {
                         StartCoroutine(ResetLeanAfterDuration(Random.Range(1f, 1.5f)));
                         resetTime = Time.time + Random.Range(1f, 1.5f);
+                        yield return new WaitForSeconds(0.1f);
                     }
                 }
 
-                if (ShouldILean)
+                if (ShouldILean && !ShouldIReset)
                 {
                     StartCoroutine(ExecuteLean());
+                    yield return new WaitForSeconds(0.5f);
                 }
 
                 // Overall Check Frequency
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.1f);
             }
         }
 
@@ -70,7 +72,6 @@ namespace SAIN.Movement.Components
         {
             get
             {
-                // Makes sure the bot is active before sending lean commands
                 if (bot?.BotState != EBotState.Active) return false;
 
                 if (!ScavDodgeToggle.Value && bot.IsRole(WildSpawnType.assault)) return false;
@@ -126,7 +127,7 @@ namespace SAIN.Movement.Components
                 System.Console.WriteLine($"{bot.name} Leaned. Leaned Right? [{right}] because [{Angle}]");
             }
 
-            yield return new WaitForSeconds(0.1f);
+            yield return null;
         }
 
         // Resets Lean
@@ -159,7 +160,7 @@ namespace SAIN.Movement.Components
             BotOwner bot = this.bot;
             angle = 0f;
 
-            if (Calculate(out Vector3 leancorner1, out Vector3 leancorner2, out Vector3 normal, 50f))
+            if (Calculate(out Vector3 leancorner1, out Vector3 leancorner2, out Vector3 normal, 10f))
             {
                 angle = Vector3.SignedAngle(leancorner1, leancorner2, Vector3.up);
 
