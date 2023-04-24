@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+﻿using EFT;
 using System.Collections;
-using EFT;
+using UnityEngine;
 
 namespace SAIN.Combat.Helpers
 {

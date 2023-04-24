@@ -396,8 +396,8 @@ namespace SAIN.Movement.Components
             {
                 System.Console.WriteLine($"NavMesh FindLeanCorners: Success! Drawing Red Sphere at corner 1 and blue Sphere at corner 2");
 
-                Draw.Sphere(allcorners[1], 0.2f, Color.red);
-                Draw.Sphere(allcorners[2], 0.2f, Color.blue);
+                DebugDrawer.Sphere(allcorners[1], 0.2f, Color.red, 3f);
+                DebugDrawer.Sphere(allcorners[2], 0.2f, Color.blue, 3f);
             }
 
             Vector3 A = allcorners[0];

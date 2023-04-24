@@ -154,6 +154,8 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Talk\TalkComponent.cs" />
+    <Compile Include="Components\Talk\TalkPatch.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Patch.cs" />
     <Compile Include="Plugin.cs" />

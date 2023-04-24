@@ -1,9 +1,9 @@
-﻿using Comfort.Common;
+﻿using BepInEx.Logging;
+using Comfort.Common;
 using EFT;
 using SAIN.Audio.Helpers;
 using System;
 using UnityEngine;
-using BepInEx.Logging;
 using static SAIN.Audio.Configs.SoundConfig;
 
 namespace SAIN.Audio.Components
@@ -68,19 +68,14 @@ namespace SAIN.Audio.Components
 
             if (player != null)
             {
-                //if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard a sound");
-                // Makes sure bots aren't reacting to their own sounds
                 if (botOwner_0.GetPlayer == player.GetPlayer)
                 {
-                    //if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard their own sound");
                     return;
                 }
 
-                // Checks if a sound is within audible range.
-                bool wasHeard = DoIHearSound(player, position, power, type, out float distance);
+                bool wasHeard = DoIHearSound(player, position, power, type, out float distance, true);
                 if (!wasHeard)
                 {
-                    //if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} is out of range of sound");
                     return;
                 }
 
@@ -98,7 +93,7 @@ namespace SAIN.Audio.Components
                 }
 
                 // Checks the sound again after applying modifiers
-                wasHeard = DoIHearSound(player, position, power, type, out distance);
+                wasHeard = DoIHearSound(player, position, power, type, out distance, false);
                 if (!wasHeard)
                 {
                     if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard a sound since they are in a state where its harder to hear, they didn't notice it");
@@ -156,6 +151,7 @@ namespace SAIN.Audio.Components
                 ReactToSound(null, position, distance, distance < power, type);
             }
         }
+        private float HeardSoundTime = 0f;
         private void ReactToSound(IAIDetails enemy, Vector3 pos, float power, bool wasHeard, AISoundType type)
         {
             if (botOwner_0.IsDead)
@@ -164,6 +160,7 @@ namespace SAIN.Audio.Components
             }
 
             bool hasenemy = enemy != null;
+            var goalEnemy = botOwner_0.Memory.GoalEnemy;
 
             if (hasenemy && enemy.AIData.IsAI && botOwner_0.BotsGroup.Contains(enemy.AIData.BotOwner))
             {
@@ -171,36 +168,44 @@ namespace SAIN.Audio.Components
             }
 
             float bulletfeeldistance = 500f;
-            Vector3 bulletPos = botOwner_0.Transform.position - pos;
-            float bulletDistance = bulletPos.magnitude;
-            bool gunsound = type == AISoundType.gun || type == AISoundType.silencedGun;
-            bool bulletfelt = bulletDistance < bulletfeeldistance;
-            float bulletclosedistance = 5f;
+            Vector3 shotPosition = botOwner_0.Transform.position - pos;
+            float shooterDistance = shotPosition.magnitude;
+            bool isGunSound = type == AISoundType.gun || type == AISoundType.silencedGun;
+            bool bulletfelt = shooterDistance < bulletfeeldistance;
 
             if (wasHeard)
             {
                 try
                 {
-                    if (type == AISoundType.step && botOwner_0.Memory?.GoalEnemy?.IsVisible == false && botOwner_0.Memory?.GoalEnemy?.PersonalLastSeenTime < Time.time + 5f)
+                    if (!isGunSound && HeardSoundTime < Time.time && (goalEnemy != null || botOwner_0.Memory?.GoalEnemy?.PersonalLastSeenTime < Time.time + 15f))
                     {
-                        if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard a footstep");
-
-                        botOwner_0.BotTalk.Say(EPhraseTrigger.NoisePhrase, false, ETagStatus.Combat);
+                        if (UnityEngine.Random.value < 0.1f)
+                        {
+                            HeardSoundTime = Time.time + 20f;
+                            botOwner_0.BotTalk.Say(EPhraseTrigger.Rat, false, ETagStatus.Combat);
+                        }
+                        else if (UnityEngine.Random.value < 0.25f && goalEnemy == null)
+                        {
+                            HeardSoundTime = Time.time + 20f;
+                            botOwner_0.BotTalk.Say(EPhraseTrigger.NoisePhrase, false, ETagStatus.Combat);
+                        }
+                        else if (UnityEngine.Random.value < 0.1f && goalEnemy == null)
+                        {
+                            HeardSoundTime = Time.time + 20f;
+                            botOwner_0.BotTalk.Say(EPhraseTrigger.Silence, false, ETagStatus.Combat);
+                        }
                     }
                 }
-                catch
-                {
-                    Logger.LogError($"{botOwner_0.name} heard a footstep - ERROR");
-                }
+                catch { }
 
                 float dispersion;
                 if (type != AISoundType.step && type - AISoundType.silencedGun <= 1)
                 {
-                    dispersion = bulletDistance / 100f;
+                    dispersion = shooterDistance / 100f;
                 }
                 else
                 {
-                    dispersion = bulletDistance / 50f;
+                    dispersion = shooterDistance / 50f;
                 }
                 float num2 = MathHelpers.Random(-dispersion, dispersion);
                 float num3 = MathHelpers.Random(-dispersion, dispersion);
@@ -210,13 +215,9 @@ namespace SAIN.Audio.Components
                 try
                 {
                     var placeForChecktest = botOwner_0.BotsGroup.AddPointToSearch(vector, power, botOwner_0, true);
+                    botOwner_0.BotTalk.TrySay(EPhraseTrigger.Attention);
                 }
-                catch
-                {
-                    Logger.LogError($"{botOwner_0.name} placeForCheck - ERROR");
-                }
-
-                var placeForCheck = botOwner_0.BotsGroup.AddPointToSearch(vector, power, botOwner_0, true);
+                catch { }
 
                 if (DebugSolarintSound.Value)
                 {
@@ -225,38 +226,54 @@ namespace SAIN.Audio.Components
                     DebugDrawer.Sphere(vector, 0.1f, Color.white, 2f);
                 }
 
-                if (bulletDistance < botOwner_0.Settings.FileSettings.Hearing.RESET_TIMER_DIST)
+                if (shooterDistance < botOwner_0.Settings.FileSettings.Hearing.RESET_TIMER_DIST)
                 {
                     botOwner_0.LookData.ResetUpdateTime();
                 }
 
                 //OnEnemySounHearded?.Invoke(vector, bulletDistance, type);
 
-                if (hasenemy && bulletfelt && gunsound)
+                if (hasenemy && bulletfelt && isGunSound)
                 {
-                    if (bulletDistance >= 20f && !IsShotFiredatMe(bulletPos.magnitude, enemy.LookDirection, bulletPos))
+                    if (shooterDistance >= 20f && !IsShotFiredatMe(shotPosition.magnitude, enemy.LookDirection, shotPosition))
                     {
                         if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard gunshot but it was far and not fired at them.");
 
-                        botOwner_0.Memory.SetPanicPoint(placeForCheck, false);
+                        try
+                        {
+                            var placeForCheck = botOwner_0.BotsGroup.AddPointToSearch(pos, power, botOwner_0, true);
+                            botOwner_0.Memory.SetPanicPoint(placeForCheck, false);
+                        }
+                        catch { }
                     }
                     else
                     {
                         Vector3 to = pos + enemy.LookDirection;
                         bool soundclose = IsSoundClose(pos, to, 20f);
-                        botOwner_0.Memory.SetPanicPoint(placeForCheck, soundclose);
 
-                        if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard a gunshot fired at them!");
+                        try
+                        {
+                            var placeForCheck = botOwner_0.BotsGroup.AddPointToSearch(pos, power, botOwner_0, true);
+                            botOwner_0.Memory.SetPanicPoint(placeForCheck, soundclose);
+                        }
+                        catch { }
 
                         if (soundclose)
                         {
+
                             if (botOwner_0.Memory.IsInCover) botOwner_0.Memory.BotCurrentCoverInfo.AddShootDirection();
 
-                            botOwner_0.Memory.SetUnderFire();
+                            try
+                            {
+                                botOwner_0.Memory.SetUnderFire();
 
-                            if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} is under fire!");
+                                botOwner_0.BotTalk.Say(EPhraseTrigger.UnderFire, true, ETagStatus.Combat);
 
-                            if (bulletDistance > 80f) botOwner_0.BotTalk.Say(EPhraseTrigger.SniperPhrase, false, null);
+                                if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} is under fire!");
+                            }
+                            catch { }
+
+                            if (shooterDistance > 80f) botOwner_0.BotTalk.Say(EPhraseTrigger.SniperPhrase, false, null);
                         }
                     }
                 }
@@ -270,17 +287,21 @@ namespace SAIN.Audio.Components
                     return;
                 }
             }
-            else if (gunsound && bulletfelt && hasenemy)
+            else if (isGunSound && bulletfelt && hasenemy)
             {
                 Vector3 to2 = pos + enemy.LookDirection;
                 if (IsSoundClose(pos, to2, 20f))
                 {
                     if (botOwner_0.Memory.IsInCover) botOwner_0.Memory.Spotted(false, null, null);
 
-                    GClass270 placeForCheck2 = botOwner_0.BotsGroup.AddPointToSearch(pos, power, botOwner_0, true);
-                    botOwner_0.Memory.SetPanicPoint(placeForCheck2, false);
+                    try
+                    {
+                        var placeForCheck2 = botOwner_0.BotsGroup.AddPointToSearch(pos, power, botOwner_0, true);
+                        botOwner_0.Memory.SetPanicPoint(placeForCheck2, false);
 
-                    if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard a close gunshot!");
+                        if (DebugSolarintSound.Value) Logger.LogDebug($"{botOwner_0.name} heard a close gunshot!");
+                    }
+                    catch { }
                 }
             }
         }
@@ -375,7 +396,7 @@ namespace SAIN.Audio.Components
         /// <param name="type">AISoundType</param>
         /// <param name="distance">Distance to the enemy if sound was heard</param>
         /// <returns></returns>
-        public bool DoIHearSound(IAIDetails enemy, Vector3 position, float power, AISoundType type, out float distance)
+        public bool DoIHearSound(IAIDetails enemy, Vector3 position, float power, AISoundType type, out float distance, bool withOcclusionCheck)
         {
             /// Returns true if sound is heard
             // he dead bro
@@ -390,14 +411,14 @@ namespace SAIN.Audio.Components
             // Is sound within hearing distance at all?
             if (distance < power)
             {
+                if (!withOcclusionCheck)
+                {
+                    return distance < power;
+                }
                 // if so, is sound blocked by obstacles?
                 if (OcclusionCheck(enemy, position, power, distance, type, out float occludedpower))
                 {
-                    // With obstacles taken into account, is the sound still audible?
-                    distance = (botOwner_0.Transform.position - position).magnitude;
-                    bool soundheard = distance < occludedpower;
-
-                    return soundheard;
+                    return distance < occludedpower;
                 }
             }
 

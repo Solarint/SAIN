@@ -17,7 +17,8 @@ namespace SAIN.Flashlights
 
             try
             {
-                new Patches.FlashLightDazzle().Enable();
+                new Patches.DazzlePatch().Enable();
+                new Patches.AddComponentPatch().Enable();
             }
             catch (Exception ex)
             {

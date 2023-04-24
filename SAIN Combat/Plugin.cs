@@ -1,7 +1,7 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using Solarint.VersionCheck;
 using SAIN.Combat.Configs;
+using Solarint.VersionCheck;
 using System;
 using System.Diagnostics;
 

@@ -1,9 +1,8 @@
 ﻿using EFT;
-using System;
 using System.Collections;
 using UnityEngine;
 
-namespace SAIN.Movement.Helpers
+namespace SAIN.Flashlights.Helpers
 {
     public class DebugDrawer : MonoBehaviour
     {
@@ -29,6 +28,7 @@ namespace SAIN.Movement.Helpers
                 Destroy(runner.gameObject);
             }
         }
+
         public static GameObject Sphere(Vector3 position, float size, Color color, float expiretime)
         {
             var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -41,6 +41,7 @@ namespace SAIN.Movement.Helpers
 
             return sphere;
         }
+
         public static GameObject Line(Vector3 startPoint, Vector3 endPoint, float lineWidth, Color color, float expiretime)
         {
             var lineObject = new GameObject();

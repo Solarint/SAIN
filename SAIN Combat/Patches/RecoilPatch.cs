@@ -4,13 +4,13 @@ using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Combat.Components;
 using SAIN.Combat.Helpers;
-using System.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
-using static SAIN.Combat.Configs.RecoilScatterConfig;
 using static SAIN.Combat.Configs.DebugConfig;
+using static SAIN.Combat.Configs.RecoilScatterConfig;
 
 namespace SAIN.Combat.Patches
 {

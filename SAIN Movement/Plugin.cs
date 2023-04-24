@@ -24,7 +24,9 @@ namespace SAIN.Movement
                 new Patches.BotGlobalsMindSettingsPatch().Enable();
 
                 new Patches.MovementSpeed().Enable();
-                new Patches.DodgePatch().Enable();
+                new Patches.DogFight.Fight().Enable();
+                //new Patches.DogFight.ManualUpdate().Enable();
+                //new Patches.DogFight.Start().Enable();
 
                 //new Patches.CoverPatch().Enable();
                 //new Patches.DoorPatch().Enable();

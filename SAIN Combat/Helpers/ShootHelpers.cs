@@ -2,9 +2,9 @@
 using EFT.InventoryLogic;
 using SAIN.Combat.Components;
 using UnityEngine;
-using static SAIN.Combat.Configs.SemiAutoConfig;
 using static SAIN.Combat.Configs.FullAutoConfig;
 using static SAIN.Combat.Configs.RecoilScatterConfig;
+using static SAIN.Combat.Configs.SemiAutoConfig;
 
 namespace SAIN.Combat.Helpers
 {

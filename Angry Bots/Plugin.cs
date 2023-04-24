@@ -1,6 +1,6 @@
-﻿using SAIN_AngryBots.Config;
-using BepInEx;
+﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
+using SAIN_AngryBots.Config;
 using System;
 using System.Diagnostics;
 

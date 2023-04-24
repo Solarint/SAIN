@@ -200,10 +200,10 @@
     <Compile Include="Components\MovementComponent.cs" />
     <Compile Include="Helpers\DrawHelpers.cs" />
     <Compile Include="Patches\CoverPatch.cs" />
-    <Compile Include="Patches\DogfighterPatch.cs" />
+    <Compile Include="Patches\MovementPatch.cs" />
     <Compile Include="Patches\DoorPatch.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
-    <Compile Include="Patches\DodgePatch.cs" />
+    <Compile Include="Patches\DogFightPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VersionChecker\TarkovVersion.cs" />

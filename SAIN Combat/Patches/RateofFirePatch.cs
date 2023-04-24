@@ -7,8 +7,8 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Combat.Configs.DebugConfig;
-using static SAIN.Combat.Configs.SemiAutoConfig;
 using static SAIN.Combat.Configs.FullAutoConfig;
+using static SAIN.Combat.Configs.SemiAutoConfig;
 using static SAIN.Combat.Helpers.Shoot;
 
 namespace SAIN.Combat.Patches
