@@ -48,14 +48,9 @@ namespace SAIN_Audio.Combat.Patches
     }
     public class SemiAutoPatch : ModulePatch
     {
-        private static PropertyInfo _WeaponManagerPI;
-        private static PropertyInfo _WeaponAIPresetPI;
-
         protected override MethodBase GetTargetMethod()
         {
-            _WeaponManagerPI = AccessTools.Property(typeof(BotOwner), "WeaponManager");
-            _WeaponAIPresetPI = AccessTools.Property(_WeaponManagerPI.PropertyType, "WeaponAIPreset");
-            return AccessTools.Method(_WeaponAIPresetPI.PropertyType, "method_1");
+            return AccessTools.Method(typeof(GClass363), "method_1");
         }
 
         [PatchPrefix]

@@ -8,12 +8,12 @@ using UnityEngine;
 using UnityEngine.AI;
 using static SAIN_Audio.Movement.Config.DebugConfig;
 using static SAIN_Audio.Movement.Config.DogFighterConfig;
+using SAIN_Helpers;
 
 namespace SAIN_Audio.Movement.Patches
 {
     public class DogFight
     {
-        private static Type _DogFightType;
         public class Start : ModulePatch
         {
             private static PropertyInfo _DogFightProperty;
@@ -21,11 +21,12 @@ namespace SAIN_Audio.Movement.Patches
             protected override MethodBase GetTargetMethod()
             {
                 _DogFightProperty = AccessTools.Property(typeof(BotOwner), "DogFight");
-                _DogFightType = _DogFightProperty.PropertyType;
 
-                _DogFightState = AccessTools.PropertySetter(_DogFightType, "DogFightState");
-                return AccessTools.Method(_DogFightType, "ShallStartCauseHavePlace");
+                _DogFightState = AccessTools.PropertySetter(_DogFightProperty.PropertyType, "DogFightState");
+
+                return AccessTools.Method(_DogFightProperty.PropertyType, "ShallStartCauseHavePlace");
             }
+
             [PatchPrefix]
             public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref NavMeshPath ___navMeshPath_0)
             {
@@ -48,9 +49,10 @@ namespace SAIN_Audio.Movement.Patches
             protected override MethodBase GetTargetMethod()
             {
                 _DogFightProperty = AccessTools.Property(typeof(BotOwner), "DogFight");
-                _DogFightType = _DogFightProperty.PropertyType;
-                _DogFightState = AccessTools.PropertySetter(_DogFightType, "DogFightState");
-                return AccessTools.Method(_DogFightType, "ManualUpdate");
+
+                _DogFightState = AccessTools.PropertySetter(_DogFightProperty.PropertyType, "DogFightState");
+
+                return AccessTools.Method(_DogFightProperty.PropertyType, "ManualUpdate");
             }
             [PatchPrefix]
             public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref NavMeshPath ___navMeshPath_0, ref float ___float_2)
@@ -115,9 +117,10 @@ namespace SAIN_Audio.Movement.Patches
             protected override MethodBase GetTargetMethod()
             {
                 _DogFightProperty = AccessTools.Property(typeof(BotOwner), "DogFight");
-                _DogFightType = _DogFightProperty.PropertyType;
-                _DogFightState = AccessTools.PropertySetter(_DogFightType, "DogFightState");
-                return AccessTools.Method(_DogFightType, "Fight");
+
+                _DogFightState = AccessTools.PropertySetter(_DogFightProperty.PropertyType, "DogFightState");
+
+                return AccessTools.Method(_DogFightProperty.PropertyType, "Fight");
             }
             [PatchPrefix]
             public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_1, ref bool ___bool_0, ref NavMeshPath ___navMeshPath_0)
@@ -192,7 +195,7 @@ namespace SAIN_Audio.Movement.Patches
         // Method_1
         public static bool Backup(BotOwner bot, NavMeshPath navMeshPath_0, out Vector3 trgPos)
         {
-            Vector3 a = -NormalizeFastSelf(bot.Memory.GoalEnemy.Direction);
+            Vector3 a = -SAIN_Math.NormalizeFastSelf(bot.Memory.GoalEnemy.Direction);
             trgPos = Vector3.zero;
             float num = 0f;
             NavMeshHit navMeshHit;
@@ -222,14 +225,6 @@ namespace SAIN_Audio.Movement.Patches
                 }
             }
             return false;
-        }
-        public static Vector3 NormalizeFastSelf(Vector3 v)
-        {
-            float num = (float)Math.Sqrt((double)(v.x * v.x + v.y * v.y + v.z * v.z));
-            v.x /= num;
-            v.y /= num;
-            v.z /= num;
-            return v;
         }
     }
 }

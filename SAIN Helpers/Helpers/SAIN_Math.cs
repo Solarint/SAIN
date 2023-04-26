@@ -10,7 +10,7 @@ using UnityEngine.AI;
 
 namespace SAIN_Helpers
 {
-    public static class Math
+    public static class SAIN_Math
     {
         /// <summary>
         /// Calculates the inverse of a value using a logistic function.
@@ -1057,7 +1057,7 @@ namespace SAIN_Helpers
         /// <param name="n">The Vector3 to rotate.</param>
         /// <param name="side">The direction to rotate.</param>
         /// <returns>The rotated Vector3.</returns>
-        public static Vector3 Rotate90(Vector3 n, Math.SideTurn side)
+        public static Vector3 Rotate90(Vector3 n, SAIN_Math.SideTurn side)
         {
             if (side == SideTurn.left)
             {

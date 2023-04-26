@@ -13,18 +13,23 @@ namespace SAIN_Audio.Combat.Patches
 {
     public class AimOffsetPatch : ModulePatch
     {
-        private static PropertyInfo _AimingDataPI;
 
         protected override MethodBase GetTargetMethod()
         {
-            _AimingDataPI = AccessTools.Property(typeof(BotOwner), "AimingData");
-            return AccessTools.Method(_AimingDataPI.PropertyType, "method_13");
+            // Note: Can't find this based on the property type of AimingData? Is this because of it being an interface?
+            return AccessTools.Method(typeof(GClass544), "method_13");
         }
 
         [PatchPrefix]
         public static bool PatchPrefix(GClass544 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
-            __instance.EndTargetPoint = __instance.RealTargetPoint + ___vector3_5 + ___float_13 * (___vector3_4 + (___botOwner_0.RecoilData.RecoilOffset * ScatterMultiplier.Value));
+            __instance.EndTargetPoint = __instance.RealTargetPoint 
+                + ___vector3_5 
+                + ___float_13 
+
+                * (___vector3_4 
+                + (___botOwner_0.RecoilData.RecoilOffset 
+                * ScatterMultiplier.Value));
 
             return false;
         }
