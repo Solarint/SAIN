@@ -3,15 +3,12 @@ using EFT;
 using System;
 using UnityEngine;
 using static SAIN_Flashlights.Config.DazzleConfig;
+using SAIN_Helpers;
 
 namespace SAIN_Flashlights.Helpers
 {
     public class FlashLight
     {
-        private GameObject _flashlight;
-
-        private GameObject[] _modes;
-
         protected static ManualLogSource Logger { get; private set; }
 
         /// <summary>
@@ -34,20 +31,20 @@ namespace SAIN_Flashlights.Helpers
                 {
                     if (!Physics.Raycast(weaponRoot, (position - weaponRoot).normalized, (position - weaponRoot).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                     {
+                        DebugDraw(weaponRoot, position);
+
                         if (SillyMode.Value)
                         {
-                            NonStaticHelpers voice = new NonStaticHelpers();
-                            voice.FunnyMode(bot, position);
+                            FunnyHelpers.FunnyMode(bot, position);
                             return;
                         }
 
                         float gainSight = GetGainSightModifier(enemyDist);
 
                         float dazzlemodifier = 1f;
+
                         if (enemyDist < MaxDazzleRange.Value)
-                        {
                             dazzlemodifier = GetDazzleModifier(bot, person);
-                        }
 
                         ApplyDazzle(dazzlemodifier, gainSight, bot);
 
@@ -77,8 +74,7 @@ namespace SAIN_Flashlights.Helpers
                     {
                         if (SillyMode.Value)
                         {
-                            NonStaticHelpers voice = new NonStaticHelpers();
-                            voice.FunnyMode(bot, position);
+                            FunnyHelpers.FunnyMode(bot, position);
                             return;
                         }
 
@@ -130,13 +126,13 @@ namespace SAIN_Flashlights.Helpers
         /// <param name="position">The position of the enemy.</param>
         /// <param name="weaponRoot">The weapon root of the enemy.</param>
         /// <param name="enemylookatme">Whether the enemy is looking at the player.</param>
-        private static void DebugDraw(Vector3 position, Vector3 weaponRoot, bool enemylookatme)
+        private static void DebugDraw(Vector3 position, Vector3 weaponRoot)
         {
-            if (DebugFlash.Value && enemylookatme)
+            if (DebugFlash.Value)
             {
-                DebugDrawer.Sphere(position - weaponRoot, 0.05f, Color.white, 1f);
-                DebugDrawer.Line(position, weaponRoot, 0.01f, Color.green, 1f);
-                DebugDrawer.Line(weaponRoot, position, 0.01f, Color.red, 1f);
+                SAIN_Helpers.DebugDrawer.Sphere(position - weaponRoot, 0.05f, Color.white, 1f);
+                SAIN_Helpers.DebugDrawer.Line(position, weaponRoot, 0.01f, Color.green, 1f);
+                SAIN_Helpers.DebugDrawer.Line(weaponRoot, position, 0.01f, Color.red, 1f);
             }
         }
 
@@ -150,17 +146,22 @@ namespace SAIN_Flashlights.Helpers
         {
             GClass557 modif = new GClass557
             {
-                PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 2f) * Effectiveness.Value,
-                AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 2f) * Effectiveness.Value,
+                PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,
+                AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,
                 LayChanceDangerCoef = 1f,
                 VisibleDistCoef = 1f,
                 GainSightCoef = gainSightModif,
-                ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 1.5f) * Effectiveness.Value,
-                PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 1.5f) * Effectiveness.Value,
+                ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value,
+                PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value,
                 HearingDistCoef = 1f,
                 TriggerDownDelay = 1f,
                 WaitInCoverCoef = 1f
             };
+
+            if (AIHatesFlashlights.Value)
+            {
+                FunnyHelpers.RandomVoiceLine(bot);
+            }
 
             bot.Settings.Current.Apply(modif, 0.1f);
         }
@@ -176,10 +177,8 @@ namespace SAIN_Flashlights.Helpers
             Vector3 position = bot.MyHead.position;
             Vector3 weaponRoot = person.WeaponRoot.position;
 
-            float flashAngle = Mathf.Clamp(0.9770526f * Angle.Value, 0.8f, 1f);
-            bool enemylookatme = IsAngLessNormalized(NormalizeFastSelf(position - weaponRoot), person.LookDirection, flashAngle);
-
-            DebugDraw(position, weaponRoot, enemylookatme);
+            float flashAngle = Mathf.Clamp(0.9770526f, 0.8f, 1f);
+            bool enemylookatme = SAIN_Math.IsAngLessNormalized(SAIN_Math.NormalizeFastSelf(position - weaponRoot), person.LookDirection, flashAngle);
 
             return enemylookatme;
         }
@@ -195,38 +194,10 @@ namespace SAIN_Flashlights.Helpers
             Vector3 position = bot.MyHead.position;
             Vector3 weaponRoot = person.WeaponRoot.position;
 
-            float laserAngle = 0.999f;
-            bool enemylookatme = IsAngLessNormalized(NormalizeFastSelf(position - weaponRoot), person.LookDirection, laserAngle);
-
-            DebugDraw(position, weaponRoot, enemylookatme);
+            float laserAngle = 0.990f;
+            bool enemylookatme = SAIN_Math.IsAngLessNormalized(SAIN_Math.NormalizeFastSelf(position - weaponRoot), person.LookDirection, laserAngle);
 
             return enemylookatme;
-        }
-
-        /// <summary>
-        /// Checks if the angle between two vectors is less than a given cosine value.
-        /// </summary>
-        /// <param name="a">The first vector.</param>
-        /// <param name="b">The second vector.</param>
-        /// <param name="cos">The cosine value.</param>
-        /// <returns>True if the angle between the two vectors is less than the given cosine value, false otherwise.</returns>
-        private static bool IsAngLessNormalized(Vector3 a, Vector3 b, float cos)
-        {
-            return a.x * b.x + a.y * b.y + a.z * b.z > cos;
-        }
-
-        /// <summary>
-        /// Normalizes the vector in a less performance heavy way than normal
-        /// </summary>
-        /// <param name="v">The vector to normalize.</param>
-        /// <returns>The normalized vector.</returns>
-        private static Vector3 NormalizeFastSelf(Vector3 v)
-        {
-            float num = (float)Math.Sqrt((double)(v.x * v.x + v.y * v.y + v.z * v.z));
-            v.x /= num;
-            v.y /= num;
-            v.z /= num;
-            return v;
         }
 
         /// <summary>
@@ -243,18 +214,11 @@ namespace SAIN_Flashlights.Helpers
             float enemyDist = (position - weaponRoot).magnitude;
 
             float dazzlemodifier = 1f - (enemyDist / MaxDazzleRange.Value);
-            dazzlemodifier = Mathf.Clamp(dazzlemodifier, 0.1f, 1.0f);
-            dazzlemodifier += 1.33f;
+            dazzlemodifier = (2 * dazzlemodifier) + 1f;
 
             if (bot.NightVision.UsingNow)
             {
                 dazzlemodifier *= 1.5f;
-            }
-
-            if (AIHatesFlashlights.Value)
-            {
-                NonStaticHelpers voice = new NonStaticHelpers();
-                voice.RandomVoiceLine(bot);
             }
 
             return dazzlemodifier;
@@ -274,11 +238,11 @@ namespace SAIN_Flashlights.Helpers
         }
     }
 
-    public class NonStaticHelpers
+    public class FunnyHelpers
     {
         private static float funnytimer = 0f;
 
-        public void FunnyMode(BotOwner bot, Vector3 position)
+        public static void FunnyMode(BotOwner bot, Vector3 position)
         {
             if (funnytimer < Time.time)
             {
@@ -332,7 +296,7 @@ namespace SAIN_Flashlights.Helpers
             }
         }
 
-        public void RandomVoiceLine(BotOwner bot)
+        public static void RandomVoiceLine(BotOwner bot)
         {
             float randomphrase = UnityEngine.Random.value;
             if (randomphrase > 0.97f)

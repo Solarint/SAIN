@@ -15,7 +15,6 @@ namespace SAIN_Audio.Movement.Patches
         public bool NeedtoHeal { get; set; } = false;
         public bool NeedtoReload { get; set; } = false;
         public float DodgeTimer { get; set; } = 0f;
-
         public bool GoingToNewCover { get; set; }
     }
     public class AddComponentPatch : ModulePatch

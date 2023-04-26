@@ -25,7 +25,7 @@ namespace SAIN_Flashlights.Patches
                 SAIN_Flashlight_Component flashlightComponent = person.GetPlayer.gameObject.GetComponent<SAIN_Flashlight_Component>();
                 if (flashlightComponent == null)
                 {
-                    Logger.LogError("flashlightComponent is null");
+                    Logger.LogError("SAIN Flashlight Dazzle: flashlightComponent is null");
                     return;
                 }
 

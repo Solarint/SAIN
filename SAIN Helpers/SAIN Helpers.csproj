@@ -154,7 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\DebugDraw.cs" />
-    <Compile Include="Helpers\Math.cs" />
+    <Compile Include="Helpers\SAIN_Math.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

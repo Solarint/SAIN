@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace SAIN_Audio.Combat
 {
-    [BepInPlugin("me.sol.sain", "SAIN Combat", "1.6")]
+    [BepInPlugin("me.sol.sain", "SAIN Combat", "1.1")]
     public class CombatPlugin : BaseUnityPlugin
     {
         private void Awake()

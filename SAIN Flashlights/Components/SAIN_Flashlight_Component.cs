@@ -16,13 +16,7 @@ namespace SAIN_Flashlights.Components
         private Player Player { get; set; }
         protected static ManualLogSource Logger { get; private set; }
 
-        public List<LightComponent> LightComponents { get; set; }
-
         private FlashlightDetection _lightDetection;
-
-        public int SelectedMode { get; set; }
-        public bool IsActive { get; set; }
-        public Item FlashlightItem { get; set; }
 
         private void Start()
         {
@@ -58,17 +52,20 @@ namespace SAIN_Flashlights.Components
                     yield return new WaitForSeconds(1f);
                 }
 
-                if (Player.AIData.UsingLight && WhiteLight)
+                if (WhiteLight)
                 {
-                    _lightDetection.CreateDetectionPoints(Player);
+                    if (Player.IsAI)
+                    {
+                        _lightDetection.DetectAndInvestigateFlashlight(Player);
+                    }
+
+                    if (Player.IsYourPlayer)
+                    {
+                        _lightDetection.CreateDetectionPoints(Player);
+                    }
                 }
 
-                if (Player.IsAI)
-                {
-                    _lightDetection.DetectPoints(Player);
-                }
-
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.05f);
             }
         }
 

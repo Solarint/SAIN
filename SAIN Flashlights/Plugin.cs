@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace SAIN_Flashlights
 {
-    [BepInPlugin("me.sol.sainflash", "SAIN Flashlights", "1.1")]
+    [BepInPlugin("me.sol.sainflash", "SAIN Flashlights", "2.0")]
     public class FlashlightsPlugin : BaseUnityPlugin
     {
         private void Awake()

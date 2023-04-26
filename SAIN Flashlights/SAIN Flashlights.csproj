@@ -48,7 +48,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>SAIN.Flashlights</RootNamespace>
+    <RootNamespace>SAIN_Flashlights</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
