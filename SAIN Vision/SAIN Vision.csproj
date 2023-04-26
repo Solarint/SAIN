@@ -113,6 +113,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SAIN-Helpers">
+      <HintPath>..\SAIN-Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />

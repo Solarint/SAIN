@@ -5,12 +5,19 @@ using EFT.Weather;
 using System;
 using System.Collections;
 using UnityEngine;
-using static SAIN.Audio.Configs.SoundConfig;
+using static SAIN_Audio.Configs.SoundConfig;
 
-namespace SAIN.Audio.Helpers
+namespace SAIN_Audio.Helpers
 {
     public class GunshotRange
     {
+        /// <summary>
+        /// Plays a shoot sound for a given player, range, subsonic status, and sound type.
+        /// </summary>
+        /// <param name="player">The player to play the sound for.</param>
+        /// <param name="range">The range of the sound.</param>
+        /// <param name="subsonic">Whether the sound is subsonic.</param>
+        /// <param name="soundType">The type of sound to play.</param>
         public IEnumerator OnMakingShotCoroutine(IWeapon weapon, Player player, BulletClass ammo)
         {
             if (player?.AIData != null)
@@ -47,6 +54,10 @@ namespace SAIN.Audio.Helpers
                 yield return null;
             }
         }
+
+        /// <summary>
+        /// Plays a shoot sound for the given player, range, subsonic and sound type, applying modifiers if necessary.
+        /// </summary>
         private void PlayShootSound(Player player, float range, bool subsonic, AISoundType soundtype)
         {
             // Decides if Suppressor modifier should be applied + subsonic
@@ -78,6 +89,12 @@ namespace SAIN.Audio.Helpers
                 Singleton<GClass629>.Instance.PlaySound(player, player.WeaponRoot.position, range, soundtype);
             }
         }
+
+        /// <summary>
+        /// Calculates the audible range of a given ammunition caliber.
+        /// </summary>
+        /// <param name="ammocaliber">The ammunition caliber.</param>
+        /// <returns>The audible range of the given ammunition caliber.</returns>
         private float AudibleRange(string ammocaliber)
         {
             float range;
@@ -169,21 +186,32 @@ namespace SAIN.Audio.Helpers
             }
             return range;
         }
+
+        /// <summary>
+        /// Checks if the given velocity is subsonic.
+        /// </summary>
+        /// <param name="velocity">The velocity to check.</param>
+        /// <returns>True if the velocity is subsonic, false otherwise.</returns>
         private bool IsSubsonic(float velocity)
         {
             if (velocity < 343.2f) return true;
             else return false;
         }
+
+        /// <summary>
+        /// Calculates the rain sound modifier based on the current rain value.
+        /// </summary>
+        /// <returns>
+        /// The rain sound modifier.
+        /// </returns>
         public static float RainSoundModifier()
         {
             if (WeatherController.Instance?.WeatherCurve == null)
-            {
                 return 1f;
-            }
 
-            if (timer < Time.time)
+            if (RainCheckTimer < Time.time)
             {
-                timer = Time.time + 10f;
+                RainCheckTimer = Time.time + 10f;
                 // Grabs the current rain value
                 float Rain = WeatherController.Instance.WeatherCurve.Rain;
                 RainModifier = 1f;
@@ -197,6 +225,14 @@ namespace SAIN.Audio.Helpers
             }
             return RainModifier;
         }
+
+        /// <summary>
+        /// Calculates the inverse scaling of a given value between a minimum and maximum value.
+        /// </summary>
+        /// <param name="value">The value to be scaled.</param>
+        /// <param name="min">The minimum value.</param>
+        /// <param name="max">The maximum value.</param>
+        /// <returns>The scaled value.</returns>
         public static float InverseScaling(float value, float min, float max)
         {
             // Inverse
@@ -210,7 +246,7 @@ namespace SAIN.Audio.Helpers
             return value;
         }
 
-        private static float timer = 0f;
+        private static float RainCheckTimer = 0f;
         private static float RainModifier = 1f;
     }
 }

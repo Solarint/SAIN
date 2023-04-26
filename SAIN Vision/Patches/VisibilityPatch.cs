@@ -1,13 +1,13 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN.Vision.Helpers;
+using SAIN_Audio.Vision.Helpers;
 using System;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.Vision.Config.VisionConfig;
+using static SAIN_Audio.Vision.Config.VisionConfig;
 
-namespace SAIN.Vision.Patches
+namespace SAIN_Audio.Vision.Patches
 {
     public class VisibleDistancePatch : ModulePatch
     {

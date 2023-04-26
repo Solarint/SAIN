@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace SAIN.Flashlights.Helpers
+namespace SAIN_Flashlights.Helpers
 {
     public class DebugDrawer : MonoBehaviour
     {

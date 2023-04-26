@@ -117,6 +117,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SAIN-Helpers">
+      <HintPath>..\SAIN-Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -187,11 +190,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\RecoilScatterConfig.cs" />
-    <Compile Include="Components\WeaponInfo\WeaponInfoPatch.cs" />
+    <Compile Include="Components\AddComponentPatch.cs" />
+    <Compile Include="Patches\GrenadePatch.cs" />
     <Compile Include="Patches\FiremodePatch.cs" />
     <Compile Include="GClassReferences.cs" />
     <Compile Include="Patches\RecoilPatch.cs" />
-    <Compile Include="Components\WeaponInfo\WeaponInfoComponent.cs" />
+    <Compile Include="Components\WeaponInfoComponent.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
     <Compile Include="Config\AimConfig.cs" />
     <Compile Include="Config\FullAutoConfig.cs" />

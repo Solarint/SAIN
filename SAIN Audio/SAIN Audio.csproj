@@ -113,6 +113,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SAIN-Helpers">
+      <HintPath>..\SAIN-Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -165,11 +168,11 @@
     <Compile Include="Helpers\AudioHelpers.cs" />
     <Compile Include="Components\AudioComponent.cs" />
     <Compile Include="Config\AudioConfig.cs" />
-    <Compile Include="Patches\OnEnemySoundHeardPatches.cs" />
-    <Compile Include="Patches\StepNoisePatch.cs" />
+    <Compile Include="Patches\InitiateShotPatch.cs" />
+    <Compile Include="Patches\StepSoundPatch.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
     <Compile Include="Helpers\DrawHelpers.cs" />
-    <Compile Include="Patches\ShootNoisePatch.cs" />
+    <Compile Include="Patches\TryPlayShootSoundPatch.cs" />
     <Compile Include="Patches\AddComponentPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

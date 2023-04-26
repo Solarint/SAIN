@@ -1,15 +1,15 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN.Movement.Helpers;
+using SAIN_Audio.Movement.Helpers;
 using System;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.Movement.Config.DebugConfig;
-using static SAIN.Movement.Config.DogFighterConfig;
+using static SAIN_Audio.Movement.Config.DebugConfig;
+using static SAIN_Audio.Movement.Config.DogFighterConfig;
 
-namespace SAIN.Movement.Patches
+namespace SAIN_Audio.Movement.Patches
 {
     public class DogFight
     {

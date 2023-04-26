@@ -8,7 +8,7 @@ using System.Reflection.Emit;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SAIN.Movement.Helpers
+namespace SAIN_Audio.Movement.Helpers
 {
     public static class MathHelpers
     {

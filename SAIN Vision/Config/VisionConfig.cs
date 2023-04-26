@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN.Vision.Config
+namespace SAIN_Audio.Vision.Config
 {
     internal class VisionConfig
     {

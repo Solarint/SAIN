@@ -1,10 +1,10 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Movement.Config;
+using SAIN_Audio.Movement.Config;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Movement
+namespace SAIN_Audio.Movement
 {
     [BepInPlugin("me.sol.sainmove", "SAIN Movement", "1.5")]
     [BepInProcess("EscapeFromTarkov.exe")]

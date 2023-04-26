@@ -1,10 +1,10 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Vision.Config;
+using SAIN_Audio.Vision.Config;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Vision
+namespace SAIN_Audio.Vision
 {
     [BepInPlugin("me.sol.sainvision", "SAIN Vision", "1.2")]
     public class VisionPlugin : BaseUnityPlugin

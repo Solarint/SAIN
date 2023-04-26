@@ -1,13 +1,13 @@
 using EFT;
-using SAIN.Movement.Helpers;
+using SAIN_Audio.Movement.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.Movement.Config.DebugConfig;
-using static SAIN.Movement.Config.DogFighterConfig;
+using static SAIN_Audio.Movement.Config.DebugConfig;
+using static SAIN_Audio.Movement.Config.DogFighterConfig;
 
-namespace SAIN.Movement.Components
+namespace SAIN_Audio.Movement.Components
 {
     public class DynamicLean : MonoBehaviour
     {

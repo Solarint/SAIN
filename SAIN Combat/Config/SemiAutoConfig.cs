@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN.Combat.Configs
+namespace SAIN_Audio.Combat.Configs
 {
     internal class SemiAutoConfig
     {

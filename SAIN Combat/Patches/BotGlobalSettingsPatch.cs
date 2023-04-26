@@ -1,10 +1,8 @@
 ﻿using Aki.Reflection.Patching;
-using EFT;
 using HarmonyLib;
-using SAIN.Combat.Components;
 using System.Reflection;
 
-namespace SAIN.Combat.Patches
+namespace SAIN_Audio.Combat.Patches
 {
     public class BotGlobalAimingSettingsPatch : ModulePatch
     {
@@ -33,6 +31,7 @@ namespace SAIN.Combat.Patches
             __instance.BASE_HIT_AFFECTION_MAX_ANG = 5f;
         }
     }
+
     public class BotGlobalShootDataPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -48,6 +47,7 @@ namespace SAIN.Combat.Patches
             __instance.RECOIL_DELTA_PRESS = 0f;
         }
     }
+
     public class BotGlobalScatterPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -95,6 +95,7 @@ namespace SAIN.Combat.Patches
             //__instance.RecoilYMax = 1f;
         }
     }
+
     public class BotGlobalCorePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

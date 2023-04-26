@@ -1,7 +1,6 @@
 ﻿using DrakiaXYZ.VersionChecker;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Solarint.VersionCheck
 {

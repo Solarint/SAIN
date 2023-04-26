@@ -1,11 +1,10 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Combat.Configs;
-using Solarint.VersionCheck;
+using SAIN_Audio.Combat.Configs;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Combat
+namespace SAIN_Audio.Combat
 {
     [BepInPlugin("me.sol.sain", "SAIN Combat", "1.6")]
     public class CombatPlugin : BaseUnityPlugin

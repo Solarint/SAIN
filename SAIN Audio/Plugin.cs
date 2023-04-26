@@ -1,12 +1,12 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Audio.Configs;
+using SAIN_Audio.Configs;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Audio
+namespace SAIN_Audio
 {
-    [BepInPlugin("me.sol.sainaudio", "SAIN Audio", "1.2")]
+    [BepInPlugin("me.sol.sainaudio", "SAIN Audio", "1.3")]
     public class AudioPlugin : BaseUnityPlugin
     {
         private void Awake()
