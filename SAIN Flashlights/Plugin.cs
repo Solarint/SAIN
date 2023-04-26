@@ -1,10 +1,10 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Flashlights.Config;
+using SAIN_Flashlights.Config;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Flashlights
+namespace SAIN_Flashlights
 {
     [BepInPlugin("me.sol.sainflash", "SAIN Flashlights", "1.1")]
     public class FlashlightsPlugin : BaseUnityPlugin
@@ -17,7 +17,11 @@ namespace SAIN.Flashlights
 
             try
             {
-                new Patches.FlashLightDazzle().Enable();
+                new Patches.CheckFlashlightPatch().Enable();
+
+                new Patches.DazzlePatch().Enable();
+
+                new Patches.AddComponentPatch().Enable();
             }
             catch (Exception ex)
             {

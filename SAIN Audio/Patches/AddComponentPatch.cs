@@ -1,12 +1,11 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN.Audio.Components;
+using SAIN_Audio.Components;
 using System.Reflection;
 
-namespace SAIN.Audio.Patches
+namespace SAIN_Audio.Patches
 {
-    // Adds a dictionary with bot Id for later reference by other patches
     public class ComponentAddPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -23,6 +22,7 @@ namespace SAIN.Audio.Patches
             }
         }
     }
+
     public class HearingSensorDisablePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

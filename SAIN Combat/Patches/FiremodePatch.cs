@@ -1,17 +1,11 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using EFT.InventoryLogic;
-using HarmonyLib;
-using SAIN.Combat.Components;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
-using static SAIN.Combat.Configs.DebugConfig;
-using static SAIN.Combat.Configs.SemiAutoConfig;
-using static SAIN.Combat.Configs.FullAutoConfig;
-using static SAIN.Combat.Helpers.Shoot;
+using static SAIN_Audio.Combat.Configs.FullAutoConfig;
 
-namespace SAIN.Combat.Patches
+namespace SAIN_Audio.Combat.Patches
 {
     public class FiremodePatch : ModulePatch
     {

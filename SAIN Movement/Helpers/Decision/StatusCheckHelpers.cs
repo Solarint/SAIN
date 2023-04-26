@@ -1,6 +1,6 @@
 ﻿using EFT;
 
-namespace SAIN.Movement.Helpers
+namespace SAIN_Audio.Movement.Helpers
 {
     public class CheckSelf
     {

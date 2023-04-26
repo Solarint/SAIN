@@ -1,9 +1,9 @@
 ﻿using EFT.Weather;
 using System;
 using UnityEngine;
-using static SAIN.Vision.Config.VisionConfig;
+using static SAIN_Audio.Vision.Config.VisionConfig;
 
-namespace SAIN.Vision.Helpers
+namespace SAIN_Audio.Vision.Helpers
 {
     public class Modifiers
     {

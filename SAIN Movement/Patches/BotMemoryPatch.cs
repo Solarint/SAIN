@@ -1,12 +1,12 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN.Movement.Components;
+using SAIN_Audio.Movement.Components;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.Movement.Config.DogFighterConfig;
+using static SAIN_Audio.Movement.Config.DogFighterConfig;
 
-namespace SAIN.Movement.Patches
+namespace SAIN_Audio.Movement.Patches
 {
     public class SainMemory : MonoBehaviour
     {

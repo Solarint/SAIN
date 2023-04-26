@@ -1,12 +1,12 @@
 ﻿using EFT;
 using EFT.InventoryLogic;
-using SAIN.Combat.Components;
+using SAIN_Audio.Combat.Components;
 using UnityEngine;
-using static SAIN.Combat.Configs.SemiAutoConfig;
-using static SAIN.Combat.Configs.FullAutoConfig;
-using static SAIN.Combat.Configs.RecoilScatterConfig;
+using static SAIN_Audio.Combat.Configs.FullAutoConfig;
+using static SAIN_Audio.Combat.Configs.RecoilScatterConfig;
+using static SAIN_Audio.Combat.Configs.SemiAutoConfig;
 
-namespace SAIN.Combat.Helpers
+namespace SAIN_Audio.Combat.Helpers
 {
     public class Shoot
     {

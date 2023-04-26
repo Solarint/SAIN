@@ -1,12 +1,13 @@
-﻿using UnityEngine;
+﻿using EFT;
 using System.Collections;
-using EFT;
+using UnityEngine;
 
-namespace SAIN.Combat.Helpers
+namespace SAIN_Audio.Combat.Helpers
 {
     public class DebugDrawer : MonoBehaviour
     {
         private class TempCoroutineRunner : MonoBehaviour { }
+
         private static void DestroyAfterDelay(GameObject obj, float delay)
         {
             if (obj != null)
@@ -15,6 +16,7 @@ namespace SAIN.Combat.Helpers
                 runner.StartCoroutine(RunDestroyAfterDelay(obj, delay));
             }
         }
+
         private static IEnumerator RunDestroyAfterDelay(GameObject obj, float delay)
         {
             yield return new WaitForSeconds(delay);
@@ -60,6 +62,7 @@ namespace SAIN.Combat.Helpers
 
             return lineObject;
         }
+
         public static void DrawAimLine(BotOwner bot, Vector3 recoilvector, Color linecolor, float linewidth, Color spherecolor, float sphereradius, float expiretime)
         {
             GameObject lineObject = new GameObject();

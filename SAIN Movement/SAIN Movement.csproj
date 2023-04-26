@@ -117,6 +117,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SAIN-Helpers">
+      <HintPath>..\SAIN-Helpers.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -200,10 +203,10 @@
     <Compile Include="Components\MovementComponent.cs" />
     <Compile Include="Helpers\DrawHelpers.cs" />
     <Compile Include="Patches\CoverPatch.cs" />
-    <Compile Include="Patches\DogfighterPatch.cs" />
+    <Compile Include="Patches\MovementPatch.cs" />
     <Compile Include="Patches\DoorPatch.cs" />
     <Compile Include="Patches\BotMemoryPatch.cs" />
-    <Compile Include="Patches\DodgePatch.cs" />
+    <Compile Include="Patches\DogFightPatch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VersionChecker\TarkovVersion.cs" />

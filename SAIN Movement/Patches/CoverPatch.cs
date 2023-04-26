@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SAIN.Movement.Patches
+namespace SAIN_Audio.Movement.Patches
 {
     public class CoverPatch : ModulePatch
     {

@@ -1,9 +1,9 @@
 using EFT;
 using System.Collections;
 using UnityEngine;
-using static SAIN.Movement.Config.DogFighterConfig;
+using static SAIN_Audio.Movement.Config.DogFighterConfig;
 
-namespace SAIN.Movement.Components
+namespace SAIN_Audio.Movement.Components
 {
     public class MovementSpeed : MonoBehaviour
     {

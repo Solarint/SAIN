@@ -1,13 +1,13 @@
 using EFT;
-using SAIN.Movement.Helpers;
+using SAIN_Audio.Movement.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.Movement.Config.DebugConfig;
-using static SAIN.Movement.Config.DogFighterConfig;
+using static SAIN_Audio.Movement.Config.DebugConfig;
+using static SAIN_Audio.Movement.Config.DogFighterConfig;
 
-namespace SAIN.Movement.Components
+namespace SAIN_Audio.Movement.Components
 {
     public class DynamicLean : MonoBehaviour
     {
@@ -396,8 +396,8 @@ namespace SAIN.Movement.Components
             {
                 System.Console.WriteLine($"NavMesh FindLeanCorners: Success! Drawing Red Sphere at corner 1 and blue Sphere at corner 2");
 
-                Draw.Sphere(allcorners[1], 0.2f, Color.red);
-                Draw.Sphere(allcorners[2], 0.2f, Color.blue);
+                DebugDrawer.Sphere(allcorners[1], 0.2f, Color.red, 3f);
+                DebugDrawer.Sphere(allcorners[2], 0.2f, Color.blue, 3f);
             }
 
             Vector3 A = allcorners[0];

@@ -2,23 +2,27 @@
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN.Combat.Components;
+using SAIN_Audio.Combat.Components;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.Combat.Configs.DebugConfig;
-using static SAIN.Combat.Configs.SemiAutoConfig;
-using static SAIN.Combat.Configs.FullAutoConfig;
-using static SAIN.Combat.Helpers.Shoot;
+using static SAIN_Audio.Combat.Configs.DebugConfig;
+using static SAIN_Audio.Combat.Configs.FullAutoConfig;
+using static SAIN_Audio.Combat.Configs.SemiAutoConfig;
+using static SAIN_Audio.Combat.Helpers.Shoot;
 
-namespace SAIN.Combat.Patches
+namespace SAIN_Audio.Combat.Patches
 {
     public class FullAutoPatch : ModulePatch
     {
+        private static PropertyInfo _ShootData;
+
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass546), "method_6");
+            _ShootData = AccessTools.Property(typeof(BotOwner), "ShootData");
+            return AccessTools.Method(_ShootData.PropertyType, "method_6");
         }
+
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_0)
         {
@@ -44,10 +48,16 @@ namespace SAIN.Combat.Patches
     }
     public class SemiAutoPatch : ModulePatch
     {
+        private static PropertyInfo _WeaponManagerPI;
+        private static PropertyInfo _WeaponAIPresetPI;
+
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass363), "method_1");
+            _WeaponManagerPI = AccessTools.Property(typeof(BotOwner), "WeaponManager");
+            _WeaponAIPresetPI = AccessTools.Property(_WeaponManagerPI.PropertyType, "WeaponAIPreset");
+            return AccessTools.Method(_WeaponAIPresetPI.PropertyType, "method_1");
         }
+
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float __result)
         {
@@ -75,13 +85,6 @@ namespace SAIN.Combat.Patches
             float finalTime = SemiAutoROF(EnemyDistance, permeter, firemode);
 
             if (DebugFire.Value) Logger.LogInfo($"FIRERATE: {___botOwner_0.name}, Time Between Shots: [{finalTime}], Distance: [{EnemyDistance}] is fullauto? [{firemode == Weapon.EFireMode.fullauto}]");
-            /*
-            if (bot.WeaponManager.CurrentWeapon.SelectedFireMode == Weapon.EFireMode.fullauto && bot.AimingData.LastDist2Target < 50f)
-            {
-                float rof = FullAutoROF(bot.WeaponManager.CurrentWeapon.Template.bFirerate);
-                finalTime = rof;
-            }
-            */
 
             __result = finalTime;
 

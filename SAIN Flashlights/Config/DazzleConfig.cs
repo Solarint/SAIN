@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN.Flashlights.Config
+namespace SAIN_Flashlights.Config
 {
     internal class DazzleConfig
     {

@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN.Movement.Config
+namespace SAIN_Audio.Movement.Config
 {
     internal class DogFighterConfig
     {

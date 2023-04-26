@@ -1,4 +1,4 @@
-﻿namespace SAIN.Combat.Helpers
+﻿namespace SAIN_Audio.Combat.Helpers
 {
     public static class Firerate
     {

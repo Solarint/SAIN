@@ -1,10 +1,10 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN.Movement.Config;
+using SAIN_Audio.Movement.Config;
 using System;
 using System.Diagnostics;
 
-namespace SAIN.Movement
+namespace SAIN_Audio.Movement
 {
     [BepInPlugin("me.sol.sainmove", "SAIN Movement", "1.5")]
     [BepInProcess("EscapeFromTarkov.exe")]
@@ -24,7 +24,9 @@ namespace SAIN.Movement
                 new Patches.BotGlobalsMindSettingsPatch().Enable();
 
                 new Patches.MovementSpeed().Enable();
-                new Patches.DodgePatch().Enable();
+                new Patches.DogFight.Fight().Enable();
+                //new Patches.DogFight.ManualUpdate().Enable();
+                //new Patches.DogFight.Start().Enable();
 
                 //new Patches.CoverPatch().Enable();
                 //new Patches.DoorPatch().Enable();
