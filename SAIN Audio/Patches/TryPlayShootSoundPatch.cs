@@ -1,8 +1,5 @@
 ﻿using Aki.Reflection.Patching;
-using EFT;
-using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN_Audio.Helpers;
 using System.Reflection;
 using UnityEngine;
 

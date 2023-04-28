@@ -6,19 +6,24 @@ using System.Diagnostics;
 
 namespace SAIN_Grenades
 {
-    [BepInPlugin("me.sol.sainangrybots", "SAIN Angry Bots", "1.0")]
+    [BepInPlugin("me.sol.saingrenades", "SAIN Grenades", "1.0")]
     public class AngryBotsPlugin : BaseUnityPlugin
     {
         private void Awake()
         {
-            //CheckEftVersion();
-            AngryConfig.Init(Config);
+            CheckEftVersion();
+
+            GrenadeConfigs.Init(Config);
 
             try
             {
-                new Patches.PlayerTalkPatch().Enable();
-                //new Patches.SetVisiblePatch().Enable();
-                new Patches.GlobalTalkSettingsPatch().Enable();
+                new Patches.AddComponentPatch().Enable();
+
+                new Patches.GlobalGrenadeSettingsPatch().Enable();
+
+                new Patches.DisableGrenadePatch().Enable();
+
+                //new Patches.GrenadeSoundPatch().Enable();
             }
             catch (Exception ex)
             {

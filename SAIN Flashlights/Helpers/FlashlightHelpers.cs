@@ -1,9 +1,8 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using System;
+using SAIN_Helpers;
 using UnityEngine;
 using static SAIN_Flashlights.Config.DazzleConfig;
-using SAIN_Helpers;
 
 namespace SAIN_Flashlights.Helpers
 {

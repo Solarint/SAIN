@@ -23,12 +23,12 @@ namespace SAIN_Audio.Combat.Patches
         [PatchPrefix]
         public static bool PatchPrefix(GClass544 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
-            __instance.EndTargetPoint = __instance.RealTargetPoint 
-                + ___vector3_5 
-                + ___float_13 
+            __instance.EndTargetPoint = __instance.RealTargetPoint
+                + ___vector3_5
+                + ___float_13
 
-                * (___vector3_4 
-                + (___botOwner_0.RecoilData.RecoilOffset 
+                * (___vector3_4
+                + (___botOwner_0.RecoilData.RecoilOffset
                 * ScatterMultiplier.Value));
 
             return false;

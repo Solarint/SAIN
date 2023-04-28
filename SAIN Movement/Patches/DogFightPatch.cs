@@ -2,13 +2,12 @@
 using EFT;
 using HarmonyLib;
 using SAIN_Audio.Movement.Helpers;
-using System;
+using SAIN_Helpers;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN_Audio.Movement.Config.DebugConfig;
 using static SAIN_Audio.Movement.Config.DogFighterConfig;
-using SAIN_Helpers;
 
 namespace SAIN_Audio.Movement.Patches
 {
