@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN_AngryBots.Config
+namespace SAIN_Grenades.Configs
 {
     internal class AngryConfig
     {

@@ -5,7 +5,6 @@ using SAIN_Helpers;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using static Mono.Security.X509.X520;
 using static SAIN_Flashlights.Config.DazzleConfig;
 
 namespace SAIN_Flashlights.Components

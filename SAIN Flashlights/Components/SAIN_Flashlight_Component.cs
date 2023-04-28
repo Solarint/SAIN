@@ -1,7 +1,6 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using EFT.InventoryLogic;
 using EFT.Visual;
 using System.Collections;
 using System.Collections.Generic;

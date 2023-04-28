@@ -2,6 +2,7 @@
 using Comfort.Common;
 using EFT;
 using SAIN_Audio.Helpers;
+using SAIN_Helpers;
 using UnityEngine;
 using static SAIN_Audio.Configs.SoundConfig;
 
@@ -240,8 +241,8 @@ namespace SAIN_Audio.Components
 
                 float dispersion = (type == AISoundType.gun) ? shooterDistance / 100f : shooterDistance / 50f;
 
-                float num2 = MathHelpers.Random(-dispersion, dispersion);
-                float num3 = MathHelpers.Random(-dispersion, dispersion);
+                float num2 = SAIN_Math.Random(-dispersion, dispersion);
+                float num3 = SAIN_Math.Random(-dispersion, dispersion);
 
                 Vector3 vector = new Vector3(pos.x + num2, pos.y, pos.z + num3);
 
@@ -361,7 +362,7 @@ namespace SAIN_Audio.Components
 
             if (DebugSolarintSound.Value && closeSound)
             {
-                DebugDrawer.Sphere(projectionPoint, 0.1f, Color.red, 3f);
+                SAIN_Helpers.DebugDrawer.Sphere(projectionPoint, 0.1f, Color.red, 3f);
             }
 
             return closeSound;
@@ -431,7 +432,7 @@ namespace SAIN_Audio.Components
             if (DebugSolarintSound.Value)
             {
                 GameObject lineObject = new GameObject();
-                GameObject lineObjectSegment = DebugDrawer.Line(dir, bDir, 0.01f, Color.blue, 2f);
+                GameObject lineObjectSegment = SAIN_Helpers.DebugDrawer.Line(dir, bDir, 0.01f, Color.blue, 2f);
                 lineObjectSegment.transform.parent = lineObject.transform;
             }
 
@@ -474,7 +475,7 @@ namespace SAIN_Audio.Components
             //Calculate the ratio of the difference between the distance and close hearing to the difference between the far hearing and close hearing
             float num3 = 1f - num2 / num;
 
-            return MathHelpers.Random(0f, 1f) < num3;
+            return SAIN_Math.Random(0f, 1f) < num3;
         }
 
         /// <summary>
@@ -653,12 +654,12 @@ namespace SAIN_Audio.Components
                     {
                         Vector3 hitPoint = hits[i].point;
                         float sphereSize = 0.2f;
-                        DebugDrawer.Sphere(hitPoint, sphereSize, Color.green, 2f);
+                        SAIN_Helpers.DebugDrawer.Sphere(hitPoint, sphereSize, Color.green, 2f);
                     }
 
                     GameObject lineObject = new GameObject();
                     float lineWidth = 0.05f;
-                    GameObject lineObjectSegment = DebugDrawer.Line(enemypos, botpos, lineWidth, Color.green, 2f);
+                    GameObject lineObjectSegment = SAIN_Helpers.DebugDrawer.Line(enemypos, botpos, lineWidth, Color.green, 2f);
                     lineObjectSegment.transform.parent = lineObject.transform;
                 }
 
@@ -690,23 +691,6 @@ namespace SAIN_Audio.Components
             public float power;
 
             public AISoundType type;
-        }
-
-        private static class MathHelpers
-        {
-            /// <summary>
-            /// Generates a random float number between two given numbers.
-            /// </summary>
-            /// <param name="a">The lower bound of the random number.</param>
-            /// <param name="b">The upper bound of the random number.</param>
-            /// <returns>A random float number between two given numbers.</returns>
-            public static float Random(float a, float b)
-            {
-                float num = (float)random_0.NextDouble();
-                return a + (b - a) * num;
-            }
-
-            private static readonly System.Random random_0 = new System.Random();
         }
 
         protected static ManualLogSource Logger { get; private set; }

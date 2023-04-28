@@ -1,10 +1,10 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN_AngryBots.Components;
+using SAIN_Grenades.Components;
 using System.Reflection;
 
-namespace SAIN_AngryBots.Patches
+namespace SAIN_Grenades.Patches
 {
     public class AddComponentPatch : ModulePatch
     {

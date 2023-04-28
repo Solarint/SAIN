@@ -3,7 +3,7 @@ using EFT;
 using System.Collections;
 using UnityEngine;
 
-namespace SAIN_AngryBots.Components
+namespace SAIN_Grenades.Components
 {
     public class TalkComponent : MonoBehaviour
     {

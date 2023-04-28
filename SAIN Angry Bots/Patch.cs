@@ -1,13 +1,12 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN_AngryBots.Config;
-using System;
+using SAIN_Grenades.Configs;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace SAIN_AngryBots.Patches
+namespace SAIN_Grenades.Patches
 {
     public class PlayerTalkPatch : ModulePatch
     {
@@ -22,13 +21,13 @@ namespace SAIN_AngryBots.Patches
             if (!AngryConfig.EnableMod.Value)
                 return;
 
-            bool badvoice = 
-                @event == EPhraseTrigger.NeedAmmo || 
-                @event == EPhraseTrigger.OnOutOfAmmo || 
-                @event == EPhraseTrigger.OnWeaponReload || 
-                @event == EPhraseTrigger.OnEnemyShot || 
-                @event == EPhraseTrigger.CheckHim || 
-                @event == EPhraseTrigger.OnEnemyGrenade || 
+            bool badvoice =
+                @event == EPhraseTrigger.NeedAmmo ||
+                @event == EPhraseTrigger.OnOutOfAmmo ||
+                @event == EPhraseTrigger.OnWeaponReload ||
+                @event == EPhraseTrigger.OnEnemyShot ||
+                @event == EPhraseTrigger.CheckHim ||
+                @event == EPhraseTrigger.OnEnemyGrenade ||
                 @event == EPhraseTrigger.OnGrenade;
 
             if (badvoice)
