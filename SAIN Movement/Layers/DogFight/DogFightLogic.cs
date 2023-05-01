@@ -16,7 +16,7 @@ namespace SAIN.Movement.Layers
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
 
             updateTarget_0 = new UpdateTarget(bot);
-            //updateMove_0 = new UpdateMove(bot);
+            updateMove_0 = new UpdateMove(bot);
         }
 
         public override void Start()
@@ -58,7 +58,7 @@ namespace SAIN.Movement.Layers
             {
                 ReactionTimer = Time.time + 0.25f;
 
-                //updateMove_0.Update();
+                updateMove_0.Update();
             }
         }
 
@@ -137,11 +137,11 @@ namespace SAIN.Movement.Layers
         //protected ManualLogSource Logger;
         public UpdateTarget(BotOwner bot) : base(bot)
         {
+            Logger.LogDebug($"Constructed");
+
             //Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
 
             updateShoot_0 = new UpdateShoot(bot);
-
-            Logger.LogDebug($"Constructed");
         }
 
         public override void Update()
@@ -233,60 +233,60 @@ namespace SAIN.Movement.Layers
         private GInterface5 BotFightInterface;
         protected Vector3 BotTarget;
         private float TalkDelay;
+    }
 
-        public class UpdateShoot : UpdateTarget
+    internal class UpdateShoot : DogFightLogic
+    {
+        public UpdateShoot(BotOwner bot) : base(bot)
         {
-            public UpdateShoot(BotOwner bot) : base(bot)
-            {
-                Logger.LogDebug($"Constructed {this.GetType().Name}");
-            }
-
-            public override void Update()
-            {
-                Logger.LogDebug($"Started UpdateShoot");
-
-                if (!BotOwner.WeaponManager.HaveBullets)
-                {
-                    BotOwner.WeaponManager.Reload.TryReload();
-                    return;
-                }
-
-                Vector3 position = BotOwner.GetPlayer.PlayerBones.WeaponRoot.position;
-                Vector3 realTargetPoint = BotOwner.AimingData.RealTargetPoint;
-                if (BotOwner.ShootData.ChecFriendlyFire(position, realTargetPoint))
-                {
-                    return;
-                }
-
-                if (WithTalk)
-                {
-                    Talk();
-                }
-
-                if (BotOwner.ShootData.Shoot() && Bullets > BotOwner.WeaponManager.Reload.BulletCount)
-                {
-                    Bullets = BotOwner.WeaponManager.Reload.BulletCount;
-                }
-            }
-
-            private void Talk()
-            {
-                if (SilentUntil > Time.time)
-                {
-                    return;
-                }
-
-                if (IsTrue100(50f))
-                {
-                    BotOwner.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
-                    SilentUntil = Time.time + 15f;
-                }
-            }
-
-            public float SilentUntil;
-            public bool WithTalk = true;
-            private int Bullets;
+            Logger.LogDebug($"Constructed {this.GetType().Name}");
         }
+
+        public override void Update()
+        {
+            Logger.LogDebug($"Started UpdateShoot");
+
+            if (!BotOwner.WeaponManager.HaveBullets)
+            {
+                BotOwner.WeaponManager.Reload.TryReload();
+                return;
+            }
+
+            Vector3 position = BotOwner.GetPlayer.PlayerBones.WeaponRoot.position;
+            Vector3 realTargetPoint = BotOwner.AimingData.RealTargetPoint;
+            if (BotOwner.ShootData.ChecFriendlyFire(position, realTargetPoint))
+            {
+                return;
+            }
+
+            if (WithTalk)
+            {
+                Talk();
+            }
+
+            if (BotOwner.ShootData.Shoot() && Bullets > BotOwner.WeaponManager.Reload.BulletCount)
+            {
+                Bullets = BotOwner.WeaponManager.Reload.BulletCount;
+            }
+        }
+
+        private void Talk()
+        {
+            if (SilentUntil > Time.time)
+            {
+                return;
+            }
+
+            if (IsTrue100(50f))
+            {
+                BotOwner.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
+                SilentUntil = Time.time + 15f;
+            }
+        }
+
+        public float SilentUntil;
+        public bool WithTalk = true;
+        private int Bullets;
     }
 
     internal class UpdateMove : DogFightLogic // GClass125
@@ -296,12 +296,13 @@ namespace SAIN.Movement.Layers
 
         private float DodgeTimer = 0f;
         private bool MovingToEnemy = false;
+
         public UpdateMove(BotOwner bot) : base(bot)
         {
+            Logger.LogDebug($"Constructed");
+
             //Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             Dodge = new BotDodge(bot);
-
-            Logger.LogDebug($"Constructed");
         }
 
         public override void Update()
