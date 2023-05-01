@@ -1,10 +1,10 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN_Audio.Configs;
+using SAIN_Movement.Configs;
 using System;
 using System.Diagnostics;
 
-namespace SAIN_Audio
+namespace SAIN_Movement
 {
     [BepInPlugin("me.sol.sainaudio", "SAIN Audio", "1.3")]
     public class AudioPlugin : BaseUnityPlugin

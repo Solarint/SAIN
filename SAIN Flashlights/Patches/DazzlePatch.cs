@@ -1,12 +1,12 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN_Flashlights.Components;
-using SAIN_Flashlights.Helpers;
+using Flashlights.Components;
+using Flashlights.Helpers;
 using System.Reflection;
 using UnityEngine;
 
-namespace SAIN_Flashlights.Patches
+namespace Flashlights.Patches
 {
     public class DazzlePatch : ModulePatch
     {
@@ -31,13 +31,13 @@ namespace SAIN_Flashlights.Patches
 
                 if (flashlightComponent.WhiteLight)
                 {
-                    FlashLight.EnemyWithFlashlight(___botOwner_0, person);
+                    Dazzle.EnemyWithFlashlight(___botOwner_0, person);
                     return;
                 }
 
                 if (flashlightComponent.Laser)
                 {
-                    FlashLight.EnemyWithLaser(___botOwner_0, person);
+                    Dazzle.EnemyWithLaser(___botOwner_0, person);
                     return;
                 }
 
@@ -45,13 +45,13 @@ namespace SAIN_Flashlights.Patches
                 {
                     if (flashlightComponent.IRLight)
                     {
-                        FlashLight.EnemyWithFlashlight(___botOwner_0, person);
+                        Dazzle.EnemyWithFlashlight(___botOwner_0, person);
                         return;
                     }
 
                     if (flashlightComponent.IRLaser)
                     {
-                        FlashLight.EnemyWithLaser(___botOwner_0, person);
+                        Dazzle.EnemyWithLaser(___botOwner_0, person);
                     }
                 }
             }

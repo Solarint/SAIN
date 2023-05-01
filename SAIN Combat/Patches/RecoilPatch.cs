@@ -2,14 +2,14 @@
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN_Audio.Combat.Components;
-using SAIN_Audio.Combat.Helpers;
+using Combat.Components;
+using Combat.Helpers;
 using System.Reflection;
 using UnityEngine;
-using static SAIN_Audio.Combat.Configs.DebugConfig;
-using static SAIN_Audio.Combat.Configs.RecoilScatterConfig;
+using static Combat.UserSettings.DebugConfig;
+using static Combat.UserSettings.RecoilScatterConfig;
 
-namespace SAIN_Audio.Combat.Patches
+namespace Combat.Patches
 {
     public class AimOffsetPatch : ModulePatch
     {
@@ -37,6 +37,7 @@ namespace SAIN_Audio.Combat.Patches
     public class RecoilPatch : ModulePatch
     {
         private static PropertyInfo _RecoilDataPI;
+
         protected override MethodBase GetTargetMethod()
         {
             _RecoilDataPI = AccessTools.Property(typeof(BotOwner), "RecoilData");
@@ -77,11 +78,13 @@ namespace SAIN_Audio.Combat.Patches
     public class LoseRecoilPatch : ModulePatch
     {
         private static PropertyInfo _RecoilDataPI;
+
         protected override MethodBase GetTargetMethod()
         {
             _RecoilDataPI = AccessTools.Property(typeof(BotOwner), "RecoilData");
             return AccessTools.Method(_RecoilDataPI.PropertyType, "LosingRecoil");
         }
+
         [PatchPrefix]
         public static bool PatchPrefix(GClass545 __instance, ref Vector3 ___vector3_0, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_1, ref float ___float_0, ref float ___float_1, ref float ___float_2)
         {
@@ -112,11 +115,13 @@ namespace SAIN_Audio.Combat.Patches
     public class EndRecoilPatch : ModulePatch
     {
         private static PropertyInfo _RecoilDataPI;
+
         protected override MethodBase GetTargetMethod()
         {
             _RecoilDataPI = AccessTools.Property(typeof(BotOwner), "RecoilData");
             return AccessTools.Method(_RecoilDataPI.PropertyType, "CheckEndRecoil");
         }
+
         [PatchPrefix]
         public static bool PatchPrefix()
         {

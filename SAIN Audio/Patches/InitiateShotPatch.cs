@@ -2,10 +2,10 @@
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN_Audio.Helpers;
+using SAIN_Movement.Helpers;
 using System.Reflection;
 
-namespace SAIN_Audio.Patches
+namespace SAIN_Movement.Patches
 {
     public class InitiateShotPatch : ModulePatch
     {

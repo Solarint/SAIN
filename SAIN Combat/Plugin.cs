@@ -1,24 +1,21 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN_Audio.Combat.Configs;
+using Combat.UserSettings;
 using System;
 using System.Diagnostics;
 
-namespace SAIN_Audio.Combat
+namespace Combat
 {
-    [BepInPlugin("me.sol.sain", "SAIN Combat", "1.1")]
-    public class CombatPlugin : BaseUnityPlugin
+    [BepInPlugin("me.sol.sain", "SAIN Combat", "1.2")]
+    public class Plugin : BaseUnityPlugin
     {
         private void Awake()
         {
             CheckEftVersion();
 
-            //GClassReferences.CheckBuildVersion();
-
             FullAutoConfig.Init(Config);
             SemiAutoConfig.Init(Config);
             DebugConfig.Init(Config);
-            AimingConfig.Init(Config);
             RecoilScatterConfig.Init(Config);
 
             try
@@ -29,9 +26,6 @@ namespace SAIN_Audio.Combat
                 new Patches.BotGlobalShootDataPatch().Enable();
                 new Patches.BotGlobalCorePatch().Enable();
                 new Patches.BotGlobalAimingSettingsPatch().Enable();
-
-                //new Patches.AimPatch().Enable();
-                //new Patches.ScatterPatch().Enable();
 
                 new Patches.AimOffsetPatch().Enable();
 

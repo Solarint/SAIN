@@ -53,6 +53,15 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '3.5.5|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\3.5.5\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\BepInEx\core\0Harmony.dll</HintPath>
@@ -171,6 +180,8 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)$(TargetName).dll"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)$(TargetName).dll"
+
+copy "$(TargetPath)" "$(SolutionDir)Release\$(SolutionName)-AIO\BepInEx\plugins\$(SolutionName)\$(TargetName)-$(ConfigurationName).dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

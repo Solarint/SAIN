@@ -2,11 +2,11 @@
 using EFT;
 using SAIN_Helpers;
 using UnityEngine;
-using static SAIN_Flashlights.Config.DazzleConfig;
+using static Flashlights.Config.DazzleConfig;
 
-namespace SAIN_Flashlights.Helpers
+namespace Flashlights.Helpers
 {
-    public class FlashLight
+    public class Dazzle
     {
         protected static ManualLogSource Logger { get; private set; }
 
@@ -18,7 +18,7 @@ namespace SAIN_Flashlights.Helpers
         public static void EnemyWithFlashlight(BotOwner bot, IAIDetails person)
         {
             if (Logger == null)
-                Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(FlashLight));
+                Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(Dazzle));
 
             Vector3 position = bot.MyHead.position;
             Vector3 weaponRoot = person.WeaponRoot.position;
@@ -59,7 +59,7 @@ namespace SAIN_Flashlights.Helpers
         public static void EnemyWithLaser(BotOwner bot, IAIDetails person)
         {
             if (Logger == null)
-                Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(FlashLight));
+                Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(Dazzle));
 
             Vector3 position = bot.MyHead.position;
             Vector3 weaponRoot = person.WeaponRoot.position;

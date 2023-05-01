@@ -30,9 +30,9 @@ namespace SAIN_Grenades.Configs
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
 
             DebugLogs = Config.Bind(grenade,
-                "Debug Logs", false, 
-                new ConfigDescription("Log Bot Reaction Times and Grenade Seen Status", 
-                null, 
+                "Debug Logs", false,
+                new ConfigDescription("Log Bot Reaction Times and Grenade Seen Status",
+                null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
 
             DebugDrawTools = Config.Bind(grenade,

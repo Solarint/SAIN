@@ -1,10 +1,10 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN_Audio.Vision.Config
+namespace Vision.UserSettings
 {
     internal class VisionConfig
     {
-        public static ConfigEntry<bool> EnableMod { get; private set; }
+        public static ConfigEntry<bool> EnableSAINVision { get; private set; }
         public static ConfigEntry<bool> Experimental { get; private set; }
         public static ConfigEntry<float> AbsoluteMaxVisionDistance { get; private set; }
         public static ConfigEntry<bool> NoGlobalFog { get; private set; }
@@ -14,7 +14,7 @@ namespace SAIN_Audio.Vision.Config
         {
             string debugmode = "Settings";
 
-            EnableMod = Config.Bind(debugmode, "Mod Enabled", true,
+            EnableSAINVision = Config.Bind(debugmode, "Mod Enabled", true,
                 new ConfigDescription("Turns this mod on or off",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 5 }));

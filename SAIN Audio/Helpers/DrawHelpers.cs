@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace SAIN_Audio.Helpers
+namespace SAIN_Movement.Helpers
 {
     public class DebugDrawer : MonoBehaviour
     {

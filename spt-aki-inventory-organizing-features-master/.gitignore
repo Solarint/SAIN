@@ -1,0 +1,7 @@
+dist/
+dist_zip/
+node_modules/
+client-side/InventoryOrganizingFeatures/.vs/
+client-side/InventoryOrganizingFeatures/bin/
+client-side/InventoryOrganizingFeatures/obj/
+

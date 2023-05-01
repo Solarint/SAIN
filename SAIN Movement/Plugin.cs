@@ -1,41 +1,56 @@
 ﻿using BepInEx;
+using DrakiaXYZ.BigBrain.Brains;
 using DrakiaXYZ.VersionChecker;
-using SAIN_Audio.Movement.Config;
+using Movement.UserSettings;
+using SAIN.Movement.Layers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace SAIN_Audio.Movement
+namespace Movement
 {
-    [BepInPlugin("me.sol.sainmove", "SAIN Movement", "1.5")]
+    [BepInPlugin("me.sol.sainmove", "SAIN Movement", "2.0")]
     [BepInProcess("EscapeFromTarkov.exe")]
-    public class SAIN : BaseUnityPlugin
+    public class Plugin : BaseUnityPlugin
     {
         private void Awake()
         {
             CheckEftVersion();
 
-            DogFighterConfig.Init(Config);
-            DebugConfig.Init(Config);
-            //DoorConfig.Init(Config);
+            DogFight.Init(Config);
+            UserSettings.Debug.Init(Config);
 
             try
             {
-                new Patches.AddComponentPatch().Enable();
-                new Patches.BotGlobalsMindSettingsPatch().Enable();
+                //new Patches.AddComponentPatch().Enable();
+                //new Patches.DisposeComponentPatch().Enable();
 
-                new Patches.MovementSpeed().Enable();
-                new Patches.DogFight.Fight().Enable();
-                //new Patches.DogFight.ManualUpdate().Enable();
-                //new Patches.DogFight.Start().Enable();
+                //new Patches.DogFight.BotGlobalMindPatch().Enable();
+                //new Patches.DogFight.BotLogicDecisionPatch().Enable();
+                //new Patches.DogFight.DogFightGStructPatch().Enable();
+                //new Patches.DogFight.EndShootFromPlacePatch().Enable();
 
-                //new Patches.CoverPatch().Enable();
-                //new Patches.DoorPatch().Enable();
+                //new Patches.DogFight.TryStopReloadPatch().Enable();
+                //new Patches.DogFight.IsInDogFightPatch().Enable();
+                //new Patches.DogFight.StartPatch().Enable();
+                //new Patches.DogFight.ManualUpdatePatch().Enable();
+                //new Patches.DogFight.UpdatePatch().Enable();
+
+                //new Patches.DogFight.StopHealPatch1().Enable();
+                //new Patches.DogFight.StopHealPatch2().Enable();
+                //new Patches.DogFight.StopHealPatch3().Enable();
+                //new Patches.DogFight.StopHealPatch5().Enable();
+                //new Patches.DogFight.StopHealPatch6().Enable();
+                //new Patches.DogFight.StopHealPatch7().Enable();
+
             }
             catch (Exception ex)
             {
                 Logger.LogError($"{GetType().Name}: {ex}");
                 throw;
             }
+
+            BrainManager.Instance.AddCustomLayer(typeof(DogFightLayer), new List<string>() { "Assault", "PMC" }, 100);
         }
         private void CheckEftVersion()
         {

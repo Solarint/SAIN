@@ -3,7 +3,7 @@ using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
 
-namespace SAIN_Audio.Patches
+namespace SAIN_Movement.Patches
 {
     public class TryPlayShootSoundPatch : ModulePatch
     {

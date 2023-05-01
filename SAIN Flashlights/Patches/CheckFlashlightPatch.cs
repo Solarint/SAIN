@@ -1,11 +1,11 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN_Flashlights.Components;
+using Flashlights.Components;
 using System.Reflection;
-using static SAIN_Flashlights.Config.DazzleConfig;
+using static Flashlights.Config.DazzleConfig;
 
-namespace SAIN_Flashlights.Patches
+namespace Flashlights.Patches
 {
     public class CheckFlashlightPatch : ModulePatch
     {

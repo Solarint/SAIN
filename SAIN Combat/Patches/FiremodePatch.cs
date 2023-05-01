@@ -3,9 +3,9 @@ using EFT;
 using EFT.InventoryLogic;
 using System.Linq;
 using System.Reflection;
-using static SAIN_Audio.Combat.Configs.FullAutoConfig;
+using static Combat.UserSettings.FullAutoConfig;
 
-namespace SAIN_Audio.Combat.Patches
+namespace Combat.Patches
 {
     public class FiremodePatch : ModulePatch
     {

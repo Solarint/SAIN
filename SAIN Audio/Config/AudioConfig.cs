@@ -1,6 +1,6 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN_Audio.Configs
+namespace SAIN_Movement.Configs
 {
     internal class SoundConfig
     {

@@ -1,7 +1,7 @@
 ﻿/*
-namespace SAIN.Movement.Config
+namespace Movement.UserSettings
 {
-    internal class DoorConfig
+    internal class Door
     {
         public static ConfigEntry<bool> DoorPatchToggle { get; private set; }
         public static void Init(ConfigFile Config)

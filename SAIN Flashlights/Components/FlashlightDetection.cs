@@ -5,9 +5,9 @@ using SAIN_Helpers;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN_Flashlights.Config.DazzleConfig;
+using static Flashlights.Config.DazzleConfig;
 
-namespace SAIN_Flashlights.Components
+namespace Flashlights.Components
 {
     public class FlashlightDetection
     {

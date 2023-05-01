@@ -1,9 +1,9 @@
 ﻿using EFT.Weather;
 using System;
 using UnityEngine;
-using static SAIN_Audio.Vision.Config.VisionConfig;
+using Vision.UserSettings;
 
-namespace SAIN_Audio.Vision.Helpers
+namespace Vision.Helpers
 {
     public class Modifiers
     {
@@ -14,7 +14,7 @@ namespace SAIN_Audio.Vision.Helpers
             {
                 if (WeatherController.Instance?.WeatherCurve == null)
                 {
-                    if (DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
+                    if (VisionConfig.DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
                     {
                         DebugTimer = UnityEngine.Time.time + 5f;
                         System.Console.WriteLine($"SAIN Weather: No Weather Found!");
@@ -37,7 +37,7 @@ namespace SAIN_Audio.Vision.Helpers
                 weathermodifier = Mathf.Clamp(weathermodifier, 0.2f, 1f);
 
                 // Log Everything!
-                if (DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
+                if (VisionConfig.DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
                 {
                     DebugTimer = UnityEngine.Time.time + 5f;
                     System.Console.WriteLine($"SAIN Weather: Final Weather Modifier: [{weathermodifier}], Fog: [{fogmod}], Rain: [{rainmod}], Clouds: [{cloudsmod}]");

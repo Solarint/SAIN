@@ -2,7 +2,7 @@
 using EFT;
 using System.Reflection;
 
-namespace SAIN_Audio.Patches
+namespace SAIN_Movement.Patches
 {
     public class StepSoundPatch : ModulePatch
     {

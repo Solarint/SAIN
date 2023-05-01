@@ -1,9 +1,9 @@
 ﻿using Aki.Reflection.Patching;
 using HarmonyLib;
-using SAIN_Flashlights.Components;
+using Flashlights.Components;
 using System.Reflection;
 
-namespace SAIN_Flashlights.Patches
+namespace Flashlights.Patches
 {
     public class AddComponentPatch : ModulePatch
     {

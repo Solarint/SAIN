@@ -2,16 +2,16 @@
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN_Audio.Combat.Components;
+using Combat.Components;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static SAIN_Audio.Combat.Configs.DebugConfig;
-using static SAIN_Audio.Combat.Configs.FullAutoConfig;
-using static SAIN_Audio.Combat.Configs.SemiAutoConfig;
-using static SAIN_Audio.Combat.Helpers.Shoot;
+using static Combat.UserSettings.DebugConfig;
+using static Combat.UserSettings.FullAutoConfig;
+using static Combat.UserSettings.SemiAutoConfig;
+using static Combat.Helpers.Shoot;
 
-namespace SAIN_Audio.Combat.Patches
+namespace Combat.Patches
 {
     public class FullAutoPatch : ModulePatch
     {

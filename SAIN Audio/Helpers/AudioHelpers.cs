@@ -5,9 +5,9 @@ using EFT.Weather;
 using System;
 using System.Collections;
 using UnityEngine;
-using static SAIN_Audio.Configs.SoundConfig;
+using static SAIN_Movement.Configs.SoundConfig;
 
-namespace SAIN_Audio.Helpers
+namespace SAIN_Movement.Helpers
 {
     public class GunshotRange
     {

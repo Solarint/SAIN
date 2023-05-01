@@ -57,6 +57,35 @@ namespace SAIN_Helpers
         }
 
         /// <summary>
+        /// Creates a ray object with a line renderer component and sets the start and end points of the line to draw a ray.
+        /// </summary>
+        /// <param name="startPoint">The start point of the ray.</param>
+        /// <param name="direction">The direction of the ray.</param>
+        /// <param name="length">The length of the ray.</param>
+        /// <param name="lineWidth">The width of the line.</param>
+        /// <param name="color">The color of the line.</param>
+        /// <param name="expiretime">The time after which the ray object will be destroyed.</param>
+        /// <returns>The ray object.</returns>
+        public static GameObject Ray(Vector3 startPoint, Vector3 direction, float length, float lineWidth, Color color, float expiretime)
+        {
+            var rayObject = new GameObject();
+            var lineRenderer = rayObject.AddComponent<LineRenderer>();
+
+            // Set the color and width of the line
+            lineRenderer.material.color = color;
+            lineRenderer.startWidth = lineWidth;
+            lineRenderer.endWidth = lineWidth;
+
+            // Set the start and end points of the line to draw a ray
+            lineRenderer.SetPosition(0, startPoint);
+            lineRenderer.SetPosition(1, startPoint + direction.normalized * length);
+
+            DestroyAfterDelay(rayObject, expiretime);
+
+            return rayObject;
+        }
+
+        /// <summary>
         /// Class to run coroutines on a MonoBehaviour.
         /// </summary>
         private class TempCoroutineRunner : MonoBehaviour { }
@@ -118,6 +147,60 @@ namespace SAIN_Helpers
             sphereObject.transform.parent = lineObject.transform;
 
             DestroyAfterDelay(lineObject, expiretime);
+        }
+
+        /// <summary>
+        /// Creates a line between two game objects and adds a script to update the line's position and color every frame.
+        /// </summary>
+        /// <param name="startObject">The starting game object.</param>
+        /// <param name="endObject">The ending game object.</param>
+        /// <param name="lineWidth">The width of the line.</param>
+        /// <param name="color">The color of the line.</param>
+        /// <returns>The game object containing the line renderer.</returns>
+        public static GameObject FollowLine(GameObject startObject, GameObject endObject, float lineWidth, Color color)
+        {
+            var lineObject = new GameObject();
+            var lineRenderer = lineObject.AddComponent<LineRenderer>();
+
+            // Set the color and width of the line
+            lineRenderer.material.color = color;
+            lineRenderer.startWidth = lineWidth;
+            lineRenderer.endWidth = lineWidth;
+
+            // Set the initial start and end points of the line
+            lineRenderer.SetPosition(0, startObject.transform.position);
+            lineRenderer.SetPosition(1, endObject.transform.position);
+
+            // Add a script to update the line's position and color every frame
+            var followLineScript = lineObject.AddComponent<FollowLineScript>();
+            followLineScript.startObject = startObject;
+            followLineScript.endObject = endObject;
+            followLineScript.lineRenderer = lineRenderer;
+
+            return lineObject;
+        }
+
+        public class FollowLineScript : MonoBehaviour
+        {
+            public GameObject startObject;
+            public GameObject endObject;
+            public LineRenderer lineRenderer;
+            public float yOffset = 1f;
+
+            private void Update()
+            {
+                lineRenderer.SetPosition(0, startObject.transform.position + new Vector3(0, yOffset, 0));
+                lineRenderer.SetPosition(1, endObject.transform.position + new Vector3(0, yOffset, 0));
+            }
+
+            /// <summary>
+            /// Sets the color of the line renderer material.
+            /// </summary>
+            /// <param name="color">The color to set.</param>
+            public void SetColor(Color color)
+            {
+                lineRenderer.material.color = color;
+            }
         }
     }
 }

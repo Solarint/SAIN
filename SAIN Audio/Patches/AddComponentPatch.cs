@@ -1,10 +1,10 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN_Audio.Components;
+using SAIN_Movement.Components;
 using System.Reflection;
 
-namespace SAIN_Audio.Patches
+namespace SAIN_Movement.Patches
 {
     public class ComponentAddPatch : ModulePatch
     {

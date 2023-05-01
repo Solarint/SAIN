@@ -1,12 +1,11 @@
 ﻿using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using SAIN_Audio.Helpers;
 using SAIN_Helpers;
 using UnityEngine;
-using static SAIN_Audio.Configs.SoundConfig;
+using static SAIN_Movement.Configs.SoundConfig;
 
-namespace SAIN_Audio.Components
+namespace SAIN_Movement.Components
 {
     public class SolarintAudio : MonoBehaviour
     {
@@ -214,7 +213,7 @@ namespace SAIN_Audio.Components
                         if (DebugSolarintSound.Value)
                             Logger.LogDebug($"{bot.Profile.Nickname} Said Phrase: [Rat]");
                     }
-                    else
+                    else if (1f < 0f)
                     {
                         EPhraseTrigger[] options = new EPhraseTrigger[] {
                            EPhraseTrigger.OnBreath,

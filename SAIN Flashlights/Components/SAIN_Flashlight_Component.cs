@@ -6,9 +6,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static SAIN_Flashlights.Config.DazzleConfig;
+using static Flashlights.Config.DazzleConfig;
 
-namespace SAIN_Flashlights.Components
+namespace Flashlights.Components
 {
     public class SAIN_Flashlight_Component : MonoBehaviour
     {

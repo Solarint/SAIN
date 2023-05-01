@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SAIN_Audio.Movement.Patches
+namespace Movement.Patches
 {
     public class CoverPatch : ModulePatch
     {
@@ -19,7 +19,6 @@ namespace SAIN_Audio.Movement.Patches
             BotOwner bot = ___botOwner_0;
             Vector3 botPos = bot.Transform.position;
             Vector3 enemyPos = bot.Memory.GoalEnemy.EnemyLastPosition;
-            SainMemory sain = bot.gameObject.GetComponent<SainMemory>();
 
             if (bot.Memory.GoalEnemy.PersonalLastSeenTime + 5f < Time.time)
             {
@@ -34,8 +33,6 @@ namespace SAIN_Audio.Movement.Patches
                 Vector3 goodcover = coverPoint.normalized;
 
                 bot.GoToPoint(goodcover, true, 2f, false, true, true);
-
-                sain.GoingToNewCover = true;
 
                 return false;
             }

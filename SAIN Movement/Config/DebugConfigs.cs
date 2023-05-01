@@ -1,8 +1,8 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN_Audio.Movement.Config
+namespace Movement.UserSettings
 {
-    internal class DebugConfig
+    internal class Debug
     {
         public static ConfigEntry<bool> DebugDodge { get; private set; }
         public static ConfigEntry<bool> DebugLean { get; private set; }

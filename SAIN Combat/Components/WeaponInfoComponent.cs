@@ -3,9 +3,9 @@ using EFT;
 using EFT.InventoryLogic;
 using System.Collections;
 using UnityEngine;
-using static SAIN_Audio.Combat.Configs.DebugConfig;
+using static Combat.UserSettings.DebugConfig;
 
-namespace SAIN_Audio.Combat.Components
+namespace Combat.Components
 {
     public class WeaponInfo : MonoBehaviour
     {

@@ -97,6 +97,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
     </Reference>
+    <Reference Include="DrakiaXYZ-BigBrain">
+      <HintPath>..\..\..\BepInEx\plugins\DrakiaXYZ-BigBrain.dll</HintPath>
+    </Reference>
     <Reference Include="Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\spt 3.5.4\EscapeFromTarkov_Data\Managed\Mono.Data.Sqlite.dll</HintPath>
@@ -189,24 +192,30 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\StatusComponent.cs" />
-    <Compile Include="Components\DodgeComponent.cs" />
+    <Compile Include="Components\DogFight\SAIN_Bot_Controller.cs" />
+    <Compile Include="Layers\DogFight\Functions\BotDecision.cs" />
+    <Compile Include="Components\DogFight\DogFightComponent.cs" />
+    <Compile Include="Components\Experimental\DogFightUpdate.cs" />
+    <Compile Include="Components\Experimental\old.cs" />
+    <Compile Include="Components\DogFight\DogFightPatch.cs" />
+    <Compile Include="Components\Experimental\StatusComponent.cs" />
+    <Compile Include="Components\Experimental\DodgeComponent.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
     <Compile Include="Components\LeanComponent.cs" />
-    <Compile Include="Helpers\Decision\StatusCheckHelpers.cs" />
-    <Compile Include="Helpers\MathHelpers.cs" />
-    <Compile Include="Helpers\Medical\MedicalHelper.cs" />
-    <Compile Include="Helpers\DodgeHelpers.cs" />
+    <Compile Include="Helpers\StatusCheckHelpers.cs" />
+    <Compile Include="Helpers\MedicalHelper.cs" />
+    <Compile Include="Layers\DogFight\Functions\DodgeHelpers.cs" />
+    <Compile Include="Layers\DogFight\DogFightLayer.cs" />
+    <Compile Include="Layers\DogFight\DogFightLogic.cs" />
+    <Compile Include="Layers\DogFight\Functions\Corners\FindCorners.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
-    <Compile Include="Config\DogFighterConfig.cs" />
+    <Compile Include="Config\DogFight.cs" />
     <Compile Include="Config\DoorConfig.cs" />
-    <Compile Include="Components\MovementComponent.cs" />
-    <Compile Include="Helpers\DrawHelpers.cs" />
+    <Compile Include="Components\Experimental\MovementComponent.cs" />
     <Compile Include="Patches\CoverPatch.cs" />
     <Compile Include="Patches\MovementPatch.cs" />
     <Compile Include="Patches\DoorPatch.cs" />
-    <Compile Include="Patches\BotMemoryPatch.cs" />
-    <Compile Include="Patches\DogFightPatch.cs" />
+    <Compile Include="Components\AddComponents.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VersionChecker\TarkovVersion.cs" />

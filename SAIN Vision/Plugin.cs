@@ -1,17 +1,17 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN_Audio.Vision.Config;
+using Vision.UserSettings;
 using System;
 using System.Diagnostics;
 
-namespace SAIN_Audio.Vision
+namespace Vision
 {
-    [BepInPlugin("me.sol.sainvision", "SAIN Vision", "1.2")]
-    public class VisionPlugin : BaseUnityPlugin
+    [BepInPlugin("me.sol.sainvision", "SAIN Vision", "1.3")]
+    public class Plugin : BaseUnityPlugin
     {
         private void Awake()
         {
-            //CheckEftVersion();
+            CheckEftVersion();
 
             VisionConfig.Init(Config);
 
@@ -20,6 +20,9 @@ namespace SAIN_Audio.Vision
                 new Patches.VisibleDistancePatch().Enable();
                 new Patches.GainSightPatch().Enable();
                 new Patches.VisionOverridesPatch().Enable();
+                //new Patches.IsPartVisiblePatch().Enable();
+
+                new Patches.AddComponentPatch().Enable();
             }
             catch (Exception ex)
             {

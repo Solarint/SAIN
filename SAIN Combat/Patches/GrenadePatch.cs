@@ -1,13 +1,14 @@
 ﻿using Aki.Reflection.Patching;
 using HarmonyLib;
-using SAIN_Audio.Combat.Helpers;
+using Combat.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static SAIN_Audio.Combat.Patches.Helpers;
+using static SAIN_Helpers.SAIN_Math;
+using static Combat.Patches.GrenadeHelpers;
 
-namespace SAIN_Audio.Combat.Patches
+namespace Combat.Patches
 {
     public class GrenadePatch : ModulePatch
     {
@@ -119,7 +120,7 @@ namespace SAIN_Audio.Combat.Patches
         }
     }
 
-    public class Helpers
+    public class GrenadeHelpers
     {
         public class GrenadeAngleProperties
         {
@@ -225,19 +226,5 @@ namespace SAIN_Audio.Combat.Patches
                 new GrenadeAngleProperties(55f)
             }
         };
-
-        /// <summary>
-        /// Normalizes the vector in a less performance heavy way than normal
-        /// </summary>
-        /// <param name="v">The vector to normalize.</param>
-        /// <returns>The normalized vector.</returns>
-        public static Vector3 NormalizeFastSelf(Vector3 v)
-        {
-            float num = (float)Math.Sqrt((double)(v.x * v.x + v.y * v.y + v.z * v.z));
-            v.x /= num;
-            v.y /= num;
-            v.z /= num;
-            return v;
-        }
     }
 }

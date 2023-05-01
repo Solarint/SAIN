@@ -2,9 +2,9 @@
 using EFT;
 using HarmonyLib;
 using System.Reflection;
-using static SAIN_Audio.Movement.Config.DogFighterConfig;
+using static Movement.UserSettings.DogFight;
 
-namespace SAIN_Audio.Movement.Patches
+namespace Movement.Patches
 {
     public class MovementSpeed : ModulePatch
     {

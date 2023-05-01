@@ -1,6 +1,6 @@
 ﻿//using static Config.Door;
 /*
-namespace SAIN.Movement.Patches
+namespace Movement.Patches
 {
     public class DoorPatch : ModulePatch
     {
