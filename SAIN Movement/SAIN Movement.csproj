@@ -48,7 +48,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>SAIN.Movement</RootNamespace>
+    <RootNamespace>Movement</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -195,6 +195,10 @@
     <Compile Include="Components\Experimental\DogFight\SAIN_Bot_Controller.cs" />
     <Compile Include="Helpers\BotDecision.cs" />
     <Compile Include="Components\Experimental\DogFight\DogFightComponent.cs" />
+    <Compile Include="Helpers\CoverCheckerHelper.cs" />
+    <Compile Include="Layers\DogFight\Logic\UpdateShoot.cs" />
+    <Compile Include="Layers\DogFight\Logic\UpdateMove.cs" />
+    <Compile Include="Layers\DogFight\Logic\UpdateTarget.cs" />
     <Compile Include="Patches\DogFightPatch.cs" />
     <Compile Include="Components\Experimental\DodgeComponent.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
@@ -209,9 +213,9 @@
     <Compile Include="Config\DogFight.cs" />
     <Compile Include="Config\DoorConfig.cs" />
     <Compile Include="Components\Experimental\MovementComponent.cs" />
-    <Compile Include="Patches\CoverPatch.cs" />
-    <Compile Include="Patches\MovementPatch.cs" />
-    <Compile Include="Patches\DoorPatch.cs" />
+    <Compile Include="Patches\Old\CoverPatch.cs" />
+    <Compile Include="Patches\Old\MovementPatch.cs" />
+    <Compile Include="Patches\Old\DoorPatch.cs" />
     <Compile Include="Patches\AddComponents.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

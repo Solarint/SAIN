@@ -2,7 +2,6 @@
 using EFT;
 using HarmonyLib;
 using Movement.Components;
-using SAIN.Movement.Components.DogFight_State;
 using SAIN_Helpers;
 using System.CodeDom;
 using System.Reflection;
@@ -52,6 +51,7 @@ namespace Movement.Patches
                 __instance.DOG_FIGHT_OUT = 2f;
             }
         }
+
         public class StopHealPatch1 : ModulePatch
         {
 

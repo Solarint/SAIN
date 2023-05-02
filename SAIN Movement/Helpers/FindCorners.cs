@@ -1,10 +1,9 @@
 using BepInEx.Logging;
 using EFT;
+using SAIN_Helpers;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
-using SAIN_Helpers;
 using static Movement.UserSettings.Debug;
 
 namespace Movement.Components
@@ -31,7 +30,9 @@ namespace Movement.Components
             {
                 float leanAngle = 0f;
 
-                if (FindCorners(out Vector3 corner1, out Vector3 corner2, maxDistance))
+                Vector3[] corners = Corners.GetCorners(true, false, true, true);
+
+                if (PickLeanCorners(corners, out Vector3 corner1, out Vector3 corner2, maxDistance))
                 {
                     leanAngle = Vector3.SignedAngle(corner1, corner2, Vector3.up);
                     Leaning = true;
@@ -40,73 +41,46 @@ namespace Movement.Components
                 return leanAngle;
             }
 
-            private bool FindCorners(out Vector3 corner1, out Vector3 corner2, float maxdistance)
+            private bool PickLeanCorners(Vector3[] allcorners, out Vector3 firstcorner, out Vector3 secondcorner, float maxdistance = 10f)
             {
-                Vector3 targetPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
-                Vector3 botPosition = BotOwner.Transform.position;
-
-                NavMeshPath navMeshPath = new NavMeshPath();
-                NavMesh.CalculatePath(botPosition, targetPosition, -1, navMeshPath);
-
-                List<Vector3> NavmeshCornersList = new List<Vector3>(navMeshPath.corners);
-
-                for (int i = 0; i < NavmeshCornersList.Count; i++)
-                {
-                    Vector3 corner = NavmeshCornersList[i];
-                    corner.y += BotOwner.MyHead.position.y;
-                    NavmeshCornersList[i] = corner;
-                }
-
-                Vector3[] raisedcorners = NavmeshCornersList.ToArray();
-
-                if (raisedcorners.Length > 1)
-                {
-                    Corners.RaycastTrim(raisedcorners, out Vector3[] RaycastCorners);
-                    Corners.AverageCorners(RaycastCorners, out Vector3[] averagedcorners, 1f);
-
-                    if (PickLeanCorners(averagedcorners, out Vector3 LeanCorner1, out Vector3 LeanCorner2, maxdistance))
-                    {
-                        corner1 = LeanCorner1;
-                        corner2 = LeanCorner2;
-                        return true;
-                    }
-                }
-
-                corner1 = Vector3.zero;
-                corner2 = Vector3.zero;
-                return false;
-            }
-
-            private bool PickLeanCorners(Vector3[] allcorners, out Vector3 firstcorner, out Vector3 secondcorner, float maxdistance)
-            {
-                Vector3 A = allcorners[0];
-
-                if (Vector3.Distance(BotOwner.Transform.position, A) > maxdistance || allcorners.Length < 3)
+                if (allcorners.Length < 3)
                 {
                     firstcorner = Vector3.zero;
                     secondcorner = Vector3.zero;
                     return false;
                 }
 
+                if (Vector3.Distance(BotOwner.Transform.position, allcorners[0]) > maxdistance)
+                {
+                    firstcorner = Vector3.zero;
+                    secondcorner = Vector3.zero;
+                    return false;
+                }
+
+                Vector3 A = allcorners[0];
                 Vector3 B = allcorners[1];
                 Vector3 C = allcorners[2];
 
                 firstcorner = A - B;
                 secondcorner = C - B;
 
-                if (DebugNavMesh.Value)
+                if (DebugNavMesh.Value && DebugTimer < Time.time)
                 {
-                    DebugDrawer.Line(BotOwner.MyHead.position, firstcorner, 0.1f, Color.red, 0.25f);
-                    DebugDrawer.Line(BotOwner.MyHead.position, secondcorner, 0.1f, Color.red, 0.25f);
+                    DebugTimer = Time.time + 5f;
 
-                    DebugDrawer.Ray(A, Vector3.down, 2f, 0.025f, Color.yellow, 1f);
-                    DebugDrawer.Ray(B, Vector3.down, 2f, 0.025f, Color.yellow, 1f);
-                    DebugDrawer.Ray(C, Vector3.down, 2f, 0.025f, Color.yellow, 1f);
+                    DebugDrawer.Line(BotOwner.MyHead.position, A, 0.025f, Color.blue, 5f);
+                    DebugDrawer.Line(BotOwner.MyHead.position, B, 0.025f, Color.green, 5f);
+                    DebugDrawer.Line(BotOwner.MyHead.position, C, 0.025f, Color.yellow, 5f);
+
+                    DebugDrawer.Ray(A, Vector3.down, 2f, 0.025f, Color.blue, 5f);
+                    DebugDrawer.Ray(B, Vector3.down, 2f, 0.025f, Color.green, 5f);
+                    DebugDrawer.Ray(C, Vector3.down, 2f, 0.025f, Color.yellow, 5f);
                 }
 
                 return true;
             }
 
+            private float DebugTimer = 0f;
             public bool Leaning { get; set; }
 
             private readonly CornerProcessing Corners;
@@ -118,7 +92,62 @@ namespace Movement.Components
             {
             }
 
-            public Vector3[] RaycastTrim(Vector3[] navmeshcorners, out Vector3[] newcorners)
+            /// <summary>
+            /// Calculates the corners of the NavMeshPath between the bot and the target position, and optionally trims them using raycasting, length trimming, and lerp trimming.
+            /// </summary>
+            /// <param name="raycastTrim">Whether to trim the corners using raycasting.</param>
+            /// <param name="lengthTrim">Whether to trim the corners using length trimming.</param>
+            /// <param name="lerpTrim">Whether to trim the corners using lerp trimming.</param>
+            /// <param name="raisetoHeadHeight">Whether to raise the corners to the bot's head height.</param>
+            /// <param name="minlengthfortrim">The minimum length for length trimming.</param>
+            /// <returns>The trimmed corners of the NavMeshPath.</returns>
+            public Vector3[] GetCorners(bool raycastTrim = true, bool lengthTrim = false, bool lerpTrim = false, bool raisetoHeadHeight = false, float minlengthfortrim = 2f)
+            {
+                Vector3 targetPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
+                Vector3 botPosition = BotOwner.Transform.position;
+
+                NavMeshPath navMeshPath = new NavMeshPath();
+                NavMesh.CalculatePath(botPosition, targetPosition, -1, navMeshPath);
+
+                List<Vector3> NavmeshCornersList = new List<Vector3>(navMeshPath.corners);
+
+                if (raisetoHeadHeight)
+                {
+                    for (int i = 0; i < NavmeshCornersList.Count; i++)
+                    {
+                        Vector3 corner = NavmeshCornersList[i];
+                        corner.y += BotOwner.MyHead.position.y;
+                        NavmeshCornersList[i] = corner;
+                    }
+                }
+
+                Vector3[] corners = NavmeshCornersList.ToArray();
+
+                if (corners.Length > 1)
+                {
+                    if (raycastTrim)
+                    {
+                        RaycastTrim(corners, out Vector3[] RaycastCorners);
+                        corners = RaycastCorners;
+                    }
+
+                    if (lengthTrim)
+                    {
+                        TrimCorners(corners, out Vector3[] trimmedCorners, minlengthfortrim);
+                        corners = trimmedCorners;
+                    }
+
+                    if (lerpTrim)
+                    {
+                        AverageCorners(corners, out Vector3[] averagedcorners, 1f);
+                        corners = averagedcorners;
+                    }
+                }
+
+                return corners;
+            }
+
+            private Vector3[] RaycastTrim(Vector3[] navmeshcorners, out Vector3[] newcorners)
             {
                 List<Vector3> cornersList = new List<Vector3>(navmeshcorners);
 
@@ -145,7 +174,7 @@ namespace Movement.Components
                 return newcorners;
             }
 
-            public Vector3[] TrimCorners(Vector3[] allcorners, out Vector3[] longcorners, float minlength)
+            private Vector3[] TrimCorners(Vector3[] allcorners, out Vector3[] longcorners, float minlength)
             {
                 List<Vector3> cornersList = new List<Vector3>(allcorners);
 
@@ -167,7 +196,7 @@ namespace Movement.Components
                 return longcorners;
             }
 
-            public Vector3[] AverageCorners(Vector3[] oldcorners, out Vector3[] averagedcorners, float minlength)
+            private Vector3[] AverageCorners(Vector3[] oldcorners, out Vector3[] averagedcorners, float minlength)
             {
                 List<Vector3> cornersList = new List<Vector3>(oldcorners);
 
