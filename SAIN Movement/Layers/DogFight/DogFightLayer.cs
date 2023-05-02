@@ -61,10 +61,6 @@ namespace SAIN.Movement.Layers
                         isActive = true;
                         return true;
                     }
-                    else
-                    {
-                        Logger.LogDebug("  No Dogfight");
-                    }
                 }
 
                 return false;

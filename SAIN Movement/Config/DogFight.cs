@@ -13,9 +13,6 @@ namespace Movement.UserSettings
         public static ConfigEntry<bool> MoveSpeedToggle { get; private set; }
         public static ConfigEntry<bool> ScavMoveSlowerToggle { get; private set; }
 
-        public static ConfigEntry<float> DogFighterStart { get; private set; }
-        public static ConfigEntry<float> DogFighterEnd { get; private set; }
-
         public static void Init(ConfigFile Config)
         {
             string dogfighter = "1. DogFighter";
@@ -52,20 +49,6 @@ namespace Movement.UserSettings
                 false, new ConfigDescription(
                 "Scavs will walk around at a slower pace than other bot types when not in combat", null, new ConfigurationManagerAttributes
                 { IsAdvanced = false, Order = 5 }));
-
-            DogFighterStart = Config.Bind(dogfighter,
-                "Dog Fighter Start",
-                20.0f, new ConfigDescription(
-                "Requires Raid Restart, The distance to start Dog Fight Behavior", new AcceptableValueRange<float>
-                (1f, 200.0f), new ConfigurationManagerAttributes
-                { IsAdvanced = true, Order = 2 }));
-            DogFighterEnd = Config.Bind(dogfighter,
-                "Dog Fighter End",
-                25.0f, new ConfigDescription(
-                "Requires Raid Restart, The distance to end Dog Fight Behavior", new AcceptableValueRange<float>
-                (2f, 210.0f), new ConfigurationManagerAttributes
-                { IsAdvanced = true, Order = 1 }));
-
         }
     }
 }

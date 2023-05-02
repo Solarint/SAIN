@@ -54,7 +54,7 @@ namespace SAIN.Movement.Layers.DogFight
             float ShootToCenter = BotOwner.Settings.FileSettings.Aiming.DIST_TO_SHOOT_TO_CENTER;
             var goalEnemy = BotOwner.Memory.GoalEnemy;
 
-            if (goalEnemy != null && goalEnemy.CanShoot && goalEnemy.IsVisible)
+            if (goalEnemy != null && CanShootEnemyAndVisible)
             {
                 Vector3 aimTarget;
 
@@ -103,6 +103,10 @@ namespace SAIN.Movement.Layers.DogFight
             }
             return null;
         }
+
+        public bool CanShootEnemyAndVisible => CanShootEnemy && CanSeeEnemy;
+        public bool CanShootEnemy => BotOwner.Memory.GoalEnemy.IsVisible;
+        public bool CanSeeEnemy => BotOwner.Memory.GoalEnemy.CanShoot;
 
         private readonly UpdateShoot updateShoot_0;
         private GInterface5 BotFightInterface;

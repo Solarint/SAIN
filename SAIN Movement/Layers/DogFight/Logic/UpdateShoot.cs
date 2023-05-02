@@ -55,7 +55,7 @@ namespace SAIN.Movement.Layers.DogFight
                 return;
             }
 
-            if (IsTrue100(50f))
+            if (IsTrue100(10f))
             {
                 BotOwner.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
                 SilentUntil = Time.time + 15f;

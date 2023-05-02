@@ -1,26 +1,67 @@
+using BepInEx.Logging;
 using EFT;
 using Movement.Helpers;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using static Movement.UserSettings.Debug;
 using static Movement.UserSettings.DogFight;
-using SAIN_Helpers;
-using BepInEx.Logging;
 
 namespace Movement.Components
 {
     public class DynamicLean : MonoBehaviour
     {
+        private bool ShouldILean
+        {
+            get
+            {
+                if (bot?.Memory?.GoalEnemy == null)
+                    return false;
+
+                if (bot?.BotState != EBotState.Active) 
+                    return false;
+
+
+                if (!LeanToggle.Value) 
+                    return false;
+
+                if (!ScavLeanToggle.Value && bot.IsRole(WildSpawnType.assault))
+                    return false;
+
+
+                if (bot.Memory.GoalEnemy.CanShoot == true || bot.Memory.IsInCover == true) 
+                    return false;
+
+                if (bot.Memory.GoalEnemy.Distance > 30f) 
+                    return false;
+
+                return true;
+            }
+        }
+        private bool ShouldIReset
+        {
+            get
+            {
+                if (Lean.Leaning)
+                {
+                    if (bot?.BotState != EBotState.Active)
+                        return true;
+
+                    if (!ScavLeanToggle.Value && bot.IsRole(WildSpawnType.assault))
+                        return true;
+
+                    if (!LeanToggle.Value)
+                        return true;
+
+                    if (bot?.Memory?.GoalEnemy == null)
+                        return true;
+
+                    if (bot.Memory.GoalEnemy.IsVisible == true || bot.Memory.GoalEnemy.CanShoot)
+                        return true;
+                }
+                return false;
+            }
+        }
         public bool StartingLean { get; private set; }
         public bool Resetting { get; private set; }
-
-        private FindCorners.FindDirectionToLean Lean;
-
-        private BotOwner bot;
-
-        protected static ManualLogSource Logger { get; private set; }
 
         private void Awake()
         {
@@ -30,7 +71,7 @@ namespace Movement.Components
 
             Resetting = false;
             StartingLean = false;
-            Lean = new FindCorners.FindDirectionToLean(bot);
+            Lean = new Corners.FindDirectionToLean(bot);
 
             StartCoroutine(ContinuousLean());
         }
@@ -49,76 +90,28 @@ namespace Movement.Components
                 if (ShouldIReset && !Resetting)
                 {
                     Resetting = true;
-                    StartCoroutine(ResetLeanAfterDuration(Random.Range(1f, 3f)));
-                    yield return new WaitForSeconds(0.1f);
-                    continue;
+                    StartCoroutine(ResetLeanAfterDuration(Random.Range(1f, 2f)));
                 }
-
-                if (ShouldILean && !StartingLean)
+                else if (ShouldILean && !StartingLean)
                 {
                     StartingLean = true;
-                    StartCoroutine(ExecuteLean(0.1f));
-                    yield return new WaitForSeconds(0.1f);
-                    continue;
+                    StartCoroutine(ExecuteLean(0.5f));
                 }
 
                 yield return new WaitForSeconds(0.1f);
             }
         }
 
-        private bool ShouldILean
-        {
-            get
-            {
-                if (bot?.BotState != EBotState.Active) return false;
-
-                if (!ScavDodgeToggle.Value && bot.IsRole(WildSpawnType.assault)) return false;
-
-                if (!LeanToggle.Value) return false;
-
-                if (bot?.Memory?.GoalEnemy?.CanShoot == true || bot?.Memory?.IsInCover == true) return false;
-
-                if (bot?.Memory?.GoalEnemy == null) return false;
-
-                if (bot?.Memory?.GoalEnemy.Distance > 30f) return false;
-
-                return true;
-            }
-        }
-
-        private bool ShouldIReset
-        {
-            get
-            {
-                if (Lean.Leaning)
-                {
-                    if (bot?.BotState != EBotState.Active) 
-                        return true;
-
-                    if (!ScavDodgeToggle.Value && bot.IsRole(WildSpawnType.assault)) 
-                        return true;
-
-                    if (!LeanToggle.Value) 
-                        return true;
-
-                    if (bot?.Memory?.GoalEnemy == null) 
-                        return true;
-
-                    if (bot?.Memory?.GoalEnemy?.IsVisible == true || bot.Memory.GoalEnemy.CanShoot) 
-                        return true;
-                }
-                return false;
-            }
-        }
-
         public IEnumerator ExecuteLean(float delay)
         {
+            float leanAngle = Lean.FindLeanAngle(10f);
+
             yield return new WaitForSeconds(delay);
+
             StartingLean = false;
 
-            if (ShouldILean)
+            if (ShouldILean && !ShouldIReset)
             {
-                float leanAngle = Lean.FindLeanAngle(10f);
                 bot.GetPlayer.MovementContext.SetTilt((leanAngle > 0f) ? 5 : -5, false);
             }
         }
@@ -128,12 +121,19 @@ namespace Movement.Components
             yield return new WaitForSeconds(duration);
             Resetting = false;
 
-            if (ShouldIReset)
+            if (!ShouldILean && ShouldIReset)
             {
                 bot.GetPlayer.MovementContext.SetTilt(0f, false);
 
                 Lean.Leaning = false;
             }
         }
+
+        private Corners.FindDirectionToLean Lean;
+
+        private BotOwner bot;
+
+        protected ManualLogSource Logger;
+
     }
 }

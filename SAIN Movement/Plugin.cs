@@ -25,7 +25,11 @@ namespace Movement
                 new Patches.AddComponentPatch().Enable();
                 new Patches.DisposeComponentPatch().Enable();
 
-                new Patches.DogFight.BotGlobalMindPatch().Enable();
+                new Patches.GlobalSettings.BotGlobalMindPatch().Enable();
+                new Patches.GlobalSettings.BotGlobalMovePatch().Enable();
+                new Patches.GlobalSettings.BotGlobalCorePatch().Enable();
+
+                new Patches.DoorPatch.KickPatch().Enable();
 
                 //new Patches.DogFight.BotLogicDecisionPatch().Enable();
                 //new Patches.DogFight.DogFightGStructPatch().Enable();
@@ -37,12 +41,12 @@ namespace Movement
                 //new Patches.DogFight.ManualUpdatePatch().Enable();
                 //new Patches.DogFight.UpdatePatch().Enable();
 
-                //new Patches.DogFight.StopHealPatch1().Enable();
-                //new Patches.DogFight.StopHealPatch2().Enable();
-                //new Patches.DogFight.StopHealPatch3().Enable();
-                //new Patches.DogFight.StopHealPatch5().Enable();
-                //new Patches.DogFight.StopHealPatch6().Enable();
-                //new Patches.DogFight.StopHealPatch7().Enable();
+                //new Patches.Heal.StopHealPatch1().Enable();
+                //new Patches.Heal.StopHealPatch2().Enable();
+                //new Patches.Heal.StopHealPatch3().Enable();
+                //new Patches.Heal.StopHealPatch5().Enable();
+                //new Patches.Heal.StopHealPatch6().Enable();
+                //new Patches.Heal.StopHealPatch7().Enable();
 
             }
             catch (Exception ex)

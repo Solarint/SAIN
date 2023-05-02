@@ -40,7 +40,7 @@ namespace Movement.Helpers
 
             for (int i = 0; i < 3; i++)
             {
-                FindArcPoint(BotPosition, TargetPosition, out Vector3 ArcPoint, ShuffleRange, ArcAngle, 0.25f, ShuffleRange);
+                Vector3 ArcPoint = FindArcPoint(BotPosition, TargetPosition, ShuffleRange, ArcAngle, 0.25f, ShuffleRange);
                 if (NavMesh.SamplePosition(ArcPoint, out NavMeshHit navmeshhit, 1f, -1))
                 {
                     position = navmeshhit.position;
@@ -51,7 +51,7 @@ namespace Movement.Helpers
             return false;
         }
 
-        private Vector3 FindArcPoint(Vector3 bot, Vector3 target, out Vector3 dodgePosition, float arcRadius, float arcAngle, float minDist, float maxDist)
+        public Vector3 FindArcPoint(Vector3 bot, Vector3 target, float arcRadius, float arcAngle, float minDist, float maxDist)
         {
             bool movingRight = Random.value > 0.5f;
 
@@ -67,7 +67,7 @@ namespace Movement.Helpers
             arcRadius = Mathf.Clamp(arcRadius, minDist, maxDist);
             float randomAngle = Random.Range(arcStart, arcEnd);
             Vector3 direction = Quaternion.AngleAxis(randomAngle, Vector3.up) * right;
-            dodgePosition = bot + direction * arcRadius;
+            Vector3 dodgePosition = bot + direction * arcRadius;
 
             return dodgePosition;
         }

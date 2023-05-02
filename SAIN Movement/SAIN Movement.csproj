@@ -195,10 +195,14 @@
     <Compile Include="Components\Experimental\DogFight\SAIN_Bot_Controller.cs" />
     <Compile Include="Helpers\BotDecision.cs" />
     <Compile Include="Components\Experimental\DogFight\DogFightComponent.cs" />
-    <Compile Include="Helpers\CoverCheckerHelper.cs" />
+    <Compile Include="Helpers\CoverHelpers.cs" />
+    <Compile Include="Layers\DogFight\Logic\UpdateSteering.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateShoot.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateMove.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateTarget.cs" />
+    <Compile Include="Patches\DoorPatch.cs" />
+    <Compile Include="Patches\BotGlobalPatches.cs" />
+    <Compile Include="Patches\HealPatches.cs" />
     <Compile Include="Patches\DogFightPatch.cs" />
     <Compile Include="Components\Experimental\DodgeComponent.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
@@ -208,7 +212,7 @@
     <Compile Include="Helpers\DodgeHelpers.cs" />
     <Compile Include="Layers\DogFight\DogFightLayer.cs" />
     <Compile Include="Layers\DogFight\DogFightLogic.cs" />
-    <Compile Include="Helpers\FindCorners.cs" />
+    <Compile Include="Helpers\Corners.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
     <Compile Include="Config\DogFight.cs" />
     <Compile Include="Config\DoorConfig.cs" />
@@ -228,7 +232,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Layers\Healing\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
