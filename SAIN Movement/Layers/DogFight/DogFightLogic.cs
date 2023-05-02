@@ -15,7 +15,12 @@ namespace SAIN.Movement.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
 
+            Logger.LogDebug($"Constructed");
+
             updateTarget_0 = new UpdateTarget(bot);
+
+            Logger.LogDebug($"Constructed");
+
             updateMove_0 = new UpdateMove(bot);
         }
 
@@ -129,22 +134,26 @@ namespace SAIN.Movement.Layers
             }
         }
 
-        public ManualLogSource Logger { get; private set; }
+        public ManualLogSource Logger;
     }
 
-    internal class UpdateTarget : DogFightLogic
+    internal class UpdateTarget
     {
-        //protected ManualLogSource Logger;
-        public UpdateTarget(BotOwner bot) : base(bot)
-        {
-            Logger.LogDebug($"Constructed");
+        private readonly BotOwner BotOwner;
 
-            //Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+        protected ManualLogSource Logger;
+        public UpdateTarget(BotOwner bot)
+        {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+
+            BotOwner = bot;
+
+            Logger.LogDebug($"Constructed {this.GetType().Name}");
 
             updateShoot_0 = new UpdateShoot(bot);
         }
 
-        public override void Update()
+        public void Update()
         {
             Logger.LogDebug($"Started");
 
@@ -235,14 +244,22 @@ namespace SAIN.Movement.Layers
         private float TalkDelay;
     }
 
-    internal class UpdateShoot : DogFightLogic
+    internal class UpdateShoot
     {
-        public UpdateShoot(BotOwner bot) : base(bot)
+        private readonly BotOwner BotOwner;
+
+        protected ManualLogSource Logger;
+
+        public UpdateShoot(BotOwner bot)
         {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+
+            BotOwner = bot;
+
             Logger.LogDebug($"Constructed {this.GetType().Name}");
         }
 
-        public override void Update()
+        public void Update()
         {
             Logger.LogDebug($"Started UpdateShoot");
 
@@ -289,23 +306,30 @@ namespace SAIN.Movement.Layers
         private int Bullets;
     }
 
-    internal class UpdateMove : DogFightLogic // GClass125
+    internal class UpdateMove
     {
-        //protected ManualLogSource Logger;
+        private readonly BotOwner BotOwner;
+
+        protected ManualLogSource Logger;
+
         private readonly BotDodge Dodge;
 
         private float DodgeTimer = 0f;
+
         private bool MovingToEnemy = false;
 
-        public UpdateMove(BotOwner bot) : base(bot)
+        public UpdateMove(BotOwner bot)
         {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+
+            BotOwner = bot;
+
             Logger.LogDebug($"Constructed");
 
-            //Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             Dodge = new BotDodge(bot);
         }
 
-        public override void Update()
+        public void Update()
         {
             Logger.LogDebug($"Started");
 
