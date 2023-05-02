@@ -22,10 +22,11 @@ namespace Movement
 
             try
             {
-                //new Patches.AddComponentPatch().Enable();
-                //new Patches.DisposeComponentPatch().Enable();
+                new Patches.AddComponentPatch().Enable();
+                new Patches.DisposeComponentPatch().Enable();
 
-                //new Patches.DogFight.BotGlobalMindPatch().Enable();
+                new Patches.DogFight.BotGlobalMindPatch().Enable();
+
                 //new Patches.DogFight.BotLogicDecisionPatch().Enable();
                 //new Patches.DogFight.DogFightGStructPatch().Enable();
                 //new Patches.DogFight.EndShootFromPlacePatch().Enable();

@@ -14,13 +14,7 @@ namespace SAIN.Movement.Layers
         public DogFightLogic(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-
-            Logger.LogDebug($"Constructed");
-
             updateTarget_0 = new UpdateTarget(bot);
-
-            Logger.LogDebug($"Constructed");
-
             updateMove_0 = new UpdateMove(bot);
         }
 
@@ -36,8 +30,6 @@ namespace SAIN.Movement.Layers
 
         public override void Update()
         {
-            Logger.LogDebug($"Started");
-
             var goalEnemy = BotOwner.Memory.GoalEnemy;
 
             Fight();
@@ -142,25 +134,18 @@ namespace SAIN.Movement.Layers
         private readonly BotOwner BotOwner;
 
         protected ManualLogSource Logger;
+
         public UpdateTarget(BotOwner bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-
             BotOwner = bot;
-
-            Logger.LogDebug($"Constructed {this.GetType().Name}");
-
             updateShoot_0 = new UpdateShoot(bot);
         }
 
         public void Update()
         {
-            Logger.LogDebug($"Started");
-
             if (BotFightInterface == null)
-            {
                 BotFightInterface = BotOwner.AimingData;
-            }
 
             BotOwner.BotLight.TurnOn(BotFightInterface.AlwaysTurnOnLight);
 
@@ -253,16 +238,11 @@ namespace SAIN.Movement.Layers
         public UpdateShoot(BotOwner bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-
             BotOwner = bot;
-
-            Logger.LogDebug($"Constructed {this.GetType().Name}");
         }
 
         public void Update()
         {
-            Logger.LogDebug($"Started UpdateShoot");
-
             if (!BotOwner.WeaponManager.HaveBullets)
             {
                 BotOwner.WeaponManager.Reload.TryReload();
@@ -321,33 +301,24 @@ namespace SAIN.Movement.Layers
         public UpdateMove(BotOwner bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-
             BotOwner = bot;
-
-            Logger.LogDebug($"Constructed");
-
             Dodge = new BotDodge(bot);
         }
 
         public void Update()
         {
-            Logger.LogDebug($"Started");
-
             if (BotOwner.Memory.GoalEnemy.IsVisible && DodgeTimer < Time.time)
             {
                 DodgeTimer = Time.time + 0.5f;
 
                 FullSpeed();
                 Dodge.Execute();
-                MovingToEnemy = false;
-
                 return;
             }
 
             if (!MovingToEnemy)
             {
                 FullSpeed();
-                return;
             }
 
             if (BotOwner.Memory.GoalEnemy.CanShoot)
