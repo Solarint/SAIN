@@ -3,8 +3,9 @@ using EFT;
 using Movement.Helpers;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UIElements;
 using static Movement.UserSettings.DogFight;
+using static Movement.UserSettings.Debug;
+using SAIN_Helpers;
 
 namespace Movement.Components
 {
@@ -21,6 +22,8 @@ namespace Movement.Components
             StartCoroutine(FindLeanAngleLoop());
 
             StartCoroutine(LeanConditionCheckLoop());
+
+            StartCoroutine(CheckVisibleLoop());
         }
 
         public void Dispose()
@@ -33,11 +36,11 @@ namespace Movement.Components
         {
             while (true)
             {
-                if (ShouldBotLean)
+                if (ShouldBotLean && !StartingLean)
                 {
                     StartCoroutine(ExecuteLean(0.25f));
                 }
-                else if (!ShouldBotLean)
+                else if (ShouldBotReset && !Resetting)
                 {
                     StartCoroutine(ResetLeanAfterDuration(Random.Range(1f, 2f)));
                 }
@@ -48,18 +51,35 @@ namespace Movement.Components
 
         public IEnumerator ExecuteLean(float delay)
         {
-            if (!StartingLean)
+            StartingLean = true;
+
+            yield return new WaitForSeconds(delay);
+
+            if (ShouldBotLean)
             {
-                StartingLean = true;
+                SetLean((LeaningRight ? 5 : -5), true);
+            }
 
-                yield return new WaitForSeconds(delay);
+            StartingLean = false;
+        }
 
-                StartingLean = false;
-
-                if (ShouldBotLean)
+        private IEnumerator CheckVisibleLoop()
+        {
+            while (true)
+            {
+                if (!GoalEnemyNull)
                 {
-                    SetLean((LeaningRight ? 5 : -5), true);
+                    if (CheckEnemyParts())
+                    {
+                        if (DebugMode)
+                        {
+                            Logger.LogDebug($"Enemy Visible");
+                        }
+                    }
+                    yield return new WaitForSeconds(0.25f);
                 }
+
+                yield return new WaitForEndOfFrame();
             }
         }
 
@@ -67,9 +87,9 @@ namespace Movement.Components
         {
             while (true)
             {
-                if (!EnemyVisibleOrShootable)
+                if (!GoalEnemyNull && !EnemyVisible)
                 {
-                    LeanAngle = Lean.FindLeanAngle(20f);
+                    LeanAngle = Lean.FindLeanAngle(20f, DebugMode);
                     yield return new WaitForSeconds(0.2f);
                 }
 
@@ -79,19 +99,16 @@ namespace Movement.Components
 
         private IEnumerator ResetLeanAfterDuration(float duration)
         {
-            if (!Resetting)
+            Resetting = true;
+
+            yield return new WaitForSeconds(duration);
+
+            if (ShouldBotReset)
             {
-                Resetting = true;
-
-                yield return new WaitForSeconds(duration);
-
-                Resetting = false;
-
-                if (!ShouldBotLean)
-                {
-                    SetLean(0f, false);
-                }
+                SetLean(0f, false);
             }
+
+            Resetting = false;
         }
 
         private void SetLean(float num, bool value)
@@ -102,17 +119,81 @@ namespace Movement.Components
 
                 bot.GetPlayer.MovementContext.SetTilt(num, false);
 
-                Logger.LogDebug($"Leaning Right: [{LeaningRight}] so Lean Input is {LastLeanNum} because [{LeanAngle}]");
+                if (DebugMode)
+                {
+                    Logger.LogDebug($"Leaning Right: [{LeaningRight}] so Lean Input is {LastLeanNum} because [{LeanAngle}]");
+                }
             }
+
             Lean.Leaning = value;
         }
 
-        private bool ShouldBotLean => (BotActive || !GoalEnemyNull || !EnemyVisibleOrShootable || AllowLean || AllowScavLean) && !BotInCover;
+        private bool AllowScavLean
+        {
+            get
+            {
+                if (bot.IsRole(WildSpawnType.assault) && !ScavLeanToggle.Value)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        private bool NewEnemyIsVisible;
+
+        private bool CheckLineOfSight
+        {
+            get
+            {
+                if (GoalEnemyNull)
+                {
+                    NewEnemyIsVisible = false;
+                    return false;
+                }
+
+                if (Physics.Raycast(bot.LookSensor._headPoint, bot.Memory.GoalEnemy.Direction, out RaycastHit hit, bot.Memory.GoalEnemy.Distance, LayerMaskClass.HighPolyWithTerrainMaskAI))
+                {
+                    if (DebugMode)
+                    {
+                        DebugDrawer.Line(bot.LookSensor._headPoint, hit.point, 0.05f, Color.white, 0.25f);
+                    }
+                    NewEnemyIsVisible = false;
+                    return false;
+                }
+
+                if (DebugMode)
+                {
+                    DebugDrawer.Ray(bot.LookSensor._headPoint, bot.Memory.GoalEnemy.Direction, bot.Memory.GoalEnemy.Distance, 0.05f, Color.red, 0.25f);
+                }
+                NewEnemyIsVisible = true;
+                return true;
+            }
+        }
+
+        private bool CheckEnemyParts()
+        {
+            var parts = bot.Memory.GoalEnemy.Owner.MainParts;
+            foreach (BodyPartClass part in parts.Values)
+            {
+                if (!Physics.Linecast(bot.LookSensor._headPoint, part.Position, LayerMaskClass.HighPolyWithTerrainMaskAI))
+                {
+                    if (DebugMode)
+                    {
+                        DebugDrawer.Line(bot.LookSensor._headPoint, part.Position, 0.1f, Color.red, 0.25f);
+                    }
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ShouldBotLean => BotActive && !GoalEnemyNull && !EnemyVisibleOrShootable && !BotInCover && AllowLean && AllowScavLean;
+        private bool ShouldBotReset => (!BotActive || GoalEnemyNull || EnemyVisibleOrShootable || !AllowLean || !AllowScavLean) && !BotInCover;
         private bool EnemyFar => !GoalEnemyNull && bot.Memory.GoalEnemy.Distance > 50f;
-        private bool BotActive => bot?.BotState == EBotState.Active;
-        private bool AllowScavLean => ScavLeanToggle.Value && Scav;
-        private bool AllowLean => LeanToggle.Value && !Scav;
-        private bool Scav => bot.IsRole(WildSpawnType.assault);
+        private bool BotActive => bot.BotState == EBotState.Active;
+        private bool AllowLean => LeanToggle.Value;
         private bool EnemyVisibleOrShootable => EnemyVisible || EnemyCanShoot;
         private bool EnemyVisible => !GoalEnemyNull && bot.Memory.GoalEnemy.IsVisible;
         private bool EnemyCanShoot => !GoalEnemyNull && bot.Memory.GoalEnemy.CanShoot;
@@ -121,12 +202,13 @@ namespace Movement.Components
         public bool LeaningRight => LeanAngle > 0f;
         public float LeanAngle { get; private set; }
 
+        private bool DebugMode => DebugDynamicLean.Value;
+
         private Corners.FindDirectionToLean Lean;
         private BotOwner bot;
         protected ManualLogSource Logger;
         private bool StartingLean;
         private bool Resetting;
         private float LastLeanNum = 0f;
-
     }
 }

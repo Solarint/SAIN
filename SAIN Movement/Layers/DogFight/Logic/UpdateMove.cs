@@ -277,6 +277,9 @@ namespace SAIN.Movement.Layers.DogFight
                 PathLength = Path.CalculatePathLength();
             }
         }
+        private NavMeshPath Path = new NavMeshPath();
+        private float LastDistanceCheck = 0f;
+        private float PathLength = 0f;
 
         private NavMeshPath navMeshPath_0 = new NavMeshPath();
         private readonly BotOwner BotOwner;
@@ -285,9 +288,6 @@ namespace SAIN.Movement.Layers.DogFight
         private readonly CoverFinder CoverFinder;
         private float DodgeTimer = 0f;
         private Vector3? targetPos = null;
-        private NavMeshPath Path = new NavMeshPath();
-        private float LastDistanceCheck = 0f;
-        private float PathLength = 0f;
         private float ReactionTimer = 0f;
     }
 }

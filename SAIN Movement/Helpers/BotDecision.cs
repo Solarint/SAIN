@@ -22,10 +22,6 @@ namespace Movement.Components
 
         public bool GetDecision()
         {
-            if (Execute.Heal())
-            {
-                return true;
-            }
             if (Execute.CancelReload())
             {
                 return true;
@@ -34,7 +30,7 @@ namespace Movement.Components
             {
                 return true;
             }
-            if (Execute.SprintWhileReload())
+            if (Execute.Heal())
             {
                 return true;
             }
@@ -63,16 +59,12 @@ namespace Movement.Components
 
                 if (ShouldI.Heal())
                 {
-                    if (CheckEnemyDistance(out Vector3 movepoint))
+                    bot.Medecine.RefreshCurMeds();
+                    if (bot.Medecine.FirstAid.ShallStartUse())
                     {
-                        bot.Medecine.RefreshCurMeds();
-                        if (bot.Medecine.FirstAid.ShallStartUse())
-                        {
-                            bot.Medecine.FirstAid.TryApplyToCurrentPart(null, null);
-                            bot.GoToPoint(movepoint, false, -1f, false, true, true);
-                            Logger.LogDebug($"Healing");
-                            return true;
-                        }
+                        bot.Medecine.FirstAid.TryApplyToCurrentPart(null, null);
+                        Logger.LogDebug($"Healing");
+                        return true;
                     }
                 }
 
@@ -81,6 +73,11 @@ namespace Movement.Components
 
             public bool CancelReload()
             {
+                if (!bot.WeaponManager.Reload.Reloading)
+                {
+                    return false;
+                }
+
                 if (ShouldI.CancelReload())
                 {
                     bot.WeaponManager.Reload.TryStopReload();
@@ -92,6 +89,11 @@ namespace Movement.Components
 
             public bool Reload()
             {
+                if (bot.WeaponManager.Reload.Reloading)
+                {
+                    return true;
+                }
+
                 if (ShouldI.Reload())
                 {
                     Logger.LogDebug($"Reloading");
@@ -99,73 +101,6 @@ namespace Movement.Components
                     return true;
                 }
                 return false;
-            }
-
-            public bool SprintWhileReload()
-            {
-                if (ShouldI.Reload() && ShouldI.Sprint())
-                {
-                    CheckEnemyDistance(out Vector3 position);
-                    var coverPoint = bot.Covers.FindClosestPoint(position, false);
-                    bot.Steering.LookToMovingDirection();
-                    bot.Mover.Sprint(true);
-                    bot.Sprint(true);
-                    bot.GoToPoint(coverPoint.Position, false, -1f, false, true, true);
-
-                    if (!bot.WeaponManager.Reload.Reloading)
-                        bot.WeaponManager.Reload.Reload();
-
-                    Logger.LogDebug($"Sprint Reloading");
-                    return true;
-                }
-                return false;
-            }
-
-            public bool CheckEnemyDistance(out Vector3 trgPos)
-            {
-                Vector3 a = -NormalizeFastSelf(bot.Memory.GoalEnemy.Direction);
-
-                trgPos = Vector3.zero;
-
-                float num = 0f;
-                if (NavMesh.SamplePosition(bot.Position + a * 2f / 2f, out NavMeshHit navMeshHit, 1f, -1))
-                {
-                    trgPos = navMeshHit.position;
-
-                    Vector3 a2 = trgPos - bot.Position;
-
-                    float magnitude = a2.magnitude;
-
-                    if (magnitude != 0f)
-                    {
-                        Vector3 a3 = a2 / magnitude;
-
-                        num = magnitude;
-
-                        if (NavMesh.SamplePosition(bot.Position + a3 * 2f, out navMeshHit, 1f, -1))
-                        {
-                            trgPos = navMeshHit.position;
-
-                            num = (trgPos - bot.Position).magnitude;
-                        }
-                    }
-                }
-                if (num != 0f && num > bot.Settings.FileSettings.Move.REACH_DIST)
-                {
-                    NavMeshPath navMeshPath_0 = new NavMeshPath();
-                    if (NavMesh.CalculatePath(bot.Position, trgPos, -1, navMeshPath_0) && navMeshPath_0.status == NavMeshPathStatus.PathComplete)
-                    {
-                        trgPos = navMeshPath_0.corners[navMeshPath_0.corners.Length - 1];
-
-                        return CheckStraightDistance(navMeshPath_0, num);
-                    }
-                }
-                return false;
-            }
-
-            private bool CheckStraightDistance(NavMeshPath path, float straighDist)
-            {
-                return path.CalculatePathLength() < straighDist * 1.2f;
             }
         }
 
@@ -182,7 +117,6 @@ namespace Movement.Components
             {
                 if (bot.WeaponManager.Reload.Reloading)
                 {
-                    bot.WeaponManager.Reload.TryStopReload();
                     return false;
                 }
 
@@ -202,12 +136,16 @@ namespace Movement.Components
             public bool Reload()
             {
                 if (bot?.WeaponManager?.Reload == null || bot?.WeaponManager?.CurrentWeapon == null)
+                {
                     return false;
+                }
 
                 if (!bot.WeaponManager.Reload.Reloading && bot.WeaponManager.Reload.CanReload(false))
                 {
                     if (!bot.WeaponManager.HaveBullets)
+                    {
                         return true;
+                    }
 
                     int currentAmmo = bot.WeaponManager.Reload.BulletCount;
                     int maxAmmo = bot.WeaponManager.Reload.MaxBulletCount;
@@ -226,32 +164,18 @@ namespace Movement.Components
                 return false;
             }
 
-            public bool Sprint()
-            {
-                if (!bot.WeaponManager.HaveBullets)
-                {
-                    if (bot.Memory.GoalEnemy != null && bot.Memory.GoalEnemy.IsVisible)
-                    {
-                        if (bot.Mover != null && bot.Steering != null)
-                            return true;
-                    }
-                }
-                return false;
-            }
-
             public bool CancelReload()
             {
                 if (bot?.Memory?.GoalEnemy == null || bot?.WeaponManager?.CurrentWeapon == null)
-                    return false;
-
-                if (!Physics.Raycast(bot.MyHead.position, (bot.MyHead.position - bot.Memory.GoalEnemy.CurrPosition), (bot.MyHead.position - bot.Memory.GoalEnemy.CurrPosition).magnitude - 0.25f, LayerMaskClass.HighPolyWithTerrainMask))
                 {
-                    if (bot.WeaponManager.Reload.Reloading)
+                    return false;
+                }
+
+                if (bot.WeaponManager.Reload.Reloading)
+                {
+                    if (bot.WeaponManager.HaveBullets)
                     {
-                        if (bot.WeaponManager.HaveBullets)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
 

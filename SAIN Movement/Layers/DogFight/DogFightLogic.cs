@@ -35,15 +35,12 @@ namespace SAIN.Movement.Layers
 
                 Steering.Update(Move.FallingBack, DebugMode);
 
-                if (Decisions.GetDecision())
-                {
-                    return;
-                }
-
-                if (!EnemyIsNull && CanShootEnemyAndVisible)
+                if (CanShootEnemyAndVisible)
                 {
                     Targeting.Update();
                 }
+
+                Decisions.GetDecision();
             }
 
             private readonly UpdateTarget Targeting;
@@ -53,8 +50,8 @@ namespace SAIN.Movement.Layers
 
             public bool EnemyIsNull => BotOwner.Memory.GoalEnemy == null;
             public bool CanShootEnemyAndVisible => CanShootEnemy && CanSeeEnemy;
-            public bool CanShootEnemy => BotOwner.Memory.GoalEnemy.IsVisible;
-            public bool CanSeeEnemy => BotOwner.Memory.GoalEnemy.CanShoot;
+            public bool CanShootEnemy => !EnemyIsNull && BotOwner.Memory.GoalEnemy.IsVisible;
+            public bool CanSeeEnemy => !EnemyIsNull && BotOwner.Memory.GoalEnemy.CanShoot;
             public bool DebugMode => DebugDogFightLayer.Value;
             public bool DebugDrawPoints => DebugDogFightLayerDraw.Value;
 

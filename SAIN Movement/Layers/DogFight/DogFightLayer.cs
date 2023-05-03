@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.AI;
 using static SAIN_Helpers.DebugDrawer;
 using static SAIN_Helpers.SAIN_Math;
+using static Movement.UserSettings.Debug;
+using SAIN_Helpers;
 
 namespace SAIN.Movement.Layers
 {
@@ -12,8 +14,12 @@ namespace SAIN.Movement.Layers
     {
         internal class DogFightLayer : CustomLayer
         {
+            private readonly float DogFightIn = 25f;
+
+            private readonly float DogFightOut = 30f;
+
             protected ManualLogSource Logger;
-            protected float nextRoamCheckTime = 0f;
+
             protected bool isActive = false;
 
             public DogFightLayer(BotOwner botOwner, int priority) : base(botOwner, priority)
@@ -29,47 +35,35 @@ namespace SAIN.Movement.Layers
 
             public override bool IsActive()
             {
-                if (BotOwner.Memory.IsPeace || BotOwner.Memory.GoalEnemy == null)
+                if (BotOwner.Memory.GoalEnemy == null || BotOwner.BewareGrenade?.GrenadeDangerPoint?.Grenade != null || EnemyFar)
                 {
                     isActive = false;
                     return false;
                 }
 
-                if (BotOwner.Memory.GoalEnemy.Distance > DogFightOut)
+                CheckPathLength();
+
+                if (PathLength < DogFightIn)
+                {
+                    isActive = true;
+                }
+                else if (PathLength > DogFightOut)
                 {
                     isActive = false;
-                    return false;
                 }
 
-                if (BotOwner.BewareGrenade?.GrenadeDangerPoint?.Grenade != null)
-                {
-                    isActive = false;
-                    return false;
-                }
-
-                // If we're active already, then stay active
                 if (isActive)
                 {
-                    return true;
+                    DebugDrawPath();
                 }
 
-                if (BotOwner.Memory.GoalEnemy.Distance < DogFightIn)
-                {
-                    if (CheckEnemyDistance(out Vector3 vector))
-                    {
-                        Logger.LogDebug("  DOGFIGHT");
-                        isActive = true;
-                        return true;
-                    }
-                }
-
-                return false;
+                return isActive;
             }
 
             public override Action GetNextAction()
             {
                 Logger.LogInfo($"Called DogFight GetAction for {BotOwner.name}");
-                return new Action(typeof(DogFightLogic), "DogFight Mode Engaged");
+                return new Action(typeof(DogFightLogic), "DogFight");
             }
 
             public override bool IsCurrentActionEnding()
@@ -77,61 +71,37 @@ namespace SAIN.Movement.Layers
                 return false;
             }
 
-            public bool CheckEnemyDistance(out Vector3 trgPos)
+            private void DebugDrawPath()
             {
-                Vector3 a = -NormalizeFastSelf(BotOwner.Memory.GoalEnemy.Direction);
-
-                trgPos = Vector3.zero;
-
-                float num = 0f;
-                if (NavMesh.SamplePosition(BotOwner.Position + a * 2f / 2f, out NavMeshHit navMeshHit, 1f, -1))
+                if (DebugDogFightLayerDraw.Value && DebugTimer < Time.time)
                 {
-                    trgPos = navMeshHit.position;
-
-                    Vector3 a2 = trgPos - BotOwner.Position;
-
-                    float magnitude = a2.magnitude;
-
-                    if (magnitude != 0f)
+                    DebugTimer = Time.time + 1f;
+                    for (int i = 0; i < Path.corners.Length - 1; i++)
                     {
-                        Vector3 a3 = a2 / magnitude;
-
-                        num = magnitude;
-
-                        if (NavMesh.SamplePosition(BotOwner.Position + a3 * 2f, out navMeshHit, 1f, -1))
-                        {
-                            trgPos = navMeshHit.position;
-
-                            Sphere(trgPos, 0.15f, Color.yellow, 1f);
-
-                            num = (trgPos - BotOwner.Position).magnitude;
-                        }
+                        Vector3 corner1 = Path.corners[i];
+                        Vector3 corner2 = Path.corners[i + 1];
+                        Line(corner1, corner2, 0.025f, Color.white, 1f);
                     }
                 }
-                if (num != 0f && num > BotOwner.Settings.FileSettings.Move.REACH_DIST)
-                {
-                    navMeshPath_0.ClearCorners();
-                    if (NavMesh.CalculatePath(BotOwner.Position, trgPos, -1, navMeshPath_0) && navMeshPath_0.status == NavMeshPathStatus.PathComplete)
-                    {
-                        trgPos = navMeshPath_0.corners[navMeshPath_0.corners.Length - 1];
-
-                        Sphere(trgPos, 0.25f, Color.white, 1f);
-                        Line(trgPos, BotOwner.Transform.position, 0.05f, Color.white, 1f);
-
-                        return CheckStraightDistance(navMeshPath_0, num);
-                    }
-                }
-                return false;
             }
 
-            private bool CheckStraightDistance(NavMeshPath path, float straighDist)
+            private void CheckPathLength()
             {
-                return path.CalculatePathLength() < straighDist * 1.2f;
+                if (LastDistanceCheck < Time.time)
+                {
+                    LastDistanceCheck = Time.time + 0.5f;
+                    NavMesh.CalculatePath(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, -1, Path);
+                    PathLength = Path.CalculatePathLength();
+                }
             }
 
-            private NavMeshPath navMeshPath_0 = new NavMeshPath();
-            private static readonly float DogFightIn = 25f;
-            private static readonly float DogFightOut = 30f;
+            private float DebugTimer = 0f;
+            private NavMeshPath Path = new NavMeshPath();
+            private float LastDistanceCheck = 0f;
+            private float PathLength = 0f;
+
+            private bool EnemyFar => EnemyDistance > 50f;
+            private float EnemyDistance => Vector3.Distance(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition);
         }
     }
 }
