@@ -36,11 +36,13 @@ namespace SAIN.Movement.Layers.DogFight
 
                 if (CheckFallBackConditions(debug, debugDrawAll))
                 {
-                    if (HasStamina) SetSprint(true);
-                    else SetSprint(false);
+                    SetSprint(HasStamina);
                     return;
                 }
-                else SetSprint(false);
+                else
+                {
+                    SetSprint(false);
+                }
 
                 if (CanShootEnemyAndVisible)
                 {
@@ -63,17 +65,37 @@ namespace SAIN.Movement.Layers.DogFight
                 }
                 else
                 {
-                    if (ShouldISneak) Sneak();
-                    else if (!IsEnemyClose) SlowWalk();
-                    else if (IsEnemyVeryClose) FullSpeed();
-                    else NormalSpeed();
+                    DecideMovementSpeed();
 
-                    if (!BotIsAtLastEnemyPosition && LastEnemyPosition != null) BotOwner.MoveToEnemyData.TryMoveToEnemy(LastEnemyPosition.Value);
+                    if (!BotIsAtLastEnemyPosition && LastEnemyPosition != null)
+                    {
+                        BotOwner.MoveToEnemyData.TryMoveToEnemy(LastEnemyPosition.Value);
+                    }
                     else
                     {
                         BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
                     }
                 }
+            }
+        }
+
+        private void DecideMovementSpeed()
+        {
+            if (ShouldISneak)
+            {
+                Sneak();
+            }
+            else if (!IsEnemyClose)
+            {
+                SlowWalk();
+            }
+            else if (IsEnemyVeryClose)
+            {
+                FullSpeed();
+            }
+            else
+            {
+                NormalSpeed();
             }
         }
 

@@ -1,15 +1,8 @@
 ﻿using BepInEx.Logging;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
-using SAIN_Helpers;
-using UnityEngine;
-using UnityEngine.AI;
 using Movement.Components;
-using Movement.Helpers;
-using Movement.UserSettings;
-using System.Configuration;
 using static Movement.UserSettings.Debug;
-using System;
 
 namespace SAIN.Movement.Layers
 {
@@ -23,6 +16,7 @@ namespace SAIN.Movement.Layers
                 Targeting = new UpdateTarget(bot);
                 Move = new UpdateMove(bot);
                 Steering = new UpdateSteering(bot);
+                Decisions = new BotDecision(bot);
             }
 
             public override void Start()
@@ -41,6 +35,11 @@ namespace SAIN.Movement.Layers
 
                 Steering.Update(Move.FallingBack, DebugMode);
 
+                if (Decisions.GetDecision())
+                {
+                    return;
+                }
+
                 if (!EnemyIsNull && CanShootEnemyAndVisible)
                 {
                     Targeting.Update();
@@ -50,6 +49,7 @@ namespace SAIN.Movement.Layers
             private readonly UpdateTarget Targeting;
             private readonly UpdateMove Move;
             private readonly UpdateSteering Steering;
+            public readonly BotDecision Decisions;
 
             public bool EnemyIsNull => BotOwner.Memory.GoalEnemy == null;
             public bool CanShootEnemyAndVisible => CanShootEnemy && CanSeeEnemy;

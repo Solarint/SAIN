@@ -26,7 +26,9 @@ namespace SAIN.Movement.Layers.DogFight
         public void Update()
         {
             if (BotFightInterface == null)
+            {
                 BotFightInterface = BotOwner.AimingData;
+            }
 
             BotOwner.BotLight.TurnOn(BotFightInterface.AlwaysTurnOnLight);
 

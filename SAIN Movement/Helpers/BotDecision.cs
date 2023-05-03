@@ -9,11 +9,12 @@ using SAIN_Helpers;
 
 namespace Movement.Components
 {
-    public class Decisions : MonoBehaviour
+    public class BotDecision : MonoBehaviour
     {
         private readonly BotOwner bot;
-        public Decisions(BotOwner botOwner_0)
+        public BotDecision(BotOwner botOwner_0)
         {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(BotDecision));
             bot = botOwner_0;
         }
 
@@ -21,40 +22,48 @@ namespace Movement.Components
 
         public bool GetDecision()
         {
-            if (Logger == null)
-                Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(Decisions));
-
-            if (Execute.Heal(bot))
+            if (Execute.Heal())
             {
                 return true;
             }
-            if (Execute.CancelReload(bot))
+            if (Execute.CancelReload())
             {
                 return true;
             }
-            if (Execute.Reload(bot))
+            if (Execute.Reload())
             {
                 return true;
             }
-            if (Execute.SprintWhileReload(bot))
+            if (Execute.SprintWhileReload())
             {
                 return true;
             }
             return false;
         }
 
-        public class Execute
+        public DoDecision Execute { get; private set; }
+
+        public class DoDecision
         {
-            public static bool Heal(BotOwner bot)
+            public DoDecision(BotOwner bot)
+            {
+                this.bot = bot;
+                ShouldI = new ShouldBot(bot);
+            }
+
+            private readonly BotOwner bot;
+            public ShouldBot ShouldI { get; private set; }
+
+            public bool Heal()
             {
                 if (bot.Medecine.Using)
                 {
                     return true;
                 }
 
-                if (Should.Heal(bot))
+                if (ShouldI.Heal())
                 {
-                    if (CheckEnemyDistance(out Vector3 movepoint, bot))
+                    if (CheckEnemyDistance(out Vector3 movepoint))
                     {
                         bot.Medecine.RefreshCurMeds();
                         if (bot.Medecine.FirstAid.ShallStartUse())
@@ -70,9 +79,9 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool CancelReload(BotOwner bot)
+            public bool CancelReload()
             {
-                if (Should.CancelReload(bot))
+                if (ShouldI.CancelReload())
                 {
                     bot.WeaponManager.Reload.TryStopReload();
                     Logger.LogDebug($"Stopped reload to shoot");
@@ -81,9 +90,9 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool Reload(BotOwner bot)
+            public bool Reload()
             {
-                if (Should.Reload(bot))
+                if (ShouldI.Reload())
                 {
                     Logger.LogDebug($"Reloading");
                     bot.WeaponManager.Reload.TryReload();
@@ -92,11 +101,11 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool SprintWhileReload(BotOwner bot)
+            public bool SprintWhileReload()
             {
-                if (Should.Reload(bot) && Should.Sprint(bot))
+                if (ShouldI.Reload() && ShouldI.Sprint())
                 {
-                    CheckEnemyDistance(out Vector3 position, bot);
+                    CheckEnemyDistance(out Vector3 position);
                     var coverPoint = bot.Covers.FindClosestPoint(position, false);
                     bot.Steering.LookToMovingDirection();
                     bot.Mover.Sprint(true);
@@ -112,7 +121,7 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool CheckEnemyDistance(out Vector3 trgPos, BotOwner bot)
+            public bool CheckEnemyDistance(out Vector3 trgPos)
             {
                 Vector3 a = -NormalizeFastSelf(bot.Memory.GoalEnemy.Direction);
 
@@ -154,15 +163,22 @@ namespace Movement.Components
                 return false;
             }
 
-            private static bool CheckStraightDistance(NavMeshPath path, float straighDist)
+            private bool CheckStraightDistance(NavMeshPath path, float straighDist)
             {
                 return path.CalculatePathLength() < straighDist * 1.2f;
             }
         }
 
-        public class Should
+        public class ShouldBot
         {
-            public static bool Heal(BotOwner bot)
+            public ShouldBot(BotOwner bot)
+            {
+                this.bot = bot;
+            }
+
+            private readonly BotOwner bot;
+
+            public bool Heal()
             {
                 if (bot.WeaponManager.Reload.Reloading)
                 {
@@ -183,7 +199,7 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool Reload(BotOwner bot)
+            public bool Reload()
             {
                 if (bot?.WeaponManager?.Reload == null || bot?.WeaponManager?.CurrentWeapon == null)
                     return false;
@@ -210,7 +226,7 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool Sprint(BotOwner bot)
+            public bool Sprint()
             {
                 if (!bot.WeaponManager.HaveBullets)
                 {
@@ -223,7 +239,7 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool CancelReload(BotOwner bot)
+            public bool CancelReload()
             {
                 if (bot?.Memory?.GoalEnemy == null || bot?.WeaponManager?.CurrentWeapon == null)
                     return false;
@@ -242,7 +258,7 @@ namespace Movement.Components
                 return false;
             }
 
-            public static bool Attack(BotOwner bot)
+            public bool Attack()
             {
                 return false;
             }

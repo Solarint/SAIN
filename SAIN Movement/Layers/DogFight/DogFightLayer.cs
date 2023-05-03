@@ -3,8 +3,8 @@ using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN_Helpers.SAIN_Math;
 using static SAIN_Helpers.DebugDrawer;
+using static SAIN_Helpers.SAIN_Math;
 
 namespace SAIN.Movement.Layers
 {
