@@ -192,7 +192,6 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\Experimental\DogFight\SAIN_Bot_Controller.cs" />
     <Compile Include="Helpers\BotDecision.cs" />
     <Compile Include="Components\Experimental\DogFight\DogFightComponent.cs" />
     <Compile Include="Helpers\CoverHelpers.cs" />
