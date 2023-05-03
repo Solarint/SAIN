@@ -38,11 +38,13 @@ namespace Movement.Helpers
             return false;
         }
 
+        private float DebugTimer = 0f;
+
         private Vector3? FindCover(Vector3 bot, Vector3 target, float initialArcRadius, float radiusIncrementStep, bool debugMode = false, bool debugDrawAll = false)
         {
-            const float incrementAngle = 10.0f;
-            const float incrementRadiusBase = 5.0f;
-            const int maxIterations = 10;
+            const float incrementAngle = 5.0f;
+            const float incrementRadiusBase = 2.0f;
+            const int maxIterations = 100;
 
             float currentRadius = initialArcRadius;
             int iterations = 0;
@@ -51,20 +53,48 @@ namespace Movement.Helpers
             {
                 for (float angle = -120.0f; angle <= 120.0f; angle += incrementAngle)
                 {
+                    // Generates a random point in a 240 degree arc away from the enemy
                     Vector3 potentialCover = FindArcPoint(bot, target, currentRadius, angle, debugDrawAll);
 
-                    if (CheckCover(potentialCover, debugMode))
+                    // Runs the random point through our cover checker to see if its viable or not. How viable it is will be saved as properties for the analyzer instance until another coverpoint is checked.
+                    CheckCover(potentialCover, debugMode);
+
+                    // Debug Draw Checks
+                    if (DebugTimer < Time.time && debugDrawAll)
+                    {
+                        if (Analyzer.ProneCover || Analyzer.GoodCover || Analyzer.FullCover)
+                        {
+                            DebugTimer = Time.time + 0.25f;
+                            DebugDrawer.Sphere(potentialCover, 0.1f, Color.white, 3f);
+                        }
+                    }
+
+                    // Checks cover viability based on how many iterations the loop has gone through, the longer it goes, the more lax the restrictions.
+                    if (Analyzer.FullCover)
+                    {
+                        return potentialCover;
+                    }
+                    else if (iterations > 33 && Analyzer.GoodCover && Analyzer.ChestCover)
+                    {
+                        return potentialCover;
+                    }
+                    else if (iterations > 66 && Analyzer.GoodCover)
+                    {
+                        return potentialCover;
+                    }
+                    else if (iterations > 90 && Analyzer.ProneCover)
                     {
                         return potentialCover;
                     }
                 }
 
+                // Increment the radius size and angle checked.
                 float incrementRadius = incrementRadiusBase + (iterations * radiusIncrementStep);
                 currentRadius += incrementRadius;
                 iterations++;
             }
 
-            // If no suitable point is found, return the bot's position as a fallback
+            // If still no suitable point is found, return null
             return null;
         }
 
@@ -72,11 +102,8 @@ namespace Movement.Helpers
         {
             if (NavMesh.SamplePosition(point, out var navHit, 0.5f, NavMesh.AllAreas))
             {
-                if (Analyzer.AnalyseCoverPosition(navHit.position, debugMode))
+                if (Analyzer.AnalyseCoverPosition(navHit.position, debugMode) && Analyzer.FullCover)
                 {
-                    if (debugMode)
-                        DebugDrawer.Ray(navHit.position, Vector3.up, 3f, 0.1f, Color.white, 3f);
-
                     return true;
                 }
             }
@@ -97,20 +124,12 @@ namespace Movement.Helpers
             Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * right;
             Vector3 edgePosition = bot + direction * arcRadius;
 
-            if (debugDrawAll)
-                DebugDrawer.Sphere(edgePosition, 0.05f, Color.white, 1f);
-
             return edgePosition;
         }
     }
 
     public class CoverAnalyzer
     {
-        /// <summary>
-        /// Constructor for CoverAnalyzer class.
-        /// </summary>
-        /// <param name="bot">The BotOwner object.</param>
-        /// <returns>A CoverAnalyzer object.</returns>
         public CoverAnalyzer(BotOwner bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
@@ -127,6 +146,7 @@ namespace Movement.Helpers
         public bool CanShoot { get; private set; }
         public Vector3? AcceptableCoverPosition { get; private set; }
         public bool GoodCover { get; private set; }
+        public bool FullCover { get; private set; }
 
         private Vector3 enemyGunPos;
 
@@ -148,8 +168,11 @@ namespace Movement.Helpers
                 ChestCover = false;
                 WaistCover = false;
                 ProneCover = false;
+
                 CanShoot = false;
+                AcceptableCoverPosition = null;
                 GoodCover = false;
+                FullCover = false;
             }
 
             enemyGunPos = BotOwner.Memory.GoalEnemy.Owner.GetPlayer.PlayerBones.WeaponRoot.position;
@@ -158,13 +181,13 @@ namespace Movement.Helpers
                 Head(coverPoint, 0.01f, debugMode);
 
             if (chest)
-                Chest(coverPoint, 1.1f, 0.01f, debugMode);
+                Chest(coverPoint, 1.2f, 0.01f, debugMode);
 
             if (waist)
-                Waist(coverPoint, 0.6f, 0.01f, debugMode);
+                Waist(coverPoint, 0.7f, 0.01f, debugMode);
 
             if (prone)
-                Prone(coverPoint, 0.2f, 0.01f, debugMode);
+                Prone(coverPoint, 0.3f, 0.01f, debugMode);
 
             // Check if there is any cover at all
             if (!HeadCover && !ChestCover && !WaistCover && !ProneCover)
@@ -182,17 +205,24 @@ namespace Movement.Helpers
             {
                 GoodCover = true;
 
-                if (debugMode)
+                if (ChestCover && HeadCover)
                 {
-                    Logger.LogDebug($"Found GoodCover for {BotOwner.name}");
+                    FullCover = true;
+                }
 
-                    Vector3 enemyPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
-                    enemyPosition.y += 1.3f;
+                if (debugMode && DebugTimer < Time.time)
+                {
+                    DebugTimer = Time.time + 2.5f;
+
+                    Logger.LogDebug($"Found GoodCover for {BotOwner.name}. Debug Lines are Blue");
+
+                    Vector3 enemyPosition = BotOwner.Memory.GoalEnemy.Owner.GetPlayer.PlayerBones.WeaponRoot.position;
                     float botHeight = BotOwner.MyHead.position.y - BotOwner.Transform.position.y;
 
-                    DebugDrawer.Ray(coverPoint, Vector3.up, botHeight, 0.1f, Color.white, 20f);
-                    DebugDrawer.Line(coverPoint, BotOwner.MyHead.position, 0.05f, Color.blue, 20f);
-                    DebugDrawer.Line(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.MyHead.position, 0.05f, Color.blue, 20f);
+                    DebugDrawer.Ray(coverPoint, Vector3.up, botHeight, 0.1f, Color.blue, 5f);
+                    DebugDrawer.Line(coverPoint, BotOwner.LookSensor._headPoint, 0.1f, Color.blue, 5f);
+                    DebugDrawer.Line(enemyPosition, BotOwner.LookSensor._headPoint, 0.1f, Color.blue, 5f);
+                    DebugDrawer.Line(enemyPosition, coverPoint, 0.1f, Color.blue, 5f);
                 }
 
                 return true;
@@ -201,6 +231,8 @@ namespace Movement.Helpers
             return false;
         }
 
+        private float DebugTimer = 0f;
+
         /// <summary>
         /// Checks if a bot can shoot from a coverpoint
         /// </summary>
@@ -208,10 +240,8 @@ namespace Movement.Helpers
         /// <returns>True if they can shoot.</returns>
         private bool Shoot(Vector3 coverPoint, bool debugMode = false)
         {
-            Vector3 myHeadPos = coverPoint;
-            myHeadPos.y += BotOwner.LookSensor._headPoint.y;
-
-            if (!CheckVisiblity(BotOwner.WeaponRoot.position, enemyGunPos, 0.01f, debugMode))
+            coverPoint.y += BotOwner.WeaponRoot.position.y;
+            if (!CheckVisiblity(coverPoint, enemyGunPos, 0.01f, debugMode))
             {
                 CanShoot = true;
                 return true;
@@ -333,18 +363,12 @@ namespace Movement.Helpers
             Ray ray = new Ray(start, direction);
             float distance = Vector3.Distance(start, end);
 
-            if (Physics.SphereCast(ray, sphereSize, out RaycastHit hit, distance))
+            if (Physics.SphereCast(ray, sphereSize, distance))
             {
-                if (debugMode)
-                    DebugDrawer.Line(end, hit.point, 0.01f, Color.white, 20f);
-
                 return false;
             }
             else
             {
-                if (debugMode)
-                    DebugDrawer.Line(end, hit.point, 0.01f, Color.red, 20f);
-
                 return true;
             }
         }

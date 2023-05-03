@@ -129,7 +129,7 @@ namespace SAIN.Movement.Layers
                 return path.CalculatePathLength() < straighDist * 1.2f;
             }
 
-            private readonly NavMeshPath navMeshPath_0 = new NavMeshPath();
+            private NavMeshPath navMeshPath_0 = new NavMeshPath();
             private static readonly float DogFightIn = 25f;
             private static readonly float DogFightOut = 30f;
         }
