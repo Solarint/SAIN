@@ -1,14 +1,17 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using Movement.Helpers;
+using SAIN_Helpers;
 using UnityEngine;
 using UnityEngine.AI;
+using static HairRenderer;
 using static SAIN_Helpers.SAIN_Math;
 
 namespace SAIN.Movement.Layers.DogFight
 {
     internal class UpdateMove
     {
+        private const float UpdateFrequency = 0.1f;
         public UpdateMove(BotOwner bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
@@ -21,10 +24,10 @@ namespace SAIN.Movement.Layers.DogFight
         {
             if (ReactionTimer < Time.time)
             {
-                ReactionTimer = Time.time + 0.25f;
+                ReactionTimer = Time.time + UpdateFrequency;
                 UpdateDoorOpener();
 
-                if (CanSeeEnemy)
+                if (CanShootEnemy)
                 {
                     EnemyLastSeenTime = Time.time;
                     LastEnemyPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
@@ -37,37 +40,24 @@ namespace SAIN.Movement.Layers.DogFight
                 if (CheckFallBackConditions(debug, debugDrawAll))
                 {
                     SetSprint(HasStamina);
+                    FallingBack = true;
                     return;
                 }
                 else
                 {
+                    FallingBack = false;
                     SetSprint(false);
                 }
 
-                if (CanShootEnemyAndVisible)
+                if (CanShootEnemy)
                 {
-                    FullSpeed();
-                    if (DodgeTimer < Time.time)
-                    {
-                        DodgeTimer = Time.time + 1f;
-                        Dodge.Execute();
-                    }
-                    else if (CheckEnemyDistance(out Vector3 trgPos))
-                    {
-                        Vector3 DodgeFallBack = Dodge.FindArcPoint(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, 3f, 30f, 1f, 3f);
-                        DodgeFallBack -= BotOwner.Transform.position;
-                        trgPos += DodgeFallBack;
-
-                        BotOwner.GoToPoint(trgPos, false, 1f);
-                        UpdateDoorOpener();
-                    }
-                    return;
+                    DecidePoseFromCoverLevel();
                 }
                 else
                 {
                     DecideMovementSpeed();
 
-                    if (!BotIsAtLastEnemyPosition && LastEnemyPosition != null)
+                    if (LastEnemyPosition != null && !BotIsAtLastEnemyPosition)
                     {
                         BotOwner.MoveToEnemyData.TryMoveToEnemy(LastEnemyPosition.Value);
                     }
@@ -81,21 +71,21 @@ namespace SAIN.Movement.Layers.DogFight
 
         private void DecideMovementSpeed()
         {
-            if (ShouldISneak)
-            {
-                Sneak();
-            }
-            else if (!IsEnemyClose)
-            {
-                SlowWalk();
-            }
-            else if (IsEnemyVeryClose)
+            if (IsEnemyVeryClose)
             {
                 FullSpeed();
             }
-            else
+            else if (IsEnemyClose)
             {
                 NormalSpeed();
+            }
+            else if (ShouldISneak)
+            {
+                Sneak();
+            }
+            else
+            {
+                SlowWalk();
             }
         }
 
@@ -118,45 +108,118 @@ namespace SAIN.Movement.Layers.DogFight
                 return PathLength < 3f;
             }
         }
-        public bool BotIsAtTargetPosition => !NoTargetPosition && Vector3.Distance(targetPos.Value, BotOwner.Transform.position) < 2f;
-        public bool BotIsAtLastEnemyPosition => Vector3.Distance(LastEnemyPosition.Value, BotOwner.Transform.position) < 2f;
+        public bool BotIsAtLastEnemyPosition => LastEnemyPosition != null && Vector3.Distance(LastEnemyPosition.Value, BotOwner.Transform.position) < 2f;
         public bool Reloading => BotOwner.WeaponManager.Reload.Reloading;
-        public bool NoTargetPosition => targetPos == null;
         public bool CanShootEnemyAndVisible => CanShootEnemy && CanSeeEnemy;
         public bool CanShootEnemy => BotOwner.Memory.GoalEnemy.IsVisible;
         public bool CanSeeEnemy => BotOwner.Memory.GoalEnemy.CanShoot;
         public bool ShouldISneak => !CanShootEnemyAndVisible && EnemyLastSeenTime + 10f < Time.time;
         private bool HasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
+        public bool IsSprintingFallback => FallingBack && BotOwner.Mover.IsMoving;
+
+        private Vector3? FallbackPosition;
 
         private bool CheckFallBackConditions(bool debugMode = false, bool debugDrawAll = false)
         {
-            if (!Reloading) return false;
-
-            // If we have a target position, and we're already there, clear it
-            if (BotIsAtTargetPosition) ResetTarget();
-
-            if (NoTargetPosition)
+            if (!Reloading && !BotOwner.Medecine.FirstAid.Using)
             {
-                if (CoverFinder.FindFallbackPosition(out Vector3? coverPosition, debugMode, debugDrawAll))
+                return false;
+            }
+
+            if (FallbackPosition != null)
+            {
+                if (!CoverFinder.Analyzer.AnalyseCoverPosition(FallbackPosition.Value))
                 {
-                    targetPos = coverPosition;
-                    FallingBack = true;
-
-                    if (debugMode) Logger.LogDebug($"{BotOwner.name} is falling back while reloading");
-
-                    BotOwner.GoToPoint(targetPos.Value, false, 1f);
-                    UpdateDoorOpener();
-
-                    return true;
+                    FallbackPosition = null;
                 }
                 else
                 {
-                    ResetTarget();
-                    return false;
+                    BotOwner.GoToPoint(FallbackPosition.Value, false, -1, false, true, true);
+                }
+            }
+
+            while (FallbackPosition == null)
+            {
+                if (CoverFinder.FindFallbackPosition(out Vector3? coverPosition))
+                {
+                    FallbackPosition = coverPosition;
+
+                    DebugDrawFallback(debugMode);
+
+                    StartFallback();
                 }
             }
 
             return true;
+        }
+
+        private void StartFallback()
+        {
+            BotOwner.Steering.LookToMovingDirection();
+            SetSprint(true);
+            BotOwner.GoToPoint(FallbackPosition.Value, false, -1, false, true, true);
+            UpdateDoorOpener();
+        }
+
+        private void DebugDrawFallback(bool debugMode)
+        {
+            if (debugMode)
+            {
+                DebugDrawer.Line(FallbackPosition.Value, BotOwner.MyHead.position, 0.1f, Color.green, 3f);
+                DebugDrawer.Line(BotOwner.Memory.GoalEnemy.Owner.MyHead.position, BotOwner.MyHead.position, 0.1f, Color.green, 3f);
+                DebugDrawer.Line(BotOwner.Memory.GoalEnemy.Owner.MyHead.position, FallbackPosition.Value, 0.1f, Color.green, 3f);
+                Logger.LogDebug($"{BotOwner.name} is falling back while reloading");
+            }
+        }
+
+        private void DecidePoseFromCoverLevel()
+        {
+            CoverFinder cover = new CoverFinder(BotOwner);
+            cover.Analyzer.AnalyseCoverPosition(BotOwner.Transform.position);
+
+            if (cover.Analyzer.FullCover)
+            {
+                //BotOwner.MovementPause(UpdateFrequency * 2f);
+                BotOwner.SetPose(1f);
+            }
+            else if (cover.Analyzer.ChestCover)
+            {
+                //BotOwner.MovementPause(UpdateFrequency * 2f);
+                BotOwner.SetPose(0.75f);
+            }
+            else if (cover.Analyzer.WaistCover)
+            {
+                //BotOwner.MovementPause(UpdateFrequency * 2f);
+                BotOwner.SetPose(0.5f);
+            }
+            else if (cover.Analyzer.ProneCover)
+            {
+                //BotOwner.MovementPause(UpdateFrequency * 2f);
+                BotOwner.SetPose(0f);
+            }
+            else
+            {
+                BotOwner.SetPose(0.9f);
+                BotNeedsToBackup();
+            }
+        }
+
+        private bool BotNeedsToBackup()
+        {
+            if (CheckEnemyDistance(out Vector3 trgPos))
+            {
+                Vector3 DodgeFallBack = Dodge.FindArcPoint(trgPos, BotOwner.Memory.GoalEnemy.CurrPosition, 2f, 10f, 1f, 2f);
+                if (NavMesh.SamplePosition(DodgeFallBack, out NavMeshHit hit, 10f, -1))
+                {
+                    trgPos = hit.position;
+                }
+
+                BotOwner.GoToPoint(trgPos, false, -1, false, false, true);
+                UpdateDoorOpener();
+
+                return true;
+            }
+            return false;
         }
 
         public bool CheckEnemyDistance(out Vector3 trgPos)
@@ -208,8 +271,8 @@ namespace SAIN.Movement.Layers.DogFight
 
         private void ResetTarget()
         {
+            FallbackPosition = null;
             FallingBack = false;
-            targetPos = null;
         }
 
         private void UpdateDoorOpener()
@@ -235,36 +298,28 @@ namespace SAIN.Movement.Layers.DogFight
 
         private void FullSpeed()
         {
-            BotOwner.Sprint(false);
-            BotOwner.SetPose(1f);
             BotOwner.SetTargetMoveSpeed(1f);
         }
 
         private void CrouchWalk()
         {
-            BotOwner.Sprint(false);
             BotOwner.SetPose(0f);
             BotOwner.SetTargetMoveSpeed(1f);
         }
 
         private void Sneak()
         {
-            BotOwner.Sprint(false);
             BotOwner.SetPose(0f);
             BotOwner.SetTargetMoveSpeed(0f);
         }
 
         private void SlowWalk()
         {
-            BotOwner.Sprint(false);
-            BotOwner.SetPose(0.75f);
             BotOwner.SetTargetMoveSpeed(0.33f);
         }
 
         private void NormalSpeed()
         {
-            BotOwner.Sprint(false);
-            BotOwner.SetPose(1f);
             BotOwner.SetTargetMoveSpeed(0.75f);
         }
 
@@ -277,6 +332,7 @@ namespace SAIN.Movement.Layers.DogFight
                 PathLength = Path.CalculatePathLength();
             }
         }
+
         private NavMeshPath Path = new NavMeshPath();
         private float LastDistanceCheck = 0f;
         private float PathLength = 0f;
@@ -287,7 +343,6 @@ namespace SAIN.Movement.Layers.DogFight
         private readonly BotDodge Dodge;
         private readonly CoverFinder CoverFinder;
         private float DodgeTimer = 0f;
-        private Vector3? targetPos = null;
         private float ReactionTimer = 0f;
     }
 }

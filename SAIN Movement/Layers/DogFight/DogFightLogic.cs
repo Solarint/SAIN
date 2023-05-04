@@ -31,16 +31,16 @@ namespace SAIN.Movement.Layers
 
             public override void Update()
             {
-                Move.Update(DebugMode, DebugDrawPoints);
+                Decisions.GetDecision();
 
-                Steering.Update(Move.FallingBack, DebugMode);
+                Move.Update(DebugMode, DebugDrawPoints);
 
                 if (CanShootEnemyAndVisible)
                 {
                     Targeting.Update();
                 }
 
-                Decisions.GetDecision();
+                Steering.Update(Move.IsSprintingFallback, DebugMode);
             }
 
             private readonly UpdateTarget Targeting;

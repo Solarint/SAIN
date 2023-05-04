@@ -41,12 +41,12 @@ namespace Movement
                 //new Patches.DogFight.ManualUpdatePatch().Enable();
                 //new Patches.DogFight.UpdatePatch().Enable();
 
-                //new Patches.Heal.StopHealPatch1().Enable();
-                //new Patches.Heal.StopHealPatch2().Enable();
-                //new Patches.Heal.StopHealPatch3().Enable();
-                //new Patches.Heal.StopHealPatch5().Enable();
-                //new Patches.Heal.StopHealPatch6().Enable();
-                //new Patches.Heal.StopHealPatch7().Enable();
+                //new Patches.ShouldBotHeal.StopHealPatch1().Enable();
+                //new Patches.ShouldBotHeal.StopHealPatch2().Enable();
+                //new Patches.ShouldBotHeal.StopHealPatch3().Enable();
+                //new Patches.ShouldBotHeal.StopHealPatch5().Enable();
+                //new Patches.ShouldBotHeal.StopHealPatch6().Enable();
+                //new Patches.ShouldBotHeal.StopHealPatch7().Enable();
 
             }
             catch (Exception ex)

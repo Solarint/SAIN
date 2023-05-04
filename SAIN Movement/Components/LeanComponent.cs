@@ -42,7 +42,7 @@ namespace Movement.Components
                 }
                 else if (ShouldBotReset && !Resetting)
                 {
-                    StartCoroutine(ResetLeanAfterDuration(Random.Range(1f, 2f)));
+                    //StartCoroutine(ResetLeanAfterDuration(Random.Range(1f, 2f)));
                 }
 
                 yield return new WaitForEndOfFrame();
@@ -71,12 +71,8 @@ namespace Movement.Components
                 {
                     if (CheckEnemyParts())
                     {
-                        if (DebugMode)
-                        {
-                            Logger.LogDebug($"Enemy Visible");
-                        }
                     }
-                    yield return new WaitForSeconds(0.25f);
+                    yield return new WaitForSeconds(1f);
                 }
 
                 yield return new WaitForEndOfFrame();
@@ -128,15 +124,22 @@ namespace Movement.Components
             Lean.Leaning = value;
         }
 
-        private bool AllowScavLean
+        private bool AllowLean
         {
             get
             {
-                if (bot.IsRole(WildSpawnType.assault) && !ScavLeanToggle.Value)
+                if (LeanToggle.Value)
                 {
-                    return false;
+                    if (!bot.IsRole(WildSpawnType.assault))
+                    {
+                        return true;
+                    }
+                    else if (ScavLeanToggle.Value)
+                    {
+                        return true;
+                    }
                 }
-                return true;
+                return false;
             }
         }
 
@@ -180,7 +183,7 @@ namespace Movement.Components
                 {
                     if (DebugMode)
                     {
-                        DebugDrawer.Line(bot.LookSensor._headPoint, part.Position, 0.1f, Color.red, 0.25f);
+                        DebugDrawer.Line(bot.LookSensor._headPoint, part.Position, 0.1f, Color.red, 1f);
                     }
 
                     return true;
@@ -189,11 +192,10 @@ namespace Movement.Components
             return false;
         }
 
-        private bool ShouldBotLean => BotActive && !GoalEnemyNull && !EnemyVisibleOrShootable && !BotInCover && AllowLean && AllowScavLean;
-        private bool ShouldBotReset => (!BotActive || GoalEnemyNull || EnemyVisibleOrShootable || !AllowLean || !AllowScavLean) && !BotInCover;
+        private bool ShouldBotLean => BotActive && !GoalEnemyNull && !EnemyVisibleOrShootable && !BotInCover && AllowLean;
+        private bool ShouldBotReset => (!BotActive || GoalEnemyNull || EnemyVisibleOrShootable || !AllowLean) && !BotInCover;
         private bool EnemyFar => !GoalEnemyNull && bot.Memory.GoalEnemy.Distance > 50f;
         private bool BotActive => bot.BotState == EBotState.Active;
-        private bool AllowLean => LeanToggle.Value;
         private bool EnemyVisibleOrShootable => EnemyVisible || EnemyCanShoot;
         private bool EnemyVisible => !GoalEnemyNull && bot.Memory.GoalEnemy.IsVisible;
         private bool EnemyCanShoot => !GoalEnemyNull && bot.Memory.GoalEnemy.CanShoot;

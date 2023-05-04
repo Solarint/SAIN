@@ -3,6 +3,7 @@ using EFT;
 using SAIN_Helpers;
 using UnityEngine;
 using UnityEngine.AI;
+using static HairRenderer;
 
 namespace Movement.Helpers
 {
@@ -13,23 +14,34 @@ namespace Movement.Helpers
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             BotOwner = bot;
             Analyzer = new CoverAnalyzer(bot);
+            Corners = new Corners.CornerProcessing(bot);
         }
 
         protected ManualLogSource Logger;
         private readonly BotOwner BotOwner;
+        private readonly Corners.CornerProcessing Corners;
 
         public CoverAnalyzer Analyzer { get; private set; }
         public Vector3? CoverPosition { get; private set; }
+        public Vector3[] SavedCoverPositions { get; private set; }
 
+        /// <summary>
+        /// Finds a fallback position for the bot to take cover in.
+        /// </summary>
+        /// <param name="coverPosition">The fallback position.</param>
+        /// <param name="debugMode">Whether to enable debug mode.</param>
+        /// <param name="debugDrawAll">Whether to draw all debug information.</param>
+        /// <returns>Whether a fallback position was found.</returns>
         public bool FindFallbackPosition(out Vector3? coverPosition, bool debugMode = false, bool debugDrawAll = false)
         {
             if (BotOwner.Memory.GoalEnemy != null)
             {
-                coverPosition = FindCover(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, 3f, 3f, debugMode, debugDrawAll);
+                coverPosition = FindCover(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, debugMode, debugDrawAll);
 
-                if (CoverPosition != null)
+                if (coverPosition != null)
                 {
-                    CoverPosition = coverPosition;
+                    //CoverPosition = coverPosition;
+                    //SavedCoverPositions.AddToArray(coverPosition.Value);
                     return true;
                 }
             }
@@ -40,57 +52,44 @@ namespace Movement.Helpers
 
         private float DebugTimer = 0f;
 
-        private Vector3? FindCover(Vector3 bot, Vector3 target, float initialArcRadius, float radiusIncrementStep, bool debugMode = false, bool debugDrawAll = false)
+        /// <summary>
+        /// Finds a suitable cover position for the bot to hide from the target.
+        /// </summary>
+        /// <param name="bot">The bot's current position.</param>
+        /// <param name="target">The target's current position.</param>
+        /// <param name="debugMode">Whether or not to enable debug mode.</param>
+        /// <param name="debugDrawAll">Whether or not to draw all debug information.</param>
+        /// <returns>
+        /// Returns a Vector3 of the cover position if found, otherwise returns null.
+        /// </returns>
+        private Vector3? FindCover(Vector3 bot, Vector3 target, bool debugMode = false, bool debugDrawAll = false)
         {
-            const float incrementAngle = 5.0f;
-            const float incrementRadiusBase = 2.0f;
-            const int maxIterations = 100;
+            const float incrementRadiusBase = 20f;
+            const float radiusIncrementStep = 10f;
+            float currentRadius = incrementRadiusBase;
 
-            float currentRadius = initialArcRadius;
+            const int maxIterations = 10;
+
             int iterations = 0;
-
             while (iterations < maxIterations)
             {
-                for (float angle = -120.0f; angle <= 120.0f; angle += incrementAngle)
+                // Generates a random point in a 240 degree arc away from the enemy
+                Vector3 randomPoint = FindArcPoint(bot, target, currentRadius, Random.Range(-120, 120), debugDrawAll);
+
+                // Generates a path to the random point and returns corners that have been trimmed and processed
+                Vector3[] corners = Corners.GetCorners(randomPoint, true, true);
+
+                // Checks those corners to see if a coverposition is present along the path
+                Vector3? potentialCover = CheckCornersForCover(corners, currentRadius);
+
+                // If Cover was found, potentialCover will not be null
+                if (potentialCover != null)
                 {
-                    // Generates a random point in a 240 degree arc away from the enemy
-                    Vector3 potentialCover = FindArcPoint(bot, target, currentRadius, angle, debugDrawAll);
-
-                    // Runs the random point through our cover checker to see if its viable or not. How viable it is will be saved as properties for the analyzer instance until another coverpoint is checked.
-                    CheckCover(potentialCover, debugMode);
-
-                    // Debug Draw Checks
-                    if (DebugTimer < Time.time && debugDrawAll)
-                    {
-                        if (Analyzer.ProneCover || Analyzer.GoodCover || Analyzer.FullCover)
-                        {
-                            DebugTimer = Time.time + 0.25f;
-                            DebugDrawer.Sphere(potentialCover, 0.1f, Color.white, 3f);
-                        }
-                    }
-
-                    // Checks cover viability based on how many iterations the loop has gone through, the longer it goes, the more lax the restrictions.
-                    if (Analyzer.FullCover)
-                    {
-                        return potentialCover;
-                    }
-                    else if (iterations > 33 && Analyzer.GoodCover && Analyzer.ChestCover)
-                    {
-                        return potentialCover;
-                    }
-                    else if (iterations > 66 && Analyzer.GoodCover)
-                    {
-                        return potentialCover;
-                    }
-                    else if (iterations > 90 && Analyzer.ProneCover)
-                    {
-                        return potentialCover;
-                    }
+                    return potentialCover;
                 }
 
-                // Increment the radius size and angle checked.
-                float incrementRadius = incrementRadiusBase + (iterations * radiusIncrementStep);
-                currentRadius += incrementRadius;
+                // Increment the radius size if no cover found and start again
+                currentRadius += incrementRadiusBase + (iterations * radiusIncrementStep);
                 iterations++;
             }
 
@@ -98,20 +97,88 @@ namespace Movement.Helpers
             return null;
         }
 
-        private bool CheckCover(Vector3 point, bool debugMode = false)
+        /// <summary>
+        /// Checks the corners of a path for cover points.
+        /// </summary>
+        /// <param name="corners">The corners of the path.</param>
+        /// <param name="currentRadius">The current radius of the path.</param>
+        /// <returns>
+        /// Returns a Vector3 if a cover point is found, otherwise returns null.
+        /// </returns>
+        private Vector3? CheckCornersForCover(Vector3[] corners, float currentRadius)
         {
-            if (NavMesh.SamplePosition(point, out var navHit, 0.5f, NavMesh.AllAreas))
+            const int maxCornerIterations = 5;
+            const float lerpStep = 0.2f;
+
+            // Makes sure the length of the path is not too far from the bot, and that there are corners to check
+            if (CheckPathLength(currentRadius) && corners.Length > 2)
             {
-                if (Analyzer.AnalyseCoverPosition(navHit.position, debugMode) && Analyzer.FullCover)
+                // Normalize corner 2 to check for cover points along its path to corner 3
+                Vector3 cornerNormalized = corners[2].normalized;
+
+                int cornerIterations = 0;
+                while (cornerIterations < maxCornerIterations)
                 {
+                    // Lerp from corner 1 to corner 2 normalized in even steps based on the iteration count to check for cover points every 0.2 meters
+                    cornerNormalized = Vector3.Lerp(corners[1], cornerNormalized, lerpStep * cornerIterations);
+
+                    // Draw a bunch of bullshit
+                    DebugDraw(cornerNormalized, lerpStep, cornerIterations);
+
+                    // Check if the lerped value is cover or not
+                    if (CheckIfCoverGood(cornerNormalized, 1f))
+                    {
+                        return cornerNormalized;
+                    }
+                    // if not, keep checking
+                    cornerIterations++;
+                }
+            }
+            // No cover found along this path.
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if there is good cover at a given position.
+        /// </summary>
+        /// <param name="cornerNormalized">The normalized corner position.</param>
+        /// <param name="iterations">The number of iterations.</param>
+        /// <param name="debugMode">Whether debug mode is enabled.</param>
+        /// <returns>True if there is good cover at the given position, false otherwise.</returns>
+        private bool CheckIfCoverGood(Vector3 cornerNormalized, float iterations, bool debugMode = false)
+        {
+            // Is there any cover at this position?
+            if (Analyzer.AnalyseCoverPosition(cornerNormalized, debugMode))
+            {
+                // if so, how good is it?
+                if (CoverViability(iterations))
+                {
+                    Logger.LogDebug("Found Cover!");
                     return true;
                 }
             }
-
+            // No cover here
             return false;
         }
 
+        /// <summary>
+        /// Checks if the path length is less than the current radius multiplied by 1.5f.
+        /// </summary>
+        /// <returns>True if the path length is less than the current radius multiplied by 1.5f, false otherwise.</returns>
+        private bool CheckPathLength(float currentRadius)
+        {
+            return Corners.NavMeshPath.CalculatePathLength() < currentRadius * 1.5f;
+        }
 
+        /// <summary>
+        /// Finds the point on an arc between two points with a given radius and angle.
+        /// </summary>
+        /// <param name="bot">The starting point of the arc.</param>
+        /// <param name="target">The ending point of the arc.</param>
+        /// <param name="arcRadius">The radius of the arc.</param>
+        /// <param name="inputAngle">The angle of the arc.</param>
+        /// <param name="debugDrawAll">Whether to draw the arc for debugging.</param>
+        /// <returns>The point on the arc.</returns>
         public Vector3 FindArcPoint(Vector3 bot, Vector3 target, float arcRadius, float inputAngle, bool debugDrawAll = false)
         {
             Vector3 forward = bot - target;
@@ -125,6 +192,50 @@ namespace Movement.Helpers
             Vector3 edgePosition = bot + direction * arcRadius;
 
             return edgePosition;
+        }
+
+        /// <summary>
+        /// Draws a debug sphere at the given cornerNormalized position with a size, color, and expire time based on the lerpStep and cornerIterations.
+        /// </summary>
+        /// <param name="cornerNormalized">The normalized corner position.</param>
+        /// <param name="lerpStep">The lerp step.</param>
+        /// <param name="cornerIterations">The corner iterations.</param>
+        private void DebugDraw(Vector3 cornerNormalized, float lerpStep, int cornerIterations)
+        {
+            float debugSphereSize = 0.1f + (lerpStep * cornerIterations * 0.1f);
+            float debugExpireTime = 0.5f + (lerpStep * cornerIterations * 0.5f);
+            Vector3 debugSpherePosition = cornerNormalized;
+            debugSpherePosition.y += 0.25f + (lerpStep * cornerIterations * 0.25f);
+            DebugDrawer.Sphere(cornerNormalized, debugSphereSize, Color.cyan, debugExpireTime);
+        }
+
+        /// <summary>
+        /// Checks cover viability based on how many iterations the loop has gone through, the longer it goes, the more lax the restrictions.
+        /// </summary>
+        /// <param name="iterations">Number of iterations the loop has gone through</param>
+        /// <returns>
+        /// True if cover is viable, false otherwise.
+        /// </returns>
+        private bool CoverViability(float iterations)
+        {
+            if (Analyzer.FullCover)
+            {
+                return true;
+            }
+            else if (iterations > 70 && Analyzer.ChestCover && Analyzer.WaistCover && Analyzer.ProneCover)
+            {
+                return true;
+            }
+            else if (iterations > 85 && Analyzer.WaistCover && Analyzer.ProneCover)
+            {
+                return true;
+            }
+            else if (iterations > 95 && Analyzer.ProneCover)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 
@@ -145,10 +256,9 @@ namespace Movement.Helpers
         public bool ProneCover { get; private set; }
         public bool CanShoot { get; private set; }
         public Vector3? AcceptableCoverPosition { get; private set; }
-        public bool GoodCover { get; private set; }
         public bool FullCover { get; private set; }
 
-        private Vector3 enemyGunPos;
+        private Vector3 enemyPosition;
 
         /// <summary>
         /// Analyzes the cover position of the character and sets the appropriate cover values.
@@ -160,78 +270,99 @@ namespace Movement.Helpers
         /// <param name="prone">Whether to analyze prone cover.</param>
         /// <param name="reset">Whether to reset the previous saved cover values.</param>
         /// <returns>Whether the cover position is valid at all.</returns>
-        public bool AnalyseCoverPosition(Vector3 coverPoint, bool head = true, bool chest = true, bool waist = true, bool prone = true, bool reset = true, bool debugMode = false)
+        public bool AnalyseCoverPosition(Vector3 coverPoint, bool debugMode = false)
         {
-            if (reset)
-            {
-                HeadCover = false;
-                ChestCover = false;
-                WaistCover = false;
-                ProneCover = false;
+            ResetCoverValues();
 
-                CanShoot = false;
-                AcceptableCoverPosition = null;
-                GoodCover = false;
-                FullCover = false;
+            // CurrPosition is at ground level, so we need to raise it up
+            enemyPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
+            enemyPosition.y += 1f;
+
+            // Check each of the Bot's parts for visibility at the coverpoint
+            CheckParts(coverPoint, debugMode);
+
+            // Checks the results
+            if (ChestCover && HeadCover & WaistCover && ProneCover)
+            {
+                FullCover = true;
             }
 
-            enemyGunPos = BotOwner.Memory.GoalEnemy.Owner.GetPlayer.PlayerBones.WeaponRoot.position;
-
-            if (head)
-                Head(coverPoint, 0.01f, debugMode);
-
-            if (chest)
-                Chest(coverPoint, 1.2f, 0.01f, debugMode);
-
-            if (waist)
-                Waist(coverPoint, 0.7f, 0.01f, debugMode);
-
-            if (prone)
-                Prone(coverPoint, 0.3f, 0.01f, debugMode);
-
-            // Check if there is any cover at all
-            if (!HeadCover && !ChestCover && !WaistCover && !ProneCover)
+            // If we found cover, return true;
+            if (HeadCover || ChestCover || WaistCover || ProneCover)
             {
-                AcceptableCoverPosition = null;
-                return false;
-            }
-
-            AcceptableCoverPosition = coverPoint;
-
-            // Can a bot shoot from this position?
-            Shoot(coverPoint, debugMode);
-
-            if (WaistCover && ProneCover)
-            {
-                GoodCover = true;
-
-                if (ChestCover && HeadCover)
-                {
-                    FullCover = true;
-                }
-
-                if (debugMode && DebugTimer < Time.time)
-                {
-                    DebugTimer = Time.time + 2.5f;
-
-                    Logger.LogDebug($"Found GoodCover for {BotOwner.name}. Debug Lines are Blue");
-
-                    Vector3 enemyPosition = BotOwner.Memory.GoalEnemy.Owner.GetPlayer.PlayerBones.WeaponRoot.position;
-                    float botHeight = BotOwner.MyHead.position.y - BotOwner.Transform.position.y;
-
-                    DebugDrawer.Ray(coverPoint, Vector3.up, botHeight, 0.1f, Color.blue, 5f);
-                    DebugDrawer.Line(coverPoint, BotOwner.LookSensor._headPoint, 0.1f, Color.blue, 5f);
-                    DebugDrawer.Line(enemyPosition, BotOwner.LookSensor._headPoint, 0.1f, Color.blue, 5f);
-                    DebugDrawer.Line(enemyPosition, coverPoint, 0.1f, Color.blue, 5f);
-                }
-
+                AcceptableCoverPosition = coverPoint;
+                DebugCoverPosition(debugMode);
                 return true;
             }
-
-            return false;
+            else
+            {
+                Logger.LogWarning($"No Cover");
+                return false;
+            }
         }
 
-        private float DebugTimer = 0f;
+        /// <summary>
+        /// Checks the head, chest, waist, prone and shoot cover points for the given Vector3
+        /// </summary>
+        /// <param name="coverPoint">The Vector3 cover point to check.</param>
+        private void CheckParts(Vector3 coverPoint, bool debugMode)
+        {
+            if (Head(coverPoint, debugMode))
+            {
+                HeadCover = true;
+            }
+            if (Chest(coverPoint, 1.15f, debugMode))
+            {
+                ChestCover = true;
+            }
+            if (Waist(coverPoint, 0.7f, debugMode))
+            {
+                WaistCover = true;
+            }
+            if (Prone(coverPoint, 0.3f, debugMode))
+            {
+                ProneCover = true;
+            }
+            if (Shoot(coverPoint, debugMode))
+            {
+                CanShoot = true;
+            }
+        }
+
+        /// <summary>
+        /// Resets all cover values to their default state.
+        /// </summary>
+        private void ResetCoverValues()
+        {
+            HeadCover = false;
+            ChestCover = false;
+            WaistCover = false;
+            ProneCover = false;
+            CanShoot = false;
+            AcceptableCoverPosition = null;
+            FullCover = false;
+        }
+
+        /// <summary>
+        /// Draws debug lines to visualize the cover position for the bot owner.
+        /// </summary>
+        /// <param name="debugMode">Whether debug mode is enabled.</param>
+        private void DebugCoverPosition(bool debugMode)
+        {
+            if (debugMode && DebugTimer < Time.time)
+            {
+                DebugTimer = Time.time + 1f;
+
+                Logger.LogDebug($"Found GoodCover for {BotOwner.name}. Debug Lines are Blue");
+
+                float botHeight = BotOwner.MyHead.position.y - BotOwner.Transform.position.y;
+
+                DebugDrawer.Ray(AcceptableCoverPosition.Value, Vector3.up, botHeight, 0.25f, Color.blue, 2f);
+                DebugDrawer.Line(AcceptableCoverPosition.Value, BotOwner.LookSensor._headPoint, 0.05f, Color.blue, 2f);
+                DebugDrawer.Line(enemyPosition, BotOwner.LookSensor._headPoint, 0.05f, Color.blue, 2f);
+                DebugDrawer.Line(enemyPosition, AcceptableCoverPosition.Value, 0.05f, Color.blue, 2f);
+            }
+        }
 
         /// <summary>
         /// Checks if a bot can shoot from a coverpoint
@@ -241,14 +372,12 @@ namespace Movement.Helpers
         private bool Shoot(Vector3 coverPoint, bool debugMode = false)
         {
             coverPoint.y += BotOwner.WeaponRoot.position.y;
-            if (!CheckVisiblity(coverPoint, enemyGunPos, 0.01f, debugMode))
+            if (!CheckVisiblity(coverPoint, enemyPosition, debugMode))
             {
-                CanShoot = true;
                 return true;
             }
             else
             {
-                CanShoot = false;
                 return false;
             }
         }
@@ -259,19 +388,17 @@ namespace Movement.Helpers
         /// <param name="coverPoint">The cover point to check.</param>
         /// <param name="sphereSize">The size of the sphere to check.</param>
         /// <returns>True if the head is covered, false otherwise.</returns>
-        private bool Head(Vector3 coverPoint, float sphereSize, bool debugMode = false)
+        private bool Head(Vector3 coverPoint, bool debugMode = false)
         {
             Vector3 myHeadPos = coverPoint;
             myHeadPos.y += BotOwner.LookSensor._headPoint.y;
 
-            if (!CheckVisiblity(myHeadPos, enemyGunPos, sphereSize, debugMode))
+            if (!CheckVisiblity(myHeadPos, enemyPosition, debugMode))
             {
-                HeadCover = true;
                 return true;
             }
             else
             {
-                HeadCover = false;
                 return false;
             }
         }
@@ -285,19 +412,17 @@ namespace Movement.Helpers
         /// <returns>
         /// Returns true if the chest is not visible to the enemy gun position, false otherwise.
         /// </returns>
-        private bool Chest(Vector3 coverPoint, float chestY, float sphereSize, bool debugMode = false)
+        private bool Chest(Vector3 coverPoint, float chestY, bool debugMode = false)
         {
             Vector3 myChestPos = coverPoint;
             myChestPos.y += chestY;
 
-            if (!CheckVisiblity(myChestPos, enemyGunPos, sphereSize, debugMode))
+            if (!CheckVisiblity(myChestPos, enemyPosition, debugMode))
             {
-                ChestCover = true;
                 return true;
             }
             else
             {
-                ChestCover = false;
                 return false;
             }
         }
@@ -309,19 +434,17 @@ namespace Movement.Helpers
         /// <param name="waistY">The y-axis offset for the waist.</param>
         /// <param name="sphereSize">The size of the sphere to check for waist cover.</param>
         /// <returns>True if the waist is covered, false otherwise.</returns>
-        private bool Waist(Vector3 coverPoint, float waistY, float sphereSize, bool debugMode = false)
+        private bool Waist(Vector3 coverPoint, float waistY, bool debugMode = false)
         {
             Vector3 myWaistPos = coverPoint;
             myWaistPos.y += waistY;
 
-            if (!CheckVisiblity(myWaistPos, enemyGunPos, sphereSize, debugMode))
+            if (!CheckVisiblity(myWaistPos, enemyPosition, debugMode))
             {
-                WaistCover = true;
                 return true;
             }
             else
             {
-                WaistCover = false;
                 return false;
             }
         }
@@ -333,19 +456,17 @@ namespace Movement.Helpers
         /// <param name="enemyGunPos">The enemy gun position.</param>
         /// <param name="sphereSize">The size of the sphere to check.</param>
         /// <returns>True if the cover point is visible, false otherwise.</returns>
-        private bool Prone(Vector3 coverPoint, float proneY, float sphereSize, bool debugMode = false)
+        private bool Prone(Vector3 coverPoint, float proneY, bool debugMode = false)
         {
             Vector3 myPronePos = coverPoint;
             myPronePos.y += proneY;
 
-            if (!CheckVisiblity(myPronePos, enemyGunPos, sphereSize, debugMode))
+            if (!CheckVisiblity(myPronePos, enemyPosition, debugMode))
             {
-                ProneCover = true;
                 return true;
             }
             else
             {
-                ProneCover = false;
                 return false;
             }
         }
@@ -357,13 +478,9 @@ namespace Movement.Helpers
         /// <param name="end">The end point of the line.</param>
         /// <param name="sphereSize">The size of the sphere used for the spherecast.</param>
         /// <returns>True if the line is visible, false otherwise.</returns>
-        private bool CheckVisiblity(Vector3 start, Vector3 end, float sphereSize, bool debugMode = false)
+        private bool CheckVisiblity(Vector3 start, Vector3 end, bool debugMode = false)
         {
-            Vector3 direction = end - start;
-            Ray ray = new Ray(start, direction);
-            float distance = Vector3.Distance(start, end);
-
-            if (Physics.SphereCast(ray, sphereSize, distance))
+            if (Physics.Linecast(start, end, out RaycastHit hit, LayerMaskClass.HighPolyWithTerrainMask) && hit.transform.name != BotOwner.Memory.GoalEnemy.Owner.gameObject.transform.name)
             {
                 return false;
             }
@@ -372,5 +489,7 @@ namespace Movement.Helpers
                 return true;
             }
         }
+
+        private float DebugTimer = 0f;
     }
 }

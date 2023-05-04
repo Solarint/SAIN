@@ -130,7 +130,7 @@
                                 Draw.Sphere(EnemyPos, 0.5f, Color.red);
                             }
 
-                            bot.WeaponManager.Reload.Reload();
+                            bot.WeaponManager.ShouldBotReload.ShouldBotReload();
                             bot.GoToPoint(FallbackPosition);
                             _DogFightStateSetter.Invoke(bot, new object[] { BotDogFightStatus.dogFight });
 
@@ -144,9 +144,9 @@
                 }
             }
 
-            if (bot.Memory.GoalEnemy.CanShoot && bot.WeaponManager.Reload.Reloading && Ammo > 0.35f)
+            if (bot.Memory.GoalEnemy.CanShoot && bot.WeaponManager.ShouldBotReload.Reloading && Ammo > 0.35f)
             {
-                bot.WeaponManager.Reload.TryStopReload();
+                bot.WeaponManager.ShouldBotReload.TryStopReload();
             }
             
             if (!bot.Memory.GoalEnemy.CanShoot && bot.Medecine.FirstAid.IsBleeding && bot.Medecine.FirstAid.HaveSmth2Use)
@@ -172,9 +172,9 @@
                 {
                     if (Dodge.ExecuteDodge(bot))
                     {
-                        if (!bot.WeaponManager.Reload.Reloading)
+                        if (!bot.WeaponManager.ShouldBotReload.Reloading)
                         {
-                            bot.WeaponManager.Reload.TryReload();
+                            bot.WeaponManager.ShouldBotReload.TryReload();
                         }
 
                         if (DebugDodge.Value)

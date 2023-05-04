@@ -315,52 +315,73 @@ namespace Vision.Helpers
         }
     }
 
-
     public class BotLineObject : MonoBehaviour
     {
         private BotOwner Bot;
+        private Player LocalPlayer;
         public GameObject LineObject { get; private set; }
         public FollowLineScript LineScript { get; private set; }
 
         private void Awake()
         {
             Bot = GetComponent<BotOwner>();
-
-            CreateLine();
+            FindYourPlayer();
+            StartCoroutine(LineTracker());
         }
 
-        private void CreateLine()
+        private void FindYourPlayer()
         {
-            Player player = Singleton<GameWorld>.Instance.RegisteredPlayers.Find(p => p.IsYourPlayer);
-            LineObject = FollowLine(player.gameObject, Bot.GetPlayer.gameObject, 0.03f, Color.white);
-            LineScript = LineObject.GetComponent<FollowLineScript>();
-            StartCoroutine(DestroyLine());
+            if (LocalPlayer == null)
+            {
+                LocalPlayer = Singleton<GameWorld>.Instance.RegisteredPlayers.Find(p => p.IsYourPlayer);
+            }
+
+            if (LineObject == null)
+            {
+                LineObject = FollowLine(LocalPlayer.gameObject, Bot.GetPlayer.gameObject, 0.02f, Color.white);
+            }
+
+            if (LineScript == null)
+            {
+                LineScript = LineObject.GetComponent<FollowLineScript>();
+            }
         }
 
-        private IEnumerator DestroyLine()
+        private IEnumerator LineTracker()
         {
             while (true)
             {
+                if (LineScript == null || LineObject == null || LocalPlayer == null)
+                {
+                    yield return new WaitForEndOfFrame();
+                    continue;
+                }
+
                 if (Bot.IsDead)
                 {
-                    LineScript = null;
                     Destroy(LineObject);
+                    StopAllCoroutines();
                     yield break;
                 }
 
-                if (Bot.Memory.GoalEnemy != null)
+                if (Bot.Memory.GoalEnemy != null && Bot.Memory.GoalEnemy.Person.GetPlayer.IsYourPlayer)
                 {
-                    if (Bot.Memory.GoalEnemy.Person.GetPlayer.IsYourPlayer)
+                    if (Bot.Memory.GoalEnemy.CanShoot)
                     {
-                        if (Bot.Memory.GoalEnemy.IsVisible)
-                        {
-                            LineScript.SetColor(Color.red);
-                        }
-                        else
-                        {
-                            LineScript.SetColor(Color.white);
-                        }
+                        LineScript.SetColor(Color.red);
                     }
+                    else if (Bot.Memory.GoalEnemy.IsVisible)
+                    {
+                        LineScript.SetColor(Color.yellow);
+                    }
+                    else
+                    {
+                        LineScript.SetColor(Color.white);
+                    }
+                }
+                else if (Vector3.Distance(Bot.Transform.position, LocalPlayer.Transform.position) > 50f)
+                {
+                    LineScript.SetColor(Color.clear);
                 }
 
                 yield return new WaitForSeconds(0.1f);

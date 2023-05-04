@@ -30,7 +30,15 @@ namespace SAIN.Movement.Layers.DogFight
                 BotFightInterface = BotOwner.AimingData;
             }
 
-            BotOwner.BotLight.TurnOn(BotFightInterface.AlwaysTurnOnLight);
+            if (BotOwner.Memory.GoalEnemy.Distance < 30f && CanShootEnemy)
+            {
+                LightTime = Time.time;
+                BotOwner.BotLight.TurnOn();
+            }
+            else if (LightTime < Time.time - 2f)
+            {
+                BotOwner.BotLight.TurnOff();
+            }
 
             Vector3? pointToShoot = GetPointToShoot();
 
@@ -46,6 +54,7 @@ namespace SAIN.Movement.Layers.DogFight
                 }
             }
         }
+        private float LightTime = 0f;
 
         protected void ReadyToShoot()
         {
@@ -92,9 +101,9 @@ namespace SAIN.Movement.Layers.DogFight
 
                 if (TalkDelay < Time.time)
                 {
-                    TalkDelay = Time.time + Random(5f, 8f);
+                    TalkDelay = Time.time + Random(10f, 15f);
 
-                    BotOwner.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
+                    BotOwner.BotTalk.TrySay(EPhraseTrigger.MumblePhrase, ETagStatus.Combat, true);
                 }
 
                 BotFightInterface.SetTarget(BotTarget);

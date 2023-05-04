@@ -36,7 +36,7 @@ namespace Movement.Helpers
             {
                 float leanAngle = 0f;
 
-                Vector3[] corners = Corners.GetCorners(true, false, true, true, 0f, debugMode);
+                Vector3[] corners = Corners.GetCorners(BotOwner.Transform.position, true, false, true, true, 0f, debugMode);
 
                 if (PickLeanCorners(corners, out Vector3 corner1, out Vector3 corner2, maxDistance, debugMode))
                 {
@@ -120,7 +120,10 @@ namespace Movement.Helpers
         {
             public CornerProcessing(BotOwner bot) : base(bot)
             {
+                NavMeshPath = new NavMeshPath();
             }
+
+            public NavMeshPath NavMeshPath { get; private set; }
 
             /// <summary>
             /// Calculates the corners of the NavMeshPath between the bot and the target position, and optionally trims them using raycasting, length trimming, and lerp trimming.
@@ -131,15 +134,18 @@ namespace Movement.Helpers
             /// <param name="cornerToHeadHeight">Whether to raise the corners to the bot's head height.</param>
             /// <param name="minlengthfortrim">The minimum length for length trimming.</param>
             /// <returns>The trimmed corners of the NavMeshPath.</returns>
-            public Vector3[] GetCorners(bool raycastTrim = true, bool lengthTrim = false, bool lerpTrim = false, bool cornerToHeadHeight = false, float minlengthfortrim = 2f, bool debugMode = false)
+            public Vector3[] GetCorners(Vector3 targetPos, bool raycastTrim = true, bool lengthTrim = false, bool lerpTrim = false, bool cornerToHeadHeight = false, float minlengthfortrim = 2f, bool debugMode = false)
             {
-                Vector3 targetPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
                 Vector3 botPosition = BotOwner.Transform.position;
 
-                NavMeshPath navMeshPath = new NavMeshPath();
-                NavMesh.CalculatePath(botPosition, targetPosition, -1, navMeshPath);
+                if (NavMeshPath.corners.Length != 0 )
+                {
+                    NavMeshPath.ClearCorners();
+                }
 
-                List<Vector3> NavmeshCornersList = new List<Vector3>(navMeshPath.corners);
+                NavMesh.CalculatePath(botPosition, targetPos, -1, NavMeshPath);
+
+                List<Vector3> NavmeshCornersList = new List<Vector3>(NavMeshPath.corners);
 
                 if (cornerToHeadHeight)
                 {

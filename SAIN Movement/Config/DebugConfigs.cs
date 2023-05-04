@@ -7,6 +7,7 @@ namespace Movement.UserSettings
         public static ConfigEntry<bool> DebugDynamicLean { get; private set; }
         public static ConfigEntry<bool> DebugDogFightLayer { get; private set; }
         public static ConfigEntry<bool> DebugDogFightLayerDraw { get; private set; }
+        public static ConfigEntry<bool> DebugBotDecisions { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
@@ -24,6 +25,11 @@ namespace Movement.UserSettings
 
             DebugDogFightLayerDraw = Config.Bind(debugmode, "DogFight Layer Draw Generated Points", false,
                 new ConfigDescription("Draws points everywhere",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
+
+            DebugBotDecisions = Config.Bind(debugmode, "DogFighter Bot Decisions", false,
+                new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
         }
