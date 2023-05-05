@@ -14,14 +14,6 @@ namespace SAIN.Movement.Layers
     {
         internal class DogFightLayer : CustomLayer
         {
-            private readonly float DogFightIn = 25f;
-
-            private readonly float DogFightOut = 30f;
-
-            protected ManualLogSource Logger;
-
-            protected bool isActive = false;
-
             public DogFightLayer(BotOwner botOwner, int priority) : base(botOwner, priority)
             {
                 Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
@@ -35,29 +27,33 @@ namespace SAIN.Movement.Layers
 
             public override bool IsActive()
             {
-                if (BotOwner.Memory.GoalEnemy == null || BotOwner.BewareGrenade?.GrenadeDangerPoint?.Grenade != null || EnemyFar)
+                if (BotOwner.BewareGrenade?.GrenadeDangerPoint?.Grenade != null)
                 {
                     isActive = false;
                     return false;
                 }
 
-                CheckPathLength();
+                CheckForDanger();
 
-                if (PathLength < DogFightIn)
+                if (TargetPosition != null && TargetPosition.HasValue && !TargetFar)
                 {
-                    isActive = true;
-                }
-                else if (PathLength > DogFightOut)
-                {
-                    isActive = false;
-                }
+                    CheckPathLength();
 
-                if (isActive)
-                {
+                    if (PathLength < DogFightIn)
+                    {
+                        isActive = true;
+                    }
+                    else if (PathLength > DogFightOut)
+                    {
+                        isActive = false;
+                    }
+
                     DebugDrawPath();
+
+                    return isActive;
                 }
 
-                return isActive;
+                return false;
             }
 
             public override Action GetNextAction()
@@ -71,37 +67,66 @@ namespace SAIN.Movement.Layers
                 return false;
             }
 
+            private void CheckForDanger()
+            {
+                if (BotOwner.Memory.GoalEnemy != null)
+                {
+                    TargetPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
+                }
+                else if (BotOwner.Memory.GoalTarget != null)
+                {
+                    if (BotOwner.Memory.GoalTarget.IsDanger)
+                    {
+                        TargetPosition = BotOwner.Memory.GoalTarget.Position;
+                    }
+                    else
+                    {
+                        TargetPosition = null;
+                    }
+                }
+                else
+                {
+                    TargetPosition = null;
+                }
+            }
+
             private void DebugDrawPath()
             {
-                if (DebugDogFightLayerDraw.Value && DebugTimer < Time.time)
+                if (isActive && DebugMode && DebugTimer < Time.time)
                 {
                     DebugTimer = Time.time + 1f;
                     for (int i = 0; i < Path.corners.Length - 1; i++)
                     {
                         Vector3 corner1 = Path.corners[i];
                         Vector3 corner2 = Path.corners[i + 1];
-                        Line(corner1, corner2, 0.025f, Color.white, 1f);
+                        Line(corner1, corner2, 0.05f, Color.red, 1f);
                     }
                 }
             }
 
             private void CheckPathLength()
             {
-                if (LastDistanceCheck < Time.time)
+                if (TargetPosition.HasValue && LastDistanceCheck < Time.time)
                 {
                     LastDistanceCheck = Time.time + 0.5f;
-                    NavMesh.CalculatePath(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, -1, Path);
+                    NavMesh.CalculatePath(BotOwner.Transform.position, TargetPosition.Value, -1, Path);
                     PathLength = Path.CalculatePathLength();
                 }
             }
 
+            protected bool isActive = false;
             private float DebugTimer = 0f;
-            private NavMeshPath Path = new NavMeshPath();
             private float LastDistanceCheck = 0f;
             private float PathLength = 0f;
+            private readonly float DogFightIn = 25f;
+            private readonly float DogFightOut = 30f;
+            protected ManualLogSource Logger;
+            private Vector3? TargetPosition;
+            private NavMeshPath Path = new NavMeshPath();
 
-            private bool EnemyFar => EnemyDistance > 50f;
-            private float EnemyDistance => Vector3.Distance(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition);
+            private bool DebugMode => DebugDogFightLayer.Value;
+            private bool TargetFar => TargetDistance > 50f;
+            private float TargetDistance => Vector3.Distance(BotOwner.Transform.position, TargetPosition.Value);
         }
     }
 }

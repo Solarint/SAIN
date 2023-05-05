@@ -4,6 +4,7 @@ using Movement.Helpers;
 using SAIN_Helpers;
 using UnityEngine;
 using UnityEngine.AI;
+using static Movement.UserSettings.Debug;
 
 namespace SAIN.Movement.Layers.DogFight
 {
@@ -13,20 +14,27 @@ namespace SAIN.Movement.Layers.DogFight
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             BotOwner = bot;
-            Corners = new Corners.CornerProcessing(bot);
         }
+        private bool DebugMode => DebugUpdateSteering.Value;
 
-        public void Update(bool IsSprintingFallback, bool debugMode = false)
+        public void Update(bool IsSprintingFallback)
         {
+            if (GoalEnemyNull)
+            {
+                BotOwner.LookData.SetLookPointByHearing(null);
+            }
+
             if (IsSprintingFallback)
             {
                 BotOwner.Steering.LookToMovingDirection();
             }
             else if (CanShootEnemy)
             {
-                BotOwner.Steering.LookToPoint(BotOwner.Memory.GoalEnemy.CurrPosition);
+                Vector3 target = BotOwner.Memory.GoalEnemy.CurrPosition;
+                target.y += 0.75f;
+                BotOwner.Steering.LookToPoint(target);
             }
-            else if (NextCornerPosition(out Vector3 corner, debugMode))
+            else if (NextCornerPosition(out Vector3 corner))
             {
                 BotOwner.Steering.LookToPoint(corner);
             }
@@ -35,27 +43,29 @@ namespace SAIN.Movement.Layers.DogFight
                 BotOwner.LookData.SetLookPointByHearing(null);
             }
 
-            if (debugMode && DebugTimer2 < Time.time)
+            if (DebugMode && DebugTimer2 < Time.time)
             {
-                //DebugTimer2 = Time.time + 0.05f;
-                //DebugDrawer.Ray(BotOwner.LookSensor._headPoint, BotOwner.Steering.LookDirection, 1f, 0.025f, Color.white, 0.1f);
+                DebugTimer2 = Time.time + 0.05f;
+                DebugDrawer.Ray(BotOwner.LookSensor._headPoint, BotOwner.Steering.LookDirection, 1f, 0.025f, Color.white, 0.1f);
             }
         }
 
-        private bool NextCornerPosition(out Vector3 corner, bool debugMode = false)
+        private bool NextCornerPosition(out Vector3 corner)
         {
-            Vector3[] corners = Corners.GetCorners(BotOwner.Transform.position, true, false, true, true);
+            Vector3[] corners = Corners.CornerProcessing.GetCorners(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, true, false, true, true);
             if (corners.Length > 0)
             {
                 corner = corners[1];
 
                 if (Vector3.Distance(corners[0], corner) < 1f)
                 {
-                    corner = BotOwner.Memory.GoalEnemy.Owner.GetPlayer.PlayerBones.Spine1.position;
+                    corner = BotOwner.Memory.GoalEnemy.CurrPosition;
                     return false;
                 }
 
-                if (debugMode && DebugTimer < Time.time)
+                corner.y = BotOwner.LookSensor._headPoint.y;
+
+                if (DebugMode && DebugTimer < Time.time)
                 {
                     DebugTimer = Time.time + 1f;
                     DebugDrawer.Sphere(corner, 0.25f, Color.red, 1f);
@@ -66,7 +76,7 @@ namespace SAIN.Movement.Layers.DogFight
             }
             else
             {
-                corner = BotOwner.Memory.GoalEnemy.Owner.GetPlayer.PlayerBones.Spine1.position;
+                corner = BotOwner.Memory.GoalEnemy.CurrPosition;
                 return false;
             }
         }
@@ -75,10 +85,10 @@ namespace SAIN.Movement.Layers.DogFight
         private bool CanShootEnemy => BotOwner.Memory.GoalEnemy.IsVisible;
         private bool CanSeeEnemy => BotOwner.Memory.GoalEnemy.CanShoot;
         private bool HasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
+        private bool GoalEnemyNull => BotOwner.Memory.GoalEnemy == null;
 
         private readonly BotOwner BotOwner;
         protected ManualLogSource Logger;
-        private readonly Corners.CornerProcessing Corners;
         private float DebugTimer = 0f;
         private float DebugTimer2 = 0f;
     }

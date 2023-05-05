@@ -11,17 +11,26 @@ namespace Movement.Helpers
 {
     public class CustomCoverPoint
     {
-        public CustomCoverPoint(Vector3 point, float coverLevel, float distance, NavMeshPath Path)
+        public CustomCoverPoint(Vector3 startPosition, Vector3 coverPosition, float coverLevel, bool canShoot)
         {
-            CoverPosition = point;
+            CoverPosition = coverPosition;
             CoverLevel = coverLevel;
-            CoverDistance = distance;
-            NavMeshPath = Path;
+            CanShoot = canShoot;
+            CalculatePath(startPosition, coverPosition);
         }
+
+        private void CalculatePath(Vector3 startPosition, Vector3 coverPosition)
+        {
+            NavMeshPath = new NavMeshPath();
+            NavMesh.CalculatePath(startPosition, coverPosition, -1, NavMeshPath);
+            CoverDistance = NavMeshPath.CalculatePathLength();
+        }
+
         public NavMeshPath NavMeshPath { get; set; }
         public Vector3 CoverPosition { get; set; }
         public float CoverDistance { get; set; }
         public float CoverLevel { get; set; }
+        public bool CanShoot { get; set; } 
     }
 
     public class CoverMonitor : MonoBehaviour

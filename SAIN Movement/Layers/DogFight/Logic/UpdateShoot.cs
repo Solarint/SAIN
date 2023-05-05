@@ -7,12 +7,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using static SAIN_Helpers.DebugDrawer;
 using static SAIN_Helpers.SAIN_Math;
+using static Movement.UserSettings.Debug;
 
 namespace SAIN.Movement.Layers.DogFight
 {
     internal class UpdateShoot
     {
         private readonly BotOwner BotOwner;
+        private bool DebugMode => DebugUpdateShoot.Value;
 
         protected ManualLogSource Logger;
 

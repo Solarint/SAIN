@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using static SAIN_Helpers.DebugDrawer;
 using static SAIN_Helpers.SAIN_Math;
+using static Movement.UserSettings.Debug;
 
 namespace SAIN.Movement.Layers.DogFight
 {
@@ -22,6 +23,7 @@ namespace SAIN.Movement.Layers.DogFight
             BotOwner = bot;
             updateShoot_0 = new UpdateShoot(bot);
         }
+        private bool DebugMode => DebugUpdateTargetting.Value;
 
         public void Update()
         {

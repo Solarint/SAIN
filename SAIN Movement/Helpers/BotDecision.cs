@@ -64,7 +64,10 @@ namespace Movement.Components
                 }
             }
 
-            if (DebugMode) Logger.LogDebug($"Popping Stims");
+            if (DebugMode)
+            {
+                Logger.LogDebug($"Popping Stims");
+            }
 
             bot.Medecine.Stimulators.TryApply(true, null, null);
 
@@ -78,17 +81,29 @@ namespace Movement.Components
         {
             if (bot.Medecine.FirstAid.ShallStartUse())
             {
-                if (DebugMode) Logger.LogDebug($"I Need to Heal!");
+                if (DebugMode)
+                {
+                    Logger.LogDebug($"I Need to Heal!");
+                }
+
                 BotNeedsToHeal = true;
 
                 if (bot.WeaponManager.Reload.Reloading)
                 {
-                    if (DebugMode) Logger.LogDebug($"But I'm reloading");
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"But I'm reloading");
+                    }
+
                     return false;
                 }
                 else
                 {
-                    if (DebugMode) Logger.LogDebug($"So I healed!");
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"So I healed!");
+                    }
+
                     bot.Medecine.FirstAid.TryApplyToCurrentPart(null, null);
                     return true;
                 }
@@ -102,7 +117,7 @@ namespace Movement.Components
 
         private bool ShouldBotCancelReload()
         {
-            if (bot?.Memory?.GoalEnemy == null || bot?.WeaponManager?.CurrentWeapon == null)
+            if (bot.Memory.GoalEnemy == null || !bot.WeaponManager.IsReady)
             {
                 BotShouldCancelReload = false;
                 return false;
@@ -110,7 +125,10 @@ namespace Movement.Components
 
             if (bot.WeaponManager.Reload.Reloading && !LowAmmo() && bot.Memory.GoalEnemy.CanShoot)
             {
-                if (DebugMode) Logger.LogDebug($"I need to cancel my reload!");
+                if (DebugMode)
+                {
+                    Logger.LogDebug($"I need to cancel my reload!");
+                }
 
                 BotShouldCancelReload = true;
 
@@ -127,7 +145,7 @@ namespace Movement.Components
 
         private bool ShouldBotReload()
         {
-            if (bot?.WeaponManager?.Reload == null || bot?.WeaponManager?.CurrentWeapon == null)
+            if (!bot.WeaponManager.IsReady)
             {
                 return false;
             }
@@ -140,31 +158,51 @@ namespace Movement.Components
             }
             else if (!bot.WeaponManager.HaveBullets)
             {
-                if (DebugMode) Logger.LogDebug($"I'm Empty! Need to reload!");
+                if (DebugMode) 
+                {
+                    Logger.LogDebug($"I'm Empty! Need to reload!");
+                }
+
                 needToReload = true;
             }
             else if (LowAmmo())
             {
                 if (bot.Memory.GoalEnemy == null)
                 {
-                    if (DebugMode) Logger.LogDebug($"I'm low on ammo, and I have no enemy, so I should reload");
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"I'm low on ammo, and I have no enemy, so I should reload");
+                    }
+
                     needToReload = true;
                 }
                 else if (bot.Memory.GoalEnemy.PersonalSeenTime < Time.time - 2f)
                 {
-                    if (DebugMode) Logger.LogDebug($"I'm low on ammo, and I haven't seen my enemy in a few seconds, so I should reload. Last Seen time = [{bot.Memory.GoalEnemy.PersonalSeenTime - Time.time}]");
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"I'm low on ammo, and I haven't seen my enemy in a few seconds, so I should reload. Last Seen time = [{bot.Memory.GoalEnemy.PersonalSeenTime - Time.time}]");
+                    }
+
                     needToReload = true;
                 }
                 else if (bot.Memory.GoalEnemy.Distance > 15f && !bot.Memory.GoalEnemy.CanShoot)
                 {
-                    if (DebugMode) Logger.LogDebug($"I'm low on ammo, and I can't see my enemy and he isn't close, so I should reload. Enemy Distance = [{bot.Memory.GoalEnemy.Distance}]");
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"I'm low on ammo, and I can't see my enemy and he isn't close, so I should reload. Enemy Distance = [{bot.Memory.GoalEnemy.Distance}]");
+                    }
+
                     needToReload = true;
                 }
             }
 
             if (needToReload)
             {
-                if (DebugMode) Logger.LogDebug($"Reloading!");
+                if (DebugMode)
+                {
+                    Logger.LogDebug($"Reloading!");
+                }
+
                 bot.WeaponManager.Reload.TryReload();
                 return true;
             }
@@ -181,12 +219,8 @@ namespace Movement.Components
         {
             int currentAmmo = bot.WeaponManager.Reload.BulletCount;
             int maxAmmo = bot.WeaponManager.Reload.MaxBulletCount;
-
-            float ammoRatio = (float)currentAmmo / maxAmmo; // Cast one of the integers to a float before dividing
+            float ammoRatio = (float)currentAmmo / maxAmmo;
             bool lowAmmo = ammoRatio < 0.3f;
-
-            //Logger.LogDebug($"Ammo: [{currentAmmo}] MaxAmmo: [{maxAmmo}] Ratio: [{ammoRatio}] Low Ammo? {lowAmmo}");
-
             return lowAmmo;
         }
 
