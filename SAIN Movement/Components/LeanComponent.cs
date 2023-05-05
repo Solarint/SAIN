@@ -177,7 +177,7 @@ namespace Movement.Components
         private bool CheckEnemyParts()
         {
             var parts = bot.Memory.GoalEnemy.Owner.MainParts;
-            foreach (BodyPartClass part in parts.Values)
+            foreach (var part in parts.Values)
             {
                 if (!Physics.Linecast(bot.LookSensor._headPoint, part.Position, LayerMaskClass.HighPolyWithTerrainMaskAI))
                 {

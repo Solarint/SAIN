@@ -123,26 +123,20 @@ namespace SAIN.Movement.Layers.DogFight
         {
             if (!Reloading && !BotOwner.Medecine.FirstAid.Using)
             {
+                FallbackPosition = null;
                 return false;
             }
 
             if (FallbackPosition != null)
             {
-                if (!CoverFinder.Analyzer.AnalyseCoverPosition(FallbackPosition.Value))
-                {
-                    FallbackPosition = null;
-                }
-                else
-                {
-                    BotOwner.GoToPoint(FallbackPosition.Value, false, -1, false, true, true);
-                }
             }
 
-            while (FallbackPosition == null)
+            if (FallbackPosition == null)
             {
-                if (CoverFinder.FindFallbackPosition(out Vector3? coverPosition))
+                if (CoverFinder.FindFallbackPosition(out CustomCoverPoint coverPoint))
                 {
-                    FallbackPosition = coverPosition;
+                    CoverPoint = coverPoint;
+                    FallbackPosition = coverPoint.CoverPosition;
 
                     DebugDrawFallback(debugMode);
 
@@ -152,6 +146,8 @@ namespace SAIN.Movement.Layers.DogFight
 
             return true;
         }
+
+        public CustomCoverPoint CoverPoint { get; private set; }
 
         private void StartFallback()
         {
@@ -182,24 +178,24 @@ namespace SAIN.Movement.Layers.DogFight
                 //BotOwner.MovementPause(UpdateFrequency * 2f);
                 BotOwner.SetPose(1f);
             }
-            else if (cover.Analyzer.ChestCover)
+            else if (cover.Analyzer.FullCover)
             {
                 //BotOwner.MovementPause(UpdateFrequency * 2f);
-                BotOwner.SetPose(0.75f);
+                BotOwner.SetPose(0.66f);
             }
-            else if (cover.Analyzer.WaistCover)
+            else if (cover.Analyzer.FullCover)
             {
                 //BotOwner.MovementPause(UpdateFrequency * 2f);
-                BotOwner.SetPose(0.5f);
+                BotOwner.SetPose(0.25f);
             }
-            else if (cover.Analyzer.ProneCover)
+            else if (cover.Analyzer.FullCover)
             {
                 //BotOwner.MovementPause(UpdateFrequency * 2f);
                 BotOwner.SetPose(0f);
             }
             else
             {
-                BotOwner.SetPose(0.9f);
+                //BotOwner.SetPose(0.9f);
                 BotNeedsToBackup();
             }
         }

@@ -194,7 +194,10 @@
   <ItemGroup>
     <Compile Include="Helpers\BotDecision.cs" />
     <Compile Include="Components\Experimental\DogFight\DogFightComponent.cs" />
-    <Compile Include="Helpers\CoverHelpers.cs" />
+    <Compile Include="Helpers\CoverSystem\CustomCoverPoint.cs" />
+    <Compile Include="Helpers\CoverSystem\CoverAnalyzerHelper.cs" />
+    <Compile Include="Helpers\CoverSystem\CoverPositionsHelper.cs" />
+    <Compile Include="Helpers\CoverSystem\CoverFinderHelper.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateSteering.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateShoot.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateMove.cs" />
