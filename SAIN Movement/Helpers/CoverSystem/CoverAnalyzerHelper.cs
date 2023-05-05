@@ -25,11 +25,10 @@ namespace Movement.Helpers
 
         public bool CanShoot { get; private set; }
         public bool FullCover { get; private set; }
-        public CustomCoverPoint[] CoverPositions { get; private set; }
 
         private Vector3 enemyPosition;
 
-        public CustomCoverPoint AnalyseCoverPosition(Vector3 coverPoint, bool debugMode = false)
+        public CustomCoverPoint AnalyseCoverPosition(Vector3 coverPoint)
         {
             CanShoot = false;
             FullCover = false;
@@ -38,12 +37,9 @@ namespace Movement.Helpers
             enemyPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
             enemyPosition.y += 1f;
 
-            if (NewCheckParts(coverPoint, out float coverscore))
+            if (RayCastBodyParts(coverPoint, out float coverscore))
             {
-                CustomCoverPoint cover = new CustomCoverPoint(coverPoint, coverscore, 10f);
-                CoverPositions.AddItem(cover);
-                Logger.LogDebug($"CoverPositions Array Count = [{CoverPositions.Length}]");
-                return cover;
+                return new CustomCoverPoint(coverPoint, coverscore, 0f, null);
             }
             else
             {
@@ -51,7 +47,7 @@ namespace Movement.Helpers
             }
         }
 
-        public bool NewCheckParts(Vector3 coverPoint, out float coverAmount)
+        public bool RayCastBodyParts(Vector3 coverPoint, out float coverAmount)
         {
             var parts = BotOwner.MainParts;
             int coverScoreCount = 0;
@@ -113,7 +109,7 @@ namespace Movement.Helpers
 
             Ray ray = new Ray(partPositionFromCover, EnemyDirectionFromPoint(partPositionFromCover));
 
-            if (Physics.Raycast(ray, out RaycastHit hit, 3f, Mask))
+            if (Physics.Raycast(ray, out RaycastHit hit, 3f, Mask) && hit.transform.name != BotOwner.gameObject.transform.name)
             {
                 DebugDrawer.Line(EnemyPosition, hit.point, 0.1f, Color.red, 2f);
 
@@ -136,6 +132,12 @@ namespace Movement.Helpers
             return Vector3.Distance(point, BotOwner.Memory.GoalEnemy.CurrPosition);
         }
 
+        private float BotDistanceFromPoint(Vector3 point)
+        {
+            NavMeshPath path = new NavMeshPath();
+            NavMesh.CalculatePath(BotPosition, point,-1, path);
+            return path.CalculatePathLength();
+        }
 
         private float DebugTimer = 0f;
     }

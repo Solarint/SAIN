@@ -4,7 +4,6 @@ using Movement.Helpers;
 using SAIN_Helpers;
 using UnityEngine;
 using UnityEngine.AI;
-using static HairRenderer;
 using static SAIN_Helpers.SAIN_Math;
 
 namespace SAIN.Movement.Layers.DogFight
@@ -12,6 +11,7 @@ namespace SAIN.Movement.Layers.DogFight
     internal class UpdateMove
     {
         private const float UpdateFrequency = 0.1f;
+
         public UpdateMove(BotOwner bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
@@ -37,16 +37,9 @@ namespace SAIN.Movement.Layers.DogFight
                     LastEnemyPosition = null;
                 }
 
-                if (CheckFallBackConditions(debug, debugDrawAll))
+                if (CheckFallBackConditions())
                 {
-                    SetSprint(HasStamina);
-                    FallingBack = true;
                     return;
-                }
-                else
-                {
-                    FallingBack = false;
-                    SetSprint(false);
                 }
 
                 if (CanShootEnemy)
@@ -92,6 +85,7 @@ namespace SAIN.Movement.Layers.DogFight
         public bool FallingBack { get; private set; }
         public Vector3? LastEnemyPosition { get; private set; }
         public float EnemyLastSeenTime { get; private set; }
+
         public bool IsEnemyClose
         {
             get
@@ -100,6 +94,7 @@ namespace SAIN.Movement.Layers.DogFight
                 return PathLength < 10f;
             }
         }
+
         public bool IsEnemyVeryClose
         {
             get
@@ -108,6 +103,7 @@ namespace SAIN.Movement.Layers.DogFight
                 return PathLength < 3f;
             }
         }
+
         public bool BotIsAtLastEnemyPosition => LastEnemyPosition != null && Vector3.Distance(LastEnemyPosition.Value, BotOwner.Transform.position) < 2f;
         public bool Reloading => BotOwner.WeaponManager.Reload.Reloading;
         public bool CanShootEnemyAndVisible => CanShootEnemy && CanSeeEnemy;
@@ -117,43 +113,60 @@ namespace SAIN.Movement.Layers.DogFight
         private bool HasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
         public bool IsSprintingFallback => FallingBack && BotOwner.Mover.IsMoving;
 
-        private Vector3? FallbackPosition;
-
-        private bool CheckFallBackConditions(bool debugMode = false, bool debugDrawAll = false)
+        private bool CheckFallBackConditions(bool debugMode = false)
         {
-            if (!Reloading && !BotOwner.Medecine.FirstAid.Using)
+            if (!Reloading && !BotOwner.Medecine.FirstAid.Using || BotOwner.BotLay.IsLay)
             {
-                FallbackPosition = null;
+                SetSprint(false);
+                FallingBack = false;
                 return false;
             }
 
-            if (FallbackPosition != null)
+            if (FallBackCoverPoint != null)
             {
-            }
-
-            if (FallbackPosition == null)
-            {
-                if (CoverFinder.FindFallbackPosition(out CustomCoverPoint coverPoint))
+                CustomCoverPoint cover = CoverFinder.Analyzer.AnalyseCoverPosition(FallBackCoverPoint.CoverPosition);
+                if (cover != null)
                 {
-                    CoverPoint = coverPoint;
-                    FallbackPosition = coverPoint.CoverPosition;
-
                     DebugDrawFallback(debugMode);
+                    StartFallback(cover.CoverPosition);
 
-                    StartFallback();
+                    Logger.LogDebug($"Old CoverPoint is still good for {BotOwner.name}");
+                    return true;
+                }
+                else
+                {
+                    FallBackCoverPoint = null;
                 }
             }
 
-            return true;
+            if (FallBackCoverPoint == null && CoverFinder.FindCover(out CustomCoverPoint coverPoint))
+            {
+                FallBackCoverPoint = coverPoint;
+                DebugDrawFallback(debugMode);
+                StartFallback(coverPoint.CoverPosition);
+
+                Logger.LogDebug($"Found New CoverPoint for {BotOwner.name}");
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        public CustomCoverPoint CoverPoint { get; private set; }
+        public CustomCoverPoint FallBackCoverPoint { get; private set; }
 
-        private void StartFallback()
+        private void StartFallback(Vector3 coverPosition)
         {
-            BotOwner.Steering.LookToMovingDirection();
-            SetSprint(true);
-            BotOwner.GoToPoint(FallbackPosition.Value, false, -1, false, true, true);
+            FallingBack = true;
+
+            if (HasStamina)
+            {
+                BotOwner.Steering.LookToMovingDirection();
+                SetSprint(HasStamina);
+            }
+
+            BotOwner.GoToPoint(coverPosition, true, -1, false, true, true);
             UpdateDoorOpener();
         }
 
@@ -161,44 +174,49 @@ namespace SAIN.Movement.Layers.DogFight
         {
             if (debugMode)
             {
-                DebugDrawer.Line(FallbackPosition.Value, BotOwner.MyHead.position, 0.1f, Color.green, 3f);
+                DebugDrawer.Line(FallBackCoverPoint.CoverPosition, BotOwner.MyHead.position, 0.1f, Color.green, 3f);
                 DebugDrawer.Line(BotOwner.Memory.GoalEnemy.Owner.MyHead.position, BotOwner.MyHead.position, 0.1f, Color.green, 3f);
-                DebugDrawer.Line(BotOwner.Memory.GoalEnemy.Owner.MyHead.position, FallbackPosition.Value, 0.1f, Color.green, 3f);
+                DebugDrawer.Line(BotOwner.Memory.GoalEnemy.Owner.MyHead.position, FallBackCoverPoint.CoverPosition, 0.1f, Color.green, 3f);
                 Logger.LogDebug($"{BotOwner.name} is falling back while reloading");
             }
         }
 
         private void DecidePoseFromCoverLevel()
         {
-            CoverFinder cover = new CoverFinder(BotOwner);
-            cover.Analyzer.AnalyseCoverPosition(BotOwner.Transform.position);
+            SelfCover = CoverFinder.Analyzer.AnalyseCoverPosition(BotOwner.Transform.position);
 
-            if (cover.Analyzer.FullCover)
+            if (SelfCover != null)
             {
-                //BotOwner.MovementPause(UpdateFrequency * 2f);
-                BotOwner.SetPose(1f);
-            }
-            else if (cover.Analyzer.FullCover)
-            {
-                //BotOwner.MovementPause(UpdateFrequency * 2f);
-                BotOwner.SetPose(0.66f);
-            }
-            else if (cover.Analyzer.FullCover)
-            {
-                //BotOwner.MovementPause(UpdateFrequency * 2f);
-                BotOwner.SetPose(0.25f);
-            }
-            else if (cover.Analyzer.FullCover)
-            {
-                //BotOwner.MovementPause(UpdateFrequency * 2f);
-                BotOwner.SetPose(0f);
+                if (SelfCover.CoverLevel > 0.9)
+                {
+                    BotOwner.SetPose(1f);
+                }
+                else if (SelfCover.CoverLevel > 0.75)
+                {
+                    BotOwner.SetPose(0.66f);
+                }
+                else if (SelfCover.CoverLevel > 0.5)
+                {
+                    BotOwner.SetPose(0.25f);
+                }
+                else if (SelfCover.CoverLevel > 0.25)
+                {
+                    BotOwner.SetPose(0f);
+                }
+                else
+                {
+                    BotOwner.SetPose(0.9f);
+                    BotNeedsToBackup();
+                }
             }
             else
             {
-                //BotOwner.SetPose(0.9f);
+                BotOwner.SetPose(0.9f);
                 BotNeedsToBackup();
             }
         }
+
+        private CustomCoverPoint SelfCover;
 
         private bool BotNeedsToBackup()
         {
@@ -263,12 +281,6 @@ namespace SAIN.Movement.Layers.DogFight
         private bool CheckStraightDistance(NavMeshPath path, float straighDist)
         {
             return path.CalculatePathLength() < straighDist * 1.2f;
-        }
-
-        private void ResetTarget()
-        {
-            FallbackPosition = null;
-            FallingBack = false;
         }
 
         private void UpdateDoorOpener()

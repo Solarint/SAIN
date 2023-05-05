@@ -38,7 +38,7 @@ namespace Movement.Helpers
             }
             try
             {
-                if (StartSavedCheck(out Vector3 oldCover, BotOwner))
+                if (CheckSavedPositions(out Vector3 oldCover, BotOwner))
                 {
                     coverPosition = oldCover;
                     return true;
@@ -52,7 +52,8 @@ namespace Movement.Helpers
             coverPosition = Vector3.zero;
             return false;
         }
-        private bool StartSavedCheck(out Vector3 cover, BotOwner BotOwner)
+
+        private bool CheckSavedPositions(out Vector3 cover, BotOwner BotOwner)
         {
             TargetPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
             BotPosition = BotOwner.Transform.position;
