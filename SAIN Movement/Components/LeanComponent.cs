@@ -86,8 +86,8 @@ namespace Movement.Components
             {
                 if (!GoalEnemyNull)
                 {
-                    LeanAngle = Lean.FindLeanAngle(bot.Transform.position, bot.Memory.GoalEnemy.CurrPosition, 10f, DebugMode);
-                    yield return new WaitForSeconds(0.2f);
+                    LeanAngle = Lean.FindLeanAngle(bot.Transform.position, bot.Memory.GoalEnemy.CurrPosition, bot.LookSensor._headPoint, 10f);
+                    yield return new WaitForSeconds(0.25f);
                 }
 
                 yield return null;

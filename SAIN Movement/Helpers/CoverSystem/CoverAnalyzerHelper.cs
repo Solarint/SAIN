@@ -17,121 +17,107 @@ namespace Movement.Helpers
             BotOwner = bot;
         }
 
-        public bool AnalyseCoverPosition(Vector3 enemyPosition, Vector3 coverPosition, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f)
+        /// <summary>
+        /// Analyzes a Vector3 and checks if the bot is visible from it, and if so, by how much.
+        /// </summary>
+        /// <param name="enemyPosition">The position of the enemy.</param>
+        /// <param name="coverPosition">The position of the cover.</param>
+        /// <param name="coverPoint">The CustomCoverPoint object.</param>
+        /// <param name="minCoverLevel">The minimum cover level.</param>
+        /// <returns>True if the cover position is valid, false otherwise.</returns>
+        public bool CheckPosition(Vector3 enemyPosition, Vector3 coverPosition, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f)
         {
+            coverPoint = null;
+
             TargetPosition = enemyPosition;
+            CoverPosition = coverPosition;
+            MinimumCover = minCoverLevel;
 
-            if (RayCastBodyParts(coverPosition, out float coverscore, out bool canShoot, minCoverLevel))
+            if (CheckParts)
             {
-                coverPoint = new CustomCoverPoint(BotOwner.Transform.position, coverPosition, coverscore, canShoot);
+                coverPoint = new CustomCoverPoint(BotPosition, coverPosition, CoverRatio, !IsVisible(WeaponPos));
                 return true;
             }
-            else
-            {
-                coverPoint = null;
-                return false;
-            }
-        }
 
-        private bool RayCastBodyParts(Vector3 coverPoint, out float coverAmount, out bool canShoot, float minCoverLevel = 0.5f)
-        {
-            var parts = BotOwner.MainParts;
-            int coverScoreCount = 0;
-            int bodyPartCount = 0;
-            foreach (var part in parts.Values)
-            {
-                bodyPartCount++;
-                Vector3 partLocalPosition = part.Position - BotPosition;
-                Vector3 partPositionFromCover = partLocalPosition + coverPoint;
-
-                float distance = Vector3.Distance(partPositionFromCover, TargetPosition) / 2f;
-                Ray ray = new Ray(partPositionFromCover, EnemyDirectionFromPoint(partPositionFromCover));
-                if (Physics.Raycast(ray, out RaycastHit hit, distance, Mask))
-                {
-                    if (DebugMode)
-                    {
-                        Vector3 trgPos = TargetPosition;
-                        trgPos.y += 1f;
-                        DebugDrawer.Line(trgPos, hit.point, 0.1f, Color.red, 2f);
-                    }
-
-                    coverScoreCount++;
-                }
-            }
-
-            if (Shoot(coverPoint))
-            {
-                canShoot = true;
-            }
-            else
-            {
-                canShoot = false;
-            }
-
-            float Ratio = (float)coverScoreCount / bodyPartCount;
-
-            coverAmount = Ratio;
-
-            if (coverAmount >= minCoverLevel)
-            {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"True! Ratio: {Ratio} because min level {minCoverLevel}");
-                }
-                return true;
-            }
-            else
-            {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"False! Ratio: {Ratio} because min level {minCoverLevel}");
-                }
-                return false;
-            }
-        }
-
-        private bool Shoot(Vector3 coverPoint)
-        {
-            if (BotOwner.WeaponRoot != null)
-            {
-                if (!CheckVisiblity(coverPoint, BotOwner.WeaponRoot.position))
-                {
-                    return true;
-                }
-            }
             return false;
         }
 
-        private bool CheckVisiblity(Vector3 coverPoint, Vector3 partPos)
+        private bool CheckParts
         {
-            Vector3 partLocalPosition = partPos - BotPosition;
-
-            Vector3 partPositionFromCover = partLocalPosition + coverPoint;
-
-            float distance = Vector3.Distance(partPositionFromCover, TargetPosition) / 2f;
-            Ray ray = new Ray(partPositionFromCover, EnemyDirectionFromPoint(partPositionFromCover));
-
-            string botTransformName = BotOwner.gameObject.transform.name;
-            if (Physics.Raycast(ray, out RaycastHit hit, distance, Mask) && hit.transform.name != botTransformName)
+            get
             {
-                return false;
+                var parts = BotOwner.MainParts;
+                int coverScoreCount = 0;
+                int bodyPartCount = 0;
+
+                foreach (var part in parts.Values)
+                {
+                    bodyPartCount++;
+
+                    if (IsVisible(part.Position))
+                    {
+                        coverScoreCount++;
+                    }
+                }
+
+                CoverRatio = (float)coverScoreCount / bodyPartCount;
+                return CoverRatio >= MinimumCover;
             }
-            return true;
         }
 
-        private Vector3 EnemyDirectionFromPoint(Vector3 point)
+        private bool IsVisible(Vector3 point)
+        {
+            Vector3 partPosition = Position(point);
+            Vector3 enemyDirection = Direction(point);
+            float enemyDistance = Distance(enemyDirection);
+
+            if (Physics.Raycast(partPosition, enemyDirection, enemyDistance, Mask))
+            {
+                if (DebugMode)
+                {
+                    DebugDrawer.Ray(partPosition, enemyDirection, enemyDistance, 0.025f, Color.green, 2f);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private Vector3 Direction(Vector3 point)
+        {
+            return Target() - point;
+        }
+
+        private Vector3 Target()
         {
             Vector3 target = TargetPosition;
-            target.y += 1.3f;
-            return TargetPosition - point;
+            target.y += EnemyYOffset;
+            return target;
+        }
+
+        private float Distance(Vector3 direction)
+        {
+            return direction.magnitude;
+        }
+
+        private Vector3 Position(Vector3 part)
+        {
+            return part - BotPosition + CoverPosition;
         }
 
         private bool DebugMode => DebugCoverSystem.Value;
         private Vector3 BotPosition => BotOwner.Transform.position;
-        private LayerMask Mask => LayerMaskClass.HighPolyWithTerrainMask;
+        private LayerMask Mask => LayerMaskClass.HighPolyWithTerrainMaskAI;
+        private Vector3 WeaponPos => BotOwner.WeaponRoot.position;
 
+        private const float EnemyYOffset = 1.4f;
+
+        private float CoverRatio = 1f;
         private readonly BotOwner BotOwner;
         protected ManualLogSource Logger;
         private Vector3 TargetPosition;
+        private Vector3 CoverPosition;
+        private float MinimumCover;
     }
 }

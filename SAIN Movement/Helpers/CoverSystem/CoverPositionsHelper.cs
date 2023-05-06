@@ -80,7 +80,7 @@ namespace Movement.Helpers
                     coverCheckPoint.y += 1f;
 
                     /*
-                    if (Finder.CheckCover(coverCheckPoint))
+                    if (Finder.CheckPosition(coverCheckPoint))
                     {
                         Logger.LogDebug($"Found Good Old Position!");
                         goodPosition = coverCheckPoint;
@@ -116,7 +116,7 @@ namespace Movement.Helpers
         {
             Vector3 closestPosition = GetClosestPosition();
             /*
-            if (Finder.CheckCover(closestPosition))
+            if (Finder.CheckPosition(closestPosition))
             {
                 Logger.LogDebug($"Found Good Closest Position!");
                 position = closestPosition;

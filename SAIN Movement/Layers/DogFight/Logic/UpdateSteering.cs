@@ -4,6 +4,7 @@ using Movement.Helpers;
 using SAIN_Helpers;
 using UnityEngine;
 using UnityEngine.AI;
+using static Movement.Helpers.Corners;
 using static Movement.UserSettings.Debug;
 
 namespace SAIN.Movement.Layers.DogFight
@@ -46,13 +47,13 @@ namespace SAIN.Movement.Layers.DogFight
             if (DebugMode && DebugTimer2 < Time.time)
             {
                 DebugTimer2 = Time.time + 0.05f;
-                DebugDrawer.Ray(BotOwner.LookSensor._headPoint, BotOwner.Steering.LookDirection, 1f, 0.025f, Color.white, 0.1f);
+                DebugDrawer.Ray(BotOwner.LookSensor._headPoint, BotOwner.Steering.LookDirection, 2f, 0.025f, Color.white, 0.1f);
             }
         }
 
         private bool NextCornerPosition(out Vector3 corner)
         {
-            Vector3[] corners = Corners.CornerProcessing.GetCorners(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, true, false, true, true);
+            Vector3[] corners = Processing.GetCorners(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.LookSensor._headPoint, true, false, true, true);
             if (corners.Length > 0)
             {
                 corner = corners[1];
@@ -91,5 +92,6 @@ namespace SAIN.Movement.Layers.DogFight
         protected ManualLogSource Logger;
         private float DebugTimer = 0f;
         private float DebugTimer2 = 0f;
+        private readonly CornerProcessing Processing = new CornerProcessing();
     }
 }

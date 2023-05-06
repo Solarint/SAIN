@@ -21,17 +21,20 @@ namespace SAIN.Movement.Layers.DogFight
             DynamicLean = bot.gameObject.GetComponent<DynamicLean>();
         }
 
-        private const float UpdateFrequency = 0.2f;
+        private const float UpdateFrequency = 0.15f;
 
-        public void Update()
+        public void Update(bool canSee, bool canShoot)
         {
-            if (!GoalEnemyNull && CanShootEnemy)
-            {
-                EnemyLastSeenTime = Time.time;
-            }
+            CanSeeEnemy = canSee;
+            CanShootEnemy = canShoot;
 
             if (ReactionTimer < Time.time)
             {
+                if (CanShootEnemy && CanSeeEnemy)
+                {
+                    EnemyLastSeenTime = Time.time;
+                }
+
                 UpdateDoorOpener();
 
                 ReactionTimer = Time.time + UpdateFrequency;
@@ -188,7 +191,7 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 RecheckTime = Time.time + 0.5f;
 
-                if (CoverFinder.Analyzer.AnalyseCoverPosition(BotOwner.Memory.GoalEnemy.CurrPosition, FallBackCoverPoint.CoverPosition, out CustomCoverPoint cover, 1.0f))
+                if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, FallBackCoverPoint.CoverPosition, out CustomCoverPoint cover, 1.0f))
                 {
                     if (DebugMode)
                     {
@@ -316,7 +319,7 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 SelfCoverCheckTime = Time.time + 0.5f;
 
-                if (CoverFinder.Analyzer.AnalyseCoverPosition(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Transform.position, out CustomCoverPoint cover, 0.2f))
+                if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Transform.position, out CustomCoverPoint cover, 0.2f))
                 {
                     if (DebugMode)
                     {
@@ -544,6 +547,8 @@ namespace SAIN.Movement.Layers.DogFight
             return true;
         }
 
+        private bool CanShootEnemy;
+        private bool CanSeeEnemy;
         private bool ShouldBotSneak
         {
             get
@@ -554,7 +559,7 @@ namespace SAIN.Movement.Layers.DogFight
                 }
                 else
                 {
-                    return !CanShootEnemyAndVisible && EnemyLastSeenTime + 10f < Time.time;
+                    return !CanShootEnemyAndVisible && EnemyLastSeenTime < Time.time - 10f;
                 }
             }
         }
@@ -577,8 +582,6 @@ namespace SAIN.Movement.Layers.DogFight
         private bool BotIsAtTargetPosition => TargetPosition != null && Vector3.Distance(TargetPosition.Value, BotOwner.Transform.position) < 2f;
         private bool Reloading => BotOwner.WeaponManager != null && BotOwner.WeaponManager.Reload.Reloading;
         private bool CanShootEnemyAndVisible => !GoalEnemyNull && CanShootEnemy && CanSeeEnemy;
-        private bool CanShootEnemy => BotOwner.Memory.GoalEnemy != null && BotOwner.Memory.GoalEnemy.IsVisible;
-        private bool CanSeeEnemy => BotOwner.Memory.GoalEnemy != null && BotOwner.Memory.GoalEnemy.CanShoot;
         private bool GoalEnemyNull => BotOwner.Memory.GoalEnemy == null;
         private bool GoalTargetNull => BotOwner.Memory.GoalTarget == null;
         private bool HasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;

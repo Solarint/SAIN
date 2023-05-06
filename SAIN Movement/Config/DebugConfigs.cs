@@ -13,6 +13,8 @@ namespace Movement.UserSettings
         public static ConfigEntry<bool> DebugUpdateSteering { get; private set; }
         public static ConfigEntry<bool> DebugUpdateTargetting { get; private set; }
         public static ConfigEntry<bool> DebugCoverSystem { get; private set; }
+        public static ConfigEntry<bool> DebugCornerProcessing { get; private set; }
+        public static ConfigEntry<bool> DebugCornerLeanAngle { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
@@ -62,6 +64,16 @@ namespace Movement.UserSettings
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 0 }));
+
+            DebugCornerProcessing = Config.Bind(debugmode, "DebugCorners", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = -1 }));
+
+            DebugCornerLeanAngle = Config.Bind(debugmode, "DebugCornerLeanAngle", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = -1 }));
         }
     }
 }

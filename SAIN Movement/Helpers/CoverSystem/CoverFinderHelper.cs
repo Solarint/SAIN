@@ -1,9 +1,13 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN_Helpers;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
+using static Movement.Helpers.Corners;
 using static Movement.UserSettings.Debug;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace Movement.Helpers
 {
@@ -19,94 +23,71 @@ namespace Movement.Helpers
             Analyzer = new CoverAnalyzer(bot);
         }
 
-        public bool FindCover(out CustomCoverPoint coverPoint, Vector3 enemyPosition, float minCoverLevel = 0.5f, bool decreaseMinCoverLevelwithIterations = true, float rangeModifier = 1f)
+        private const int maxCoverIterations = 5;
+        private const int maxLerpIterations = 5;
+        private const float LerpStep = 0.2f;
+        private const float incrementRadiusBase = 10f;
+        private const float radiusIncrementStep = 10f;
+        private const float MinAngle = 30f;
+        private const float MaxAngle = 175f;
+
+        /// <summary>
+        /// Finds a cover point for the AI to hide from the enemy.
+        /// </summary>
+        /// <param name="coverPoint">The cover point found.</param>
+        /// <param name="enemyPosition">The position of the enemy.</param>
+        /// <param name="minCoverLevel">The minimum cover level required.</param>
+        /// <param name="minCoverReduce">Whether the minimum cover level should be reduced if no cover is found.</param>
+        /// <returns>Whether a cover point was found.</returns>
+        public bool FindCover(out CustomCoverPoint coverPoint, Vector3 enemyPosition, float minCoverLevel = 0.5f, bool minCoverReduce = true)
         {
             TargetPosition = enemyPosition;
-
-            const float incrementRadiusBase = 3f;
-            const float radiusIncrementStep = 5f;
             float currentRadius = incrementRadiusBase;
-
-            float initialCoverMin = minCoverLevel;
-
-            const int maxIterations = 20;
             int iterations = 0;
-            while (iterations < maxIterations)
+            coverPoint = null;
+
+            while (iterations < maxCoverIterations)
             {
-                // Generates a random point in a 200 degree arc away from the enemy
-                float randomAngle = Random.Range(-90, 90);
-                Vector3 randomPoint = FindArcPoint(BotPosition, enemyPosition, currentRadius, randomAngle);
-
-                if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, -1))
+                if (FindRandomPoint(out NavMeshHit hit, currentRadius))
                 {
-                    // Grabs Processing from our Corner Helper. We are trimming corners heavily here so that we are only checking viable corners with our raycast system.
-                    Vector3[] corners = Corners.CornerProcessing.GetCorners(BotPosition, hit.position, true, false, true, true, true);
-
-                    // Checks corners to see if a cover coverPosition is present along the path.
-                    if (CheckCornersForCover(corners, out coverPoint, minCoverLevel))
+                    if (FindCorners(hit, out coverPoint, minCoverLevel))
                     {
+                        coverPoint = AddPath(coverPoint);
+
                         if (DebugMode)
                         {
                             Logger.LogInfo($"Found Cover after [{iterations}] iterations with Minimum Cover Level set to {minCoverLevel} and Radius = {currentRadius}");
                         }
+
                         return true;
                     }
                 }
 
-                // Decrease the min cover level up to 2/3 its input value
-                if (decreaseMinCoverLevelwithIterations && minCoverLevel > initialCoverMin / 1.5f)
-                {
-                    minCoverLevel *= 0.9f;
-                }
-
-                // Increment the radius size if no cover found and start again
-                currentRadius += (incrementRadiusBase + (iterations * radiusIncrementStep)) * rangeModifier;
+                minCoverLevel = minCoverReduce ? DecreaseCoverLevel(minCoverLevel) : minCoverLevel;
+                currentRadius = IncreaseRadius(iterations);
                 iterations++;
             }
 
-            // If still no suitable point is found, return false
             if (DebugMode)
             {
                 Logger.LogWarning($"Found No Cover after [{iterations}] iterations with Minimum Cover Level set to {minCoverLevel} and Radius = {currentRadius}");
             }
-            coverPoint = null;
             return false;
         }
-        private bool CheckCornersForCover(Vector3[] corners, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f)
+
+        private bool FindCorners(NavMeshHit hit, out CustomCoverPoint coverPoint, float minCover)
         {
             coverPoint = null;
+
+            Vector3[] corners = Corners(hit.position);
+            DebugCorners(corners);
 
             int i = 1;
             while (i < corners.Length)
             {
-                const float lerpStep = 0.25f;
-                const int maxIterations = 3;
-
-                int iterations = 0;
-                while (iterations < maxIterations)
+                if (CheckBetweenCorners(corners[i - 1], corners[i], out coverPoint, minCover))
                 {
-                    // Lerps between corners to find possible cover points between them.
-                    float lerpValue = lerpStep + (lerpStep * iterations);
-                    Vector3 cornerLerped = Vector3.Lerp(corners[i - 1], corners[i], lerpValue);
-
-                    // Checks resulting point to see if its cover.
-                    if (CheckCover(cornerLerped, out coverPoint, minCoverLevel))
-                    {
-                        // Calculate a new path to the cover point we found. Then get the distance and assign these values to our CustomCoverPoint.
-                        NavMeshPath navMeshPath1 = new NavMeshPath();
-                        NavMesh.CalculatePath(BotOwner.Transform.position, cornerLerped, -1, navMeshPath1);
-                        float distance = navMeshPath1.CalculatePathLength();
-
-                        coverPoint.CoverDistance = distance;
-                        coverPoint.NavMeshPath = navMeshPath1;
-
-                        if (DebugMode)
-                        {
-                            Logger.LogInfo($"CheckCornersForCover: Found Cover after [{iterations}] iterations. Cover Distance = {distance} for corner pair {i - 1}-{i}.");
-                        }
-                        return true;
-                    }
-                    iterations++;
+                    return true;
                 }
 
                 i++;
@@ -116,54 +97,134 @@ namespace Movement.Helpers
             {
                 Logger.LogWarning($"CheckCornersForCover: Found No Cover");
             }
+
             return false;
         }
 
-        public bool CheckCover(Vector3 coverPosition, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f)
+        private bool CheckBetweenCorners(Vector3 cornerA, Vector3 cornerB, out CustomCoverPoint coverPoint, float minCover)
         {
-            // Check if the lerped value is cover or not
-            if (Analyzer.AnalyseCoverPosition(TargetPosition, coverPosition, out coverPoint, minCoverLevel))
-            {
-                if (DebugMode)
-                {
-                    DebugDrawer.Ray(coverPosition, Vector3.up, 2f, 0.1f, Color.red, 30f);
-                }
-                return true;
-            }
             coverPoint = null;
+            int iterations = 0;
+
+            while (iterations < maxLerpIterations)
+            {
+                // Lerps between corners to find possible cover points between them.
+                Vector3 cornerLerped = LerpCorners(iterations, cornerA, cornerB, LerpStep);
+
+                if (Analyzer.CheckPosition(TargetPosition, cornerLerped, out coverPoint, minCover))
+                {
+                    if (DebugMode)
+                    {
+                        Logger.LogInfo($"CheckCornersForCover: Found Cover after [{iterations}] iterations");
+                        DebugDrawer.Ray(cornerLerped, Vector3.up, 1.5f, 0.1f, Color.green, 60f);
+                    }
+
+                    return true;
+                }
+
+                iterations++;
+            }
+
             return false;
         }
 
-        private static bool CheckPathLength(NavMeshPath navMeshPath, float currentRadius, out float distance)
+        private bool FindRandomPoint(out NavMeshHit hit, float radius)
         {
-            distance = navMeshPath.CalculatePathLength();
-            return distance < currentRadius * 2f;
+            Vector3 randomPoint = FindArcPoint(BotPosition, TargetPosition, radius, RandomAngle);
+
+            bool onNavMesh = false;
+
+            if (NavMesh.SamplePosition(randomPoint, out hit, 10f, -1))
+            {
+                onNavMesh = true;
+            }
+
+            return onNavMesh;
         }
 
-        public static Vector3 FindArcPoint(Vector3 bot, Vector3 target, float arcRadius, float inputAngle)
+        /// <summary>
+        /// Calculates the position on an arc between two points with a given radius and angle.
+        /// </summary>
+        /// <param name="botPos">The position of the bot.</param>
+        /// <param name="targetPos">The position of the target.</param>
+        /// <param name="arcRadius">The radius of the arc.</param>
+        /// <param name="angle">The angle of the arc.</param>
+        /// <returns>The position on the arc.</returns>
+        public static Vector3 FindArcPoint(Vector3 botPos, Vector3 targetPos, float arcRadius, float angle)
         {
-            Vector3 forward = bot - target;
-            forward.y = 0.0f;
-            forward.Normalize();
+            // Calculate the direction vector from the enemy position to the bot position
+            Vector3 direction = (botPos - targetPos).normalized;
 
-            Vector3 right = new Vector3(forward.z, 0.0f, -forward.x);
+            // Find an orthogonal vector to the direction vector
+            Vector3 orthogonal = Vector3.Cross(direction, Vector3.up).normalized;
 
-            Vector3 direction = Quaternion.AngleAxis(inputAngle, Vector3.up) * right;
-            Vector3 edgePosition = bot + direction * arcRadius;
+            // Rotate the direction vector around the orthogonal vector by the specified angle
+            Quaternion rotation = Quaternion.AngleAxis(angle, orthogonal);
+            Vector3 rotatedDirection = rotation * direction;
 
-            return edgePosition;
+            // Calculate the position on the arc
+            Vector3 arcPoint = botPos + arcRadius * rotatedDirection;
+
+            return arcPoint;
         }
 
+        private Vector3[] Corners(Vector3 point)
+        {
+            return Processing.GetCorners(BotPosition, point, BotOwner.LookSensor._headPoint, true, true, false, false, false, 1f);
+        }
+
+        private void DebugCorners(Vector3[] corners)
+        {
+            if (DebugMode && DebugTimer < Time.time)
+            {
+                Logger.LogDebug($"Corners Length = [{corners.Length}]");
+                DebugTimer = Time.time + 10f;
+                for (int i = 0; i < corners.Length - 1; i++)
+                {
+                    Vector3 corner1 = corners[i];
+                    Vector3 corner2 = corners[i + 1];
+                    corner1.y += 0.25f;
+                    corner2.y += 0.25f;
+                    DebugDrawer.Line(corner1, corner2, 0.075f, Color.green, 30f);
+                }
+            }
+        }
+
+        private float DecreaseCoverLevel(float minCover)
+        {
+            return minCover > 0.2f ? minCover * 0.8f : minCover;
+        }
+
+        private float IncreaseRadius(float iterations)
+        {
+            return (incrementRadiusBase + (iterations * radiusIncrementStep));
+        }
+
+        private Vector3 LerpCorners(float iterations, Vector3 A, Vector3 B, float step = 0.1f)
+        {
+            return Vector3.Lerp(A, B, step + (step * iterations));
+        }
+
+        private CustomCoverPoint AddPath(CustomCoverPoint Cover)
+        {
+            NavMeshPath Path = new NavMeshPath();
+            NavMesh.CalculatePath(BotPosition, Cover.CoverPosition, -1, Path);
+
+            Cover.NavMeshPath = Path;
+            Cover.CoverDistance = Path.CalculatePathLength();
+
+            return Cover;
+        }
+
+        private Vector3 BotPosition => BotOwner.Transform.position;
+        private float RandomAngle => SAIN_Math.RandomBool(50f) ? Random.Range(MinAngle, MaxAngle) : Random.Range(-MinAngle, -MaxAngle);
         private bool DebugMode => DebugCoverSystem.Value;
         public CoverAnalyzer Analyzer { get; private set; }
 
+        private float DebugTimer = 0f;
         private Vector3 TargetPosition;
-        private Vector3 BotPosition => BotOwner.Transform.position;
         protected ManualLogSource Logger;
         private readonly BotOwner BotOwner;
-
-        // Shortcuts
-        private bool GoalEnemyNull => BotOwner.Memory.GoalEnemy == null;
-        private bool GoalTargetNull => BotOwner.Memory.GoalTarget == null;
+        private readonly CornerProcessing Processing = new CornerProcessing();
     }
 }
