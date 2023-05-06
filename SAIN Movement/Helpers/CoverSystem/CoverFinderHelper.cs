@@ -24,11 +24,15 @@ namespace Movement.Helpers
         }
 
         private const int maxCoverIterations = 5;
-        private const int maxLerpIterations = 5;
-        private const float LerpStep = 0.2f;
+        private const float coverReduceStep = -0.1f;
+
         private const float incrementRadiusBase = 10f;
-        private const float radiusIncrementStep = 10f;
-        private const float MinAngle = 30f;
+        private const float radiusIncreaseStep = 10f;
+
+        private const int maxLerpIterations = 10;
+        private const float LerpStep = 1f / maxLerpIterations;
+
+        private const float MinAngle = 45f;
         private const float MaxAngle = 175f;
 
         /// <summary>
@@ -48,6 +52,9 @@ namespace Movement.Helpers
 
             while (iterations < maxCoverIterations)
             {
+                currentRadius += radiusIncreaseStep * iterations;
+                minCoverLevel += minCoverReduce ? coverReduceStep * iterations : 0f;
+
                 if (FindRandomPoint(out NavMeshHit hit, currentRadius))
                 {
                     if (FindCorners(hit, out coverPoint, minCoverLevel))
@@ -63,8 +70,6 @@ namespace Movement.Helpers
                     }
                 }
 
-                minCoverLevel = minCoverReduce ? DecreaseCoverLevel(minCoverLevel) : minCoverLevel;
-                currentRadius = IncreaseRadius(iterations);
                 iterations++;
             }
 
@@ -72,6 +77,7 @@ namespace Movement.Helpers
             {
                 Logger.LogWarning($"Found No Cover after [{iterations}] iterations with Minimum Cover Level set to {minCoverLevel} and Radius = {currentRadius}");
             }
+
             return false;
         }
 
@@ -109,7 +115,7 @@ namespace Movement.Helpers
             while (iterations < maxLerpIterations)
             {
                 // Lerps between corners to find possible cover points between them.
-                Vector3 cornerLerped = LerpCorners(iterations, cornerA, cornerB, LerpStep);
+                Vector3 cornerLerped = LerpCorners(iterations, cornerA, cornerB);
 
                 if (Analyzer.CheckPosition(TargetPosition, cornerLerped, out coverPoint, minCover))
                 {
@@ -132,14 +138,7 @@ namespace Movement.Helpers
         {
             Vector3 randomPoint = FindArcPoint(BotPosition, TargetPosition, radius, RandomAngle);
 
-            bool onNavMesh = false;
-
-            if (NavMesh.SamplePosition(randomPoint, out hit, 10f, -1))
-            {
-                onNavMesh = true;
-            }
-
-            return onNavMesh;
+            return NavMesh.SamplePosition(randomPoint, out hit, 10f, -1);
         }
 
         /// <summary>
@@ -153,22 +152,18 @@ namespace Movement.Helpers
         public static Vector3 FindArcPoint(Vector3 botPos, Vector3 targetPos, float arcRadius, float angle)
         {
             Vector3 direction = (botPos - targetPos).normalized;
-
             Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
+            Vector3 arcPoint = arcRadius * (rotation * direction);
 
-            Vector3 rotatedDirection = rotation * direction;
-
-            if (DebugCoverSystem.Value && DebugTimerArc < Time.time)
+            if (DebugCoverSystem.Value)
             {
-                DebugTimerArc = Time.time + 1f;
-                DebugDrawer.Line(botPos, botPos + arcRadius * rotatedDirection, 0.025f, Color.white, 10f);
-                DebugDrawer.Sphere(botPos + arcRadius * rotatedDirection, 0.25f, Color.white, 10f);
+                System.Console.WriteLine($"Arc Point Distance: {arcPoint.magnitude}");
+                DebugDrawer.Line(botPos, botPos + arcPoint, 0.025f, Color.white, 2f);
+                DebugDrawer.Sphere(botPos + arcPoint, 0.25f, Color.white, 2f);
             }
 
-            return botPos + arcRadius * rotatedDirection;
+            return botPos + arcPoint;
         }
-
-        private static float DebugTimerArc = 0f;
 
         private Vector3[] Corners(Vector3 point)
         {
@@ -192,19 +187,9 @@ namespace Movement.Helpers
             }
         }
 
-        private float DecreaseCoverLevel(float minCover)
+        private Vector3 LerpCorners(float iterations, Vector3 A, Vector3 B)
         {
-            return minCover > 0.2f ? minCover * 0.8f : minCover;
-        }
-
-        private float IncreaseRadius(float iterations)
-        {
-            return (incrementRadiusBase + (iterations * radiusIncrementStep));
-        }
-
-        private Vector3 LerpCorners(float iterations, Vector3 A, Vector3 B, float step = 0.1f)
-        {
-            return Vector3.Lerp(A, B, step + (step * iterations));
+            return Vector3.Lerp(A, B, LerpStep + (LerpStep * iterations));
         }
 
         private CustomCoverPoint AddPath(CustomCoverPoint Cover)

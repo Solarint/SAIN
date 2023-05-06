@@ -345,7 +345,7 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 float angleAdd = angleStep * iterations;
                 float currentAngle = UnityEngine.Random.Range(-15f - angleAdd, 15f + angleAdd);
-                float currentRange = rangeStep * iterations + 1f;
+                float currentRange = rangeStep * iterations + 5f;
 
                 Vector3 DodgeFallBack = CoverFinder.FindArcPoint(BotOwner.Transform.position, TargetPosition.Value, currentRange, currentAngle);
                 if (NavMesh.SamplePosition(DodgeFallBack, out NavMeshHit hit, 2f, -1))
@@ -360,11 +360,6 @@ namespace SAIN.Movement.Layers.DogFight
                         UpdateDoorOpener();
                         return;
                     }
-                }
-
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"Moving to next iteration. Found No Backup Position after [{iterations}] iterations. Angle = [{currentAngle}] Range = [{currentRange}]");
                 }
 
                 iterations++;
@@ -501,6 +496,7 @@ namespace SAIN.Movement.Layers.DogFight
         {
             if (Reloading || BotOwner.Medecine.FirstAid.Using)
             {
+                SetSprint(true);
                 FallingBack = true;
             }
             else
