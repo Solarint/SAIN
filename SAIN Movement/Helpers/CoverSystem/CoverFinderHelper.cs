@@ -152,21 +152,23 @@ namespace Movement.Helpers
         /// <returns>The position on the arc.</returns>
         public static Vector3 FindArcPoint(Vector3 botPos, Vector3 targetPos, float arcRadius, float angle)
         {
-            // Calculate the direction vector from the enemy position to the bot position
             Vector3 direction = (botPos - targetPos).normalized;
 
-            // Find an orthogonal vector to the direction vector
-            Vector3 orthogonal = Vector3.Cross(direction, Vector3.up).normalized;
+            Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
 
-            // Rotate the direction vector around the orthogonal vector by the specified angle
-            Quaternion rotation = Quaternion.AngleAxis(angle, orthogonal);
             Vector3 rotatedDirection = rotation * direction;
 
-            // Calculate the position on the arc
-            Vector3 arcPoint = botPos + arcRadius * rotatedDirection;
+            if (DebugCoverSystem.Value && DebugTimerArc < Time.time)
+            {
+                DebugTimerArc = Time.time + 1f;
+                DebugDrawer.Line(botPos, botPos + arcRadius * rotatedDirection, 0.025f, Color.white, 10f);
+                DebugDrawer.Sphere(botPos + arcRadius * rotatedDirection, 0.25f, Color.white, 10f);
+            }
 
-            return arcPoint;
+            return botPos + arcRadius * rotatedDirection;
         }
+
+        private static float DebugTimerArc = 0f;
 
         private Vector3[] Corners(Vector3 point)
         {
