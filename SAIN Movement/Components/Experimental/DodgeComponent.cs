@@ -44,7 +44,7 @@
 //            return false;
 //        }
 //
-//        // Finds a suitable dodge Position when exchanging gunfire. Returns True if a point a suitable point is found
+//        // Finds a suitable dodge PartPosition when exchanging gunfire. Returns True if a point a suitable point is found
 //        private bool Dodge(BotOwner bot, out Vector3 position)
 //        {
 //            // CONFIG VALUES
@@ -52,12 +52,12 @@
 //            float ArcAngle = 30.0f; // The angle of the dodge arc in degrees
 //
 //            Vector3 BotPosition = bot.Transform.position;
-//            Vector3 TargetPosition = bot.Memory.GoalEnemy.CurrPosition;
+//            Vector3 Target = bot.Memory.GoalEnemy.CurrPosition;
 //
 //            // Run a loop that takes a points from an arc we generate to see if we get a navmesh hit.
 //            for (int i = 0; i < 3; i++)
 //            {
-//                FindPoint.FindArcPoint(BotPosition, TargetPosition, out Vector3 ArcPoint, ShuffleRange, ArcAngle, 0.25f, ShuffleRange);
+//                FindPoint.FindArcPoint(BotPosition, Target, out Vector3 ArcPoint, ShuffleRange, ArcAngle, 0.25f, ShuffleRange);
 //                if (NavMesh.SamplePosition(ArcPoint, out NavMeshHit navmeshhit, 1f, -1))
 //                {
 //                    position = navmeshhit.position;
@@ -107,7 +107,7 @@
 
                     if (Dodge.ExecuteFallBack(bot, out Vector3 FallbackPosition))
                     {
-                        // Bot Head Position to check if visible
+                        // Bot Head PartPosition to check if visible
                         Vector3 VisibleCheckPos = FallbackPosition;
                         float HeadOffset = bot.MyHead.position.y - bot.Transform.position.y;
                         VisibleCheckPos.y += HeadOffset;
@@ -125,7 +125,7 @@
 
                             if (DebugDodge.Value)
                             {
-                                Logger.LogDebug($"Fallback Dodge: [{bot.name}]: Suitable Fallback Position is out of view of enemy. Drawing White Sphere at fallback position and red sphere at enemy position");
+                                Logger.LogDebug($"Fallback Dodge: [{bot.name}]: Suitable Fallback PartPosition is out of view of enemy. Drawing White Sphere at fallback position and red sphere at enemy position");
                                 Draw.Sphere(VisibleCheckPos, 0.5f, Color.white);
                                 Draw.Sphere(EnemyPos, 0.5f, Color.red);
                             }
@@ -168,7 +168,7 @@
             */
 
 /*
-                if ((!bot.Memory.GoalEnemy.CanShoot || !bot.Memory.GoalEnemy.IsVisible) && Ammo < 0.2f)
+                if ((!bot.Memory.GoalEnemy.CanShoot || !bot.Memory.GoalEnemy.SightBlocked) && Ammo < 0.2f)
                 {
                     if (Dodge.ExecuteDodge(bot))
                     {

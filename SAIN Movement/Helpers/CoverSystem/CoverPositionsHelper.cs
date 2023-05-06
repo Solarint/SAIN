@@ -82,7 +82,7 @@ namespace Movement.Helpers
                     /*
                     if (Finder.CheckPosition(coverCheckPoint))
                     {
-                        Logger.LogDebug($"Found Good Old Position!");
+                        Logger.LogDebug($"Found Good Old PartPosition!");
                         goodPosition = coverCheckPoint;
                         return true;
                     }
@@ -118,7 +118,7 @@ namespace Movement.Helpers
             /*
             if (Finder.CheckPosition(closestPosition))
             {
-                Logger.LogDebug($"Found Good Closest Position!");
+                Logger.LogDebug($"Found Good Closest PartPosition!");
                 position = closestPosition;
                 return true;
             }

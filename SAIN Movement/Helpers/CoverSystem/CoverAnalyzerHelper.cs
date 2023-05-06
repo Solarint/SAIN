@@ -17,107 +17,98 @@ namespace Movement.Helpers
             BotOwner = bot;
         }
 
+        private bool DebugMode => DebugCoverSystem.Value;
+
         /// <summary>
         /// Analyzes a Vector3 and checks if the bot is visible from it, and if so, by how much.
         /// </summary>
-        /// <param name="enemyPosition">The position of the enemy.</param>
-        /// <param name="coverPosition">The position of the cover.</param>
+        /// <param name="targetPos">The position of the enemy.</param>
+        /// <param name="coverPos">The position of the cover.</param>
         /// <param name="coverPoint">The CustomCoverPoint object.</param>
         /// <param name="minCoverLevel">The minimum cover level.</param>
         /// <returns>True if the cover position is valid, false otherwise.</returns>
-        public bool CheckPosition(Vector3 enemyPosition, Vector3 coverPosition, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f)
+        public bool CheckPosition(Vector3 targetPos, Vector3 coverPos, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f)
         {
-            coverPoint = null;
+            // Assign values for use in other methods
+            Target = targetPos;
+            CoverPosition = coverPos;
 
-            TargetPosition = enemyPosition;
-            CoverPosition = coverPosition;
-            MinimumCover = minCoverLevel;
+            // Calculate Cover Viability
+            float coverRatio = CalculateRatio();
+            bool goodCover = coverRatio >= minCoverLevel;
+            bool canShoot = !SightBlocked(BotOwner.WeaponRoot.position);
 
-            if (CheckParts)
-            {
-                coverPoint = new CustomCoverPoint(BotPosition, coverPosition, CoverRatio, !IsVisible(WeaponPos));
-                return true;
-            }
+            // Check is cover is viable, if so create a new CustomCoverPoint to return
+            coverPoint = goodCover ? new CustomCoverPoint(BotOwner.Transform.position, coverPos, coverRatio, canShoot) : null;
 
-            return false;
+            // Return true if cover meets requirements
+            return goodCover;
         }
 
-        private bool CheckParts
+        private float CalculateRatio()
         {
-            get
-            {
-                var parts = BotOwner.MainParts;
-                int coverScoreCount = 0;
-                int bodyPartCount = 0;
+            int coverScoreCount = 0;
+            int bodyPartCount = 0;
 
-                foreach (var part in parts.Values)
+            // Check each body part on a bot to see if it will be visible at the cover position
+            foreach (var part in BotOwner.MainParts.Values)
+            {
+                // Count the body part
+                bodyPartCount++;
+
+                // Check is that body part has line of sight
+                if (SightBlocked(part.Position))
                 {
-                    bodyPartCount++;
-
-                    if (IsVisible(part.Position))
-                    {
-                        coverScoreCount++;
-                    }
+                    // Count the blocked body part
+                    coverScoreCount++;
                 }
-
-                CoverRatio = (float)coverScoreCount / bodyPartCount;
-                return CoverRatio >= MinimumCover;
             }
+
+            // Our cover amount is the number of blocked body parts divided by the total body parts
+            return (float)coverScoreCount / bodyPartCount;
         }
 
-        private bool IsVisible(Vector3 point)
+        /// <summary>
+        /// Checks if the sight from a given part to the target is blocked by an object.
+        /// </summary>
+        /// <param name="part">The part to check from.</param>
+        /// <returns>True if the sight is blocked, false otherwise.</returns>
+        private bool SightBlocked(Vector3 part)
         {
-            Vector3 partPosition = Position(point);
-            Vector3 enemyDirection = Direction(point);
-            float enemyDistance = Distance(enemyDirection);
+            // Assign the mask we are using for the raycast
+            var mask = LayerMaskClass.HighPolyWithTerrainMaskAI;
 
-            if (Physics.Raycast(partPosition, enemyDirection, enemyDistance, Mask))
+            // Find the position our part will be at at the potential cover position
+            var partPos = PartPosition(part);
+
+            // Find direction from part to target
+            var direction = Target - partPos;
+
+            // Is line of sight blocked at this position for this part?
+            bool sightBlocked = Physics.Raycast(partPos, direction, direction.magnitude, mask);
+
+            // Debug
+            if (sightBlocked && DebugMode)
             {
-                if (DebugMode)
-                {
-                    DebugDrawer.Ray(partPosition, enemyDirection, enemyDistance, 0.025f, Color.green, 2f);
-                }
-
-                return true;
+                DebugDrawer.Ray(partPos, direction, direction.magnitude, 0.01f, Color.magenta, 0.1f);
             }
 
-            return false;
+            // Return true if sight is blocked
+            return sightBlocked;
         }
 
-        private Vector3 Direction(Vector3 point)
+        /// <summary>
+        /// Checks the visibility a part will have at the potential cover position
+        /// </summary>
+        /// <param name="part">The part to calculate the position of.</param>
+        private Vector3 PartPosition(Vector3 part)
         {
-            return Target() - point;
+            return part - BotOwner.Transform.position + CoverPosition;
         }
 
-        private Vector3 Target()
-        {
-            Vector3 target = TargetPosition;
-            target.y += EnemyYOffset;
-            return target;
-        }
-
-        private float Distance(Vector3 direction)
-        {
-            return direction.magnitude;
-        }
-
-        private Vector3 Position(Vector3 part)
-        {
-            return part - BotPosition + CoverPosition;
-        }
-
-        private bool DebugMode => DebugCoverSystem.Value;
-        private Vector3 BotPosition => BotOwner.Transform.position;
-        private LayerMask Mask => LayerMaskClass.HighPolyWithTerrainMaskAI;
-        private Vector3 WeaponPos => BotOwner.WeaponRoot.position;
-
-        private const float EnemyYOffset = 1.4f;
-
-        private float CoverRatio = 1f;
         private readonly BotOwner BotOwner;
         protected ManualLogSource Logger;
-        private Vector3 TargetPosition;
+        private Vector3 Target;
         private Vector3 CoverPosition;
-        private float MinimumCover;
     }
 }
