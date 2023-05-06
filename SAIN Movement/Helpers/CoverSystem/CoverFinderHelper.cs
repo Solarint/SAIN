@@ -2,12 +2,10 @@
 using EFT;
 using SAIN_Helpers;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
 using static Movement.Helpers.Corners;
 using static Movement.UserSettings.Debug;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace Movement.Helpers
 {
@@ -34,6 +32,45 @@ namespace Movement.Helpers
 
         private const float MinAngle = 45f;
         private const float MaxAngle = 175f;
+
+        private void FindAllCorners(Vector3 enemyPosition)
+        {
+            TargetPosition = enemyPosition;
+            float radius = 50f;
+            int iterations = 0;
+            const int limit = 30;
+            const int max = 360 - limit * 2;
+            List<Vector3> visitedCorners = new List<Vector3>();
+            List<Vector3> newCorners = new List<Vector3>();
+            int countedCorners = 0;
+            while (iterations < max)
+            {
+                Vector3 randomPoint = FindArcPoint(BotPosition, TargetPosition, radius, (float)iterations + limit);
+
+                if (NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 10f, -1))
+                {
+                    NavMeshPath path = new NavMeshPath();
+                    NavMesh.CalculatePath(BotOwner.Transform.position, hit.position, -1, path);
+                    List<Vector3> corners = new List<Vector3>(path.corners);
+                    countedCorners += corners.Count;
+                    corners.RemoveAll(c => visitedCorners.Contains(c));
+                    newCorners.AddRange(corners);
+                    visitedCorners.AddRange(corners);
+
+                    if (DebugMode)
+                    {
+                        Logger.LogInfo($"");
+                    }
+                }
+
+                iterations++;
+            }
+
+            Vector3[] NavCorners = newCorners.ToArray();
+
+            Logger.LogInfo($"Total Corners found {NavCorners.Length}");
+            Logger.LogInfo($"All Checked Corners {countedCorners}");
+        }
 
         /// <summary>
         /// Finds a cover point for the AI to hide from the enemy.
@@ -114,7 +151,7 @@ namespace Movement.Helpers
 
             while (iterations < maxLerpIterations)
             {
-                // Lerps between corners to find possible cover points between them.
+                // Lerps between RawCorners to find possible cover points between them.
                 Vector3 cornerLerped = LerpCorners(iterations, cornerA, cornerB);
 
                 if (Analyzer.CheckPosition(TargetPosition, cornerLerped, out coverPoint, minCover))

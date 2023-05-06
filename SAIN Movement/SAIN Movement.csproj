@@ -192,6 +192,7 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\CoverFinderComponent.cs" />
     <Compile Include="Helpers\BotDecision.cs" />
     <Compile Include="Components\Experimental\DogFight\DogFightComponent.cs" />
     <Compile Include="Helpers\CoverSystem\CustomCoverPoint.cs" />

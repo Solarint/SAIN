@@ -18,7 +18,7 @@ namespace SAIN.Movement.Layers.DogFight
             BotOwner = bot;
             Dodge = new BotDodge(bot);
             CoverFinder = new CoverFinder(bot);
-            DynamicLean = bot.gameObject.GetComponent<DynamicLean>();
+            DynamicLean = bot.gameObject.GetComponent<LeanComponent>();
         }
 
         private const float UpdateFrequency = 0.15f;
@@ -583,7 +583,7 @@ namespace SAIN.Movement.Layers.DogFight
         private bool HasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
         public bool IsSprintingFallback => FallingBack && BotOwner.Mover.IsMoving;
         private bool DebugMode => DebugUpdateMove.Value;
-        public DynamicLean DynamicLean { get; private set; }
+        public LeanComponent DynamicLean { get; private set; }
 
         private bool FallingBack;
         private float ReactionTimer = 0f;

@@ -16,7 +16,8 @@ namespace Movement.Patches
         [PatchPostfix]
         public static void PatchPostfix(ref BotOwner __instance)
         {
-            __instance.gameObject.AddComponent<DynamicLean>();
+            __instance.gameObject.AddComponent<LeanComponent>();
+            __instance.gameObject.AddComponent<CoverFinderComponent>();
         }
     }
 
@@ -37,7 +38,8 @@ namespace Movement.Patches
             if (botState == EBotState.PreActive)
                 return;
 
-            __instance.gameObject.GetComponent<DynamicLean>().Dispose();
+            __instance.gameObject.GetComponent<LeanComponent>().Dispose();
+            __instance.gameObject.GetComponent<CoverFinderComponent>().Dispose();
         }
     }
 }

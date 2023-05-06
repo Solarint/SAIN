@@ -11,7 +11,7 @@ namespace Movement.Helpers
     public class Corners
     {
         /// <summary>
-        /// Finds corners and generates an angle between the first 2 to calculate the direction a bot should lean in based on enemy position
+        /// Finds RawCorners and generates an angle between the first 2 to calculate the direction a bot should lean in based on enemy position
         /// </summary>
         public class FindDirectionToLean
         {
@@ -22,9 +22,9 @@ namespace Movement.Helpers
             }
 
             /// <summary>
-            /// Finds the lean angle for a Bot based on the corners in a navmeshpath.
+            /// Finds the lean angle for a Bot based on the RawCorners in a navmeshpath.
             /// </summary>
-            /// <param name="maxDistance">The maximum distance between the two corners.</param>
+            /// <param name="maxDistance">The maximum distance between the two RawCorners.</param>
             /// <param name="debugMode">Whether or not to enable debug mode.</param>
             /// <returns>The lean angle for a bot, 0 if no lean.</returns>
             public float FindLeanAngle(Vector3 botPosition, Vector3 targetPosition, Vector3 botHeadPosition, float maxDistance)
@@ -52,19 +52,19 @@ namespace Movement.Helpers
             }
 
             /// <summary>
-            /// Picks the two lean corners from the given array of corners.
+            /// Picks the two lean RawCorners from the given array of RawCorners.
             /// </summary>
-            /// <param name="corners">Array of corners.</param>
+            /// <param name="corners">Array of RawCorners.</param>
             /// <param name="firstcorner">The first corner.</param>
             /// <param name="secondcorner">The second corner.</param>
             /// <param name="maxdistance">The maximum distance.</param>
             /// <param name="debugMode">if set to <c>true</c> debug mode is enabled.</param>
             /// <returns>
-            ///   <c>true</c> if two lean corners are picked; otherwise, <c>false</c>.
+            ///   <c>true</c> if two lean RawCorners are picked; otherwise, <c>false</c>.
             /// </returns>
             private bool PickLeanCorners(Vector3[] corners, out Vector3 firstcorner, out Vector3 secondcorner)
             {
-                // Corner 0 is at bot position. So we need 3 corners to check lean angle.
+                // Corner 0 is at bot position. So we need 3 RawCorners to check lean angle.
                 if (corners.Length < 3)
                 {
                     firstcorner = Vector3.zero;
@@ -145,7 +145,7 @@ namespace Movement.Helpers
         }
 
         /// <summary>
-        /// Generates NavMesh paths and finds corners, then processes them if specified in GetCorners method
+        /// Generates NavMesh paths and finds RawCorners, then processes them if specified in GetCorners method
         /// </summary>
         public class CornerProcessing
         {
@@ -157,14 +157,14 @@ namespace Movement.Helpers
             private bool DebugMode => DebugCornerProcessing.Value;
 
             /// <summary>
-            /// Calculates the corners of the navMeshPath between the bot and the target position, and optionally trims them using raycasting, length trimming, and lerp trimming.
+            /// Calculates the RawCorners of the navMeshPath between the bot and the target position, and optionally trims them using raycasting, length trimming, and lerp trimming.
             /// </summary>
-            /// <param name="raycastTrim">Whether to trim the corners using raycasting.</param>
-            /// <param name="lengthTrim">Whether to trim the corners using length trimming.</param>
-            /// <param name="lerpTrim">Whether to trim the corners using lerp trimming.</param>
-            /// <param name="cornerToHeadHeight">Whether to raise the corners to the bot's head height.</param>
+            /// <param name="raycastTrim">Whether to trim the RawCorners using raycasting.</param>
+            /// <param name="lengthTrim">Whether to trim the RawCorners using length trimming.</param>
+            /// <param name="lerpTrim">Whether to trim the RawCorners using lerp trimming.</param>
+            /// <param name="cornerToHeadHeight">Whether to raise the RawCorners to the bot's head height.</param>
             /// <param name="minlengthfortrim">The minimum length for length trimming.</param>
-            /// <returns>The trimmed corners of the navMeshPath.</returns>
+            /// <returns>The trimmed RawCorners of the navMeshPath.</returns>
             public Vector3[] GetCorners(Vector3 botPosition, Vector3 targetPos, Vector3 botHeadPosition, bool raycastTrim = true, bool lengthTrim = false, bool lerpTrim = false, bool cornerToHeadHeight = false, bool returnFromHeadHeight = false, float minlengthfortrim = 2f)
             {
                 Vector3 headLocalPos = botHeadPosition - botPosition;
@@ -229,14 +229,14 @@ namespace Movement.Helpers
             }
 
             /// <summary>
-            /// Processes the corners of a mesh by raycasting, length trimming, and lerp trimming.
+            /// Processes the RawCorners of a mesh by raycasting, length trimming, and lerp trimming.
             /// </summary>
-            /// <param name="corners">The corners of the mesh.</param>
-            /// <param name="raycastTrim">Whether to raycast trim the corners.</param>
-            /// <param name="lengthTrim">Whether to length trim the corners.</param>
-            /// <param name="lerpTrim">Whether to lerp trim the corners.</param>
+            /// <param name="corners">The RawCorners of the mesh.</param>
+            /// <param name="raycastTrim">Whether to raycast trim the RawCorners.</param>
+            /// <param name="lengthTrim">Whether to length trim the RawCorners.</param>
+            /// <param name="lerpTrim">Whether to lerp trim the RawCorners.</param>
             /// <param name="minLengthTrim">The minimum length for trimming.</param>
-            /// <returns>The processed corners.</returns>
+            /// <returns>The processed RawCorners.</returns>
             private Vector3[] ProcessCorners(Vector3[] corners, bool raycastTrim, bool lengthTrim, bool lerpTrim, float minLengthTrim)
             {
                 if (lerpTrim && corners.Length > 3)
@@ -279,11 +279,11 @@ namespace Movement.Helpers
             }
 
             /// <summary>
-            /// Raycasts between corners of a navmesh and trims out unnecessary corners.
+            /// Raycasts between RawCorners of a navmesh and trims out unnecessary RawCorners.
             /// </summary>
-            /// <param name="navMeshCorners">The corners of the navmesh.</param>
-            /// <param name="raycastCorners">The new corners of the navmesh after trimming.</param>
-            /// <returns>The new corners of the navmesh after trimming.</returns>
+            /// <param name="navMeshCorners">The RawCorners of the navmesh.</param>
+            /// <param name="raycastCorners">The new RawCorners of the navmesh after trimming.</param>
+            /// <returns>The new RawCorners of the navmesh after trimming.</returns>
             private static Vector3[] RaycastTrim(Vector3[] navMeshCorners)
             {
                 List<Vector3> cornersList = new List<Vector3>(navMeshCorners);
@@ -314,7 +314,7 @@ namespace Movement.Helpers
             }
 
             /// <summary>
-            /// Trims the corners of an array of Vector3s to a minimum length.
+            /// Trims the RawCorners of an array of Vector3s to a minimum length.
             /// </summary>
             /// <param name="navMeshCorners">The array of Vector3s to trim.</param>
             /// <param name="longcorners">The array of Vector3s after trimming.</param>
@@ -342,12 +342,12 @@ namespace Movement.Helpers
             }
 
             /// <summary>
-            /// Lerps the corners of a Vector3 array, removing any corners that are too close together.
+            /// Lerps the RawCorners of a Vector3 array, removing any RawCorners that are too close together.
             /// </summary>
-            /// <param name="navMeshCorners">The original array of Vector3 corners.</param>
-            /// <param name="averagedcorners">The averaged array of Vector3 corners.</param>
-            /// <param name="minlength">The minimum distance between corners.</param>
-            /// <returns>The averaged array of Vector3 corners.</returns>
+            /// <param name="navMeshCorners">The original array of Vector3 RawCorners.</param>
+            /// <param name="averagedcorners">The averaged array of Vector3 RawCorners.</param>
+            /// <param name="minlength">The minimum distance between RawCorners.</param>
+            /// <returns>The averaged array of Vector3 RawCorners.</returns>
             private static Vector3[] LerpTrim(Vector3[] navMeshCorners, float minlength)
             {
                 List<Vector3> cornersList = new List<Vector3>(navMeshCorners);

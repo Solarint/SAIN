@@ -15,6 +15,7 @@ namespace Movement.UserSettings
         public static ConfigEntry<bool> DebugCoverSystem { get; private set; }
         public static ConfigEntry<bool> DebugCornerProcessing { get; private set; }
         public static ConfigEntry<bool> DebugCornerLeanAngle { get; private set; }
+        public static ConfigEntry<bool> DebugCoverComponent { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
@@ -71,6 +72,11 @@ namespace Movement.UserSettings
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = -1 }));
 
             DebugCornerLeanAngle = Config.Bind(debugmode, "DebugCornerLeanAngle", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = -1 }));
+
+            DebugCoverComponent = Config.Bind(debugmode, "DebugCoverComponent", false,
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = -1 }));

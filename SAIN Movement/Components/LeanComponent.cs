@@ -1,29 +1,27 @@
 using BepInEx.Logging;
 using EFT;
 using Movement.Helpers;
+using SAIN_Helpers;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 using static Movement.UserSettings.Debug;
 using static Movement.UserSettings.DogFight;
 
 namespace Movement.Components
 {
-    public class DynamicLean : MonoBehaviour
+    public class LeanComponent : MonoBehaviour
     {
-        public void CoverSystemConnection()
-        {
-        }
-
         private void Awake()
         {
             bot = GetComponent<BotOwner>();
-
-            Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(DynamicLean) + $": {bot.name}: ");
-
+            BotColor = RandomColor;
+            Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(LeanComponent) + $": {bot.name}: ");
             Lean = new Corners.FindDirectionToLean();
 
             StartCoroutine(FindLeanAngleLoop());
-
             StartCoroutine(LeanConditionCheckLoop());
         }
 
@@ -137,6 +135,7 @@ namespace Movement.Components
                 return false;
             }
         }
+
         private bool ShouldBotLean => BotActive && !GoalEnemyNull && !EnemyVisibleOrShootable && !BotInCover && AllowLean;
         private bool ShouldBotReset => (!BotActive || GoalEnemyNull || EnemyVisibleOrShootable || !AllowLean) && !BotInCover;
         private bool EnemyFar => !GoalEnemyNull && bot.Memory.GoalEnemy.Distance > 50f;
@@ -150,6 +149,9 @@ namespace Movement.Components
         public float LeanAngle { get; private set; }
         public bool HoldLean { get; set; }
         private bool DebugMode => DebugDynamicLean.Value;
+
+        public static Color RandomColor => new Color(Random.value, Random.value, Random.value);
+        private Color BotColor;
 
         private Corners.FindDirectionToLean Lean;
         private BotOwner bot;

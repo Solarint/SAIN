@@ -26,7 +26,7 @@ namespace Movement.Patches
                 NavMeshPath navMeshPath = new NavMeshPath();
                 NavMesh.CalculatePath(botPos, enemyPos, -1, navMeshPath);
 
-                //Vector3 firstCorner = navMeshPath.corners[1];
+                //Vector3 firstCorner = navMeshPath.RawCorners[1];
 
                 Vector3 coverPoint = Vector3.RotateTowards(navMeshPath.corners[2], botPos, 10f, 999f);
 

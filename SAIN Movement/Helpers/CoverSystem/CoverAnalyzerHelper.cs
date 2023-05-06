@@ -79,7 +79,7 @@ namespace Movement.Helpers
             var mask = LayerMaskClass.HighPolyWithTerrainMaskAI;
 
             // Find the position our part will be at at the potential cover position
-            var partPos = PartPosition(part);
+            var partPos = part - BotOwner.Transform.position + CoverPosition;
 
             // Find direction from part to target
             var direction = Target - partPos;
@@ -95,15 +95,6 @@ namespace Movement.Helpers
 
             // Return true if sight is blocked
             return sightBlocked;
-        }
-
-        /// <summary>
-        /// Checks the visibility a part will have at the potential cover position
-        /// </summary>
-        /// <param name="part">The part to calculate the position of.</param>
-        private Vector3 PartPosition(Vector3 part)
-        {
-            return part - BotOwner.Transform.position + CoverPosition;
         }
 
         private readonly BotOwner BotOwner;
