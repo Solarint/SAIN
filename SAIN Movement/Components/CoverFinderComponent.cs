@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using EFT;
+using HarmonyLib;
 using Movement.Helpers;
 using SAIN_Helpers;
 using System.Collections;
@@ -9,86 +10,90 @@ using UnityEngine;
 using UnityEngine.AI;
 using static Movement.UserSettings.Debug;
 using static Movement.UserSettings.DogFight;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace Movement.Components
 {
     public class CoverFinderComponent : MonoBehaviour
     {
+        private bool DebugMode => DebugCoverComponent.Value;
         private void Awake()
         {
             bot = GetComponent<BotOwner>();
             BotColor = RandomColor;
             Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(LeanComponent) + $": {bot.name}: ");
-            DebugTimer = Time.time + 5f;
 
-            StartCoroutine(CornerFinder());
-
-            StartCoroutine(CheckNavMeshCorners());
-            StartCoroutine(RayCastCorners());
-            StartCoroutine(LerpCorners());
-            StartCoroutine(CheckPointsForCover());
+            StartCoroutine(PathGenerator());
+            StartCoroutine(GeneratePoints());
+            StartCoroutine(VerifyGenPoints());
+            StartCoroutine(PossibleCoverCheck());
         }
 
-        public Color BotColor;
-        public List<Vector3> FinalPositions = new List<Vector3>();
-
-        private bool DebugMode => DebugCoverComponent.Value;
-
-        public void Dispose()
-        {
-            StopAllCoroutines();
-            Destroy(this);
-        }
-
-        private IEnumerator CornerFinder()
-        {
-            while (true)
-            {
-                FindAllCorners();
-                yield return new WaitForSeconds(5f);
-            }
-        }
-
-        private void FindAllCorners()
-        {
-            int iterations = 0;
-            const int max = 5;
-
-            while (iterations < max)
-            {
-                CheckCornersInRadius(iterations * 10f + 2f);
-                iterations++;
-            }
-
-            if (DebugMode && FinalPositions.Count > 0)
-            {
-                Log();
-
-                foreach (var corner in FinalPositions)
-                {
-                    DebugDrawer.Sphere(corner, 0.15f, BotColor, 5f);
-                }
-            }
-        }
+        private const float MovementThreshold = 1.0f;
 
         private void Log()
         {
-            Logger.LogDebug($"Total CoverPositions [{FinalPositions.Count}]. " +
+            Logger.LogDebug($"Final PossibleCoverPoints [{PossibleCoverPoints.Count}]. " +
 
-                $"BackLog = Raycast[{RaycastBacklog.Count}] Lerp[{LerpBacklog.Count}] Checked[{FinalCheckBacklog.Count}] Process:[{ProcessBacklog.Count}] " +
+                $"BackLog: VerifiedPoints = [{VerifiedPoints.Count}] GeneratedPoints = [{GeneratedPoints.Count}]. " +
 
-                $"with [{RawCorners.Count}] Total corners found and [{ProcessedCorners.Count}] corners added to processing");
+                $"Data: [{RandomNavPoints.Count}] Total NavPoints found and [{ProcessedRandomPoints.Count}] Points added to processing");
         }
 
-        private void CheckCornersInRadius(float radius)
+        private IEnumerator PathGenerator()
         {
-            int iter = 0;
-            const int max = 10;
-            int finished = 0;
+            while (true)
+            {
+                const int maxCover = 1000;
 
-            List<Vector3> newCorners = new List<Vector3>();
+                // If the bot hasn't moved a certain distance, stop calculating new cover positions
+                float distance = Vector3.Distance(LastPositionForCheck, bot.Transform.position);
+                if (distance < MovementThreshold && PossibleCoverPoints.Count > maxCover)
+                {
+                    yield return new WaitForEndOfFrame();
+                    continue;
+                }
 
-            while (iter < max)
+                // Save the bot's current position for reference later above in the next loop
+                LastPositionForCheck = bot.Transform.position;
+
+                // Set the steps to increase the range for each iteration
+                const float rangeBase = 3f;
+                const float rangeMod = 5f;
+
+                // Calculate Paths in increasing radius based on the number of i
+                const int max = 20;
+                int i = 0;
+                while (i < max)
+                {
+                    StartCoroutine(CheckPaths(i * rangeMod + rangeBase));
+                    yield return new WaitForEndOfFrame();
+                    i++;
+                }
+
+                if (DebugMode && PossibleCoverPoints.Count > 0 && DebugTimer < Time.time)
+                {
+                    DebugTimer = Time.time + 30f;
+
+                    Log();
+
+                    foreach (var corner in PossibleCoverPoints)
+                    {
+                        DebugDrawer.Ray(corner, Vector3.up, 0.5f, 0.05f, BotColor, 30f);
+                    }
+                }
+                yield return new WaitForSeconds(1f);
+            }
+        }
+
+        private IEnumerator CheckPaths(float radius)
+        {
+            int i = 0;
+            const int max = 5;
+
+            List<Vector3> Points = new List<Vector3>();
+
+            while (i < max)
             {
                 Vector3 randomPoint = Random.onUnitSphere * radius;
                 randomPoint.y = Random.Range(-5, 5);
@@ -97,174 +102,164 @@ namespace Movement.Components
                 if (NavMesh.SamplePosition(randomPoint, out var hit, 2f, NavMesh.AllAreas))
                 {
                     NavMeshPath path = new NavMeshPath();
-                    if (NavMesh.CalculatePath(bot.Transform.position, hit.position, -1, path))
+                    if (NavMesh.CalculatePath(bot.Transform.position, hit.position, -1, path) && path.status == NavMeshPathStatus.PathComplete)
                     {
-                        newCorners.AddRange(path.corners);
-                        finished++;
+                        Points.Add(hit.position);
                     }
                 }
-                iter++;
+
+                yield return new WaitForEndOfFrame();
+                i++;
             }
 
-            CompareAndAdd(newCorners);
+            // Checks the randomly generate nav hits to make sure they aren't too close together, then make sure we haven't already processed them, and that they aren't awaiting processing.
+            var newNavPoints = FilterDistance(Points, 10f).Except(ProcessedRandomPoints, new Vector3PositionComparer()).ToList().Except(RandomNavPoints, new Vector3PositionComparer());
+
+            // If Any points remain, add them to our cache
+            RandomNavPoints.AddRange(newNavPoints.ToList());
+
+            yield return null;
         }
 
-        private void CompareAndAdd(List<Vector3> corners)
-        {
-            var distinctList = corners.Except(RawCorners, new Vector3PositionComparer());
-            var filteredList = distinctList.Where(corner => Vector3.Distance(corner, bot.Transform.position) >= 0.5f).ToList();
-            RawCorners.AddRange(filteredList);
-
-            var distinctList2 = filteredList.Except(ProcessedCorners, new Vector3PositionComparer());
-            var filteredList2 = distinctList2.ToList();
-            ProcessBacklog.AddRange(filteredList2);
-        }
-
-        private IEnumerator CheckNavMeshCorners()
+        private IEnumerator GeneratePoints()
         {
             while (true)
             {
-                if (ProcessBacklog.Count > 1)
+                if (RandomNavPoints.Count > 0)
                 {
-                    List<Vector3> list = new List<Vector3>();
+                    Vector3 point = RandomNavPoints.PickRandom();
+                    ProcessedRandomPoints.Add(point);
+                    RandomNavPoints.Remove(point);
 
-                    for (int i = 0; i < ProcessBacklog.Count; i++)
+                    Generate(point);
+                }
+
+                yield return new WaitForEndOfFrame();
+            }
+        }
+
+        private void Generate(Vector3 startPoint)
+        {
+            int i = 0;
+            const int max = 10;
+
+            List<Vector3> points = new List<Vector3>();
+
+            while (i < max)
+            {
+                Vector3 randomPoint = Random.insideUnitCircle * 30f;
+                randomPoint += startPoint;
+
+                if (NavMesh.SamplePosition(randomPoint, out var hit, 1f, NavMesh.AllAreas))
+                {
+                    points.Add(hit.position);
+                }
+                i++;
+            }
+
+            points = FilterDistance(points);
+
+            var distinctList = points.Except(GeneratedPoints, new Vector3PositionComparer());
+
+            GeneratedPoints.AddRange(distinctList.ToList());
+
+            GeneratedPoints = FilterDistance(GeneratedPoints);
+        }
+
+        private IEnumerator VerifyGenPoints()
+        {
+            while (true)
+            {
+                if (GeneratedPoints.Count > 0)
+                {
+                    // Grab a random point from the list cache
+                    Vector3 point = GeneratedPoints.PickRandom();
+                    // remove that point from the list cache
+                    GeneratedPoints.Remove(point);
+
+                    const float floatingCheck = 0.25f;
+                    const float heightCheck = 1.5f;
+
+                    // Check to make sure the point isn't floating.
+                    if (Physics.Raycast(point, Vector3.down, floatingCheck, Mask))
                     {
-                        for (int j = i + 1; j < ProcessBacklog.Count; j++)
+                        // Check to make sure the point isn't under something
+                        if (!Physics.Raycast(point, Vector3.up, heightCheck, Mask))
                         {
-                            if (Approximately(ProcessBacklog[i].y, ProcessBacklog[j].y, 0.05f))
-                            {
-                                if (Vector3.Distance(ProcessBacklog[i], ProcessBacklog[j]) < 5f)
-                                {
-                                    list.Add(ProcessBacklog[i]);
-                                    list.Add(ProcessBacklog[j]);
-                                }
-                            }
+                            // Add point to list
+                            VerifiedPoints.Add(point);
                         }
+                        yield return new WaitForEndOfFrame();
                     }
-
-                    RaycastBacklog = FilterDistance(list);
-                    ProcessedCorners.AddRange(ProcessBacklog);
-                    ProcessBacklog.Clear();
-
-                    yield return new WaitForSeconds(0.25f);
                 }
 
-                yield return null;
+                yield return new WaitForEndOfFrame();
             }
         }
 
-        private IEnumerator RayCastCorners()
+        private IEnumerator PossibleCoverCheck()
         {
             while (true)
             {
-                if (RaycastBacklog.Count > 1)
+                if (VerifiedPoints.Count > 0)
                 {
-                    List<Vector3> list = new List<Vector3>();
-
-                    for (int i = 0; i < RaycastBacklog.Count; i++)
-                    {
-                        for (int j = i + 1; j < RaycastBacklog.Count; j++)
-                        {
-                            Vector3 position = RaycastBacklog[i];
-                            position.y += 0.2f;
-                            Vector3 direction = RaycastBacklog[j] - position;
-                            direction.y += 0.2f;
-
-                            if (!Physics.Raycast(position, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                            {
-                                list.Add(RaycastBacklog[i]);
-                                list.Add(RaycastBacklog[j]);
-                            }
-                        }
-                    }
-
-                    RaycastBacklog.Clear();
-                    LerpBacklog = FilterDistance(list);
-                    yield return new WaitForSeconds(0.25f);
-                }
-
-                yield return null;
-            }
-        }
-
-        private IEnumerator LerpCorners()
-        {
-            while (true)
-            {
-                if (LerpBacklog.Count > 1)
-                {
-                    List<Vector3> list = new List<Vector3>();
-
-                    for (int i = 0; i < LerpBacklog.Count; i++)
-                    {
-                        for (int j = i + 1; j < LerpBacklog.Count; j++)
-                        {
-                            if (Vector3.Distance(LerpBacklog[i], LerpBacklog[j]) < 5f)
-                            {
-                                Vector3 lerpedCorner = Vector3.Lerp(LerpBacklog[i], LerpBacklog[j], 0.5f);
-                                list.Add(lerpedCorner);
-                            }
-                        }
-                    }
-
-                    LerpBacklog.Clear();
-                    FinalCheckBacklog = FilterDistance(list);
-                    yield return new WaitForSeconds(0.25f);
-                }
-
-                yield return null;
-            }
-        }
-
-        private IEnumerator CheckPointsForCover()
-        {
-            while (true)
-            {
-                if (FinalCheckBacklog.Count > 1)
-                {
-                    Vector3 point = FinalCheckBacklog.PickRandom();
-
-                    if (CheckForObjects(point))
-                    {
-                        FinalCheckBacklog.Remove(point);
-                        FinalPositions.Add(point);
-                    }
-
-                    FinalPositions = FilterDistance(FinalPositions);
                     yield return new WaitForEndOfFrame();
+
+                    // Grab a random point from the list cache
+                    Vector3 point = VerifiedPoints.PickRandom();
+                    // remove that point from the list cache
+                    VerifiedPoints.Remove(point);
+
+                    NavMeshPath path = new NavMeshPath();
+                    if (NavMesh.CalculatePath(bot.Transform.position, point, -1, path) && path.status != NavMeshPathStatus.PathComplete)
+                    {
+                        continue;
+                    }
+
+                    // max number of hits a point can have before its considered possible cover
+                    const int threshold = 1;
+
+                    // Copies the point and then raises it so its not blocked by small ground objects
+                    Vector3 rayPoint = point;
+                    rayPoint.y += 0.5f;
+
+                    // Max distance to check and cover score int
+                    float raycastDistance = 1f;
+                    int cover = 0;
+
+                    // Checks 8 cardinal directions around the point
+                    foreach (Vector3 direction in Directions)
+                    {
+                        // is cover score over our limit?
+                        if (cover > threshold)
+                        {
+                            // Then add it to our new list
+                            PossibleCoverPoints.Add(point);
+                            coverPoints.AddItem(new CoverPoint(point, direction, cover));
+                            break;
+                        }
+
+                        // Does it intersect a collider in this direction?
+                        if (Physics.Raycast(rayPoint, direction, raycastDistance, Mask))
+                        {
+                            // Add 1 point to its coverscore
+                            cover++;
+                        }
+                    }
                 }
-                yield return null;
+
+                yield return new WaitForEndOfFrame();
             }
         }
 
-        private bool CheckForObjects(Vector3 point)
+        private CoverPoint[] coverPoints;
+
+        private static bool Approximately(float a, float b, float tolerance)
         {
-            point.y += 0.25f;
-            float raycastDistance = 2f;
-
-            foreach (Vector3 direction in Directions)
-            {
-                if (Physics.Raycast(point, direction, raycastDistance, LayerMaskClass.LowPolyColliderLayerMask))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return Mathf.Abs(a - b) < tolerance;
         }
 
-        private readonly Vector3[] Directions = {
-            Vector3.forward,
-            Vector3.back,
-            Vector3.left,
-            Vector3.right,
-            (Vector3.forward + Vector3.left).normalized,
-            (Vector3.forward + Vector3.right).normalized,
-            (Vector3.back + Vector3.left).normalized,
-            (Vector3.back + Vector3.right).normalized
-        };
-
-        private List<Vector3> FilterDistance(List<Vector3> corners, float min = 0.5f)
+        private static List<Vector3> FilterDistance(List<Vector3> corners, float min = 0.5f)
         {
             for (int i = 0; i < corners.Count; i++)
             {
@@ -281,33 +276,45 @@ namespace Movement.Components
             return corners;
         }
 
-        private static bool Approximately(float a, float b, float tolerance)
-        {
-            return Mathf.Abs(a - b) < tolerance;
-        }
-
-        private static Vector3 FindArcPoint(Vector3 botPos, Vector3 targetPos, float arcRadius, float angle)
-        {
-            Vector3 direction = (botPos - targetPos).normalized;
-            direction.y = 0f;
-            Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
-            Vector3 arcPoint = arcRadius * (rotation * direction);
-
-            return botPos + arcPoint;
-        }
+        private readonly Vector3[] Directions = {
+            Vector3.forward,
+            Vector3.back,
+            Vector3.left,
+            Vector3.right,
+            (Vector3.forward + Vector3.left).normalized,
+            (Vector3.forward + Vector3.right).normalized,
+            (Vector3.back + Vector3.left).normalized,
+            (Vector3.back + Vector3.right).normalized
+        };
 
         public static Color RandomColor => new Color(Random.value, Random.value, Random.value);
 
+        private List<Vector3> ProcessedRandomPoints = new List<Vector3>();
+        private List<Vector3> RandomNavPoints = new List<Vector3>();
+        private List<Vector3> GeneratedPoints = new List<Vector3>();
+        private List<Vector3> VerifiedPoints = new List<Vector3>();
+        private List<Vector3> PossibleCoverPoints = new List<Vector3>();
+
+        private Vector3 LastPositionForCheck;
+        public Color BotColor;
+        private LayerMask Mask = LayerMaskClass.LowPolyColliderLayerMask;
         private float DebugTimer = 0f;
         private BotOwner bot;
         protected ManualLogSource Logger;
 
-        private List<Vector3> RawCorners = new List<Vector3>();
-        private List<Vector3> ProcessedCorners = new List<Vector3>();
-        private List<Vector3> ProcessBacklog = new List<Vector3>();
-        private List<Vector3> RaycastBacklog = new List<Vector3>();
-        private List<Vector3> LerpBacklog = new List<Vector3>();
-        private List<Vector3> FinalCheckBacklog = new List<Vector3>();
+        private class CoverPoint
+        {
+            public CoverPoint(Vector3 point, Vector3 direction, int coverLevel)
+            {
+                Position = point;
+                Direction = direction;
+                CoverLevel = coverLevel;
+            }
+
+            public Vector3 Position { get; private set; }
+            public Vector3 Direction { get; private set; }
+            public int CoverLevel { get; private set; }
+        }
 
         // Custom IEqualityComparer that compares Vector3 objects based on their position
         private class Vector3PositionComparer : IEqualityComparer<Vector3>
@@ -321,6 +328,12 @@ namespace Movement.Components
             {
                 return v.GetHashCode();
             }
+        }
+
+        public void Dispose()
+        {
+            StopAllCoroutines();
+            Destroy(this);
         }
     }
 }
