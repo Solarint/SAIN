@@ -17,7 +17,6 @@ namespace Movement.Patches
         public static void PatchPostfix(ref BotOwner __instance)
         {
             __instance.gameObject.AddComponent<LeanComponent>();
-            __instance.gameObject.AddComponent<CoverFinderComponent>();
         }
     }
 
@@ -39,7 +38,6 @@ namespace Movement.Patches
                 return;
 
             __instance.gameObject.GetComponent<LeanComponent>().Dispose();
-            __instance.gameObject.GetComponent<CoverFinderComponent>().Dispose();
         }
     }
 }

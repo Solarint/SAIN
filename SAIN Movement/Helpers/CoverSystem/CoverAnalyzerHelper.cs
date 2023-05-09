@@ -20,7 +20,7 @@ namespace Movement.Helpers
         private bool DebugMode => DebugCoverSystem.Value;
 
         /// <summary>
-        /// Analyzes a Vector3 and checks if the bot is visible from it, and if so, by how much.
+        /// Analyzes a Vector3 and checks if the player is visible from it, and if so, by how much.
         /// </summary>
         /// <param name="targetPos">The position of the enemy.</param>
         /// <param name="coverPos">The position of the cover.</param>
@@ -38,7 +38,7 @@ namespace Movement.Helpers
             bool goodCover = coverRatio >= minCoverLevel;
             bool canShoot = !SightBlocked(BotOwner.WeaponRoot.position);
 
-            // Check is cover is viable, if so create a new CustomCoverPoint to return
+            // CheckForCalcPath is cover is viable, if so create a new CustomCoverPoint to return
             coverPoint = goodCover ? new CustomCoverPoint(BotOwner.Transform.position, coverPos, coverRatio, canShoot) : null;
 
             // Return true if cover meets requirements
@@ -50,13 +50,13 @@ namespace Movement.Helpers
             int coverScoreCount = 0;
             int bodyPartCount = 0;
 
-            // Check each body part on a bot to see if it will be visible at the cover position
+            // CheckForCalcPath each body part on a player to see if it will be visible at the cover position
             foreach (var part in BotOwner.MainParts.Values)
             {
                 // Count the body part
                 bodyPartCount++;
 
-                // Check is that body part has line of sight
+                // CheckForCalcPath is that body part has line of sight
                 if (SightBlocked(part.Position))
                 {
                     // Count the blocked body part

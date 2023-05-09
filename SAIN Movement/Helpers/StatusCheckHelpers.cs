@@ -32,7 +32,7 @@ namespace Movement.Helpers
 
 //COPYPASTE
 /*
-//Check for new contact
+//CheckForCalcPath for new contact
 if (___botOwner_0.Memory.GoalEnemy.ProfileId != currentEnemyID)
 {
     isEnemyHurt = false;
@@ -43,12 +43,12 @@ if (___botOwner_0.Memory.GoalEnemy.ProfileId != currentEnemyID)
     }
     currentEnemyID = ___botOwner_0.Memory.GoalEnemy.ProfileId;
 }
-//Check if still falling back PLACEHOLDER
+//CheckForCalcPath if still falling back PLACEHOLDER
 if (fallbackTime > Time.time + 3.0f)
 {
     isFallingBack = false;
 }
-//Check if the enemy has been hit a few times
+//CheckForCalcPath if the enemy has been hit a few times
 if (___botOwner_0.Memory.GoalEnemy.LastHitTime < Time.time + 3.0f)
 {
     hitCount += 1.0f;

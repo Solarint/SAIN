@@ -11,7 +11,7 @@ namespace Movement.Helpers
     public class Corners
     {
         /// <summary>
-        /// Finds RawCorners and generates an angle between the first 2 to calculate the direction a bot should lean in based on enemy position
+        /// Finds RawCorners and generates an angle between the first 2 to calculate the direction a player should lean in based on enemy position
         /// </summary>
         public class FindDirectionToLean
         {
@@ -26,7 +26,7 @@ namespace Movement.Helpers
             /// </summary>
             /// <param name="maxDistance">The maximum distance between the two RawCorners.</param>
             /// <param name="debugMode">Whether or not to enable debug mode.</param>
-            /// <returns>The lean angle for a bot, 0 if no lean.</returns>
+            /// <returns>The lean angle for a player, 0 if no lean.</returns>
             public float FindLeanAngle(Vector3 botPosition, Vector3 targetPosition, Vector3 botHeadPosition, float maxDistance)
             {
                 BotPosition = botPosition;
@@ -64,7 +64,7 @@ namespace Movement.Helpers
             /// </returns>
             private bool PickLeanCorners(Vector3[] corners, out Vector3 firstcorner, out Vector3 secondcorner)
             {
-                // Corner 0 is at bot position. So we need 3 RawCorners to check lean angle.
+                // Corner 0 is at player position. So we need 3 RawCorners to check lean angle.
                 if (corners.Length < 3)
                 {
                     firstcorner = Vector3.zero;
@@ -78,7 +78,7 @@ namespace Movement.Helpers
                     return false;
                 }
 
-                // Check that corner 1 isn't past our input Max Distance
+                // CheckForCalcPath that corner 1 isn't past our input Max PathDistance
                 float distance = Vector3.Distance(BotPosition, corners[1]);
                 if (distance > MaxDistance * MaxDistance)
                 {
@@ -113,7 +113,7 @@ namespace Movement.Helpers
             /// </summary>
             /// <param name="firstcorner">The first corner position.</param>
             /// <param name="secondcorner">The second corner position.</param>
-            /// <param name="botPosition">The bot's position.</param>
+            /// <param name="botPosition">The player's position.</param>
             private void DebugDrawMode(Vector3 firstcorner, Vector3 secondcorner)
             {
                 if (DebugTimer < Time.time)
@@ -157,12 +157,12 @@ namespace Movement.Helpers
             private bool DebugMode => DebugCornerProcessing.Value;
 
             /// <summary>
-            /// Calculates the RawCorners of the navMeshPath between the bot and the target position, and optionally trims them using raycasting, length trimming, and lerp trimming.
+            /// Calculates the RawCorners of the navMeshPath between the player and the target position, and optionally trims them using raycasting, length trimming, and lerp trimming.
             /// </summary>
             /// <param name="raycastTrim">Whether to trim the RawCorners using raycasting.</param>
             /// <param name="lengthTrim">Whether to trim the RawCorners using length trimming.</param>
             /// <param name="lerpTrim">Whether to trim the RawCorners using lerp trimming.</param>
-            /// <param name="cornerToHeadHeight">Whether to raise the RawCorners to the bot's head height.</param>
+            /// <param name="cornerToHeadHeight">Whether to raise the RawCorners to the player's head height.</param>
             /// <param name="minlengthfortrim">The minimum length for length trimming.</param>
             /// <returns>The trimmed RawCorners of the navMeshPath.</returns>
             public Vector3[] GetCorners(Vector3 botPosition, Vector3 targetPos, Vector3 botHeadPosition, bool raycastTrim = true, bool lengthTrim = false, bool lerpTrim = false, bool cornerToHeadHeight = false, bool returnFromHeadHeight = false, float minlengthfortrim = 2f)

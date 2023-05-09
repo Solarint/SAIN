@@ -22,7 +22,7 @@ namespace Movement.Patches
 
             if (bot.Memory.GoalEnemy.PersonalLastSeenTime + 5f < Time.time)
             {
-                // Calculate a new path between bot and target
+                // Calculate a new path between player and target
                 NavMeshPath navMeshPath = new NavMeshPath();
                 NavMesh.CalculatePath(botPos, enemyPos, -1, navMeshPath);
 

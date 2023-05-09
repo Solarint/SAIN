@@ -18,7 +18,8 @@ namespace Movement.Components
         {
             bot = GetComponent<BotOwner>();
             BotColor = RandomColor;
-            Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(LeanComponent) + $": {bot.name}: ");
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {bot.name}: ");
+
             Lean = new Corners.FindDirectionToLean();
 
             StartCoroutine(FindLeanAngleLoop());

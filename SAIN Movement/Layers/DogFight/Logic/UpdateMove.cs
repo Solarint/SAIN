@@ -19,7 +19,10 @@ namespace SAIN.Movement.Layers.DogFight
             Dodge = new BotDodge(bot);
             CoverFinder = new CoverFinder(bot);
             DynamicLean = bot.gameObject.GetComponent<LeanComponent>();
+            CoverFinderNew = bot.gameObject.GetComponent<CoverFinderComponent>();
         }
+
+        private CoverFinderComponent CoverFinderNew;
 
         private const float UpdateFrequency = 0.15f;
 
@@ -85,33 +88,15 @@ namespace SAIN.Movement.Layers.DogFight
 
             if (!MovingToLastEnemyPos && BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.EnemyLastPosition))
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"{BotOwner.name} is Moving to last known enemy position.");
-                }
-
+                movingToEnemyTimer = Time.time + UnityEngine.Random.Range(3f, 8f);
                 MovingToLastEnemyPos = true;
             }
-            else if (MovingToLastEnemyPos && BotOwner.Mover.IsComeTo(2f, false))
+            else if (movingToEnemyTimer < Time.time)
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"{BotOwner.name} is moving to current enemy position.");
-                }
-
-                BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
-            }
-            else
-            {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"{BotOwner.name} has no place to go!");
-                }
-
                 BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
             }
         }
-
+        private float movingToEnemyTimer = 0f;
         private void SearchForTarget()
         {
             if (DebugMode)
@@ -133,49 +118,24 @@ namespace SAIN.Movement.Layers.DogFight
         {
             if (GoalEnemyNull && ShouldBotSneak)
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"Sneak");
-                }
-
                 Sneak();
                 return;
             }
 
             if (IsTargetVeryClose)
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"FullSpeed");
-                }
-
                 FullSpeed();
             }
             else if (IsTargetClose)
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"NormalSpeed");
-                }
-
                 NormalSpeed();
             }
             else if (ShouldBotSneak)
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"Sneak");
-                }
-
                 Sneak();
             }
             else
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"SlowWalk");
-                }
-
                 SlowWalk();
             }
         }
@@ -189,7 +149,7 @@ namespace SAIN.Movement.Layers.DogFight
 
             if (RecheckTime < Time.time)
             {
-                RecheckTime = Time.time + 0.5f;
+                RecheckTime = Time.time + 0.25f;
 
                 if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, FallBackCoverPoint.CoverPosition, out CustomCoverPoint cover, 1.0f))
                 {
@@ -197,8 +157,6 @@ namespace SAIN.Movement.Layers.DogFight
                     {
                         Logger.LogDebug($"Old FallBack Position is still good for {BotOwner.name}");
                     }
-
-                    FallBackCoverPoint = cover;
                 }
                 else
                 {
@@ -207,7 +165,7 @@ namespace SAIN.Movement.Layers.DogFight
                         Logger.LogDebug($"Old FallBack Position is BAD for {BotOwner.name}");
                     }
 
-                    FallBackCoverPoint = null;
+                    FallingBack = false;
                 }
             }
         }
@@ -219,15 +177,13 @@ namespace SAIN.Movement.Layers.DogFight
                 Logger.LogDebug($"{BotOwner.name} Is falling back");
             }
 
-            FallingBack = true;
-
             if (HasStamina)
             {
                 BotOwner.Steering.LookToMovingDirection();
                 SetSprint(true);
             }
 
-            BotOwner.GoToPoint(coverPosition, true, -1, false, true, true);
+            BotOwner.GoToPoint(coverPosition, false, -1, false, true, true);
             UpdateDoorOpener();
         }
 
@@ -247,7 +203,7 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 if (DebugMode)
                 {
-                    Logger.LogDebug($"{BotOwner.name} Can See Enemy, and Shoot Enemy. Engaging.");
+                    //Logger.LogDebug($"{BotOwner.name} Can See Enemy, and Shoot Enemy. Engaging.");
                 }
 
                 MovingToLastEnemyPos = false;
@@ -259,7 +215,7 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 if (DebugMode)
                 {
-                    Logger.LogDebug($"{BotOwner.name} Can See Enemy, but can't shoot!. Moving Position.");
+                    //Logger.LogDebug($"{BotOwner.name} Can See Enemy, but can't shoot!. Moving LastPosition.");
                 }
 
                 MovingToLastEnemyPos = false;
@@ -296,7 +252,7 @@ namespace SAIN.Movement.Layers.DogFight
 
                 if (DebugMode)
                 {
-                    Logger.LogDebug($"{BotOwner.name} Is taking Cover from enemy in front. Pose Level = [{poseLevel}] because Cover Level = [{coverLevel}]");
+                    //Logger.LogDebug($"{BotOwner.name} Is taking Cover from enemy in front. Pose Level = [{poseLevel}] because Cover Level = [{coverLevel}]");
                 }
 
                 BotOwner.SetPose(poseLevel);
@@ -305,7 +261,7 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 if (DebugMode)
                 {
-                    Logger.LogDebug($"{BotOwner.name} Checked Self for Cover but has no cover. Proceeding to backup behavior.");
+                    //Logger.LogDebug($"{BotOwner.name} Checked Self for Cover but has no cover. Proceeding to backup behavior.");
                 }
 
                 BotOwner.SetPose(1f);
@@ -323,7 +279,7 @@ namespace SAIN.Movement.Layers.DogFight
                 {
                     if (DebugMode)
                     {
-                        Logger.LogDebug($"{BotOwner.name} Checked Self for Cover and found cover.");
+                        //Logger.LogDebug($"{BotOwner.name} Checked Self for Cover and found cover.");
                     }
 
                     SelfCover = cover;
@@ -354,7 +310,7 @@ namespace SAIN.Movement.Layers.DogFight
                     {
                         if (DebugMode)
                         {
-                            Logger.LogInfo($"Found Backup Position after [{iterations}] iterations. Angle = [{currentAngle}] Range = [{currentRange}]");
+                            //Logger.LogInfo($"Found Backup LastPosition after [{iterations}] iterations. Angle = [{currentAngle}] Range = [{currentRange}]");
                         }
 
                         UpdateDoorOpener();
@@ -367,7 +323,7 @@ namespace SAIN.Movement.Layers.DogFight
 
             if (DebugMode)
             {
-                Logger.LogWarning($"Found No Backup Position after [{iterations}] iterations.");
+                //Logger.LogWarning($"Found No Backup LastPosition after [{iterations}] iterations.");
             }
         }
 
@@ -430,7 +386,7 @@ namespace SAIN.Movement.Layers.DogFight
         }
 
         /// <summary>
-        /// Sets the sprint of the bot to true or false.
+        /// Sets the sprint of the player to true or false.
         /// </summary>
         /// <param name="value">The value to set the sprint to.</param>
         private void SetSprint(bool value)
@@ -494,51 +450,30 @@ namespace SAIN.Movement.Layers.DogFight
 
         private bool CheckFallBack()
         {
-            if (Reloading || BotOwner.Medecine.FirstAid.Using)
-            {
-                SetSprint(true);
-                FallingBack = true;
-            }
-            else
+            if (!Reloading && !BotOwner.Medecine.FirstAid.Using)
             {
                 SetSprint(false);
                 FallingBack = false;
                 return false;
             }
 
-            RecheckCoverPosition();
-
-            if (FallBackCoverPoint != null && FallingBack && !BotOwner.Mover.IsMoving)
+            if (!FallingBack && CoverFinder.FindCover(out CustomCoverPoint coverPoint, BotOwner.Memory.GoalEnemy.CurrPosition, 0.75f))
             {
-                if (DebugMode)
-                {
-                    Logger.LogDebug($"Bot is not moving but falling back. Taking Cover! {BotOwner.name}");
-                }
+                FallBackCoverPoint = coverPoint;
 
-                DecidePoseFromCoverLevel(FallBackCoverPoint);
-                return true;
-            }
+                FallingBack = true;
 
-            if (FallBackCoverPoint == null && CoverFinder.FindCover(out CustomCoverPoint coverPoint, TargetPosition.Value, 1f))
-            {
                 if (DebugMode)
                 {
                     Logger.LogDebug($"Found New FallBack Position for {BotOwner.name}");
                 }
 
-                FallBackCoverPoint = coverPoint;
-
                 DebugDrawFallback();
 
                 StartFallback(coverPoint.CoverPosition);
             }
-            else
-            {
-                if (DebugMode)
-                {
-                    Logger.LogWarning($"Couldn't Find Position for {BotOwner.name}");
-                }
-            }
+
+            RecheckCoverPosition();
 
             return true;
         }

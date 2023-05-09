@@ -24,7 +24,7 @@ namespace Movement.Components
         {
             while (true)
             {
-                // Redundant Check if the bot is alive before continuing
+                // Redundant CheckForCalcPath if the player is alive before continuing
                 if (!bot.GetPlayer.HealthController.IsAlive || bot.GetPlayer == null)
                 {
                     StopAllCoroutines();
@@ -39,7 +39,7 @@ namespace Movement.Components
 
                 if (ShouldIChange()) WhatSpeedShouldIPick();
 
-                // Overall Check Frequency
+                // Overall CheckForCalcPath Frequency
                 yield return new WaitForSeconds(0.2f);
             }
         }
@@ -47,10 +47,10 @@ namespace Movement.Components
         // Logic checks for when to execute lean or reset
         private bool ShouldIChange()
         {
-            // Check if the bot is alive before continuing, and stop the Coroutine if they are dead.
+            // CheckForCalcPath if the player is alive before continuing, and stop the Coroutine if they are dead.
             if (bot?.GetPlayer?.HealthController?.IsAlive == false) StopAllCoroutines();
 
-            // Makes sure the bot is active before sending lean commands
+            // Makes sure the player is active before sending lean commands
             if (bot?.BotState != EBotState.Active) return false;
 
             if (!MoveSpeedToggle.Value) return false;
@@ -59,10 +59,10 @@ namespace Movement.Components
         }
         public void WhatSpeedShouldIPick()
         {
-            // Check if the bot is alive before continuing, and stop the Coroutine if they are dead.
+            // CheckForCalcPath if the player is alive before continuing, and stop the Coroutine if they are dead.
             if (!bot.GetPlayer.HealthController.IsAlive) StopAllCoroutines();
 
-            // Makes sure the bot is active before sending lean commands
+            // Makes sure the player is active before sending lean commands
             if (bot.BotState != EBotState.Active) return;
 
             if (!MoveSpeedToggle.Value) return;
