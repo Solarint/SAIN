@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using static Movement.Helpers.Corners;
 using static Movement.UserSettings.Debug;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace SAIN.Movement.Layers.DogFight
 {
@@ -18,50 +19,54 @@ namespace SAIN.Movement.Layers.DogFight
         }
         private bool DebugMode => DebugUpdateSteering.Value;
 
-        public void Update(bool IsSprintingFallback)
+        public void Update()
         {
             if (GoalEnemyNull)
             {
                 BotOwner.LookData.SetLookPointByHearing(null);
             }
 
-            if (IsSprintingFallback)
+            if (BotOwner.WeaponManager.Reload.Reloading || BotOwner.Medecine.FirstAid.Using || !BotOwner.WeaponManager.HaveBullets)
             {
+                SetSprint(true);
                 BotOwner.Steering.LookToMovingDirection();
+                return;
             }
-            else if (CanShootEnemy)
+
+            if (CanShootEnemy)
             {
+                SetSprint(false);
                 Vector3 target = BotOwner.Memory.GoalEnemy.CurrPosition;
                 target.y += 0.75f;
                 BotOwner.Steering.LookToPoint(target);
-            }
-            else if (NextCornerPosition(out Vector3 corner))
-            {
-                BotOwner.Steering.LookToPoint(corner);
-            }
-            else
-            {
-                BotOwner.LookData.SetLookPointByHearing(null);
+                return;
             }
 
-            if (DebugMode && DebugTimer2 < Time.time)
+            bool randomSprint = SAIN_Math.RandomBool(15f);
+
+            if (SprintTimer < Time.time)
             {
-                DebugTimer2 = Time.time + 0.05f;
-                DebugDrawer.Ray(BotOwner.LookSensor._headPoint, BotOwner.Steering.LookDirection, 2f, 0.025f, Color.white, 0.1f);
+                SprintTimer = Time.time + 3f;
+                SetSprint(randomSprint);
             }
+
+            var corner = NextCornerPosition();
+
+            BotOwner.Steering.LookToPoint(corner);
         }
 
-        private bool NextCornerPosition(out Vector3 corner)
+        private float SprintTimer = 0f;
+
+        private Vector3 NextCornerPosition()
         {
             Vector3[] corners = Processing.GetCorners(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.LookSensor._headPoint, true, false, true, true);
             if (corners.Length > 0)
             {
-                corner = corners[1];
+                Vector3 corner = corners[1];
 
                 if (Vector3.Distance(corners[0], corner) < 1f)
                 {
-                    corner = BotOwner.Memory.GoalEnemy.CurrPosition;
-                    return false;
+                    return BotOwner.Memory.GoalEnemy.CurrPosition;
                 }
 
                 corner.y = BotOwner.LookSensor._headPoint.y;
@@ -73,13 +78,19 @@ namespace SAIN.Movement.Layers.DogFight
                     DebugDrawer.Line(corner, BotOwner.MyHead.position, 0.1f, Color.red, 1f);
                 }
 
-                return true;
+                return corner;
             }
             else
             {
-                corner = BotOwner.Memory.GoalEnemy.CurrPosition;
-                return false;
+                return BotOwner.Memory.GoalEnemy.CurrPosition;
             }
+        }
+        private void SetSprint(bool value)
+        {
+            BotOwner.SetPose(1f);
+            BotOwner.SetTargetMoveSpeed(1f);
+            BotOwner.GetPlayer.EnableSprint(value);
+            BotOwner.Sprint(value);
         }
 
         private bool CanShootEnemyAndVisible => CanShootEnemy && CanSeeEnemy;

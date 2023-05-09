@@ -27,17 +27,17 @@ namespace Movement.Components
         {
             if (DecisionTimer < Time.time)
             {
-                DecisionTimer = Time.time + 0.5f;
+                DecisionTimer = Time.time + 0.33f;
 
                 if (ShouldBotReload())
                 {
                     return;
                 }
-                else if (ShouldBotPopStims())
+                if (ShouldBotPopStims())
                 {
                     return;
                 }
-                else if (ShouldBotHeal())
+                if (ShouldBotHeal())
                 {
                     return;
                 }
@@ -46,101 +46,102 @@ namespace Movement.Components
 
         private bool ShouldBotPopStims()
         {
-            if (bot.Medecine.Using || bot.Medecine.Stimulators == null || bot.WeaponManager.Reload.Reloading)
+            bool stimsTaken = false;
+            bool botCanTake = true;
+            if (bot.Medecine.Using || bot.WeaponManager.Reload.Reloading || EnemyClose)
             {
-                return false;
+                botCanTake = false;
             }
 
-            if (!BotHasStims)
+            if (botCanTake && !BotHasStims)
             {
                 if (StimulatorRefreshTime < Time.time)
                 {
-                    StimulatorRefreshTime = Time.time + 10f;
+                    StimulatorRefreshTime = Time.time + 3f;
                     bot.Medecine.Stimulators.Refresh();
                 }
-                if (!BotHasStims)
-                {
-                    return false;
-                }
             }
 
-            if (DebugMode)
+            if (botCanTake && BotHasStims && LastStimTime < Time.time)
             {
-                Logger.LogDebug($"Popping Stims");
+                if (DebugMode)
+                {
+                    Logger.LogDebug($"Popping Stims");
+                }
+
+                LastStimTime = Time.time + 20f;
+                bot.Medecine.Stimulators.TryApply(true, null, null);
+                stimsTaken = true;
             }
 
-            bot.Medecine.Stimulators.TryApply(true, null, null);
-
-            return false;
+            return stimsTaken;
         }
 
         private bool BotHasStims => bot.Medecine.Stimulators.HaveSmt;
         private float StimulatorRefreshTime = 0f;
+        private float LastStimTime = 0f;
 
         private bool ShouldBotHeal()
         {
-            if (bot.Medecine.FirstAid.ShallStartUse())
+            bool BotNeedsToHeal = bot.Medecine.FirstAid.ShallStartUse();
+            bool BotCanHeal = true;
+            if (BotNeedsToHeal)
             {
                 if (DebugMode)
                 {
                     Logger.LogDebug($"I Need to Heal!");
                 }
 
-                BotNeedsToHeal = true;
-
-                if (bot.WeaponManager.Reload.Reloading)
+                if (!bot.Medecine.FirstAid.IsBleeding && EnemyClose)
+                {
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"But an enemy is infront of me, and I'm not bleeding.");
+                    }
+                    BotCanHeal = false;
+                }
+                else if (bot.WeaponManager.Reload.Reloading)
                 {
                     if (DebugMode)
                     {
                         Logger.LogDebug($"But I'm reloading");
                     }
-
-                    return false;
-                }
-                else
-                {
-                    if (DebugMode)
-                    {
-                        Logger.LogDebug($"So I healed!");
-                    }
-
-                    bot.Medecine.FirstAid.TryApplyToCurrentPart(null, null);
-                    return true;
+                    BotCanHeal = false;
                 }
             }
-            else
+
+            bool hasHealed = false;
+            if (BotCanHeal && BotNeedsToHeal)
             {
-                BotNeedsToHeal = false;
-                return false;
+                if (DebugMode)
+                {
+                    Logger.LogDebug($"So I healed!");
+                }
+                bot.Medecine.FirstAid.TryApplyToCurrentPart(null, null);
+                hasHealed = true;
             }
+
+            return hasHealed;
         }
 
         private bool ShouldBotCancelReload()
         {
-            if (bot.Memory.GoalEnemy == null || !bot.WeaponManager.IsReady)
+            bool botShouldCancel = false;
+            if (bot.Memory.GoalEnemy != null && bot.WeaponManager.IsReady)
             {
-                BotShouldCancelReload = false;
-                return false;
-            }
-
-            if (bot.WeaponManager.Reload.Reloading && !LowAmmo() && bot.Memory.GoalEnemy.CanShoot)
-            {
-                if (DebugMode)
+                if (bot.WeaponManager.Reload.Reloading && !LowAmmo() && EnemyClose)
                 {
-                    Logger.LogDebug($"I need to cancel my reload!");
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"I need to cancel my reload!");
+                    }
+
+                    botShouldCancel = true;
+                    bot.WeaponManager.Reload.TryStopReload();
                 }
-
-                BotShouldCancelReload = true;
-
-                bot.WeaponManager.Reload.TryStopReload();
-
-                return true;
             }
-            else
-            {
-                BotShouldCancelReload = false;
-                return false;
-            }
+
+            return botShouldCancel;
         }
 
         private bool ShouldBotReload()
@@ -204,16 +205,17 @@ namespace Movement.Components
                 }
 
                 bot.WeaponManager.Reload.TryReload();
-                return true;
             }
 
-            return false;
+            return needToReload;
         }
 
         private bool ShouldBotAttack()
         {
             return false;
         }
+
+        bool EnemyClose => Vector3.Distance(bot.Memory.GoalEnemy.CurrPosition, bot.Transform.position) < 10f;
 
         private bool LowAmmo()
         {

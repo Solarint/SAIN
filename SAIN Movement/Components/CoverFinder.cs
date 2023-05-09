@@ -16,159 +16,141 @@ namespace Movement.Components
         private bool DebugMode => DebugCoverComponent.Value;
         public List<CoverPoint> FinalCoverPoints = new List<CoverPoint>();
         public List<CoverPoint> CloseCoverPoints = new List<CoverPoint>();
-        public List<Vector3> PointsToSend = new List<Vector3>();
+        public List<Vector3> OutputPoints = new List<Vector3>();
 
         private void Start()
         {
-            player = GetComponent<Player>();
+            Player = GetComponent<Player>();
+            CheckStationary = new CheckIfPlayerStationary(Player);
             PlayerColor = RandomColor;
 
-            string name = player.IsYourPlayer ? player.Profile.Nickname : player.name;
+            string name = Player.IsYourPlayer ? Player.Profile.Nickname : Player.name;
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {name}: ");
 
             StartCoroutine(PathGenerator());
             StartCoroutine(CoverFinder());
-
-            CheckStationary = new CheckIfPlayerStationary(player);
         }
 
-        private CoverCentralComponent CoverCentralComponent;
         private CheckIfPlayerStationary CheckStationary;
 
         private void Update()
         {
-            if (CheckStationary == null)
-            {
-                Logger.LogError($"Check Stationary Component is null!");
-                CheckStationary = new CheckIfPlayerStationary(player);
-            }
-
-            if (CoverCentralComponent == null)
-            {
-                var central = GameObject.Find("CoverCentralObject");
-                if (central != null)
-                {
-                    var centralComponent = central.GetComponent<CoverCentralComponent>();
-                    if (centralComponent != null)
-                    {
-                        CoverCentralComponent = centralComponent;
-                    }
-                    else
-                    {
-                        Logger.LogError($"Central Component Null");
-                    }
-                }
-                else
-                {
-                    Logger.LogError($"Central GameObject Null");
-                }
-            }
-
-            if (CoverCentralComponent == null)
-            {
-                Logger.LogError($"Central Component is STILL Null! oh no!");
-            }
-            else
-            {
-            }
-
-            if (PointsToSend.Count > 0)
-            {
-                return;
-            }
-
-            if (!player.HealthController.IsAlive)
-            {
-                StopAllCoroutines();
-                Destroy(this);
-            }
+            DebugDrawPoints();
         }
 
+        /// <summary>
+        /// Coroutine to find cover points for the player.
+        /// </summary>
         private IEnumerator CoverFinder()
         {
             while (true)
             {
+                if (!Player.HealthController.IsAlive)
+                {
+                    if (OutputPoints.Count == 0)
+                    {
+                        StopAllCoroutines();
+                        yield break;
+                    }
+                    yield return new WaitForSeconds(0.25f);
+                    continue;
+                }
+
                 if (FinalCoverPoints.Count > 0)
                 {
-                    float StartTime = Time.time;
-
                     List<CoverPoint> finalPoints = new List<CoverPoint>();
                     List<CoverPoint> closePoints = new List<CoverPoint>();
 
                     finalPoints.AddRange(FinalCoverPoints);
-                    finalPoints = CoverPointSorter.SortByDistance(finalPoints, player.Transform.position);
+                    finalPoints = CoverPointSorter.SortByDistance(finalPoints, Player.Transform.position);
 
                     yield return new WaitForEndOfFrame();
 
-                    if (finalPoints.Count > 150)
+                    if (finalPoints.Count > 300)
                     {
-                        finalPoints.RemoveRange(150, finalPoints.Count - 150);
+                        finalPoints.RemoveRange(300, finalPoints.Count - 300);
                     }
 
-                    //Logger.LogDebug($"First 150 Count = {finalPoints.Count}");
+                    finalPoints = FilterCoverSpacing(finalPoints, 2f);
 
-                    finalPoints = FilterCoverSpacing(finalPoints, 3f);
-
-                    yield return new WaitForEndOfFrame();
-
-                    //Logger.LogDebug($"Filtered 150 Count = {finalPoints.Count} starting raycasting at {Time.time}");
-
-                    int max = Mathf.Clamp(finalPoints.Count, 0, 30);
+                    int max = Mathf.Clamp(finalPoints.Count, 0, 100);
 
                     for (int i = 0; i < max; i++)
                     {
                         if (IsVector3Close(finalPoints[i].Position, out var path))
                         {
-                            if (player.AIData?.BotOwner?.Memory?.GoalEnemy == null)
+                            if (Player.AIData?.BotOwner?.Memory?.GoalEnemy == null)
                             {
                                 closePoints.Add(finalPoints[i]);
                             }
                             else
                             {
-                                yield return new WaitForEndOfFrame();
-
-                                if (CheckPointForHidden(finalPoints[i], path))
+                                Vector3 enemyPos = Player.AIData.BotOwner.Memory.GoalEnemy.CurrPosition;
+                                if (CheckPointForCover(finalPoints[i], path, enemyPos))
                                 {
                                     closePoints.Add(finalPoints[i]);
                                 }
+
+                                yield return new WaitForEndOfFrame();
                             }
                         }
                     }
 
-                    //Logger.LogDebug($"Final Count = {closePoints.Count} which took {Time.time - StartTime} seconds");
+                    closePoints = CoverPointSorter.SortByDistance(closePoints, Player.Transform.position);
+
                     CloseCoverPoints.Clear();
                     CloseCoverPoints.AddRange(closePoints);
                 }
-
-                DebugDrawPoints(CloseCoverPoints);
 
                 yield return new WaitForSeconds(0.1f);
             }
         }
 
-        private bool CheckPointForHidden(CoverPoint point, NavMeshPath path)
+        /// <summary>
+        /// Checks if a given CoverPoint is facing the enemy and if it is hidden from the enemy's view.
+        /// </summary>
+        /// <param name="point">The CoverPoint to check.</param>
+        /// <param name="botPath">The path of the bot.</param>
+        /// <param name="enemyPosition">The position of the enemy.</param>
+        /// <returns>True if the CoverPoint is facing the enemy and hidden from the enemy's view, false otherwise.</returns>
+        private bool CheckPointForCover(CoverPoint point, NavMeshPath botPath, Vector3 enemyPosition)
         {
             bool hidden = false;
 
-            if (player.AIData?.BotOwner?.Memory?.GoalEnemy != null)
+            if (IsCoverFacingEnemyDirection(point, enemyPosition))
             {
-                if (IsVector3Hidden(point.Position))
+                if (IsPointVisible(point.Position))
                 {
-                    if (AreCornersVisible(path))
+                    NavMeshPath enemyPath = new NavMeshPath();
+                    NavMesh.CalculatePath(enemyPosition, point.Position, -1, enemyPath);
+                    if (enemyPath.CalculatePathLength() > botPath.CalculatePathLength())
+                    {
+                        hidden = true;
+                    }
+                    else if (DoesPathLeadToEnemy(botPath, enemyPosition) == false)
                     {
                         hidden = true;
                     }
                 }
             }
+
             return hidden;
         }
 
-        private bool IsVector3Close(Vector3 point, out NavMeshPath path)
+        /// <summary>
+        /// Checks if a Vector3 point is close to the player, and if so, calculates a NavMeshPath between them, and checks the distance of that path.
+        /// </summary>
+        /// <param name="point">The Vector3 point to check.</param>
+        /// <param name="path">The NavMeshPath between the player and the point.</param>
+        /// <param name="minStraightDist">The minimum straight-line distance between the player and the point.</param>
+        /// <param name="minPathDist">The minimum path distance between the player and the point.</param>
+        /// <returns>True if the point is close to the player, false otherwise.</returns>
+        private bool IsVector3Close(Vector3 point, out NavMeshPath path, float minStraightDist = 30f, float minPathDist = 30f)
         {
             path = new NavMeshPath();
-            if (Vector3.Distance(point, player.Transform.position) < 30f)
+            if (Vector3.Distance(point, Player.Transform.position) < minStraightDist)
             {
-                if (NavMesh.CalculatePath(player.Transform.position, point, -1, path) && path.CalculatePathLength() < 30f)
+                if (NavMesh.CalculatePath(Player.Transform.position, point, -1, path) && path.CalculatePathLength() < minPathDist)
                 {
                     return true;
                 }
@@ -176,66 +158,100 @@ namespace Movement.Components
             return false;
         }
 
-        private bool AreCornersVisible(NavMeshPath path)
+        /// <summary>
+        /// Checks if a given navmesh path leads to a given enemy position.
+        /// </summary>
+        /// <param name="path">The path to check.</param>
+        /// <param name="enemyPosition">The enemy position to check against.</param>
+        /// <returns>True if the path leads to the enemy, false otherwise.</returns>
+        private bool DoesPathLeadToEnemy(NavMeshPath path, Vector3 enemyPosition)
         {
-            if (player.AIData?.BotOwner?.Memory?.GoalEnemy != null)
-            {
-                int hit = 0;
-                foreach (var corner in path.corners)
-                {
-                    if (hit > 2)
-                    {
-                        return false;
-                    }
+            var corners = path.corners;
 
-                    if (!IsVector3Hidden(corner))
-                    {
-                        hit++;
-                    }
-                }
+            if (corners.Length < 2)
+            {
+                return false; // Return false if there is no second corner in the botPath
             }
-            return true;
+
+            // Check if the second corner (index 1) is towards the enemy
+            return IsPointTowardsEnemy(corners[1], enemyPosition);
         }
 
-        private bool IsVector3Hidden(Vector3 point)
+        /// <summary>
+        /// Checks if a point is pointing towards an enemy in a 90 degree arc.
+        /// </summary>
+        /// <param name="point">The point to check.</param>
+        /// <param name="enemyPosition">The enemy's position.</param>
+        /// <returns>True if the point is pointing towards the enemy, false otherwise.</returns>
+        private bool IsPointTowardsEnemy(Vector3 point, Vector3 enemyPosition)
         {
-            var enemy = player.AIData.BotOwner.Memory.GoalEnemy;
-            if (Vector3.Distance(point, enemy.CurrPosition) < 8f)
-            {
-                return false;
-            }
+            Vector3 pointDirection = (point - Player.Transform.position).normalized;
+            Vector3 enemyDirection = (enemyPosition - Player.Transform.position).normalized;
+
+            float dotProduct = Vector3.Dot(pointDirection, enemyDirection);
+
+            // If the dot product is greater than the cosine of 45 degrees (approx. 0.7071),
+            // it means the angle between these vectors is less than 45 degrees
+            return dotProduct > 0.7071f;
+        }
+
+        /// <summary>
+        /// Checks if the stored direction in a cover point object is facing the enemy's direction.
+        /// </summary>
+        /// <param name="point">The cover point to check.</param>
+        /// <param name="enemyPosition">The enemy's position.</param>
+        /// <returns>True if the cover point is facing the enemy's direction, false otherwise.</returns>
+        private bool IsCoverFacingEnemyDirection(CoverPoint point, Vector3 enemyPosition)
+        {
+            Vector3 coverDirection = point.Direction.normalized;
+            Vector3 enemyDirection = (enemyPosition - point.Position).normalized;
+
+            float dotProduct = Vector3.Dot(coverDirection, enemyDirection);
+
+            return dotProduct > 0;
+        }
+
+        /// <summary>
+        /// Checks if a point is visible from the enemy's head.
+        /// </summary>
+        /// <param name="point">The point to check.</param>
+        /// <returns>True if the point is not visible, false otherwise.</returns>
+        private bool IsPointVisible(Vector3 point)
+        {
+            Player.AIData.BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
 
             point.y += 0.25f;
-            var direction = point - enemy.CurrPosition;
 
-            if (Physics.Raycast(enemy.CurrPosition, direction, direction.magnitude, Mask))
-            {
-                return true;
-            }
-            return false;
+            var direction = point - EnemyHead.Position;
+
+            return Physics.Raycast(EnemyHead.Position, direction, direction.magnitude, LayerMaskClass.HighPolyCollider);
         }
 
-        private void DebugDrawPoints(List<CoverPoint> points)
+        private void DebugDrawPoints()
         {
-            if (points.Count > 0)
+            if (CloseCoverPoints.Count > 0 && !Player.IsYourPlayer && Player.AIData?.BotOwner?.LookSensor != null)
             {
-                if (player.IsYourPlayer)
-                {
-                    return;
-                }
+                var point = CloseCoverPoints.PickRandom();
 
-                int i = 0;
-                while (i < points.Count)
-                {
-                    Vector3 pos = player.Transform.position;
-                    pos.y += 1.4f;
-                    DebugDrawer.Line(points[i].Position, pos, 0.015f, PlayerColor, 0.15f);
-                    DebugDrawer.Sphere(points[i].Position, 0.1f, PlayerColor, 0.15f);
-                    i++;
-                }
+                Vector3 coverPoint = point.Position;
+                coverPoint.y += point.CoverHeight;
+
+                DebugDrawPath(point);
+                DebugDrawer.Line(point.Position, coverPoint, 0.03f, PlayerColor, 0.33f);
             }
         }
 
+        private void DebugDrawPath(CoverPoint point)
+        {
+            NavMeshPath Path = new NavMeshPath();
+            NavMesh.CalculatePath(Player.Transform.position, point.Position, -1, Path);
+            for (int i = 0; i < Path.corners.Length - 1; i++)
+            {
+                Vector3 corner1 = Path.corners[i];
+                Vector3 corner2 = Path.corners[i + 1];
+                DebugDrawer.Line(corner1, corner2, 0.05f, Color.red, 1f);
+            }
+        }
 
         /// <summary>
         /// Generates NavMesh newPoints in random directions at increasing ranges and checks to see if the bot is stationary before cutting off the generator.
@@ -244,6 +260,17 @@ namespace Movement.Components
         {
             while (true)
             {
+                if (!Player.HealthController.IsAlive)
+                {
+                    if (OutputPoints.Count == 0)
+                    {
+                        StopAllCoroutines();
+                        yield break;
+                    }
+                    yield return new WaitForSeconds(1f);
+                    continue;
+                }
+
                 if (CheckStationary == null)
                 {
                     yield return new WaitForSeconds(0.25f);
@@ -255,12 +282,11 @@ namespace Movement.Components
                     //continue;
                 }
 
-                var newPoints = FindStartPoints(player.Transform.position);
+                var newPoints = FindStartPoints(Player.Transform.position);
 
                 yield return new WaitForEndOfFrame();
 
                 List<Vector3> genPoints = new List<Vector3>();
-
                 foreach (Vector3 point in newPoints)
                 {
                     genPoints.AddRange(GeneratePoints(point));
@@ -269,9 +295,7 @@ namespace Movement.Components
                 yield return new WaitForEndOfFrame();
 
                 var filteredPoints = FilterDistance(genPoints);
-
                 List<Vector3> verifiedPoints = new List<Vector3>();
-
                 foreach (var point in filteredPoints)
                 {
                     if (VerifyPoint(point))
@@ -280,33 +304,33 @@ namespace Movement.Components
                     }
                 }
 
-                PointsToSend.AddRange(verifiedPoints);
+                OutputPoints.AddRange(verifiedPoints);
 
                 yield return new WaitForSeconds(2f);
             }
         }
 
         /// <summary>
-        /// Generates a list of random points around the player position and checks them against the NavMesh for valid newPoints.
+        /// Generates a list of random points around the Player position and checks them against the NavMesh for valid newPoints.
         /// </summary>
-        /// <param name="radius">The radius around the player position to generate random points.</param>
-        /// <param name="playerPosition">The player position to generate random points around.</param>
+        /// <param name="radius">The radius around the Player position to generate random points.</param>
+        /// <param name="playerPosition">The Player position to generate random points around.</param>
         private List<Vector3> FindStartPoints(Vector3 playerPosition)
         {
             int i = 0;
             List<Vector3> newPoints = new List<Vector3>();
             while (i < MaxRangeIterations)
             {
-                // Find a random points in a sphere around the player position.
+                // Find a random points in a sphere around the Player position.
                 Vector3 randomPoint = Random.onUnitSphere * IncreaseRange(i);
                 randomPoint.y = RandomAngle;
-                // Add the player position to our random points, so that is it centered around them.
+                // Add the Player position to our random points, so that is it centered around them.
                 randomPoint += playerPosition;
 
                 // Sample the position on the navmesh to find a hit.
                 if (NavMesh.SamplePosition(randomPoint, out var hit, SamplePositionRange, NavMesh.AllAreas))
                 {
-                    // Calculate a path to that hit, and make sure there a complete path from the player position.
+                    // Calculate a botPath to that hit, and make sure there a complete botPath from the Player position.
                     NavMeshPath path = new NavMeshPath();
                     if (NavMesh.CalculatePath(playerPosition, hit.position, -1, path) && path.status == NavMeshPathStatus.PathComplete)
                     {
@@ -351,9 +375,9 @@ namespace Movement.Components
         /// </summary>
         private bool VerifyPoint(Vector3 point)
         {
-            // CheckForCalcPath that the point has a complete path to the player position.
+            // CheckForCalcPath that the point has a complete botPath to the Player position.
             NavMeshPath path = new NavMeshPath();
-            if (!NavMesh.CalculatePath(player.Transform.position, point, -1, path) || path.status != NavMeshPathStatus.PathComplete)
+            if (!NavMesh.CalculatePath(Player.Transform.position, point, -1, path) || path.status != NavMeshPathStatus.PathComplete)
             {
                 return false;
             }
@@ -394,6 +418,12 @@ namespace Movement.Components
             return positions;
         }
 
+        /// <summary>
+        /// Filters a list of CoverPoints based on a minimum spacing between them.
+        /// </summary>
+        /// <param name="points">The list of CoverPoints to filter.</param>
+        /// <param name="min">The minimum spacing between CoverPoints.</param>
+        /// <returns>The filtered list of CoverPoints.</returns>
         private List<CoverPoint> FilterCoverSpacing(List<CoverPoint> points, float min = 1f)
         {
             for (int i = 0; i < points.Count; i++)
@@ -410,9 +440,14 @@ namespace Movement.Components
             return points;
         }
 
+        /// <summary>
+        /// Increases the range for the botPath finder.
+        /// </summary>
+        /// <param name="i">The iteration number.</param>
+        /// <returns>The increased range.</returns>
         private float IncreaseRange(int i)
         {
-            // Set our range for the path finder.
+            // Set our range for the botPath finder.
             float range = i * i + RangeBase;
             float iterRatio = (float)i / MaxRangeIterations;
             if (iterRatio > RangeThreshB)
@@ -426,23 +461,24 @@ namespace Movement.Components
             return range;
         }
 
+        /// <summary>
+        /// Generates a random angle between the negative and positive maximum Y angle.
+        /// </summary>
         private float RandomAngle => Random.Range(-MaxYAngle, MaxYAngle);
         public static Color RandomColor => new Color(Random.value, Random.value, Random.value);
         public Color PlayerColor;
-
         private LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMask;
-        private float DebugTimer = 0f;
-        private Player player;
+        private Player Player;
         protected ManualLogSource Logger;
     }
 
     public class HelperClasses
     {
         /// <summary>
-        /// Checks if the player is stationary by comparing the distance between the last calculated position and the current position.
+        /// Checks if the Player is stationary by comparing the distance between the last calculated position and the current position.
         /// </summary>
-        /// <param name="playerPos">The current position of the player.</param>
-        /// <returns>True if the player is stationary, false otherwise.</returns>
+        /// <param name="playerPos">The current position of the Player.</param>
+        /// <returns>True if the Player is stationary, false otherwise.</returns>
         public class CheckIfPlayerStationary
         {
             public CheckIfPlayerStationary(Player player, int maxStationaryCalc = 10, float tolerance = 1f)
@@ -470,7 +506,7 @@ namespace Movement.Components
                     PathCount--;
                 }
 
-                // Save the player's current position for reference later above in the next loop
+                // Save the Player's current position for reference later
                 LastPosition = Player.Transform.position;
 
                 return false;

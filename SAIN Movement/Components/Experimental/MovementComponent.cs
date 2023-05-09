@@ -24,7 +24,7 @@ namespace Movement.Components
         {
             while (true)
             {
-                // Redundant CheckForCalcPath if the player is alive before continuing
+                // Redundant CheckForCalcPath if the Player is alive before continuing
                 if (!bot.GetPlayer.HealthController.IsAlive || bot.GetPlayer == null)
                 {
                     StopAllCoroutines();
@@ -47,10 +47,10 @@ namespace Movement.Components
         // Logic checks for when to execute lean or reset
         private bool ShouldIChange()
         {
-            // CheckForCalcPath if the player is alive before continuing, and stop the Coroutine if they are dead.
+            // CheckForCalcPath if the Player is alive before continuing, and stop the Coroutine if they are dead.
             if (bot?.GetPlayer?.HealthController?.IsAlive == false) StopAllCoroutines();
 
-            // Makes sure the player is active before sending lean commands
+            // Makes sure the Player is active before sending lean commands
             if (bot?.BotState != EBotState.Active) return false;
 
             if (!MoveSpeedToggle.Value) return false;
@@ -59,10 +59,10 @@ namespace Movement.Components
         }
         public void WhatSpeedShouldIPick()
         {
-            // CheckForCalcPath if the player is alive before continuing, and stop the Coroutine if they are dead.
+            // CheckForCalcPath if the Player is alive before continuing, and stop the Coroutine if they are dead.
             if (!bot.GetPlayer.HealthController.IsAlive) StopAllCoroutines();
 
-            // Makes sure the player is active before sending lean commands
+            // Makes sure the Player is active before sending lean commands
             if (bot.BotState != EBotState.Active) return;
 
             if (!MoveSpeedToggle.Value) return;

@@ -72,7 +72,7 @@ namespace Movement.Components
 
             Logger.LogDebug($"Central Controller Loaded");
 
-            StartCoroutine(GrabPoints());
+            StartCoroutine(SendFinalPoints());
             StartCoroutine(CheckPointsForCover());
         }
 
@@ -136,9 +136,9 @@ namespace Movement.Components
         public const float CoverRatio = 0.33f;
 
         /// <summary>
-        /// Checks for possible cover points around the player and adds them to the RawCoverPoints list.
+        /// Checks for possible cover points around the Player and adds them to the RawCoverPoints list.
         /// </summary>
-        private IEnumerator GrabPoints()
+        private IEnumerator SendFinalPoints()
         {
             while (true)
             {
@@ -158,10 +158,9 @@ namespace Movement.Components
                             {
                                 if (finder != null)
                                 {
-                                    points.AddRange(finder.PointsToSend);
-                                    finder.PointsToSend.Clear();
-
                                     finder.FinalCoverPoints = FinalCoverPoints;
+                                    points.AddRange(finder.OutputPoints);
+                                    finder.OutputPoints.Clear();
                                 }
                                 else
                                 {
@@ -337,7 +336,7 @@ namespace Movement.Components
                 {
                     foreach (var point in FinalCoverPoints)
                     {
-                        //DebugDrawer.Ray(point.Position, Vector3.up, 1f, 0.06f, Color.blue, 10f);
+                        DebugDrawer.Sphere(point.Position, 0.3f, Color.blue, 10f);
                     }
                 }
             }

@@ -86,9 +86,9 @@ namespace Movement.Patches
             //{
             //	Singleton<GClass627>.Instance.PlaySound(___botOwner_0, ___botOwner_0.Transform.position, GClass558.Core.SOUND_DOOR_OPEN_METERS, AISoundType.step);
             //}
-            //Player player = ___botOwner_0.GetPlayer;
+            //Player Player = ___botOwner_0.GetPlayer;
             //GClass2596 interactionResult = new GClass2596(EInteractionType.Open);
-            //player.CurrentState.StartDoorInteraction(___door_0, interactionResult, null);
+            //Player.CurrentState.StartDoorInteraction(___door_0, interactionResult, null);
             //PlayerAnimatorSetInteraction(true, approached);
 
             //ORIGINAL

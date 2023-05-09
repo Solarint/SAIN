@@ -7,7 +7,7 @@ using static Movement.UserSettings.Debug;
 namespace Movement.Helpers
 {
     /// <summary>
-    /// Finds Points that can be checked to see if they provide cover for a player
+    /// Finds Points that can be checked to see if they provide cover for a Player
     /// </summary>
     public class CoverFinder
     {
@@ -50,7 +50,7 @@ namespace Movement.Helpers
         /// <summary>
         /// Calculates the position on an arc between two points with a given radius and angle.
         /// </summary>
-        /// <param name="botPos">The position of the player.</param>
+        /// <param name="botPos">The position of the Player.</param>
         /// <param name="targetPos">The position of the target.</param>
         /// <param name="arcRadius">The radius of the arc.</param>
         /// <param name="angle">The angle of the arc.</param>

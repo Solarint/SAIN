@@ -40,22 +40,20 @@ namespace SAIN.Movement.Layers
                     CanSeeEnemy = SeeCheck;
                 }
 
-                try
-                {
-                    Decisions.GetDecision();
-                }
-                catch
-                {
-                    Logger.LogError($"GetDecision");
-                }
+                Decisions.GetDecision();
 
                 Move.Update(CanSeeEnemy, CanShootEnemy);
 
-                Steering.Update(Move.IsSprintingFallback);
+                Steering.Update();
 
                 if (!BotOwner.WeaponManager.HaveBullets)
                 {
                     BotOwner.WeaponManager.Reload.TryReload();
+                }
+
+                if (BotOwner.WeaponManager.Reload.Reloading || BotOwner.Medecine.FirstAid.Using || !BotOwner.WeaponManager.HaveBullets)
+                {
+                    return;
                 }
 
                 if (CanSeeEnemy)
