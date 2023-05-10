@@ -2,7 +2,7 @@
 
 namespace Movement.UserSettings
 {
-    internal class Debug
+    internal class DebugConfig
     {
         public static ConfigEntry<bool> DebugDynamicLean { get; private set; }
         public static ConfigEntry<bool> DebugDogFightLayer { get; private set; }

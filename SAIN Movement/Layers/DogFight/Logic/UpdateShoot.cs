@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using static SAIN_Helpers.DebugDrawer;
 using static SAIN_Helpers.SAIN_Math;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 
 namespace SAIN.Movement.Layers.DogFight
 {

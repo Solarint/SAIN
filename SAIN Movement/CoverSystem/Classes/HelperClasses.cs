@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 
 namespace Movement.Classes
 {
@@ -141,8 +141,8 @@ namespace Movement.Classes
             /// <returns>A negative number if the distance of the first CoverPoint to the target is less than the distance of the second CoverPoint to the target; 0 if the distances are equal; a positive number if the distance of the first CoverPoint to the target is greater than the distance of the second CoverPoint to the target.</returns>
             public int Compare(CoverPoint a, CoverPoint b)
             {
-                var targetPosition = target.Position;
-                return Vector3.Distance(a.Position, targetPosition).CompareTo(Vector3.Distance(b.Position, targetPosition));
+                var targetPosition = target.position;
+                return Vector3.Distance(a.position, targetPosition).CompareTo(Vector3.Distance(b.position, targetPosition));
             }
         }
 
@@ -159,7 +159,7 @@ namespace Movement.Classes
             /// <returns>A sorted list of CoverPoints.</returns>
             public static List<CoverPoint> SortByDistance(List<CoverPoint> coverPoints, Vector3 targetPosition)
             {
-                return coverPoints.OrderBy(cp => Vector3.Distance(cp.Position, targetPosition)).ToList();
+                return coverPoints.OrderBy(cp => Vector3.Distance(cp.position, targetPosition)).ToList();
             }
         }
 

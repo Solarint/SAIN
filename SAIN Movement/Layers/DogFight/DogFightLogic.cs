@@ -3,7 +3,7 @@ using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using Movement.Components;
 using UnityEngine;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 using SAIN_Helpers;
 
 namespace SAIN.Movement.Layers

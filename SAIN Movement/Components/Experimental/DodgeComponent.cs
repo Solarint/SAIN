@@ -71,7 +71,7 @@
 //        // Returns Random Point on a arc to the left or right of the Player, based on the position of enemy.
 //        private Vector3 FindArcPoint(Vector3 Player, Vector3 target, out Vector3 dodgePosition, float arcRadius, float arcAngle, float minDist, float maxDist)
 //        {
-//            //Random Direction
+//            //Random centerDirection
 //            bool movingRight = UnityEngine.Random.value > 0.5f;
 //
 //            //Generate an arc that is perpendicular to the Player's target enemy

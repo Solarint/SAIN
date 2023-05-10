@@ -13,6 +13,25 @@ namespace SAIN_Helpers
         /// <param name="position">The position of the sphere.</param>
         /// <param name="size">The size of the sphere.</param>
         /// <param name="color">The color of the sphere.</param>
+        /// <returns>The created sphere game object.</returns>
+        public static GameObject PermanentSphere(Vector3 position, float size, Color color)
+        {
+            var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.GetComponent<Renderer>().material.color = color;
+            sphere.GetComponent<Collider>().enabled = false;
+            sphere.transform.position = new Vector3(position.x, position.y, position.z); ;
+            sphere.transform.localScale = new Vector3(size, size, size);
+
+            return sphere;
+        }
+
+
+        /// <summary>
+        /// Creates a sphere game object with the given parameters.
+        /// </summary>
+        /// <param name="position">The position of the sphere.</param>
+        /// <param name="size">The size of the sphere.</param>
+        /// <param name="color">The color of the sphere.</param>
         /// <param name="expiretime">The time after which the sphere will be destroyed.</param>
         /// <returns>The created sphere game object.</returns>
         public static GameObject Sphere(Vector3 position, float size, Color color, float expiretime)

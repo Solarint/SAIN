@@ -2,7 +2,7 @@
 using EFT;
 using HarmonyLib;
 using System.Reflection;
-using static Movement.UserSettings.DogFight;
+using static Movement.UserSettings.DogFightConfig;
 
 namespace Movement.Patches
 {

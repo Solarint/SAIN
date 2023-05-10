@@ -1,7 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using UnityEngine;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 
 namespace Movement.Components
 {

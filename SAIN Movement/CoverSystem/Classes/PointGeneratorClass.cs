@@ -1,13 +1,10 @@
 using BepInEx.Logging;
 using EFT;
-using SAIN_Helpers;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using static Movement.Classes.ConstantValues;
 using static Movement.Classes.HelperClasses;
-using static Movement.UserSettings.Debug;
 
 namespace Movement.Classes
 {
@@ -25,30 +22,32 @@ namespace Movement.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {name}: ");
         }
 
-        private float RandomTimer => Random.Range(1.25f, 2.25f);
+        private float RandomTimer => Random.Range(0.25f, 0.5f);
+        private const float RangeBase = 3f;
 
         /// <summary>
         /// Generates paths, Find Points from those paths, generating random points around those start points, and then verifying points to make sure they are valid places a player can walk to.
         /// </summary>
-        public void ManualUpdate()
+        public void ManualUpdate(int MaxNavPaths = 5, int MaxCorners = 20, int maxGenIterations = 10, float generatorTimer = 1f, float filterdistance = 0.5f)
         {
             if (!Player.HealthController.IsAlive)
             {
                 return;
             }
 
-            if (PathGenTimer < Time.time && CheckStationary.CheckForCalcPath())
+            // CheckStationary.CheckForCalcPath()
+            if (PathGenTimer < Time.time)
             {
-                PathGenTimer = Time.time + RandomTimer;
+                PathGenTimer = Time.time + generatorTimer;
 
-                Paths.AddRange(GeneratePaths(Player.Transform.position));
+                Paths.AddRange(GeneratePaths(Player.Transform.position, MaxNavPaths, MaxNavPaths));
             }
 
             if (StartPointTimer < Time.time && Paths.Count > 0)
             {
-                StartPointTimer = Time.time + RandomTimer;
+                StartPointTimer = Time.time + generatorTimer;
 
-                var Points = FindPointsFromPaths(Paths);
+                var Points = FindPointsFromPaths(Paths, MaxCorners);
 
                 Paths.Clear();
 
@@ -57,21 +56,21 @@ namespace Movement.Classes
 
             if (PointGenTimer < Time.time && StartPoints.Count > 0)
             {
-                PointGenTimer = Time.time + RandomTimer;
+                PointGenTimer = Time.time + generatorTimer;
 
                 foreach (Vector3 point in StartPoints)
                 {
-                    GenPoints.AddRange(GeneratePoints(point));
+                    GenPoints.AddRange(GeneratePoints(point, maxGenIterations, filterdistance));
                 }
 
                 StartPoints.Clear();
 
-                GenPoints = FilterDistance(GenPoints);
+                GenPoints = FilterDistance(GenPoints, filterdistance);
             }
 
             if (VerifyPointTimer < Time.time && GenPoints.Count > 0)
             {
-                VerifyPointTimer = Time.time + RandomTimer;
+                VerifyPointTimer = Time.time + generatorTimer;
 
                 List<Vector3> verifiedPoints = new List<Vector3>();
 
@@ -106,15 +105,15 @@ namespace Movement.Classes
         /// </summary>
         /// <param name="radius">The radius around the Player position to generate random points.</param>
         /// <param name="playerPosition">The Player position to generate random points around.</param>
-        private List<NavMeshPath> GeneratePaths(Vector3 startPosition)
+        private List<NavMeshPath> GeneratePaths(Vector3 startPosition, float maxPaths = 5, int maxIterations = 10)
         {
             int i = 0;
             List<NavMeshPath> Paths = new List<NavMeshPath>();
-            while (i < MaxRangeIterations)
+            while (i < maxIterations)
             {
                 // Find a random points in a sphere around the Player position.
-                Vector3 randomPoint = Random.onUnitSphere * IncreaseRange(i);
-                randomPoint.y = RandomAngle;
+                Vector3 randomPoint = Random.onUnitSphere * IncreaseRange(i, maxIterations);
+                randomPoint.y = RandomY;
                 // Add the Player position to our random points, so that is it centered around them.
                 randomPoint += startPosition;
 
@@ -128,7 +127,7 @@ namespace Movement.Classes
                         // Add this path to our list
                         Paths.Add(newPath);
                     }
-                    if (Paths.Count >= MaxPaths)
+                    if (Paths.Count >= maxPaths)
                     {
                         // Break the loop if we've reached our max paths per batch
                         break;
@@ -189,11 +188,11 @@ namespace Movement.Classes
         /// <summary>
         /// Generates random points within a given range and filters out points that are too closePoints to one another.
         /// </summary>
-        private List<Vector3> GeneratePoints(Vector3 navPoint)
+        private List<Vector3> GeneratePoints(Vector3 navPoint, int maxIterations = 10, float minDistance = 1f, float sampleRange = 2f)
         {
             List<Vector3> genPoints = new List<Vector3>();
             int i = 0;
-            while (i < MaxRandomGen)
+            while (i < maxIterations)
             {
                 // Generate a random point
                 Vector3 randomPoint = Random.insideUnitCircle * Random.Range(RandomGenMin, RandomGenMax);
@@ -201,7 +200,7 @@ namespace Movement.Classes
                 randomPoint += navPoint;
 
                 // Sample that point to see if its on navmesh
-                if (NavMesh.SamplePosition(randomPoint, out var hit, SamplePositionRange, NavMesh.AllAreas))
+                if (NavMesh.SamplePosition(randomPoint, out var hit, sampleRange, NavMesh.AllAreas))
                 {
                     // Add it to our list
                     genPoints.Add(hit.position);
@@ -210,7 +209,7 @@ namespace Movement.Classes
             }
 
             // Filter out any points that are too closePoints to one another
-            return FilterDistance(genPoints, FilterDistancePoints);
+            return FilterDistance(genPoints, minDistance);
         }
 
         /// <summary>
@@ -266,11 +265,11 @@ namespace Movement.Classes
         /// </summary>
         /// <param name="i">The iteration number.</param>
         /// <returns>The increased range.</returns>
-        private float IncreaseRange(int i)
+        private float IncreaseRange(int i, int maxIterations)
         {
             // Set our range for the botPath finder.
             float range = i * i + RangeBase;
-            float iterRatio = (float)i / MaxRangeIterations;
+            float iterRatio = (float)i / maxIterations;
             if (iterRatio > RangeThreshB)
             {
                 range *= 2.5f;
@@ -285,7 +284,8 @@ namespace Movement.Classes
         /// <summary>
         /// Generates a random angle between the negative and positive maximum Y angle.
         /// </summary>
-        private float RandomAngle => Random.Range(-MaxYAngle, MaxYAngle);
+        private float RandomY => Random.Range(-MaxYAngle, MaxYAngle);
+
         public static Color RandomColor => new Color(Random.value, Random.value, Random.value);
         public Color PlayerColor;
         private LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMask;

@@ -3,7 +3,7 @@ using EFT;
 using SAIN_Helpers;
 using System.Collections.Generic;
 using UnityEngine;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 
 namespace Movement.Helpers
 {
@@ -172,7 +172,7 @@ namespace Movement.Helpers
             // Is line of sight blocked at this position for this part?
             bool sightBlocked = Physics.Raycast(partPos, direction, direction.magnitude, mask);
 
-            // Debug
+            // DebugConfig
             if (sightBlocked && DebugMode)
             {
                 DebugDrawer.Ray(partPos, direction, direction.magnitude, 0.01f, Color.magenta, 0.1f);

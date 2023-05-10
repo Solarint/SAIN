@@ -123,7 +123,7 @@ namespace Movement.Patches
             public static bool PatchPrefix(ref BotOwner ___botOwner_0)
             {
                 //var dogFight = ___botOwner_0.gameObject.GetComponent<DogFightComponent>();
-                //dogFight.ManualUpdate();
+                //dogFight.ProcessPoints();
                 return false;
             }
         }

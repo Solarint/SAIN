@@ -17,8 +17,9 @@ namespace Movement
         {
             CheckEftVersion();
 
-            DogFight.Init(Config);
-            UserSettings.Debug.Init(Config);
+            DogFightConfig.Init(Config);
+            DebugConfig.Init(Config);
+            CoverSystemConfig.Init(Config);
 
             try
             {
@@ -30,23 +31,6 @@ namespace Movement
                 new Patches.GlobalSettings.BotGlobalCorePatch().Enable();
 
                 new Patches.DoorPatch.KickPatch().Enable();
-
-                //new Patches.DogFight.BotLogicDecisionPatch().Enable();
-                //new Patches.DogFight.DogFightGStructPatch().Enable();
-                //new Patches.DogFight.EndShootFromPlacePatch().Enable();
-
-                //new Patches.DogFight.TryStopReloadPatch().Enable();
-                //new Patches.DogFight.IsInDogFightPatch().Enable();
-                //new Patches.DogFight.StartPatch().Enable();
-                //new Patches.DogFight.ManualUpdatePatch().Enable();
-                //new Patches.DogFight.UpdatePatch().Enable();
-
-                //new Patches.ShouldBotHeal.StopHealPatch1().Enable();
-                //new Patches.ShouldBotHeal.StopHealPatch2().Enable();
-                //new Patches.ShouldBotHeal.StopHealPatch3().Enable();
-                //new Patches.ShouldBotHeal.StopHealPatch5().Enable();
-                //new Patches.ShouldBotHeal.StopHealPatch6().Enable();
-                //new Patches.ShouldBotHeal.StopHealPatch7().Enable();
 
             }
             catch (Exception ex)

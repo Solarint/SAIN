@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-using static Movement.UserSettings.Debug;
-using static Movement.UserSettings.DogFight;
+using static Movement.UserSettings.DebugConfig;
+using static Movement.UserSettings.DogFightConfig;
 
 namespace Movement.Components
 {

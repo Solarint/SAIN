@@ -192,8 +192,10 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\CoverSystemConfig.cs" />
     <Compile Include="CoverSystem\Classes\HelperClasses.cs" />
     <Compile Include="CoverSystem\Classes\PointGeneratorClass.cs" />
+    <Compile Include="CoverSystem\Classes\CoverChecker.cs" />
     <Compile Include="CoverSystem\Components\CoverFinder.cs" />
     <Compile Include="CoverSystem\Components\CoverCentral.cs" />
     <Compile Include="CoverSystem\Classes\ConstantValuesClass.cs" />
@@ -218,7 +220,7 @@
     <Compile Include="Layers\DogFight\DogFightLogic.cs" />
     <Compile Include="Helpers\Corners.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
-    <Compile Include="Config\DogFight.cs" />
+    <Compile Include="Config\DogFightConfig.cs" />
     <Compile Include="Config\DoorConfig.cs" />
     <Compile Include="Components\Experimental\MovementComponent.cs" />
     <Compile Include="Patches\Old\CoverPatch.cs" />

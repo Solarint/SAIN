@@ -6,7 +6,7 @@ using Movement.Helpers;
 using SAIN_Helpers;
 using UnityEngine;
 using UnityEngine.AI;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 
 namespace SAIN.Movement.Layers.DogFight
 {
@@ -318,7 +318,7 @@ namespace SAIN.Movement.Layers.DogFight
                 }
                 else if (CoverFinderNew.SafeCoverPoints.Count > 0)
                 {
-                    BotOwner.GoToPoint(CoverFinderNew.SafeCoverPoints[0].Position, false);
+                    BotOwner.GoToPoint(CoverFinderNew.SafeCoverPoints[0].position, false);
                 }
                 else if (!CanBotBackUp() && CanShootEnemy)
                 {

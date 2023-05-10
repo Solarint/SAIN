@@ -5,7 +5,7 @@ using SAIN_Helpers;
 using UnityEngine;
 using UnityEngine.AI;
 using static Movement.Helpers.Corners;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 using static UnityEngine.UI.GridLayoutGroup;
 
 namespace SAIN.Movement.Layers.DogFight

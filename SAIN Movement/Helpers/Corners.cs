@@ -4,7 +4,7 @@ using SAIN_Helpers;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 
 namespace Movement.Helpers
 {

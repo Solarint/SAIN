@@ -1,7 +1,7 @@
 using EFT;
 using System.Collections;
 using UnityEngine;
-using static Movement.UserSettings.DogFight;
+using static Movement.UserSettings.DogFightConfig;
 
 namespace Movement.Components
 {

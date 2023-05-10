@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static Movement.UserSettings.Debug;
+using static Movement.UserSettings.DebugConfig;
 using static Movement.Classes.HelperClasses;
 using Movement.Helpers;
 
@@ -68,7 +68,7 @@ namespace Movement.Components
 
                     for (int i = 0; i < max; i++)
                     {
-                        if (IsVector3Close(finalPoints[i].Position, out var path))
+                        if (IsVector3Close(finalPoints[i].position, out var path))
                         {
                             closePoints.Add(finalPoints[i]);
                         }
@@ -106,7 +106,7 @@ namespace Movement.Components
                         Vector3 enemyPos = Player.AIData.BotOwner.Memory.GoalEnemy.CurrPosition;
 
                         NavMeshPath path = new NavMeshPath();
-                        NavMesh.CalculatePath(enemyPos, point.Position, -1, path);
+                        NavMesh.CalculatePath(enemyPos, point.position, -1, path);
 
                         if (CheckPointForCover(point, path, enemyPos))
                         {
@@ -160,7 +160,7 @@ namespace Movement.Components
                                 break;
                             }
 
-                            if (Analyzer.CheckPosition(enemyPos, safePoints[i].Position, out var custompoint, 1f, 10))
+                            if (Analyzer.CheckPosition(enemyPos, safePoints[i].position, out var custompoint, 1f, 10))
                             {
                                 FallBackPoint = custompoint;
                                 break;
@@ -188,10 +188,10 @@ namespace Movement.Components
 
             if (IsCoverFacingEnemyDirection(point, enemyPosition))
             {
-                if (IsPointVisible(point.Position))
+                if (IsPointVisible(point.position))
                 {
                     NavMeshPath enemyPath = new NavMeshPath();
-                    NavMesh.CalculatePath(enemyPosition, point.Position, -1, enemyPath);
+                    NavMesh.CalculatePath(enemyPosition, point.position, -1, enemyPath);
                     if (enemyPath.CalculatePathLength() > botPath.CalculatePathLength())
                     {
                         hidden = true;
@@ -272,8 +272,8 @@ namespace Movement.Components
         /// <returns>True if the cover point is facing the enemy's direction, false otherwise.</returns>
         private bool IsCoverFacingEnemyDirection(CoverPoint point, Vector3 enemyPosition)
         {
-            Vector3 coverDirection = point.Direction.normalized;
-            Vector3 enemyDirection = (enemyPosition - point.Position).normalized;
+            Vector3 coverDirection = point.centerDirection.normalized;
+            Vector3 enemyDirection = (enemyPosition - point.position).normalized;
 
             float dotProduct = Vector3.Dot(coverDirection, enemyDirection);
 
@@ -308,7 +308,7 @@ namespace Movement.Components
             {
                 for (int j = i + 1; j < points.Count; j++)
                 {
-                    if (Vector3.Distance(points[i].Position, points[j].Position) < min)
+                    if (Vector3.Distance(points[i].position, points[j].position) < min)
                     {
                         points.RemoveAt(j);
                         j--;
@@ -343,7 +343,7 @@ namespace Movement.Components
                     if (Player.AIData.BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead))
                     {
                         //DebugDrawer.Line(Player.AIData.BotOwner.LookSensor._headPoint, FallBackPoint.CoverPosition, 0.1f, PlayerColor, 0.05f);
-                        //DebugDrawer.Line(EnemyHead.Position, FallBackPoint.CoverPosition, 0.025f, PlayerColor, 0.05f);
+                        //DebugDrawer.Line(EnemyHead.position, FallBackPoint.CoverPosition, 0.025f, PlayerColor, 0.05f);
                     }
                 }
 
@@ -351,11 +351,11 @@ namespace Movement.Components
                 {
                     var point = SafeCoverPoints.PickRandom();
 
-                    Vector3 coverPoint = point.Position;
-                    coverPoint.y += point.CoverHeight;
+                    Vector3 coverPoint = point.position;
+                    coverPoint.y += point.height;
 
                     DebugDrawPath(point);
-                    DebugDrawer.Line(point.Position, coverPoint, 0.03f, PlayerColor, 0.33f);
+                    DebugDrawer.Line(point.position, coverPoint, 0.03f, PlayerColor, 0.33f);
                 }
             }
         }
@@ -363,7 +363,7 @@ namespace Movement.Components
         private void DebugDrawPath(CoverPoint point)
         {
             NavMeshPath Path = new NavMeshPath();
-            NavMesh.CalculatePath(Player.Transform.position, point.Position, -1, Path);
+            NavMesh.CalculatePath(Player.Transform.position, point.position, -1, Path);
             for (int i = 0; i < Path.corners.Length - 1; i++)
             {
                 Vector3 corner1 = Path.corners[i];

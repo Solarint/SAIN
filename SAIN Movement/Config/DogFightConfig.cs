@@ -2,7 +2,7 @@
 
 namespace Movement.UserSettings
 {
-    internal class DogFight
+    internal class DogFightConfig
     {
         public static ConfigEntry<bool> DodgeToggle { get; private set; }
         public static ConfigEntry<bool> ScavDodgeToggle { get; private set; }
