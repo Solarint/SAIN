@@ -78,7 +78,7 @@ namespace Movement.Helpers
                     return false;
                 }
 
-                // CheckForCalcPath that corner 1 isn't past our input Max PathDistance
+                // CheckForCalcPath that corner 1 isn't past our input MaxCalcPath Distance
                 float distance = Vector3.Distance(BotPosition, corners[1]);
                 if (distance > MaxDistance * MaxDistance)
                 {

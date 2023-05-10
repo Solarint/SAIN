@@ -19,7 +19,7 @@ namespace SAIN.Movement.Layers.DogFight
         }
         private bool DebugMode => DebugUpdateSteering.Value;
 
-        public void Update()
+        public void ManualUpdate()
         {
             if (GoalEnemyNull)
             {

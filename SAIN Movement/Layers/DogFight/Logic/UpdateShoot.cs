@@ -24,7 +24,7 @@ namespace SAIN.Movement.Layers.DogFight
             BotOwner = bot;
         }
 
-        public void Update()
+        public void ManualUpdate()
         {
             if (!BotOwner.WeaponManager.HaveBullets)
             {

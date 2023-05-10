@@ -6,7 +6,7 @@
 //        // Basic Dodge. (A-D Strafe Basically). Returns false if dodge point could not be found
 //        public bool ExecuteDodge(BotOwner Player)
 //        {
-//            if (FindStartPoints.Dodge(Player, out Vector3 dodgePosition))
+//            if (GeneratePaths.Dodge(Player, out Vector3 dodgePosition))
 //            {
 //                Player.GoToPoint(dodgePosition, false, -1, false, true, true);
 //                return true;
@@ -17,7 +17,7 @@
 //        // Fallback Dodge. Uses EFT Method to move away from a target. Returns false if dodge point could not be found
 //        public bool ExecuteFallBack(BotOwner Player, out Vector3 fallbackposition)
 //        {
-//            if (FindStartPoints.Fallback(Player, out Vector3 FallbackPos))
+//            if (GeneratePaths.Fallback(Player, out Vector3 FallbackPos))
 //            {
 //                fallbackposition = FallbackPos;
 //                return true;
@@ -57,7 +57,7 @@
 //            // Run a loop that takes a points from an arc we generate to see if we get a navmesh hit.
 //            for (int i = 0; i < 3; i++)
 //            {
-//                FindStartPoints.FindArcPoint(BotPosition, Target, out Vector3 ArcPoint, ShuffleRange, ArcAngle, 0.25f, ShuffleRange);
+//                GeneratePaths.FindArcPoint(BotPosition, Target, out Vector3 ArcPoint, ShuffleRange, ArcAngle, 0.25f, ShuffleRange);
 //                if (NavMesh.SamplePosition(ArcPoint, out NavMeshHit navmeshhit, 1f, -1))
 //                {
 //                    position = navmeshhit.position;

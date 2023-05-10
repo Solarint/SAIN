@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Movement.Components
+namespace Movement.Classes
 {
     public static class ConstantValues
     {
         /// <summary>
         /// Represents a constant float value for the NavMesh sample position range.
         /// </summary>
-        public const float SamplePositionRange = 3.0f;
+        public const float SamplePositionRange = 2.0f;
 
         /// <summary>
         /// How far a bot has to move in meters to start generating again.
@@ -29,7 +29,7 @@ namespace Movement.Components
         /// <summary>
         /// Represents the maximum iterations for ranges to send to the path generator
         /// </summary>
-        public const int MaxRangeIterations = 8;
+        public const int MaxRangeIterations = 20;
         /// <summary>
         /// Represents the base range to send to the path generator.
         /// </summary>
@@ -51,6 +51,10 @@ namespace Movement.Components
         /// </summary>
         public const float ExtraRangeIncrease = 3f;
 
+        /// <summary>
+        /// Represents the maximum number of NavMesh paths allowed per batch.
+        /// </summary>
+        public const float MaxPaths = 5;
         /// <summary>
         /// Represents the maximum iterations for the NavMesh Path Generator
         /// </summary>

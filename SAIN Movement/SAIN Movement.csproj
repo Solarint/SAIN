@@ -192,15 +192,15 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\CoverFinder.cs" />
-    <Compile Include="Components\CoverCentral.cs" />
-    <Compile Include="Components\CoverFinderConstants.cs" />
+    <Compile Include="CoverSystem\Classes\HelperClasses.cs" />
+    <Compile Include="CoverSystem\Classes\PointGeneratorClass.cs" />
+    <Compile Include="CoverSystem\Components\CoverFinder.cs" />
+    <Compile Include="CoverSystem\Components\CoverCentral.cs" />
+    <Compile Include="CoverSystem\Classes\ConstantValuesClass.cs" />
     <Compile Include="Helpers\BotDecision.cs" />
     <Compile Include="Components\Experimental\DogFight\DogFightComponent.cs" />
-    <Compile Include="Helpers\CoverSystem\CustomCoverPoint.cs" />
-    <Compile Include="Helpers\CoverSystem\CoverAnalyzerHelper.cs" />
-    <Compile Include="Helpers\CoverSystem\CoverPositionsHelper.cs" />
-    <Compile Include="Helpers\CoverSystem\CoverFinderHelper.cs" />
+    <Compile Include="CoverSystem\CustomCoverPoint.cs" />
+    <Compile Include="CoverSystem\CoverAnalyzerHelper.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateSteering.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateShoot.cs" />
     <Compile Include="Layers\DogFight\Logic\UpdateMove.cs" />
@@ -213,7 +213,6 @@
     <Compile Include="Config\DebugConfigs.cs" />
     <Compile Include="Components\LeanComponent.cs" />
     <Compile Include="Helpers\StatusCheckHelpers.cs" />
-    <Compile Include="Helpers\MedicalHelper.cs" />
     <Compile Include="Helpers\DodgeHelpers.cs" />
     <Compile Include="Layers\DogFight\DogFightLayer.cs" />
     <Compile Include="Layers\DogFight\DogFightLogic.cs" />

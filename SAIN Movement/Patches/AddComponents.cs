@@ -38,6 +38,7 @@ namespace Movement.Patches
                 return;
 
             __instance.gameObject.GetComponent<LeanComponent>().Dispose();
+            __instance.GetPlayer.gameObject.GetComponent<CoverFinderComponent>().Dispose();
         }
     }
 }

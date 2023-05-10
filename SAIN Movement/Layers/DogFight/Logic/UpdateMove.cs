@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using Movement.Classes;
 using Movement.Components;
 using Movement.Helpers;
 using SAIN_Helpers;
@@ -17,26 +18,30 @@ namespace SAIN.Movement.Layers.DogFight
             BotOwner = bot;
             Cover = new CoverSystem(bot);
             Dodge = new BotDodge(bot);
+            MovementSpeed = new MovementSpeed(bot);
         }
 
+        private readonly MovementSpeed MovementSpeed; 
         private readonly BotDodge Dodge;
         private readonly CoverSystem Cover;
         private const float UpdateFrequency = 0.1f;
 
-        public void Update(bool canSee, bool canShoot)
+        public void ManualUpdate(bool canSee, bool canShoot)
         {
             CanSeeEnemy = canSee;
             CanShootEnemy = canShoot;
 
-            Cover.Update(canShoot, canSee);
+            if (canSee)
+            {
+                EnemyLastSeenTime = Time.time;
+            }
+
+            MovementSpeed.ManualUpdate(canShoot, canSee, EnemyLastSeenTime);
+
+            Cover.ManualUpdate(canShoot, canSee);
 
             if (ReactionTimer < Time.time)
             {
-                if (CanShootEnemy && CanSeeEnemy)
-                {
-                    EnemyLastSeenTime = Time.time;
-                }
-
                 UpdateDoorOpener();
 
                 ReactionTimer = Time.time + UpdateFrequency;
@@ -48,12 +53,14 @@ namespace SAIN.Movement.Layers.DogFight
                         return;
                     }
 
-                    DecideMovementSpeed();
+                    MovementSpeed.DecideMovementSpeed();
 
                     if (Cover.TakeCover())
                     {
                         return;
                     }
+
+                    MovementSpeed.SetSprint(false);
 
                     BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
                 }
@@ -66,17 +73,15 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 if (Reloading || BotOwner.Medecine.FirstAid.Using || !BotOwner.WeaponManager.HaveBullets)
                 {
-                    FallingBack = true;
-
-                    var coverPoint = Cover.RunAway();
+                    var coverPoint = Cover.CoverFinderNew.FallBackPoint;
 
                     if (coverPoint != null)
                     {
-                        SetSprint(true);
                         FallBack(coverPoint.CoverPosition);
                     }
-                    else
+                    else if (DodgeTimer < Time.time)
                     {
+                        DodgeTimer = Time.time + Random.Range(0.5f, 1f);
                         Dodge.Execute();
                     }
                     return true;
@@ -85,7 +90,59 @@ namespace SAIN.Movement.Layers.DogFight
             }
         }
 
-        private void DecideMovementSpeed()
+        private void FallBack(Vector3 position)
+        {
+            MovementSpeed.SetSprint(true);
+            BotOwner.Steering.LookToMovingDirection();
+            BotOwner.GoToPoint(position, false);
+            UpdateDoorOpener();
+        }
+
+        private void UpdateDoorOpener()
+        {
+            BotOwner.DoorOpener.Update();
+        }
+
+        private bool CanShootEnemy;
+        private bool CanSeeEnemy;
+
+        private bool Reloading => BotOwner.WeaponManager != null && BotOwner.WeaponManager.Reload.Reloading;
+        private bool CanShootEnemyAndVisible => !GoalEnemyNull && CanShootEnemy && CanSeeEnemy;
+        private bool GoalEnemyNull => BotOwner.Memory.GoalEnemy == null;
+        private bool HasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
+        private bool DebugMode => DebugUpdateMove.Value;
+        public LeanComponent DynamicLean { get; private set; }
+
+        private float DodgeTimer = 0f;
+        private float ReactionTimer = 0f;
+        private float EnemyLastSeenTime;
+        private float LastDistanceCheck = 0f;
+        private float PathLength = 0f;
+        public CustomCoverPoint FallBackCoverPoint;
+        private NavMeshPath BotPath = new NavMeshPath();
+        private readonly BotOwner BotOwner;
+        private readonly ManualLogSource Logger;
+    }
+
+    public class MovementSpeed
+    {
+        public MovementSpeed(BotOwner bot)
+        {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            BotOwner = bot;
+        }
+
+        public void ManualUpdate(bool canShoot, bool canSee, float lastSeen)
+        {
+            CanShootEnemy = canShoot;
+            CanSeeEnemy = canSee;
+            EnemyLastSeenTime = lastSeen;
+        }
+
+        private readonly BotOwner BotOwner;
+        private readonly ManualLogSource Logger;
+
+        public void DecideMovementSpeed()
         {
             if (GoalEnemyNull)
             {
@@ -111,26 +168,13 @@ namespace SAIN.Movement.Layers.DogFight
             }
         }
 
-        private void FallBack(Vector3 coverPosition)
+        public void SetSprint(bool value)
         {
-            if (HasStamina)
+            if (value)
             {
-                BotOwner.Steering.LookToMovingDirection();
-                SetSprint(true);
+                BotOwner.SetPose(1f);
+                BotOwner.SetTargetMoveSpeed(1f);
             }
-
-            BotOwner.GoToPoint(coverPosition, false, -1, false, true, true);
-            UpdateDoorOpener();
-        }
-
-        /// <summary>
-        /// Sets the sprint of the Player to true or false.
-        /// </summary>
-        /// <param name="value">The value to set the sprint to.</param>
-        private void SetSprint(bool value)
-        {
-            BotOwner.SetPose(1f);
-            BotOwner.SetTargetMoveSpeed(1f);
             BotOwner.GetPlayer.EnableSprint(value);
             BotOwner.Sprint(value);
         }
@@ -148,12 +192,12 @@ namespace SAIN.Movement.Layers.DogFight
 
         private void SlowWalk()
         {
-            BotOwner.SetTargetMoveSpeed(0.33f);
+            BotOwner.SetTargetMoveSpeed(0.45f);
         }
 
         private void NormalSpeed()
         {
-            BotOwner.SetTargetMoveSpeed(0.75f);
+            BotOwner.SetTargetMoveSpeed(0.85f);
         }
 
         private void CheckPathLength()
@@ -179,14 +223,22 @@ namespace SAIN.Movement.Layers.DogFight
             }
         }
 
-        private void UpdateDoorOpener()
+        private bool IsTargetClose
         {
-            BotOwner.DoorOpener.Update();
+            get
+            {
+                CheckPathLength();
+                return PathLength < 10f;
+            }
         }
-
-        private bool CanShootEnemy;
-        private bool CanSeeEnemy;
-
+        private bool IsTargetVeryClose
+        {
+            get
+            {
+                CheckPathLength();
+                return PathLength < 3f;
+            }
+        }
         private bool ShouldBotSneak
         {
             get
@@ -201,43 +253,17 @@ namespace SAIN.Movement.Layers.DogFight
                 }
             }
         }
-
-        private bool IsTargetClose
-        {
-            get
-            {
-                CheckPathLength();
-                return PathLength < 10f;
-            }
-        }
-
-        private bool IsTargetVeryClose
-        {
-            get
-            {
-                CheckPathLength();
-                return PathLength < 3f;
-            }
-        }
-
-        private bool Reloading => BotOwner.WeaponManager != null && BotOwner.WeaponManager.Reload.Reloading;
         private bool CanShootEnemyAndVisible => !GoalEnemyNull && CanShootEnemy && CanSeeEnemy;
         private bool GoalEnemyNull => BotOwner.Memory.GoalEnemy == null;
         private bool HasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
-        public bool IsSprintingFallback => FallingBack && BotOwner.Mover.IsMoving;
-        private bool DebugMode => DebugUpdateMove.Value;
-        public LeanComponent DynamicLean { get; private set; }
+        public bool IsMoving => BotOwner.Mover.IsMoving;
 
-        private bool FallingBack;
-        private float ReactionTimer = 0f;
-        private float EnemyLastSeenTime;
         private float LastDistanceCheck = 0f;
         private float PathLength = 0f;
-        public CustomCoverPoint FallBackCoverPoint;
-        private NavMeshPath BotBackupPath = new NavMeshPath();
         private NavMeshPath BotPath = new NavMeshPath();
-        private readonly BotOwner BotOwner;
-        private readonly ManualLogSource Logger;
+        private bool CanShootEnemy;
+        private bool CanSeeEnemy;
+        private float EnemyLastSeenTime;
     }
 
     public class CoverSystem
@@ -247,12 +273,11 @@ namespace SAIN.Movement.Layers.DogFight
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             BotOwner = botOwner;
             Dodge = new BotDodge(botOwner);
-            CoverFinder = new CoverFinder(botOwner);
             DynamicLean = botOwner.gameObject.GetComponent<LeanComponent>();
             CoverFinderNew = botOwner.gameObject.GetComponent<CoverFinderComponent>();
         }
 
-        public void Update(bool CanShoot, bool CanSee)
+        public void ManualUpdate(bool CanShoot, bool CanSee)
         {
             CanShootEnemy = CanShoot;
             CanSeeEnemy = CanSee;
@@ -264,7 +289,7 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 SelfCoverCheckTime = Time.time + 0.5f;
 
-                if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Transform.position, out SelfCover, 0.33f))
+                if (CoverFinderNew.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Transform.position, out SelfCover, 0.33f))
                 {
                     return true;
                 }
@@ -288,7 +313,12 @@ namespace SAIN.Movement.Layers.DogFight
             {
                 if (CheckSelfForCover() && CanShootEnemy)
                 {
+                    DynamicLean.HoldLean = true;
                     DecidePoseFromCoverLevel(SelfCover);
+                }
+                else if (CoverFinderNew.SafeCoverPoints.Count > 0)
+                {
+                    BotOwner.GoToPoint(CoverFinderNew.SafeCoverPoints[0].Position, false);
                 }
                 else if (!CanBotBackUp() && CanShootEnemy)
                 {
@@ -296,8 +326,7 @@ namespace SAIN.Movement.Layers.DogFight
                 }
                 else
                 {
-                    var point = CoverFinderNew.CloseCoverPoints.PickRandom();
-                    BotOwner.GoToPoint(point.Position);
+                    BotOwner.SetPose(0f);
                 }
                 return true;
             }
@@ -326,41 +355,15 @@ namespace SAIN.Movement.Layers.DogFight
 
                 BotOwner.SetPose(poseLevel);
             }
-            else
-            {
-                BotOwner.SetPose(1f);
-                CanBotBackUp();
-            }
         }
-
-        public CustomCoverPoint RunAway(float minCover = 0.75f)
-        {
-            if (FallBackCoverPoint != null && RecheckCoverTime < Time.time)
-            {
-                RecheckCoverTime = Time.time + 0.25f;
-                if (!RecheckCoverPosition)
-                {
-                    FallBackCoverPoint = null;
-                }
-            }
-            if (FallBackCoverPoint == null && CoverFinder.FindCover(out CustomCoverPoint coverPoint, BotOwner.Memory.GoalEnemy.CurrPosition, minCover))
-            {
-                FallBackCoverPoint = coverPoint;
-                DebugDrawFallback();
-            }
-
-            return FallBackCoverPoint;
-        }
-
-        private bool RecheckCoverPosition => CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, FallBackCoverPoint.CoverPosition, out CustomCoverPoint cover, 0.66f);
 
         public bool CanBotBackUp()
         {
             if (FightCover != null)
             {
-                if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, FightCover.CoverPosition, out FightCover, 0.25f))
+                if (CoverFinderNew.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, FightCover.CoverPosition, out FightCover, 0.25f))
                 {
-                    BotOwner.GoToPoint(FightCover.CoverPosition, false, -1, false, true, true);
+                    BotOwner.GoToPoint(FightCover.CoverPosition, false);
                     UpdateDoorOpener();
                     return true;
                 }
@@ -376,12 +379,12 @@ namespace SAIN.Movement.Layers.DogFight
                 float currentAngle = UnityEngine.Random.Range(-5f - angleAdd, 5f + angleAdd);
                 float currentRange = rangeStep * i + 2f;
 
-                Vector3 DodgeFallBack = CoverFinder.FindArcPoint(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, currentRange, currentAngle);
-                if (NavMesh.SamplePosition(DodgeFallBack, out NavMeshHit hit, 2f, -1))
+                Vector3 DodgeFallBack = HelperClasses.FindArcPoint(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, currentRange, currentAngle);
+                if (NavMesh.SamplePosition(DodgeFallBack, out NavMeshHit hit, 5f, -1))
                 {
-                    if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, hit.position, out FightCover, 0.25f))
+                    if (CoverFinderNew.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, hit.position, out FightCover, 0.25f))
                     {
-                        if (BotOwner.GoToPoint(hit.position, false, -1, false, false, true) == NavMeshPathStatus.PathComplete)
+                        if (BotOwner.GoToPoint(hit.position, false) == NavMeshPathStatus.PathComplete)
                         {
                             UpdateDoorOpener();
                             return true;
@@ -405,14 +408,12 @@ namespace SAIN.Movement.Layers.DogFight
         private bool CanShootEnemy;
         private bool CanSeeEnemy;
         private bool DebugMode => DebugUpdateMove.Value;
-        private readonly CoverFinder CoverFinder;
-        private float RecheckCoverTime = 0f;
         private float SelfCoverCheckTime = 0f;
         private readonly ManualLogSource Logger;
         private readonly BotOwner BotOwner;
         private CustomCoverPoint SelfCover;
         public CustomCoverPoint FallBackCoverPoint;
         private readonly BotDodge Dodge;
-        private CoverFinderComponent CoverFinderNew;
+        public CoverFinderComponent CoverFinderNew { get; private set; }
     }
 }

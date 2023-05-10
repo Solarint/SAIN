@@ -30,8 +30,14 @@ namespace Movement.Helpers
         /// <returns>True if the cover position is valid, false otherwise.</returns>
         public bool CheckPosition(Vector3 targetPos, Vector3 coverPos, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f, int numberOfRaycasts = 6)
         {
-            // Assign values for use in other methods
-            Target = targetPos;
+            if (BotOwner.Memory.GoalEnemy == null)
+            {
+                coverPoint = null;
+                return false;
+            }
+
+            BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
+            Target = EnemyHead.Position;
             CoverPosition = coverPos;
 
             // Calculate Cover Viability
@@ -52,17 +58,6 @@ namespace Movement.Helpers
         /// <returns>The cover level as a proportion of the total number of rays cast. With 1 being full cover, and 0 being no cover.</returns>
         private float CheckCoverLevel(int numberOfRaycasts)
         {
-            Vector3 origin;
-            if (BotOwner.Memory.GoalEnemy != null)
-            {
-                BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
-                origin = EnemyHead.Position; // The origin point, e.g., the enemy's position
-            }
-            else
-            {
-                origin = Target;
-            }
-
             Bounds playerBounds = BotOwner.GetPlayer.gameObject.GetComponent<Collider>().bounds;
             Vector3 size = playerBounds.size;
             Vector3 min = playerBounds.min;
@@ -92,8 +87,8 @@ namespace Movement.Helpers
 
                         rayCasts++;
                         targetPoint = targetPoint - BotOwner.Transform.position + CoverPosition;
-                        Vector3 direction = targetPoint - origin;
-                        if (Physics.Raycast(origin, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                        Vector3 direction = targetPoint - Target;
+                        if (Physics.Raycast(Target, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                         {
                             coverScoreCount++;
                         }

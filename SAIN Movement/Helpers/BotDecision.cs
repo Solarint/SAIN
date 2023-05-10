@@ -92,7 +92,7 @@ namespace Movement.Components
                     Logger.LogDebug($"I Need to Heal!");
                 }
 
-                if (!bot.Medecine.FirstAid.IsBleeding && EnemyClose)
+                if (bot.GetPlayer.HealthStatus != ETagStatus.BadlyInjured && EnemyClose)
                 {
                     if (DebugMode)
                     {

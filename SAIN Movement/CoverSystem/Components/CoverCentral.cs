@@ -2,13 +2,16 @@ using BepInEx;
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
+using Movement.Classes;
 using SAIN_Helpers;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Reflection;
 using UnityEngine;
-using static Movement.Components.ConstantValues;
+using static Movement.Classes.ConstantValues;
+using static Movement.Classes.HelperClasses;
 using static Movement.UserSettings.Debug;
 
 namespace Movement.Components
@@ -17,18 +20,17 @@ namespace Movement.Components
     public class Plugin : BaseUnityPlugin
     {
         private bool DebugMode => DebugCoverComponent.Value;
-
-        //private List<CoverFinderComponent> CoverFinders = new List<CoverFinderComponent>();
-        private List<Player> Players = new List<Player>();
-
         private GameObject CoverObject;
         private CoverCentralComponent Central;
-        private List<string> PlayerIDs = new List<string>();
 
         private void Awake()
         {
+            Directory.CreateDirectory(CoverFolder);
             Logger.LogDebug($"Universal Cover System Loaded");
         }
+
+        public static string PluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        public static string CoverFolder = Path.Combine(PluginFolder, "CoverPoints");
 
         private void Update()
         {
@@ -36,6 +38,25 @@ namespace Movement.Components
 
             if (gameWorld == null || gameWorld.RegisteredPlayers == null)
             {
+                if (Central != null)
+                {
+                    if (Central.FinalCoverPoints.Count > 0)
+                    {
+                        SaveFinalCoverPoints();
+
+                        Central.FinalCoverPoints.Clear();
+                    }
+
+                    if (Central.CoverFinderDictionary.Count > 0)
+                    {
+                        Central.CoverFinderDictionary.Clear();
+                    }
+
+                    if (Central.PointGeneratorDictionary.Count > 0)
+                    {
+                        Central.PointGeneratorDictionary.Clear();
+                    }
+                }
                 return;
             }
 
@@ -55,6 +76,24 @@ namespace Movement.Components
             }
         }
 
+        private void SaveFinalCoverPoints()
+        {
+            Logger.LogDebug($"Starting Save Process");
+
+            // Convert the list of CoverPoint objects to JSON
+            string json = Central.FinalCoverPoints.ToJson();
+
+            string LevelName = Singleton<GameWorld>.Instance.LocationId.ToString();
+
+            // Set the file path where you want to save the JSON
+            string filePath = CoverFolder + LevelName + "_CoverPoints.json";
+
+            // Write the JSON string to the file
+            File.WriteAllText(filePath, json);
+
+            Logger.LogWarning($"Saved CoverPoints to JSON");
+        }
+
         private float Frequency = 0f;
     }
 
@@ -65,135 +104,105 @@ namespace Movement.Components
         public List<CoverPoint> FinalCoverPoints = new List<CoverPoint>();
         private List<Vector3> PointsToCheck = new List<Vector3>();
         public List<Vector3> InputPoints = new List<Vector3>();
+        public Dictionary<Player, PointGenerator> PointGeneratorDictionary = new Dictionary<Player, PointGenerator>();
+        public Dictionary<Player, CoverFinderComponent> CoverFinderDictionary = new Dictionary<Player, CoverFinderComponent>();
 
-        private void Awake()
+        private void Start()
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
 
             Logger.LogDebug($"Central Controller Loaded");
 
-            StartCoroutine(SendFinalPoints());
             StartCoroutine(CheckPointsForCover());
         }
 
-        private List<CoverFinderComponent> CoverFinders = new List<CoverFinderComponent>();
-
+        float GeneratorTickTimer = 0f;
         private void Update()
         {
             var gameWorld = Singleton<GameWorld>.Instance;
-
             if (gameWorld == null || gameWorld.RegisteredPlayers == null)
             {
-                if (CoverFinders.Count != 0)
-                {
-                    CoverFinders.Clear();
-                }
                 return;
             }
 
-            if (RecheckTimer < Time.time)
+            if (UpdateTimer < Time.time)
             {
-                RecheckTimer = Time.time + 1f;
-                CheckForNewPlayers();
-                DrawDebug();
-            }
-        }
+                UpdateTimer = Time.time + 1f;
 
-        private float RecheckTimer = 0f;
-
-        private void CheckForNewPlayers()
-        {
-            List<Player> currentPlayers = Singleton<GameWorld>.Instance.RegisteredPlayers;
-            foreach (Player player in currentPlayers)
-            {
-                if (player.HealthController.IsAlive)
+                foreach (Player player in gameWorld.RegisteredPlayers)
                 {
-                    bool lockTaken = false;
-                    try
+                    if (player.HealthController.IsAlive)
                     {
-                        // Check if lock is not held before accessing CoverFinders
-                        lockTaken = Monitor.TryEnter(_coverFindersLock);
-
-                        var component = player.GetComponent<CoverFinderComponent>();
-
-                        if (component == null)
+                        if (!PointGeneratorDictionary.Keys.Contains(player))
                         {
-                            CoverFinders.Add(player.gameObject.AddComponent<CoverFinderComponent>());
+                            Logger.LogWarning($"Added Point Generator for {player.name}");
+                            PointGeneratorDictionary.Add(player, new PointGenerator(player));
                         }
-                    }
-                    finally
-                    {
-                        // Release the lock if it was taken by this thread
-                        if (lockTaken)
+
+                        if (!player.IsYourPlayer)
                         {
-                            Monitor.Exit(_coverFindersLock);
-                        }
-                    }
-                }
-            }
-        }
-
-        public const float CoverRatio = 0.33f;
-
-        /// <summary>
-        /// Checks for possible cover points around the Player and adds them to the RawCoverPoints list.
-        /// </summary>
-        private IEnumerator SendFinalPoints()
-        {
-            while (true)
-            {
-                if (CoverFinders.Count > 0)
-                {
-                    List<Vector3> points = new List<Vector3>();
-
-                    bool lockTaken = false;
-                    try
-                    {
-                        // Check if lock is not held before accessing CoverFinders
-                        lockTaken = Monitor.TryEnter(_coverFindersLock);
-
-                        if (lockTaken)
-                        {
-                            foreach (var finder in CoverFinders.ToList())
+                            if (!CoverFinderDictionary.Keys.Contains(player))
                             {
-                                if (finder != null)
-                                {
-                                    finder.FinalCoverPoints = FinalCoverPoints;
-                                    points.AddRange(finder.OutputPoints);
-                                    finder.OutputPoints.Clear();
-                                }
-                                else
-                                {
-                                    CoverFinders.Remove(finder);
-                                }
+                                Logger.LogWarning($"Added CoverFinder for {player.name}");
+                                CoverFinderDictionary.Add(player, player.gameObject.AddComponent<CoverFinderComponent>());
+                            }
+
+                            if (CoverFinderDictionary.TryGetValue(player, out var component))
+                            {
+                                component.FinalCoverPoints = FinalCoverPoints;
+                            }
+                            else
+                            {
+                                Logger.LogError($"Cant get Value for CoverFinder Dictionary");
                             }
                         }
-                        else
-                        {
-                            yield return new WaitForSeconds(0.1f);
-                            continue;
-                        }
                     }
-                    finally
-                    {
-                        // Release the lock if it was taken by this thread
-                        if (lockTaken)
-                        {
-                            Monitor.Exit(_coverFindersLock);
-                        }
-                    }
-
-                    if (points.Count > 0)
-                    {
-                        var filtered = FilterDistance(points, 2f);
-
-                        Logger.LogDebug($"Checking [{filtered.Count}] points for cover");
-
-                        PointsToCheck.AddRange(filtered);
-                    }
-                    yield return new WaitForSeconds(1f);
                 }
-                yield return null;
+            }
+
+            if (FinalCoverPoints.Count > 0)
+            {
+                var point = FinalCoverPoints.PickRandom();
+                DebugDrawer.Sphere(point.Position, 0.3f, Color.blue, 1f);
+            }
+
+            if (PointGeneratorDictionary.Count > 0 && GeneratorTickTimer < Time.time)
+            {
+                GeneratorTickTimer = Time.time + 0.25f;
+
+                List<Vector3> points = new List<Vector3>();
+
+                foreach (var generator in PointGeneratorDictionary.Values)
+                {
+                    if (generator == null)
+                    {
+                        Logger.LogError($"Point Generator is null");
+                        continue;
+                    }
+
+                    generator.ManualUpdate();
+                    points.AddRange(generator.OutputPoints);
+                    generator.OutputPoints.Clear();
+                }
+
+                StartChecks(points);
+            }
+
+            DrawDebug();
+        }
+
+        private float UpdateTimer = 0;
+        public const float CoverRatio = 0.33f;
+
+        private void StartChecks(List<Vector3> points)
+        {
+            if (points.Count > 0)
+            {
+                var filtered = FilterDistance(points, 1f);
+
+                Logger.LogDebug($"Checking [{filtered.Count}] points for cover");
+
+                PointsToCheck.AddRange(filtered);
             }
         }
 
@@ -211,52 +220,60 @@ namespace Movement.Components
                     int i = 0;
                     while (i < points.Count)
                     {
+                        yield return new WaitForEndOfFrame();
+
                         if (FinalCoverPoints.Count > 0 && CheckDistanceToExisting(FinalCoverPoints, points[i], 2f))
                         {
                             i++;
-                            yield return new WaitForEndOfFrame();
                             continue;
                         }
 
-                        // Copies the points and then raises it so its not blocked by small ground objects
-                        Vector3 rayPoint = points[i];
-                        rayPoint.y += RayYOffset;
-
-                        yield return new WaitForEndOfFrame();
-
-                        // Checks 8 even directions around the points
-                        foreach (Vector3 direction in Directions)
+                        if (CheckForCover(points[i], out CoverPoint goodCover))
                         {
-                            // Does it intersect a collider in this direction?
-                            if (Physics.Raycast(rayPoint, direction, out var hit, RayCastDistance, Mask))
-                            {
-                                Vector3 hitDirection = hit.point - rayPoint;
-
-                                // If a cover point hits, but is too close to the objects that may provide cover, shift its position away from the object.
-                                if (hitDirection.magnitude < HitDistanceThreshold)
-                                {
-                                    points[i] -= hitDirection.normalized / PointDistanceDivideBy;
-                                }
-
-                                var cover = new CoverPoint(points[i], direction);
-
-                                yield return new WaitForEndOfFrame();
-
-                                if (CheckHeightAndPercent(cover, out CoverPoint goodCover))
-                                {
-                                    coverPoints.Add(goodCover);
-                                }
-                                break;
-                            }
+                            coverPoints.Add(goodCover);
                         }
+
                         i++;
                     }
 
                     FinalCoverPoints.AddRange(coverPoints);
                 }
 
-                yield return null;
+                yield return new WaitForSeconds(1f);
             }
+        }
+
+        private bool CheckForCover(Vector3 point, out CoverPoint cover)
+        {
+            cover = null;
+
+            // Copies the points and then raises it so its not blocked by small ground objects
+            Vector3 rayPoint = point;
+            rayPoint.y += RayYOffset;
+
+            // Checks 8 even directions around the points
+            foreach (Vector3 direction in Directions)
+            {
+                // Does it intersect a collider in this direction?
+                if (Physics.Raycast(rayPoint, direction, out var hit, RayCastDistance, Mask))
+                {
+                    Vector3 hitDirection = hit.point - rayPoint;
+
+                    // If a cover point hits, but is too close to the objects that may provide cover, shift its position away from the object.
+                    if (hitDirection.magnitude < HitDistanceThreshold)
+                    {
+                        point -= hitDirection.normalized / PointDistanceDivideBy;
+                    }
+
+                    if (CheckHeightAndPercent(new CoverPoint(point, direction), out CoverPoint goodCover))
+                    {
+                        cover = goodCover;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private bool CheckHeightAndPercent(CoverPoint point, out CoverPoint goodPoint, float minCoverRatio = 0.45f)
@@ -331,14 +348,6 @@ namespace Movement.Components
                 DebugTimer = Time.time + 10f;
 
                 Logger.LogDebug($"Final Points = [{FinalCoverPoints.Count}]");
-
-                if (FinalCoverPoints.Count > 0)
-                {
-                    foreach (var point in FinalCoverPoints)
-                    {
-                        DebugDrawer.Sphere(point.Position, 0.3f, Color.blue, 10f);
-                    }
-                }
             }
         }
 
@@ -372,10 +381,6 @@ namespace Movement.Components
             return points;
         }
 
-        private readonly object _coverFindersLock = new object();
-        private readonly object _inputPointsLock = new object();
-        private int Filtered = 0;
-        public List<CoverPoint> DistanceChecked = new List<CoverPoint>();
         private LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMask;
         private float DebugTimer = 0f;
         protected ManualLogSource Logger;
@@ -400,61 +405,5 @@ namespace Movement.Components
         public int CoverWidth { get; set; }
         public float CoverHeight { get; set; }
         public float CoverAmount { get; set; }
-    }
-
-    /// <summary>
-    /// Compares CoverPoint objects.
-    /// </summary>
-    public class CoverPointComparer : IEqualityComparer<CoverPoint>
-    {
-        public bool Equals(CoverPoint v1, CoverPoint v2)
-        {
-            return v1.Equals(v2);
-        }
-
-        public int GetHashCode(CoverPoint v)
-        {
-            return v.GetHashCode();
-        }
-    }
-
-    /// <summary>
-    /// Compares Vector3 objects based on their newPosition.
-    /// </summary>
-    public class Vector3PositionComparer : IEqualityComparer<Vector3>
-    {
-        public bool Equals(Vector3 v1, Vector3 v2)
-        {
-            return v1.Equals(v2);
-        }
-
-        public int GetHashCode(Vector3 v)
-        {
-            return v.GetHashCode();
-        }
-    }
-
-    public class CoverPointDistanceComparer : IComparer<CoverPoint>
-    {
-        private CoverPoint target;
-
-        public CoverPointDistanceComparer(CoverPoint distanceToTarget)
-        {
-            target = distanceToTarget;
-        }
-
-        public int Compare(CoverPoint a, CoverPoint b)
-        {
-            var targetPosition = target.Position;
-            return Vector3.Distance(a.Position, targetPosition).CompareTo(Vector3.Distance(b.Position, targetPosition));
-        }
-    }
-
-    public static class CoverPointSorter
-    {
-        public static List<CoverPoint> SortByDistance(List<CoverPoint> coverPoints, Vector3 targetPosition)
-        {
-            return coverPoints.OrderBy(cp => Vector3.Distance(cp.Position, targetPosition)).ToList();
-        }
     }
 }

@@ -25,7 +25,7 @@ namespace SAIN.Movement.Layers.DogFight
         }
         private bool DebugMode => DebugUpdateTargetting.Value;
 
-        public void Update()
+        public void ManualUpdate()
         {
             if (BotFightInterface == null)
             {
@@ -52,7 +52,7 @@ namespace SAIN.Movement.Layers.DogFight
                 {
                     ReadyToShoot();
 
-                    updateShoot_0.Update();
+                    updateShoot_0.ManualUpdate();
                 }
             }
         }

@@ -42,9 +42,9 @@ namespace SAIN.Movement.Layers
 
                 Decisions.GetDecision();
 
-                Move.Update(CanSeeEnemy, CanShootEnemy);
+                Move.ManualUpdate(CanSeeEnemy, CanShootEnemy);
 
-                Steering.Update();
+                Steering.ManualUpdate();
 
                 if (!BotOwner.WeaponManager.HaveBullets)
                 {
@@ -58,7 +58,7 @@ namespace SAIN.Movement.Layers
 
                 if (CanSeeEnemy)
                 {
-                    Targeting.Update();
+                    Targeting.ManualUpdate();
                 }
             }
 
@@ -79,7 +79,8 @@ namespace SAIN.Movement.Layers
                         Vector3 weaponPos = BotOwner.WeaponRoot.position;
                         foreach (var part in BotOwner.Memory.GoalEnemy.AllActiveParts.Keys)
                         {
-                            if (!Physics.Raycast(weaponPos, part.Position - weaponPos, Vector3.Distance(weaponPos, part.Position), LayerMaskClass.HighPolyWithTerrainMaskAI))
+                            Vector3 direction = part.Position - weaponPos;
+                            if (!Physics.Raycast(weaponPos, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMaskAI))
                             {
                                 if (DebugMode)
                                 {
@@ -102,7 +103,8 @@ namespace SAIN.Movement.Layers
                         Vector3 headPos = BotOwner.LookSensor._headPoint;
                         foreach (var part in BotOwner.Memory.GoalEnemy.AllActiveParts.Keys)
                         {
-                            if (!Physics.Raycast(headPos, part.Position - headPos, Vector3.Distance(headPos, part.Position), LayerMaskClass.HighPolyWithTerrainMaskAI))
+                            Vector3 direction = part.Position - headPos;
+                            if (!Physics.Raycast(headPos, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMaskAI))
                             {
                                 if (DebugMode)
                                 {
