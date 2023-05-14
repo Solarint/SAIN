@@ -1,12 +1,15 @@
 ﻿using BepInEx.Configuration;
 
-namespace Movement.UserSettings
+namespace SAIN.UserSettings
 {
     internal class DebugConfig
     {
+        public static ConfigEntry<bool> DrawVerticesDebug { get; private set; }
+        public static ConfigEntry<bool> ToggleDrawCoverPoints { get; private set; }
+        public static ConfigEntry<bool> ToggleDrawInputPoints { get; private set; }
         public static ConfigEntry<bool> DebugDynamicLean { get; private set; }
-        public static ConfigEntry<bool> DebugDogFightLayer { get; private set; }
-        public static ConfigEntry<bool> DebugDogFightLayerDraw { get; private set; }
+        public static ConfigEntry<bool> DebugLayers { get; private set; }
+        public static ConfigEntry<bool> DebugLayersDraw { get; private set; }
         public static ConfigEntry<bool> DebugBotDecisions { get; private set; }
         public static ConfigEntry<bool> DebugUpdateMove { get; private set; }
         public static ConfigEntry<bool> DebugUpdateShoot { get; private set; }
@@ -21,17 +24,32 @@ namespace Movement.UserSettings
         {
             string debugmode = "7. Debug Mode";
 
+            DrawVerticesDebug = Config.Bind(debugmode, "DrawVerticesDebug", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 99 }));
+
+            ToggleDrawCoverPoints = Config.Bind(debugmode, "ToggleDrawCoverPoints", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 99 }));
+
+            ToggleDrawInputPoints = Config.Bind(debugmode, "ToggleDrawInputPoints", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 98 }));
+
             DebugDynamicLean = Config.Bind(debugmode, "Dynamic Lean", false,
                 new ConfigDescription("Draws debug Lines and logs events",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 8 }));
 
-            DebugDogFightLayer = Config.Bind(debugmode, "DogFight Layer", false, 
+            DebugLayers = Config.Bind(debugmode, "DogFight Layer", false, 
                 new ConfigDescription("Draws debug Lines and logs events", 
                 null, 
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 7 }));
 
-            DebugDogFightLayerDraw = Config.Bind(debugmode, "DogFight Layer Draw Generated Points", false,
+            DebugLayersDraw = Config.Bind(debugmode, "DogFight Layer Draw Generated Points", false,
                 new ConfigDescription("Draws points everywhere",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 6 }));

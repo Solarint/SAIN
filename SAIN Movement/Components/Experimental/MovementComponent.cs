@@ -1,9 +1,8 @@
 using EFT;
 using System.Collections;
 using UnityEngine;
-using static Movement.UserSettings.DogFightConfig;
 
-namespace Movement.Components
+namespace SAIN.Components
 {
     public class MovementSpeed : MonoBehaviour
     {
@@ -24,7 +23,7 @@ namespace Movement.Components
         {
             while (true)
             {
-                // Redundant CheckForCalcPath if the Player is alive before continuing
+                // Redundant CheckForCalcPath if the BotOwner is alive before continuing
                 if (!bot.GetPlayer.HealthController.IsAlive || bot.GetPlayer == null)
                 {
                     StopAllCoroutines();
@@ -47,25 +46,21 @@ namespace Movement.Components
         // Logic checks for when to execute lean or reset
         private bool ShouldIChange()
         {
-            // CheckForCalcPath if the Player is alive before continuing, and stop the Coroutine if they are dead.
+            // CheckForCalcPath if the BotOwner is alive before continuing, and stop the Coroutine if they are dead.
             if (bot?.GetPlayer?.HealthController?.IsAlive == false) StopAllCoroutines();
 
-            // Makes sure the Player is active before sending lean commands
+            // Makes sure the BotOwner is active before sending lean commands
             if (bot?.BotState != EBotState.Active) return false;
-
-            if (!MoveSpeedToggle.Value) return false;
 
             return true;
         }
         public void WhatSpeedShouldIPick()
         {
-            // CheckForCalcPath if the Player is alive before continuing, and stop the Coroutine if they are dead.
+            // CheckForCalcPath if the BotOwner is alive before continuing, and stop the Coroutine if they are dead.
             if (!bot.GetPlayer.HealthController.IsAlive) StopAllCoroutines();
 
-            // Makes sure the Player is active before sending lean commands
+            // Makes sure the BotOwner is active before sending lean commands
             if (bot.BotState != EBotState.Active) return;
-
-            if (!MoveSpeedToggle.Value) return;
 
             if (bot.Memory.IsPeace) // Peace Mode
             {
@@ -74,7 +69,7 @@ namespace Movement.Components
                 AimMoveSpeed = 0.65f;
 
                 // Slows down Scavs Even More
-                if (bot.IsRole(WildSpawnType.assault) && ScavMoveSlowerToggle.Value)
+                if (bot.IsRole(WildSpawnType.assault))
                 {
                     MoveSpeed = 0.5f;
                     PoseLevel = 1.0f;

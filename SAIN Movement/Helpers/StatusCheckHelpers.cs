@@ -1,6 +1,6 @@
 ﻿using EFT;
 
-namespace Movement.Helpers
+namespace SAIN.Helpers
 {
     public class CheckSelf
     {
@@ -37,9 +37,9 @@ if (___botOwner_0.Memory.GoalEnemy.ProfileId != currentEnemyID)
 {
     isEnemyHurt = false;
     hitCount = 0.0f;
-    if (SAIN.DebugDogFighter.Value == true)
+    if (Core.DebugDogFighter.Value == true)
     {
-        Logger.LogInfo($"Dogfighter {___botOwner_0.name}: Contact! New Enemy: {___botOwner_0.Memory.GoalEnemy.Nickname} Old Enemy: {___botOwner_0.Memory.LastEnemy.Nickname}");
+        Logger.LogInfo($"Dogfighter {___botOwner_0.name}: Contact! New Enemy: {___botOwner_0.Memory.GoalEnemy.Nickname} Old Enemy: {___botOwner_0.Memory.Enemy_Last_Id.Nickname}");
     }
     currentEnemyID = ___botOwner_0.Memory.GoalEnemy.ProfileId;
 }
@@ -55,7 +55,7 @@ if (___botOwner_0.Memory.GoalEnemy.LastHitTime < Time.time + 3.0f)
     if ((hitCount >= 3.0f) && !isEnemyHurt)
     {
         isEnemyHurt = true;
-        if (SAIN.DebugDogFighter.Value == true)
+        if (Core.DebugDogFighter.Value == true)
         {
             Logger.LogInfo($"Dogfighter {___botOwner_0.name}: Enemy is Hurtin! Hitcount: {hitCount}");
         }

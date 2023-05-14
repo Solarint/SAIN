@@ -1,56 +1,63 @@
 ﻿using BepInEx;
+using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
-using DrakiaXYZ.VersionChecker;
-using Movement.UserSettings;
-using SAIN.Movement.Layers.DogFight;
+using EFT;
+using SAIN.Components;
+using SAIN.UserSettings;
+using SAIN.Layers;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-namespace Movement
+namespace SAIN
 {
-    [BepInPlugin("me.sol.sainmove", "SAIN Movement", "2.0")]
+    [BepInPlugin("me.sol.sainlayers", "SAIN Layers", "1.0")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class Plugin : BaseUnityPlugin
     {
         private void Awake()
         {
-            CheckEftVersion();
-
-            DogFightConfig.Init(Config);
-            DebugConfig.Init(Config);
-            CoverSystemConfig.Init(Config);
-
             try
             {
+                DogFightConfig.Init(Config);
+                DebugConfig.Init(Config);
+                CoverSystemConfig.Init(Config);
+
                 new Patches.AddComponentPatch().Enable();
                 new Patches.DisposeComponentPatch().Enable();
 
-                new Patches.GlobalSettings.BotGlobalMindPatch().Enable();
-                new Patches.GlobalSettings.BotGlobalMovePatch().Enable();
-                new Patches.GlobalSettings.BotGlobalCorePatch().Enable();
+                new Patches.BotGlobalMindPatch().Enable();
+                new Patches.BotGlobalMovePatch().Enable();
+                new Patches.BotGlobalCorePatch().Enable();
 
-                new Patches.DoorPatch.KickPatch().Enable();
+                new Patches.KickPatch().Enable();
 
+                BrainManager.AddCustomLayer(typeof(ScavLayer), new List<string>() { "Assault" }, 100);
+                BrainManager.AddCustomLayer(typeof(PMCLayer), new List<string>() { "PMC" }, 100);
             }
             catch (Exception ex)
             {
                 Logger.LogError($"{GetType().Name}: {ex}");
                 throw;
             }
-
-            BrainManager.Instance.AddCustomLayer(typeof(DogFightLayer), new List<string>() { "Assault", "PMC" }, 100);
         }
-        private void CheckEftVersion()
+
+        private void Update()
         {
-            // Make sure the version of EFT being run is the correct version
-            int currentVersion = FileVersionInfo.GetVersionInfo(BepInEx.Paths.ExecutablePath).FilePrivatePart;
-            int buildVersion = TarkovVersion.BuildVersion;
-            if (currentVersion != buildVersion)
+            var gameWorld = Singleton<GameWorld>.Instance;
+
+            if (gameWorld?.RegisteredPlayers == null || gameWorld?.MainPlayer?.Location == null || !Singleton<IBotGame>.Instantiated)
             {
-                Logger.LogError($"ERROR: This version of {Info.Metadata.Name} v{Info.Metadata.Version} was built for Tarkov {buildVersion}, but you are running {currentVersion}. Please download the correct plugin version.");
-                throw new Exception($"Invalid EFT Version ({currentVersion} != {buildVersion})");
+                ComponentAdded = false;
+                return;
+            }
+
+            if (!ComponentAdded)
+            {
+                gameWorld.MainPlayer.gameObject.AddComponent<CoverCentralComponent>();
+                ComponentAdded = true;
             }
         }
+
+        private bool ComponentAdded = false;
     }
 }

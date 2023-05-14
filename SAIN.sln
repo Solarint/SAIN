@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Audio", "SAIN Audio\SA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Flashlights", "SAIN Flashlights\SAIN Flashlights.csproj", "{26FD5B9F-2847-4072-BCE3-6182F3F7A8A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Movement", "SAIN Movement\SAIN Movement.csproj", "{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Layers", "SAIN Movement\SAIN Layers.csproj", "{08D5B0F0-2F19-46FB-9C26-D78C0722ECA5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Vision", "SAIN Vision\SAIN Vision.csproj", "{897900E4-B305-4B15-8C8D-91B481296EE2}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoGrenadeYell", "No More Grenade Yell\NoGrenadeYell.csproj", "{7B486D24-E89C-4495-87B7-154843EBBAE9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Grenades", "SAIN Grenades\SAIN Grenades.csproj", "{465CE5B9-A24A-4685-A858-8155764559D5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN AI Core", "SAIN Core\SAIN AI Core.csproj", "{5C185FCC-C29A-464C-A7C8-B268C2962F74}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,6 +139,18 @@ Global
 		{465CE5B9-A24A-4685-A858-8155764559D5}.Release|Any CPU.Build.0 = Release|x86
 		{465CE5B9-A24A-4685-A858-8155764559D5}.Release|x86.ActiveCfg = Release|x86
 		{465CE5B9-A24A-4685-A858-8155764559D5}.Release|x86.Build.0 = Release|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.3.5.5|Any CPU.ActiveCfg = 3.5.5|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.3.5.5|Any CPU.Build.0 = 3.5.5|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.3.5.5|x86.ActiveCfg = 3.5.5|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.3.5.5|x86.Build.0 = 3.5.5|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Debug|Any CPU.Build.0 = Debug|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Debug|x86.ActiveCfg = Debug|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Debug|x86.Build.0 = Debug|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Release|Any CPU.ActiveCfg = Release|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Release|Any CPU.Build.0 = Release|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Release|x86.ActiveCfg = Release|x86
+		{5C185FCC-C29A-464C-A7C8-B268C2962F74}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

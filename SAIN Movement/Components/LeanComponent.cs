@@ -1,27 +1,24 @@
 using BepInEx.Logging;
 using EFT;
-using Movement.Helpers;
-using SAIN_Helpers;
+using SAIN.Helpers;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.AI;
-using static Movement.UserSettings.DebugConfig;
-using static Movement.UserSettings.DogFightConfig;
+using static SAIN.UserSettings.DebugConfig;
+using static SAIN.UserSettings.DogFightConfig;
 
-namespace Movement.Components
+namespace SAIN.Components
 {
     public class LeanComponent : MonoBehaviour
     {
-        private void Awake()
+        public LeanComponent(BotOwner bot)
         {
-            bot = GetComponent<BotOwner>();
-            BotColor = RandomColor;
+            BotOwner = bot;
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {bot.name}: ");
-
             Lean = new Corners.FindDirectionToLean();
+        }
 
+        private void Start()
+        {
             StartCoroutine(FindLeanAngleLoop());
             StartCoroutine(LeanConditionCheckLoop());
         }
@@ -36,7 +33,7 @@ namespace Movement.Components
         {
             while (true)
             {
-                if (bot.Memory.GoalEnemy != null && bot.Brain.ActiveLayerName() != "SAIN DogFight")
+                if (BotOwner.Memory.GoalEnemy != null && BotOwner.Brain.ActiveLayerName() != "SAIN DogFight")
                 {
                     HoldLean = false;
                 }
@@ -85,7 +82,7 @@ namespace Movement.Components
             {
                 if (!GoalEnemyNull)
                 {
-                    LeanAngle = Lean.FindLeanAngle(bot.Transform.position, bot.Memory.GoalEnemy.CurrPosition, bot.LookSensor._headPoint, 10f);
+                    LeanAngle = Lean.FindLeanAngle(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.LookSensor._headPoint, 10f);
                     yield return new WaitForSeconds(0.25f);
                 }
 
@@ -112,7 +109,7 @@ namespace Movement.Components
             if (num != LastLeanNum)
             {
                 LastLeanNum = num;
-                bot.GetPlayer.MovementContext.SetTilt(num, false);
+                BotOwner.GetPlayer.MovementContext.SetTilt(num, false);
             }
 
             Lean.Leaning = value;
@@ -124,7 +121,7 @@ namespace Movement.Components
             {
                 if (LeanToggle.Value)
                 {
-                    if (!bot.IsRole(WildSpawnType.assault))
+                    if (!BotOwner.IsRole(WildSpawnType.assault))
                     {
                         return true;
                     }
@@ -139,13 +136,13 @@ namespace Movement.Components
 
         private bool ShouldBotLean => BotActive && !GoalEnemyNull && !EnemyVisibleOrShootable && !BotInCover && AllowLean;
         private bool ShouldBotReset => (!BotActive || GoalEnemyNull || EnemyVisibleOrShootable || !AllowLean) && !BotInCover;
-        private bool EnemyFar => !GoalEnemyNull && bot.Memory.GoalEnemy.Distance > 50f;
-        private bool BotActive => bot.BotState == EBotState.Active;
+        private bool EnemyFar => !GoalEnemyNull && BotOwner.Memory.GoalEnemy.Distance > 50f;
+        private bool BotActive => BotOwner.BotState == EBotState.Active;
         private bool EnemyVisibleOrShootable => EnemyVisible || EnemyCanShoot;
-        private bool EnemyVisible => !GoalEnemyNull && bot.Memory.GoalEnemy.IsVisible;
-        private bool EnemyCanShoot => !GoalEnemyNull && bot.Memory.GoalEnemy.CanShoot;
-        private bool GoalEnemyNull => bot?.Memory?.GoalEnemy == null;
-        private bool BotInCover => bot.Memory.IsInCover;
+        private bool EnemyVisible => !GoalEnemyNull && BotOwner.Memory.GoalEnemy.IsVisible;
+        private bool EnemyCanShoot => !GoalEnemyNull && BotOwner.Memory.GoalEnemy.CanShoot;
+        private bool GoalEnemyNull => BotOwner?.Memory?.GoalEnemy == null;
+        private bool BotInCover => BotOwner.Memory.IsInCover;
         public bool LeaningRight => LeanAngle > 0f;
         public float LeanAngle { get; private set; }
         public bool HoldLean { get; set; }
@@ -155,7 +152,7 @@ namespace Movement.Components
         private Color BotColor;
 
         private Corners.FindDirectionToLean Lean;
-        private BotOwner bot;
+        private BotOwner BotOwner;
         protected ManualLogSource Logger;
         private bool StartingLean;
         private bool Resetting;

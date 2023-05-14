@@ -1,12 +1,9 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using HarmonyLib;
-using Movement.Components;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Movement.Helpers
+namespace SAIN.Helpers
 {
     public class BotDodge
     {
