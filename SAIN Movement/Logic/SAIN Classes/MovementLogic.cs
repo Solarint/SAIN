@@ -4,43 +4,29 @@ using SAIN.Components;
 
 namespace SAIN.Layers.Logic
 {
-    public class MovementLogic
+    public class MovementLogic : SAINBotExt
     {
-        public MovementLogic(BotOwner bot)
+        public MovementLogic(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            BotOwner = bot;
-            SAIN = bot.GetComponent<SAINCore>();
         }
-
-        private readonly SAINCore SAIN;
-
-        private readonly BotOwner BotOwner;
-        private readonly ManualLogSource Logger;
 
         public void DecideMovementSpeed()
         {
-            if (BotOwner.Memory.GoalEnemy == null)
-            {
-                SlowWalk();
-                return;
-            }
-
-            if (SAIN.Enemy.Path.RangeVeryClose)
+            if (SAIN.Core.Enemy.Path.RangeVeryClose)
             {
                 FullSpeed();
             }
-            else if (SAIN.Enemy.Path.RangeClose)
+            else if (SAIN.Core.Enemy.Path.RangeClose)
             {
                 NormalSpeed();
             }
             else if (ShouldBotSneak)
             {
-                Sneak();
             }
             else
             {
-                SlowWalk();
+                NormalSpeed();
             }
         }
 
@@ -86,9 +72,11 @@ namespace SAIN.Layers.Logic
                 }
                 else
                 {
-                    return !SAIN.Enemy.CanSee && !SAIN.Enemy.CanShoot && SAIN.Enemy.LastSeen.TimeSinceSeen > 10f;
+                    return !SAIN.Core.Enemy.CanSee && !SAIN.Core.Enemy.CanShoot && SAIN.Core.Enemy.LastSeen.TimeSinceSeen > 10f;
                 }
             }
         }
+
+        private readonly ManualLogSource Logger;
     }
 }

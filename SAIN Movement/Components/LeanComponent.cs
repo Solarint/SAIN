@@ -3,6 +3,7 @@ using EFT;
 using SAIN.Helpers;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static SAIN.UserSettings.DebugConfig;
 using static SAIN.UserSettings.DogFightConfig;
 
@@ -10,15 +11,15 @@ namespace SAIN.Components
 {
     public class LeanComponent : MonoBehaviour
     {
-        public LeanComponent(BotOwner bot)
-        {
-            BotOwner = bot;
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {bot.name}: ");
-            Lean = new Corners.FindDirectionToLean();
-        }
+        private SAINComponent SAIN;
 
         private void Start()
         {
+            BotOwner = GetComponent<BotOwner>();
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {BotOwner.name}: ");
+            Lean = new Corners.FindDirectionToLean();
+            SAIN = BotOwner.GetComponent<SAINComponent>();
+
             StartCoroutine(FindLeanAngleLoop());
             StartCoroutine(LeanConditionCheckLoop());
         }
@@ -33,11 +34,6 @@ namespace SAIN.Components
         {
             while (true)
             {
-                if (BotOwner.Memory.GoalEnemy != null && BotOwner.Brain.ActiveLayerName() != "SAIN DogFight")
-                {
-                    HoldLean = false;
-                }
-
                 if (ShouldBotLean && !StartingLean)
                 {
                     float random = Random.Range(0.2f, 0.5f);
@@ -52,6 +48,54 @@ namespace SAIN.Components
                 }
 
                 yield return null;
+            }
+        }
+
+        private bool ShouldBotLean
+        {
+            get
+            {
+                if (BotOwner.Memory.GoalEnemy == null)
+                {
+                    return false;
+                }
+                if (BotOwner.BotState != EBotState.Active)
+                {
+                    return false;
+                }
+                if (BotOwner.Memory.IsInCover)
+                {
+                    return false;
+                }
+                if (SAIN.Core.Enemy.CanShoot)
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        private bool ShouldBotReset
+        {
+            get
+            {
+                if (BotOwner.Memory.GoalEnemy == null)
+                {
+                    return true;
+                }
+                if (BotOwner.BotState != EBotState.Active)
+                {
+                    return true;
+                }
+                if (BotOwner.Memory.IsInCover)
+                {
+                    return true;
+                }
+                if (SAIN.Core.Enemy.CanShoot)
+                {
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -80,7 +124,7 @@ namespace SAIN.Components
         {
             while (true)
             {
-                if (!GoalEnemyNull)
+                if (BotOwner.Memory.GoalEnemy != null)
                 {
                     LeanAngle = Lean.FindLeanAngle(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.LookSensor._headPoint, 10f);
                     yield return new WaitForSeconds(0.25f);
@@ -115,41 +159,10 @@ namespace SAIN.Components
             Lean.Leaning = value;
         }
 
-        private bool AllowLean
-        {
-            get
-            {
-                if (LeanToggle.Value)
-                {
-                    if (!BotOwner.IsRole(WildSpawnType.assault))
-                    {
-                        return true;
-                    }
-                    else if (ScavLeanToggle.Value)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }
-
-        private bool ShouldBotLean => BotActive && !GoalEnemyNull && !EnemyVisibleOrShootable && !BotInCover && AllowLean;
-        private bool ShouldBotReset => (!BotActive || GoalEnemyNull || EnemyVisibleOrShootable || !AllowLean) && !BotInCover;
-        private bool EnemyFar => !GoalEnemyNull && BotOwner.Memory.GoalEnemy.Distance > 50f;
-        private bool BotActive => BotOwner.BotState == EBotState.Active;
-        private bool EnemyVisibleOrShootable => EnemyVisible || EnemyCanShoot;
-        private bool EnemyVisible => !GoalEnemyNull && BotOwner.Memory.GoalEnemy.IsVisible;
-        private bool EnemyCanShoot => !GoalEnemyNull && BotOwner.Memory.GoalEnemy.CanShoot;
-        private bool GoalEnemyNull => BotOwner?.Memory?.GoalEnemy == null;
-        private bool BotInCover => BotOwner.Memory.IsInCover;
         public bool LeaningRight => LeanAngle > 0f;
         public float LeanAngle { get; private set; }
         public bool HoldLean { get; set; }
         private bool DebugMode => DebugDynamicLean.Value;
-
-        public static Color RandomColor => new Color(Random.value, Random.value, Random.value);
-        private Color BotColor;
 
         private Corners.FindDirectionToLean Lean;
         private BotOwner BotOwner;

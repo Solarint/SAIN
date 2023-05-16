@@ -7,30 +7,15 @@ using SAIN.Components;
 
 namespace SAIN.Layers.Logic
 {
-    public class UpdateShoot
+    public class UpdateShoot : SAINBotExt
     {
-        private readonly BotOwner BotOwner;
-        private bool DebugMode => DebugUpdateShoot.Value;
-
-        protected ManualLogSource Logger;
-
-        public UpdateShoot(BotOwner bot)
+        public UpdateShoot(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            BotOwner = bot;
-            SAIN = bot.GetComponent<SAINCore>();
         }
-
-        private SAINCore SAIN;
 
         public void ManualUpdate()
         {
-            if (!BotOwner.WeaponManager.HaveBullets)
-            {
-                BotOwner.WeaponManager.Reload.TryReload();
-                return;
-            }
-
             Vector3 position = BotOwner.GetPlayer.PlayerBones.WeaponRoot.position;
             Vector3 realTargetPoint = BotOwner.AimingData.RealTargetPoint;
             if (BotOwner.ShootData.ChecFriendlyFire(position, realTargetPoint))
@@ -51,12 +36,7 @@ namespace SAIN.Layers.Logic
 
         private void Talk()
         {
-            if (SilentUntil > Time.time)
-            {
-                return;
-            }
-
-            if (IsTrue100(10f))
+            if (SilentUntil < Time.time && IsTrue100(3f))
             {
                 BotOwner.BotTalk.TrySay(EPhraseTrigger.OnFight, true);
                 SilentUntil = Time.time + 15f;
@@ -66,5 +46,6 @@ namespace SAIN.Layers.Logic
         public float SilentUntil;
         public bool WithTalk = true;
         private int Bullets;
+        protected ManualLogSource Logger;
     }
 }

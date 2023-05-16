@@ -7,18 +7,16 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
-    internal class DogFightLogic : CustomLogic
+    internal class SkirmishAction : CustomLogic
     {
-        public DogFightLogic(BotOwner bot) : base(bot)
+        public SkirmishAction(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            Targeting = new UpdateTarget(bot);
-            Move = new UpdateMove(bot);
-            Steering = new UpdateSteering(bot);
-            SAIN = bot.GetComponent<SAINCore>();
+
+            SAIN = bot.GetComponent<SAINComponent>();
         }
 
-        private SAINCore SAIN;
+        private SAINComponent SAIN;
 
         public override void Start()
         {
@@ -32,19 +30,15 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            Move.ManualUpdate();
+            //SAIN.Move.ManualUpdate();
 
-            Steering.ManualUpdate();
+            SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Enemy.CanSee)
+            if (SAIN.Core.Enemy.CanSee)
             {
-                Targeting.ManualUpdate();
+                SAIN.Targeting.ManualUpdate();
             }
         }
-
-        private readonly UpdateTarget Targeting;
-        private readonly UpdateMove Move;
-        private readonly UpdateSteering Steering;
 
         public bool DebugMode => DebugLayers.Value;
         public bool DebugDrawPoints => DebugLayersDraw.Value;

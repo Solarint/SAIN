@@ -9,15 +9,15 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
-    internal class FightLogic : CustomLogic
+    internal class FightAction : CustomLogic
     {
-        public FightLogic(BotOwner bot) : base(bot)
+        public FightAction(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            SAIN = bot.GetComponent<SAINBotComponent>();
+            SAIN = bot.GetComponent<SAINComponent>();
         }
 
-        private readonly SAINBotComponent SAIN;
+        private readonly SAINComponent SAIN;
 
         public override void Start()
         {
@@ -31,8 +31,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-
-            SAIN.Move.ManualUpdate();
+            //SAIN.Move.ManualUpdate();
 
             SAIN.Steering.ManualUpdate();
 
@@ -41,8 +40,6 @@ namespace SAIN.Layers
                 SAIN.Targeting.ManualUpdate();
             }
         }
-
-        public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
     }

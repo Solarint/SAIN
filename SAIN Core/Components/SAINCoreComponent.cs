@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SAIN.Components
 {
-    public class SAINCore : MonoBehaviour
+    public class SAINCoreComponent : MonoBehaviour
     {
         public Color BotColor;
         public Medical Medical { get; private set; }
@@ -30,7 +30,7 @@ namespace SAIN.Components
             Destroy(this);
         }
 
-        protected BotOwner BotOwner;
+        public BotOwner BotOwner { get; private set; }
 
         private void Update()
         {
@@ -91,10 +91,10 @@ namespace SAIN.Components
         public SAINBot(BotOwner bot)
         {
             BotOwner = bot;
-            Core = bot.GetComponent<SAINCore>();
+            Core = bot.GetComponent<SAINCoreComponent>();
         }
 
-        protected SAINCore Core { get; private set; }
+        protected SAINCoreComponent Core { get; private set; }
         protected BotOwner BotOwner { get; private set; }
     }
 

@@ -244,7 +244,7 @@ namespace SAIN.Classes
             float coverAmount = (float)coverHit / i;
 
             // Assign the cover height and amount we found to the CoverPoint object
-            point.Ratio = coverAmount;
+            point.CoverLevel = coverAmount;
             point.Height = heightHit;
 
             //Logger.LogDebug($"Final CheckForCalcPath for this point [{coverAmount > minCoverLevel0to1}] because [{coverHit}] and [{i}]. coverPointRatio [{coverAmount}] Height [{heightHit}]");

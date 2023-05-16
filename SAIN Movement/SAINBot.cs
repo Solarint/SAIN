@@ -6,13 +6,13 @@ using UnityEngine.UIElements;
 
 namespace SAIN
 {
-    public abstract class SAINBotLayers : SAINBot
+    public abstract class SAINBotExt : SAINBot
     {
-        public SAINBotLayers(BotOwner bot) : base(bot)
+        public SAINBotExt(BotOwner bot) : base(bot)
         {
-            SAIN = bot.GetOrAddComponent<SAINBotComponent>();
+            SAIN = bot.GetOrAddComponent<SAINComponent>();
         }
 
-        protected SAINBotComponent SAIN { get; private set; }
+        protected SAINComponent SAIN { get; private set; }
     }
 }

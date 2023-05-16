@@ -22,7 +22,7 @@ namespace Vision
                 new Patches.VisionOverridesPatch().Enable();
                 //new Patches.IsPartVisiblePatch().Enable();
 
-                new Patches.AddComponentPatch().Enable();
+                //new Patches.AddComponentPatch().Enable();
             }
             catch (Exception ex)
             {

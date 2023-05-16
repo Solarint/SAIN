@@ -7,22 +7,15 @@ using SAIN.Components;
 
 namespace SAIN.Layers.Logic
 {
-    public class UpdateTarget
+    public class UpdateTarget : SAINBotExt
     {
-        private readonly BotOwner BotOwner;
-
         protected ManualLogSource Logger;
 
-        public UpdateTarget(BotOwner bot)
+        public UpdateTarget(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            BotOwner = bot;
-            updateShoot_0 = new UpdateShoot(bot);
-            SAIN = bot.GetComponent<SAINCore>();
+            UpdateShoot = new UpdateShoot(bot);
         }
-
-        private SAINCore SAIN;
-        private bool DebugMode => DebugUpdateTargetting.Value;
 
         public void ManualUpdate()
         {
@@ -31,7 +24,7 @@ namespace SAIN.Layers.Logic
                 BotFightInterface = BotOwner.AimingData;
             }
 
-            if (BotOwner.Memory.GoalEnemy.Distance < 30f && CanShootEnemy)
+            if (BotOwner.Memory.GoalEnemy.Distance < 30f && SAIN.Core.Enemy.CanShoot)
             {
                 LightTime = Time.time;
                 BotOwner.BotLight.TurnOn();
@@ -51,7 +44,7 @@ namespace SAIN.Layers.Logic
                 {
                     ReadyToShoot();
 
-                    updateShoot_0.ManualUpdate();
+                    UpdateShoot.ManualUpdate();
                 }
             }
         }
@@ -66,7 +59,7 @@ namespace SAIN.Layers.Logic
             float ShootToCenter = BotOwner.Settings.FileSettings.Aiming.DIST_TO_SHOOT_TO_CENTER;
             var goalEnemy = BotOwner.Memory.GoalEnemy;
 
-            if (goalEnemy != null && CanShootEnemyAndVisible)
+            if (goalEnemy != null && SAIN.Core.Enemy.CanShoot && SAIN.Core.Enemy.CanSee)
             {
                 Vector3 aimTarget;
 
@@ -116,11 +109,7 @@ namespace SAIN.Layers.Logic
             return null;
         }
 
-        public bool CanShootEnemyAndVisible => CanShootEnemy && CanSeeEnemy;
-        public bool CanShootEnemy => BotOwner.Memory.GoalEnemy.IsVisible;
-        public bool CanSeeEnemy => BotOwner.Memory.GoalEnemy.CanShoot;
-
-        private readonly UpdateShoot updateShoot_0;
+        private readonly UpdateShoot UpdateShoot;
         private GInterface5 BotFightInterface;
         protected Vector3 BotTarget;
         private float TalkDelay;

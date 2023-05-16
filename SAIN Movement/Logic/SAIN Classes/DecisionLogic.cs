@@ -7,16 +7,11 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Components
 {
-    public class Decisions : SAINBotLayers
+    public class DecisionLogic : SAINBotExt
     {
-        public Decisions(BotOwner bot) : base(bot)
+        public DecisionLogic(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource($": {BotOwner.name}" + GetType().Name);
-        }
-
-        private void Awake()
-        {
-            Draw = new DebugGizmos.DrawLists(Color.red, Color.blue, GetType().Name, true);
         }
 
         private const float FightIn = 60f;
@@ -25,37 +20,27 @@ namespace SAIN.Components
         private const float DogFightIn = 10f;
         private const float DogFightOut = 15f;
 
-        private const float LastSeenReloadTime = 2f;
         private const float LowAmmoThresh0to1 = 0.3f;
 
         public void BotHeal()
         {
-            if (DebugMode)
-            {
-                Logger.LogDebug($"I healed!");
-            }
+            Logger.LogDebug($"I healed!");
 
             BotOwner.Medecine.FirstAid.TryApplyToCurrentPart(null, null);
         }
 
         public void BotUseStims()
         {
-            if (DebugMode)
-            {
-                Logger.LogDebug($"I'm Popping Stims");
-            }
+            Logger.LogDebug($"I'm Popping Stims");
 
             BotOwner.Medecine.Stimulators.TryApply(true, null, null);
         }
 
         public void BotReload()
         {
-            if (DebugMode)
-            {
-                Logger.LogDebug($"Reloading!");
-            }
+            Logger.LogDebug($"Reloading!");
 
-            BotOwner.WeaponManager.Reload.TryReload();
+            BotOwner.WeaponManager.Reload.Reload();
         }
 
         public void BotStopReload()
@@ -78,9 +63,9 @@ namespace SAIN.Components
                 {
                     active = false;
                 }
-                else if (SAIN.Enemy.LastSeen.EnemyStraightDistance < 100f)
+                else if (SAIN.Core.Enemy.LastSeen.EnemyStraightDistance < 100f)
                 {
-                    float distance = SAIN.Enemy.Path.Length;
+                    float distance = SAIN.Core.Enemy.Path.Length;
 
                     if (distance < FightIn)
                     {
@@ -112,9 +97,9 @@ namespace SAIN.Components
                 {
                     active = false;
                 }
-                else if (SAIN.Enemy.LastSeen.EnemyStraightDistance < 50f)
+                else if (SAIN.Core.Enemy.LastSeen.EnemyStraightDistance < 50f)
                 {
-                    float distance = SAIN.Enemy.Path.Length;
+                    float distance = SAIN.Core.Enemy.Path.Length;
 
                     if (distance < DogFightIn)
                     {
@@ -141,9 +126,9 @@ namespace SAIN.Components
             get
             {
                 bool takeStims = false;
-                if (SAIN.Medical.HasStims && LastStimTime < Time.time)
+                if (SAIN.Core.Medical.HasStims && LastStimTime < Time.time)
                 {
-                    var status = SAIN.BotStatus;
+                    var status = SAIN.Core.BotStatus;
                     if (status.Healthy)
                     {
                         takeStims = false;
@@ -157,7 +142,7 @@ namespace SAIN.Components
                     }
                     else
                     {
-                        var enemy = SAIN.Enemy;
+                        var enemy = SAIN.Core.Enemy;
                         var path = enemy.Path;
 
                         if (status.Injured)
@@ -208,13 +193,13 @@ namespace SAIN.Components
 
                     if (BotOwner.Memory.GoalEnemy == null)
                     {
-                        Logger.LogDebug($"Popped Stims Because: I have no enemy and I'm [{Reason(SAIN.BotStatus)}]");
+                        Logger.LogDebug($"Popped Stims Because: I have no enemy and I'm [{Classes.Debug.Reason(SAIN.Core.BotStatus)}]");
                     }
                     else
                     {
-                        string healthReason = Reason(SAIN.BotStatus);
-                        string enemydistReason = Reason(SAIN.Enemy);
-                        string canSee = Reason(SAIN.Enemy.CanSee);
+                        string healthReason = Classes.Debug.Reason(SAIN.Core.BotStatus);
+                        string enemydistReason = Classes.Debug.Reason(SAIN.Core.Enemy);
+                        string canSee = Classes.Debug.Reason(SAIN.Core.Enemy.CanSee);
                         Logger.LogDebug($"Popped Stims Because: I'm [{healthReason}] and my enemy is [{enemydistReason}] and I [{canSee}] them.");
                     }
                 }
@@ -228,8 +213,8 @@ namespace SAIN.Components
             get
             {
                 bool BotShouldHeal = false;
-                var status = SAIN.BotStatus;
-                if (SAIN.Medical.CanHeal && !status.Healthy)
+                var status = SAIN.Core.BotStatus;
+                if (SAIN.Core.Medical.CanHeal && !status.Healthy)
                 {
                     if (BotOwner.Memory.GoalEnemy == null)
                     {
@@ -237,7 +222,7 @@ namespace SAIN.Components
                     }
                     else
                     {
-                        var enemy = SAIN.Enemy;
+                        var enemy = SAIN.Core.Enemy;
                         var path = enemy.Path;
 
                         if (status.Injured)
@@ -283,9 +268,9 @@ namespace SAIN.Components
                     }
                     else
                     {
-                        string healthReason = Reason(SAIN.BotStatus);
-                        string enemydistReason = Reason(SAIN.Enemy);
-                        string canSee = Reason(SAIN.Enemy.CanSee);
+                        string healthReason = Classes.Debug.Reason(SAIN.Core.BotStatus);
+                        string enemydistReason = Classes.Debug.Reason(SAIN.Core.Enemy);
+                        string canSee = Classes.Debug.Reason(SAIN.Core.Enemy.CanSee);
                         Logger.LogDebug($"Healed Because: I'm [{healthReason}] and my enemy is [{enemydistReason}] and I [{canSee}] them.");
                     }
                 }
@@ -302,7 +287,7 @@ namespace SAIN.Components
 
                 if (BotOwner.Memory.GoalEnemy != null && BotOwner.WeaponManager.Reload.Reloading)
                 {
-                    if (!LowAmmo && SAIN.Enemy.Path.RangeClose)
+                    if (!LowAmmo && SAIN.Core.Enemy.Path.RangeClose)
                     {
                         if (DebugMode)
                         {
@@ -311,7 +296,7 @@ namespace SAIN.Components
 
                         botShouldCancel = true;
                     }
-                    if (BotOwner.WeaponManager.HaveBullets && SAIN.Enemy.Path.RangeVeryClose)
+                    if (BotOwner.WeaponManager.HaveBullets && SAIN.Core.Enemy.Path.RangeVeryClose)
                     {
                         if (DebugMode)
                         {
@@ -326,69 +311,11 @@ namespace SAIN.Components
             }
         }
 
-        private string Reason(bool canSee)
-        {
-            string reason;
-            if (canSee)
-            {
-                reason = "Can See";
-            }
-            else
-            {
-                reason = "Can't See";
-            }
-            return reason;
-        }
-
-        private string Reason(Enemy enemy)
-        {
-            string reason;
-            if (enemy.Path.RangeFar)
-            {
-                reason = "Far";
-            }
-            else if (enemy.Path.RangeMid)
-            {
-                reason = "MidRange";
-            }
-            else if (enemy.Path.RangeClose)
-            {
-                reason = "Close";
-            }
-            else
-            {
-                reason = "Very Close";
-            }
-            return reason;
-        }
-
-        private string Reason(BotStatus status)
-        {
-            string reason;
-            if (status.Injured)
-            {
-                reason = "Injured";
-            }
-            else if (status.BadlyInjured)
-            {
-                reason = "Badly Injured";
-            }
-            else if (status.Dying)
-            {
-                reason = "Dying";
-            }
-            else
-            {
-                reason = "Healthy";
-            }
-            return reason;
-        }
-
         public bool ShouldBotReload
         {
             get
             {
-                if (!BotOwner.WeaponManager.IsReady)
+                if (!BotOwner.WeaponManager.IsReady || !BotOwner.WeaponManager.Reload.CanReload(false))
                 {
                     return false;
                 }
@@ -409,7 +336,7 @@ namespace SAIN.Components
                     else if (LowAmmo)
                     {
                         float randomrange = Random.Range(2f, 5f);
-                        var enemy = SAIN.Enemy;
+                        var enemy = SAIN.Core.Enemy;
                         if (BotOwner.Memory.GoalEnemy == null)
                         {
                             if (DebugMode)
@@ -423,7 +350,7 @@ namespace SAIN.Components
                         {
                             if (DebugMode)
                             {
-                                Logger.LogDebug($"I'm low on ammo, and I haven't seen my enemy in [{randomrange}] seconds. so I should reload. Last Saw Enemy [{SAIN.Enemy.LastSeen.TimeSinceSeen}] seconds ago");
+                                Logger.LogDebug($"I'm low on ammo, and I haven't seen my enemy in [{randomrange}] seconds. so I should reload. Last Saw Enemy [{SAIN.Core.Enemy.LastSeen.TimeSinceSeen}] seconds ago");
                             }
 
                             needToReload = true;
@@ -439,7 +366,10 @@ namespace SAIN.Components
                         }
                     }
                 }
-
+                if (needToReload)
+                {
+                    BotReload();
+                }
                 return needToReload;
             }
         }
@@ -463,7 +393,6 @@ namespace SAIN.Components
         private float DebugTimer = 0f;
 
         protected ManualLogSource Logger;
-        private DebugGizmos.DrawLists Draw;
 
         private float LastStimTime = 0f;
 
@@ -472,19 +401,8 @@ namespace SAIN.Components
             if (DebugMode && DebugTimer < Time.time && enemyDistance < minDistance)
             {
                 DebugTimer = Time.time + 1f;
-                Draw.DrawTempPath(SAIN.Enemy.Path.Path, active, Color.red, Color.green, 0.1f, 1f, true);
+                SAIN.DebugDrawList.DrawTempPath(SAIN.Core.Enemy.Path.Path, active, Color.red, Color.green, 0.1f, 1f, true);
             }
-        }
-
-        public bool ShouldBotAttack()
-        {
-            return false;
-        }
-
-        public void Dispose()
-        {
-            StopAllCoroutines();
-            Destroy(this);
         }
     }
 }

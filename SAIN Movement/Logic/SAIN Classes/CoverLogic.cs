@@ -1,8 +1,6 @@
 ﻿using BepInEx.Logging;
-using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Classes;
-using SAIN.Components;
 using SAIN.Helpers;
 using SAIN_Helpers;
 using UnityEngine;
@@ -11,28 +9,31 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers.Logic
 {
-    public class CoverLogic : SAINBot
+    public class CoverLogic : SAINBotExt
     {
         public CoverLogic(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            Dodge = new BotDodge(bot);
-            DynamicLean = bot.gameObject.GetComponent<LeanComponent>();
-            CoverFinder = bot.gameObject.GetComponent<CoverFinderComponent>();
         }
 
-        public bool CheckSelfForCover()
+        public bool CheckSelfForCover(out float ratio)
         {
-            if (SelfCover != null && SelfCoverCheckTime < Time.time)
+            int rays = 0;
+            int cover = 0;
+            foreach (var part in BotOwner.MainParts.Values)
             {
-                SelfCoverCheckTime = Time.time + 0.5f;
-
-                if (CoverFinder.Analyzer.CheckPosition(SAIN.Enemy.LastSeen.EnemyPosition, BotOwner.Transform.position, out SelfCover, 0.33f))
+                BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
+                Vector3 direction = part.Position - EnemyHead.Position;
+                if (Physics.Raycast(EnemyHead.Position, direction, direction.magnitude, Components.SAINCoreComponent.SightMask))
                 {
-                    return true;
+                    cover++;
                 }
+                rays++;
             }
-            return false;
+
+            ratio = (float)cover / rays;
+
+            return ratio > 0.33f;
         }
 
         public void DebugDrawFallback()
@@ -47,59 +48,49 @@ namespace SAIN.Layers.Logic
 
         public bool TakeCover()
         {
-            if (SAIN.Enemy.CanSee)
+            if (SAIN.Core.Enemy.CanSee)
             {
-                if (CheckSelfForCover() && SAIN.Enemy.CanShoot)
+                if (SAIN.Core.Enemy.CanShoot)
                 {
-                    DynamicLean.HoldLean = true;
-                    DecidePoseFromCoverLevel(SelfCover);
-                }
-                else if (CoverFinder.SafeCoverPoints.Count > 0)
-                {
-                    BotOwner.GoToPoint(CoverFinder.SafeCoverPoints[0].Position, false);
-                }
-                else if (!CanBotBackUp() && SAIN.Enemy.CanShoot)
-                {
-                    Dodge.Execute();
+                    if (CheckSelfForCover(out float ratio))
+                    {
+                        BotOwner.SetPose(ratio);
+                        BotOwner.MovementPause(1f);
+                    }
+                    else
+                    {
+                        BotOwner.SetPose(1f);
+                        if (SAIN.CoverFinder.SafeCoverPoints.Count > 0)
+                        {
+                            BotOwner.GoToPoint(SAIN.CoverFinder.SafeCoverPoints[0].Position, false);
+                        }
+                        else if (!CanBotBackUp())
+                        {
+                            SAIN.Dodge.Execute();
+                        }
+                    }
                 }
                 else
                 {
-                    BotOwner.SetPose(0f);
+                    if (SAIN.CoverFinder.SafeCoverPoints.Count > 0)
+                    {
+                        BotOwner.GoToPoint(SAIN.CoverFinder.SafeCoverPoints.PickRandom().Position, false);
+                    }
+                    else
+                    {
+                        SAIN.Dodge.Execute();
+                    }
                 }
                 return true;
             }
             return false;
         }
 
-        public void DecidePoseFromCoverLevel(CustomCoverPoint cover)
-        {
-            if (cover != null)
-            {
-                float coverLevel = cover.CoverLevel;
-                float poseLevel;
-
-                if (coverLevel > 0.75)
-                {
-                    poseLevel = 0.5f;
-                }
-                else if (coverLevel > 0.5f)
-                {
-                    poseLevel = 0.25f;
-                }
-                else
-                {
-                    poseLevel = 0.0f;
-                }
-
-                BotOwner.SetPose(poseLevel);
-            }
-        }
-
         public bool CanBotBackUp()
         {
             if (FightCover != null)
             {
-                if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, FightCover.CoverPosition, out FightCover, 0.25f))
+                if (SAIN.CoverFinder.Analyzer.CheckPosition(FightCover.CoverPosition, out FightCover, 0.25f))
                 {
                     BotOwner.GoToPoint(FightCover.CoverPosition, false);
                     UpdateDoorOpener();
@@ -120,7 +111,7 @@ namespace SAIN.Layers.Logic
                 Vector3 DodgeFallBack = HelperClasses.FindArcPoint(BotOwner.Transform.position, BotOwner.Memory.GoalEnemy.CurrPosition, currentRange, currentAngle);
                 if (NavMesh.SamplePosition(DodgeFallBack, out NavMeshHit hit, 5f, -1))
                 {
-                    if (CoverFinder.Analyzer.CheckPosition(BotOwner.Memory.GoalEnemy.CurrPosition, hit.position, out FightCover, 0.25f))
+                    if (SAIN.CoverFinder.Analyzer.CheckPosition(hit.position, out FightCover, 0.25f))
                     {
                         if (BotOwner.GoToPoint(hit.position, false) == NavMeshPathStatus.PathComplete)
                         {
@@ -142,13 +133,10 @@ namespace SAIN.Layers.Logic
             BotOwner.DoorOpener.Update();
         }
 
-        public LeanComponent DynamicLean { get; private set; }
         private bool DebugMode => DebugUpdateMove.Value;
         private float SelfCoverCheckTime = 0f;
         private readonly ManualLogSource Logger;
         private CustomCoverPoint SelfCover;
         public CustomCoverPoint FallBackCoverPoint;
-        private readonly BotDodge Dodge;
-        public CoverFinderComponent CoverFinder { get; private set; }
     }
 }

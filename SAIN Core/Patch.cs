@@ -16,7 +16,7 @@ namespace SAIN
         [PatchPostfix]
         public static void PatchPostfix(ref BotOwner __instance)
         {
-            __instance.gameObject.AddComponent<SAINCore>();
+            __instance.gameObject.AddComponent<SAINCoreComponent>();
         }
     }
 
@@ -37,7 +37,7 @@ namespace SAIN
 
             if (botState == EBotState.PreActive) return;
 
-            __instance.gameObject.GetComponent<SAINCore>().Dispose();
+            __instance.gameObject.GetComponent<SAINCoreComponent>().Dispose();
         }
     }
 }

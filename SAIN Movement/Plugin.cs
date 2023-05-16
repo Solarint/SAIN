@@ -2,9 +2,10 @@
 using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Classes;
 using SAIN.Components;
-using SAIN.UserSettings;
 using SAIN.Layers;
+using SAIN.UserSettings;
 using System;
 using System.Collections.Generic;
 
@@ -30,34 +31,40 @@ namespace SAIN
                 new Patches.BotGlobalCorePatch().Enable();
 
                 new Patches.KickPatch().Enable();
-
-                BrainManager.AddCustomLayer(typeof(ScavLayer), new List<string>() { "Assault" }, 100);
-                BrainManager.AddCustomLayer(typeof(PMCLayer), new List<string>() { "PMC" }, 100);
             }
             catch (Exception ex)
             {
                 Logger.LogError($"{GetType().Name}: {ex}");
                 throw;
             }
+
+            BrainManager.AddCustomLayer(typeof(RetreatLayer), new List<string>() { "PMC", "Assault" }, 100);
+
+            BrainManager.AddCustomLayer(typeof(DogFightLayer), new List<string>() { "PMC", "Assault" }, 95);
+
+            BrainManager.AddCustomLayer(typeof(FightLayer), new List<string>() { "PMC", "Assault" }, 90);
+
+            BrainManager.AddCustomLayer(typeof(SkirmishLayer), new List<string>() { "PMC", "Assault" }, 85);
         }
 
         private void Update()
         {
+            /*
             var gameWorld = Singleton<GameWorld>.Instance;
 
             if (gameWorld?.RegisteredPlayers == null || gameWorld?.MainPlayer?.Location == null || !Singleton<IBotGame>.Instantiated)
             {
-                ComponentAdded = false;
+                CoverCentral.NavmeshVertices = null;
                 return;
             }
 
-            if (!ComponentAdded)
+            foreach (var player in gameWorld.RegisteredPlayers)
             {
-                gameWorld.MainPlayer.gameObject.AddComponent<CoverCentralComponent>();
-                ComponentAdded = true;
+                player.GetOrAddComponent<PointGenerator>();
             }
-        }
 
-        private bool ComponentAdded = false;
+            CoverCentral.Update();
+            */
+        }
     }
 }

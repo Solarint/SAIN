@@ -8,26 +8,19 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers.Logic
 {
-    public class UpdateSteering
+    public class UpdateSteering : SAINBotExt
     {
-        public UpdateSteering(BotOwner bot)
+        public UpdateSteering(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            BotOwner = bot;
-            SAIN = bot.GetComponent<SAINCore>();
         }
-
-        private SAINCore SAIN;
         private bool DebugMode => DebugUpdateSteering.Value;
 
         public void ManualUpdate()
         {
-            if (CanShootEnemy)
+            if (SAIN.Core.Enemy.CanSee)
             {
-                //SetSprint(false);
-                //Vector3 target = BotOwner.Memory.GoalEnemy.CurrPosition;
-                //target.y += 0.75f;
-                //BotOwner.Steering.LookToPoint(target);
+                BotOwner.Steering.LookToPoint(SAIN.Core.Enemy.LastSeen.EnemyPosition);
                 return;
             }
 
@@ -63,8 +56,8 @@ namespace SAIN.Layers.Logic
                 if (DebugMode && DebugTimer < Time.time)
                 {
                     DebugTimer = Time.time + 1f;
-                    SAIN_Helpers.DebugDrawer.Sphere(corner, 0.25f, Color.red, 1f);
-                    SAIN_Helpers.DebugDrawer.Line(corner, BotOwner.MyHead.position, 0.1f, Color.red, 1f);
+                    DebugDrawer.Sphere(corner, 0.25f, Color.red, 1f);
+                    DebugDrawer.Line(corner, BotOwner.MyHead.position, 0.1f, Color.red, 1f);
                 }
 
                 return corner;
@@ -83,11 +76,6 @@ namespace SAIN.Layers.Logic
             BotOwner.Sprint(value);
         }
 
-        private bool CanShootEnemy => BotOwner.Memory.GoalEnemy.IsVisible;
-        private bool CanSeeEnemy => BotOwner.Memory.GoalEnemy.CanShoot;
-        private bool GoalEnemyNull => BotOwner.Memory.GoalEnemy == null;
-
-        private readonly BotOwner BotOwner;
         protected ManualLogSource Logger;
         private float DebugTimer = 0f;
         private readonly CornerProcessing Processing = new CornerProcessing();

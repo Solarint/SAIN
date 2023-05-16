@@ -1,3 +1,4 @@
+using Audio.DebugTools;
 using BepInEx.Logging;
 using EFT;
 using SAIN.Helpers;
@@ -16,13 +17,13 @@ namespace SAIN.Components
         private bool DebugMode => DebugCoverComponent.Value;
         public List<CoverPoint> CloseCoverPoints = new List<CoverPoint>();
         public List<CoverPoint> SafeCoverPoints = new List<CoverPoint>();
-        private SAINCore SAIN;
+        private SAINComponent SAIN;
         public CoverAnalyzer Analyzer { get; private set; }
 
         private void Start()
         {
             BotOwner = GetComponent<BotOwner>();
-            SAIN = BotOwner.GetComponent<SAINCore>();
+            SAIN = BotOwner.GetComponent<SAINComponent>();
 
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {BotOwner.name}: ");
 
@@ -63,9 +64,9 @@ namespace SAIN.Components
                     CloseCoverPoints.AddRange(closePoints);
                 }
 
-                if (CloseCoverPoints.Count < 100 && CoverCentralComponent.FinalCoverPoints.Count > 0)
+                if (CloseCoverPoints.Count < 50 && CoverCentral.FinalCoverPoints.Count > 0)
                 {
-                    int count = CoverCentralComponent.FinalCoverPoints.Count;
+                    int count = CoverCentral.FinalCoverPoints.Count;
                     int delay = Mathf.CeilToInt((float)count / 1000f); // Calculate the delay value
 
                     for (int i = 0; i < count; i++)
@@ -75,12 +76,12 @@ namespace SAIN.Components
                             yield return new WaitForEndOfFrame();
                         }
 
-                        if (IsVector3Close(CoverCentralComponent.FinalCoverPoints[i].Position, out var path, 50f, 50f))
+                        if (IsVector3Close(CoverCentral.FinalCoverPoints[i].Position, out var path, 50f, 50f))
                         {
-                            CloseCoverPoints.Add(CoverCentralComponent.FinalCoverPoints[i]);
+                            CloseCoverPoints.Add(CoverCentral.FinalCoverPoints[i]);
                         }
 
-                        if (CloseCoverPoints.Count >= 200)
+                        if (CloseCoverPoints.Count >= 80)
                         {
                             break;
                         }
@@ -101,6 +102,7 @@ namespace SAIN.Components
                     closePoints.AddRange(CloseCoverPoints);
 
                     SafeCoverPoints.Clear();
+                    FullCover.Clear();
 
                     foreach (var point in closePoints)
                     {
@@ -119,11 +121,24 @@ namespace SAIN.Components
                         if (CheckPointForCover(point, path, enemyPos))
                         {
                             SafeCoverPoints.Add(point);
+
+                            if (point.CoverLevel >= 0.9f)
+                            {
+                                SAIN_Helpers.DebugDrawer.Line(BotOwner.LookSensor._headPoint, point.Position, 0.1f, Color.magenta, 0.1f);
+                                FullCover.Add(point);
+                            }
                         }
                     }
+
+                    yield return new WaitForEndOfFrame();
+                    SafeCoverPoints = SortPointsByDistance(SafeCoverPoints);
+                    yield return new WaitForEndOfFrame();
+                    FullCover = SortPointsByDistance(FullCover);
                 }
             }
         }
+
+        private List<CoverPoint> FullCover = new List<CoverPoint>();
 
         private IEnumerator FindNextFallBackPoint()
         {
@@ -139,39 +154,32 @@ namespace SAIN.Components
                         continue;
                     }
 
-                    Vector3 enemyPos = BotOwner.AIData.BotOwner.Memory.GoalEnemy.CurrPosition;
-
-                    if (FallBackPoint != null)
+                    if (FullCover.Count > 0)
                     {
-                        if (Analyzer.CheckPosition(enemyPos, FallBackPoint.CoverPosition, out var custompoint, 1f, 10))
-                        {
-                            continue;
-                        }
-                    }
+                        List<CoverPoint> fullCover = new List<CoverPoint>();
+                        fullCover.AddRange(FullCover);
 
-                    if (SafeCoverPoints.Count > 0)
-                    {
-                        List<CoverPoint> safePoints = new List<CoverPoint>();
-                        safePoints.AddRange(SafeCoverPoints);
+                        fullCover = SortPointsByDistance(fullCover);
 
                         int i = 0;
-                        while (i < safePoints.Count)
+                        while (i < fullCover.Count)
                         {
                             if (BotOwner.AIData?.BotOwner?.Memory?.GoalEnemy == null)
                             {
                                 break;
                             }
 
-                            if (Analyzer.CheckPosition(enemyPos, safePoints[i].Position, out var custompoint, 1f, 10))
+                            SAIN_Helpers.DebugDrawer.Line(FullCover[i].Position, BotOwner.MyHead.position, 0.1f, SAIN.Core.BotColor, 0.1f);
+
+                            if (Analyzer.CheckPosition(fullCover[i].Position, out var custompoint, 1f))
                             {
                                 FallBackPoint = custompoint;
                                 break;
                             }
-                            i++;
-                            yield return new WaitForEndOfFrame();
-                        }
 
-                        SafeCoverPoints = safePoints;
+                            yield return new WaitForEndOfFrame();
+                            i++;
+                        }
                     }
                 }
             }
@@ -327,13 +335,7 @@ namespace SAIN.Components
         /// <returns>The sorted list of CoverPoints.</returns>
         private List<CoverPoint> SortPointsByDistance(List<CoverPoint> points)
         {
-            if (points.Count > 0 && SortTimer < Time.time)
-            {
-                SortTimer = Time.time + 1f;
-
-                return CoverPointSorter.SortByDistance(points, BotOwner.Transform.position);
-            }
-            return points;
+            return CoverPointSorter.SortByDistance(points, BotOwner.Transform.position);
         }
 
         private void DebugDrawPoints()

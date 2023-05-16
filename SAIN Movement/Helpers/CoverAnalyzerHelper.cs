@@ -2,21 +2,20 @@
 using EFT;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
+using SAIN;
+using SAIN_Helpers;
 
 namespace SAIN.Helpers
 {
     /// <summary>
     /// Analyzes Vector3 Positions using raycasts to see if they are useful cover points for bots
     /// </summary>
-    public class CoverAnalyzer
+    public class CoverAnalyzer : SAINBotExt
     {
-        public CoverAnalyzer(BotOwner bot)
+        public CoverAnalyzer(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            BotOwner = bot;
         }
-
-        private bool DebugMode => DebugCoverSystem.Value;
 
         /// <summary>
         /// Analyzes a Vector3 and checks if the BotOwner is visible from it, and if so, by how much.
@@ -26,7 +25,7 @@ namespace SAIN.Helpers
         /// <param name="coverPoint">The CustomCoverPoint object.</param>
         /// <param name="minCoverLevel">The minimum cover level.</param>
         /// <returns>True if the cover position is valid, false otherwise.</returns>
-        public bool CheckPosition(Vector3 targetPos, Vector3 coverPos, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f, int numberOfRaycasts = 6)
+        public bool CheckPosition(Vector3 coverPos, out CustomCoverPoint coverPoint, float minCoverLevel = 0.5f)
         {
             if (BotOwner.Memory.GoalEnemy == null)
             {
@@ -35,17 +34,21 @@ namespace SAIN.Helpers
             }
 
             BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
-            Target = EnemyHead.Position;
-            CoverPosition = coverPos;
 
             // Calculate Cover Viability
-            float coverRatio = CheckCoverLevel(numberOfRaycasts);
+            float coverRatio = CheckCoverLevel(EnemyHead.Position, coverPos);
             bool goodCover = coverRatio >= minCoverLevel;
 
             // CheckForCalcPath is cover is viable, if so create a new CustomCoverPoint to return
-            coverPoint = goodCover ? new CustomCoverPoint(BotOwner.Transform.position, coverPos, coverRatio, CanBotShoot()) : null;
+            coverPoint = goodCover ? new CustomCoverPoint(BotOwner.Transform.position, coverPos, coverRatio, true) : null;
 
             // Return true if cover meets requirements
+            if (goodCover)
+            {
+                //DebugDrawer.Sphere(coverPos, 0.25f, Color.blue, 15f);
+                //DebugDrawer.Line(coverPos, BotOwner.MyHead.position, 0.1f, SAIN.Core.BotColor, 0.1f);
+            }
+
             return goodCover;
         }
 
@@ -54,87 +57,32 @@ namespace SAIN.Helpers
         /// </summary>
         /// <param name="numberOfRaycasts">The number of raycasts to perform.</param>
         /// <returns>The cover level as a proportion of the total number of rays cast. With 1 being full cover, and 0 being no cover.</returns>
-        private float CheckCoverLevel(int numberOfRaycasts)
+        private float CheckCoverLevel(Vector3 enemyPos, Vector3 coverPos)
         {
-            Bounds playerBounds = BotOwner.GetPlayer.gameObject.GetComponent<Collider>().bounds;
-            Vector3 size = playerBounds.size;
-            Vector3 min = playerBounds.min;
+            int raycasts = 0;
+            int cover = 0;
 
-            int coverScoreCount = 0;
-
-            int subdivisions = Mathf.CeilToInt(Mathf.Pow(numberOfRaycasts, 1f / 3f));
-
-            int rayCasts = 0;
-
-            // Perform raycasts from the origin to each evenly spaced point within the player's bounding box
-            for (int x = 0; x < subdivisions; x++)
+            foreach (var part in BotOwner.GetPlayer.MainParts.Values)
             {
-                for (int y = 0; y < subdivisions; y++)
+                //DebugDrawer.Line(part.Position, BotOwner.Transform.position, 0.1f, Color.white, 0.25f);
+                raycasts++;
+
+                Vector3 coverPart = part.Position;
+                coverPart -= BotOwner.Transform.position + coverPos;
+
+                //DebugDrawer.Line(coverPart, coverPos, 0.1f, Color.white, 5f);
+
+                Vector3 directions = coverPart - enemyPos;
+
+                if (Physics.Raycast(enemyPos, directions, directions.magnitude, Components.SAINCoreComponent.SightMask))
                 {
-                    for (int z = 0; z < subdivisions; z++)
-                    {
-                        float lerpX = (float)x / (subdivisions - 1);
-                        float lerpY = (float)y / (subdivisions - 1);
-                        float lerpZ = (float)z / (subdivisions - 1);
-
-                        Vector3 targetPoint = new Vector3(
-                            min.x + size.x * lerpX,
-                            min.y + size.y * lerpY,
-                            min.z + size.z * lerpZ
-                        );
-
-                        rayCasts++;
-                        targetPoint = targetPoint - BotOwner.Transform.position + CoverPosition;
-                        Vector3 direction = targetPoint - Target;
-                        if (Physics.Raycast(Target, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                        {
-                            coverScoreCount++;
-                        }
-                    }
+                    cover++;
                 }
             }
-            //Logger.LogDebug($"CoverScore: [{coverScoreCount}]. RayCasts: [{rayCasts}]. Ratio: [{(float)coverScoreCount / rayCasts}].");
-            // Return the cover score as a proportion of the total number of rays cast
-            return (float)coverScoreCount / rayCasts;
+
+            return (float)cover / raycasts;
         }
 
-        /// <summary>
-        /// Checks if the BotOwner can shoot at the enemy by raycasting from the weapon to the enemy body parts.
-        /// </summary>
-        /// <returns>Returns true if the BotOwner can shoot at the enemy, false otherwise. Returns false if the GoalEnemy is null</returns>
-        public bool CanBotShoot()
-        {
-            if (BotOwner.Memory.GoalEnemy == null)
-            {
-                return false;
-            }
-            foreach (var part in BotOwner.Memory.GoalEnemy.Person.MainParts.Values)
-            {
-                // Assign the mask we are using for the raycast
-                var mask = LayerMaskClass.HighPolyWithTerrainMaskAI;
-
-                // Find the position our weapon will be at at the potential cover position
-                var gunPosition = BotOwner.WeaponRoot.position - BotOwner.Transform.position + CoverPosition;
-
-                // Find direction from weapon to enemy bodyparts
-                var direction = part.Position - gunPosition;
-
-                // Is there a clear line of sight for a BotOwner to shoot this body part?
-                if (!Physics.Raycast(gunPosition, direction, direction.magnitude, mask))
-                {
-                    if (DebugMode)
-                    {
-                        SAIN_Helpers.DebugDrawer.Ray(gunPosition, direction, direction.magnitude, 0.01f, Color.magenta, 0.1f);
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private readonly BotOwner BotOwner;
         protected ManualLogSource Logger;
-        private Vector3 Target;
-        private Vector3 CoverPosition;
     }
 }

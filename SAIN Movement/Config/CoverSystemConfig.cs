@@ -4,8 +4,8 @@ namespace SAIN.UserSettings
 {
     internal class CoverSystemConfig
     {
-        public static ConfigEntry<bool> ResetGenerator { get; private set; }
         public static ConfigEntry<bool> TogglePointGenerator { get; private set; }
+        public static ConfigEntry<bool> AddNewVertices { get; private set; }
         public static ConfigEntry<bool> SaveCoverPoints { get; private set; }
         public static ConfigEntry<bool> StartFiltering { get; private set; }
         public static ConfigEntry<int> RayCastAccuracy { get; private set; }
@@ -14,14 +14,12 @@ namespace SAIN.UserSettings
         public static ConfigEntry<int> MaxVerificationBatch { get; private set; }
         public static ConfigEntry<int> MaxRandomGenIterations { get; private set; }
         public static ConfigEntry<int> CheckVertBatchSize { get; private set; }
-        public static ConfigEntry<float> FilterDistance { get; private set; }
-        public static ConfigEntry<float> NavMeshSampleRange { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
             string coversystem = "1. Cover System";
 
-            ResetGenerator = Config.Bind(coversystem, "ResetGenerator", false,
+            AddNewVertices = Config.Bind(coversystem, "AddNewVertices", false,
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 499 }));
@@ -36,7 +34,7 @@ namespace SAIN.UserSettings
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 299 }));
 
-            RayCastAccuracy = Config.Bind(coversystem, "RayCastAccuracy", 2,
+            RayCastAccuracy = Config.Bind(coversystem, "RayCastAccuracy", 5,
                 new ConfigDescription("",
                 new AcceptableValueRange<int>(0, 5),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 10 }));
@@ -52,11 +50,6 @@ namespace SAIN.UserSettings
                 new ConfigDescription("Start the lag machine",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 999 }));
-
-            ResetGenerator = Config.Bind(pointGenerator, "ResetGenerator", false,
-                new ConfigDescription("",
-                null,
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 499 }));
 
             MaxGeneratorBatchSize = Config.Bind(pointGenerator, "Max Generator Batch Size", 10,
                 new ConfigDescription("",
@@ -77,16 +70,6 @@ namespace SAIN.UserSettings
                 new ConfigDescription("",
                 new AcceptableValueRange<int>(5, 1000),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
-
-            FilterDistance = Config.Bind(pointGenerator, "Filter Min Distance", 0.25f,
-                new ConfigDescription("",
-                new AcceptableValueRange<float>(0.1f, 1f),
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
-
-            NavMeshSampleRange = Config.Bind(pointGenerator, "NavMeshSampleRange", 1f,
-                new ConfigDescription("",
-                new AcceptableValueRange<float>(0.25f, 5f),
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
         }
     }
 }

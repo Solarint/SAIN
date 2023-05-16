@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.AI;
 using SAIN.Components;
 using SAIN.Helpers;
-using BepInEx.Logging;
 
 namespace SAIN.Classes
 {
@@ -43,7 +42,7 @@ namespace SAIN.Classes
 
         private void UpdateVision(Vector3 botPosition, IAIDetails person)
         {
-            if (RaycastHelpers.CheckVisible(botPosition, person, SAINCore.SightMask))
+            if (RaycastHelpers.CheckVisible(botPosition, person, SAINCoreComponent.SightMask))
             {
                 CanSee = true;
 
@@ -70,7 +69,7 @@ namespace SAIN.Classes
 
         private void UpdateShoot(Vector3 botPosition, IAIDetails person)
         {
-            if (RaycastHelpers.CheckVisible(botPosition, person, SAINCore.ShootMask))
+            if (RaycastHelpers.CheckVisible(botPosition, person, SAINCoreComponent.ShootMask))
             {
                 CanShoot = true;
 
@@ -93,7 +92,7 @@ namespace SAIN.Classes
         public EnemyPath Path {  get; private set; }
         public EnemyLastSeen LastSeen { get; private set; }
 
-        private Timers Timers = new Timers();
+        private readonly Timers Timers = new Timers();
 
         public class EnemyPath : SAINBot
         {
@@ -153,9 +152,10 @@ namespace SAIN.Classes
         {
             BotOwner.Medecine?.Stimulators?.Refresh();
             BotOwner.Medecine?.FirstAid?.Refresh();
+            CanHeal = BotOwner.Medecine.FirstAid.ShallStartUse();
         }
 
-        public bool CanHeal => BotOwner.Medecine.FirstAid.ShallStartUse();
+        public bool CanHeal = false;
         public bool HasStims => BotOwner.Medecine.Stimulators.HaveSmt;
         public bool Bleeding => BotOwner.Medecine.FirstAid.IsBleeding;
         public bool HasFirstAid => BotOwner.Medecine.FirstAid.HaveSmth2Use;
@@ -178,5 +178,90 @@ namespace SAIN.Classes
         public bool Dying => HealthStatus == ETagStatus.Dying;
 
         private ETagStatus HealthStatus = ETagStatus.Healthy;
+    }
+
+    public class Debug
+    {
+        public static string Reason(bool canSee)
+        {
+            string reason;
+            if (canSee)
+            {
+                reason = "Can See";
+            }
+            else
+            {
+                reason = "Can't See";
+            }
+            return reason;
+        }
+
+        public static string Reason(Enemy enemy)
+        {
+            string reason;
+            if (enemy.Path.RangeFar)
+            {
+                reason = "Far";
+            }
+            else if (enemy.Path.RangeMid)
+            {
+                reason = "MidRange";
+            }
+            else if (enemy.Path.RangeClose)
+            {
+                reason = "Close";
+            }
+            else
+            {
+                reason = "Very Close";
+            }
+            return reason;
+        }
+
+        public static string Reason(BotStatus status)
+        {
+            string reason;
+            if (status.Injured)
+            {
+                reason = "Injured";
+            }
+            else if (status.BadlyInjured)
+            {
+                reason = "Badly Injured";
+            }
+            else if (status.Dying)
+            {
+                reason = "Dying";
+            }
+            else
+            {
+                reason = "Healthy";
+            }
+            return reason;
+        }
+
+        public static string Reason(Medical medical)
+        {
+            string reason = "Some Reason";
+
+            if (medical.CanHeal)
+            {
+                reason = "Can Heal";
+            }
+            if (medical.HasStims)
+            {
+                reason += " and Have Stims";
+            }
+            if (medical.Bleeding)
+            {
+                reason += " and Bleeding";
+            }
+            if (medical.HasFirstAid)
+            {
+                reason += " and Have First Aid";
+            }
+
+            return reason;
+        }
     }
 }

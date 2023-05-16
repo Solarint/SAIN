@@ -166,7 +166,7 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\SAINCore.cs" />
+    <Compile Include="Components\SAINCoreComponent.cs" />
     <Compile Include="Classes\BotMemory.cs" />
     <Compile Include="Helpers\RayCast.cs" />
     <Compile Include="Helpers\DebugDraw.cs" />
