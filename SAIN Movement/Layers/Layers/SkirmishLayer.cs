@@ -17,7 +17,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
 
-            if (DebugLayers.Value) Logger.LogInfo($"Added [{GetName()}] Layer to [{bot.name}] Bot Type: [{bot.Profile.Info.Settings.Role}]");
+            //if (DebugLayers.Value) Logger.LogInfo($"Added [{GetName()}] Layer to [{bot.name}] Bot Type: [{bot.Profile.Info.Settings.Role}]");
 
             SAIN = bot.GetComponent<SAINComponent>();
         }
@@ -41,7 +41,7 @@ namespace SAIN.Layers
                 return true;
             }
 
-            return true;
+            return false;
         }
 
         public override Action GetNextAction()

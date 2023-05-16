@@ -27,11 +27,6 @@ namespace SAIN.Layers.Logic
                 SAIN.MovementLogic.DecideMovementSpeed();
             }
 
-            if (SAIN.Cover.TakeCover())
-            {
-                return;
-            }
-
             //SAIN.MovementLogic.SetSprint(false);
 
             //BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);

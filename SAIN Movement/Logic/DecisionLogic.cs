@@ -126,7 +126,7 @@ namespace SAIN.Components
             get
             {
                 bool takeStims = false;
-                if (SAIN.Core.Medical.HasStims && LastStimTime < Time.time)
+                if (!BotOwner.Medecine.Using && SAIN.Core.Medical.HasStims && LastStimTime < Time.time)
                 {
                     var status = SAIN.Core.BotStatus;
                     if (status.Healthy)
@@ -189,8 +189,11 @@ namespace SAIN.Components
 
                 if (takeStims)
                 {
+                    BotUseStims();
+
                     LastStimTime = Time.time + 30f;
 
+                    // Debug
                     if (BotOwner.Memory.GoalEnemy == null)
                     {
                         Logger.LogDebug($"Popped Stims Because: I have no enemy and I'm [{Classes.Debug.Reason(SAIN.Core.BotStatus)}]");
@@ -214,7 +217,7 @@ namespace SAIN.Components
             {
                 bool BotShouldHeal = false;
                 var status = SAIN.Core.BotStatus;
-                if (SAIN.Core.Medical.CanHeal && !status.Healthy)
+                if (!BotOwner.Medecine.Using && SAIN.Core.Medical.CanHeal && !status.Healthy)
                 {
                     if (BotOwner.Memory.GoalEnemy == null)
                     {
@@ -262,6 +265,9 @@ namespace SAIN.Components
 
                 if (BotShouldHeal)
                 {
+                    BotHeal();
+
+                    // Debug
                     if (BotOwner.Memory.GoalEnemy == null)
                     {
                         Logger.LogDebug($"Healed Because: I have no enemy");

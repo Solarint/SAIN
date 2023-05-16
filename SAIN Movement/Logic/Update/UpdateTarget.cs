@@ -24,7 +24,7 @@ namespace SAIN.Layers.Logic
                 BotFightInterface = BotOwner.AimingData;
             }
 
-            if (BotOwner.Memory.GoalEnemy.Distance < 30f && SAIN.Core.Enemy.CanShoot)
+            if (BotOwner.Memory.GoalEnemy.Distance < 20f && SAIN.Core.Enemy.CanShoot)
             {
                 LightTime = Time.time;
                 BotOwner.BotLight.TurnOn();
@@ -40,7 +40,7 @@ namespace SAIN.Layers.Logic
             {
                 BotTarget = pointToShoot.Value;
 
-                if (BotFightInterface.IsReady)
+                if (BotFightInterface.IsReady && SAIN.Core.Enemy.CanShoot)
                 {
                     ReadyToShoot();
 

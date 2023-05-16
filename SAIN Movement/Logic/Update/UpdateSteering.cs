@@ -14,13 +14,17 @@ namespace SAIN.Layers.Logic
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
+
         private bool DebugMode => DebugUpdateSteering.Value;
 
         public void ManualUpdate()
         {
+            SAIN.BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.body, out BodyPartClass enemyChest);
+            EnemyChest = enemyChest.Position;
+
             if (SAIN.Core.Enemy.CanSee)
             {
-                BotOwner.Steering.LookToPoint(SAIN.Core.Enemy.LastSeen.EnemyPosition);
+                BotOwner.Steering.LookToPoint(EnemyChest);
                 return;
             }
 
@@ -29,13 +33,13 @@ namespace SAIN.Layers.Logic
             if (SprintTimer < Time.time)
             {
                 SprintTimer = Time.time + 3f;
-                SetSprint(randomSprint);
+                SAIN.MovementLogic.SetSprint(randomSprint);
             }
 
-            var corner = NextCornerPosition();
-
-            BotOwner.Steering.LookToPoint(corner);
+            BotOwner.Steering.LookToPoint(NextCornerPosition());
         }
+
+        private Vector3 EnemyChest;
 
         private float SprintTimer = 0f;
 
@@ -48,7 +52,7 @@ namespace SAIN.Layers.Logic
 
                 if (Vector3.Distance(corners[0], corner) < 1f)
                 {
-                    return BotOwner.Memory.GoalEnemy.CurrPosition;
+                    return EnemyChest;
                 }
 
                 corner.y = BotOwner.LookSensor._headPoint.y;
@@ -64,16 +68,8 @@ namespace SAIN.Layers.Logic
             }
             else
             {
-                return BotOwner.Memory.GoalEnemy.CurrPosition;
+                return EnemyChest;
             }
-        }
-
-        private void SetSprint(bool value)
-        {
-            BotOwner.SetPose(1f);
-            BotOwner.SetTargetMoveSpeed(1f);
-            BotOwner.GetPlayer.EnableSprint(value);
-            BotOwner.Sprint(value);
         }
 
         protected ManualLogSource Logger;

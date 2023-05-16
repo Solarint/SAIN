@@ -26,7 +26,7 @@ namespace SAIN.Layers.Logic
             }
             else
             {
-                NormalSpeed();
+                SlowWalk();
             }
         }
 

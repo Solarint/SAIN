@@ -20,48 +20,8 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            var sain = SAIN;
-            var decide = sain.Decisions;
-            var core = sain.Core;
-            var coverFinder = sain.CoverFinder;
-
-            if (decide.ShouldBotPopStims)
-            {
-                decide.BotUseStims();
-            }
-            if (decide.ShouldBotHeal)
-            {
-                decide.BotHeal();
-            }
-            if (decide.ShouldBotReload)
-            {
-                decide.BotReload();
-            }
-
-            return;
-
-            if (coverFinder.FallBackPoint != null)
-            {
-                BotOwner.GoToPoint(coverFinder.FallBackPoint.CoverPosition, false);
-                BotOwner.Steering.LookToMovingDirection();
-                SAIN.MovementLogic.SetSprint(true);
-            }
-            else
-            {
-                sain.Steering.ManualUpdate();
-
-                var path = core.Enemy.Path;
-                if (DodgeTimer < Time.time && (path.RangeClose || path.RangeVeryClose))
-                {
-                    DodgeTimer = Time.time + Random.Range(0.5f, 1f);
-                    sain.Dodge.Execute();
-                }
-                else
-                {
-                    sain.Move.ManualUpdate();
-                }
-            }
-
+            BotOwner.Steering.LookToMovingDirection();
+            SAIN.MovementLogic.SetSprint(true);
             UpdateDoorOpener();
         }
 
@@ -69,8 +29,6 @@ namespace SAIN.Layers
         {
             BotOwner.DoorOpener.Update();
         }
-
-        private float DodgeTimer = 0f;
 
         private readonly SAINComponent SAIN;
 

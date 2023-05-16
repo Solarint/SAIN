@@ -71,10 +71,10 @@ namespace SAIN.Patches
         public static void PatchPostfix(BotGlobalsMoveSettings __instance)
         {
             __instance.RUN_IF_CANT_SHOOT = true;
-            __instance.SEC_TO_CHANGE_TO_RUN = 0.5f;
-            __instance.CHANCE_TO_RUN_IF_NO_AMMO_0_100 = 100f;
-            __instance.RUN_IF_GAOL_FAR_THEN = 5f;
-            __instance.RUN_TO_COVER_MIN = 2f;
+            //__instance.SEC_TO_CHANGE_TO_RUN = 0.5f;
+            //__instance.CHANCE_TO_RUN_IF_NO_AMMO_0_100 = 100f;
+            //__instance.RUN_IF_GAOL_FAR_THEN = 5f;
+            //__instance.RUN_TO_COVER_MIN = 2f;
         }
     }
 

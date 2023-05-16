@@ -61,26 +61,28 @@ namespace SAIN.Components
             {
                 Timers.CheckStatusTimer = Time.time + Timers.CheckStatusFreq;
 
-                BotStatus.Update(BotOwner.GetPlayer.HealthStatus);
+                BotStatus.Update();
             }
 
             if (BotOwner.Memory.GoalEnemy != null)
             {
-                Enemy.Update(BotPosition, BotOwner.Memory.GoalEnemy.Person);
+                Enemy.Update(BotOwner.Memory.GoalEnemy.Person);
             }
         }
 
-        public float UnderFire_LastTime;
+        public float UnderFire_LastTime = 0f;
 
-        public Vector3 UnderFire_LastPosition;
+        public Vector3 UnderFire_LastPosition = Vector3.zero;
 
+        public Vector3 BotHeadPosition => BotOwner.MyHead.position;
+        public Vector3 BotLookSensorPos => BotOwner.LookSensor._headPoint;
         public bool BotReloading => BotOwner.WeaponManager.Reload.Reloading;
         public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
         public bool BotIsMoving => BotOwner.Mover.IsMoving;
         public Vector3 BotPosition => BotOwner.Transform.position;
         public float PowerLevel => BotOwner.AIData.PowerOfEquipment;
 
-        public static LayerMask SightMask => LayerMaskClass.HighPolyWithTerrainMaskAI;
+        public static LayerMask SightMask => LayerMaskClass.HighPolyWithTerrainMask;
         public static LayerMask ShootMask => LayerMaskClass.HighPolyWithTerrainMask;
 
         private static Color RandomColor => new Color(Random.value, Random.value, Random.value);

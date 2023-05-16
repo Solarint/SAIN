@@ -79,21 +79,6 @@ namespace SAIN.Classes
             }
         }
 
-        /// <summary>
-        /// Compares CoverPoint objects.
-        /// </summary>
-        public class CoverPointComparer : IEqualityComparer<CoverPoint>
-        {
-            public bool Equals(CoverPoint v1, CoverPoint v2)
-            {
-                return v1.Equals(v2);
-            }
-
-            public int GetHashCode(CoverPoint v)
-            {
-                return v.GetHashCode();
-            }
-        }
 
         /// <summary>
         /// Compares Vector3 objects based on their newPosition.
@@ -111,37 +96,6 @@ namespace SAIN.Classes
             }
         }
 
-        /// <summary>
-        /// Compares two CoverPoint objects based on their distance from a given point. 
-        /// </summary>
-        public class CoverPointDistanceComparer : IComparer<CoverPoint>
-        {
-            private CoverPoint target;
-
-            /// <summary>
-            /// Compares two CoverPoints based on their distance to a target CoverPoint.
-            /// </summary>
-            /// <param name="distanceToTarget">The target CoverPoint to compare against.</param>
-            /// <returns>
-            /// An integer that indicates the relative values of the two CoverPoints. 
-            /// </returns>
-            public CoverPointDistanceComparer(CoverPoint distanceToTarget)
-            {
-                target = distanceToTarget;
-            }
-
-            /// <summary>
-            /// Compares two CoverPoints based on their distance to a target position.
-            /// </summary>
-            /// <param name="a">The first CoverPoint to compare.</param>
-            /// <param name="b">The second CoverPoint to compare.</param>
-            /// <returns>A negative number if the distance of the first CoverPoint to the target is less than the distance of the second CoverPoint to the target; 0 if the distances are equal; a positive number if the distance of the first CoverPoint to the target is greater than the distance of the second CoverPoint to the target.</returns>
-            public int Compare(CoverPoint a, CoverPoint b)
-            {
-                var targetPosition = target.Position;
-                return Vector3.Distance(a.Position, targetPosition).CompareTo(Vector3.Distance(b.Position, targetPosition));
-            }
-        }
 
         public class Vector3SortByDistance : IComparer<Vector3>
         {
@@ -159,22 +113,6 @@ namespace SAIN.Classes
             }
         }
 
-        /// <summary>
-        /// This static class provides methods for sorting CoverPoint objects.
-        /// </summary>
-        public static class CoverPointSorter
-        {
-            /// <summary>
-            /// Sorts a list of CoverPoints by their distance to a target position.
-            /// </summary>
-            /// <param name="coverPoints">The list of CoverPoints to sort.</param>
-            /// <param name="targetPosition">The target position to sort by.</param>
-            /// <returns>A sorted list of CoverPoints.</returns>
-            public static List<CoverPoint> SortByDistance(List<CoverPoint> coverPoints, Vector3 targetPosition)
-            {
-                return coverPoints.OrderBy(cp => Vector3.Distance(cp.Position, targetPosition)).ToList();
-            }
-        }
 
         /// <summary>
         /// Calculates the position on an arc between two points with a given radius and angle.

@@ -14,7 +14,7 @@ namespace SAIN.Classes
             Path = new EnemyPath(bot);
         }
 
-        public void Update(Vector3 botPosition, IAIDetails person)
+        public void Update(IAIDetails person)
         {
             if (person == null)
             {
@@ -30,27 +30,32 @@ namespace SAIN.Classes
             if (Timers.VisionRaycastTimer < Time.time)
             {
                 Timers.VisionRaycastTimer = Time.time + Timers.VisionRaycastFreq;
-                UpdateVision(botPosition, person);
+                UpdateVision(person);
             }
 
             if (Timers.ShootRaycastTimer < Time.time)
             {
                 Timers.ShootRaycastTimer = Time.time + Timers.ShootRaycastFreq;
-                UpdateShoot(botPosition, person);
+                UpdateShoot(person);
             }
         }
 
-        private void UpdateVision(Vector3 botPosition, IAIDetails person)
+        private void UpdateVision(IAIDetails person)
         {
-            if (RaycastHelpers.CheckVisible(botPosition, person, SAINCoreComponent.SightMask))
+            if (RaycastHelpers.CheckVisible(BotOwner.MyHead.position, person, SAINCoreComponent.SightMask))
             {
+                person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
+                EnemyHeadPosition = EnemyHead.Position;
+                person.MainParts.TryGetValue(BodyPartType.body, out BodyPartClass EnemyBody);
+                EnemyChestPosition = EnemyBody.Position;
+
                 CanSee = true;
 
                 LastSeen.Time = Time.time;
                 LastSeen.EnemyPosition = person.Transform.position;
-                LastSeen.EnemyDirection = person.Transform.position - botPosition;
-                LastSeen.EnemyStraightDistance = Vector3.Distance(person.Transform.position, botPosition);
-                LastSeen.BotPosition = botPosition;
+                LastSeen.EnemyDirection = person.Transform.position - BotOwner.Transform.position;
+                LastSeen.EnemyStraightDistance = Vector3.Distance(person.Transform.position, BotOwner.Transform.position);
+                LastSeen.BotPosition = BotOwner.Transform.position;
 
                 bool newEnemy = person != LastPerson;
                 if (newEnemy)
@@ -67,15 +72,15 @@ namespace SAIN.Classes
             }
         }
 
-        private void UpdateShoot(Vector3 botPosition, IAIDetails person)
+        private void UpdateShoot(IAIDetails person)
         {
-            if (RaycastHelpers.CheckVisible(botPosition, person, SAINCoreComponent.ShootMask))
+            if (RaycastHelpers.CheckVisible(BotOwner.WeaponRoot.position, person, SAINCoreComponent.ShootMask))
             {
                 CanShoot = true;
 
                 LastSeen.BotShootTime = Time.time;
 
-                LastSeen.BotShootPosition = botPosition;
+                LastSeen.BotShootPosition = BotOwner.Transform.position;
             }
             else
             {
@@ -88,6 +93,9 @@ namespace SAIN.Classes
 
         public bool CanShoot = false;
         public bool CanSee = false;
+
+        public Vector3 EnemyHeadPosition = Vector3.zero;
+        public Vector3 EnemyChestPosition = Vector3.zero;
 
         public EnemyPath Path {  get; private set; }
         public EnemyLastSeen LastSeen { get; private set; }
@@ -167,9 +175,9 @@ namespace SAIN.Classes
         {
         }
 
-        public void Update(ETagStatus status)
+        public void Update()
         {
-            HealthStatus = status;
+            HealthStatus = BotOwner.GetPlayer.HealthStatus;
         }
 
         public bool Healthy => HealthStatus == ETagStatus.Healthy;

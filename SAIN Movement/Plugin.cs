@@ -21,7 +21,7 @@ namespace SAIN
             {
                 DogFightConfig.Init(Config);
                 DebugConfig.Init(Config);
-                CoverSystemConfig.Init(Config);
+                CoverConfig.Init(Config);
 
                 new Patches.AddComponentPatch().Enable();
                 new Patches.DisposeComponentPatch().Enable();

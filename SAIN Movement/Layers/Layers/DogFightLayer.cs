@@ -2,23 +2,22 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using static RoadSplineGenerator;
 using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
-    internal class RetreatLayer : CustomLayer
+    internal class DogFightLayer : CustomLayer
     {
         public override string GetName()
         {
-            return "SAIN Retreat";
+            return "SAIN DogFight";
         }
 
-        public RetreatLayer(BotOwner bot, int priority) : base(bot, priority)
+        public DogFightLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
 
-            if (DebugLayers.Value) Logger.LogInfo($"Added [{GetName()}] Layer to [{bot.name}] Bot Type: [{bot.Profile.Info.Settings.Role}]");
+            //Logger.LogInfo($"Added {GetName()} Layer to {bot.name}. Bot Type: [{bot.Profile.Info.Settings.Role}]");
 
             SAIN = bot.GetComponent<SAINComponent>();
         }
@@ -37,38 +36,26 @@ namespace SAIN.Layers
                 return false;
             }
 
-            Reload = false;
-            Heal = false;
             // Decide if we need to activate this layer
-            var decision = SAIN.Decisions;
-            if (decision.ShouldBotHeal)
+            if (SAIN.Decisions.StartDogFight)
             {
-                Heal = true;
                 return true;
             }
-
-            if (decision.ShouldBotReload)
+            else
             {
-                Reload = true;
-                return true;
+                return false;
             }
-
-            return false;
         }
-
-        bool Heal = false;
-        bool Reload = false;
 
         public override Action GetNextAction()
         {
-            string reason = Reload ? ": Reload" : ": Heal";
-            if (DebugLayers.Value) Logger.LogWarning($"Called {GetName()} Action for [{BotOwner.name}] because [{reason}]");
-            return new Action(typeof(RetreatAction), GetName() + reason);
+            if (DebugLayers.Value) Logger.LogWarning($"Called {GetName()} Action for [{BotOwner.name}]");
+            return new Action(typeof(DogfightAction), GetName());
         }
 
         public override bool IsCurrentActionEnding()
         {
-            return !Heal && !Reload;
+            return false;
         }
 
         private readonly SAINComponent SAIN;

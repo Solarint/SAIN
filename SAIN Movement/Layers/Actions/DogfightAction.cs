@@ -17,11 +17,9 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            //SAIN.Move.ManualUpdate();
-
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Core.Enemy.CanSee)
+            if (SAIN.Core.Enemy.CanSee && SAIN.Core.Enemy.CanShoot)
             {
                 SAIN.Targeting.ManualUpdate();
             }
