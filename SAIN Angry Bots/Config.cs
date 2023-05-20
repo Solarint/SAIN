@@ -1,8 +1,8 @@
 ﻿using BepInEx.Configuration;
 
-namespace SAIN_Grenades.Configs
+namespace SAIN.Talk.UserSettings
 {
-    internal class AngryConfig
+    internal class TalkConfig
     {
         public static ConfigEntry<bool> EnableMod { get; private set; }
         public static ConfigEntry<bool> SuperAngryMode { get; private set; }

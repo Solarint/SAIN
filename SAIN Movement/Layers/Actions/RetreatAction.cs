@@ -2,11 +2,8 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using SAIN.Helpers;
 using SAIN.Layers.Logic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
@@ -18,15 +15,44 @@ namespace SAIN.Layers
             SAIN = bot.GetComponent<SAINComponent>();
         }
 
+        private CoverClass Cover => SAIN.Cover;
+        private CoverStatus CurrentFallBackStatus => Cover.FallBackPointStatus;
+        private CoverStatus CurrentCoverStatus => Cover.CoverPointStatus;
+        private bool InCoverPosition => CurrentFallBackStatus == CoverStatus.InCover || CurrentCoverStatus == CoverStatus.InCover;
+
         public override void Update()
         {
-            BotOwner.Steering.LookToMovingDirection();
-            SAIN.MovementLogic.SetSprint(true);
-            UpdateDoorOpener();
-        }
+            if (InCoverPosition && SAIN.Cover.DuckInCover())
+            {
+                SAIN.Steering.ManualUpdate();
+                return;
+            }
 
-        private void UpdateDoorOpener()
-        {
+            CoverPoint PointToGo = null;
+            if (SAIN.Cover.CurrentFallBackPoint != null)
+            {
+                PointToGo = SAIN.Cover.CurrentFallBackPoint;
+            }
+            else if (SAIN.Cover.CurrentCoverPoint != null)
+            {
+                PointToGo = SAIN.Cover.CurrentCoverPoint;
+            }
+
+            if (PointToGo != null)
+            {
+                BotOwner.GoToPoint(PointToGo.Position, false);
+
+                if (!BotOwner.GetPlayer.MovementContext.IsSprintEnabled)
+                {
+                    BotOwner.GetPlayer.EnableSprint(true);
+                    //BotOwner.Sprint(true);
+                }
+            }
+            else
+            {
+                Logger.LogError("Point Null");
+            }
+
             BotOwner.DoorOpener.Update();
         }
 
@@ -35,10 +61,22 @@ namespace SAIN.Layers
         public override void Start()
         {
             BotOwner.PatrollingData.Pause();
+
+            BotOwner.Steering.LookToMovingDirection();
+            BotOwner.SetPose(1f);
+            BotOwner.SetTargetMoveSpeed(1f);
         }
 
         public override void Stop()
         {
+            if (BotOwner.GetPlayer.MovementContext.IsSprintEnabled)
+            {
+                BotOwner.GetPlayer.EnableSprint(false);
+                BotOwner.Sprint(false);
+            }
+
+            SAIN.Steering.ManualUpdate();
+
             BotOwner.PatrollingData.Unpause();
         }
 

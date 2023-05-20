@@ -5,11 +5,11 @@ using UnityEngine.AI;
 
 namespace SAIN.Helpers
 {
-    public class BotDodge
+    public class DodgeClass
     {
-        public BotDodge(BotOwner bot)
+        public DodgeClass(BotOwner bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(BotDodge));
+            Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(DodgeClass));
             this.bot = bot;
         }
 

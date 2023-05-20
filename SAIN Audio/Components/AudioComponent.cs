@@ -196,46 +196,6 @@ namespace SAIN_Movement.Components
             {
                 if (!isGunSound)
                 {
-                    var groupTalk = bot.BotsGroup.GroupTalk;
-                    if (HeardNoiseTime < Time.time && groupTalk.CanSay(bot, EPhraseTrigger.NoisePhrase))
-                    {
-                        HeardNoiseTime = Time.time + 60f;
-                        bot.BotTalk.Say(EPhraseTrigger.NoisePhrase);
-
-                        if (DebugSolarintSound.Value)
-                            Logger.LogDebug($"{bot.Profile.Nickname} Said Phrase: [NoisePhrase]");
-                    }
-                    else if (SayRatTime < Time.time && groupTalk.CanSay(bot, EPhraseTrigger.Rat))
-                    {
-                        SayRatTime = Time.time + 120f;
-                        bot.BotTalk.Say(EPhraseTrigger.Rat);
-
-                        if (DebugSolarintSound.Value)
-                            Logger.LogDebug($"{bot.Profile.Nickname} Said Phrase: [Rat]");
-                    }
-                    else if (1f < 0f)
-                    {
-                        EPhraseTrigger[] options = new EPhraseTrigger[] {
-                           EPhraseTrigger.OnBreath,
-                           EPhraseTrigger.OnSix,
-                           EPhraseTrigger.Covering,
-                           EPhraseTrigger.CoverMe,
-                           EPhraseTrigger.OnEnemyConversation,
-                           EPhraseTrigger.OnFight,
-                           EPhraseTrigger.OnMutter,
-                           EPhraseTrigger.Regroup,
-                           EPhraseTrigger.Silence,
-                           EPhraseTrigger.Gogogo
-                        };
-
-                        System.Random rnd = new System.Random();
-                        int index = rnd.Next(options.Length);
-
-                        bot.BotTalk.Say(options[index]);
-
-                        if (DebugSolarintSound.Value)
-                            Logger.LogDebug($"{bot.Profile.Nickname} Said Phrase: [{options[index]}]");
-                    }
                 }
 
                 float dispersion = (type == AISoundType.gun) ? shooterDistance / 100f : shooterDistance / 50f;
@@ -699,8 +659,6 @@ namespace SAIN_Movement.Components
         private float occlusionmodifier = 1f;
 
         private float raycasttimer = 0f;
-
-        private float SayRatTime = 0f;
 
         private float HeardNoiseTime = 0f;
 

@@ -70,7 +70,6 @@ namespace SAIN.Helpers
 
                 return rayObject;
             }
-
         }
 
         public class DrawLists
@@ -95,8 +94,6 @@ namespace SAIN.Helpers
                 }
 
                 Logger = BepInEx.Logging.Logger.CreateLogSource(LogName);
-
-                Logger.LogDebug($"Created {LogName} that uses colors [{ColorA}] and [{ColorB}]");
             }
 
             public void DrawTempPath(NavMeshPath Path, bool active, Color colorActive, Color colorInActive, float lineSize = 0.05f, float expireTime = 0.5f, bool useDrawerSetColors = false)

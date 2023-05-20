@@ -166,11 +166,20 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Classes\InfoClass.cs" />
+    <Compile Include="Components\Classes\BotSquadClass.cs" />
+    <Compile Include="Components\Classes\EnemyClass.cs" />
+    <Compile Include="Components\Classes\MedicalClass.cs" />
+    <Compile Include="Components\Classes\BotStatusClass.cs" />
+    <Compile Include="Components\Enum.cs" />
     <Compile Include="Components\SAINCoreComponent.cs" />
-    <Compile Include="Classes\BotMemory.cs" />
+    <Compile Include="Components\Classes\DebugClass.cs" />
+    <Compile Include="Helpers\GetComponentsHelpers.cs" />
+    <Compile Include="Helpers\JsonUtility.cs" />
     <Compile Include="Helpers\RayCast.cs" />
     <Compile Include="Helpers\DebugDraw.cs" />
     <Compile Include="Helpers\EFT_Math.cs" />
+    <Compile Include="Helpers\VectorHelpers.cs" />
     <Compile Include="Patch.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
@@ -184,7 +193,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Components\Classes\WeaponInfo\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />

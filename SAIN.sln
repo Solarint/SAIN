@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Vision", "SAIN Vision\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Helpers", "SAIN Helpers\SAIN Helpers.csproj", "{EA3D2672-54BE-4C2F-8955-747A13B54CC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN AngryBots", "SAIN Angry Bots\SAIN AngryBots.csproj", "{7B759B9D-0130-40AF-8AF1-D91C2088BA56}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAIN Layers AI Talk", "SAIN Angry Bots\SAIN Layers AI Talk.csproj", "{7B759B9D-0130-40AF-8AF1-D91C2088BA56}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoGrenadeYell", "No More Grenade Yell\NoGrenadeYell.csproj", "{7B486D24-E89C-4495-87B7-154843EBBAE9}"
 EndProject

@@ -1,24 +1,34 @@
 ﻿using BepInEx;
 using DrakiaXYZ.VersionChecker;
-using SAIN_Grenades.Configs;
+using SAIN.Helpers;
+using SAIN.Talk.Components;
+using SAIN.Talk.UserSettings;
 using System;
 using System.Diagnostics;
 
-namespace SAIN_Grenades
+namespace SAIN.Talk
 {
-    [BepInPlugin("me.sol.sainangrybots", "SAIN Angry Bots", "1.0")]
-    public class AngryBotsPlugin : BaseUnityPlugin
+    [BepInPlugin("me.sol.saintalk", "SAIN Layers AI Talk", "1.0")]
+    public class Plugin : BaseUnityPlugin
     {
         private void Awake()
         {
-            //CheckEftVersion();
-            AngryConfig.Init(Config);
+            CheckEftVersion();
 
             try
             {
+                TalkConfig.Init(Config);
+
                 new Patches.PlayerTalkPatch().Enable();
-                //new Patches.SetVisiblePatch().Enable();
-                new Patches.GlobalTalkSettingsPatch().Enable();
+                new Patches.BotGlobalSettingsPatch().Enable();
+
+                new Patches.TalkDisablePatch1().Enable();
+                new Patches.TalkDisablePatch2().Enable();
+                new Patches.TalkDisablePatch3().Enable();
+                new Patches.TalkDisablePatch4().Enable();
+
+                new Patches.AddComponentPatch().Enable();
+                new Patches.DisposeComponentPatch().Enable();
             }
             catch (Exception ex)
             {
@@ -26,6 +36,14 @@ namespace SAIN_Grenades
                 throw;
             }
         }
+
+        private void Update()
+        {
+            AddComponent.AddSingleComponent<PlayerTalkComponent>();
+        }
+
+        private readonly MainPlayerComponentSingle AddComponent = new MainPlayerComponentSingle();
+
         private void CheckEftVersion()
         {
             // Make sure the version of EFT being run is the correct version

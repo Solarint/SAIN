@@ -13,9 +13,9 @@ namespace SAIN
         public static ConfigEntry<float> ShootRaycast { get; private set; }
         public static ConfigEntry<float> CheckPath { get; private set; }
         public static ConfigEntry<float> CheckStatus { get; private set; }
-        public static ConfigEntry<float> UnderFire { get; private set; }
         public static ConfigEntry<float> RefreshMeds { get; private set; }
 
+        public static ConfigEntry<bool> DebugDrawVision { get; private set; }
         public static ConfigEntry<bool> DebugLogs { get; private set; }
 
         private void Awake()
@@ -27,7 +27,7 @@ namespace SAIN
                 new AcceptableValueRange<float>(0f, 0.5f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 11 }));
 
-            ShootRaycast = Config.Bind("Settings", "Raycast Shoot Frequency", 0.25f,
+            ShootRaycast = Config.Bind("Settings", "Raycast Shoot Frequency", 0.15f,
                 new ConfigDescription("How often to update the bool value of Bot's ability to shoot their enemy",
                 new AcceptableValueRange<float>(0f, 0.5f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 10 }));
@@ -42,15 +42,15 @@ namespace SAIN
                 new AcceptableValueRange<float>(0f, 3f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 9 }));
 
-            UnderFire = Config.Bind("Settings", "Update UnderFire Frequency", 0.1f,
-                new ConfigDescription("How often to update positions and timer when bot is under fire.",
-                new AcceptableValueRange<float>(0f, 0.5f),
-                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 8 }));
-
             RefreshMeds = Config.Bind("Settings", "Update Meds Frequency", 3f,
                 new ConfigDescription("How Often to update a bot's memory of their current meds and stims",
                 new AcceptableValueRange<float>(0f, 10f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 7 }));
+
+            DebugDrawVision = Config.Bind("Settings", "Debug Draw Vision", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = -995 }));
 
             DebugLogs = Config.Bind("Settings", "Debug Logs", false,
                 new ConfigDescription("",
@@ -61,16 +61,13 @@ namespace SAIN
             {
                 new AddComponentPatch().Enable();
                 new DisposeComponentPatch().Enable();
+                new InitHelper().Enable();
             }
             catch (Exception ex)
             {
                 Logger.LogError($"{GetType().Name}: {ex}");
                 throw;
             }
-        }
-
-        private void Update()
-        {
         }
 
         private void CheckEftVersion()

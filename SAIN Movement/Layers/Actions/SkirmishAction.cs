@@ -14,7 +14,11 @@ namespace SAIN.Layers
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
 
             SAIN = bot.GetComponent<SAINComponent>();
+
+            this.gclass105_0 = new GClass105(bot);
         }
+
+        private GClass105 gclass105_0;
 
         private SAINComponent SAIN;
 
@@ -30,11 +34,19 @@ namespace SAIN.Layers
 
         public override void Update()
         {
+            if (BotOwner.Memory.GoalEnemy == null)
+            {
+                return;
+            }
+
+            BotOwner.SetPose(1f);
+            SAIN.Movement.DecideMovementSpeed();
+
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Core.Enemy.CanSee && SAIN.Core.Enemy.CanShoot)
+            if (SAIN.Core.Enemy.CanSee)
             {
-                SAIN.Targeting.ManualUpdate();
+                gclass105_0.Update();
             }
         }
 

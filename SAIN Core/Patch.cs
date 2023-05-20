@@ -2,6 +2,7 @@
 using EFT;
 using HarmonyLib;
 using SAIN.Components;
+using SAIN.Helpers;
 using System.Reflection;
 
 namespace SAIN
@@ -38,6 +39,20 @@ namespace SAIN
             if (botState == EBotState.PreActive) return;
 
             __instance.gameObject.GetComponent<SAINCoreComponent>().Dispose();
+        }
+    }
+
+    public class InitHelper : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotControllerClass), "Init");
+        }
+
+        [PatchPostfix]
+        public static void PatchPostfix(ref BotOwner __instance)
+        {
+            VectorHelpers.Init();
         }
     }
 }

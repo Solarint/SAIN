@@ -2,10 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using SAIN.Layers.Logic;
-using SAIN_Helpers;
 using UnityEngine;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
@@ -15,7 +12,10 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
+            AimData = new GClass105(bot);
         }
+
+        private readonly GClass105 AimData;
 
         private readonly SAINComponent SAIN;
 
@@ -31,14 +31,55 @@ namespace SAIN.Layers
 
         public override void Update()
         {
+            SAIN.Movement.DecideMovementSpeed();
+
+            if (BotOwner.Memory.GoalEnemy != null)
+            {
+                if (BotOwner.Memory.GoalEnemy.IsVisible && BotOwner.Memory.GoalEnemy.CanShoot)
+                {
+                    if (!SAIN.Core.Enemy.CanSee)
+                    {
+                        Logger.LogError("SAIN Core enemy can't see");
+                    }
+
+                    AimData.Update();
+
+                    /*
+                    if (!SAIN.Core.Enemy.CanShoot && SAIN.Cover.Component.CurrentCover != null && SAIN.InCover && Vector3.Distance(SAIN.Cover.Component.CurrentCover.Position, BotOwner.Transform.position) < 1f)
+                    {
+                        var move = BotOwner.GetPlayer.MovementContext;
+                        if (SAIN.Cover.Component.CurrentCover.Height <= 1.55f)
+                        {
+                            move.SetBlindFire(1);
+                            Logger.LogWarning($"Bot is trying to blind fire! 1 [{move.BlindFire}]");
+                        }
+                        else if (Vector3.Dot(BotOwner.GetPlayer.Transform.right, BotOwner.Memory.GoalEnemy.CurrPosition) > 0)
+                        {
+                            move.SetBlindFire(-1);
+                            Logger.LogWarning($"Bot is trying to blind fire! 2 [{move.BlindFire}]");
+                        }
+                        else
+                        {
+                            move.SetBlindFire(0);
+                        }
+                    }
+                    */
+                }
+            }
+
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Core.Enemy.CanSee && SAIN.Core.Enemy.CanShoot)
+            if (BotOwner.AimingData != null)
             {
-                SAIN.Targeting.ManualUpdate();
+                Vector3 position = BotOwner.GetPlayer.PlayerBones.WeaponRoot.position;
+                Vector3 realTargetPoint = BotOwner.AimingData.RealTargetPoint;
+                if (BotOwner.ShootData.Shooting && BotOwner.ShootData.ChecFriendlyFire(position, realTargetPoint))
+                {
+                    BotOwner.ShootData.EndShoot();
+                }
             }
         }
 
-        public ManualLogSource Logger;
+        private ManualLogSource Logger;
     }
 }

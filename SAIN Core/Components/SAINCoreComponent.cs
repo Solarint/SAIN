@@ -2,24 +2,35 @@
 using EFT;
 using SAIN.Classes;
 using UnityEngine;
+using SAIN_Helpers;
 
 namespace SAIN.Components
 {
     public class SAINCoreComponent : MonoBehaviour
     {
         public Color BotColor;
-        public Medical Medical { get; private set; }
-        public BotStatus BotStatus { get; private set; }
-        public Enemy Enemy { get; private set; }
+        public SquadClass BotSquad { get; private set; }
+        public MedicalClass Medical { get; private set; }
+        public StatusClass BotStatus { get; private set; }
+        public EnemyClass Enemy { get; private set; }
+        public BotInfoClass Info { get; private set; }
 
         private void Awake()
         {
             BotOwner = GetComponent<BotOwner>();
+
+            Init();
+        }
+
+        private void Init()
+        {
             BotColor = RandomColor;
 
-            Medical = new Medical(BotOwner);
-            BotStatus = new BotStatus(BotOwner);
-            Enemy = new Enemy(BotOwner);
+            Info = new BotInfoClass(BotOwner);
+            Medical = new MedicalClass(BotOwner);
+            BotStatus = new StatusClass(BotOwner);
+            Enemy = new EnemyClass(BotOwner);
+            BotSquad = new SquadClass(BotOwner);
         }
 
         private readonly Timers Timers = new Timers();
@@ -39,19 +50,15 @@ namespace SAIN.Components
                 return;
             }
 
-            // Check if a bot is under fire
-            if (Timers.UnderFireTimer < Time.time && BotOwner.Memory.IsUnderFire)
-            {
-                Timers.UnderFireTimer = Time.time + Timers.UnderFireFreq;
-
-                UnderFire_LastTime = Time.time;
-                UnderFire_LastPosition = BotPosition;
-            }
+            BotSquad.ManualUpdate();
 
             // Check if a bot has meds or stims
             if (Timers.UpdateMedsTimer < Time.time)
             {
                 Timers.UpdateMedsTimer = Time.time + Timers.UpdateMedsFreq;
+
+                BotOwner.WeaponManager.UpdateWeaponsList();
+                Info.SetPersonality();
 
                 Medical.Update();
             }
@@ -64,28 +71,51 @@ namespace SAIN.Components
                 BotStatus.Update();
             }
 
-            if (BotOwner.Memory.GoalEnemy != null)
+            var goalEnemy = BotOwner.Memory.GoalEnemy;
+            if (goalEnemy != null)
             {
-                Enemy.Update(BotOwner.Memory.GoalEnemy.Person);
+                if (IsPointInVisibleSector(goalEnemy.CurrPosition))
+                {
+                    Enemy.Update(goalEnemy.Person);
+                }
+            }
+            else
+            {
+                Enemy.CanShoot = false;
+                Enemy.CanSee = false;
             }
         }
 
-        public float UnderFire_LastTime = 0f;
+        public Vector3 Position => BotOwner.Transform.position;
+        public Vector3 HeadPosition => BotOwner.MyHead.position;
+        public Vector3 LookSensorPos => BotOwner.LookSensor._headPoint;
 
-        public Vector3 UnderFire_LastPosition = Vector3.zero;
-
-        public Vector3 BotHeadPosition => BotOwner.MyHead.position;
-        public Vector3 BotLookSensorPos => BotOwner.LookSensor._headPoint;
-        public bool BotReloading => BotOwner.WeaponManager.Reload.Reloading;
+        public bool BotReloading => BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.Reload.Reloading;
         public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
-        public bool BotIsMoving => BotOwner.Mover.IsMoving;
-        public Vector3 BotPosition => BotOwner.Transform.position;
-        public float PowerLevel => BotOwner.AIData.PowerOfEquipment;
 
         public static LayerMask SightMask => LayerMaskClass.HighPolyWithTerrainMask;
         public static LayerMask ShootMask => LayerMaskClass.HighPolyWithTerrainMask;
+        public static LayerMask CoverMask => LayerMaskClass.LowPolyColliderLayerMask;
+        public static LayerMask FoliageMask => LayerMaskClass.AI;
 
         private static Color RandomColor => new Color(Random.value, Random.value, Random.value);
+
+        public bool IsPointInVisibleSector(Vector3 position)
+        {
+            Vector3 direction = position - BotOwner.Position;
+
+            float cos;
+            if (BotOwner.NightVision.UsingNow)
+            {
+                cos = BotOwner.LookSensor.VISIBLE_ANGLE_NIGHTVISION;
+            }
+            else
+            {
+                cos = (BotOwner.BotLight.IsEnable ? BotOwner.LookSensor.VISIBLE_ANGLE_LIGHT : 160f);
+            }
+
+            return SAIN_Math.IsAngLessNormalized(BotOwner.LookDirection, SAIN_Math.NormalizeFastSelf(direction), cos);
+        }
     }
 
     public abstract class SAINBot
@@ -107,12 +137,10 @@ namespace SAIN.Components
         public readonly float CheckStatusFreq = Plugin.CheckStatus.Value;
         public readonly float CheckPathFreq = Plugin.CheckPath.Value;
         public readonly float UpdateMedsFreq = Plugin.RefreshMeds.Value;
-        public readonly float UnderFireFreq = Plugin.UnderFire.Value;
         public float VisionRaycastTimer = 0f;
         public float ShootRaycastTimer = 0f;
         public float CheckStatusTimer = 0f;
         public float CheckPathTimer = 0f;
         public float UpdateMedsTimer = 0f;
-        public float UnderFireTimer = 0f;
     }
 }

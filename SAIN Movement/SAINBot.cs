@@ -3,6 +3,7 @@ using SAIN.Components;
 using SAIN.Layers.Logic;
 using SAIN.Helpers;
 using UnityEngine.UIElements;
+using SAIN.Talk.Components;
 
 namespace SAIN
 {
