@@ -13,7 +13,10 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
+            AimData = new GClass105(bot);
         }
+
+        private readonly GClass105 AimData;
 
         private CoverClass Cover => SAIN.Cover;
         private CoverStatus CurrentFallBackStatus => Cover.FallBackPointStatus;
@@ -22,7 +25,13 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (InCoverPosition && SAIN.Cover.DuckInCover())
+            if (SAIN.CurrentDecision == SAINLogicDecision.WalkToCover)
+            {
+                SAIN.Steering.ManualUpdate();
+                AimData.Update();
+            }
+
+            if (SAIN.Cover.BotIsAtCoverPoint && SAIN.Cover.DuckInCover())
             {
                 SAIN.Steering.ManualUpdate();
                 return;

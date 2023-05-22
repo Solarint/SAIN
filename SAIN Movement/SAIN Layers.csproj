@@ -196,7 +196,7 @@
   <ItemGroup>
     <Compile Include="Components\CoverComponent.cs" />
     <Compile Include="Components\GrenadeTrackerComponent.cs" />
-    <Compile Include="Layers\Actions\RunToCoverAction.cs" />
+    <Compile Include="Layers\Actions\DebugMoveToPlayerAction.cs" />
     <Compile Include="Layers\Actions\SearchAction.cs" />
     <Compile Include="Layers\Actions\HoldInCoverAction.cs" />
     <Compile Include="Layers\Actions\SuppressAction.cs" />
@@ -206,7 +206,6 @@
     <Compile Include="Config\CoverConfig.cs" />
     <Compile Include="Config\GrenadeConfigs.cs" />
     <Compile Include="Helpers\HelperClasses.cs" />
-    <Compile Include="Helpers\JsonUtility.cs" />
     <Compile Include="Components\SAINComponent\Classes\DecisionClass.cs" />
     <Compile Include="Layers\SAINFight.cs" />
     <Compile Include="Layers\Actions\SkirmishAction.cs" />
@@ -219,7 +218,7 @@
     <Compile Include="Components\SAINComponent\Classes\Update\UpdateMove.cs" />
     <Compile Include="Components\SAINComponent\Classes\Update\UpdateTarget.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
-    <Compile Include="Components\LeanComponent.cs" />
+    <Compile Include="Components\SAINComponent\Classes\LeanClass.cs" />
     <Compile Include="Helpers\DodgeHelpers.cs" />
     <Compile Include="Layers\Actions\DogfightAction.cs" />
     <Compile Include="Helpers\CornersHelper.cs" />

@@ -1,8 +1,11 @@
 ﻿using BepInEx.Logging;
+using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
+using SAIN.UserSettings;
 using UnityEngine;
+using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
@@ -21,10 +24,17 @@ namespace SAIN.Layers
             //Logger.LogInfo($"Added {GetName()} Layer to {bot.name}. Bot Type: [{bot.Profile.Info.Settings.Role}]");
 
             SAIN = bot.GetComponent<SAINComponent>();
+
+            LastDecision = CurrentDecision;
         }
 
         public override Action GetNextAction()
         {
+            if (CoverConfig.AllBotsMoveToPlayer.Value)
+            {
+                return new Action(typeof(DebugMoveToPlayerAction), $"CHARGE!");
+            }
+
             Action nextAction;
 
             switch (CurrentDecision)
@@ -35,6 +45,8 @@ namespace SAIN.Layers
                 case SAINLogicDecision.CombatHeal:
                 case SAINLogicDecision.RunAway:
                 case SAINLogicDecision.RunForCover:
+                case SAINLogicDecision.RunAwayGrenade:
+                case SAINLogicDecision.WalkToCover:
                     nextAction = new Action(typeof(RetreatAction), $"{CurrentDecision}");
                     break;
 
@@ -63,26 +75,38 @@ namespace SAIN.Layers
                     break;
 
                 default:
-                    nextAction = new Action(typeof(FightAction), "Fight");
+                    nextAction = new Action(typeof(RetreatAction), $"DEFAULT!");
                     break;
             }
 
             LastDecision = CurrentDecision;
+
+            Logger.LogInfo($"New Action for {BotOwner.name}. {nextAction.GetType().Name}");
 
             return nextAction;
         }
 
         public override bool IsActive()
         {
+            if (CoverConfig.AllBotsMoveToPlayer.Value)
+            {
+                return true;
+            }
+
             return CurrentDecision != SAINLogicDecision.None;
         }
 
         public override bool IsCurrentActionEnding()
         {
+            if (CoverConfig.AllBotsMoveToPlayer.Value)
+            {
+                return false;
+            }
+
             return CurrentDecision != LastDecision;
         }
 
-        public SAINLogicDecision LastDecision = SAINLogicDecision.None;
+        public SAINLogicDecision LastDecision;
         public SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
 
         private readonly SAINComponent SAIN;

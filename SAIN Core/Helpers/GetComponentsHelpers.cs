@@ -16,7 +16,8 @@ namespace SAIN.Helpers
             {
                 if (!ComponentAdded)
                 {
-                    GetComponentHelpers.GetOrAddComponentForPlayer<T>(player);
+                    player.GetOrAddComponent<T>();
+                    //GetComponentHelpers.GetOrAddComponentForPlayer<T>(player);
                     ComponentAdded = true;
                 }
             }

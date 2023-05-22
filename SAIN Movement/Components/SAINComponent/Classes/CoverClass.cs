@@ -13,6 +13,7 @@ namespace SAIN.Layers.Logic
     {
         public CoverClass(BotOwner bot) : base(bot)
         {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             Component = BotOwner.GetOrAddComponent<CoverComponent>();
             FallBackPointStatus = CoverStatus.None;
             CoverPointStatus = CoverStatus.None;
@@ -47,6 +48,9 @@ namespace SAIN.Layers.Logic
 
         public void ManualUpdate()
         {
+            UpdateSideStep();
+            UpdateLeanTime();
+
             if (BotOwner.Memory.GoalEnemy != null)
             {
                 if (CheckSelfCoverTimer < Time.time)
@@ -61,10 +65,8 @@ namespace SAIN.Layers.Logic
             if (BotOwner.Memory.GoalEnemy == null && BotOwner.Memory.GoalTarget?.GoalTarget == null)
             {
                 Component.StopLooking();
-                return;
             }
-
-            if (UpdateTimer < Time.time)
+            else if (UpdateTimer < Time.time)
             {
                 AssignSettings();
 
@@ -74,28 +76,82 @@ namespace SAIN.Layers.Logic
 
                 if (targetPosition != null)
                 {
+                    DebugGizmos.SingleObjects.Line(targetPosition.Value, BotOwner.MyHead.position, Color.red, 0.05f, true, CoverUpdateFrequency.Value, true);
+
                     Component.LookForCover(targetPosition);
 
                     DrawDebug(targetPosition.Value);
                 }
 
-                Logger.LogWarning("Checking Debug");
                 FallBackPointStatus = CheckCoverPointStatus(CurrentFallBackPoint, InCoverDist, CloseCoverDist, FarCoverDist);
                 CoverPointStatus = CheckCoverPointStatus(CurrentCoverPoint, InCoverDist, CloseCoverDist, FarCoverDist);
 
-                Logger.LogWarning($"Cover Statuses: {CoverPointStatus} : {FallBackPointStatus}");
+                //Logger.LogWarning($"Cover Statuses: {CoverPointStatus} : {FallBackPointStatus}");
 
-                if (CurrentFallBackPoint == null)
+                if (CurrentFallBackPoint == null && CurrentCoverPoint == null)
                 {
-                    Logger.LogInfo($"CurrentFallBackPoint == null");
-                }
-                if (CurrentCoverPoint == null)
-                {
-                    Logger.LogInfo($"CurrentCoverPoint == null");
+                    //Logger.LogError($"CurrentFallBackPoint == null && CurrentCoverPoint == null");
                 }
             }
         }
 
+        public void UpdateSideStep()
+        {
+            var lean = SAIN.Lean.LeanSetting;
+
+            switch (lean)
+            {
+                case LeanSetting.Left:
+                    if (!SAIN.Core.Enemy.CanSee)
+                    {
+                        BotOwner.GetPlayer.MovementContext.SetSidestep(-1f);
+                        CurrentSideStep = SideStepSetting.Left;
+                    }
+                    break;
+
+                case LeanSetting.Right:
+                    if (!SAIN.Core.Enemy.CanSee)
+                    {
+                        BotOwner.GetPlayer.MovementContext.SetSidestep(1f);
+                        CurrentSideStep = SideStepSetting.Right;
+                    }
+                    break;
+
+                case LeanSetting.None:
+                    BotOwner.GetPlayer.MovementContext.SetSidestep(0f);
+                    CurrentSideStep = SideStepSetting.None;
+                    break;
+
+                default:
+                    BotOwner.GetPlayer.MovementContext.SetSidestep(0f);
+                    CurrentSideStep = SideStepSetting.None;
+                    break;
+            }
+        }
+
+        private void UpdateLeanTime()
+        {
+            if (BotIsLeaning)
+            {
+                if (!StartLeanTimer)
+                {
+                    LeanTimer = Time.time;
+                    StartLeanTimer = true;
+                }
+                TimeSpentLeaning = Time.time - LeanTimer;
+            }
+            else
+            {
+                LeanTimer = 0f;
+                StartLeanTimer = false;
+                TimeSpentLeaning = 0f;
+            }
+        }
+
+        private float LeanTimer = 0f;
+        public bool BotIsLeaning => SAIN.Lean.LeanSetting == LeanSetting.Left || SAIN.Lean.LeanSetting == LeanSetting.Right;
+        public float TimeSpentLeaning { get; private set; }
+        private bool StartLeanTimer = false;
         private float UpdateTimer = 0f;
 
         private Vector3? GetPointToHideFrom()
@@ -245,22 +301,22 @@ namespace SAIN.Layers.Logic
                 {
                     DebugGizmos.SingleObjects.Line(SAIN.Core.HeadPosition, CurrentCoverPoint.Position, Color.blue, 0.05f, true, 0.5f);
 
-                    NavMeshPath path = new NavMeshPath();
-                    if (NavMesh.CalculatePath(SAIN.BotOwner.Transform.position, CurrentCoverPoint.Position, NavMesh.AllAreas, path))
-                    {
-                        SAIN.DebugDrawList.DrawTempPath(path, true, Color.magenta, Color.blue, 0.1f, 0.5f, false);
-                    }
+                    //NavMeshPath path = new NavMeshPath();
+                    //if (NavMesh.CalculatePath(BotOwner.Transform.position, CurrentCoverPoint.Position, NavMesh.AllAreas, path))
+                    //{
+                    //    SAIN.DebugDrawList.DrawTempPath(path, true, Color.magenta, Color.blue, 0.1f, 0.5f, false);
+                    //}
                 }
 
                 if (CurrentFallBackPoint != null)
                 {
                     DebugGizmos.SingleObjects.Line(SAIN.Core.HeadPosition, CurrentFallBackPoint.Position, Color.magenta, 0.05f, true, 0.5f);
 
-                    NavMeshPath path2 = new NavMeshPath();
-                    if (NavMesh.CalculatePath(SAIN.BotOwner.Transform.position, CurrentFallBackPoint.Position, NavMesh.AllAreas, path2))
-                    {
-                        SAIN.DebugDrawList.DrawTempPath(path2, true, Color.magenta, Color.magenta, 0.1f, 0.5f, false);
-                    }
+                    //NavMeshPath path2 = new NavMeshPath();
+                    //if (NavMesh.CalculatePath(SAIN.BotOwner.Transform.position, CurrentFallBackPoint.Position, NavMesh.AllAreas, path2))
+                    //{
+                    //    SAIN.DebugDrawList.DrawTempPath(path2, true, Color.magenta, Color.magenta, 0.1f, 0.5f, false);
+                    //}
                 }
             }
         }
@@ -289,6 +345,7 @@ namespace SAIN.Layers.Logic
 
         public bool InCover { get; private set; }
         public float CoverRatio { get; private set; }
+        public SideStepSetting CurrentSideStep { get; private set; }
 
         private float CheckSelfCoverTimer = 0f;
         private readonly float CheckSelfFreq = 0.1f;
@@ -306,5 +363,12 @@ namespace SAIN.Layers.Logic
         InCover = 1,
         FarFromCover = 3,
         CloseToCover = 4
+    }
+
+    public enum SideStepSetting
+    {
+        None = 0,
+        Left = 1,
+        Right = 2
     }
 }

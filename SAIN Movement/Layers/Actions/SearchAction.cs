@@ -27,8 +27,6 @@ namespace SAIN.Layers
                 return;
             }
 
-            var sainEnemy = SAIN.Core.Enemy;
-
             if (Vector3.Distance(BotOwner.Transform.position, EnemyPosition.Value) < 2f)
             {
                 int i = 0;
@@ -44,20 +42,22 @@ namespace SAIN.Layers
                 }
             }
 
-            SAIN.Steering.ManualUpdate();
-
             if (BotOwner.Memory.GoalEnemy != null)
             {
-                if (sainEnemy.CanSee)
+                if (SAIN.HasEnemyAndCanShoot)
                 {
                     gclass105_0.Update();
+                    SAIN.Steering.ManualUpdate();
                 }
-
-                SAIN.BotOwner.MoveToEnemyData.TryMoveToEnemy(EnemyPosition.Value);
+                else if (SAIN.BotOwner.MoveToEnemyData.TryMoveToEnemy(EnemyPosition.Value))
+                {
+                    BotOwner.Steering.LookToMovingDirection();
+                }
             }
             else
             {
                 BotOwner.GoToPoint(EnemyPosition.Value);
+                SAIN.Steering.ManualUpdate();
             }
         }
 

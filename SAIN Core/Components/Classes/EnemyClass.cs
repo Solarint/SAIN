@@ -69,7 +69,7 @@ namespace SAIN.Classes
                 person.MainParts.TryGetValue(BodyPartType.body, out BodyPartClass EnemyBody);
                 EnemyChestPosition = EnemyBody.Position;
 
-                LastSeen.Update(person);
+                LastSeen.UpdateSeen(person);
 
                 NewEnemy = person != LastPerson;
                 if (NewEnemy)
@@ -94,7 +94,7 @@ namespace SAIN.Classes
             }
             else
             {
-                LastSeen.TimeSinceSeen = Time.time - LastSeen.Time;
+                LastSeen.UpdateTimeSinceSeen();
             }
         }
 
@@ -104,11 +104,13 @@ namespace SAIN.Classes
 
             if (CanShoot)
             {
-                LastSeen.BotShootTime = Time.time;
-
-                LastSeen.BotShootPosition = BotOwner.Transform.position;
+                LastSeen.UpdateShoot(person);
 
                 DebugGizmos(BotOwner.WeaponRoot.position, Color.red);
+            }
+            else
+            {
+                LastSeen.UpdateTimeSinceShoot();
             }
         }
 
@@ -122,27 +124,27 @@ namespace SAIN.Classes
 
                 if (GrenadeCheckTimer < Time.time)
                 {
-                    GrenadeCheckTimer = Time.time + 0.1f;
+                    GrenadeCheckTimer = Time.time + 0.05f;
 
                     CanSeeGrenade = RaycastHelpers.CheckVisible(Core.HeadPosition, Grenade.transform.position, SAINCoreComponent.SightMask);
 
                     if (CanSeeGrenade)
                     {
-                        LastSeen.GrenadePosition = Grenade.transform.position;
-                        LastSeen.GrenadeTime = Time.time;
+                        LastSeen.UpdateGrenade(Grenade.transform.position, BotOwner.BewareGrenade.GrenadeDangerPoint.DangerPoint);
                     }
                     else
                     {
-                        LastSeen.GrenadeTimeSinceSeen = Time.time - LastSeen.GrenadeTime;
+                        LastSeen.UpdateTimeSinceGrenade();
                     }
                 }
             }
             else
             {
-                if (Grenade != null) Grenade = null;
-                if (LastSeen.GrenadePosition != Vector3.zero) LastSeen.GrenadePosition = Vector3.zero;
-                if (LastSeen.GrenadeTime != 0f) LastSeen.GrenadeTime = 0f;
-                if (LastSeen.GrenadeTimeSinceSeen != 0f) LastSeen.GrenadeTimeSinceSeen = 0f;
+                if (Grenade != null)
+                {
+                    Grenade = null;
+                    LastSeen.DisposeGrenade();
+                }
             }
         }
 
@@ -190,7 +192,7 @@ namespace SAIN.Classes
         public float TimeFirstVisible = 0f;
         public float TimeVisibleReal = 0f;
         public bool CanSee = false;
-        public bool CanSeeGrenade = false;
+        public bool CanSeeGrenade { get; private set; }
 
         public Vector3? EnemyHeadPosition { get; private set; }
         public Vector3? EnemyChestPosition { get; private set; }
@@ -210,20 +212,37 @@ namespace SAIN.Classes
             {
                 Path = new NavMeshPath();
                 NavMesh.CalculatePath(BotOwner.Transform.position, enemyPosition, -1, Path);
-                Length = Path.CalculatePathLength();
+                PathLength = Path.CalculatePathLength();
             }
 
-            public bool RangeVeryClose => Length <= VeryCloseDist;
-            public bool RangeClose => Length <= CloseDist;
-            public bool RangeMid => Length <= FarDist;
-            public bool RangeFar => Length > FarDist;
+            /// <summary>
+            /// Gets a value indicating whether the path length is very close. 
+            /// </summary>
+            public bool RangeVeryClose => PathLength <= VeryCloseDist;
+            /// <summary>
+            /// Checks if the path length is within the close distance and not within the very close distance. 
+            /// </summary>
+            public bool RangeClose => !RangeVeryClose && PathLength <= CloseDist;
+            /// <summary>
+            /// Checks if the path length is within the mid range and not close.
+            /// </summary>
+            public bool RangeMid => !RangeClose && PathLength <= FarDist;
+            /// <summary>
+            /// Checks if the path length is within the very far distance and not within the mid range. 
+            /// </summary>
+            public bool RangeFar => !RangeMid && PathLength <= VeryFarDist;
+            /// <summary>
+            /// Checks if the path length is greater than the VeryFarDist. 
+            /// </summary>
+            public bool RangeVeryFar => PathLength > VeryFarDist;
 
             public NavMeshPath Path = new NavMeshPath();
-            public float Length = 999f;
+            public float PathLength { get; private set; } = 0f;
 
-            private const float VeryCloseDist = 3f;
-            private const float CloseDist = 10f;
-            private const float FarDist = 100f;
+            public const float VeryCloseDist = 8f;
+            public const float CloseDist = 30f;
+            public const float FarDist = 80f;
+            public const float VeryFarDist = 120f;
         }
 
         public class EnemyLastSeen : SAINBot
@@ -232,7 +251,7 @@ namespace SAIN.Classes
             {
             }
 
-            public void Update(IAIDetails person)
+            public void UpdateSeen(IAIDetails person)
             {
                 Time = UnityEngine.Time.time;
                 EnemyPosition = person.Transform.position;
@@ -241,20 +260,76 @@ namespace SAIN.Classes
                 BotPosition = BotOwner.Transform.position;
             }
 
-            public float Time = 0f;
-            public float TimeSinceSeen = 0f;
+            public void UpdateTimeSinceSeen()
+            {
+                TimeSinceSeen = UnityEngine.Time.time - Time;
+            }
 
-            public Vector3 BotPosition = Vector3.zero;
-            public float BotShootTime = 0f;
-            public Vector3 BotShootPosition = Vector3.zero;
+            public void UpdateShoot(IAIDetails person)
+            {
+                ShootTime = UnityEngine.Time.time;
+                BotShootPosition = BotOwner.Transform.position;
+            }
 
-            public Vector3 EnemyPosition = Vector3.zero;
-            public Vector3 EnemyDirection = Vector3.zero;
-            public float EnemyStraightDistance = 0f;
+            public void UpdateTimeSinceShoot()
+            {
+                TimeSinceShoot = UnityEngine.Time.time - ShootTime;
+            }
 
-            public Vector3 GrenadePosition = Vector3.zero;
-            public float GrenadeTime = 0f;
-            public float GrenadeTimeSinceSeen = 0f;
+            public void UpdateGrenade(Vector3 grenadePos, Vector3 dangerPoint)
+            {
+                GrenadeTime = UnityEngine.Time.time;
+                GrenadePosition = grenadePos;
+                GrenadeDangerPoint = dangerPoint;
+            }
+
+            public void UpdateTimeSinceGrenade()
+            {
+                GrenadeTimeSinceSeen = UnityEngine.Time.time - GrenadeTime;
+            }
+
+            public void DisposeGrenade()
+            {
+                GrenadeTimeSinceSeen = 999f;
+                GrenadePosition = null;
+                GrenadeDangerPoint = null;
+                GrenadeTime = 0f;
+            }
+
+
+            /// <summary>
+            /// Gets a value indicating whether the enemy has not been seen in the last 3 seconds.
+            /// </summary>
+            public bool NotSeenEnemyRecent => TimeSinceSeen > 3f;
+            /// <summary>
+            /// Gets a value indicating whether the enemy has not been seen in the middle for more than 10 seconds.
+            /// </summary>
+            public bool NotSeenEnemyMid => TimeSinceSeen > 10f;
+            /// <summary>
+            /// Gets a value indicating whether the enemy has not been seen for more than 20 seconds.
+            /// </summary>
+            public bool NotSeenEnemyLong => TimeSinceSeen > 20f;
+            /// <summary>
+            /// Gets a value indicating whether the enemy has not been seen for more than 60 seconds.
+            /// </summary>
+            public bool NotSeenEnemyVeryLong => TimeSinceSeen > 60f;
+
+            public float Time { get; private set; }
+            public float TimeSinceSeen { get; private set; }
+
+            public Vector3 BotPosition { get; private set; }
+            public float ShootTime { get; private set; }
+            public float TimeSinceShoot { get; private set; }
+            public Vector3 BotShootPosition { get; private set; }
+
+            public Vector3 EnemyPosition { get; private set; }
+            public Vector3 EnemyDirection { get; private set; }
+            public float EnemyStraightDistance { get; private set; }
+
+            public Vector3? GrenadeDangerPoint { get; private set; }
+            public Vector3? GrenadePosition { get; private set; }
+            public float GrenadeTime { get; private set; }
+            public float GrenadeTimeSinceSeen { get; private set; }
         }
     }
 }

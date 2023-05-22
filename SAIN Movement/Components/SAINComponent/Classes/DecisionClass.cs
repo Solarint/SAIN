@@ -156,17 +156,21 @@ namespace SAIN.Components
             {
                 Decision = SAINLogicDecision.RunAwayGrenade;
             }
-            else if (ShouldBotHeal() || BotOwner.Medecine.Using)
+            else if (StartCombatHeal() || BotOwner.Medecine.FirstAid.Using)
             {
-                Decision = SAINLogicDecision.Heal;
+                Decision = SAINLogicDecision.CombatHeal;
             }
-            else if (ShouldBotReload() || BotOwner.WeaponManager.Reload.Reloading)
+            else if (StartBotReload() || BotOwner.WeaponManager.Reload.Reloading)
             {
                 Decision = SAINLogicDecision.Reload;
             }
-            else if (ShouldBotPopStims() || BotOwner.Medecine.Stimulators.Using)
+            else if (StartUseStims() || BotOwner.Medecine.Stimulators.Using)
             {
                 Decision = SAINLogicDecision.Stims;
+            }
+            else if (StartFullHeal() || BotOwner.Medecine.SurgicalKit.Using)
+            {
+                Decision = SAINLogicDecision.CombatHeal;
             }
 
             return Decision;
@@ -213,18 +217,18 @@ namespace SAIN.Components
                 {
                     Decision = SAINLogicDecision.HoldInCover;
                 }
-                else if (StartDogFightAction())
-                {
-                    Decision = SAINLogicDecision.DogFight;
-                }
+                ///else if (StartDogFightAction())
+                ///{
+                ///    Decision = SAINLogicDecision.DogFight;
+                ///}
                 else if (StartSuppression())
                 {
                     Decision = SAINLogicDecision.Suppress;
                 }
-                else if (StartFightAction())
-                {
-                    Decision = SAINLogicDecision.Fight;
-                }
+                ///else if (StartFightAction())
+                ///{
+                ///    Decision = SAINLogicDecision.Fight;
+                ///}
                 else
                 {
                     Decision = SAINLogicDecision.Skirmish;
@@ -273,12 +277,12 @@ namespace SAIN.Components
 
         private bool StartSeekEnemy()
         {
-            return !Enemy.CanSee && Enemy.LastSeen.TimeSinceSeen > TimeBeforeSearch;
+            return !SAIN.HasEnemyAndCanShoot && Enemy.LastSeen.TimeSinceSeen > TimeBeforeSearch;
         }
 
         private bool StartHoldInCover()
         {
-            return Enemy.CanSee && Enemy.CanShoot && SAIN.Cover.InCover;
+            return SAIN.HasEnemyAndCanShoot && SAIN.Cover.BotIsAtCoverPoint;
         }
 
         private bool StartRunAway()
@@ -286,9 +290,56 @@ namespace SAIN.Components
             return false;
         }
 
-        private bool StartCombatHeal()
+        private bool StartFullHeal()
         {
-            return false;
+            bool BotShouldHeal = false;
+            var status = SAIN.Core.BotStatus;
+            if (BotOwner.Medecine.SurgicalKit.HaveWork)
+            {
+                if (BotOwner.Memory.GoalEnemy == null)
+                {
+                    BotShouldHeal = true;
+                }
+                else
+                {
+                    if (SAIN.Cover.BotIsAtCoverPoint)
+                    {
+                        var enemy = SAIN.Core.Enemy;
+                        var path = enemy.Path;
+
+                        if (status.Injured && enemy.LastSeen.NotSeenEnemyVeryLong)
+                        {
+                            BotShouldHeal = true;
+                        }
+                        else if (status.BadlyInjured && enemy.LastSeen.NotSeenEnemyLong && path.RangeFar)
+                        {
+                            BotShouldHeal = true;
+                        }
+                        else if (status.Dying && enemy.LastSeen.NotSeenEnemyMid && (path.RangeMid || path.RangeFar))
+                        {
+                            BotShouldHeal = true;
+                        }
+                    }
+                }
+            }
+
+            if (BotShouldHeal)
+            {
+                // Debug
+                if (BotOwner.Memory.GoalEnemy == null)
+                {
+                    Logger.LogDebug($"Used Surgery Because: I have no enemy");
+                }
+                else
+                {
+                    string healthReason = DebugClass.Reason(SAIN.Core.BotStatus);
+                    string enemydistReason = DebugClass.Reason(SAIN.Core.Enemy);
+                    string canSee = DebugClass.Reason(SAIN.Core.Enemy.CanSee);
+                    Logger.LogDebug($"Used Surgery Because: I'm [{healthReason}] and my enemy is [{enemydistReason}] and I [{canSee}] them.");
+                }
+            }
+
+            return BotShouldHeal;
         }
 
         private const float FightIn = 125f;
@@ -307,7 +358,7 @@ namespace SAIN.Components
             {
                 if (SAIN.Core.Enemy.LastSeen.EnemyStraightDistance < 100f)
                 {
-                    float distance = SAIN.Core.Enemy.Path.Length;
+                    float distance = SAIN.Core.Enemy.Path.PathLength;
 
                     active = FightActive;
 
@@ -333,6 +384,8 @@ namespace SAIN.Components
 
         public bool StartDogFightAction()
         {
+            return false;
+
             bool active = DogFightActive;
 
             if (BotOwner.Memory.GoalEnemy == null)
@@ -341,7 +394,7 @@ namespace SAIN.Components
             }
             else if (SAIN.Core.Enemy.LastSeen.EnemyStraightDistance < 50f)
             {
-                float distance = SAIN.Core.Enemy.Path.Length;
+                float distance = SAIN.Core.Enemy.Path.PathLength;
 
                 if (distance < DogFightIn)
                 {
@@ -362,10 +415,10 @@ namespace SAIN.Components
             return active;
         }
 
-        public bool ShouldBotPopStims()
+        public bool StartUseStims()
         {
             bool takeStims = false;
-            if (!BotOwner.Medecine.Stimulators.Using && SAIN.Core.Medical.HasStims && LastStimTime < Time.time)
+            if (!BotOwner.Medecine.Stimulators.Using && BotOwner.Medecine.Stimulators.HaveSmt && LastStimTime < Time.time)
             {
                 var status = SAIN.Core.BotStatus;
                 if (status.Healthy)
@@ -447,11 +500,11 @@ namespace SAIN.Components
             return takeStims;
         }
 
-        public bool ShouldBotHeal()
+        public bool StartCombatHeal()
         {
             bool BotShouldHeal = false;
             var status = SAIN.Core.BotStatus;
-            if (!BotOwner.Medecine.Using && SAIN.Core.Medical.CanHeal)
+            if (!BotOwner.Medecine.Using && BotOwner.Medecine.FirstAid.ShallStartUse())
             {
                 if (BotOwner.Memory.GoalEnemy == null)
                 {
@@ -516,7 +569,7 @@ namespace SAIN.Components
             return BotShouldHeal;
         }
 
-        public bool GetShouldBotCancelReload()
+        public bool ShouldCancelReload()
         {
             if (!BotOwner.WeaponManager.IsReady)
             {
@@ -550,7 +603,7 @@ namespace SAIN.Components
             return botShouldCancel;
         }
 
-        public bool ShouldBotReload()
+        public bool StartBotReload()
         {
             if (!BotOwner.WeaponManager.IsReady || !BotOwner.WeaponManager.Reload.CanReload(false))
             {
@@ -592,7 +645,7 @@ namespace SAIN.Components
 
                         needToReload = true;
                     }
-                    else if (!enemy.Path.RangeClose && !enemy.CanSee)
+                    else if (!enemy.Path.RangeClose && !SAIN.HasEnemyAndCanShoot)
                     {
                         if (DebugMode)
                         {

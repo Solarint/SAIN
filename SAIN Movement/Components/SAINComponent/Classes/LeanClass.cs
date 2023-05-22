@@ -14,40 +14,17 @@ namespace SAIN.Components
         Right = 2
     }
 
-    public class LeanComponent : MonoBehaviour
+    public class LeanClass : SAINBotExt
     {
-        private SAINComponent SAIN;
+        public LeanSetting LeanSetting { get; private set; }
 
-        public LeanSetting LeanSetting;
-
-        private void Awake()
+        public LeanClass(BotOwner bot) : base(bot)
         {
-            BotOwner = GetComponent<BotOwner>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name + $": {BotOwner.name}: ");
             Lean = new Corners.FindDirectionToLean(BotOwner);
-            SAIN = BotOwner.GetComponent<SAINComponent>();
         }
 
-        public bool GetTargetPosition(out Vector3 targetPos)
-        {
-            if (BotOwner.Memory.GoalEnemy != null)
-            {
-                targetPos = BotOwner.Memory.GoalEnemy.CurrPosition;
-                return true;
-            }
-            else if (BotOwner.Memory.GoalTarget?.GoalTarget?.Position != null)
-            {
-                targetPos = BotOwner.Memory.GoalTarget.GoalTarget.Position;
-                return true;
-            }
-            else
-            {
-                targetPos = Vector3.zero;
-                return false;
-            }
-        }
-
-        private void Update()
+        public void ManualUpdate()
         {
             if (BotOwner.BotState != EBotState.Active || BotOwner.IsDead)
             {
@@ -112,10 +89,24 @@ namespace SAIN.Components
             OldAllowLeanDecision = AllowLeanDecision;
         }
 
-        private float UnderFireRealTime = 0f;
-        private bool OldUnderFire = false;
-        private float ResetTimer = 0f;
-        private bool OldAllowLeanDecision = false;
+        public bool GetTargetPosition(out Vector3 targetPos)
+        {
+            if (BotOwner.Memory.GoalEnemy != null)
+            {
+                targetPos = BotOwner.Memory.GoalEnemy.CurrPosition;
+                return true;
+            }
+            else if (BotOwner.Memory.GoalTarget?.GoalTarget?.Position != null)
+            {
+                targetPos = BotOwner.Memory.GoalTarget.GoalTarget.Position;
+                return true;
+            }
+            else
+            {
+                targetPos = Vector3.zero;
+                return false;
+            }
+        }
 
         private LeanSetting FindSetting(float leanAngle, out float inputNum)
         {
@@ -150,15 +141,6 @@ namespace SAIN.Components
             return angle;
         }
 
-        private float FindLeanAngleTimer = 0f;
-        private const float FindLeanFreq = 0.1f;
-
-        public void Dispose()
-        {
-            StopAllCoroutines();
-            Destroy(this);
-        }
-
         private bool AllowLeanDecision => SAIN.CurrentDecision == SAINLogicDecision.Fight || SAIN.CurrentDecision == SAINLogicDecision.Search || SAIN.CurrentDecision == SAINLogicDecision.HoldInCover || SAIN.CurrentDecision == SAINLogicDecision.Suppress || SAIN.CurrentDecision == SAINLogicDecision.DogFight || SAIN.CurrentDecision == SAINLogicDecision.Skirmish;
 
         private void SetLean(float num, bool value)
@@ -173,9 +155,14 @@ namespace SAIN.Components
 
         private bool DebugMode => DebugDynamicLean.Value;
 
-        private Corners.FindDirectionToLean Lean;
-        private BotOwner BotOwner;
-        protected ManualLogSource Logger;
+        private float FindLeanAngleTimer = 0f;
+        private const float FindLeanFreq = 0.1f;
+        private float UnderFireRealTime = 0f;
+        private bool OldUnderFire = false;
+        private float ResetTimer = 0f;
+        private bool OldAllowLeanDecision = false;
+        private readonly Corners.FindDirectionToLean Lean;
+        private readonly ManualLogSource Logger;
         private float LastLeanNum = 0f;
     }
 }

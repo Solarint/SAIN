@@ -33,17 +33,12 @@ namespace SAIN.Layers
         {
             SAIN.Movement.DecideMovementSpeed();
 
-            if (BotOwner.Memory.GoalEnemy != null)
+            if (SAIN.HasEnemyAndCanShoot)
             {
-                if (BotOwner.Memory.GoalEnemy.IsVisible && BotOwner.Memory.GoalEnemy.CanShoot)
+                AimData.Update();
+
+                if (BotOwner.Memory.GoalEnemy.CanShoot)
                 {
-                    if (!SAIN.Core.Enemy.CanSee)
-                    {
-                        Logger.LogError("SAIN Core enemy can't see");
-                    }
-
-                    AimData.Update();
-
                     /*
                     if (!SAIN.Core.Enemy.CanShoot && SAIN.Cover.Component.CurrentCover != null && SAIN.InCover && Vector3.Distance(SAIN.Cover.Component.CurrentCover.Position, BotOwner.Transform.position) < 1f)
                     {

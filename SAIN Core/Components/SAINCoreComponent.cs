@@ -10,7 +10,6 @@ namespace SAIN.Components
     {
         public Color BotColor;
         public SquadClass BotSquad { get; private set; }
-        public MedicalClass Medical { get; private set; }
         public StatusClass BotStatus { get; private set; }
         public EnemyClass Enemy { get; private set; }
         public BotInfoClass Info { get; private set; }
@@ -27,7 +26,6 @@ namespace SAIN.Components
             BotColor = RandomColor;
 
             Info = new BotInfoClass(BotOwner);
-            Medical = new MedicalClass(BotOwner);
             BotStatus = new StatusClass(BotOwner);
             Enemy = new EnemyClass(BotOwner);
             BotSquad = new SquadClass(BotOwner);
@@ -59,8 +57,6 @@ namespace SAIN.Components
 
                 BotOwner.WeaponManager.UpdateWeaponsList();
                 Info.SetPersonality();
-
-                Medical.Update();
             }
 
             // Check bot health status

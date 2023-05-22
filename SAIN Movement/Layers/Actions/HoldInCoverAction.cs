@@ -22,7 +22,7 @@ namespace SAIN.Layers
         {
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Core.Enemy.CanSee)
+            if (SAIN.HasEnemyAndCanShoot)
             {
                 gclass105_0.Update();
             }

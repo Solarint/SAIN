@@ -17,7 +17,10 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            AimData.Update();
+            if (SAIN.HasEnemyAndCanShoot)
+            {
+                AimData.Update();
+            }
 
             BotOwner.SuppressShoot.Init(BotOwner.Memory.GoalEnemy);
         }

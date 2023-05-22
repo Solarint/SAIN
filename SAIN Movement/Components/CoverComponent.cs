@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using SAIN.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -127,7 +128,7 @@ namespace SAIN.Components
             float scaled = (clamp - min) / (max - min);
             scaled += min;
 
-            Logger.LogDebug($"Min Distance Result: [{scaled}] because Distance: [{distance}]");
+            //Logger.LogDebug($"Min Distance Result: [{scaled}] because Distance: [{distance}]");
 
             result = Mathf.Clamp(scaled, min, max);
 
@@ -224,7 +225,7 @@ namespace SAIN.Components
 
         private SAINComponent SAIN;
         protected ManualLogSource Logger;
-        private LayerMask HidableLayers = LayerMaskClass.HighPolyWithTerrainMask;
+        private LayerMask HidableLayers = LayerMaskClass.HighPolyCollider;
         public float MinObstacleHeight;
         private Coroutine TakeCoverCoroutine;
 
@@ -296,6 +297,9 @@ namespace SAIN.Components
                     System.Array.Sort(collidersArray, ColliderPathSortComparer);
 
                     colliderAndPathLengths = collidersArray;
+
+                    Logger.LogInfo($"Final collider array length = [{collidersArray.Length}]");
+
                 }
 
                 return colliderAndPathLengths;

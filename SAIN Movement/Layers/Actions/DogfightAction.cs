@@ -13,19 +13,18 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            this.gclass105_0 = new GClass105(bot);
+            gclass105_0 = new GClass105(bot);
         }
+
         private GClass105 gclass105_0;
 
         public override void Update()
         {
-            if (SAIN.Core.Enemy.CanSee)
+            SAIN.Steering.ManualUpdate();
+
+            if (SAIN.HasEnemyAndCanShoot)
             {
                 gclass105_0.Update();
-            }
-            else
-            {
-                SAIN.Steering.ManualUpdate();
             }
         }
 
@@ -38,11 +37,13 @@ namespace SAIN.Layers
         public override void Start()
         {
             BotOwner.PatrollingData.Pause();
+            //BotOwner.GetPlayer.MovementContext.SetAimingSlowdown(false, 0.75f);
         }
 
         public override void Stop()
         {
-            BotOwner.PatrollingData.Unpause();
+            BotOwner.GetPlayer.MovementContext.SetAimingSlowdown(true, 0.6f);
+            //BotOwner.PatrollingData.Unpause();
         }
     }
 }

@@ -69,29 +69,5 @@ namespace SAIN.Classes
             }
             return reason;
         }
-
-        public static string Reason(MedicalClass medical)
-        {
-            string reason = "Some Reason";
-
-            if (medical.CanHeal)
-            {
-                reason = "Can Heal";
-            }
-            if (medical.HasStims)
-            {
-                reason += " and Have Stims";
-            }
-            if (medical.Bleeding)
-            {
-                reason += " and Bleeding";
-            }
-            if (medical.HasFirstAid)
-            {
-                reason += " and Have First Aid";
-            }
-
-            return reason;
-        }
     }
 }

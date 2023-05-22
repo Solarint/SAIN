@@ -19,13 +19,22 @@ namespace SAIN.Layers.Logic
 
         public void ManualUpdate()
         {
-            if (SAIN.Core.Enemy.CanSee && BotOwner.Memory.GoalEnemy != null)
+            var enemy = BotOwner.Memory.GoalEnemy;
+            if (enemy == null)
             {
-                BotOwner.Steering.LookToDirection(BotOwner.Memory.GoalEnemy.Direction, 150f);
+                if (BotOwner.Memory.LastEnemy != null)
+                {
+                    enemy = BotOwner.Memory.LastEnemy;
+                }
+            }
+
+            if (enemy != null && (enemy.CanShoot || enemy.IsVisible))
+            {
+                BotOwner.Steering.LookToPoint(enemy.CurrPosition, 150f);
             }
             else
             {
-                SetLookPointByHearing();
+                BotOwner.LookData.SetLookPointByHearing();
             }
         }
 

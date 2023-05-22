@@ -2,8 +2,12 @@
 using EFT;
 using SAIN.Helpers;
 using SAIN.Layers;
+using SAIN.UserSettings;
 using SAIN.Layers.Logic;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using Comfort.Common;
 
 namespace SAIN.Components
 {
@@ -11,56 +15,75 @@ namespace SAIN.Components
     {
         public SAINLogicDecision CurrentDecision => Decisions.CurrentDecision;
 
-        public bool InCover = false;
-        public float CoverRatio = 0f;
+        public static List<SAINLogicDecision> HealDecisions = new List<SAINLogicDecision> { SAINLogicDecision.Heal, SAINLogicDecision.CombatHeal, SAINLogicDecision.Stims };
+        public static List<SAINLogicDecision> AggressiveActions = new List<SAINLogicDecision> { SAINLogicDecision.DogFight, SAINLogicDecision.Fight, SAINLogicDecision.Search, SAINLogicDecision.Suppress, SAINLogicDecision.Skirmish };
+        public static List<SAINLogicDecision> DefensiveActions = new List<SAINLogicDecision> { SAINLogicDecision.Reload, SAINLogicDecision.RunForCover, SAINLogicDecision.HoldInCover, SAINLogicDecision.RunAway, SAINLogicDecision.WalkToCover, SAINLogicDecision.RunAwayGrenade };
+
+        public bool InCover { get; private set; }
+        public float CoverRatio { get; private set; }
+        public bool HasEnemyAndCanShoot => BotOwner.Memory.GoalEnemy != null && BotOwner.Memory.GoalEnemy.CanShoot && BotOwner.Memory.GoalEnemy.IsVisible;
 
         private void Awake()
         {
             BotOwner = GetComponent<BotOwner>();
-
             Logger = BepInEx.Logging.Logger.CreateLogSource($"[{GetType().Name}]" + $" - [{BotOwner.name}]");
-
             Core = BotOwner.GetComponent<SAINCoreComponent>();
-            LeanComponent = BotOwner.GetOrAddComponent<LeanComponent>();
 
             Init();
         }
 
         private void Update()
         {
-            Cover.ManualUpdate();
+            if (BotOwner.IsDead || BotOwner.BotState != EBotState.Active)
+            {
+                return;
+            }
 
+            if (CoverConfig.AllBotsMoveToPlayer.Value)
+            {
+                var playerPos = Singleton<GameWorld>.Instance.MainPlayer.Transform.position;
+                if (Vector3.Distance(BotOwner.Destination, playerPos) > 10f)
+                {
+                    NavMeshPath Path = new NavMeshPath();
+                    if (NavMesh.CalculatePath(BotOwner.Transform.position, playerPos, -1, Path))
+                    {
+                        if (Path.status == NavMeshPathStatus.PathComplete)
+                        {
+                            BotOwner.GoToPoint(playerPos, true, 20f, false, false);
+                        }
+                        if (Path.status == NavMeshPathStatus.PathPartial)
+                        {
+                            BotOwner.GoToPoint(Path.corners[Path.corners.Length - 1], true, 20f, false, false);
+                        }
+                    }
+                }
+            }
+
+            Lean.ManualUpdate();
+            Cover.ManualUpdate();
             Decisions.ManualUpdate();
 
             DoSelfAction();
-
-            if (DebugTimer < Time.time)
-            {
-                DebugTimer = Time.time + 5f;
-                Logger.LogWarning($"Current Bot Decision = [{CurrentDecision}]");
-            }
         }
-
-        private float DebugTimer = 0f;
 
         private void DoSelfAction()
         {
             switch (CurrentDecision)
             {
                 case SAINLogicDecision.Reload:
-                    BotReload();
+                    DoReload();
                     break;
 
                 case SAINLogicDecision.Heal:
-                    BotHeal();
+                    DoFullHeal();
                     break;
 
                 case SAINLogicDecision.CombatHeal:
-                    BotHeal();
+                    DoCombatHeal();
                     break;
 
                 case SAINLogicDecision.Stims:
-                    BotUseStims();
+                    DoStims();
                     break;
 
                 default:
@@ -71,6 +94,7 @@ namespace SAIN.Components
         private void Init()
         {
             Settings = new SettingsClass(BotOwner);
+            Lean = new LeanClass(BotOwner);
             Cover = new CoverClass(BotOwner);
             Movement = new MovementClass(BotOwner);
             Dodge = new DodgeClass(BotOwner);
@@ -81,27 +105,44 @@ namespace SAIN.Components
             DebugDrawList = new DebugGizmos.DrawLists(Core.BotColor, Core.BotColor);
         }
 
-        public void BotHeal()
+        public void DoCombatHeal()
         {
-            if (!BotOwner.Medecine.Using)
+            var heal = BotOwner.Medecine.FirstAid;
+            if (heal.ShallStartUse() && HealTimer < Time.time)
             {
+                HealTimer = Time.time + 5f;
+
                 Logger.LogDebug($"I healed!");
 
-                BotOwner.Medecine.FirstAid.TryApplyToCurrentPart(null, null);
+                heal.TryApplyToCurrentPart(null, null);
             }
         }
 
-        public void BotUseStims()
+        public void DoFullHeal()
         {
-            if (!BotOwner.Medecine.Stimulators.Using)
+            var surgery = BotOwner.Medecine.SurgicalKit;
+            if (surgery.ShallStartUse() && HealTimer < Time.time)
+            {
+                HealTimer = Time.time + 5f;
+
+                Logger.LogDebug($"Used Surgery");
+
+                surgery.ApplyToCurrentPart();
+            }
+        }
+
+        public void DoStims()
+        {
+            var stims = BotOwner.Medecine.Stimulators;
+            if (stims.CanUseNow())
             {
                 Logger.LogDebug($"I'm Popping Stims");
 
-                BotOwner.Medecine.Stimulators.TryApply(true, null, null);
+                stims.TryApply(true, null, null);
             }
         }
 
-        public void BotReload()
+        public void DoReload()
         {
             if (!BotOwner.WeaponManager.Reload.Reloading)
             {
@@ -124,10 +165,10 @@ namespace SAIN.Components
         public void Dispose()
         {
             Cover.Component.Dispose();
-            LeanComponent.Dispose();
             Destroy(this);
         }
 
+        public LeanClass Lean { get; private set; }
         public GrenadeClass Grenade { get; private set; }
         public MovementClass Movement { get; private set; }
         public DodgeClass Dodge { get; private set; }
@@ -135,12 +176,12 @@ namespace SAIN.Components
         public SteeringClass Steering { get; private set; }
         public DebugGizmos.DrawLists DebugDrawList { get; private set; }
         public CoverClass Cover { get; private set; }
-        public LeanComponent LeanComponent { get; private set; }
         public SAINCoreComponent Core { get; private set; }
         public SettingsClass Settings { get; private set; }
         public BotOwner BotOwner { get; private set; }
 
         protected ManualLogSource Logger;
+        private float HealTimer = 0f;
     }
 
     public class SettingsClass : SAINBotExt

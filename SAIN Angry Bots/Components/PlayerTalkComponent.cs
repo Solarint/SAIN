@@ -18,6 +18,20 @@ namespace SAIN.Talk.Components
         private void Awake()
         {
             Player = GetComponent<Player>();
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
+            System.Console.WriteLine("Component Added to Player");
         }
 
         private void Update()

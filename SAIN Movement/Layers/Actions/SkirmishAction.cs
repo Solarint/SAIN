@@ -34,20 +34,16 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (BotOwner.Memory.GoalEnemy == null)
-            {
-                return;
-            }
-
-            BotOwner.SetPose(1f);
             SAIN.Movement.DecideMovementSpeed();
 
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Core.Enemy.CanSee)
+            if (SAIN.HasEnemyAndCanShoot)
             {
                 gclass105_0.Update();
             }
+
+            BotOwner.SetPose(1f);
         }
 
         public bool DebugMode => DebugLayers.Value;

@@ -23,6 +23,9 @@ namespace SAIN.Patches
             __instance.DOG_FIGHT_OUT = 0.1f;
             __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
             __instance.NO_RUN_AWAY_FOR_SAFE = false;
+            __instance.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
+            __instance.CAN_USE_MEDS = true;
+            __instance.CAN_USE_FOOD_DRINK = true;
         }
     }
 
