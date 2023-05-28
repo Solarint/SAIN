@@ -1,1 +1,0 @@
-Adds a slider in the f12 menu for how often bots will be allowed to yell about enemy grenades.
