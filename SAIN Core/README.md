@@ -1,2 +1,0 @@
-# AI-Tweaks
-TEMPLATE PROJECT
