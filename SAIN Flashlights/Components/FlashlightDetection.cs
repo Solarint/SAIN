@@ -1,7 +1,7 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using SAIN_Helpers;
+using SAIN.Helpers;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -21,9 +21,6 @@ namespace Flashlights.Components
 
         private float RayCastFrequencyTime;
 
-        /// <summary>
-        /// Finds the local player and the SAIN_Flashlight_Component if it is not already set.
-        /// </summary>
         public void FindYourPlayer()
         {
             if (LocalPlayer == null)
@@ -37,10 +34,6 @@ namespace Flashlights.Components
             }
         }
 
-        /// <summary>
-        /// Creates detection points for the flashlight detection system.
-        /// </summary>
-        /// <param name="player">The player to create the detection points for.</param>
         public void CreateDetectionPoints(Player player)
         {
             if (Logger == null)
@@ -77,13 +70,10 @@ namespace Flashlights.Components
                 ExpirePlayerPoint(0.1f);
 
                 if (DebugFlash.Value)
-                    DebugDrawer.Sphere(hit.point, 0.1f, Color.red, 0.25f);
+                    DebugGizmos.SingleObjects.Sphere(hit.point, 0.1f, Color.red, true, 0.25f);
             }
         }
 
-        /// <summary>
-        /// Detects and investigates a flashlight for bots.
-        /// </summary>
         public void DetectAndInvestigateFlashlight(Player player)
         {
             if (Logger == null)
@@ -115,20 +105,11 @@ namespace Flashlights.Components
                         Vector3 estimatedPosition = EstimateSearchPosition(playerPos, flashPos, botPos, 5f);
 
                         TryToInvestigate(bot, estimatedPosition, out Vector3 debugHitPos);
-
-                        DebugSearchPosition(bot.name, debugHitPos, flashPos, botPos, 5f, 0.15f, 0.05f);
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// Checks if the bot can see the flashlight based on the bot's position, the player's position, and the flashlight's position.
-        /// </summary>
-        /// <param name="bot">The bot owner.</param>
-        /// <param name="playerPos">The player's position.</param>
-        /// <param name="flashPos">The flashlight's position.</param>
-        /// <returns>True if the bot can see the flashlight, false otherwise.</returns>
         private bool CanISeeFlashlight(BotOwner bot, Vector3 flashPos)
         {
             if (bot.LookSensor.IsPointInVisibleSector(flashPos))
@@ -153,13 +134,6 @@ namespace Flashlights.Components
             return false;
         }
 
-        /// <summary>
-        /// Tries to investigate a visible flashlight beam by estimating a search position and adding it to the bot's group search points.
-        /// </summary>
-        /// <param name="bot">The bot owner.</param>
-        /// <param name="playerPos">The player's position.</param>
-        /// <param name="flashPos">The flashbang's position.</param>
-        /// <param name="botPos">The bot's position.</param>
         private void TryToInvestigate(BotOwner bot, Vector3 estimatedPosition, out Vector3 debugHitPos)
         {
             debugHitPos = Vector3.zero;
@@ -207,8 +181,8 @@ namespace Flashlights.Components
 
             float positionDispersion = maxDispersion / dispersion;
 
-            float x = SAIN_Math.Random(-positionDispersion, positionDispersion);
-            float z = SAIN_Math.Random(-positionDispersion, positionDispersion);
+            float x = EFT_Math.Random(-positionDispersion, positionDispersion);
+            float z = EFT_Math.Random(-positionDispersion, positionDispersion);
 
             return new Vector3(estimatedPosition.x + x, estimatedPosition.y, estimatedPosition.z + z);
         }
@@ -229,31 +203,6 @@ namespace Flashlights.Components
         private void SetRayCastTimer(float duration)
         {
             RayCastFrequencyTime = Time.time + duration;
-        }
-
-        /// <summary>
-        /// Draws debug lines and spheres to visualize the search position of a bot.
-        /// </summary>
-        /// <param name="name">Name of the bot.</param>
-        /// <param name="hitpos">Position of the hit.</param>
-        /// <param name="flashpos">Position of the flashlight.</param>
-        /// <param name="botpos">Position of the bot.</param>
-        /// <param name="expiretime">Time until the debug lines and spheres expire.</param>
-        /// <param name="spheresize">Size of the debug spheres.</param>
-        /// <param name="linesize">Size of the debug lines.</param>
-        private void DebugSearchPosition(string name, Vector3 hitpos, Vector3 flashpos, Vector3 botpos, float expiretime, float spheresize, float linesize)
-        {
-            if (DebugFlash.Value)
-            {
-                Logger.LogDebug($"{name} Is Investigating Flashlight Beam");
-
-                Helpers.DebugDrawer.Sphere(hitpos, spheresize, Color.red, expiretime);
-                Helpers.DebugDrawer.Sphere(flashpos, spheresize, Color.red, expiretime);
-
-                Helpers.DebugDrawer.Line(flashpos, botpos, linesize, Color.red, expiretime);
-                Helpers.DebugDrawer.Line(hitpos, botpos, linesize, Color.red, expiretime);
-                Helpers.DebugDrawer.Line(hitpos, flashpos, linesize, Color.red, expiretime);
-            }
         }
 
         /// <summary>
@@ -278,6 +227,7 @@ namespace Flashlights.Components
             PlayerPosition = Vector3.zero;
         }
     }
+
     public class TimedVector3
     {
         public TimedVector3(Vector3 point, float timestamp)

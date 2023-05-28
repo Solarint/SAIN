@@ -17,7 +17,6 @@ namespace SAIN.Talk.Components
         public BotTalk Talk { get; private set; }
         public EnemyTalk EnemyTalk { get; private set; }
         public GroupTalk GroupTalk { get; private set; }
-        public bool AllowTalkAnyways { get; private set; } = false;
 
         private void Awake()
         {
@@ -64,7 +63,7 @@ namespace SAIN.Talk.Components
         private IEnumerator TalkDelayCoroutine(TalkEventObject talk, float delay)
         {
             yield return new WaitForSeconds(delay);
-            Talk.TrySay(talk.PhraseSaid, talk.TagStatus, true);
+            Talk.Say(talk.PhraseSaid, talk.TagStatus, true);
         }
 
         private void ResetTalk()

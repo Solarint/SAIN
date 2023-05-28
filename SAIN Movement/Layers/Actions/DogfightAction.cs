@@ -30,7 +30,6 @@ namespace SAIN.Layers
 
         private readonly SAINComponent SAIN;
         public bool DebugMode => DebugLayers.Value;
-        public bool DebugDrawPoints => DebugLayersDraw.Value;
 
         public ManualLogSource Logger;
 

@@ -1,19 +1,17 @@
 ﻿using EFT;
 using SAIN.Components;
-using SAIN.Layers.Logic;
-using SAIN.Helpers;
-using UnityEngine.UIElements;
-using SAIN.Talk.Components;
 
 namespace SAIN
 {
-    public abstract class SAINBotExt : SAINBot
+    public abstract class SAINBot
     {
-        public SAINBotExt(BotOwner bot) : base(bot)
+        public SAINBot(BotOwner bot)
         {
+            BotOwner = bot;
             SAIN = bot.GetOrAddComponent<SAINComponent>();
         }
 
+        protected BotOwner BotOwner { get; private set; }
         protected SAINComponent SAIN { get; private set; }
     }
 }

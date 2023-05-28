@@ -3,6 +3,7 @@ using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
 using SAIN.Layers.Logic;
+using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
@@ -26,11 +27,15 @@ namespace SAIN.Layers
             {
                 gclass105_0.Update();
             }
+
+            if (SAIN.BotUnderFire)
+            {
+                BotOwner.SetPose(0f);
+            }
         }
 
         private readonly SAINComponent SAIN;
         public bool DebugMode => DebugLayers.Value;
-        public bool DebugDrawPoints => DebugLayersDraw.Value;
 
         public ManualLogSource Logger;
 

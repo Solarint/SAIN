@@ -70,7 +70,7 @@ namespace SAIN.Talk.Components
 
             if (distanceToEnemy < TauntDist)
             {
-                if (sainEnemy.CanSee)
+                if (BotOwner.Memory.GoalEnemy.CanShoot && BotOwner.Memory.GoalEnemy.IsVisible)
                 {
                     if (sainEnemy.EnemyLookingAtMe)
                     {
@@ -101,7 +101,7 @@ namespace SAIN.Talk.Components
 
             if (tauntEnemy)
             {
-                Talk.Say(EPhraseTrigger.MumblePhrase, true, ETagStatus.Combat);
+                Talk.Say(EPhraseTrigger.MumblePhrase, ETagStatus.Combat, true);
 
                 Logger.LogWarning($"Bot Taunted Enemy!: [{type}]");
             }
@@ -132,7 +132,7 @@ namespace SAIN.Talk.Components
                 float delay = LastEnemyTalk.TalkDelay;
                 if (LastEnemyTalk.TalkTime + delay < Time.time)
                 {
-                    Talk.TrySay(LastEnemyTalk.Trigger, LastEnemyTalk.Status, true);
+                    Talk.Say(LastEnemyTalk.Trigger, LastEnemyTalk.Status, true);
                     LastEnemyTalk = null;
                 }
             }

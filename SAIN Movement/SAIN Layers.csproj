@@ -62,6 +62,15 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '3.5.7|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\3.5.7\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\BepInEx\core\0Harmony.dll</HintPath>
@@ -98,7 +107,7 @@
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
     </Reference>
     <Reference Include="DrakiaXYZ-BigBrain">
-      <HintPath>..\..\..\BepInEx\plugins\DrakiaXYZ-BigBrain.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Games\spt 3.5.7\BepInEx\plugins\DrakiaXYZ-BigBrain.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -119,12 +128,6 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="SAIN-AI-Core-3.5.5">
-      <HintPath>..\..\..\BepInEx\plugins\SAIN\SAIN-AI-Core-3.5.5.dll</HintPath>
-    </Reference>
-    <Reference Include="SAIN-Layers-Talk-3.5.5">
-      <HintPath>..\..\..\BepInEx\plugins\SAIN\SAIN-Layers-Talk-3.5.5.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -162,6 +165,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Games\spt 3.5.7\EscapeFromTarkov_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UI.dll</HintPath>
@@ -169,10 +176,6 @@
     <Reference Include="UnityEngine.UIElementsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestAudioModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -192,43 +195,85 @@
     <None Include="Properties\.vs\slnx.sqlite" />
     <None Include="Properties\.vs\VSWorkspaceState.json" />
     <None Include="Properties\NuGet.Config" />
+    <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\CoverComponent.cs" />
-    <Compile Include="Components\GrenadeTrackerComponent.cs" />
-    <Compile Include="Layers\Actions\DebugMoveToPlayerAction.cs" />
+    <Compile Include="Config\AudioConfig.cs" />
+    <Compile Include="Config\FullautoConfig.cs" />
+    <Compile Include="Config\RecoilScatterConfig.cs" />
+    <Compile Include="Config\SemiAutoConfig.cs" />
+    <Compile Include="Config\TalkConfig.cs" />
+    <Compile Include="Config\VisionConfig.cs" />
+    <Compile Include="Helpers\AudioHelpers.cs" />
+    <Compile Include="Helpers\DebugDraw.cs" />
+    <Compile Include="Helpers\EFT_Math.cs" />
+    <Compile Include="Helpers\GetComponentsHelpers.cs" />
+    <Compile Include="Helpers\JsonUtility.cs" />
+    <Compile Include="Helpers\RayCast.cs" />
+    <Compile Include="Helpers\ShootHelpers.cs" />
+    <Compile Include="Helpers\VectorHelpers.cs" />
+    <Compile Include="Helpers\VisibilityHelpers.cs" />
+    <Compile Include="Patches\Audio\HearSensorActivatePatch.cs" />
+    <Compile Include="Patches\Shoot\FiremodePatch.cs" />
+    <Compile Include="Patches\Audio\InitiateShotPatch.cs" />
+    <Compile Include="Patches\Shoot\RateofFirePatch.cs" />
+    <Compile Include="Patches\Shoot\RecoilPatch.cs" />
+    <Compile Include="Patches\Audio\StepSoundPatch.cs" />
+    <Compile Include="Patches\Audio\TalkPatch.cs" />
+    <Compile Include="Patches\Audio\TryPlayShootSoundPatch.cs" />
+    <Compile Include="Patches\VisibilityPatch.cs" />
+    <Compile Include="SAINComponent\Classes\SelfActionClass.cs" />
+    <Compile Include="SAINComponent\Classes\SettingsClass.cs" />
+    <Compile Include="SAINComponent\Classes\WeaponInfoClass.cs" />
+    <Compile Include="SAINComponent\SubComponents\AudioComponent.cs" />
+    <Compile Include="SAINComponent\SubComponents\BotTalkComponent.cs" />
+    <Compile Include="SAINComponent\Classes\Talk\BotTalk.cs" />
+    <Compile Include="SAINComponent\Classes\Talk\EnemyTalkClass.cs" />
+    <Compile Include="SAINComponent\Classes\Talk\EnemyTalkObject.cs" />
+    <Compile Include="SAINComponent\Classes\Talk\GroupTalk.cs" />
+    <Compile Include="SAINComponent\Classes\BotSquadClass.cs" />
+    <Compile Include="SAINComponent\Classes\BotStatusClass.cs" />
+    <Compile Include="SAINComponent\Classes\DebugClass.cs" />
+    <Compile Include="SAINComponent\Classes\EnemyClass.cs" />
+    <Compile Include="SAINComponent\Classes\InfoClass.cs" />
+    <Compile Include="SAINComponent\SubComponents\CoverComponent.cs" />
+    <Compile Include="SAINComponent\SubComponents\DecisionComponent.cs" />
+    <Compile Include="SAINEnum.cs" />
+    <Compile Include="SAINComponent\SubComponents\CoverFinderComponent.cs" />
+    <Compile Include="SAINComponent\SubComponents\GrenadeTrackerComponent.cs" />
+    <Compile Include="SAINComponent\SubComponents\EnemySearchComponent.cs" />
+    <Compile Include="SAINComponent\SubComponents\LeanComponent.cs" />
     <Compile Include="Layers\Actions\SearchAction.cs" />
     <Compile Include="Layers\Actions\HoldInCoverAction.cs" />
     <Compile Include="Layers\Actions\SuppressAction.cs" />
-    <Compile Include="Patches\GrenadeSound.cs" />
-    <Compile Include="Components\SAINComponent\Classes\GrenadeClass.cs" />
-    <Compile Include="Components\SAINComponent\SAINComponent.cs" />
+    <Compile Include="Patches\Shoot\GrenadeSound.cs" />
+    <Compile Include="SAINComponent\Classes\GrenadeReactionClass.cs" />
+    <Compile Include="SAINComponent\SAINComponent.cs" />
     <Compile Include="Config\CoverConfig.cs" />
-    <Compile Include="Config\GrenadeConfigs.cs" />
     <Compile Include="Helpers\HelperClasses.cs" />
-    <Compile Include="Components\SAINComponent\Classes\DecisionClass.cs" />
     <Compile Include="Layers\SAINFight.cs" />
     <Compile Include="Layers\Actions\SkirmishAction.cs" />
     <Compile Include="Layers\Actions\RetreatAction.cs" />
     <Compile Include="Layers\Actions\FightAction.cs" />
-    <Compile Include="Components\SAINComponent\Classes\MovementClass.cs" />
-    <Compile Include="Components\SAINComponent\Classes\CoverClass.cs" />
-    <Compile Include="Components\SAINComponent\Classes\SteeringClass.cs" />
-    <Compile Include="Components\SAINComponent\Classes\Update\UpdateShoot.cs" />
-    <Compile Include="Components\SAINComponent\Classes\Update\UpdateMove.cs" />
-    <Compile Include="Components\SAINComponent\Classes\Update\UpdateTarget.cs" />
+    <Compile Include="SAINComponent\Classes\MovementClass.cs" />
+    <Compile Include="SAINComponent\Classes\CoverClass.cs" />
+    <Compile Include="SAINComponent\Classes\SteeringClass.cs" />
+    <Compile Include="SAINComponent\Classes\Update\UpdateShoot.cs" />
+    <Compile Include="SAINComponent\Classes\Update\UpdateMove.cs" />
+    <Compile Include="SAINComponent\Classes\Update\UpdateTarget.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
-    <Compile Include="Components\SAINComponent\Classes\LeanClass.cs" />
     <Compile Include="Helpers\DodgeHelpers.cs" />
     <Compile Include="Layers\Actions\DogfightAction.cs" />
     <Compile Include="Helpers\CornersHelper.cs" />
     <Compile Include="Patches\GlobalSettingsPatches.cs" />
-    <Compile Include="Patches\ComponentsPatch.cs" />
+    <Compile Include="Patches\AddComponentPatch.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
     <Compile Include="Patches\GenericPatches.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SAINBot.cs" />
+    <Compile Include="PlayerTalkComponent.cs" />
+    <Compile Include="VersionChecker\TarkovVersion.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -243,7 +288,7 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\..\..\BepInEx\plugins\$(SolutionName)\$(TargetName)-$(ConfigurationName).dll"
+    <PostBuildEvent>copy "$(TargetPath)" "C:\Games\spt 3.5.7\BepInEx\plugins\SAIN\$(TargetName)-$(ConfigurationName).dll"
 
 copy "$(TargetPath)" "$(SolutionDir)Release\$(TargetName)\BepInEx\plugins\$(SolutionName)\$(TargetName)-$(ConfigurationName).dll"
 

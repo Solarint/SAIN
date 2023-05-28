@@ -157,7 +157,7 @@ namespace Combat.Components
             {
                 Modifiers equipmod = new Modifiers();
 
-                ClassModifier = equipmod.WeaponClass(weapon.Template.weapClass, weapon.AmmoCaliber);
+                ClassModifier = equipmod.WeaponClass(weapon.Template.weapClass, weapon.CurrentAmmoTemplate.Caliber);
                 ClassModifier = Scaling(ClassModifier, 0f, 1f, 1 - classScaling, 1 + classScaling);
 
                 RecoilModifier = equipmod.Recoil(weapon.RecoilBase, weapon.RecoilTotal, weapon.CurrentAmmoTemplate.ammoRec);

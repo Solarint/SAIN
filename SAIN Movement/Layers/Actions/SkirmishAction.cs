@@ -47,7 +47,6 @@ namespace SAIN.Layers
         }
 
         public bool DebugMode => DebugLayers.Value;
-        public bool DebugDrawPoints => DebugLayersDraw.Value;
 
         public ManualLogSource Logger;
     }

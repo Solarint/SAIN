@@ -9,11 +9,6 @@ namespace SAIN.Classes
 {
     public class HelperClasses
     {
-        /// <summary>
-        /// Checks if the BotOwner is stationary by comparing the distance between the last position that a method in this class was called and the current position.
-        /// </summary>
-        /// <param name="playerPos">The current position of the BotOwner.</param>
-        /// <returns>True if the BotOwner is stationary, false otherwise.</returns>
         public class CheckIfPlayerStationary
         {
             public CheckIfPlayerStationary(Player player, int maxStationaryCalc = 10, float tolerance = 1f)
@@ -24,10 +19,6 @@ namespace SAIN.Classes
                 LastPosition = Player.Transform.position;
             }
 
-            /// <summary>
-            /// Checks if the path should be calculated by checking how far a BotOwner has moved from the last time this method was called.
-            /// </summary>
-            /// <returns>Returns true if the path should be calculated, false otherwise.</returns>
             public bool CheckForCalcPath()
             {
                 if (!Movement)

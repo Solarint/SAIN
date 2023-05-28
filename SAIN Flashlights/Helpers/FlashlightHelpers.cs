@@ -1,6 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using SAIN_Helpers;
+using SAIN.Helpers;
 using UnityEngine;
 using static Flashlights.Config.DazzleConfig;
 
@@ -30,8 +30,6 @@ namespace Flashlights.Helpers
                 {
                     if (!Physics.Raycast(weaponRoot, (position - weaponRoot).normalized, (position - weaponRoot).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                     {
-                        DebugDraw(weaponRoot, position);
-
                         if (SillyMode.Value)
                         {
                             FunnyHelpers.FunnyMode(bot, position);
@@ -120,22 +118,6 @@ namespace Flashlights.Helpers
         }
 
         /// <summary>
-        /// Draws debug lines and spheres to visualize the position and weapon root of an enemy.
-        /// </summary>
-        /// <param name="position">The position of the enemy.</param>
-        /// <param name="weaponRoot">The weapon root of the enemy.</param>
-        /// <param name="enemylookatme">Whether the enemy is looking at the player.</param>
-        private static void DebugDraw(Vector3 position, Vector3 weaponRoot)
-        {
-            if (DebugFlash.Value)
-            {
-                SAIN_Helpers.DebugDrawer.Sphere(position - weaponRoot, 0.05f, Color.white, 1f);
-                SAIN_Helpers.DebugDrawer.Line(position, weaponRoot, 0.01f, Color.green, 1f);
-                SAIN_Helpers.DebugDrawer.Line(weaponRoot, position, 0.01f, Color.red, 1f);
-            }
-        }
-
-        /// <summary>
         /// Applies dazzle modifications to the bot's settings for 0.1 seconds.
         /// </summary>
         /// <param name="dazzleModif">The dazzle modification.</param>
@@ -177,7 +159,7 @@ namespace Flashlights.Helpers
             Vector3 weaponRoot = person.WeaponRoot.position;
 
             float flashAngle = Mathf.Clamp(0.9770526f, 0.8f, 1f);
-            bool enemylookatme = SAIN_Math.IsAngLessNormalized(SAIN_Math.NormalizeFastSelf(position - weaponRoot), person.LookDirection, flashAngle);
+            bool enemylookatme = VectorHelpers.IsAngLessNormalized(VectorHelpers.NormalizeFastSelf(position - weaponRoot), person.LookDirection, flashAngle);
 
             return enemylookatme;
         }
@@ -194,7 +176,7 @@ namespace Flashlights.Helpers
             Vector3 weaponRoot = person.WeaponRoot.position;
 
             float laserAngle = 0.990f;
-            bool enemylookatme = SAIN_Math.IsAngLessNormalized(SAIN_Math.NormalizeFastSelf(position - weaponRoot), person.LookDirection, laserAngle);
+            bool enemylookatme = VectorHelpers.IsAngLessNormalized(VectorHelpers.NormalizeFastSelf(position - weaponRoot), person.LookDirection, laserAngle);
 
             return enemylookatme;
         }

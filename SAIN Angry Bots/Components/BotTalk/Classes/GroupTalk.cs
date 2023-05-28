@@ -1,6 +1,6 @@
 using EFT;
 using SAIN.Classes;
-using SAIN_Helpers;
+using SAIN.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -38,7 +38,7 @@ namespace SAIN.Talk.Components
                 return;
             }
 
-            BotTalkComponent.Talk.Say(EPhraseTrigger.OnFriendlyDown, true, ETagStatus.Combat);
+            BotTalkComponent.Talk.Say(EPhraseTrigger.OnFriendlyDown, ETagStatus.Combat, true);
         }
 
         private float FirstContactTimer = 0f;
@@ -50,10 +50,10 @@ namespace SAIN.Talk.Components
                 return;
             }
 
-            if (FirstContactTimer < Time.time && SAIN.Enemy.CurrentPerson == person && SAIN.Enemy.CanSee)
+            if (FirstContactTimer < Time.time)
             {
-                FirstContactTimer = Time.time + FirstContactFreq;
-                BotTalkComponent.Talk.Say(EPhraseTrigger.OnFirstContact, true, ETagStatus.Combat);
+                //FirstContactTimer = Time.time + FirstContactFreq;
+               // BotTalkComponent.Talk.Say(EPhraseTrigger.OnFirstContact, true, ETagStatus.Combat);
             }
         }
 
@@ -73,7 +73,7 @@ namespace SAIN.Talk.Components
             trigger |= EPhraseTrigger.LootWeapon;
             trigger |= EPhraseTrigger.OnLoot;
 
-            BotTalkComponent.Talk.TrySay(trigger, true);
+            BotTalkComponent.Talk.Say(trigger, null, true);
         }
 
         public void Dispose()
@@ -176,7 +176,7 @@ namespace SAIN.Talk.Components
                 {
                     if (Vector3.Distance(member.Transform.position, SAIN.BotSquad.Leader.Transform.position) < 30f)
                     {
-                        if (SAIN_Math.RandomBool(chance))
+                        if (EFT_Math.RandomBool(chance))
                         {
                             member?.GetComponent<BotTalkComponent>()?.TalkAfterDelay(talk, delay);
                         }
@@ -197,7 +197,7 @@ namespace SAIN.Talk.Components
                     {
                         if (CheckFriendlyLocation(out var trigger))
                         {
-                            BotTalkComponent.Talk.Say(trigger, true, ETagStatus.Combat);
+                            BotTalkComponent.Talk.Say(trigger, ETagStatus.Combat, true);
                             AllMembersSay(new TalkEventObject(EPhraseTrigger.Roger, ETagStatus.Aware, false), Random.Range(0.5f, 1.5f), 60f);
                         }
                     }
@@ -232,16 +232,16 @@ namespace SAIN.Talk.Components
                 }
                 else
                 {
-                    mask = SAIN_Math.RandomBool() ? ETagStatus.Combat : ETagStatus.Aware;
+                    mask = EFT_Math.RandomBool() ? ETagStatus.Combat : ETagStatus.Aware;
                 }
 
                 var botStatus = SAIN.BotStatus;
 
                 if (botStatus.Injured)
                 {
-                    if (SAIN_Math.RandomBool(25))
+                    if (EFT_Math.RandomBool(25))
                     {
-                        trigger = SAIN_Math.RandomBool() ? EPhraseTrigger.HurtMedium : EPhraseTrigger.HurtLight;
+                        trigger = EFT_Math.RandomBool() ? EPhraseTrigger.HurtMedium : EPhraseTrigger.HurtLight;
                         BotTalked = true;
                     }
                 }
@@ -260,7 +260,7 @@ namespace SAIN.Talk.Components
             if (BotTalked)
             {
                 //BotTalkComponent.Talk.Say(trigger, true, mask);
-                BotTalkComponent.Talk.TrySay(trigger, mask, false);
+                BotTalkComponent.Talk.Say(trigger, mask, false);
             }
 
             return BotTalked;
@@ -286,7 +286,7 @@ namespace SAIN.Talk.Components
             if (trigger != EPhraseTrigger.PhraseNone)
             {
                 //BotTalkComponent.Talk.Say(trigger, true, mask);
-                BotTalkComponent.Talk.TrySay(trigger, mask, true);
+                BotTalkComponent.Talk.Say(trigger, mask, true);
                 return true;
             }
             return false;
@@ -340,12 +340,8 @@ namespace SAIN.Talk.Components
                     trigger = EPhraseTrigger.Suppress;
                     break;
 
-                case SAINLogicDecision.Heal:
-                    mask = ETagStatus.Aware;
-                    trigger = EPhraseTrigger.StartHeal;
-                    break;
-
-                case SAINLogicDecision.CombatHeal:
+                case SAINLogicDecision.FirstAid:
+                case SAINLogicDecision.Surgery:
                     trigger = EPhraseTrigger.CoverMe;
                     break;
 
@@ -379,7 +375,7 @@ namespace SAIN.Talk.Components
                 }
                 else if (GroupDecisions.Contains(SAINLogicDecision.Search))
                 {
-                    commandTrigger = SAIN_Math.RandomBool() ? EPhraseTrigger.GoForward : EPhraseTrigger.Gogogo;
+                    commandTrigger = EFT_Math.RandomBool() ? EPhraseTrigger.GoForward : EPhraseTrigger.Gogogo;
                     commmandMask = ETagStatus.Combat;
 
                     trigger = EPhraseTrigger.Going;
@@ -395,13 +391,13 @@ namespace SAIN.Talk.Components
                 }
                 else if (GroupDecisions.Contains(SAINLogicDecision.RunForCover) || GroupDecisions.Contains(SAINLogicDecision.WalkToCover))
                 {
-                    commandTrigger = SAIN_Math.RandomBool() ? EPhraseTrigger.GetInCover : EPhraseTrigger.Attention;
+                    commandTrigger = EFT_Math.RandomBool() ? EPhraseTrigger.GetInCover : EPhraseTrigger.Attention;
                     commmandMask = ETagStatus.Combat;
 
                     trigger = EPhraseTrigger.Going;
                     mask = ETagStatus.Combat;
                 }
-                else if (BotOwner.DoorOpener.Interacting && SAIN_Math.RandomBool(33f))
+                else if (BotOwner.DoorOpener.Interacting && EFT_Math.RandomBool(33f))
                 {
                     //commandTrigger = EPhraseTrigger.OpenDoor;
                     //commmandMask = ETagStatus.Aware;
@@ -414,13 +410,13 @@ namespace SAIN.Talk.Components
                     commandTrigger = EPhraseTrigger.OnYourOwn;
                     commmandMask = ETagStatus.Aware;
 
-                    trigger = SAIN_Math.RandomBool() ? EPhraseTrigger.Repeat : EPhraseTrigger.Stop;
+                    trigger = EFT_Math.RandomBool() ? EPhraseTrigger.Repeat : EPhraseTrigger.Stop;
                     mask = ETagStatus.Aware;
                 }
 
                 if (commandTrigger != EPhraseTrigger.PhraseNone)
                 {
-                    BotTalkComponent.Talk.Say(commandTrigger, true, commmandMask);
+                    BotTalkComponent.Talk.Say(commandTrigger, commmandMask, true);
                     AllMembersSay(new TalkEventObject(trigger, mask, false), Random.Range(0.5f, 1.5f), 50f);
                 }
             }
@@ -435,9 +431,9 @@ namespace SAIN.Talk.Components
             var mask = ETagStatus.Aware;
 
             var enemy = SAIN.Enemy;
-            if (enemy.CanSee)
+            if (SAINLayers.HasEnemyAndCanShoot)
             {
-                Vector3 enemyPosition = enemy.CurrentPerson.Transform.position;
+                Vector3 enemyPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
 
                 if (enemy.EnemyLookingAtMe)
                 {
@@ -463,7 +459,7 @@ namespace SAIN.Talk.Components
             if (BotTalked)
             {
                 //BotTalkComponent.Talk.Say(trigger, true, mask);
-                BotTalkComponent.Talk.TrySay(trigger, mask, true);
+                BotTalkComponent.Talk.Say(trigger, mask, true);
             }
 
             return BotTalked;
@@ -595,11 +591,11 @@ namespace SAIN.Talk.Components
 
         private bool SayRatCheck()
         {
-            if (SAIN.Enemy.LastSeen.TimeSinceSeen > 30f && RatTimer < Time.time && BotOwner.Memory.GoalEnemy != null && SAIN.Enemy.CurrentPerson == BotOwner.Memory.GoalEnemy.Person)
+            if (SAIN.Enemy.LastSeen.TimeSinceSeen > 30f && RatTimer < Time.time && BotOwner.Memory.GoalEnemy != null)
             {
                 RatTimer = Time.time + 120f * Random.Range(0.75f, 1.25f);
 
-                if (SAIN_Math.RandomBool(33))
+                if (EFT_Math.RandomBool(33))
                 {
                     return true;
                 }

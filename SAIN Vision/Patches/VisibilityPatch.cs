@@ -7,9 +7,6 @@ using System.Reflection;
 using UnityEngine;
 using Vision.Helpers;
 using Vision.UserSettings;
-using static SAIN_Helpers.DebugDrawer;
-using static UnityEngine.Color;
-using DrakiaXYZ;
 
 namespace Vision.Patches
 {
@@ -142,48 +139,6 @@ namespace Vision.Patches
         }
     }
 
-    public class VisionOverridesPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotGlobalLookData), "Update");
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(BotGlobalLookData __instance)
-        {
-            if (!VisionConfig.EnableSAINVision.Value)
-            {
-                return;
-            }
-
-            __instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 1000f;
-
-            __instance.NIGHT_VISION_ON = 75f;
-            __instance.NIGHT_VISION_OFF = 125f;
-            __instance.NIGHT_VISION_DIST = 125f;
-            __instance.VISIBLE_ANG_NIGHTVISION = 90f;
-
-            __instance.LOOK_THROUGH_PERIOD_BY_HIT = 0f;
-
-            __instance.LightOnVisionDistance = 40f;
-            __instance.VISIBLE_ANG_LIGHT = 30f;
-            __instance.VISIBLE_DISNACE_WITH_LIGHT = 50f;
-
-            __instance.GOAL_TO_FULL_DISSAPEAR = 0.2f;
-            __instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.35f;
-            __instance.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.0001f;
-
-            __instance.MAX_VISION_GRASS_METERS = 1f;
-            __instance.MAX_VISION_GRASS_METERS_OPT = 1f;
-            __instance.MAX_VISION_GRASS_METERS_FLARE = 4f;
-            __instance.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
-
-            __instance.NO_GREEN_DIST = 1f;
-            __instance.NO_GRASS_DIST = 1f;
-        }
-    }
-
     public class IsPartVisiblePatch : ModulePatch
     {
         public static List<string> sightblocker = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider",
@@ -204,7 +159,6 @@ namespace Vision.Patches
 
             if (Owner.LookSensor.VisibleDist + addVisibility < (partPosition - headPosition).magnitude)
             {
-                Ray(headPosition, partPosition - headPosition, Owner.LookSensor.VisibleDist + addVisibility, 0.01f, yellow, 0.25f);
                 __result = false;
                 return false;
             }
@@ -218,9 +172,6 @@ namespace Vision.Patches
                 {
                     if (ObjectName.ToLower().Contains(foliageObject))
                     {
-                        Line(headPosition, rayHit.point, 0.01f, green, 0.5f);
-                        Sphere(rayHit.point, 0.05f, green, 1f);
-
                         __result = false;
                         if (Owner.Memory.GoalEnemy != null)
                         {
@@ -228,7 +179,6 @@ namespace Vision.Patches
 
                             Vector3 lastSeenPos = Owner.Memory.GoalEnemy.PersonalLastPos;
                             lastSeenPos.y += 1f;
-                            Line(Owner.WeaponRoot.position, lastSeenPos, 0.01f, red, 0.5f);
                         }
                         return false;
                     }
@@ -301,9 +251,6 @@ namespace Vision.Patches
 
             if ((rayHit2.point - rayHit.point).magnitude < 3f)
             {
-                Line(rayHit2.point, rayHit.point, 0.025f, green, 5f);
-                Sphere(rayHit.point, 0.15f, green, 5f);
-                Sphere(rayHit2.point, 0.15f, green, 5f);
                 return true;
             }
             return false;

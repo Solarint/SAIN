@@ -10,20 +10,14 @@ namespace SAIN.UserSettings
         public static ConfigEntry<float> CoverHideSensitivity { get; private set; }
         public static ConfigEntry<float> CoverUpdateFrequency { get; private set; }
         public static ConfigEntry<float> CoverNavSampleDistance { get; private set; }
-        public static ConfigEntry<bool> AllBotsMoveToPlayer { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
             string cover = "1. Cover System";
 
-            AllBotsMoveToPlayer = Config.Bind(cover, "All Bots Move To Player", false,
-                new ConfigDescription("",
-                null,
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 26 }));
-
-            CoverColliderRadius = Config.Bind(cover, "Collider Radius Base", 15f, 
+            CoverColliderRadius = Config.Bind(cover, "Collider Radius Base", 35f, 
                 new ConfigDescription("", 
-                new AcceptableValueRange<float>(3f, 50f),
+                new AcceptableValueRange<float>(3f, 80f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 6 }));
 
             CoverMinHeight = Config.Bind(cover, "Min Height", 0.75f,

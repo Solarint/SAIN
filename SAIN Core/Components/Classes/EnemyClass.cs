@@ -1,7 +1,6 @@
 ﻿using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
-using SAIN_Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,8 +24,6 @@ namespace SAIN.Classes
                 return;
             }
 
-            UpdateGrenade();
-
             if (Timers.CheckPathTimer < Time.time)
             {
                 Timers.CheckPathTimer = Time.time + Timers.CheckPathFreq;
@@ -38,30 +35,12 @@ namespace SAIN.Classes
                 Timers.VisionRaycastTimer = Time.time + Timers.VisionRaycastFreq;
                 UpdateVision(person);
             }
-
-            if (Timers.ShootRaycastTimer < Time.time)
-            {
-                Timers.ShootRaycastTimer = Time.time + Timers.ShootRaycastFreq;
-                UpdateShoot(person);
-            }
         }
 
         private void UpdateVision(IAIDetails person)
         {
-            bool CouldSeeEnemy = CanSee;
-            CanSee = RaycastHelpers.CheckVisible(BotOwner.MyHead.position, person, SAINCoreComponent.SightMask);
-
-            if (CanSee)
+            if (BotOwner.Memory.GoalEnemy.IsVisible && BotOwner.Memory.GoalEnemy.CanShoot)
             {
-                if (!CouldSeeEnemy)
-                {
-                    TimeFirstVisible = Time.time;
-                }
-                else
-                {
-                    TimeVisibleReal = Time.time - TimeFirstVisible;
-                }
-
                 EnemyLookingAtMe = IsPersonLookAtMe(person);
 
                 person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
@@ -70,27 +49,6 @@ namespace SAIN.Classes
                 EnemyChestPosition = EnemyBody.Position;
 
                 LastSeen.UpdateSeen(person);
-
-                NewEnemy = person != LastPerson;
-                if (NewEnemy)
-                {
-                    DebugGizmos(Color.magenta, 3f);
-
-                    Path.Update(person.Transform.position);
-                    LastPerson = CurrentPerson;
-                    CurrentPerson = person;
-                }
-                else
-                {
-                    if (EnemyLookingAtMe)
-                    {
-                        DebugGizmos(Color.yellow);
-                    }
-                    else
-                    {
-                        DebugGizmos(Color.green);
-                    }
-                }
             }
             else
             {
@@ -98,101 +56,22 @@ namespace SAIN.Classes
             }
         }
 
-        private void UpdateShoot(IAIDetails person)
-        {
-            CanShoot = RaycastHelpers.CheckVisible(BotOwner.WeaponRoot.position, person, SAINCoreComponent.ShootMask);
-
-            if (CanShoot)
-            {
-                LastSeen.UpdateShoot(person);
-
-                DebugGizmos(BotOwner.WeaponRoot.position, Color.red);
-            }
-            else
-            {
-                LastSeen.UpdateTimeSinceShoot();
-            }
-        }
-
-        private float GrenadeCheckTimer = 0f;
-
-        private void UpdateGrenade()
-        {
-            if (BotOwner.BewareGrenade?.GrenadeDangerPoint != null)
-            {
-                Grenade = BotOwner.BewareGrenade.GrenadeDangerPoint.Grenade;
-
-                if (GrenadeCheckTimer < Time.time)
-                {
-                    GrenadeCheckTimer = Time.time + 0.05f;
-
-                    CanSeeGrenade = RaycastHelpers.CheckVisible(Core.HeadPosition, Grenade.transform.position, SAINCoreComponent.SightMask);
-
-                    if (CanSeeGrenade)
-                    {
-                        LastSeen.UpdateGrenade(Grenade.transform.position, BotOwner.BewareGrenade.GrenadeDangerPoint.DangerPoint);
-                    }
-                    else
-                    {
-                        LastSeen.UpdateTimeSinceGrenade();
-                    }
-                }
-            }
-            else
-            {
-                if (Grenade != null)
-                {
-                    Grenade = null;
-                    LastSeen.DisposeGrenade();
-                }
-            }
-        }
-
-        private void DebugGizmos(Color color, float width = 0.025f)
-        {
-            if (Plugin.DebugDrawVision.Value)
-            {
-                DebugDrawer.Line(EnemyChestPosition.Value, Core.HeadPosition, width, color, Plugin.VisionRaycast.Value);
-            }
-        }
-
-        private void DebugGizmos(Vector3 start, Color color, float width = 0.025f)
-        {
-            if (Plugin.DebugDrawVision.Value)
-            {
-                DebugDrawer.Line(start, EnemyChestPosition.Value, width, color, Plugin.VisionRaycast.Value);
-            }
-        }
-
-        private void DebugGizmos(Vector3 start, Vector3 end, Color color, float width = 0.025f)
-        {
-            if (Plugin.DebugDrawVision.Value)
-            {
-                DebugDrawer.Line(start, end, width, color, Plugin.VisionRaycast.Value);
-            }
-        }
-
         public bool IsPersonLookAtMe(IAIDetails person)
         {
             if (person != null)
             {
-                Vector3 EnemyLookDirection = SAIN_Math.NormalizeFastSelf(BotOwner.LookSensor._headPoint - person.Transform.position);
-                return SAIN_Math.IsAngLessNormalized(EnemyLookDirection, person.LookDirection, 0.9659258f);
+                Vector3 EnemyLookDirection = VectorHelpers.NormalizeFastSelf(BotOwner.LookSensor._headPoint - person.Transform.position);
+                return VectorHelpers.IsAngLessNormalized(EnemyLookDirection, person.LookDirection, 0.9659258f);
             }
             return false;
         }
 
-        public Grenade Grenade { get; private set; }
-        public bool NewEnemy { get; private set; } = false;
         public bool EnemyLookingAtMe { get; private set; } = false;
-        public IAIDetails CurrentPerson { get; private set; } = null;
-        public IAIDetails LastPerson { get; private set; } = null;
 
-        public bool CanShoot = false;
+        //public bool CanShoot = false;
         public float TimeFirstVisible = 0f;
         public float TimeVisibleReal = 0f;
-        public bool CanSee = false;
-        public bool CanSeeGrenade { get; private set; }
+        //public bool CanSee = false;
 
         public Vector3? EnemyHeadPosition { get; private set; }
         public Vector3? EnemyChestPosition { get; private set; }
@@ -254,46 +133,11 @@ namespace SAIN.Classes
             public void UpdateSeen(IAIDetails person)
             {
                 Time = UnityEngine.Time.time;
-                EnemyPosition = person.Transform.position;
-                EnemyDirection = person.Transform.position - BotOwner.Transform.position;
-                EnemyStraightDistance = Vector3.Distance(person.Transform.position, BotOwner.Transform.position);
-                BotPosition = BotOwner.Transform.position;
             }
 
             public void UpdateTimeSinceSeen()
             {
                 TimeSinceSeen = UnityEngine.Time.time - Time;
-            }
-
-            public void UpdateShoot(IAIDetails person)
-            {
-                ShootTime = UnityEngine.Time.time;
-                BotShootPosition = BotOwner.Transform.position;
-            }
-
-            public void UpdateTimeSinceShoot()
-            {
-                TimeSinceShoot = UnityEngine.Time.time - ShootTime;
-            }
-
-            public void UpdateGrenade(Vector3 grenadePos, Vector3 dangerPoint)
-            {
-                GrenadeTime = UnityEngine.Time.time;
-                GrenadePosition = grenadePos;
-                GrenadeDangerPoint = dangerPoint;
-            }
-
-            public void UpdateTimeSinceGrenade()
-            {
-                GrenadeTimeSinceSeen = UnityEngine.Time.time - GrenadeTime;
-            }
-
-            public void DisposeGrenade()
-            {
-                GrenadeTimeSinceSeen = 999f;
-                GrenadePosition = null;
-                GrenadeDangerPoint = null;
-                GrenadeTime = 0f;
             }
 
 
@@ -317,19 +161,7 @@ namespace SAIN.Classes
             public float Time { get; private set; }
             public float TimeSinceSeen { get; private set; }
 
-            public Vector3 BotPosition { get; private set; }
-            public float ShootTime { get; private set; }
-            public float TimeSinceShoot { get; private set; }
-            public Vector3 BotShootPosition { get; private set; }
-
-            public Vector3 EnemyPosition { get; private set; }
-            public Vector3 EnemyDirection { get; private set; }
             public float EnemyStraightDistance { get; private set; }
-
-            public Vector3? GrenadeDangerPoint { get; private set; }
-            public Vector3? GrenadePosition { get; private set; }
-            public float GrenadeTime { get; private set; }
-            public float GrenadeTimeSinceSeen { get; private set; }
         }
     }
 }

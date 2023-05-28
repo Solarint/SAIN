@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using EFT;
+using SAIN.Components;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,57 +11,8 @@ namespace SAIN.Helpers
 {
     public class Corners
     {
-        /// <summary>
-        /// Finds RawCorners and generates an angle between the first 2 to calculate the direction a BotOwner should lean in based on enemy position
-        /// </summary>
-        public class FindDirectionToLean : SAINBotExt
-        {
-            public bool Leaning { get; set; }
-
-            public FindDirectionToLean(BotOwner bot) : base(bot)
-            {
-                Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            }
-
-            /// <summary>
-            /// Finds the lean angle for a Bot based on the RawCorners in a navmeshpath.
-            /// </summary>
-            /// <param name="maxDistance">The maximum distance between the two RawCorners.</param>
-            /// <param name="debugMode">Whether or not to enable debug mode.</param>
-            /// <returns>The lean angle for a BotOwner, 0 if no lean.</returns>
-            public float FindLeanAngle(Vector3 targetPos)
-            {
-                float angle = 0f;
-
-                Vector3[] corners = CornerProcessing.GetCorners(BotOwner.Transform.position, targetPos, BotOwner.MyHead.position, true, false, true);
-
-                // Corner 0 is at BotOwner position. So we need corner 1 and 2 to check lean angle.
-                if (corners.Length >= 3)
-                {
-                    Leaning = true;
-
-                    // Get the directions to the corners from the bot's position
-                    Vector3 cornerADirection = (corners[1] - BotOwner.Transform.position).normalized;
-                    Vector3 cornerBDirection = (corners[2] - BotOwner.Transform.position).normalized;
-
-                    // Set the y to 0 just in case
-                    cornerADirection.y = 0f;
-                    cornerBDirection.y = 0f;
-
-                    // Get the signed angle which is negative or positive depending on if clockwise or counterclockwise from corner 2
-                    angle = Vector3.SignedAngle(cornerBDirection, cornerADirection, Vector3.up);
-                }
-
-                return angle;
-            }
-
-            protected ManualLogSource Logger;
-        }
-
         public class CornerProcessing
         {
-            private static bool DebugMode => DebugCornerProcessing.Value;
-
             public static Vector3[] GetCorners(Vector3 botPosition, Vector3 targetPos, Vector3 botHeadPosition, bool raycastTrim = true, bool lerpTrim = false, bool cornerToHeadHeight = false, bool returnFromHeadHeight = false, float minLengthLerp = 2f)
             {
                 Vector3 headOffset = botHeadPosition - botPosition;
@@ -169,8 +121,6 @@ namespace SAIN.Helpers
                 Vector3[] lerpCorners = cornersList.ToArray();
                 return lerpCorners;
             }
-
-            private static ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("Corner Processing");
         }
     }
 }

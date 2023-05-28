@@ -1,13 +1,13 @@
 ﻿using BepInEx;
-using Comfort.Common;
+using DrakiaXYZ.VersionChecker;
 using DrakiaXYZ.BigBrain.Brains;
-using EFT;
-using SAIN.Classes;
-using SAIN.Components;
 using SAIN.Layers;
+using SAIN.Helpers;
 using SAIN.UserSettings;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using SAIN.Components;
 
 namespace SAIN
 {
@@ -23,23 +23,60 @@ namespace SAIN
 
         private void Awake()
         {
+            if (!TarkovVersion.CheckEftVersion(Logger, Info, Config))
+            {
+                throw new Exception($"Invalid EFT Version");
+            }
+
             try
             {
+                TalkConfig.Init(Config);
+                VisionConfig.Init(Config);
                 DebugConfig.Init(Config);
                 CoverConfig.Init(Config);
+                FullAutoConfig.Init(Config);
+                RecoilScatterConfig.Init(Config);
+                SemiAutoConfig.Init(Config);
+                SoundConfig.Init(Config);
 
                 new Patches.AddComponentPatch().Enable();
                 new Patches.DisposeComponentPatch().Enable();
+                new Patches.InitHelper().Enable();
 
+                new Patches.InitiateShotPatch().Enable();
+                new Patches.TryPlayShootSoundPatch().Enable();
+                new Patches.HearingSensorPatch().Enable();
+
+                new Patches.PlayerTalkPatch().Enable();
+                new Patches.TalkDisablePatch1().Enable();
+                new Patches.TalkDisablePatch2().Enable();
+                new Patches.TalkDisablePatch3().Enable();
+                new Patches.TalkDisablePatch4().Enable();
+
+                new Patches.VisibleDistancePatch().Enable();
+                new Patches.GainSightPatch().Enable();
+
+                new Patches.KickPatch().Enable();
                 new Patches.GrenadeThrownActionPatch().Enable();
+                new Patches.AddEnemyToAllGroupsInBotZonePatch().Enable();
+                new Patches.AddEnemyToAllGroupsPatch().Enable();
 
+                new Patches.BotGlobalLookPatch().Enable();
+                new Patches.BotGlobalShootPatch().Enable();
                 new Patches.BotGlobalGrenadePatch().Enable();
                 new Patches.BotGlobalMindPatch().Enable();
                 new Patches.BotGlobalMovePatch().Enable();
                 new Patches.BotGlobalCorePatch().Enable();
                 new Patches.BotGlobalAimPatch().Enable();
+                new Patches.BotGlobalScatterPatch().Enable();
 
-                new Patches.KickPatch().Enable();
+                new Patches.AimOffsetPatch().Enable();
+                new Patches.RecoilPatch().Enable();
+                new Patches.LoseRecoilPatch().Enable();
+                new Patches.EndRecoilPatch().Enable();
+                new Patches.FullAutoPatch().Enable();
+                new Patches.SemiAutoPatch().Enable();
+                new Patches.FiremodePatch().Enable();
             }
             catch (Exception ex)
             {
@@ -51,5 +88,12 @@ namespace SAIN
             BrainManager.AddCustomLayer(typeof(SAINFight), new List<string>(Bosses), 90);
             BrainManager.AddCustomLayer(typeof(SAINFight), new List<string>(Followers), 90);
         }
+
+        private void Update()
+        {
+            AddComponent.AddSingleComponent<PlayerTalkComponent>();
+        }
+
+        private readonly MainPlayerComponentSingle AddComponent = new MainPlayerComponentSingle();
     }
 }

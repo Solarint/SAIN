@@ -73,7 +73,7 @@ namespace SAIN.Talk.Patches
                 return false;
             }
 
-            PatchHelpers.AllowDefaultBotTalk(___botOwner_0, type, sayImmediately, additionalMask);
+            PatchHelpers.AllowDefaultBotTalk(___botOwner_0, type, additionalMask);
 
             return false;
         }
@@ -155,20 +155,20 @@ namespace SAIN.Talk.Patches
             return false;
         }
 
-        public static bool AllowDefaultBotTalk(BotOwner botOwner, EPhraseTrigger trigger, bool sayImmediately, ETagStatus? mask)
+        public static bool AllowDefaultBotTalk(BotOwner botOwner, EPhraseTrigger trigger, ETagStatus? mask)
         {
             if (BotInGroup(botOwner))
             {
                 if (GoodGroupTriggers.Contains(trigger))
                 {
-                    botOwner.GetComponent<BotTalkComponent>().Talk.Say(trigger, sayImmediately, mask);
+                    botOwner.GetComponent<BotTalkComponent>().Talk.Say(trigger, mask);
                 }
             }
             else
             {
                 if (GoodSoloTriggers.Contains(trigger))
                 {
-                    botOwner.GetComponent<BotTalkComponent>().Talk.Say(trigger, sayImmediately, mask);
+                    botOwner.GetComponent<BotTalkComponent>().Talk.Say(trigger, mask);
                 }
             }
 

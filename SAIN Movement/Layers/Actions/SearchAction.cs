@@ -14,57 +14,12 @@ namespace SAIN.Layers
         public SearchAction(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            SAIN = bot.GetComponent<SAINComponent>();
-            this.gclass105_0 = new GClass105(bot);
         }
-
-        private GClass105 gclass105_0;
 
         public override void Update()
         {
-            if (EnemyPosition == null)
-            {
-                return;
-            }
-
-            if (Vector3.Distance(BotOwner.Transform.position, EnemyPosition.Value) < 2f)
-            {
-                int i = 0;
-                while (i < 5)
-                {
-                    Vector3 randomPoint = Random.onUnitSphere * 10f;
-                    randomPoint.y = 0f;
-                    if (NavMesh.SamplePosition(randomPoint + EnemyPosition.Value, out var hit, 2f, NavMesh.AllAreas))
-                    {
-                        EnemyPosition = hit.position;
-                        break;
-                    }
-                }
-            }
-
-            if (BotOwner.Memory.GoalEnemy != null)
-            {
-                if (SAIN.HasEnemyAndCanShoot)
-                {
-                    gclass105_0.Update();
-                    SAIN.Steering.ManualUpdate();
-                }
-                else if (SAIN.BotOwner.MoveToEnemyData.TryMoveToEnemy(EnemyPosition.Value))
-                {
-                    BotOwner.Steering.LookToMovingDirection();
-                }
-            }
-            else
-            {
-                BotOwner.GoToPoint(EnemyPosition.Value);
-                SAIN.Steering.ManualUpdate();
-            }
+            BotOwner.SetPose(0.75f);
         }
-
-        private Vector3? EnemyPosition;
-        private readonly SAINComponent SAIN;
-        public bool DebugMode => DebugLayers.Value;
-        public bool DebugDrawPoints => DebugLayersDraw.Value;
 
         public ManualLogSource Logger;
 
@@ -72,22 +27,31 @@ namespace SAIN.Layers
         {
             BotOwner.PatrollingData.Pause();
 
+            Vector3 targetPosition;
             if (BotOwner.Memory.GoalEnemy != null)
             {
-                EnemyPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
+                targetPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
             }
-            else if (BotOwner.Memory.GoalTarget?.Position != null)
+            else if (BotOwner.Memory.GoalTarget?.GoalTarget?.Position != null)
             {
-                EnemyPosition = BotOwner.Memory.GoalTarget.Position.Value;
+                targetPosition = BotOwner.Memory.GoalTarget.GoalTarget.Position;
             }
             else
             {
-                EnemyPosition = BotOwner.Transform.position;
+                targetPosition = BotOwner.Transform.position;
             }
+
+            BotOwner.gameObject.AddComponent<EnemySearchComponent>().Init(targetPosition);
         }
 
         public override void Stop()
         {
+            var component = BotOwner.gameObject.GetComponent<EnemySearchComponent>();
+            if (component != null)
+            {
+                component.Dispose();
+            }
+
             BotOwner.PatrollingData.Unpause();
         }
     }

@@ -79,4 +79,32 @@ namespace SAIN.Patches
             }
         }
     }
+
+    public class AddEnemyToAllGroupsInBotZonePatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotControllerClass).GetMethod("AddEnemyToAllGroupsInBotZone", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix()
+        {
+            return false;
+        }
+    }
+
+    public class AddEnemyToAllGroupsPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotControllerClass).GetMethod("AddEnemyToAllGroups", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix()
+        {
+            return false;
+        }
+    }
 }

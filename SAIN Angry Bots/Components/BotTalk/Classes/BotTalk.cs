@@ -6,40 +6,24 @@ namespace SAIN.Talk.Components
 {
     public class BotTalk : SAINTalk
     {
-        public static List<EPhraseTrigger> GoodPhrasesForPatch = new List<EPhraseTrigger>();
-
-        private const float BotTalkDelaySetting = 3f;
+        private const float BotTalkDelaySetting = 1f;
 
         public BotTalk(BotOwner bot) : base(bot)
         {
-            AddPhrases();
-            Activate();
+            PhraseObjectsAdd();
+
+            CanTalk = BotOwner.Settings.FileSettings.Mind.CAN_TALK;
         }
 
-        public void Say(EPhraseTrigger type, bool sayImmediately = false, ETagStatus? additionalMask = null)
+        public void Say(EPhraseTrigger type, ETagStatus? additionalMask = null, bool withGroupDelay = false)
         {
+            CheckDictionaryMissing(type);
+
             if (!CanTalk)
             {
-                //return;
-            }
-
-            ETagStatus mask = SetETagMask(additionalMask);
-
-            if (!sayImmediately)
-            {
-                CheckDelay(type, true, 0f, mask);
                 return;
             }
 
-            Logger.LogDebug($"Bot Said: Phrase: [{type}] Mask: [{additionalMask}]");
-
-            talkDelay = Time.time + BotTalkDelaySetting * UnityEngine.Random.Range(0.75f, 1.25f);
-
-            BotOwner.GetPlayer.Say(type, true, 0f, mask, 100, false);
-        }
-
-        public void TrySay(EPhraseTrigger type, ETagStatus? additionalMask, bool withGroupDelay)
-        {
             if (withGroupDelay && !BotOwner.BotsGroup.GroupTalk.CanSay(BotOwner, type))
             {
                 return;
@@ -47,7 +31,7 @@ namespace SAIN.Talk.Components
 
             ETagStatus mask = SetETagMask(additionalMask);
 
-            CheckDelay(type, true, 0f, mask);
+            CheckPhrase(type, mask);
         }
 
         public void ManualUpdate()
@@ -57,28 +41,37 @@ namespace SAIN.Talk.Components
                 return;
             }
 
-            if (!TalkLimited)
+            if (TalkPriorityTimer < Time.time && talkPackage != null)
             {
-                return;
-            }
+                TalkPriorityActive = false;
 
-            if (TalkLimiter < Time.time && talkPackage != null)
-            {
-                TalkLimited = false;
-
-                if (talkDelay < Time.time)
+                if (allTalkDelay < Time.time)
                 {
-                    BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, talkPackage.type);
+                    SendSayCommand(talkPackage);
 
-                    BotOwner.GetPlayer.Say(talkPackage.type, talkPackage.demand, talkPackage.delay, talkPackage.mask, 100, false);
-
-                    Logger.LogDebug($"Bot Said After Query: Phrase: [{talkPackage.type}] Mask: [{talkPackage.mask}]");
-
-                    talkDelay = Time.time + BotTalkDelaySetting * UnityEngine.Random.Range(0.75f, 1.25f);
+                    allTalkDelay = Time.time + BotTalkDelaySetting;
                 }
 
                 talkPackage = null;
             }
+        }
+
+        private void SendSayCommand(EPhraseTrigger type, ETagStatus mask)
+        {
+            BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, type);
+            BotOwner.GetPlayer.Say(type, true, 0f, mask);
+            PhraseDictionary[type].TimeLastSaid = Time.time;
+        }
+
+        private void SendSayCommand(BotTalkPackage talkPackage)
+        {
+            var phrase = talkPackage.phraseInfo.Phrase;
+
+            Logger.LogDebug($"Bot Said After Query: Phrase: [{phrase}] Mask: [{talkPackage.Mask}]");
+
+            BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, phrase);
+            BotOwner.GetPlayer.Say(phrase, true, 0f, talkPackage.Mask);
+            PhraseDictionary[phrase].TimeLastSaid = Time.time;
         }
 
         private ETagStatus SetETagMask(ETagStatus? additionaMask = null)
@@ -126,20 +119,31 @@ namespace SAIN.Talk.Components
             return etagStatus;
         }
 
-        private void CheckDelay(EPhraseTrigger type, bool demand, float delay, ETagStatus mask)
+        private void CheckPhrase(EPhraseTrigger type, ETagStatus mask)
         {
-            GClass467 data = new GClass467(type, demand, delay, mask);
-
-            talkPackage = CheckPriorityPhrase(data, talkPackage);
-
-            if (!TalkLimited)
+            if (type == EPhraseTrigger.OnDeath || type == EPhraseTrigger.OnAgony || type == EPhraseTrigger.OnBeingHurt)
             {
-                TalkLimited = true;
-                TalkLimiter = Time.time + 0.15f;
+                SendSayCommand(type, mask);
+                return;
+            }
+
+            var phrase = PhraseDictionary[type];
+
+            if (phrase.TimeLastSaid + phrase.TimeDelay < Time.time)
+            {
+                var data = new BotTalkPackage(phrase, mask);
+
+                talkPackage = CheckPriority(data, talkPackage);
+
+                if (!TalkPriorityActive)
+                {
+                    TalkPriorityActive = true;
+                    TalkPriorityTimer = Time.time + 0.15f;
+                }
             }
         }
 
-        private GClass467 CheckPriorityPhrase(GClass467 newTalk, GClass467 oldTalk)
+        private BotTalkPackage CheckPriority(BotTalkPackage newTalk, BotTalkPackage oldTalk)
         {
             if (oldTalk == null)
             {
@@ -150,77 +154,151 @@ namespace SAIN.Talk.Components
                 return oldTalk;
             }
 
-            float New = PhraseDictionary.ContainsKey(newTalk.type) ? PhraseDictionary[newTalk.type] : 101f;
-            float Old = PhraseDictionary.ContainsKey(oldTalk.type) ? PhraseDictionary[oldTalk.type] : 100f;
+            int newPriority = newTalk.phraseInfo.Priority;
+            int oldPriority = oldTalk.phraseInfo.Priority;
 
-            bool ChangeTalk = Old < New;
-
-            //Logger.LogDebug($"Talk Priority: Old: [{Old}] for [{oldTalk.type}] New: [{New}] for [{newTalk.type}]");
+            bool ChangeTalk = oldPriority <= newPriority;
 
             return ChangeTalk ? newTalk : oldTalk;
         }
 
-        public void TrySay(EPhraseTrigger type)
+        private void CheckDictionaryMissing(EPhraseTrigger trigger)
         {
-            TrySay(type, null, false);
+            if (!PhraseDictionary.ContainsKey(trigger))
+            {
+                Logger.LogError($"Phrase [{trigger}] is not in dictionary, adding it.");
+
+                var phrase = new PhraseInfo(trigger, 10, 20f);
+                Phrases.Add(phrase);
+
+                PhraseDictionary.Add(trigger, phrase);
+            }
         }
 
-        public void TrySay(EPhraseTrigger type, bool withGroupDelay)
+        private void PhraseObjectsAdd()
         {
-            TrySay(type, null, withGroupDelay);
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnGoodWork, 1, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnBreath, 3, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.EnemyHit, 4, 3f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Rat, 5, 60f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnMutter, 6, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyDown, 7, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyConversation, 8, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.GoForward, 9, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Gogogo, 10, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Going, 11, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnFight, 12, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyShot, 13, 3f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnLostVisual, 14, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnRepeatedContact, 15, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnFirstContact, 16, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnBeingHurtDissapoinment, 17, 35f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.StartHeal, 18, 75f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtLight, 19, 60f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnWeaponReload, 20, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnOutOfAmmo, 21, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtMedium, 22, 60f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtHeavy, 23, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LegBroken, 24, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.HandBroken, 25, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtNearDeath, 26, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnFriendlyDown, 27, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.FriendlyFire, 28, 2f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.NeedHelp, 29, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.GetInCover, 30, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LeftFlank, 31, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.RightFlank, 32, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.NeedWeapon, 33, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.WeaponBroken, 34, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnGrenade, 35, 1f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyGrenade, 36, 1f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Stop, 37, 1f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnBeingHurt, 38, 1f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnAgony, 39, 1f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnDeath, 40, 1f));
+
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnSix, 15, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.InTheFront, 15, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.FollowMe, 15, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Suppress, 20, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Roger, 10, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Negative, 10, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.PhraseNone, 1, 1f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Attention, 25, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnYourOwn, 25, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Repeat, 25, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.CoverMe, 25, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.NoisePhrase, 5, 60f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.UnderFire, 37, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.MumblePhrase, 30, 5f));
+
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LootBody, 5, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LootContainer, 5, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LootGeneric, 5, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LootKey, 5, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LootMoney, 5, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LootNothing, 5, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.LootWeapon, 5, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnLoot, 5, 30f));
+
+            foreach (var phrase in Phrases)
+            {
+                PhraseDictionary.Add(phrase.Phrase, phrase);
+            }
+
+            foreach (EPhraseTrigger value in System.Enum.GetValues(typeof(EPhraseTrigger)))
+            {
+                if (!PhraseDictionary.ContainsKey(value))
+                {
+                    //Logger.LogWarning($"Enum Value is not in dict [{value}]");
+
+                    var phrase = new PhraseInfo(value, 5, 10f);
+
+                    Phrases.Add(phrase);
+                    PhraseDictionary.Add(value, phrase);
+                }
+            }
         }
 
-        public void Activate()
+        private readonly List<PhraseInfo> Phrases = new List<PhraseInfo>();
+
+        private BotTalkPackage talkPackage;
+
+        private bool TalkPriorityActive = false;
+        private float TalkPriorityTimer = 0f;
+        private float allTalkDelay = 0f;
+
+        private readonly bool CanTalk = true;
+
+        private readonly Dictionary<EPhraseTrigger, PhraseInfo> PhraseDictionary = new Dictionary<EPhraseTrigger, PhraseInfo>();
+    }
+
+    public class BotTalkPackage
+    {
+        public BotTalkPackage(PhraseInfo phrase, ETagStatus mask)
         {
-            CanTalk = BotOwner.Settings.FileSettings.Mind.CAN_TALK;
+            phraseInfo = phrase;
+            Mask = mask;
         }
 
-        private void AddPhrases()
+        public PhraseInfo phraseInfo;
+
+        public ETagStatus Mask;
+    }
+
+    public class PhraseInfo
+    {
+        public PhraseInfo(EPhraseTrigger trigger, int priority, float timeDelay)
         {
-            PhraseDictionary.Add(EPhraseTrigger.OnGoodWork, 5f);
-            PhraseDictionary.Add(EPhraseTrigger.LootBody, 10f);
-            PhraseDictionary.Add(EPhraseTrigger.OnBreath, 15f);
-            PhraseDictionary.Add(EPhraseTrigger.EnemyHit, 20f);
-            PhraseDictionary.Add(EPhraseTrigger.Rat, 25f);
-            PhraseDictionary.Add(EPhraseTrigger.OnMutter, 30f);
-            PhraseDictionary.Add(EPhraseTrigger.OnEnemyDown, 35f);
-            PhraseDictionary.Add(EPhraseTrigger.OnEnemyConversation, 40f);
-            PhraseDictionary.Add(EPhraseTrigger.OnFight, 45f);
-            PhraseDictionary.Add(EPhraseTrigger.OnEnemyShot, 50f);
-            PhraseDictionary.Add(EPhraseTrigger.OnLostVisual, 55f);
-            PhraseDictionary.Add(EPhraseTrigger.OnRepeatedContact, 60f);
-            PhraseDictionary.Add(EPhraseTrigger.OnFirstContact, 65f);
-            PhraseDictionary.Add(EPhraseTrigger.OnBeingHurtDissapoinment, 70f);
-            PhraseDictionary.Add(EPhraseTrigger.StartHeal, 75f);
-            PhraseDictionary.Add(EPhraseTrigger.HurtLight, 80f);
-            PhraseDictionary.Add(EPhraseTrigger.OnBeingHurt, 82f);
-            PhraseDictionary.Add(EPhraseTrigger.OnWeaponReload, 83f);
-            PhraseDictionary.Add(EPhraseTrigger.OnOutOfAmmo, 84f);
-            PhraseDictionary.Add(EPhraseTrigger.HurtMedium, 85f);
-            PhraseDictionary.Add(EPhraseTrigger.HurtHeavy, 90f);
-            PhraseDictionary.Add(EPhraseTrigger.LegBroken, 95f);
-            PhraseDictionary.Add(EPhraseTrigger.HandBroken, 100f);
-            PhraseDictionary.Add(EPhraseTrigger.HurtNearDeath, 105f);
-            PhraseDictionary.Add(EPhraseTrigger.OnFriendlyDown, 125f);
-            PhraseDictionary.Add(EPhraseTrigger.FriendlyFire, 130f);
-            PhraseDictionary.Add(EPhraseTrigger.NeedHelp, 135f);
-            PhraseDictionary.Add(EPhraseTrigger.GetInCover, 140f);
-            PhraseDictionary.Add(EPhraseTrigger.LeftFlank, 145f);
-            PhraseDictionary.Add(EPhraseTrigger.RightFlank, 150f);
-            PhraseDictionary.Add(EPhraseTrigger.NeedWeapon, 155f);
-            PhraseDictionary.Add(EPhraseTrigger.WeaponBroken, 160f);
-            PhraseDictionary.Add(EPhraseTrigger.OnGrenade, 165f);
-            PhraseDictionary.Add(EPhraseTrigger.OnEnemyGrenade, 170f);
-            PhraseDictionary.Add(EPhraseTrigger.Stop, 175f);
-            PhraseDictionary.Add(EPhraseTrigger.OnAgony, 180f);
-            PhraseDictionary.Add(EPhraseTrigger.OnDeath, 185f);
+            Phrase = trigger;
+            Priority = priority;
+            TimeDelay = timeDelay * Random.Range(0.75f, 1.25f);
         }
 
-        private GClass467 talkPackage;
-        private bool TalkLimited = false;
-        private float TalkLimiter = 0f;
-        private float talkDelay = 0f;
-        private bool CanTalk = false;
-        private readonly Dictionary<EPhraseTrigger, float> PhraseDictionary = new Dictionary<EPhraseTrigger, float>();
+        public EPhraseTrigger Phrase { get; private set; }
+        public int Priority { get; private set; }
+        public float TimeDelay { get; private set; }
+
+        public float TimeLastSaid = 0f;
     }
 }

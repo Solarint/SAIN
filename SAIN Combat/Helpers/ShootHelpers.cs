@@ -28,6 +28,7 @@ namespace Combat.Helpers
 
             return finalTime;
         }
+
         public static float FullAutoLength(BotOwner bot, float distance)
         {
             // Enables advanced modifiers if simple mode is off
@@ -48,6 +49,7 @@ namespace Combat.Helpers
 
             return scaledDistance * BurstLengthModifier.Value;
         }
+
         public static Vector3 Recoil(Vector3 targetpoint, float horizrecoil, float vertrecoil, float modifier, float distance)
         {
             // Reduces scatter recoil at very close range. Clamps distance between 3 and 20 then scale to 0.25 to 1.
@@ -72,6 +74,7 @@ namespace Combat.Helpers
 
             return clamped;
         }
+
         public static float FullAutoTimePerShot(int bFirerate)
         {
             float roundspersecond = bFirerate / 60;
@@ -80,6 +83,7 @@ namespace Combat.Helpers
 
             return secondsPerShot;
         }
+
         public static float InverseScaleWithLogisticFunction(float originalValue, float k, float x0 = 20f)
         {
             float scaledValue = 1f - 1f / (1f + Mathf.Exp(k * (originalValue - x0)));

@@ -40,10 +40,10 @@ namespace SAIN.Layers
                 if (BotOwner.Memory.GoalEnemy.CanShoot)
                 {
                     /*
-                    if (!SAIN.Core.Enemy.CanShoot && SAIN.Cover.Component.CurrentCover != null && SAIN.InCover && Vector3.Distance(SAIN.Cover.Component.CurrentCover.Position, BotOwner.Transform.position) < 1f)
+                    if (!SAIN.Core.Enemy.CanShoot && SAIN.Cover.CoverFinder.CurrentCover != null && SAIN.InCover && Vector3.Distance(SAIN.Cover.CoverFinder.CurrentCover.Position, BotOwner.Transform.position) < 1f)
                     {
                         var move = BotOwner.GetPlayer.MovementContext;
-                        if (SAIN.Cover.Component.CurrentCover.Height <= 1.55f)
+                        if (SAIN.Cover.CoverFinder.CurrentCover.Height <= 1.55f)
                         {
                             move.SetBlindFire(1);
                             Logger.LogWarning($"Bot is trying to blind fire! 1 [{move.BlindFire}]");
