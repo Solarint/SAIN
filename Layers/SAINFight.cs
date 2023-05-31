@@ -67,7 +67,7 @@ namespace SAIN.Layers
 
             LastDecision = CurrentDecision;
 
-            Logger.LogInfo($"New Action for {BotOwner.name}. {CurrentDecision}");
+            //Logger.LogInfo($"New Action for {BotOwner.name}. {CurrentDecision}");
 
             return nextAction;
         }

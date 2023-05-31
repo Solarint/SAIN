@@ -17,28 +17,6 @@ namespace SAIN.Classes
             return reason;
         }
 
-        public static string Reason(EnemiesComponent enemy)
-        {
-            string reason;
-            if (enemy.Path.RangeFar)
-            {
-                reason = "Far";
-            }
-            else if (enemy.Path.RangeMid)
-            {
-                reason = "MidRange";
-            }
-            else if (enemy.Path.RangeClose)
-            {
-                reason = "Close";
-            }
-            else
-            {
-                reason = "Very Close";
-            }
-            return reason;
-        }
-
         public static string Reason(StatusClass status)
         {
             string reason;

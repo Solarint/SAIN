@@ -132,6 +132,7 @@ namespace SAIN.Components
             if (wasHeard)
             {
                 SAIN.LastSoundHeardPosition = pos;
+                SAIN.LastSoundHeardTime = Time.time;
 
                 float dispersion = (type == AISoundType.gun) ? shooterDistance / 50f : shooterDistance / 20f;
 
@@ -159,14 +160,13 @@ namespace SAIN.Components
                     Vector3 to = pos + person.LookDirection;
                     bool soundclose = IsSoundClose(out var firedAtMe, pos, to, 10f);
 
-                    SAIN.UnderFireFromPosition = vector;
-
                     //BotOwner.Memory.SetPanicPoint(placeForCheck, soundclose && firedAtMe);
 
                     if (soundclose && firedAtMe)
                     {
                         try
                         {
+                            SAIN.UnderFireFromPosition = vector;
                             BotOwner.Memory.SetUnderFire();
                         }
                         catch (System.Exception)

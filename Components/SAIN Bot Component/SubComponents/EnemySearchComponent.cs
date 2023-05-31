@@ -44,7 +44,27 @@ namespace SAIN.Components
 
             if (!Peeking)
             {
-                BotOwner.Steering.LookToMovingDirection();
+                float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
+                float destinationDistance = Vector3.Distance(CurrentDestination, BotOwner.Position);
+
+                if (BotOwner.Memory.IsUnderFire)
+                {
+                    SAIN.Steering.ManualUpdate();
+                }
+                else if (soundDistance < destinationDistance && SAIN.LastSoundHeardTime > Time.time - 2f)
+                {
+                    var soundPos = SAIN.LastSoundHeardPosition;
+                    soundPos.y += 1f;
+
+                    if (!Physics.Raycast(SAIN.HeadPosition, soundPos - SAIN.HeadPosition, (soundPos - SAIN.HeadPosition).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                    {
+                        BotOwner.Steering.LookToPoint(soundPos);
+                    }
+                }
+                else
+                {
+                    BotOwner.Steering.LookToMovingDirection();
+                }
 
                 if (CornerPeekLoop != null)
                 {
@@ -81,7 +101,7 @@ namespace SAIN.Components
             }
         }
 
-        private IEnumerator PeekCorner()
+         private IEnumerator PeekCorner()
         {
             while (true)
             {
@@ -137,10 +157,31 @@ namespace SAIN.Components
 
                         PeekMoveDestination = peekDestination;
                         BotOwner.GoToPoint(peekDestination, false, -1, false, false);
-                        BotOwner.DoorOpener.Update();
                     }
 
-                    BotOwner.Steering.LookToPoint(FinalDest);
+                    float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
+                    float peekMoveDistance = Vector3.Distance(PeekMoveDestination, BotOwner.Position);
+                    float finalDestDistance = Vector3.Distance(FinalDest, BotOwner.Position);
+
+                    if (BotOwner.Memory.IsUnderFire)
+                    {
+                        SAIN.Steering.ManualUpdate();
+                    }
+                    else if ((soundDistance < peekMoveDistance || soundDistance < finalDestDistance) && SAIN.LastSoundHeardTime > Time.time - 2f)
+                    {
+                        var soundPos = SAIN.LastSoundHeardPosition;
+                        soundPos.y += 1f;
+
+                        if (!Physics.Raycast(SAIN.HeadPosition, soundPos - SAIN.HeadPosition, (soundPos - SAIN.HeadPosition).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                        {
+                            BotOwner.Steering.LookToPoint(soundPos);
+                        }
+                    }
+                    else
+                    {
+                        BotOwner.Steering.LookToPoint(FinalDest);
+                    }
+
                     BotOwner.SetTargetMoveSpeed(0.2f);
 
                     if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving))
@@ -151,6 +192,8 @@ namespace SAIN.Components
                         GoToNextPoint();
                         break;
                     }
+
+                    BotOwner.DoorOpener.Update();
                 }
 
                 yield return new WaitForEndOfFrame();

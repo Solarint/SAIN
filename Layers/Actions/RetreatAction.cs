@@ -33,6 +33,9 @@ namespace SAIN.Layers
             if (SAIN.Cover.BotIsAtCoverPoint && SAIN.Cover.DuckInCover())
             {
                 SAIN.Steering.ManualUpdate();
+
+                BotOwner.DoorOpener.Update();
+
                 return;
             }
 

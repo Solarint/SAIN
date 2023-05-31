@@ -594,13 +594,16 @@ namespace SAIN.Classes
 
         private bool SayRatCheck()
         {
-            if (SAIN.Enemies.LastSeen.TimeSinceSeen > 30f && RatTimer < Time.time && BotOwner.Memory.GoalEnemy != null)
+            if (SAIN.Enemies.PriorityEnemy != null)
             {
-                RatTimer = Time.time + 120f * Random.Range(0.75f, 1.25f);
-
-                if (EFT_Math.RandomBool(33))
+                if (SAIN.Enemies.PriorityEnemy.LastSeen.TimeSinceSeen > 30f && RatTimer < Time.time && BotOwner.Memory.GoalEnemy != null)
                 {
-                    return true;
+                    RatTimer = Time.time + 120f * Random.Range(0.75f, 1.25f);
+
+                    if (EFT_Math.RandomBool(33))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;

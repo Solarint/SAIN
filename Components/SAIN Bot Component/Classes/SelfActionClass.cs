@@ -70,8 +70,10 @@ namespace SAIN.Classes
         public void DoStims()
         {
             var stims = BotOwner.Medecine.Stimulators;
-            if (stims.CanUseNow())
+            if (StimTimer < Time.time && stims.CanUseNow())
             {
+                StimTimer = Time.time + 1f;
+
                 Logger.LogDebug($"I'm Popping Stims");
 
                 stims.TryApply(true, null, null);
@@ -82,7 +84,7 @@ namespace SAIN.Classes
         {
             if (!BotOwner.WeaponManager.Reload.Reloading)
             {
-                Logger.LogDebug($"Reloading!");
+                //Logger.LogDebug($"Reloading!");
 
                 BotOwner.WeaponManager.Reload.Reload();
             }
@@ -100,6 +102,7 @@ namespace SAIN.Classes
 
         protected ManualLogSource Logger;
 
+        private float StimTimer = 0f;
         private float HealTimer = 0f;
     }
 }

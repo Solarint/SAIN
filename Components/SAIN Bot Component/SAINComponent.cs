@@ -68,11 +68,6 @@ namespace SAIN.Components
                     SelfActions.Activate();
                 }
 
-                if (BotOwner.Memory.GoalEnemy != null)
-                {
-                    Enemies.AddEnemy(BotOwner.Memory.GoalEnemy.Person);
-                }
-
                 BotSquad.ManualUpdate();
 
                 BotOwner.WeaponManager.UpdateWeaponsList();
@@ -123,6 +118,8 @@ namespace SAIN.Components
         public Vector3 UnderFireFromPosition { get; set; }
 
         public Vector3 LastSoundHeardPosition { get; set; }
+
+        public float LastSoundHeardTime { get; set; }
 
         public bool BotIsMoving { get; private set; }
 
@@ -184,7 +181,7 @@ namespace SAIN.Components
 
         public static LayerMask ShootMask => LayerMaskClass.HighPolyWithTerrainMask;
 
-        public static LayerMask CoverMask => LayerMaskClass.LowPolyColliderLayerMask;
+        public static LayerMask CoverMask => LayerMaskClass.HighPolyWithTerrainMask;
 
         public static LayerMask FoliageMask => LayerMaskClass.AI;
 

@@ -44,7 +44,7 @@ namespace SAIN.Classes
                 BotOwner.Steering.LookToPoint(underFirePos);
                 //DebugGizmos.SingleObjects.Line(BotOwner.LookSensor._headPoint, underFirePos, Color.green, 0.025f, true, 1f, true);
             }
-            else if (Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Transform.position) < 15f)
+            else if (Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Transform.position) < 15f && SAIN.LastSoundHeardTime > Time.time - 2f)
             {
                 var hearPos = SAIN.LastSoundHeardPosition;
                 hearPos.y += 1f;
@@ -65,9 +65,9 @@ namespace SAIN.Classes
 
         private bool CanSeeAnyEnemy(out Vector3 enemyPos)
         {
-            if (SAIN.Enemies.Enemies.Count > 0)
+            if (SAIN.Enemies.GoalEnemies.Count > 0)
             {
-                foreach (var enemy in SAIN.Enemies.Enemies.Values)
+                foreach (var enemy in SAIN.Enemies.GoalEnemies.Values)
                 {
                     if (enemy.IsVisible)
                     {

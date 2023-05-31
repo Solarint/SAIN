@@ -16,20 +16,6 @@ namespace SAIN.Classes
             SAIN = GetComponent<SAINComponent>();
         }
 
-        public void AddEnemy(IAIDetails person)
-        {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
-            {
-                return;
-            }
-
-            if (person != null && !Enemies.ContainsKey(person))
-            {
-                var enemy = new SAINEnemy(BotOwner, person);
-                Enemies.Add(person, enemy);
-            }
-        }
-
         private void Update()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
@@ -37,43 +23,43 @@ namespace SAIN.Classes
                 return;
             }
 
-            RemoveEnemies();
+            UpdateEnemyList();
 
             UpdateVisionOnEnemies();
         }
 
-        private void RemoveEnemies()
+        private void UpdateEnemyList()
         {
-            if (Enemies.Count > 0)
+            if (BotOwner.EnemiesController.EnemyInfos.Count > 0)
             {
-                var dictionary = new Dictionary<IAIDetails, SAINEnemy>(Enemies);
+                var dictionary = new Dictionary<GClass475, SAINEnemy>();
 
-                foreach (var enemy in Enemies)
+                foreach (var enemy in BotOwner.EnemiesController.EnemyInfos)
                 {
-                    if (enemy.Key != null && enemy.Value != null && !enemy.Value.Person.HealthController.IsAlive && enemy.Value.LastSeen.TimeSinceSeen < 240f)
+                    if (enemy.Key != null && enemy.Value != null && enemy.Value.Person.HealthController.IsAlive)
                     {
-                        dictionary.Add(enemy.Key, enemy.Value);
+                        dictionary.Add(enemy.Value, new SAINEnemy(BotOwner, enemy.Value.Person));
                     }
                 }
 
-                Enemies = dictionary;
+                GoalEnemies = dictionary;
             }
         }
 
         private void UpdateVisionOnEnemies()
         {
-            if (Enemies.Count > 0)
+            if (GoalEnemies.Count > 0)
             {
                 List<Vector3> enemyPositions = new List<Vector3>();
 
-                foreach (var enemy in Enemies)
+                foreach (var enemy in GoalEnemies)
                 {
                     if (enemy.Key != null && enemy.Value != null)
                     {
                         enemy.Value.ManualUpdate();
                         if (enemy.Value.IsVisible)
                         {
-                            enemyPositions.Add(enemy.Key.Position);
+                            enemyPositions.Add(enemy.Key.CurrPosition);
                         }
                         else
                         {
@@ -102,19 +88,17 @@ namespace SAIN.Classes
             {
                 SAINEnemy priorityEnemy = null;
 
-                if (Enemies.Count > 0)
+                if (GoalEnemies.Count > 0)
                 {
-                    List<Vector3> enemyPositions = new List<Vector3>();
-
                     float distance = 999f;
 
-                    foreach (var enemy in Enemies)
+                    foreach (var enemy in GoalEnemies)
                     {
                         if (enemy.Key != null && enemy.Value != null)
                         {
                             if (enemy.Value.EnemyLookingAtMe)
                             {
-                                float enemydist = Vector3.Distance(enemy.Key.Position, BotOwner.Position);
+                                float enemydist = Vector3.Distance(enemy.Key.CurrPosition, BotOwner.Position);
                                 if (enemydist < distance)
                                 {
                                     distance = enemydist;
@@ -125,9 +109,14 @@ namespace SAIN.Classes
                     }
                 }
 
-                if (priorityEnemy == null && Enemies.Count > 0)
+                if (priorityEnemy == null && GoalEnemies.Count > 0)
                 {
-                    priorityEnemy = Enemies.PickRandom().Value;
+                    priorityEnemy = GoalEnemies.PickRandom().Value;
+                }
+
+                if (priorityEnemy == null && BotOwner.Memory.GoalEnemy != null)
+                {
+                    priorityEnemy = new SAINEnemy(BotOwner, BotOwner.Memory.GoalEnemy.Person);
                 }
 
                 return priorityEnemy;
@@ -142,14 +131,14 @@ namespace SAIN.Classes
             {
                 SAINEnemy closestEnemy = null;
 
-                if (Enemies.Count > 0)
+                if (GoalEnemies.Count > 0)
                 {
                     float distance = 999f;
-                    foreach (var enemy in Enemies)
+                    foreach (var enemy in GoalEnemies)
                     {
                         if (enemy.Key != null && enemy.Value != null)
                         {
-                            float enemydist = Vector3.Distance(enemy.Key.Position, BotOwner.Position);
+                            float enemydist = Vector3.Distance(enemy.Key.CurrPosition, BotOwner.Position);
                             if (enemydist < distance)
                             {
                                 distance = enemydist;
@@ -163,11 +152,7 @@ namespace SAIN.Classes
             }
         }
 
-        public Dictionary<IAIDetails, SAINEnemy> Enemies { get; private set; } = new Dictionary<IAIDetails, SAINEnemy>();
-
-        public EnemyPath Path => PriorityEnemy.Path;
-
-        public EnemyLastSeen LastSeen => PriorityEnemy.LastSeen;
+        public Dictionary<GClass475, SAINEnemy> GoalEnemies { get; private set; } = new Dictionary<GClass475, SAINEnemy>();
 
         private SAINComponent SAIN;
         private BotOwner BotOwner => SAIN.BotOwner;
@@ -194,9 +179,9 @@ namespace SAIN.Classes
             {
                 NextRayCastTime = Time.time + 0.05f;
 
-                if (SAIN.IsPointInVisibleSector(Person.Position))
+                if (BotOwner.LookSensor.IsPointInVisibleSector(Person.Position))
                 {
-                    IsVisible = RaycastHelpers.CheckVisible(BotOwner.LookSensor._headPoint, Person, LayerMaskClass.HighPolyWithTerrainMaskAI);
+                    IsVisible = RaycastHelpers.CheckVisible(BotOwner.LookSensor._headPoint, Person, LayerMaskClass.HighPolyWithTerrainMask);
 
                     CanShoot = RaycastHelpers.CheckVisible(BotOwner.WeaponRoot.position, Person, LayerMaskClass.HighPolyWithTerrainMask);
 

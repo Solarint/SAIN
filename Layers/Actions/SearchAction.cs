@@ -18,6 +18,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
+            BotOwner.DoorOpener.Update();
             BotOwner.SetPose(0.75f);
         }
 
