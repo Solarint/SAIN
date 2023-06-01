@@ -109,9 +109,9 @@ namespace SAIN.Classes
 
             if (tauntEnemy)
             {
-                Talk.Say(EPhraseTrigger.MumblePhrase, ETagStatus.Combat, true);
+                Talk.Say(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
 
-                Logger.LogWarning($"Bot Taunted Enemy!: [{type}]");
+                //Logger.LogWarning($"Bot Taunted Enemy!: [{type}]");
             }
 
             return tauntEnemy;
@@ -127,7 +127,7 @@ namespace SAIN.Classes
                 {
                     if (PlayerTalk.PlayerTalked)
                     {
-                        SetEnemyTalk(EPhraseTrigger.MumblePhrase, ETagStatus.Combat, true);
+                        SetEnemyTalk(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
                     }
                 }
             }
@@ -163,10 +163,7 @@ namespace SAIN.Classes
                     // Check the distance between the bots to see if they can hear them
                     if (Vector3.Distance(player.Transform.position, BotOwner.Transform.position) < ResponseDist)
                     {
-                        bool isEnemy = BotOwner.EnemiesController.IsEnemy(player);
-                        bool enemyAdd = !isEnemy && BotOwner.Profile.Side != player.Profile.Side;
-
-                        if (isEnemy || enemyAdd)
+                        if (BotOwner.BotsGroup.Enemies.ContainsKey(player))
                         {
                             bool enemyTalked;
                             if (player.IsAI)
@@ -180,14 +177,7 @@ namespace SAIN.Classes
 
                             if (enemyTalked)
                             {
-                                SetEnemyTalk(EPhraseTrigger.MumblePhrase, ETagStatus.Combat, true);
-
-                                if (enemyAdd)
-                                {
-                                    Logger.LogDebug($"Added player as enemy to bot because he heard them");
-
-                                    BotOwner.BotsGroup.AddEnemy(player);
-                                }
+                                SetEnemyTalk(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
 
                                 return true;
                             }

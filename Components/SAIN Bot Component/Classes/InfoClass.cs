@@ -3,6 +3,7 @@ using EFT;
 using SAIN.Helpers;
 using System;
 using System.Linq;
+using UnityEngine;
 
 namespace SAIN.Classes
 {
@@ -29,13 +30,16 @@ namespace SAIN.Classes
                 return;
             }
 
-            BotOwner.WeaponManager.UpdateWeaponsList();
-
             WeaponInfo.ManualUpdate();
 
-            SetPersonality();
+            if (PersonalityTimer < Time.time)
+            {
+                PersonalityTimer = Time.time + 10f;
+                SetPersonality();
+            }
         }
 
+        private float PersonalityTimer = 0f;
         public readonly float FightIn = 60f;
         public readonly float FightOut = 70f;
 

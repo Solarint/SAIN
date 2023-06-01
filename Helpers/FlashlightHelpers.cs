@@ -281,7 +281,7 @@ namespace SAIN.Helpers
             }
             else if (randomphrase < 0.03f)
             {
-                bot.BotTalk.Say(EPhraseTrigger.MumblePhrase, false, ETagStatus.Combat);
+                bot.BotTalk.Say(EPhraseTrigger.OnFight, false, ETagStatus.Combat);
             }
         }
     }

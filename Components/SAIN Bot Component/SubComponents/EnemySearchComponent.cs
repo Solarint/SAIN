@@ -47,19 +47,9 @@ namespace SAIN.Components
                 float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
                 float destinationDistance = Vector3.Distance(CurrentDestination, BotOwner.Position);
 
-                if (BotOwner.Memory.IsUnderFire)
+                if (ShouldUpdateSteer || (soundDistance < destinationDistance && SAIN.LastSoundHeardTime > Time.time - 2f))
                 {
                     SAIN.Steering.ManualUpdate();
-                }
-                else if (soundDistance < destinationDistance && SAIN.LastSoundHeardTime > Time.time - 2f)
-                {
-                    var soundPos = SAIN.LastSoundHeardPosition;
-                    soundPos.y += 1f;
-
-                    if (!Physics.Raycast(SAIN.HeadPosition, soundPos - SAIN.HeadPosition, (soundPos - SAIN.HeadPosition).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                    {
-                        BotOwner.Steering.LookToPoint(soundPos);
-                    }
                 }
                 else
                 {
@@ -163,19 +153,9 @@ namespace SAIN.Components
                     float peekMoveDistance = Vector3.Distance(PeekMoveDestination, BotOwner.Position);
                     float finalDestDistance = Vector3.Distance(FinalDest, BotOwner.Position);
 
-                    if (BotOwner.Memory.IsUnderFire)
+                    if (ShouldUpdateSteer || (soundDistance < peekMoveDistance || soundDistance < finalDestDistance) && SAIN.LastSoundHeardTime > Time.time - 2f)
                     {
                         SAIN.Steering.ManualUpdate();
-                    }
-                    else if ((soundDistance < peekMoveDistance || soundDistance < finalDestDistance) && SAIN.LastSoundHeardTime > Time.time - 2f)
-                    {
-                        var soundPos = SAIN.LastSoundHeardPosition;
-                        soundPos.y += 1f;
-
-                        if (!Physics.Raycast(SAIN.HeadPosition, soundPos - SAIN.HeadPosition, (soundPos - SAIN.HeadPosition).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                        {
-                            BotOwner.Steering.LookToPoint(soundPos);
-                        }
                     }
                     else
                     {
@@ -199,6 +179,8 @@ namespace SAIN.Components
                 yield return new WaitForEndOfFrame();
             }
         }
+
+        private bool ShouldUpdateSteer => BotOwner.Memory.IsUnderFire || SAIN.Enemies.PriorityEnemy != null;
 
         private float GetSignedAngle(Vector3 a, Vector3 b, Vector3 origin)
         {

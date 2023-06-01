@@ -48,7 +48,10 @@ namespace SAIN.Classes
             {
                 HealTimer = Time.time + 5f;
 
-                Logger.LogDebug($"I healed!");
+                if (UserSettings.DebugConfig.DebugLayers.Value)
+                {
+                    Logger.LogDebug($"I healed!");
+                }
 
                 heal.TryApplyToCurrentPart(null, null);
             }
@@ -61,7 +64,10 @@ namespace SAIN.Classes
             {
                 HealTimer = Time.time + 5f;
 
-                Logger.LogDebug($"Used Surgery");
+                if (UserSettings.DebugConfig.DebugLayers.Value)
+                {
+                    Logger.LogDebug($"Used Surgery");
+                }
 
                 surgery.ApplyToCurrentPart();
             }
@@ -74,7 +80,10 @@ namespace SAIN.Classes
             {
                 StimTimer = Time.time + 1f;
 
-                Logger.LogDebug($"I'm Popping Stims");
+                if (UserSettings.DebugConfig.DebugLayers.Value)
+                {
+                    Logger.LogDebug($"I'm Popping Stims");
+                }
 
                 stims.TryApply(true, null, null);
             }
@@ -84,7 +93,10 @@ namespace SAIN.Classes
         {
             if (!BotOwner.WeaponManager.Reload.Reloading)
             {
-                //Logger.LogDebug($"Reloading!");
+                if (UserSettings.DebugConfig.DebugLayers.Value)
+                {
+                    Logger.LogDebug($"Reloading!");
+                }
 
                 BotOwner.WeaponManager.Reload.Reload();
             }

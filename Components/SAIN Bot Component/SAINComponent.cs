@@ -37,7 +37,7 @@ namespace SAIN.Components
             Movement = new MovementClass(bot);
             Dodge = new DodgeClass(bot);
             Steering = new SteeringClass(bot);
-            Grenade = new GrenadeReactionClass(bot);
+            Grenade = new BotGrenadeClass(bot);
             DebugDrawList = new DebugGizmos.DrawLists(BotColor, BotColor);
 
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
@@ -50,11 +50,6 @@ namespace SAIN.Components
         {
             if (BotActive && !GameIsEnding)
             {
-                if (BotOwner.Memory.IsUnderFire)
-                {
-                    //Logger.LogDebug("UnderFire");
-                }
-
                 if (CheckMoveTimer < Time.time)
                 {
                     CheckMoveTimer = Time.time + CheckMoveFreq;
@@ -66,11 +61,10 @@ namespace SAIN.Components
                 {
                     SelfCheckTimer = Time.time + CheckSelfFreq;
                     SelfActions.Activate();
+                    BotOwner.WeaponManager.UpdateWeaponsList();
                 }
 
                 BotSquad.ManualUpdate();
-
-                BotOwner.WeaponManager.UpdateWeaponsList();
 
                 Info.ManualUpdate();
             }
@@ -113,6 +107,15 @@ namespace SAIN.Components
 
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
 
+        public bool HasTarget => BotOwner.Memory.GoalTarget?.GoalTarget != null;
+        public bool HasEnemy => BotOwner.Memory.GoalEnemy != null;
+        public Vector3? GoalTargetPos => BotOwner.Memory.GoalTarget?.GoalTarget?.Position;
+        public Vector3? GoalEnemyPos => BotOwner.Memory.GoalEnemy?.CurrPosition;
+        public Vector3 MidPoint(Vector3 target, float lerpVal = 0.5f)
+        {
+            return Vector3.Lerp(BotOwner.Position, target, lerpVal);
+        }
+
         public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
 
         public Vector3 UnderFireFromPosition { get; set; }
@@ -147,7 +150,7 @@ namespace SAIN.Components
 
         public LeanComponent Lean { get; private set; }
 
-        public GrenadeReactionClass Grenade { get; private set; }
+        public BotGrenadeClass Grenade { get; private set; }
 
         public MovementClass Movement { get; private set; }
 

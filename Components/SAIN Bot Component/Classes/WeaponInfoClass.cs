@@ -31,7 +31,7 @@ namespace SAIN.Classes
                 LastCheckedWeapon = CurrentWeapon.Template;
                 FinalModifier = Modifiers.FinalModifier;
 
-                Logger.LogInfo($"Final Modifier: [{FinalModifier}] Class: [{WeaponClass}] Caliber: [{AmmoCaliber}] Role: [{Modifiers.Role}]");
+                //Logger.LogInfo($"Final Modifier: [{FinalModifier}] Class: [{WeaponClass}] Caliber: [{AmmoCaliber}] Role: [{Modifiers.Role}]");
             }
         }
 

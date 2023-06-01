@@ -7,7 +7,7 @@ namespace SAIN.Classes
 {
     public class BotTalk : SAINBot
     {
-        private const float BotTalkDelaySetting = 1f;
+        private const float BotTalkDelaySetting = 2f;
 
         public BotTalk(BotOwner bot) : base(bot)
         {
@@ -27,10 +27,10 @@ namespace SAIN.Classes
                 return;
             }
 
-            if (withGroupDelay && !BotOwner.BotsGroup.GroupTalk.CanSay(BotOwner, type))
-            {
-                return;
-            }
+            //if (withGroupDelay && !BotOwner.BotsGroup.GroupTalk.CanSay(BotOwner, type))
+            //{
+                //return;
+            //}
 
             ETagStatus mask = SetETagMask(additionalMask);
 
@@ -62,7 +62,7 @@ namespace SAIN.Classes
         private void SendSayCommand(EPhraseTrigger type, ETagStatus mask)
         {
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, type);
-            BotOwner.GetPlayer.Say(type, true, 0f, mask);
+            BotOwner.GetPlayer.Say(type, false, 0f, mask);
             PhraseDictionary[type].TimeLastSaid = Time.time;
         }
 
@@ -73,7 +73,7 @@ namespace SAIN.Classes
             Logger.LogDebug($"Bot Said After Query: Phrase: [{phrase}] Mask: [{talkPackage.Mask}]");
 
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, phrase);
-            BotOwner.GetPlayer.Say(phrase, true, 0f, talkPackage.Mask);
+            BotOwner.GetPlayer.Say(phrase, false, 0f, talkPackage.Mask);
             PhraseDictionary[phrase].TimeLastSaid = Time.time;
         }
 
@@ -160,7 +160,7 @@ namespace SAIN.Classes
             int newPriority = newTalk.phraseInfo.Priority;
             int oldPriority = oldTalk.phraseInfo.Priority;
 
-            bool ChangeTalk = oldPriority <= newPriority;
+            bool ChangeTalk = oldPriority < newPriority;
 
             return ChangeTalk ? newTalk : oldTalk;
         }
@@ -169,7 +169,7 @@ namespace SAIN.Classes
         {
             if (!PhraseDictionary.ContainsKey(trigger))
             {
-                Logger.LogError($"Phrase [{trigger}] is not in dictionary, adding it.");
+                //Logger.LogError($"Phrase [{trigger}] is not in dictionary, adding it.");
 
                 var phrase = new PhraseInfo(trigger, 10, 20f);
                 Phrases.Add(phrase);
@@ -190,7 +190,7 @@ namespace SAIN.Classes
             Phrases.Add(new PhraseInfo(EPhraseTrigger.GoForward, 9, 20f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Gogogo, 10, 20f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Going, 11, 20f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnFight, 12, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnFight, 12, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyShot, 13, 3f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnLostVisual, 14, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnRepeatedContact, 15, 5f));
@@ -223,6 +223,7 @@ namespace SAIN.Classes
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnSix, 15, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.InTheFront, 15, 20f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.FollowMe, 15, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.HoldPosition, 6, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Suppress, 20, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Roger, 10, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Negative, 10, 5f));
@@ -232,8 +233,8 @@ namespace SAIN.Classes
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Repeat, 25, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.CoverMe, 25, 10f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.NoisePhrase, 5, 60f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.UnderFire, 37, 5f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.MumblePhrase, 30, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.UnderFire, 1, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.MumblePhrase, 10, 35f));
 
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LootBody, 5, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LootContainer, 5, 30f));

@@ -1,13 +1,10 @@
+using BepInEx.Logging;
 using EFT;
-using SAIN.Classes;
+using SAIN.Components;
 using SAIN.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using SAIN.Layers;
-using SAIN.Components;
-using System.Threading.Tasks;
-using BepInEx.Logging;
 
 namespace SAIN.Classes
 {
@@ -35,7 +32,7 @@ namespace SAIN.Classes
         private const float TalkFreq = 0.5f;
         private const float FriendTooFar = 30f;
         private const float FriendTooClose = 5f;
-        private const float EnemyTooClose = 10f;
+        private const float EnemyTooClose = 5f;
 
         private void FriendlyDown(BotOwner bot)
         {
@@ -131,10 +128,11 @@ namespace SAIN.Classes
                                 }
                             }
                         }
-                    }
-                    if (BotOwner.Memory.GoalEnemy != null && SAIN.BotSquad.IsSquadLead)
-                    {
-                        UpdateLeaderCommand();
+
+                        if (BotOwner.Memory.GoalEnemy != null && SAIN.BotSquad.IsSquadLead)
+                        {
+                            UpdateLeaderCommand();
+                        }
                     }
                 }
             }
@@ -147,7 +145,7 @@ namespace SAIN.Classes
             {
                 if (member != null && !member.IsDead)
                 {
-                    if (Vector3.Distance(member.Transform.position, BotOwner.Transform.position) < 30f)
+                    if (Vector3.Distance(member.Transform.position, BotOwner.Transform.position) < 20f)
                     {
                         closeFriend = true;
                         break;
@@ -159,7 +157,7 @@ namespace SAIN.Classes
 
         private void GetMemberDecisions()
         {
-            List <SAINLogicDecision> decisions = new List <SAINLogicDecision>();
+            List<SAINLogicDecision> decisions = new List<SAINLogicDecision>();
             foreach (var member in BotSquad.SquadMembers.Values)
             {
                 if (member != null)
@@ -177,7 +175,7 @@ namespace SAIN.Classes
             {
                 if (member != null && !member.IsDead)
                 {
-                    if (Vector3.Distance(member.Transform.position, SAIN.BotSquad.Leader.Transform.position) < 30f)
+                    if (Vector3.Distance(member.Transform.position, SAIN.BotSquad.Leader.Transform.position) < 20f)
                     {
                         if (EFT_Math.RandomBool(chance))
                         {
@@ -198,8 +196,10 @@ namespace SAIN.Classes
 
                     if (!CheckIfLeaderShouldCommand())
                     {
-                        if (CheckFriendlyLocation(out var trigger))
+                        if (CheckFriendliesTimer < Time.time && CheckFriendlyLocation(out var trigger))
                         {
+                            CheckFriendliesTimer = Time.time + 10f;
+
                             SAIN.Talk.Talk.Say(trigger, ETagStatus.Combat, true);
                             AllMembersSay(new TalkEventObject(EPhraseTrigger.Roger, ETagStatus.Aware, false), Random.Range(0.5f, 1.5f), 60f);
                         }
@@ -207,6 +207,8 @@ namespace SAIN.Classes
                 }
             }
         }
+
+        private float CheckFriendliesTimer = 0f;
 
         private void GetEnemies()
         {
@@ -280,7 +282,7 @@ namespace SAIN.Classes
                 {
                     if (!TalkBotDecision(out trigger, out mask) && BotOwner.Memory.IsUnderFire)
                     {
-                        trigger = EPhraseTrigger.UnderFire;
+                        trigger = EPhraseTrigger.NeedHelp;
                         mask = ETagStatus.Combat;
                     }
                 }
@@ -301,18 +303,18 @@ namespace SAIN.Classes
             mask = ETagStatus.Aware;
             var hear = BotOwner.BotsGroup.YoungestPlace(BotOwner, 40f, true);
 
+            if (BotOwner.Memory.GoalEnemy != null)
+            {
+                return false;
+            }
+
             if (hear != null)
             {
                 if (!hear.IsDanger)
                 {
                     if (hear.CreatedTime + 0.5f < Time.time && hear.CreatedTime + 1f > Time.time)
                     {
-                        if (BotOwner.Memory.GoalEnemy != null && !BotOwner.Memory.GoalEnemy.CanShoot)
-                        {
-                            trigger = EPhraseTrigger.NoisePhrase;
-                            mask = ETagStatus.Aware;
-                        }
-                        else if (BotOwner.Memory.GoalEnemy == null)
+                        if (BotOwner.Memory.GoalEnemy == null)
                         {
                             trigger = EPhraseTrigger.NoisePhrase;
                             mask = ETagStatus.Aware;
@@ -363,7 +365,7 @@ namespace SAIN.Classes
 
             if (CommandSayTimer < Time.time)
             {
-                CommandSayTimer = Time.time + 0.5f;
+                CommandSayTimer = Time.time + 3f;
 
                 var trigger = EPhraseTrigger.PhraseNone;
                 var mask = ETagStatus.Unaware;
@@ -414,6 +416,14 @@ namespace SAIN.Classes
                     commmandMask = ETagStatus.Aware;
 
                     trigger = EFT_Math.RandomBool() ? EPhraseTrigger.Repeat : EPhraseTrigger.Stop;
+                    mask = ETagStatus.Aware;
+                }
+                else if (!GroupDecisions.Contains(SAINLogicDecision.Search) && SAIN.CurrentDecision != SAINLogicDecision.Search)
+                {
+                    commandTrigger = EPhraseTrigger.HoldPosition;
+                    commmandMask = ETagStatus.Aware;
+
+                    trigger = EPhraseTrigger.Roger;
                     mask = ETagStatus.Aware;
                 }
 
@@ -519,33 +529,38 @@ namespace SAIN.Classes
 
         private bool CheckFriendlyLocation(out EPhraseTrigger trigger)
         {
+            trigger = EPhraseTrigger.PhraseNone;
+
             int tooFar = 0;
             int tooClose = 0;
             int tooCloseEnemy = 0;
             int total = 0;
-            foreach (var bot in BotOwner.BotsGroup.Allies)
+            var locations = SAIN.BotSquad.SquadLocations;
+            foreach (var location in locations)
             {
-                if (bot != null)
+                if (location == null) continue;
+
+                total++;
+
+                float distance = Vector3.Distance(location, BotOwner.Position);
+
+                if (distance >= FriendTooFar)
                 {
-                    total++;
-
-                    float distance = Vector3.Distance(bot.Transform.position, BotOwner.Transform.position);
-
-                    if (distance >= FriendTooFar)
-                    {
-                        tooFar++;
-                    }
-                    else if (distance <= FriendTooClose)
-                    {
-                        tooClose++;
-                    }
-                    else
+                    tooFar++;
+                }
+                else if (distance <= FriendTooClose)
+                {
+                    tooClose++;
+                }
+                else
+                {
+                    if (Enemies != null && Enemies.Count > 0)
                     {
                         foreach (var enemy in Enemies)
                         {
                             if (enemy != null)
                             {
-                                float enemyDistance = Vector3.Distance(bot.Transform.position, enemy.Transform.position);
+                                float enemyDistance = Vector3.Distance(location, enemy.Transform.position);
                                 if (enemyDistance <= EnemyTooClose)
                                 {
                                     tooCloseEnemy++;
@@ -560,21 +575,17 @@ namespace SAIN.Classes
             float tooCloseRatio = (float)tooClose / total;
             float tooFarRatio = (float)tooFar / total;
 
-            if (tooCloseRatio > 0.5f)
+            if (tooCloseRatio > 0.25f)
             {
                 trigger = EPhraseTrigger.Spreadout;
             }
-            else if (tooFarRatio > 0.5f)
+            else if (tooFarRatio > 0.25f)
             {
                 trigger = EPhraseTrigger.Regroup;
             }
             else if (tooCloseEnemy > 0)
             {
                 trigger = EPhraseTrigger.GetBack;
-            }
-            else
-            {
-                trigger = EPhraseTrigger.PhraseNone;
             }
 
             return trigger != EPhraseTrigger.PhraseNone;

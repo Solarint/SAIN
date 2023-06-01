@@ -25,7 +25,8 @@ namespace SAIN
         None = 0,
         InCover = 1,
         FarFromCover = 3,
-        CloseToCover = 4
+        CloseToCover = 4,
+        MidRangeToCover = 5,
     }
 
     public enum LeanSetting
@@ -68,5 +69,33 @@ namespace SAIN
         Normal = 1,
         High = 2,
         VeryHigh = 3
+    }
+
+    public enum GrenadeThrowDirection
+    {
+        None = 0,
+        Over = 1,
+        Around = 2
+    }
+
+    public enum GrenadeThrowType
+    {
+        None = 0,
+        Close = 1,
+        Mid = 2,
+        Far = 3
+    }
+
+    public enum BotSquadDecisions
+    {
+        None = 0,
+        Surround = 1,
+        Retreat = 2,
+        Suppress = 3,
+        BoundingAttack = 4,
+        BoundingRetreat = 5,
+        Regroup = 6,
+        SpreadOut = 7,
+        HoldPositions = 8
     }
 }

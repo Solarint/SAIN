@@ -53,17 +53,27 @@ namespace SAIN.Components
 
                     if (DebugMode)
                     {
-                        Logger.LogInfo($"Time Before Search: [{TimeBeforeSearch}]");
+                        //Logger.LogInfo($"Time Before Search: [{TimeBeforeSearch}]");
                     }
                 }
             }
 
             if (DecisionTimer < Time.time)
             {
-                DecisionTimer = Time.time + DecisionFreq;
-
                 LastDecision = CurrentDecision;
                 CurrentDecision = GetDecision();
+
+                float timeAdd;
+                if (LastDecision != CurrentDecision)
+                {
+                    timeAdd = 0.25f;
+                }
+                else
+                {
+                    timeAdd = 0.05f;
+                }
+
+                DecisionTimer = Time.time + timeAdd;
             }
         }
 

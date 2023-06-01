@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using HarmonyLib;
 using SAIN.Helpers;
 using UnityEngine;
 
@@ -19,43 +20,28 @@ namespace SAIN.Classes
                 return;
             }
 
+            var priorityEnemy = SAIN.Enemies.PriorityEnemy;
             var enemy = BotOwner.Memory.GoalEnemy;
-            if (enemy == null)
-            {
-                if (BotOwner.Memory.LastEnemy != null)
-                {
-                    enemy = BotOwner.Memory.LastEnemy;
-                }
-            }
 
+            if (priorityEnemy != null && priorityEnemy.IsVisible && priorityEnemy.EnemyChestPosition != null)
+            {
+                //LookToPriorityEnemyPos();
+            }
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
-                var pos = BotOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.body].Position;
-                BotOwner.Steering.LookToPoint(pos);
-            }
-            else if (CanSeeAnyEnemy(out var anyPos))
-            {
-                BotOwner.Steering.LookToPoint(anyPos);
+                LookToGoalEnemyPos();
             }
             else if (BotOwner.Memory.IsUnderFire)
             {
-                var underFirePos = SAIN.UnderFireFromPosition;
-                underFirePos.y += 1f;
-                BotOwner.Steering.LookToPoint(underFirePos);
-                //DebugGizmos.SingleObjects.Line(BotOwner.LookSensor._headPoint, underFirePos, Color.green, 0.025f, true, 1f, true);
+                LookToUnderFirePos();
             }
-            else if (Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Transform.position) < 15f && SAIN.LastSoundHeardTime > Time.time - 2f)
+            else if (BotOwner.Memory.LastTimeHit > Time.time - 2f)
             {
-                var hearPos = SAIN.LastSoundHeardPosition;
-                hearPos.y += 1f;
-                BotOwner.Steering.LookToPoint(hearPos);
+                LookToLastHitPos();
             }
-            else if (Time.time - BotOwner.Memory.LastTimeHit < 2f)
+            else if (SAIN.LastSoundHeardTime > Time.time - 2f)
             {
-                var lastHitPos = BotOwner.Memory.LastHitPos;
-                lastHitPos.y += 1f;
-                BotOwner.Steering.LookToPoint(lastHitPos);
-                //DebugGizmos.SingleObjects.Line(BotOwner.LookSensor._headPoint, lastHitPos, Color.red, 0.025f, true, 1f, true);
+                LookToHearPos();
             }
             else
             {
@@ -63,22 +49,60 @@ namespace SAIN.Classes
             }
         }
 
-        private bool CanSeeAnyEnemy(out Vector3 enemyPos)
+        public void LookToGoalEnemyPos()
         {
-            if (SAIN.Enemies.GoalEnemies.Count > 0)
+            var enemy = BotOwner.Memory.GoalEnemy;
+            if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
-                foreach (var enemy in SAIN.Enemies.GoalEnemies.Values)
+                var pos = enemy.Person.MainParts[BodyPartType.body].Position;
+                BotOwner.Steering.LookToPoint(pos);
+            }
+        }
+
+        public void LookToPriorityEnemyPos()
+        {
+            var priority = SAIN.Enemies.PriorityEnemy;
+            if (priority != null && priority.IsVisible && priority.EnemyChestPosition != null)
+            {
+                var enemyPos = priority.EnemyChestPosition.Value;
+                BotOwner.Steering.LookToPoint(enemyPos);
+            }
+        }
+
+        public void LookToUnderFirePos()
+        {
+            var underFirePos = SAIN.UnderFireFromPosition;
+            underFirePos.y += 1f;
+            BotOwner.Steering.LookToPoint(underFirePos);
+        }
+
+        public void LookToHearPos(bool visionCheck = false)
+        {
+            var soundPos = SAIN.LastSoundHeardPosition;
+
+            if (visionCheck)
+            {
+                soundPos.y += 0.1f;
+                var direction = soundPos - SAIN.HeadPosition;
+
+                if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
-                    if (enemy.IsVisible)
-                    {
-                        enemyPos = enemy.EnemyChestPosition.Value;
-                        return true;
-                    }
+                    BotOwner.Steering.LookToPoint(soundPos);
                 }
             }
-            enemyPos = Vector3.zero;
-            return false;
+            else
+            {
+                BotOwner.Steering.LookToPoint(soundPos);
+            }
         }
+
+        public void LookToLastHitPos()
+        {
+            var lastHitPos = BotOwner.Memory.LastHitPos;
+            lastHitPos.y += 1f;
+            BotOwner.Steering.LookToPoint(lastHitPos);
+        }
+
 
         protected ManualLogSource Logger;
     }

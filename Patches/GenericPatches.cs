@@ -30,7 +30,7 @@ namespace SAIN.Patches
 
                         if (Vector3.Distance(danger, bot.Transform.position) < 80f)
                         {
-                            bot.GetComponent<SAINComponent>().Grenade.GrenadeThrown(grenade, danger);
+                            bot.GetComponent<SAINComponent>().Grenade.EnemyGrenadeThrown(grenade, danger);
                         }
                     }
                 }

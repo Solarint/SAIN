@@ -23,43 +23,55 @@ namespace SAIN.Classes
                 return;
             }
 
-            UpdateEnemyList();
+            if (UpdateVisionTimer < Time.time)
+            {
+                UpdateVisionTimer = Time.time + 0.25f;
 
-            UpdateVisionOnEnemies();
+                UpdateEnemyList();
+
+                UpdateVisionOnEnemies();
+
+                FindPriorityEnemy();
+            }
         }
+
+        private float UpdateListTimer = 0f;
+        private float UpdateVisionTimer = 0f;
+        private float PriorityEnemyTimer = 0f;
 
         private void UpdateEnemyList()
         {
             if (BotOwner.EnemiesController.EnemyInfos.Count > 0)
             {
-                var dictionary = new Dictionary<GClass475, SAINEnemy>();
+                var dictionary = new Dictionary<IAIDetails, SAINEnemy>();
 
-                foreach (var enemy in BotOwner.EnemiesController.EnemyInfos)
+                foreach (var enemy in BotOwner.BotsGroup.Enemies)
                 {
-                    if (enemy.Key != null && enemy.Value != null && enemy.Value.Person.HealthController.IsAlive)
+                    if (enemy.Key != null && enemy.Key.HealthController.IsAlive)
                     {
-                        dictionary.Add(enemy.Value, new SAINEnemy(BotOwner, enemy.Value.Person));
+                        dictionary.Add(enemy.Key, new SAINEnemy(BotOwner, enemy.Key));
                     }
                 }
 
-                GoalEnemies = dictionary;
+                ActiveEnemies = dictionary;
             }
         }
 
         private void UpdateVisionOnEnemies()
         {
-            if (GoalEnemies.Count > 0)
+            if (ActiveEnemies.Count > 0)
             {
                 List<Vector3> enemyPositions = new List<Vector3>();
 
-                foreach (var enemy in GoalEnemies)
+                foreach (var enemy in ActiveEnemies)
                 {
                     if (enemy.Key != null && enemy.Value != null)
                     {
                         enemy.Value.ManualUpdate();
+
                         if (enemy.Value.IsVisible)
                         {
-                            enemyPositions.Add(enemy.Key.CurrPosition);
+                            enemyPositions.Add(enemy.Key.Position);
                         }
                         else
                         {
@@ -82,45 +94,34 @@ namespace SAIN.Classes
             return false;
         }
 
-        public SAINEnemy PriorityEnemy
+        public SAINEnemy PriorityEnemy { get; private set; }
+
+        private void FindPriorityEnemy()
         {
-            get
+            SAINEnemy priorityEnemy = null;
+
+            if (ActiveEnemies.Count > 0)
             {
-                SAINEnemy priorityEnemy = null;
+                float distance = 999f;
 
-                if (GoalEnemies.Count > 0)
+                foreach (var enemy in ActiveEnemies)
                 {
-                    float distance = 999f;
-
-                    foreach (var enemy in GoalEnemies)
+                    if (enemy.Key != null && enemy.Value != null)
                     {
-                        if (enemy.Key != null && enemy.Value != null)
+                        if (enemy.Value.IsVisible)
                         {
-                            if (enemy.Value.EnemyLookingAtMe)
+                            float enemydist = Vector3.Distance(enemy.Key.Position, BotOwner.Position);
+                            if (enemydist < distance)
                             {
-                                float enemydist = Vector3.Distance(enemy.Key.CurrPosition, BotOwner.Position);
-                                if (enemydist < distance)
-                                {
-                                    distance = enemydist;
-                                    priorityEnemy = enemy.Value;
-                                }
+                                distance = enemydist;
+                                priorityEnemy = enemy.Value;
                             }
                         }
                     }
                 }
-
-                if (priorityEnemy == null && GoalEnemies.Count > 0)
-                {
-                    priorityEnemy = GoalEnemies.PickRandom().Value;
-                }
-
-                if (priorityEnemy == null && BotOwner.Memory.GoalEnemy != null)
-                {
-                    priorityEnemy = new SAINEnemy(BotOwner, BotOwner.Memory.GoalEnemy.Person);
-                }
-
-                return priorityEnemy;
             }
+
+            PriorityEnemy = priorityEnemy;
         }
 
         public Vector3[] EnemyPositions { get; private set; }
@@ -131,14 +132,15 @@ namespace SAIN.Classes
             {
                 SAINEnemy closestEnemy = null;
 
-                if (GoalEnemies.Count > 0)
+                if (ActiveEnemies.Count > 0)
                 {
                     float distance = 999f;
-                    foreach (var enemy in GoalEnemies)
+                    foreach (var enemy in ActiveEnemies)
                     {
                         if (enemy.Key != null && enemy.Value != null)
                         {
-                            float enemydist = Vector3.Distance(enemy.Key.CurrPosition, BotOwner.Position);
+                            float enemydist = Vector3.Distance(enemy.Key.Position, BotOwner.Position);
+
                             if (enemydist < distance)
                             {
                                 distance = enemydist;
@@ -152,7 +154,7 @@ namespace SAIN.Classes
             }
         }
 
-        public Dictionary<GClass475, SAINEnemy> GoalEnemies { get; private set; } = new Dictionary<GClass475, SAINEnemy>();
+        public Dictionary<IAIDetails, SAINEnemy> ActiveEnemies { get; private set; } = new Dictionary<IAIDetails, SAINEnemy>();
 
         private SAINComponent SAIN;
         private BotOwner BotOwner => SAIN.BotOwner;
@@ -177,13 +179,13 @@ namespace SAIN.Classes
         {
             if (NextRayCastTime < Time.time)
             {
-                NextRayCastTime = Time.time + 0.05f;
+                NextRayCastTime = Time.time + 0.25f;
 
                 if (BotOwner.LookSensor.IsPointInVisibleSector(Person.Position))
                 {
                     IsVisible = RaycastHelpers.CheckVisible(BotOwner.LookSensor._headPoint, Person, LayerMaskClass.HighPolyWithTerrainMask);
 
-                    CanShoot = RaycastHelpers.CheckVisible(BotOwner.WeaponRoot.position, Person, LayerMaskClass.HighPolyWithTerrainMask);
+                    //CanShoot = RaycastHelpers.CheckVisible(BotOwner.WeaponRoot.position, Person, LayerMaskClass.HighPolyWithTerrainMask);
 
                     LastSeen.UpdateSeen(IsVisible);
                 }
@@ -315,35 +317,10 @@ namespace SAIN.Classes
                 TimeSinceSeen = Time.time - SeenTime;
 
                 LastSeenPos = Enemy.Person.Position;
-
-                AddPositionToDict();
             }
 
             CouldSeeEnemy = CanSee;
         }
-
-        public void AddPositionToDict()
-        {
-            bool AddPos = true;
-
-            if (PositionsAndTime.Count > 0)
-            {
-                foreach (var pos in PositionsAndTime.Keys)
-                {
-                    if (Vector3.Distance(pos, LastSeenPos) < 2f)
-                    {
-                        AddPos = false;
-                    }
-                }
-            }
-
-            if (AddPos)
-            {
-                PositionsAndTime.Add(LastSeenPos, Time.time);
-            }
-        }
-
-        public Dictionary<Vector3, float> PositionsAndTime { get; private set; } = new Dictionary<Vector3, float>();
 
         public bool HasSeenEnemy { get; private set; }
 

@@ -25,7 +25,7 @@ namespace SAIN.Components
 
         private void Update()
         {
-            if (SAIN.BotActive && TargetPosition != null && !SAIN.GameIsEnding)
+            if (SAIN.BotActive && TargetPosition != null && !SAIN.GameIsEnding && SAIN.CurrentDecision != SAINLogicDecision.Surgery && SAIN.CurrentDecision != SAINLogicDecision.Reload && SAIN.CurrentDecision != SAINLogicDecision.RunForCover && SAIN.CurrentDecision != SAINLogicDecision.FirstAid && SAIN.CurrentDecision != SAINLogicDecision.RunAwayGrenade)
             {
                 if (LeanCoroutine == null)
                 {
@@ -219,7 +219,7 @@ namespace SAIN.Components
                 if (coverPoint != null)
                 {
                     Vector3 dirNormal = (targetPos - coverPoint.Position).normalized;
-                    angle = Vector3.SignedAngle(coverPoint.DirectionToObject.normalized, dirNormal, Vector3.up);
+                    angle = Vector3.SignedAngle(coverPoint.DirectionToCollider.normalized, dirNormal, Vector3.up);
                 }
                 return angle;
             }
@@ -239,7 +239,7 @@ namespace SAIN.Components
                 {
                     if (RayTimer < Time.time)
                     {
-                        RayTimer = Time.time + 0.1f;
+                        RayTimer = Time.time + 0.33f;
 
                         RightLineOfSight = CheckOffSetRay(targetPos, 90f, 0.66f, out var rightOffset);
                         RightLineOfSightOffset = rightOffset;
@@ -283,7 +283,7 @@ namespace SAIN.Components
 
                 private bool CheckOffSetRay(Vector3 targetPos, float angle, float dist, out Vector3 offSet)
                 {
-                    var dirToEnemy = (targetPos - BotOwner.Transform.position).normalized;
+                    var dirToEnemy = (targetPos - BotOwner.Position).normalized;
 
                     Quaternion rotation = Quaternion.Euler(0, angle, 0);
 
@@ -291,7 +291,8 @@ namespace SAIN.Components
 
                     offSet = offSet.normalized * dist;
 
-                    offSet += BotOwner.LookSensor._headPoint;
+                    offSet += BotOwner.Position;
+                    offSet.y += 1.35f;
 
                     return LineOfSight(offSet, targetPos);
                 }
@@ -402,7 +403,7 @@ namespace SAIN.Components
                     if (RayCastCheck(BotOwner.WeaponRoot.position, targetPos))
                     {
                         Vector3 rayPoint = BotOwner.LookSensor._headPoint;
-                        rayPoint.y += 0.25f;
+                        rayPoint.y += 0.1f;
 
                         if (!RayCastCheck(rayPoint, targetPos))
                         {
@@ -415,7 +416,7 @@ namespace SAIN.Components
                 {
                     SetBlindFire(blindfire);
                     BotOwner.Steering.LookToPoint(targetPos);
-                    BotOwner.ShootData.Shoot();
+                    //BotOwner.ShootData.Shoot();
                 }
                 else
                 {

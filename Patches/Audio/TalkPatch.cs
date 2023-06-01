@@ -178,7 +178,7 @@ namespace SAIN.Patches
         public static List<EPhraseTrigger> GoodSoloTriggers = new List<EPhraseTrigger>()
         {
             EPhraseTrigger.OnAgony,
-            EPhraseTrigger.MumblePhrase,
+            EPhraseTrigger.OnFight,
             EPhraseTrigger.OnDeath
         };
 

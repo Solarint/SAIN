@@ -93,7 +93,7 @@ namespace SAIN.Layers.Logic
                 {
                     TalkDelay = Time.time + Random(10f, 15f);
 
-                    BotOwner.BotTalk.TrySay(EPhraseTrigger.MumblePhrase, ETagStatus.Combat, true);
+                    BotOwner.BotTalk.TrySay(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
                 }
 
                 AimingData.SetTarget(BotTarget);

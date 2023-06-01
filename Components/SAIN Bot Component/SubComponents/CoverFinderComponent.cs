@@ -16,7 +16,7 @@ namespace SAIN.Components
         {
             SAIN = GetComponent<SAINComponent>();
 
-            CollidersArray = new ColliderArray(BotOwner, 100);
+            CollidersArray = new ColliderArray(BotOwner, 150);
 
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
@@ -38,6 +38,8 @@ namespace SAIN.Components
             {
                 StopCoroutine(TakeCoverCoroutine);
                 TakeCoverCoroutine = null;
+                //CurrentCover = null;
+                //CurrentFallBackPoint = null;
             }
         }
 
@@ -45,48 +47,26 @@ namespace SAIN.Components
         {
             while (true)
             {
-                Vector3 originPoint = OriginPoint;
-                Vector3 targetPosition = TargetPosition;
+                float minDist = Vector3.Distance(TargetPosition, OriginPoint) / 2f;
+                MinTargetDist = Mathf.Clamp(minDist, CoverMinEnemyDistance.Value, 999f);
 
-                float minDist = Vector3.Distance(targetPosition, originPoint) / 2f;
-                float maxDist = CoverColliderRadius.Value;
-
-                if (!RecheckFoundPoints(targetPosition, minDist, maxDist))
+                if (!RecheckFoundPoints())
                 {
-                    var colliderParams = new ColliderParams(
-                        maxDist,
-                        minDist,
-                        originPoint,
-                        targetPosition,
-                        MinObstacleHeight,
-                        0.1f,
-                        SAINComponent.CoverMask);
-
-                    var colliders = CollidersArray.GetColliders(colliderParams);
+                    var colliders = CollidersArray.GetColliders();
 
                     if (colliders.Length == 0)
                     {
-                        Logger.LogError("FindCover: hits is 0!");
+                        //Logger.LogError("FindCover: hits is 0!");
                     }
                     else
                     {
-                        CoverPoint newPoint = null;
-
                         for (int i = 0; i < colliders.Length; i++)
                         {
-                            if (CheckColliderForCover(colliders[i], out newPoint, maxDist))
+                            if (CheckColliderForCover(colliders[i].NavMeshHit.position, colliders[i].Collider.transform.position, colliders[i].Collider.bounds.size.y, out var newPoint))
                             {
+                                SetCoverPoint(newPoint);
                                 break;
                             }
-                        }
-
-                        if (newPoint != null)
-                        {
-                            SetCoverPoint(newPoint);
-                        }
-                        else
-                        {
-                            Logger.LogWarning("No Point found");
                         }
                     }
                 }
@@ -95,28 +75,26 @@ namespace SAIN.Components
             }
         }
 
-        private bool CheckColliderForCover(ColliderWithPath collider, out CoverPoint newPoint, float maxDistance)
+        private bool CheckColliderForCover(Vector3 position, Vector3 colliderPos, float colliderHeight, out CoverPoint newPoint)
         {
-            newPoint = null;
-            if (CheckSides(collider, CoverNavSampleDistance.Value, CoverHideSensitivity.Value, maxDistance))
+            newPoint = new CoverPoint(position, colliderPos, colliderHeight);
+
+            if (CheckSides(newPoint))
             {
-                if (CheckPositionVsOtherBots(collider.NavMeshHit.position))
+                if (CheckPositionVsOtherBots(newPoint.Position))
                 {
-                    var direction = collider.TargetPosition - collider.NavMeshHit.position;
-                    if (Physics.Raycast(collider.NavMeshHit.position, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                    {
-                        newPoint = new CoverPoint(collider);
-                        return true;
-                    }
+                    return true;
                 }
             }
+
+            newPoint = null;
             return false;
         }
 
-        private bool RecheckFoundPoints(Vector3? targetPos, float minTargetDistance, float maxCoverDistance)
+        private bool RecheckFoundPoints()
         {
-            var newCover = CheckOldPoint(targetPos, CurrentCover, minTargetDistance, maxCoverDistance);
-            var newFallBack = CheckOldPoint(targetPos, CurrentFallBackPoint, minTargetDistance, maxCoverDistance);
+            var newCover = CheckOldPoint(CurrentCover);
+            var newFallBack = CheckOldPoint(CurrentFallBackPoint);
 
             if (newCover != null)
             {
@@ -136,12 +114,12 @@ namespace SAIN.Components
             return newCover != null && newFallBack != null;
         }
 
-        private CoverPoint CheckOldPoint(Vector3? targetPos, CoverPoint oldPoint, float minTargetDistance, float maxCoverDistance)
+        private CoverPoint CheckOldPoint(CoverPoint oldPoint)
         {
             CoverPoint cover = null;
-            if (oldPoint != null && Vector3.Distance(targetPos.Value, oldPoint.Position) > minTargetDistance)
+            if (oldPoint != null && Vector3.Distance(TargetPosition, oldPoint.Position) > MinTargetDist)
             {
-                CheckColliderForCover(oldPoint.ColliderPack, out cover, maxCoverDistance);
+                CheckColliderForCover(oldPoint.Position, oldPoint.ColliderPosition, oldPoint.Height, out cover);
             }
             return cover;
         }
@@ -171,43 +149,48 @@ namespace SAIN.Components
             return true;
         }
 
-        private bool CheckSides(ColliderWithPath collider, float navSampleSize, float HideSens, float maxDistance)
+        private bool CheckRayCast(Vector3 point)
         {
-            var rayPoint = collider.NavMeshHit.position;
-            rayPoint.y += 0.5f;
-
-            var trgRayPoint = collider.TargetPosition;
+            point.y += 0.5f;
+            var trgRayPoint = TargetPosition;
             trgRayPoint.y += 0.5f;
 
-            var direction = trgRayPoint - rayPoint;
-            if (!Physics.Raycast(rayPoint, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-            {
-                return false;
-            }
+            var direction = trgRayPoint - point;
 
+            return Physics.Raycast(point, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+        }
 
-            if (Vector3.Dot((collider.Collider.transform.position - collider.NavMeshHit.position).normalized, (collider.TargetPosition - collider.NavMeshHit.position).normalized) > HideSens)
+        private bool CheckSides(CoverPoint point)
+        {
+            float HideSens = CoverHideSensitivity.Value;
+            if (CheckRayCast(point.Position) && Vector3.Dot(point.DirectionToCollider.normalized, (TargetPosition - point.Position).normalized) > HideSens)
             {
-                DebugGizmos.SingleObjects.Line(collider.NavMeshHit.position, BotOwner.MyHead.position, Color.blue, 0.1f, true, 1f, true);
                 return true;
             }
             else
             {
-                Vector3 randomPos = Random.onUnitSphere;
-                randomPos.y = 0;
-                var newPos = collider.NavMeshHit.position + randomPos;
-                if (NavMesh.SamplePosition(newPos, out var hit, 1f, -1))
+                int i = 0;
+                while (i < 3)
                 {
-                    if (Vector3.Dot((collider.Collider.transform.position - hit.position).normalized, (collider.TargetPosition - hit.position).normalized) > HideSens)
+                    Vector3 randomPos = Random.onUnitSphere * 2f;
+                    randomPos.y = 0;
+
+                    var newPos = point.Position + randomPos;
+
+                    if (NavMesh.SamplePosition(newPos, out var hit, CoverNavSampleDistance.Value, -1))
                     {
-                        collider.NavMeshHit = hit;
-                        DebugGizmos.SingleObjects.Line(collider.NavMeshHit.position, BotOwner.MyHead.position, Color.green, 0.1f, true, 1f, true);
-                        return true;
+                        if (CheckRayCast(hit.position))
+                        {
+                            point.Position = hit.position;
+                            point.DirectionToCollider = point.ColliderPosition - hit.position;
+
+                            return true;
+                        }
                     }
+                    i++;
                 }
             }
 
-            DebugGizmos.SingleObjects.Line(collider.NavMeshHit.position, BotOwner.MyHead.position, Color.red, 0.1f, true, 1f, true);
             return false;
         }
 
@@ -236,191 +219,187 @@ namespace SAIN.Components
         private Vector3 OriginPoint;
 
         private Vector3 TargetPosition;
-    }
 
-    public class ColliderArray : SAINBot
-    {
-        private const float GetNewCollidersFreq = 5f;
-        private const float GetNewCollidersDist = 2f;
-        private const float CheckCollidersFreq = 0.5f;
+        public const float MinObstacleXZ = 0.33f;
 
-        public ColliderWithPath[] colliderAndPathLengths;
+        public float MaxRange => CoverColliderRadius.Value;
+        public float MinTargetDist { get; private set; }
 
-        public readonly Collider[] Colliders;
-
-        private readonly ManualLogSource Logger;
-
-        public ColliderArray(BotOwner bot, int count) : base(bot)
+        public class ColliderArray : SAINBot
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            Colliders = new Collider[count];
-        }
+            private CoverFinderComponent Finder => SAIN.Cover.CoverFinder;
 
-        public ColliderWithPath[] GetColliders(ColliderParams inputParams)
-        {
-            if (CheckColliderTimer < Time.time)
+            private const float GetNewCollidersFreq = 30f;
+            private const float GetNewCollidersDist = 5f;
+            private const float CheckCollidersFreq = 0.25f;
+
+            public ColliderWithPath[] colliderAndPathLengths;
+
+            public readonly Collider[] Colliders;
+
+            private readonly ManualLogSource Logger;
+
+            public ColliderArray(BotOwner bot, int count) : base(bot)
             {
-                CheckColliderTimer = Time.time + CheckCollidersFreq;
+                Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+                Colliders = new Collider[count];
+            }
 
-                int hits = GetCollidersArray(inputParams.OriginPoint.Value, inputParams.MaxRange, inputParams.CoverLayer);
-
-                var badColliders = new List<Collider>(KnownBadColliders);
-
-                var collidersList = new List<ColliderWithPath>();
-
-                for (int i = 0; i < hits; i++)
+            public ColliderWithPath[] GetColliders()
+            {
+                if (CheckColliderTimer < Time.time)
                 {
-                    if (badColliders.Contains(Colliders[i]))
-                    {
-                        continue;
-                    }
+                    CheckColliderTimer = Time.time + CheckCollidersFreq;
 
-                    if (Colliders[i].bounds.size.y < 0.4f || Colliders[i].bounds.size.x < inputParams.MinObstacleWidthXZ && Colliders[i].bounds.size.z < inputParams.MinObstacleWidthXZ)
-                    {
-                        badColliders.Add(Colliders[i]);
-                        continue;
-                    }
+                    int hits = GetCollidersArray();
 
-                    var direction = Colliders[i].transform.position - inputParams.OriginPoint.Value;
-                    var enemyDirection = inputParams.TargetPosition.Value - inputParams.OriginPoint.Value;
-                    if (Vector3.Dot(direction, enemyDirection) > 0f)
+                    var collidersList = new List<ColliderWithPath>();
+
+                    for (int i = 0; i < hits; i++)
                     {
-                        float distanceToTarget = Vector3.Distance(inputParams.OriginPoint.Value, inputParams.TargetPosition.Value);
-                        float distanceToCollider = Vector3.Distance(inputParams.OriginPoint.Value, Colliders[i].transform.position);
-                        if (distanceToCollider > distanceToTarget)
+                        float X = Colliders[i].bounds.size.x;
+                        float Y = Colliders[i].bounds.size.y;
+                        float Z = Colliders[i].bounds.size.z;
+
+                        if (Y < Finder.MinObstacleHeight || (X < MinObstacleXZ && Z < MinObstacleXZ))
                         {
                             continue;
                         }
 
+                        var colliderPos = Colliders[i].transform.position;
+
+                        if (Vector3.Distance(colliderPos, Finder.TargetPosition) < Finder.MinTargetDist)
+                        {
+                            continue;
+                        }
+                        if (!CheckDirectionAndDist(colliderPos))
+                        {
+                            continue;
+                        }
+
+                        if (CheckPathLength(Colliders[i], out ColliderWithPath point))
+                        {
+                            collidersList.Add(point);
+                        }
                     }
 
-                    if (Colliders[i].bounds.size.y > inputParams.MinObstacleHeightY)
+                    var collidersArray = collidersList.ToArray();
+
+                    System.Array.Sort(collidersArray, ColliderPathSortComparer);
+
+                    colliderAndPathLengths = collidersArray;
+
+                    //Logger.LogInfo($"Final collider array length = [{collidersArray.Length}]");
+
+                    return collidersArray;
+                }
+
+                return colliderAndPathLengths;
+            }
+
+            private bool CheckDirectionAndDist(Vector3 colliderPos)
+            {
+                var direction = colliderPos - Finder.OriginPoint;
+                var enemyDirection = Finder.TargetPosition - Finder.OriginPoint;
+
+                if (Vector3.Dot(direction, enemyDirection) > 0.25f && direction.magnitude > enemyDirection.magnitude)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            private bool CheckPathLength(Collider collider, out ColliderWithPath colliderPath)
+            {
+                var direction = (Finder.TargetPosition - collider.transform.position).normalized * 1.5f;
+                direction.y = 0f;
+
+                var testPos = collider.transform.position - direction;
+
+                if (NavMesh.SamplePosition(testPos, out var hit, CoverNavSampleDistance.Value, -1))
+                {
+                    NavMeshPath Path = new NavMeshPath();
+                    if (NavMesh.CalculatePath(BotOwner.Position, hit.position, -1, Path) && Path.status == NavMeshPathStatus.PathComplete)
                     {
-                        if (Vector3.Distance(Colliders[i].transform.position, inputParams.TargetPosition.Value) > inputParams.MinEnemyDistance)
+                        float pathLength = Path.CalculatePathLength();
+                        if (pathLength < Finder.MaxRange * 2f)
                         {
-                            if (CheckPathLength(inputParams.TargetPosition.Value, inputParams.OriginPoint.Value, Colliders[i], inputParams.MaxRange, out ColliderWithPath point))
-                            {
-                                collidersList.Add(point);
-                            }
+                            colliderPath = new ColliderWithPath(collider, hit, Path, pathLength);
+                            return true;
                         }
                     }
                 }
 
-                KnownBadColliders = badColliders;
-
-                var collidersArray = collidersList.ToArray();
-
-                System.Array.Sort(collidersArray, ColliderPathSortComparer);
-
-                colliderAndPathLengths = collidersArray;
-
-                Logger.LogInfo($"Final collider array length = [{collidersArray.Length}]");
-
-                return collidersArray;
+                colliderPath = null;
+                return false;
             }
 
-            return colliderAndPathLengths;
-        }
-
-        public List<Collider> KnownBadColliders = new List<Collider>();
-
-        public static bool CheckPathLength(Vector3 targetPos, Vector3 botPos, Collider collider, float maxRange, out ColliderWithPath colliderPath)
-        {
-            var direction = (targetPos - collider.transform.position).normalized * 1.5f;
-            direction.y = 0f;
-
-            var testPos = collider.transform.position - direction;
-
-            if (NavMesh.SamplePosition(testPos, out var hit, 3f, -1))
+            private int GetCollidersArray()
             {
-                NavMeshPath Path = new NavMeshPath();
-                if (NavMesh.CalculatePath(botPos, hit.position, -1, Path) && Path.status == NavMeshPathStatus.PathComplete)
+                if (GetNewCollidersTimer < Time.time || Vector3.Distance(BotOwner.Position, LastCheckPosition) > GetNewCollidersDist)
                 {
-                    float pathLength = Path.CalculatePathLength();
-                    if (pathLength < maxRange * 2f)
+                    GetNewCollidersTimer = Time.time + GetNewCollidersFreq;
+                    LastCheckPosition = BotOwner.Position;
+
+                    for (int i = 0; i < Colliders.Length; i++)
                     {
-                        colliderPath = new ColliderWithPath(collider, hit, Path, pathLength);
-                        colliderPath.TargetPosition = targetPos;
-                        return true;
+                        Colliders[i] = null;
                     }
+
+                    LastColliderHits = Physics.OverlapSphereNonAlloc(Finder.OriginPoint, Finder.MaxRange, Colliders, SAINComponent.CoverMask);
+
+                    System.Array.Sort(Colliders, ColliderArraySortComparer);
                 }
+
+                return LastColliderHits;
             }
 
-            colliderPath = null;
-            return false;
-        }
-
-        private int GetCollidersArray(Vector3 botPos, float maxRange, LayerMask coverLayer)
-        {
-            int hits = LastColliderHits;
-
-            if (GetNewCollidersTimer < Time.time || Vector3.Distance(BotOwner.Transform.position, LastCheckPosition) > GetNewCollidersDist)
+            public int ColliderArraySortComparer(Collider A, Collider B)
             {
-                GetNewCollidersTimer = Time.time + GetNewCollidersFreq;
-
-                for (int i = 0; i < Colliders.Length; i++)
+                if (A == null && B != null)
                 {
-                    Colliders[i] = null;
+                    return 1;
                 }
-
-                hits = Physics.OverlapSphereNonAlloc(botPos, maxRange, Colliders, coverLayer);
-
-                System.Array.Sort(Colliders, ColliderArraySortComparer);
+                else if (A != null && B == null)
+                {
+                    return -1;
+                }
+                else if (A == null && B == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return Vector3.Distance(SAIN.BotOwner.Transform.position, A.transform.position).CompareTo(Vector3.Distance(SAIN.BotOwner.Transform.position, B.transform.position));
+                }
             }
 
-            if (hits == 0)
+            public int ColliderPathSortComparer(ColliderWithPath A, ColliderWithPath B)
             {
-                Logger.LogError("GetCollidersArray: Hits is 0!");
+                if (A == null && B != null)
+                {
+                    return 1;
+                }
+                else if (A != null && B == null)
+                {
+                    return -1;
+                }
+                else if (A == null && B == null)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return A.PathLength.CompareTo(B.PathLength);
+                }
             }
 
-            LastColliderHits = hits;
-            return hits;
+            private float CheckColliderTimer = 0f;
+            private float GetNewCollidersTimer = 0f;
+            private int LastColliderHits = 0;
+            private Vector3 LastCheckPosition = Vector3.zero;
         }
-
-        public int ColliderArraySortComparer(Collider A, Collider B)
-        {
-            if (A == null && B != null)
-            {
-                return 1;
-            }
-            else if (A != null && B == null)
-            {
-                return -1;
-            }
-            else if (A == null && B == null)
-            {
-                return 0;
-            }
-            else
-            {
-                return Vector3.Distance(SAIN.BotOwner.Transform.position, A.transform.position).CompareTo(Vector3.Distance(SAIN.BotOwner.Transform.position, B.transform.position));
-            }
-        }
-
-        public int ColliderPathSortComparer(ColliderWithPath A, ColliderWithPath B)
-        {
-            if (A == null && B != null)
-            {
-                return 1;
-            }
-            else if (A != null && B == null)
-            {
-                return -1;
-            }
-            else if (A == null && B == null)
-            {
-                return 0;
-            }
-            else
-            {
-                return A.PathLength.CompareTo(B.PathLength);
-            }
-        }
-
-        private float CheckColliderTimer = 0f;
-        private float GetNewCollidersTimer = 0f;
-        private int LastColliderHits = 0;
-        private Vector3 LastCheckPosition = Vector3.zero;
     }
 
     public class ColliderParams
@@ -472,54 +451,17 @@ namespace SAIN.Components
 
     public class CoverPoint
     {
-        public CoverPoint(ColliderWithPath objectWithPath)
+        public CoverPoint(Vector3 position, Vector3 colliderPos, float colliderHeight)
         {
-            ColliderPack = objectWithPath;
-
-            //CheckDistanceToCover();
+            Position = position;
+            ColliderPosition = colliderPos;
+            DirectionToCollider = colliderPos - position;
+            Height = colliderHeight;
         }
 
-        private void CheckDistanceToCover()
-        {
-            // Raise the y values so we have a clear line of sight and wont hit any tiny objects
-            Vector3 rayPos = Position;
-            rayPos.y += 0.25f;
-            Vector3 rayEnemyPos = EnemyPosition;
-            rayEnemyPos.y += 0.25f;
-
-            Vector3 rayDirection = rayEnemyPos - rayPos;
-
-            // Raycast 0.5 meters to see if the object providing cover is too close
-            if (Physics.Raycast(rayPos, rayDirection, 0.5f, SAINComponent.CoverMask))
-            {
-                // Normalize the direction and multiply it by 0.5 to get a distance to shift the position
-                Vector3 shiftPosition = (EnemyPosition - Position).normalized * 0.5f;
-                // subtract the direction from the position to shift the coverPos away from the object
-                Vector3 newPosition = Position - shiftPosition;
-
-                // Make sure the new position is on the navmesh
-                if (NavMesh.SamplePosition(newPosition, out var hit, 0.5f, NavMesh.AllAreas))
-                {
-                    // Assign it as our Position and navmesh hit
-                    //Position = hit.position;
-                    ColliderPack.NavMeshHit = hit;
-                }
-            }
-        }
-
-        public ColliderWithPath ColliderPack;
-
-        public Vector3 EnemyPosition => ColliderPack.TargetPosition;
-        public Vector3 Position => ColliderPack.NavMeshHit.position;
-        public Vector3 DirectionToObject => ColliderPack.Collider.transform.position - ColliderPack.NavMeshHit.position;
-        public Vector3 DirectionToTarget => ColliderPack.TargetPosition - ColliderPack.NavMeshHit.position;
-
-        public float Height => ColliderPack.Collider.bounds.size.y;
-    }
-
-    public static class CoverColliders
-    {
-        public static List<Collider> CollidersUsed = new List<Collider>();
-        public static List<Collider> KnownBadColliders = new List<Collider>();
+        public Vector3 Position { get; set; }
+        public Vector3 DirectionToCollider { get; set; }
+        public Vector3 ColliderPosition { get; private set; }
+        public float Height { get; private set; }
     }
 }
