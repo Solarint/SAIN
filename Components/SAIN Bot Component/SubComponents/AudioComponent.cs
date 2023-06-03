@@ -175,13 +175,13 @@ namespace SAIN.Components
                         }
 
 
-                        if (shooterDistance > 80f)
+                        if (shooterDistance > 50f)
                         {
                             SAIN.Talk.Talk.Say(EPhraseTrigger.SniperPhrase);
                         }
                         else
                         {
-                            SAIN.Talk.Talk.Say(EPhraseTrigger.UnderFire);
+                            //SAIN.Talk.Talk.Say(EPhraseTrigger.UnderFire);
                         }
                     }
                 }

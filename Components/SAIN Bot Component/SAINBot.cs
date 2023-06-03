@@ -11,7 +11,7 @@ namespace SAIN
             SAIN = bot.GetOrAddComponent<SAINComponent>();
         }
 
-        protected BotOwner BotOwner { get; private set; }
-        protected SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public SAINComponent SAIN { get; private set; }
     }
 }

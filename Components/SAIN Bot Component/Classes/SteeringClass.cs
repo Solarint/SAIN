@@ -23,21 +23,17 @@ namespace SAIN.Classes
             var priorityEnemy = SAIN.Enemies.PriorityEnemy;
             var enemy = BotOwner.Memory.GoalEnemy;
 
-            if (priorityEnemy != null && priorityEnemy.IsVisible && priorityEnemy.EnemyChestPosition != null)
-            {
-                //LookToPriorityEnemyPos();
-            }
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
                 LookToGoalEnemyPos();
             }
+            else if (BotOwner.Memory.LastTimeHit > Time.time - 1f)
+            {
+                LookToLastHitPos();
+            }
             else if (BotOwner.Memory.IsUnderFire)
             {
                 LookToUnderFirePos();
-            }
-            else if (BotOwner.Memory.LastTimeHit > Time.time - 2f)
-            {
-                LookToLastHitPos();
             }
             else if (SAIN.LastSoundHeardTime > Time.time - 2f)
             {

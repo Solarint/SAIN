@@ -78,7 +78,7 @@ namespace SAIN.Classes
             var stims = BotOwner.Medecine.Stimulators;
             if (StimTimer < Time.time && stims.CanUseNow())
             {
-                StimTimer = Time.time + 1f;
+                StimTimer = Time.time + 2f;
 
                 if (UserSettings.DebugConfig.DebugLayers.Value)
                 {

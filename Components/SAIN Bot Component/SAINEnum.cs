@@ -16,7 +16,7 @@ namespace SAIN
         DogFight = 10,
         Skirmish = 11,
         Stims = 12,
-        WalkToCover = 13,
+        MoveToCover = 13,
         RunAwayGrenade = 14,
     }
 
@@ -86,7 +86,7 @@ namespace SAIN
         Far = 3
     }
 
-    public enum BotSquadDecisions
+    public enum SAINSquadDecisions
     {
         None = 0,
         Surround = 1,

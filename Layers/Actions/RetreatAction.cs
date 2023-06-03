@@ -2,6 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
+using System.Drawing;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -22,20 +23,21 @@ namespace SAIN.Layers
         {
             BotOwner.DoorOpener.Update();
 
-            if (SAIN.CurrentDecision == SAINLogicDecision.WalkToCover)
+            //if (CheckMoveToLeanPos())
+            //{
+            //    return;
+            //}
+
+            if (SAIN.Cover.DuckInCover())
             {
                 SAIN.Steering.ManualUpdate();
-                AimData.Update();
-            }
-            else
-            {
-                if (SAIN.Cover.DuckInCover())
+
+                if (SAIN.HasEnemyAndCanShoot)
                 {
-                    SAIN.Steering.ManualUpdate();
-                    return;
+                    AimData.Update();
                 }
 
-                BotOwner.Steering.LookToMovingDirection();
+                return;
             }
 
             CoverPoint PointToGo = null;
@@ -48,72 +50,103 @@ namespace SAIN.Layers
                 PointToGo = SAIN.Cover.CurrentCoverPoint;
             }
 
-            if (PointToGo != null)
+            if (PointToGo != null && SAIN.GoToPointRetreat(PointToGo.Position))
             {
-                MoveToPoint(PointToGo.Position);
+                BotOwner.Steering.LookToMovingDirection();
+                SetForMove();
             }
-            else if (TemporaryPoint == null)
+            else if (LastResultFallback())
             {
-                LastResultFallback();
+                BotOwner.Steering.LookToMovingDirection();
+                SetForMove();
             }
-        }
-
-        private void LastResultFallback()
-        {
-            var enemyPos = BotOwner.Memory.GoalEnemy.CurrPosition;
-
-            var enemyDirection = enemyPos - BotOwner.Position;
-            enemyDirection.y = 0f;
-
-            enemyDirection = enemyDirection.normalized * 10f;
-
-            var randomPoint = Random.onUnitSphere * 5f;
-            randomPoint.y = 0f;
-
-            var point = BotOwner.Position - enemyDirection + randomPoint;
-
-            if (NavMesh.SamplePosition(point, out var hit, 1f, -1))
+            else
             {
-                var pointDirection = enemyPos - hit.position;
-                if (Physics.Raycast(hit.position, pointDirection, pointDirection.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                if (SAIN.HasEnemyAndCanShoot)
                 {
-                    NavMeshPath path = new NavMeshPath();
-                    if (NavMesh.CalculatePath(BotOwner.Position, hit.position, -1, path) && path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        if (path.corners.Length > 1)
-                        {
-                            var cornerADir = path.corners[1] - BotOwner.Position;
-                            cornerADir.y = 0f;
+                    AimData.Update();
+                }
 
-                            if (Vector3.Dot(cornerADir.normalized, enemyDirection.normalized) < 0.5f)
-                            {
-                                TemporaryPoint = hit.position;
-                                MoveToPoint(hit.position);
-                            }
-                        }
-                    }
+                SAIN.Steering.ManualUpdate();
+
+                var direction = (BotOwner.Position - SAIN.CurrentTargetPosition.Value).normalized;
+                var movePoint = BotOwner.Position + direction;
+
+                if (NavMesh.SamplePosition(movePoint, out var hit, 0.25f, -1))
+                {
+                    SAIN.GoToPointRetreat(hit.position);
                 }
             }
         }
 
-        private void MoveToPoint(Vector3 point)
+        private bool CheckMoveToLeanPos()
+        {
+            var LeanPos = SAIN.Lean.CheckLeanPositions;
+            if (LeanPos != null)
+            {
+                if (NavMesh.SamplePosition(LeanPos.Value, out var hit, 0.1f, -1))
+                {
+                    SAIN.Steering.ManualUpdate();
+
+                    BotOwner.SetPose(1f);
+                    BotOwner.SetTargetMoveSpeed(0.5f);
+
+                    BotOwner.GoToPoint(hit.position, true, -1, false, false);
+
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool LastResultFallback()
+        {
+            if (SAIN.CurrentTargetPosition == null)
+            {
+                return false;
+            }
+
+            if (TemporaryPoint == null)
+            {
+                var enemyPos = SAIN.CurrentTargetPosition.Value;
+
+                var enemyDirection = enemyPos - BotOwner.Position;
+                enemyDirection.y = 0f;
+
+                enemyDirection = enemyDirection.normalized * 5f;
+
+                var randomPoint = Random.onUnitSphere * 5f;
+                randomPoint.y = 0f;
+
+                var point = BotOwner.Position - enemyDirection + randomPoint;
+
+                if (NavMesh.SamplePosition(point, out var hit, 1f, -1))
+                {
+                    var pointDirection = enemyPos - hit.position;
+                    if (Physics.Raycast(hit.position, pointDirection, pointDirection.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                    {
+                        TemporaryPoint = hit.position;
+                    }
+                }
+            }
+
+            if (TemporaryPoint != null)
+            {
+                if (SAIN.GoToPointRetreat(TemporaryPoint.Value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void SetForMove()
         {
             BotOwner.SetPose(1f);
             BotOwner.SetTargetMoveSpeed(1f);
 
-            if (SAIN.CurrentDecision != SAINLogicDecision.WalkToCover)
-            {
-                BotOwner.GetPlayer.EnableSprint(true);
-                BotOwner.Sprint(true);
-                BotOwner.GetPlayer.EnableSprint(true);
-            }
-
-            if ((BotOwner.Mover.RealDestPoint - point).magnitude < 0.25f)
-            {
-                return;
-            }
-
-            BotOwner.GoToPoint(point, true, -1, false, false);
+            BotOwner.GetPlayer.EnableSprint(true);
         }
 
         private Vector3? TemporaryPoint;
@@ -128,7 +161,6 @@ namespace SAIN.Layers
         public override void Stop()
         {
             BotOwner.GetPlayer.EnableSprint(false);
-            BotOwner.Sprint(false);
 
             SAIN.Steering.ManualUpdate();
 

@@ -23,12 +23,12 @@ namespace SAIN.Classes
             CoverPointStatus = CoverStatus.None;
         }
 
-        private const float InCoverDist = 0.5f;
+        private const float InCoverDist = 0.25f;
         private const float CloseCoverDist = 10f;
         private const float MidCoverDist = 25f;
         private const float FarCoverDist = 50f;
 
-        public static List<SAINLogicDecision> FindCoverActions = new List<SAINLogicDecision> { SAINLogicDecision.RunAwayGrenade, SAINLogicDecision.Surgery, SAINLogicDecision.Reload, SAINLogicDecision.RunForCover, SAINLogicDecision.RunAway, SAINLogicDecision.FirstAid, SAINLogicDecision.Stims, SAINLogicDecision.WalkToCover, SAINLogicDecision.Surgery};
+        public static List<SAINLogicDecision> FindCoverActions = new List<SAINLogicDecision> { SAINLogicDecision.RunAwayGrenade, SAINLogicDecision.Surgery, SAINLogicDecision.Reload, SAINLogicDecision.RunForCover, SAINLogicDecision.RunAway, SAINLogicDecision.FirstAid, SAINLogicDecision.Stims, SAINLogicDecision.MoveToCover};
 
         private void Update()
         {
@@ -38,7 +38,7 @@ namespace SAIN.Classes
                 return;
             }
 
-            if (FindCoverActions.Contains(SAIN.CurrentDecision) && (SAIN.HasEnemy || SAIN.HasTarget))
+            if (FindCoverActions.Contains(SAIN.CurrentDecision) && (SAIN.HasGoalEnemy || SAIN.HasGoalTarget))
             {
                 if (UpdateTimer < Time.time)
                 {
@@ -73,20 +73,20 @@ namespace SAIN.Classes
                 {
                     target = grenade.DangerPoint;
                 }
-                else if (SAIN.HasEnemy)
+                else if (SAIN.HasGoalEnemy)
                 {
                     target = SAIN.MidPoint(SAIN.GoalEnemyPos.Value);
                 }
-                else if (SAIN.HasTarget)
+                else if (SAIN.HasGoalTarget)
                 {
                     target = SAIN.MidPoint(SAIN.GoalTargetPos.Value);
                 }
             }
-            else if (SAIN.HasEnemy)
+            else if (SAIN.HasGoalEnemy)
             {
                 target = SAIN.GoalEnemyPos.Value;
             }
-            else if (SAIN.HasTarget)
+            else if (SAIN.HasGoalTarget)
             {
                 target = SAIN.GoalTargetPos.Value;
             }
@@ -160,9 +160,11 @@ namespace SAIN.Classes
             {
                 rays++;
 
-                Vector3 direction = part.Position - headPos;
+                Vector3 direction = headPos - part.Position;
 
-                if (Physics.Raycast(headPos, direction, direction.magnitude, SAINComponent.ShootMask))
+                float distance = Mathf.Clamp(direction.magnitude, 0f, 5f);
+
+                if (Physics.Raycast(part.Position, direction, distance, SAINComponent.ShootMask))
                 {
                     cover++;
                 }

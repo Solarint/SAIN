@@ -5,13 +5,15 @@ using SAIN.Layers.Logic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
+using System.Collections.Generic;
 using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Components
 {
     public class LeanComponent : MonoBehaviour
     {
+        public List<SAINLogicDecision> DontLeanDecisions = new List<SAINLogicDecision> { SAINLogicDecision.Surgery, SAINLogicDecision.None, SAINLogicDecision.Reload, SAINLogicDecision.RunForCover, SAINLogicDecision.RunAway, SAINLogicDecision.FirstAid, SAINLogicDecision.Stims, SAINLogicDecision.RunAwayGrenade };
+
         private void Awake()
         {
             SAIN = GetComponent<SAINComponent>();
@@ -25,7 +27,7 @@ namespace SAIN.Components
 
         private void Update()
         {
-            if (SAIN.BotActive && TargetPosition != null && !SAIN.GameIsEnding && SAIN.CurrentDecision != SAINLogicDecision.Surgery && SAIN.CurrentDecision != SAINLogicDecision.Reload && SAIN.CurrentDecision != SAINLogicDecision.RunForCover && SAIN.CurrentDecision != SAINLogicDecision.FirstAid && SAIN.CurrentDecision != SAINLogicDecision.RunAwayGrenade)
+            if (SAIN.BotActive && TargetPosition != null && !DontLeanDecisions.Contains(SAIN.CurrentDecision))
             {
                 if (LeanCoroutine == null)
                 {
@@ -60,9 +62,12 @@ namespace SAIN.Components
             {
                 Lean.FindLeanDirectionRayCast(TargetPosition.Value);
 
-                Lean.SetLean(Lean.Angle);
+                if (!DontLeanDecisions.Contains(SAIN.CurrentDecision))
+                {
+                    Lean.SetLean(Lean.Angle);
 
-                SideStep.Update();
+                    SideStep.Update();
+                }
 
                 yield return wait;
             }
@@ -89,6 +94,27 @@ namespace SAIN.Components
                 BlindFire.Update(TargetPosition.Value);
 
                 yield return wait;
+            }
+        }
+
+        public Vector3? CheckLeanPositions
+        {
+            get
+            {
+                var lean = Lean.RayCast;
+
+                Vector3? MoveLeanPos = null;
+
+                if (lean.LeftLosPos != null)
+                {
+                    MoveLeanPos = lean.LeftLosPos;
+                }
+                else if (lean.RightLosPos != null)
+                {
+                    MoveLeanPos = lean.RightLosPos;
+                }
+
+                return MoveLeanPos;
             }
         }
 
@@ -213,17 +239,6 @@ namespace SAIN.Components
                 return LeanSetting.None;
             }
 
-            private float LeanFromCover(CoverPoint coverPoint, Vector3 targetPos)
-            {
-                float angle = 0f;
-                if (coverPoint != null)
-                {
-                    Vector3 dirNormal = (targetPos - coverPoint.Position).normalized;
-                    angle = Vector3.SignedAngle(coverPoint.DirectionToCollider.normalized, dirNormal, Vector3.up);
-                }
-                return angle;
-            }
-
             private readonly ManualLogSource Logger;
 
             public class LeanRayCast : SAIN.SAINBot
@@ -239,19 +254,58 @@ namespace SAIN.Components
                 {
                     if (RayTimer < Time.time)
                     {
-                        RayTimer = Time.time + 0.33f;
+                        RayTimer = Time.time + 0.25f;
 
-                        RightLineOfSight = CheckOffSetRay(targetPos, 90f, 0.66f, out var rightOffset);
-                        RightLineOfSightOffset = rightOffset;
+                        DirectLineOfSight = CheckOffSetRay(targetPos, 0f, 0f, out var direct);
 
-                        RightHalfLineOfSight = CheckOffSetRay(targetPos, 90f, 0.33f, out var rightHalfOffset);
-                        RightHalfLineOfSightOffset = rightHalfOffset;
+                        RightLos = CheckOffSetRay(targetPos, 90f, 0.66f, out var rightOffset);
+                        if (!RightLos)
+                        {
+                            RightLosPos = rightOffset;
 
-                        LeftLineOfSight = CheckOffSetRay(targetPos, -90f, 0.66f, out var leftOffset);
-                        LeftLineOfSightOffset = leftOffset;
+                            rightOffset.y = BotOwner.Position.y;
+                            float halfDist1 = (rightOffset - BotOwner.Position).magnitude / 2f;
 
-                        LeftHalfLineOfSight = CheckOffSetRay(targetPos, -90f, 0.33f, out var leftHalfOffset);
-                        LeftLineOfSightOffset = leftHalfOffset;
+                            RightHalfLos = CheckOffSetRay(targetPos, 90f, halfDist1, out var rightHalfOffset);
+                            if (!RightHalfLos)
+                            {
+                                RightHalfLosPos = rightHalfOffset;
+                            }
+                            else
+                            {
+                                RightHalfLosPos = null;
+                            }
+                        }
+                        else
+                        {
+                            RightLosPos = null;
+                            RightHalfLosPos = null;
+                        }
+
+                        LeftLos = CheckOffSetRay(targetPos, -90f, 0.66f, out var leftOffset);
+                        if (!LeftLos)
+                        {
+                            LeftLosPos = leftOffset;
+
+                            leftOffset.y = BotOwner.Position.y;
+                            float halfDist2 = (leftOffset - BotOwner.Position).magnitude / 2f;
+
+                            LeftHalfLos = CheckOffSetRay(targetPos, -90f, halfDist2, out var leftHalfOffset);
+
+                            if (!LeftHalfLos)
+                            {
+                                LeftHalfLosPos = leftHalfOffset;
+                            }
+                            else
+                            {
+                                LeftHalfLosPos = null;
+                            }
+                        }
+                        else
+                        {
+                            LeftLosPos = null;
+                            LeftHalfLosPos = null;
+                        }
                     }
 
                     var setting = GetSettingFromResults();
@@ -265,11 +319,21 @@ namespace SAIN.Components
                 {
                     LeanSetting setting;
 
-                    if ((LeftLineOfSight || LeftHalfLineOfSight) && !RightLineOfSight)
+                    if (SAIN.Lean.DontLeanDecisions.Contains(SAIN.CurrentDecision))
+                    {
+                        return LeanSetting.None;
+                    }
+
+                    if (BotOwner.Memory.GoalEnemy != null && DirectLineOfSight)
+                    {
+                        //return LeanSetting.None;
+                    }
+
+                    if ((LeftLos || LeftHalfLos) && !RightLos)
                     {
                         setting = LeanSetting.Left;
                     }
-                    else if (!LeftLineOfSight && (RightLineOfSight || RightHalfLineOfSight))
+                    else if (!LeftLos && (RightLos || RightHalfLos))
                     {
                         setting = LeanSetting.Right;
                     }
@@ -281,20 +345,36 @@ namespace SAIN.Components
                     return setting;
                 }
 
-                private bool CheckOffSetRay(Vector3 targetPos, float angle, float dist, out Vector3 offSet)
+                private bool CheckOffSetRay(Vector3 targetPos, float angle, float dist, out Vector3 Point)
                 {
-                    var dirToEnemy = (targetPos - BotOwner.Position).normalized;
+                    Vector3 startPos = BotOwner.Position;
+                    startPos.y = SAIN.HeadPosition.y;
 
-                    Quaternion rotation = Quaternion.Euler(0, angle, 0);
+                    if (dist > 0f)
+                    {
+                        var dirToEnemy = (targetPos - BotOwner.Position).normalized;
 
-                    offSet = rotation * dirToEnemy;
+                        Quaternion rotation = Quaternion.Euler(0, angle, 0);
 
-                    offSet = offSet.normalized * dist;
+                        Vector3 direction = rotation * dirToEnemy;
 
-                    offSet += BotOwner.Position;
-                    offSet.y += 1.35f;
+                        Point = FindOffset(startPos, direction, dist);
 
-                    return LineOfSight(offSet, targetPos);
+                        if ((Point - startPos).magnitude < dist / 3f)
+                        {
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        Point = startPos;
+                    }
+
+                    bool LOS = LineOfSight(Point, targetPos);
+
+                    Point.y = BotOwner.Position.y;
+
+                    return LOS;
                 }
 
                 private bool LineOfSight(Vector3 start, Vector3 target)
@@ -310,17 +390,31 @@ namespace SAIN.Components
                     return false;
                 }
 
-                public bool LeftLineOfSight { get; set; }
-                public Vector3 LeftLineOfSightOffset { get; set; }
+                private Vector3 FindOffset(Vector3 start, Vector3 direction, float distance)
+                {
+                    if (Physics.Raycast(start, direction, out var hit, distance, LayerMaskClass.HighPolyWithTerrainMask))
+                    {
+                        return hit.point;
+                    }
+                    else
+                    {
+                        return start + direction.normalized * distance;
+                    }
+                }
 
-                public bool LeftHalfLineOfSight { get; set; }
-                public Vector3 LeftHalfLineOfSightOffset { get; set; }
+                public bool DirectLineOfSight { get; set; }
 
-                public bool RightLineOfSight { get; set; }
-                public Vector3 RightLineOfSightOffset { get; set; }
+                public bool LeftLos { get; set; }
+                public Vector3? LeftLosPos { get; set; }
 
-                public bool RightHalfLineOfSight { get; set; }
-                public Vector3 RightHalfLineOfSightOffset { get; set; }
+                public bool LeftHalfLos { get; set; }
+                public Vector3? LeftHalfLosPos { get; set; }
+
+                public bool RightLos { get; set; }
+                public Vector3? RightLosPos { get; set; }
+
+                public bool RightHalfLos { get; set; }
+                public Vector3? RightHalfLosPos { get; set; }
 
                 protected ManualLogSource Logger;
             }

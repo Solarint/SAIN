@@ -34,7 +34,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAIN.Movement.DecideMovementSpeed();
+            //SAIN.Movement.DecideMovementSpeed();
 
             SAIN.Steering.ManualUpdate();
 

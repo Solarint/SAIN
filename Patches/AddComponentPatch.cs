@@ -17,6 +17,11 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(ref BotOwner __instance)
         {
+            if (__instance.IsRole(WildSpawnType.marksman))
+            {
+                return;
+            }
+
             __instance.GetOrAddComponent<SAINComponent>();
         }
     }

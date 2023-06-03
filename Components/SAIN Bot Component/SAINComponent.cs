@@ -1,9 +1,10 @@
 ﻿using BepInEx.Logging;
+using Comfort.Common;
 using EFT;
+using SAIN.Classes;
 using SAIN.Helpers;
 using UnityEngine;
-using SAIN.Classes;
-using Comfort.Common;
+using UnityEngine.AI;
 
 namespace SAIN.Components
 {
@@ -70,6 +71,63 @@ namespace SAIN.Components
             }
         }
 
+        private float ShiftTimer = 0f;
+
+        public bool ShiftAwayFromCloseWall(Vector3 target)
+        {
+            if (ShiftTimer < Time.time && CheckTooCloseToWall(target))
+            {
+                ShiftTimer = Time.time + 0.5f;
+
+                var direction = (BotOwner.Position - target).normalized;
+                direction.y = 0f;
+                var movePoint = BotOwner.Position + direction;
+                if (NavMesh.SamplePosition(movePoint, out var hit, 0.1f, -1))
+                {
+                    BotOwner.GoToPoint(hit.position, true, -1, false, false);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool CheckTooCloseToWall(Vector3 target)
+        {
+            target.y = BotOwner.Position.y;
+            var direction = target - BotOwner.Position;
+            return Physics.Raycast(BotOwner.Position, direction, 0.5f, LayerMaskClass.HighPolyWithTerrainMask);
+        }
+
+        public bool GoToPointRetreat(Vector3 point)
+        {
+            NavMeshPath path = new NavMeshPath();
+            if (NavMesh.CalculatePath(BotOwner.Position, point, -1, path) && path.status == NavMeshPathStatus.PathComplete)
+            {
+                var corners = path.corners;
+
+                if (HasGoalEnemy)
+                {
+                    int max = corners.Length - 2;
+                    int i = 0;
+                    while (i < max)
+                    {
+                        Vector3 directionEnemy = GoalEnemyPos.Value - corners[i];
+                        Vector3 directionCorner = corners[i + 1] - corners[i];
+                        float dotProduct = Vector3.Dot(directionEnemy, directionCorner);
+                        if (dotProduct > 0.85f || (corners[i] - GoalEnemyPos.Value).magnitude < 1f)
+                        {
+                            return false;
+                        }
+                        i++;
+                    }
+                }
+
+                BotOwner.GoToByWay(corners);
+                return true;
+            }
+            return false;
+        }
+
         public bool IsPointInVisibleSector(Vector3 position)
         {
             Vector3 direction = position - BotOwner.Position;
@@ -107,10 +165,14 @@ namespace SAIN.Components
 
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
 
-        public bool HasTarget => BotOwner.Memory.GoalTarget?.GoalTarget != null;
-        public bool HasEnemy => BotOwner.Memory.GoalEnemy != null;
+        public Vector3? CurrentTargetPosition => HasGoalEnemy ? GoalEnemyPos : GoalTargetPos;
+
+        public bool HasAnyTarget => HasGoalEnemy || HasGoalTarget;
+        public bool HasGoalTarget => BotOwner.Memory.GoalTarget?.GoalTarget != null;
+        public bool HasGoalEnemy => BotOwner.Memory.GoalEnemy != null;
         public Vector3? GoalTargetPos => BotOwner.Memory.GoalTarget?.GoalTarget?.Position;
         public Vector3? GoalEnemyPos => BotOwner.Memory.GoalEnemy?.CurrPosition;
+
         public Vector3 MidPoint(Vector3 target, float lerpVal = 0.5f)
         {
             return Vector3.Lerp(BotOwner.Position, target, lerpVal);

@@ -24,22 +24,25 @@ namespace SAIN.Layers
         {
             SAIN.Steering.ManualUpdate();
 
+            if (SAIN.HasEnemyAndCanShoot)
+            {
+                gclass105_0.Update();
+            }
+
+            if (SAIN.CurrentTargetPosition != null)
+            {
+                SAIN.ShiftAwayFromCloseWall(SAIN.CurrentTargetPosition.Value);
+            }
+
             var enemy = BotOwner.Memory.GoalEnemy;
             if (enemy != null)
             {
-                if (SAIN.HasEnemyAndCanShoot)
+                if (enemy.TimeLastSeenReal < Time.time - 5f && !BotOwner.Memory.IsUnderFire && !SAIN.HasEnemyAndCanShoot)
                 {
-                    gclass105_0.Update();
-                }
-                else
-                {
-                    if (enemy.TimeLastSeenReal < Time.time - 5f && !BotOwner.Memory.IsUnderFire)
+                    if (RightMovePos == null && LeftMovePos == null)
                     {
-                        if (RightMovePos == null && LeftMovePos == null)
-                        {
-                            SetMovePoints();
-                            MoveAround();
-                        }
+                        SetMovePoints();
+                        MoveAround();
                     }
                 }
             }
@@ -171,7 +174,7 @@ namespace SAIN.Layers
         {
             BotOwner.PatrollingData.Pause();
 
-            BotOwner.MovementPause(999f);
+            BotOwner.MovementPause(0.1f);
 
             PositionToHold = BotOwner.Position;
         }
@@ -182,7 +185,7 @@ namespace SAIN.Layers
 
         public override void Stop()
         {
-            BotOwner.MovementResume();
+            //BotOwner.MovementResume();
             BotOwner.PatrollingData.Unpause();
         }
     }

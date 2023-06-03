@@ -20,6 +20,6 @@ namespace SAIN.Classes
         public bool BadlyInjured => HealthStatus == ETagStatus.BadlyInjured;
         public bool Dying => HealthStatus == ETagStatus.Dying;
 
-        private ETagStatus HealthStatus => BotOwner.GetPlayer.HealthStatus;
+        public ETagStatus HealthStatus => BotOwner.GetPlayer.HealthStatus;
     }
 }

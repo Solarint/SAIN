@@ -394,7 +394,7 @@ namespace SAIN.Classes
                     trigger = EPhraseTrigger.Going;
                     mask = ETagStatus.Aware;
                 }
-                else if (GroupDecisions.Contains(SAINLogicDecision.RunForCover) || GroupDecisions.Contains(SAINLogicDecision.WalkToCover))
+                else if (GroupDecisions.Contains(SAINLogicDecision.RunForCover) || GroupDecisions.Contains(SAINLogicDecision.MoveToCover))
                 {
                     commandTrigger = EFT_Math.RandomBool() ? EPhraseTrigger.GetInCover : EPhraseTrigger.Attention;
                     commmandMask = ETagStatus.Combat;

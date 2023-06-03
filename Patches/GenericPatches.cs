@@ -94,6 +94,20 @@ namespace SAIN.Patches
         }
     }
 
+    public class SprintPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("Sprint", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix()
+        {
+            return false;
+        }
+    }
+
     public class AddEnemyToAllGroupsPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

@@ -61,7 +61,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalShootData __instance)
         {
-            __instance.MAX_DIST_COEF = 5.0f;
+            __instance.MAX_DIST_COEF = 1.75f;
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
             __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 2f;
             __instance.BASE_AUTOMATIC_TIME = 0.5f;
@@ -99,7 +99,7 @@ namespace SAIN.Patches
             __instance.BASE_ROTATE_SPEED = 200f;
             __instance.FIRST_TURN_SPEED = 200f;
             __instance.FIRST_TURN_BIG_SPEED = 200f;
-            __instance.TURN_SPEED_ON_SPRINT = 200f;
+            __instance.TURN_SPEED_ON_SPRINT = 400f;
         }
     }
 
@@ -158,23 +158,23 @@ namespace SAIN.Patches
             __instance.NIGHT_VISION_DIST = 125f;
             __instance.VISIBLE_ANG_NIGHTVISION = 90f;
 
-            __instance.LOOK_THROUGH_PERIOD_BY_HIT = 0f;
+            //__instance.LOOK_THROUGH_PERIOD_BY_HIT = 0f;
 
             __instance.LightOnVisionDistance = 40f;
             __instance.VISIBLE_ANG_LIGHT = 30f;
             __instance.VISIBLE_DISNACE_WITH_LIGHT = 50f;
 
-            __instance.GOAL_TO_FULL_DISSAPEAR = 0.2f;
-            __instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.35f;
+            __instance.GOAL_TO_FULL_DISSAPEAR = 0.5f;
+            __instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.25f;
             __instance.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.0001f;
 
-            __instance.MAX_VISION_GRASS_METERS = 1f;
-            __instance.MAX_VISION_GRASS_METERS_OPT = 1f;
-            __instance.MAX_VISION_GRASS_METERS_FLARE = 4f;
-            __instance.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
+            //__instance.MAX_VISION_GRASS_METERS = 1f;
+            //__instance.MAX_VISION_GRASS_METERS_OPT = 1f;
+            //__instance.MAX_VISION_GRASS_METERS_FLARE = 4f;
+            //__instance.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
 
-            __instance.NO_GREEN_DIST = 1f;
-            __instance.NO_GRASS_DIST = 1f;
+            //__instance.NO_GREEN_DIST = 3f;
+            //__instance.NO_GRASS_DIST = 3f;
         }
     }
 }

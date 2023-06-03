@@ -32,8 +32,11 @@ namespace SAIN.Layers
                 case SAINLogicDecision.RunAway:
                 case SAINLogicDecision.RunForCover:
                 case SAINLogicDecision.RunAwayGrenade:
-                case SAINLogicDecision.WalkToCover:
                     nextAction = new Action(typeof(RetreatAction), $"{CurrentDecision}");
+                    break;
+
+                case SAINLogicDecision.MoveToCover:
+                    nextAction = new Action(typeof(MoveToCoverAction), $"{CurrentDecision}");
                     break;
 
                 case SAINLogicDecision.Fight:
@@ -74,7 +77,7 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            return CurrentDecision != SAINLogicDecision.None;
+            return CurrentDecision != SAINLogicDecision.None && (SAIN.HasGoalEnemy || SAIN.HasGoalTarget);
         }
 
         public override bool IsCurrentActionEnding()
