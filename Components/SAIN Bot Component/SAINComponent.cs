@@ -65,11 +65,72 @@ namespace SAIN.Components
                     BotOwner.WeaponManager.UpdateWeaponsList();
                 }
 
+                if (CheckVisTimer < Time.time && HasGoalEnemy)
+                {
+                    CheckVisTimer = Time.time + 0.5f;
+
+                    if (!BotOwner.Memory.GoalEnemy.IsVisible)
+                    {
+                        EnemyInLineOfSight = false;
+                        EnemyIsVisible = false;
+                    }
+                    else
+                    {
+                        if (BotOwner.Memory.GoalEnemy.Person != CurrentEnemy)
+                        {
+                            EnemyInLineOfSight = false;
+                            EnemyIsVisible = false;
+                        }
+
+                        CurrentEnemy = BotOwner.Memory.GoalEnemy.Person;
+
+                        EnemyInLineOfSight = CheckEnemyVisible();
+
+                        if (EnemyInLineOfSight)
+                        {
+                            Vector3 directionEnemy = BotOwner.Position - GoalEnemyPos.Value;
+                            Vector3 lookDirection = BotOwner.LookDirection;
+
+                            EnemyIsVisible = Vector3.Dot(directionEnemy, lookDirection) > 0;
+                        }
+                    }
+                }
+
+                if (!HasGoalEnemy)
+                {
+                    CurrentEnemy = null;
+                    EnemyIsVisible = false;
+                    EnemyInLineOfSight = false;
+                }
+
                 BotSquad.ManualUpdate();
 
                 Info.ManualUpdate();
             }
         }
+
+        private bool CheckEnemyVisible()
+        {
+            if (!HasGoalEnemy) 
+            { 
+                return false;
+            }
+
+            foreach (var part in BotOwner.Memory.GoalEnemy.Person.MainParts.Values)
+            {
+                Vector3 Direction = part.Position - HeadPosition;
+                if (!Physics.Raycast(HeadPosition, Direction, Direction.magnitude, SightMask))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private float CheckVisTimer = 0f;
+        public bool EnemyInLineOfSight { get; private set; }
+        public bool EnemyIsVisible { get; private set; }
+        public IAIDetails CurrentEnemy { get; private set; }
 
         private float ShiftTimer = 0f;
 
@@ -113,11 +174,14 @@ namespace SAIN.Components
                     {
                         Vector3 directionEnemy = GoalEnemyPos.Value - corners[i];
                         Vector3 directionCorner = corners[i + 1] - corners[i];
+
                         float dotProduct = Vector3.Dot(directionEnemy, directionCorner);
+
                         if (dotProduct > 0.85f || (corners[i] - GoalEnemyPos.Value).magnitude < 1f)
                         {
                             return false;
                         }
+
                         i++;
                     }
                 }
@@ -126,24 +190,6 @@ namespace SAIN.Components
                 return true;
             }
             return false;
-        }
-
-        public bool IsPointInVisibleSector(Vector3 position)
-        {
-            Vector3 direction = position - BotOwner.Position;
-
-            float cos;
-
-            if (BotOwner.NightVision.UsingNow)
-            {
-                cos = BotOwner.LookSensor.VISIBLE_ANGLE_NIGHTVISION;
-            }
-            else
-            {
-                cos = (BotOwner.BotLight.IsEnable ? BotOwner.LookSensor.VISIBLE_ANGLE_LIGHT : 180f);
-            }
-
-            return VectorHelpers.IsAngLessNormalized(BotOwner.LookDirection, VectorHelpers.NormalizeFastSelf(direction), cos);
         }
 
         public void Dispose()
@@ -222,7 +268,7 @@ namespace SAIN.Components
 
         public DebugGizmos.DrawLists DebugDrawList { get; private set; }
 
-        public bool BotActive => BotOwner.BotState == EBotState.Active && !BotOwner.IsDead;
+        public bool BotActive => BotOwner.BotState == EBotState.Active && !BotOwner.IsDead && BotOwner.GetPlayer.enabled;
 
         public bool GameIsEnding
         {

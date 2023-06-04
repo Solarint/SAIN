@@ -2,6 +2,7 @@
 using EFT;
 using SAIN.Helpers;
 using System.Collections;
+using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.CoverConfig;
@@ -11,7 +12,7 @@ namespace SAIN.Components
     public class CoverFinderComponent : MonoBehaviour
     {
 
-        private Collider[] Colliders = new Collider[100];
+        private Collider[] Colliders = new Collider[250];
 
         private void Awake()
         {
@@ -73,8 +74,8 @@ namespace SAIN.Components
 
                     if (DebugLogTimer < Time.time)
                     {
-                        DebugLogTimer = Time.time + 3f;
-                        //Logger.LogInfo($"Too Close: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Total: [{LastHitCount}] Iteration Range: [{iterationRange}] Collider Array Length: [{colliders.Length}]");
+                        DebugLogTimer = Time.time + 1f;
+                        Logger.LogInfo($"Too Close: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Total: [{LastHitCount}] Iteration Range: [{iterationRange}] Collider Array Length: [{colliders.Length}]");
                     }
 
                     if (!found)
@@ -123,10 +124,16 @@ namespace SAIN.Components
                         if (VisibilityCheck(newPoint))
                         {
                             NavMeshPath path = new NavMeshPath();
-                            if (NavMesh.CalculatePath(BotOwner.Position, newPoint.Position, -1, path) && path.status == NavMeshPathStatus.PathComplete)
+                            if (NavMesh.CalculatePath(BotOwner.Position, newPoint.Position, -1, path))
                             {
-                                //DebugGizmos.SingleObjects.Ray(newPoint.Position, Vector3.up, Color.blue, 1f, 0.025f, true, 30f);
-                                return true;
+                                if (CheckPathToPoint(path))
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    nopath++;
+                                }
                             }
                             else
                             {
@@ -153,6 +160,35 @@ namespace SAIN.Components
 
 
             newPoint = null;
+            return false;
+        }
+
+        private bool CheckPathToPoint(NavMeshPath path)
+        {
+            if (path.status == NavMeshPathStatus.PathComplete)
+            {
+                for (int i = 0; i < path.corners.Length - 1; i++)
+                {
+                    var corner = path.corners[i];
+                    float cornerDistance = (corner - TargetPosition).magnitude;
+                    float targetDistance = (TargetPosition - BotOwner.Position).magnitude;
+
+                    if (cornerDistance < targetDistance - 1f)
+                    {
+                        if (cornerDistance < MinTargetDist)
+                        {
+                            if (UserSettings.DebugConfig.DebugLayers.Value)
+                            {
+                                DebugGizmos.SingleObjects.Ray(corner, Vector3.up, Color.red, 0.5f, 0.025f, true, 30f);
+                            }
+
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
             return false;
         }
 
@@ -211,7 +247,7 @@ namespace SAIN.Components
             {
                 if (memberPos != null)
                 {
-                    if (Vector3.Distance(position, memberPos) < 0.25f)
+                    if (Vector3.Distance(position, memberPos) < 0.5f)
                     {
                         return false;
                     }
@@ -235,49 +271,69 @@ namespace SAIN.Components
         {
             if (CheckRayCast(point.Position))
             {
-                return true;
-            }
+                Vector3 enemyDirection = TargetPosition - point.Position;
+                Quaternion right = Quaternion.Euler(0f, 90f, 0f);
+                Vector3 rightPoint = right * (enemyDirection.normalized * 0.2f);
 
-            int i = 0;
-            while (i < 3)
-            {
-                Vector3 newPos = point.Position + GetRandomPos();
-
-                if (NavMesh.SamplePosition(newPos, out var hit, 0.25f, -1))
+                if (CheckRayCast(rightPoint))
                 {
-                    if (CheckRayCast(hit.position))
+                    Quaternion left = Quaternion.Euler(0f, -90f, 0f);
+                    Vector3 leftPoint = left * (enemyDirection.normalized * 0.2f);
+
+                    if (CheckRayCast(leftPoint))
                     {
-                        point.Position = hit.position;
                         return true;
                     }
                 }
-                i++;
             }
+
+            /*
+            if (point.Collider.bounds.size.x > 1f || point.Collider.bounds.size.z > 1f)
+            {
+                int i = 0;
+                while (i < 3)
+                {
+                    Vector3 newPos = point.Position + GetRandomPos(point.Collider);
+
+                    if (NavMesh.SamplePosition(newPos, out var hit, 0.25f, -1))
+                    {
+                        if (CheckRayCast(hit.position))
+                        {
+                            point.Position = hit.position;
+                            return true;
+                        }
+                    }
+                    i++;
+                }
+            }
+            */
 
             return false;
         }
 
-        private Vector3 GetRandomPos()
+        private Vector3 GetRandomPos(Collider collider)
         {
             Vector3 randomPos = Random.onUnitSphere;
             randomPos.y = 0;
+            float maxX = collider.bounds.size.x / 2f;
+            float maxZ = collider.bounds.size.z / 2f;
 
             if (randomPos.x > 0f)
             {
-                randomPos.x = Mathf.Clamp(randomPos.x, 0.5f, 1f);
+                randomPos.x = Mathf.Clamp(randomPos.x, maxX / 2f, maxX);
             }
             else
             {
-                randomPos.x = Mathf.Clamp(randomPos.x, -0.5f, -1f);
+                randomPos.x = Mathf.Clamp(randomPos.x, -maxX / 2f, -maxX);
             }
 
             if (randomPos.z > 0f)
             {
-                randomPos.z = Mathf.Clamp(randomPos.z, 0.5f, 1f);
+                randomPos.z = Mathf.Clamp(randomPos.z, maxZ / 2f, maxZ);
             }
             else
             {
-                randomPos.z = Mathf.Clamp(randomPos.z, -0.5f, -1f);
+                randomPos.z = Mathf.Clamp(randomPos.z, -maxZ / 2f, -maxZ);
             }
 
             return randomPos;
@@ -315,7 +371,7 @@ namespace SAIN.Components
                 float Y = Colliders[i].bounds.size.y;
                 float Z = Colliders[i].bounds.size.z;
 
-                if (Y < MinObstacleHeight || (X < MinObstacleXZ && Z < MinObstacleXZ))
+                if (Y < MinObstacleHeight)
                 {
                     Colliders[i] = null;
                     hitReduction++;
@@ -324,7 +380,7 @@ namespace SAIN.Components
 
             System.Array.Sort(Colliders, ColliderArraySortComparer);
 
-            hits -= hitReduction;
+           // hits -= hitReduction;
 
             LastHitCount = hits;
 
@@ -377,7 +433,7 @@ namespace SAIN.Components
 
         private Vector3 TargetPosition;
 
-        public const float MinObstacleXZ = 0.25f;
+        public const float MinObstacleXZ = 0.33f;
 
         public float MaxRange => CoverColliderRadius.Value;
         public float MinTargetDist { get; private set; }

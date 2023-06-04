@@ -40,22 +40,26 @@ namespace SAIN.Layers
                 return;
             }
 
-            CoverPoint PointToGo = null;
-            if (SAIN.Cover.CurrentFallBackPoint != null)
+            var ActivePoint = SAIN.Cover.CurrentCoverPoint;
+            if (ActivePoint != null)
             {
-                PointToGo = SAIN.Cover.CurrentFallBackPoint;
+                BotOwner.GoToPoint(ActivePoint.Position, true, -1, false, false);
+                if (Vector3.Distance(ActivePoint.Position, BotOwner.Position) < 1f)
+                {
+                    SAIN.Steering.ManualUpdate();
+                    if (SAIN.HasEnemyAndCanShoot)
+                    {
+                        AimData.Update();
+                    }
+                }
+                else
+                {
+                    BotOwner.Steering.LookToMovingDirection();
+                    SetForMove();
+                }
             }
-            else if (SAIN.Cover.CurrentCoverPoint != null)
-            {
-                PointToGo = SAIN.Cover.CurrentCoverPoint;
-            }
-
-            if (PointToGo != null && SAIN.GoToPointRetreat(PointToGo.Position))
-            {
-                BotOwner.Steering.LookToMovingDirection();
-                SetForMove();
-            }
-            else if (LastResultFallback())
+            return;
+            if (LastResultFallback())
             {
                 BotOwner.Steering.LookToMovingDirection();
                 SetForMove();
@@ -132,6 +136,10 @@ namespace SAIN.Layers
 
             if (TemporaryPoint != null)
             {
+                if (Vector3.Distance(TemporaryPoint.Value, BotOwner.Position) < 1f)
+                {
+                    SAIN.Steering.ManualUpdate();
+                }
                 if (SAIN.GoToPointRetreat(TemporaryPoint.Value))
                 {
                     return true;

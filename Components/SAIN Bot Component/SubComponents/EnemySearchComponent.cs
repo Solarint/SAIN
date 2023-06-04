@@ -162,7 +162,7 @@ namespace SAIN.Components
                         BotOwner.Steering.LookToPoint(FinalDest);
                     }
 
-                    BotOwner.SetTargetMoveSpeed(0.2f);
+                    BotOwner.SetTargetMoveSpeed(0.4f);
 
                     if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving))
                     {
@@ -204,7 +204,7 @@ namespace SAIN.Components
             CurrentCorner++;
             if (TotalCornerCount - 1 >= CurrentCorner)
             {
-                BotOwner.SetTargetMoveSpeed(0.65f);
+                BotOwner.SetTargetMoveSpeed(0.85f);
                 CurrentDestination = Path.corners[CurrentCorner];
                 BotOwner.GoToPoint(CurrentDestination);
                 BotOwner.DoorOpener.Update();

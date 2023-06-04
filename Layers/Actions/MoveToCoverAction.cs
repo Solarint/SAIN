@@ -2,6 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,6 +21,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
+            CheckVis();
             BotOwner.DoorOpener.Update();
 
             if (!SwitchToRun)
@@ -79,7 +81,31 @@ namespace SAIN.Layers
             BotOwner.PatrollingData.Pause();
         }
 
-        private bool SwitchToRun => ActivatedTime < Time.time && SAIN.HasEnemyAndCanShoot;
+        private void CheckVis()
+        {
+            if (CheckVisTimer < Time.time && SAIN.HasGoalEnemy)
+            {
+                CheckVisTimer = Time.time + 0.5f;
+
+                var enemyheadPos = BotOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position;
+                var bothead = SAIN.HeadPosition;
+                var direction = enemyheadPos - bothead;
+
+                if (Physics.Raycast(bothead, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                {
+                    ActivatedTime = Time.time + WaitForRunTime;
+                    LineOfSight = false;
+                }
+                else
+                {
+                    LineOfSight = true;
+                }
+            }
+        }
+
+        private float CheckVisTimer = 0f;
+        private bool LineOfSight = false;
+        private bool SwitchToRun => ActivatedTime < Time.time && LineOfSight;
 
         private float WaitForRunTime = 0f;
         private float ActivatedTime = 0f;

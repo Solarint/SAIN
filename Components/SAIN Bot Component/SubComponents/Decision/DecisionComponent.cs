@@ -46,16 +46,16 @@ namespace SAIN.Components
                     }
 
                     TimeBeforeSearch = time / i;
-                    TimeBeforeSearch *= Random.Range(0.8f, 1.2f);
+                    TimeBeforeSearch *= Random.Range(0.9f, 1.1f);
 
                     if (SAIN.BotSquad.IsSquadLead)
                     {
-                        TimeBeforeSearch *= 1.25f;
+                        TimeBeforeSearch += 5f;
                     }
 
                     if (DebugMode)
                     {
-                        //Logger.LogInfo($"Time Before Search: [{TimeBeforeSearch}]");
+                        Logger.LogInfo($"Time Before Search: [{TimeBeforeSearch}]");
                     }
                 }
             }
@@ -307,31 +307,19 @@ namespace SAIN.Components
             return !SAIN.Cover.BotIsAtCoverPoint;
         }
 
-        private bool StartSeekEnemy => !SAIN.HasEnemyAndCanShoot && BotOwner.Memory.GoalEnemy.TimeLastSeen < Time.time - TimeBeforeSearch;
+        private bool StartSeekEnemy => BotOwner.Memory.GoalEnemy.TimeLastSeenReal < Time.time - TimeBeforeSearch;
 
         private bool StartHoldInCover
         {
             get
             {
-                if (SAIN.HasEnemyAndCanShoot)
+                if (SAIN.Cover.CheckSelfForCover(0.33f))
                 {
-                    var lean = SAIN.Lean.Lean.RayCast;
-                    //if (SAIN.Cover.CheckSelfForCover(0.33f))
-                    //{
-                    //    return true;
-                    //}
-                    if ((lean.LeftHalfLos || lean.LeftLos) && !lean.RightLos && !lean.DirectLineOfSight)
-                    {
-                        return true;
-                    }
-                    else if ((lean.RightHalfLos || lean.RightLos) && !lean.LeftLos && !lean.DirectLineOfSight)
-                    {
-                        return true;
-                    }
-                    else if (SAIN.Cover.BotIsAtCoverPoint)
-                    {
-                        return true;
-                    }
+                    return true;
+                }
+                else if (SAIN.Cover.BotIsAtCoverPoint)
+                {
+                    return true;
                 }
                 return false;
             }
@@ -469,7 +457,7 @@ namespace SAIN.Components
 
                         if (status.Injured)
                         {
-                            if (!SAIN.HasEnemyAndCanShoot && (dist > 100f))
+                            if (!SAIN.HasEnemyAndCanShoot && dist > 100f)
                             {
                                 BotShouldHeal = true;
                             }
@@ -478,7 +466,7 @@ namespace SAIN.Components
                         {
                             if (!SAIN.HasEnemyAndCanShoot)
                             {
-                                if (dist > 20f)
+                                if (dist > 30f)
                                 {
                                     BotShouldHeal = true;
                                 }
@@ -492,9 +480,12 @@ namespace SAIN.Components
                         {
                             if (!SAIN.HasEnemyAndCanShoot)
                             {
-                                BotShouldHeal = true;
+                                if (dist > 15f)
+                                {
+                                    BotShouldHeal = true;
+                                }
                             }
-                            else if (dist > 30f)
+                            else if (dist > 50f)
                             {
                                 BotShouldHeal = true;
                             }
