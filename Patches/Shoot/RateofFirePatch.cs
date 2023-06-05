@@ -64,9 +64,15 @@ namespace SAIN.Patches
                 return true;
             }
 
+            var component = bot.gameObject.GetComponent<SAINComponent>();
+            if (component == null)
+            {
+                return true;
+            }
+
             float EnemyDistance = (bot.AimingData.RealTargetPoint - bot.WeaponRoot.position).magnitude;
 
-            var weaponInfo = bot.gameObject.GetComponent<SAINComponent>().Info.WeaponInfo;
+            var weaponInfo = component.Info.WeaponInfo;
 
             float permeter = weaponInfo.PerMeter / weaponInfo.FinalModifier;
 

@@ -18,6 +18,7 @@ namespace SAIN
         Stims = 12,
         MoveToCover = 13,
         RunAwayGrenade = 14,
+        StandAndShoot = 15,
     }
 
     public enum CoverStatus

@@ -21,6 +21,21 @@ namespace SAIN.Components
 
         private void Update()
         {
+            // Check if the bot is alive before continuing
+            if (Player.HealthController?.IsAlive == false || Player == null)
+            {
+                Dispose();
+                return;
+            }
+
+            var gameWorld = Singleton<GameWorld>.Instance;
+
+            if (gameWorld == null || gameWorld.RegisteredPlayers == null)
+            {
+                Dispose();
+                return;
+            }
+
             if (TalkTime != 0)
             {
                 TimeSinceTalk = Time.time - TalkTime;
@@ -41,6 +56,12 @@ namespace SAIN.Components
             TalkAggressive = aggressive;
             PhraseSaid = trigger;
             TagStatus = status;
+        }
+
+        public void Dispose()
+        {
+            StopAllCoroutines();
+            Destroy(this);
         }
 
         public bool TalkAggressive { get; private set; } = false;

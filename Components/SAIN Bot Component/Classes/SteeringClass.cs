@@ -20,10 +20,13 @@ namespace SAIN.Classes
                 return;
             }
 
-            var priorityEnemy = SAIN.Enemies.PriorityEnemy;
             var enemy = BotOwner.Memory.GoalEnemy;
 
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
+            {
+                LookToGoalEnemyPos();
+            }
+            else if (enemy != null && SAIN.EnemyIsVisible)
             {
                 LookToGoalEnemyPos();
             }

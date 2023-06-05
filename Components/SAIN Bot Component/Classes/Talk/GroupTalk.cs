@@ -536,6 +536,12 @@ namespace SAIN.Classes
             int tooCloseEnemy = 0;
             int total = 0;
             var locations = SAIN.BotSquad.SquadLocations;
+
+            if (locations == null)
+            {
+                return false;
+            }
+
             foreach (var location in locations)
             {
                 if (location == null) continue;

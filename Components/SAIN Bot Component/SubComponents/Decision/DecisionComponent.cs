@@ -66,8 +66,16 @@ namespace SAIN.Components
                 CurrentDecision = GetDecision();
 
                 DecisionTimer = Time.time + 0.1f;
+
+                if (LastDecision != CurrentDecision)
+                {
+                    ChangeDecisionTime = Time.time;
+                }
             }
         }
+
+        public float ChangeDecisionTime { get; private set; }
+        public float TimeSinceChangeDecision => Time.time - ChangeDecisionTime;
 
         public float GetTimeBeforeSearch()
         {
@@ -173,15 +181,15 @@ namespace SAIN.Components
             {
                 Decision = SAINLogicDecision.RunAwayGrenade;
             }
-            else if (BotOwner.Medecine.FirstAid.Using || StartFirstAid)
+            else if (BotOwner.Medecine.FirstAid.Using || StartFirstAid())
             {
                 Decision = SAINLogicDecision.FirstAid;
             }
-            else if (BotOwner.WeaponManager.Reload.Reloading || StartBotReload)
+            else if (BotOwner.WeaponManager.Reload.Reloading || StartBotReload())
             {
                 Decision = SAINLogicDecision.Reload;
             }
-            else if (BotOwner.Medecine.Stimulators.Using || StartUseStims)
+            else if (BotOwner.Medecine.Stimulators.Using || StartUseStims())
             {
                 Decision = SAINLogicDecision.Stims;
             }
@@ -222,15 +230,23 @@ namespace SAIN.Components
 
             if (BotOwner.Memory.GoalEnemy != null)
             {
-                if (StartSuppression)
+                if (StartStandAndShoot())
+                {
+                    Decision = SAINLogicDecision.StandAndShoot;
+                }
+                else if (StartSuppression())
                 {
                     Decision = SAINLogicDecision.Suppress;
                 }
-                else if (StartSeekEnemy)
+                else if (!SAIN.BotSquad.BotInGroup && StartSeekEnemy())
                 {
                     Decision = SAINLogicDecision.Search;
                 }
-                else if (StartHoldInCover)
+                else if (SAIN.BotSquad.BotInGroup && StartSeekEnemyGroup())
+                {
+                    Decision = SAINLogicDecision.Search;
+                }
+                else if (StartHoldInCover())
                 {
                     Decision = SAINLogicDecision.HoldInCover;
                 }
@@ -266,64 +282,80 @@ namespace SAIN.Components
             }
         }
 
-        private bool CanShoot => BotOwner.Memory.GoalEnemy?.CanShoot == true;
-
-        private bool IsVisible => BotOwner.Memory.GoalEnemy?.IsVisible == true;
-
-        private bool StartSuppression
+        private bool StartSuppression()
         {
-            get
+            if (SAIN.HasGoalEnemy)
             {
-                return false;
-
-                if (BotOwner.Memory.GoalEnemy != null)
+                if (BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.HaveBullets && !LowAmmo)
                 {
-                    if (BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.HaveBullets && !LowAmmo)
+                    float timeSinceSeen = Time.time - BotOwner.Memory.GoalEnemy.TimeLastSeenReal;
+                    if (timeSinceSeen > 1f && timeSinceSeen < 5f)
                     {
-                        if (!CanShoot)
-                        {
-                            if (Time.time - BotOwner.Memory.GoalEnemy.TimeLastSeenReal > 2f)
-                            {
-                                var realPos = BotOwner.Memory.GoalEnemy.CurrPosition;
-                                var lastSeenPos = BotOwner.Memory.GoalEnemy.EnemyLastPosition;
+                        var realPos = BotOwner.Memory.GoalEnemy.CurrPosition;
+                        var lastSeenPos = BotOwner.Memory.GoalEnemy.EnemyLastPositionReal;
 
-                                if (Vector3.Distance(realPos, lastSeenPos) < 5f)
-                                {
-                                    return true;
-                                }
+                        if (Vector3.Distance(realPos, lastSeenPos) < 3f)
+                        {
+                            var weaponPos = BotOwner.WeaponRoot.position;
+                            var direction = lastSeenPos - weaponPos;
+
+                            if (!Physics.Raycast(weaponPos, direction, direction.magnitude, SAINComponent.ShootMask))
+                            {
+                                return true;
                             }
                         }
                     }
                 }
-
-                return false;
             }
+
+            return false;
         }
 
-        private bool StartRunForCover => false;
+        private bool StartRunForCover()
+        {
+            return false;
+        }
 
         private bool StartMoveToCover()
         {
-            return !SAIN.Cover.BotIsAtCoverPoint;
+            return !SAIN.Cover.BotIsAtCoverPoint && (SAIN.Cover.CurrentCoverPoint != null || SAIN.Cover.CurrentFallBackPoint != null);
         }
 
-        private bool StartSeekEnemy => BotOwner.Memory.GoalEnemy.TimeLastSeenReal < Time.time - TimeBeforeSearch;
-
-        private bool StartHoldInCover
+        private bool StartSeekEnemy()
         {
-            get
-            {
-                if (SAIN.Cover.CheckSelfForCover(0.33f))
-                {
-                    return true;
-                }
-                else if (SAIN.Cover.BotIsAtCoverPoint)
-                {
-                    return true;
-                }
-                return false;
-            }
+            return TimeSinceSeenSolo > TimeBeforeSearch;
         }
+
+        private bool StartSeekEnemyGroup()
+        {
+            return TimeSinceSeenGroup > TimeBeforeSearch;
+        }
+
+        private float TimeSinceSeenSolo => Time.time - BotOwner.Memory.GoalEnemy.TimeLastSeenReal;
+        private float TimeSinceSeenGroup => Time.time - BotOwner.BotsGroup.EnemyLastSeenTimeReal;
+        private float TimeSinceVisionChangeSolo => SAIN.HasGoalEnemy ? Time.time - BotOwner.Memory.GoalEnemy.LastChangeVisionTime : -1f;
+
+        private bool StartHoldInCover()
+        {
+            if (SAIN.Cover.BotIsAtCoverPoint)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool StartStandAndShoot()
+        {
+            if (SAIN.HasGoalEnemy && SAIN.EnemyIsVisible && SAIN.HasEnemyAndCanShoot)
+            {
+                if (SAIN.Cover.CheckLimbsForCover() && TimeSinceVisionChangeSolo < 1f)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         private bool StartRunAway => false;
 
@@ -365,231 +397,219 @@ namespace SAIN.Components
 
         private const float LowAmmoThresh0to1 = 0.4f;
 
-        private bool StartUseStims
+        private bool StartUseStims()
         {
-            get
+            bool takeStims = false;
+            if (!BotOwner.Medecine.Stimulators.Using && BotOwner.Medecine.Stimulators.HaveSmt && LastStimTime < Time.time)
             {
-                bool takeStims = false;
-                if (!BotOwner.Medecine.Stimulators.Using && BotOwner.Medecine.Stimulators.HaveSmt && LastStimTime < Time.time)
+                var status = SAIN.BotStatus;
+                if (status.Healthy)
                 {
-                    var status = SAIN.BotStatus;
-                    if (status.Healthy)
+                    takeStims = false;
+                }
+                else if (BotOwner.Memory.GoalEnemy == null)
+                {
+                    if (status.Dying || status.BadlyInjured)
                     {
-                        takeStims = false;
+                        takeStims = true;
                     }
-                    else if (BotOwner.Memory.GoalEnemy == null)
+                }
+                else
+                {
+                    float dist = Vector3.Distance(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Position);
+
+                    if (status.Injured)
                     {
-                        if (status.Dying || status.BadlyInjured)
+                        if (!SAIN.HasEnemyAndCanShoot)
+                        {
+                            if (dist > 30f)
+                            {
+                                takeStims = true;
+                            }
+                        }
+                        else if (dist > 100f)
                         {
                             takeStims = true;
                         }
                     }
-                    else
+                    else if (status.BadlyInjured)
                     {
-                        float dist = Vector3.Distance(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Position);
-
-                        if (status.Injured)
+                        if (!SAIN.HasEnemyAndCanShoot)
                         {
-                            if (!SAIN.HasEnemyAndCanShoot)
-                            {
-                                if (dist > 30f)
-                                {
-                                    takeStims = true;
-                                }
-                            }
-                            else if (dist > 100f)
+                            if (dist > 10f)
                             {
                                 takeStims = true;
                             }
                         }
-                        else if (status.BadlyInjured)
+                        else if (dist > 30f)
                         {
-                            if (!SAIN.HasEnemyAndCanShoot)
-                            {
-                                if (dist > 10f)
-                                {
-                                    takeStims = true;
-                                }
-                            }
-                            else if (dist > 30f)
-                            {
-                                takeStims = true;
-                            }
+                            takeStims = true;
                         }
-                        else if (status.Dying)
+                    }
+                    else if (status.Dying)
+                    {
+                        if (!SAIN.HasEnemyAndCanShoot)
                         {
-                            if (!SAIN.HasEnemyAndCanShoot)
-                            {
-                                takeStims = true;
-                            }
-                            else if (dist > 10f)
-                            {
-                                takeStims = true;
-                            }
+                            takeStims = true;
+                        }
+                        else if (dist > 10f)
+                        {
+                            takeStims = true;
                         }
                     }
                 }
-
-                if (takeStims)
-                {
-                    LastStimTime = Time.time + 5f;
-                }
-
-                return takeStims;
             }
+
+            if (takeStims)
+            {
+                LastStimTime = Time.time + 5f;
+            }
+
+            return takeStims;
         }
 
-        private bool StartFirstAid
+        private bool StartFirstAid()
         {
-            get
+            bool BotShouldHeal = false;
+            var status = SAIN.BotStatus;
+            if (!BotOwner.Medecine.Using && BotOwner.Medecine.FirstAid.ShallStartUse())
             {
-                bool BotShouldHeal = false;
-                var status = SAIN.BotStatus;
-                if (!BotOwner.Medecine.Using && BotOwner.Medecine.FirstAid.ShallStartUse())
+                if (BotOwner.Memory.GoalEnemy == null)
+                {
+                    BotShouldHeal = true;
+                }
+                else
+                {
+                    float dist = Vector3.Distance(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Position);
+
+                    if (status.Injured)
+                    {
+                        if (!SAIN.HasEnemyAndCanShoot && dist > 100f)
+                        {
+                            BotShouldHeal = true;
+                        }
+                    }
+                    else if (status.BadlyInjured)
+                    {
+                        if (!SAIN.HasEnemyAndCanShoot)
+                        {
+                            if (dist > 30f)
+                            {
+                                BotShouldHeal = true;
+                            }
+                        }
+                        else if (dist > 100f)
+                        {
+                            BotShouldHeal = true;
+                        }
+                    }
+                    else if (status.Dying)
+                    {
+                        if (!SAIN.HasEnemyAndCanShoot)
+                        {
+                            if (dist > 15f)
+                            {
+                                BotShouldHeal = true;
+                            }
+                        }
+                        else if (dist > 50f)
+                        {
+                            BotShouldHeal = true;
+                        }
+                    }
+                }
+            }
+
+            return BotShouldHeal;
+        }
+
+        private bool StartCancelReload()
+        {
+            if (!BotOwner.WeaponManager.IsReady)
+            {
+                return false;
+            }
+
+            bool botShouldCancel = false;
+
+            if (BotOwner.Memory.GoalEnemy != null && BotOwner.WeaponManager.Reload.Reloading && SAIN.Enemies.PriorityEnemy != null)
+            {
+                if (!LowAmmo && SAIN.Enemies.PriorityEnemy.Path.RangeClose)
+                {
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"My Enemy is Close, and I have ammo!");
+                    }
+
+                    botShouldCancel = true;
+                }
+                if (BotOwner.WeaponManager.HaveBullets && SAIN.Enemies.PriorityEnemy.Path.RangeVeryClose)
+                {
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"My Enemy is Very Close And I have [{AmmoRatio * 100f}] percent of my capacity.");
+                    }
+
+                    botShouldCancel = true;
+                }
+            }
+
+            return botShouldCancel;
+        }
+
+        private bool StartBotReload()
+        {
+            if (!BotOwner.WeaponManager.IsReady || !BotOwner.WeaponManager.Reload.CanReload(true))
+            {
+                return false;
+            }
+
+            bool needToReload = false;
+
+            if (!BotOwner.WeaponManager.Reload.Reloading)
+            {
+                if (!BotOwner.WeaponManager.HaveBullets)
+                {
+                    if (DebugMode)
+                    {
+                        Logger.LogDebug($"I'm Empty! Need to reload!");
+                    }
+
+                    needToReload = true;
+                }
+                else if (LowAmmo)
                 {
                     if (BotOwner.Memory.GoalEnemy == null)
                     {
-                        BotShouldHeal = true;
-                    }
-                    else
-                    {
-                        float dist = Vector3.Distance(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Position);
-
-                        if (status.Injured)
-                        {
-                            if (!SAIN.HasEnemyAndCanShoot && dist > 100f)
-                            {
-                                BotShouldHeal = true;
-                            }
-                        }
-                        else if (status.BadlyInjured)
-                        {
-                            if (!SAIN.HasEnemyAndCanShoot)
-                            {
-                                if (dist > 30f)
-                                {
-                                    BotShouldHeal = true;
-                                }
-                            }
-                            else if (dist > 100f)
-                            {
-                                BotShouldHeal = true;
-                            }
-                        }
-                        else if (status.Dying)
-                        {
-                            if (!SAIN.HasEnemyAndCanShoot)
-                            {
-                                if (dist > 15f)
-                                {
-                                    BotShouldHeal = true;
-                                }
-                            }
-                            else if (dist > 50f)
-                            {
-                                BotShouldHeal = true;
-                            }
-                        }
-                    }
-                }
-
-                return BotShouldHeal;
-            }
-        }
-
-        private bool ShouldCancelReload
-        {
-            get
-            {
-                if (!BotOwner.WeaponManager.IsReady)
-                {
-                    return false;
-                }
-
-                bool botShouldCancel = false;
-
-                if (BotOwner.Memory.GoalEnemy != null && BotOwner.WeaponManager.Reload.Reloading && SAIN.Enemies.PriorityEnemy != null)
-                {
-                    if (!LowAmmo && SAIN.Enemies.PriorityEnemy.Path.RangeClose)
-                    {
                         if (DebugMode)
                         {
-                            Logger.LogDebug($"My Enemy is Close, and I have ammo!");
-                        }
-
-                        botShouldCancel = true;
-                    }
-                    if (BotOwner.WeaponManager.HaveBullets && SAIN.Enemies.PriorityEnemy.Path.RangeVeryClose)
-                    {
-                        if (DebugMode)
-                        {
-                            Logger.LogDebug($"My Enemy is Very Close And I have [{AmmoRatio * 100f}] percent of my capacity.");
-                        }
-
-                        botShouldCancel = true;
-                    }
-                }
-
-                return botShouldCancel;
-            }
-        }
-
-        private bool StartBotReload
-        {
-            get
-            {
-                if (!BotOwner.WeaponManager.IsReady || !BotOwner.WeaponManager.Reload.CanReload(true))
-                {
-                    return false;
-                }
-
-                bool needToReload = false;
-
-                if (!BotOwner.WeaponManager.Reload.Reloading)
-                {
-                    if (!BotOwner.WeaponManager.HaveBullets)
-                    {
-                        if (DebugMode)
-                        {
-                            Logger.LogDebug($"I'm Empty! Need to reload!");
+                            Logger.LogDebug($"I'm low on ammo, and I have no enemy, so I should reload");
                         }
 
                         needToReload = true;
                     }
-                    else if (LowAmmo)
+                    else if (BotOwner.Memory.GoalEnemy.TimeLastSeen < Time.time - 3f)
                     {
-                        if (BotOwner.Memory.GoalEnemy == null)
+                        if (DebugMode)
                         {
-                            if (DebugMode)
-                            {
-                                Logger.LogDebug($"I'm low on ammo, and I have no enemy, so I should reload");
-                            }
-
-                            needToReload = true;
+                            Logger.LogDebug($"I'm low on ammo, and I haven't seen my enemy in seconds. so I should reload.");
                         }
-                        else if (BotOwner.Memory.GoalEnemy.TimeLastSeen < Time.time - 3f)
+
+                        needToReload = true;
+                    }
+                    else if (BotOwner.Memory.GoalEnemy.Distance > 10f && !SAIN.HasEnemyAndCanShoot)
+                    {
+                        if (DebugMode)
                         {
-                            if (DebugMode)
-                            {
-                                Logger.LogDebug($"I'm low on ammo, and I haven't seen my enemy in seconds. so I should reload.");
-                            }
-
-                            needToReload = true;
+                            Logger.LogDebug($"I'm low on ammo, and I can't see my enemy and he isn't close, so I should reload.");
                         }
-                        else if (BotOwner.Memory.GoalEnemy.Distance > 10f && !SAIN.HasEnemyAndCanShoot)
-                        {
-                            if (DebugMode)
-                            {
-                                Logger.LogDebug($"I'm low on ammo, and I can't see my enemy and he isn't close, so I should reload.");
-                            }
 
-                            needToReload = true;
-                        }
+                        needToReload = true;
                     }
                 }
-
-                return needToReload;
             }
+
+            return needToReload;
         }
 
         public bool LowAmmo => AmmoRatio < LowAmmoThresh0to1;

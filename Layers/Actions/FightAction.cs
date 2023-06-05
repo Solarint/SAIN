@@ -36,30 +36,6 @@ namespace SAIN.Layers
             if (SAIN.HasEnemyAndCanShoot)
             {
                 AimData.Update();
-
-                if (BotOwner.Memory.GoalEnemy.CanShoot)
-                {
-                    /*
-                    if (!SAIN.Core.Enemies.CanShoot && SAIN.Cover.CoverFinder.CurrentCover != null && SAIN.InCover && Vector3.Distance(SAIN.Cover.CoverFinder.CurrentCover.Position, BotOwner.Transform.position) < 1f)
-                    {
-                        var move = BotOwner.GetPlayer.MovementContext;
-                        if (SAIN.Cover.CoverFinder.CurrentCover.Height <= 1.55f)
-                        {
-                            move.SetBlindFire(1);
-                            Logger.LogWarning($"Bot is trying to blind fire! 1 [{move.BlindFire}]");
-                        }
-                        else if (Vector3.Dot(BotOwner.GetPlayer.Transform.right, BotOwner.Memory.GoalEnemy.CurrPosition) > 0)
-                        {
-                            move.SetBlindFire(-1);
-                            Logger.LogWarning($"Bot is trying to blind fire! 2 [{move.BlindFire}]");
-                        }
-                        else
-                        {
-                            move.SetBlindFire(0);
-                        }
-                    }
-                    */
-                }
             }
 
             SAIN.Steering.ManualUpdate();

@@ -25,7 +25,8 @@ namespace SAIN.Patches
 
             if (__instance.IsYourPlayer)
             {
-                __instance.GetComponent<PlayerTalkComponent>().TalkEvent(@event, mask, aggressive);
+                var component = __instance.GetComponent<PlayerTalkComponent>();
+                component?.TalkEvent(@event, mask, aggressive);
                 return true;
             }
             else
@@ -120,11 +121,7 @@ namespace SAIN.Patches
     {
         public static bool BotInGroup(BotOwner botOwner)
         {
-            if (botOwner.BotsGroup.MembersCount > 1)
-            {
-                return true;
-            }
-            return false;
+            return botOwner?.BotsGroup?.MembersCount > 1;
         }
 
         public static bool CheckTalkEvent(Player player, EPhraseTrigger trigger, ETagStatus mask, bool aggressive)
@@ -133,7 +130,8 @@ namespace SAIN.Patches
             {
                 if (BotInGroup(player.AIData.BotOwner) || GoodSoloTriggers.Contains(trigger))
                 {
-                    player.AIData.BotOwner.GetComponent<BotTalkComponent>().TalkEvent(trigger, mask, aggressive);
+                    var component = player.AIData.BotOwner.GetComponent<SAINComponent>();
+                    component?.Talk.TalkEvent(trigger, mask, aggressive);
                     return true;
                 }
             }
@@ -147,14 +145,16 @@ namespace SAIN.Patches
             {
                 if (GoodGroupTriggers.Contains(trigger))
                 {
-                    botOwner.GetComponent<BotTalkComponent>().Talk.Say(trigger, mask);
+                    var component = botOwner.GetComponent<SAINComponent>();
+                    component?.Talk.Talk.Say(trigger, mask);
                 }
             }
             else
             {
                 if (GoodSoloTriggers.Contains(trigger))
                 {
-                    botOwner.GetComponent<BotTalkComponent>().Talk.Say(trigger, mask);
+                    var component = botOwner.GetComponent<SAINComponent>();
+                    component?.Talk.Talk.Say(trigger, mask);
                 }
             }
 
@@ -168,7 +168,6 @@ namespace SAIN.Patches
             EPhraseTrigger.OnFirstContact,
             EPhraseTrigger.FriendlyFire,
             EPhraseTrigger.EnemyDown,
-            EPhraseTrigger.UnderFire,
             EPhraseTrigger.OnAgony,
             EPhraseTrigger.SniperPhrase,
             EPhraseTrigger.MumblePhrase,

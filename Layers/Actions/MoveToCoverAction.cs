@@ -2,9 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace SAIN.Layers
 {
@@ -19,12 +17,50 @@ namespace SAIN.Layers
 
         private readonly GClass105 AimData;
 
+        private CoverPoint CoverPoint => SAIN.Cover.CurrentCoverPoint ?? SAIN.Cover.CurrentFallBackPoint;
+
         public override void Update()
         {
-            CheckVis();
             BotOwner.DoorOpener.Update();
 
-            if (!SwitchToRun)
+            if (SAIN.HasGoalEnemy)
+            {
+                if (SAIN.EnemyInLineOfSight)
+                {
+                    LineOfSight = true;
+                }
+                else
+                {
+                    WaitForRunTime = 3f * Random.Range(0.5f, 1.5f);
+                    ActivatedTime = Time.time + WaitForRunTime;
+                    LineOfSight = false;
+                }
+            }
+
+            if (CoverPoint != null)
+            {
+                MoveToPoint(CoverPoint.Position);
+
+                if (TimeForRun)
+                {
+                    BotOwner.Steering.LookToMovingDirection();
+                }
+                else
+                {
+                    SAIN.Steering.ManualUpdate();
+
+                    if (SAIN.HasEnemyAndCanShoot)
+                    {
+                        AimData.Update();
+                    }
+                }
+            }
+            else
+            {
+                Logger.LogError($"Point null?!");
+            }
+
+            if (!SAIN.BotIsMoving && SAIN.Decisions.TimeSinceChangeDecision > 2f)
             {
                 SAIN.Steering.ManualUpdate();
 
@@ -32,25 +68,8 @@ namespace SAIN.Layers
                 {
                     AimData.Update();
                 }
-            }
-            else
-            {
-                BotOwner.Steering.LookToMovingDirection();
-            }
 
-            CoverPoint PointToGo = null;
-            if (SAIN.Cover.CurrentFallBackPoint != null)
-            {
-                PointToGo = SAIN.Cover.CurrentFallBackPoint;
-            }
-            else if (SAIN.Cover.CurrentCoverPoint != null)
-            {
-                PointToGo = SAIN.Cover.CurrentCoverPoint;
-            }
-
-            if (PointToGo != null)
-            {
-                MoveToPoint(PointToGo.Position);
+                //Logger.LogWarning($"{BotOwner.name} is not moving while trying to move to cover!");
             }
         }
 
@@ -59,17 +78,12 @@ namespace SAIN.Layers
             BotOwner.SetPose(1f);
             BotOwner.SetTargetMoveSpeed(1f);
 
-            if (SwitchToRun)
+            if (TimeForRun)
             {
                 BotOwner.GetPlayer.EnableSprint(true);
             }
 
-            if ((BotOwner.Mover.RealDestPoint - point).magnitude < 0.25f)
-            {
-                return;
-            }
-
-            BotOwner.GoToPoint(point, true, -1, false, false);
+            BotOwner.GoToPoint(point, true, 0.15f, false, false);
         }
 
         private readonly SAINComponent SAIN;
@@ -81,31 +95,24 @@ namespace SAIN.Layers
             BotOwner.PatrollingData.Pause();
         }
 
-        private void CheckVis()
+        private bool LineOfSight = false;
+
+        private bool TimeForRun
         {
-            if (CheckVisTimer < Time.time && SAIN.HasGoalEnemy)
+            get
             {
-                CheckVisTimer = Time.time + 0.5f;
+                bool time = ActivatedTime < Time.time && LineOfSight;
 
-                var enemyheadPos = BotOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position;
-                var bothead = SAIN.HeadPosition;
-                var direction = enemyheadPos - bothead;
+                if (CoverPoint != null && time)
+                {
+                    var status = CoverPoint.Status();
+                    bool far = status == CoverStatus.FarFromCover || status == CoverStatus.MidRangeToCover;
+                    return time;
+                }
 
-                if (Physics.Raycast(bothead, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                {
-                    ActivatedTime = Time.time + WaitForRunTime;
-                    LineOfSight = false;
-                }
-                else
-                {
-                    LineOfSight = true;
-                }
+                return false;
             }
         }
-
-        private float CheckVisTimer = 0f;
-        private bool LineOfSight = false;
-        private bool SwitchToRun => ActivatedTime < Time.time && LineOfSight;
 
         private float WaitForRunTime = 0f;
         private float ActivatedTime = 0f;

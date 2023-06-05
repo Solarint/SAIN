@@ -56,7 +56,7 @@ namespace SAIN.Components
 
         private IEnumerator BotLeanLoop()
         {
-            var wait = new WaitForSeconds(0.5f);
+            var wait = new WaitForSeconds(0.33f);
 
             while (true)
             {
@@ -65,8 +65,6 @@ namespace SAIN.Components
                 if (!DontLeanDecisions.Contains(SAIN.CurrentDecision))
                 {
                     Lean.SetLean(Lean.Angle);
-
-                    SideStep.Update();
                 }
 
                 yield return wait;
@@ -75,11 +73,14 @@ namespace SAIN.Components
 
         private IEnumerator BotSideStepLoop()
         {
-            var wait = new WaitForSeconds(0.5f);
+            var wait = new WaitForSeconds(0.66f);
 
             while (true)
             {
-                //SideStep.Update();
+                if (SAIN.CurrentDecision == SAINLogicDecision.HoldInCover)
+                {
+                    SideStep.Update();
+                }
 
                 yield return wait;
             }
@@ -87,7 +88,7 @@ namespace SAIN.Components
 
         private IEnumerator BotBlindFireLoop()
         {
-            var wait = new WaitForSeconds(0.25f);
+            var wait = new WaitForSeconds(0.66f);
 
             while (true)
             {
@@ -448,7 +449,7 @@ namespace SAIN.Components
                 float value = 0f;
                 SideStepSetting setting = SideStepSetting.None;
 
-                if (!enemy.CanShoot && enemy.IsVisible)
+                if (!enemy.CanShoot && !enemy.IsVisible)
                 {
                     switch (lean)
                     {
@@ -489,6 +490,11 @@ namespace SAIN.Components
                     return;
                 }
 
+                if (BlindFireTimer > Time.time)
+                {
+                    return;
+                }
+
                 var enemy = BotOwner.Memory.GoalEnemy;
                 int blindfire = 0;
 
@@ -517,6 +523,8 @@ namespace SAIN.Components
                     SetBlindFire(0);
                 }
             }
+
+            private float BlindFireTimer = 0f;
 
             private bool RayCastCheck(Vector3 start, Vector3 targetPos)
             {

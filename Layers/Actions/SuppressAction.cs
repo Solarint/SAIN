@@ -21,8 +21,6 @@ namespace SAIN.Layers
             {
                 AimData.Update();
             }
-
-            BotOwner.SuppressShoot.Init(BotOwner.Memory.GoalEnemy);
         }
 
         private readonly GClass105 AimData;
@@ -32,6 +30,11 @@ namespace SAIN.Layers
         public override void Start()
         {
             BotOwner.PatrollingData.Pause();
+
+            if (BotOwner.Memory.GoalEnemy != null)
+            {
+                BotOwner.SuppressShoot.InitToPoint(BotOwner.Memory.GoalEnemy.EnemyLastPositionReal);
+            }
         }
 
         public override void Stop()

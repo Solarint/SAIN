@@ -23,9 +23,11 @@ namespace SAIN.Classes
 
             if (BotInGroup)
             {
-                if (CheckMembersTimer < Time.time)
+                if (UpdateMembersTimer < Time.time)
                 {
-                    CheckMembersTimer = Time.time + 5f;
+                    UpdateMembersTimer = Time.time + 0.25f;
+
+                    UpdateMembers();
 
                     if (Leader == null || !Leader.HealthController.IsAlive)
                     {
@@ -34,6 +36,8 @@ namespace SAIN.Classes
                 }
             }
         }
+
+        private float UpdateMembersTimer = 0f;
 
         private void FindSquadLeader()
         {
@@ -66,52 +70,58 @@ namespace SAIN.Classes
 
         public bool BotInGroup => BotOwner.BotsGroup.MembersCount > 1;
 
-        public Dictionary<BotOwner, SAINComponent> SquadMembers
+        public Dictionary<BotOwner, SAINComponent> SquadMembers { get; private set; } = new Dictionary<BotOwner, SAINComponent>();
+
+        public SAINLogicDecision[] GroupDecisions { get; private set; }
+
+        private void UpdateMembers()
         {
-            get
+            var locations = new List<Vector3>();
+            var dictionary = new Dictionary<BotOwner, SAINComponent>();
+            var decisions = new List<SAINLogicDecision>();
+
+            MemberIsFallingBack = false;
+
+            if (BotInGroup)
             {
-                var dictionary = new Dictionary<BotOwner, SAINComponent>();
+                var group = BotOwner.BotsGroup;
+                int count = group.MembersCount;
 
-                if (BotInGroup)
+                int i = 0;
+
+                while (i < count)
                 {
-                    var group = BotOwner.BotsGroup;
-                    int count = group.MembersCount;
-
-                    int i = 0;
-
-                    while (i < count)
+                    var member = group.Member(i);
+                    if (member != null && member.HealthController.IsAlive)
                     {
-                        var member = group.Member(i);
-                        if (member != null && member != BotOwner && member.HealthController.IsAlive)
+                        var component = member.GetComponent<SAINComponent>();
+
+                        if (component != null)
                         {
-                            dictionary.Add(member, member.GetComponent<SAINComponent>());
+                            dictionary.Add(member, component);
+                            decisions.Add(component.CurrentDecision);
+                            locations.Add(member.Position);
+
+                            if (component.Decisions.RetreatDecisions.Contains(component.CurrentDecision))
+                            {
+                                MemberIsFallingBack = true;
+                            }
                         }
-                        i++;
                     }
+                    i++;
                 }
-
-                SquadPowerLevel = BotOwner.BotsGroup.GroupPower;
-                return dictionary;
             }
+
+            SquadLocations = locations.ToArray();
+            GroupDecisions = decisions.ToArray();
+
+            SquadPowerLevel = BotOwner.BotsGroup.GroupPower;
+            SquadMembers = dictionary;
         }
 
-        public Vector3[] SquadLocations
-        {
-            get
-            {
-                List<Vector3> locations = new List<Vector3>();
+        public bool MemberIsFallingBack { get; private set; }
 
-                if (SquadMembers != null && BotInGroup && SquadMembers.Count > 0)
-                {
-                    foreach (var member in SquadMembers)
-                    {
-                        locations.Add(member.Key.Position);
-                    }
-                }
-
-                return locations.ToArray();
-            }
-        }
+        public Vector3[] SquadLocations { get; private set; }
 
         protected ManualLogSource Logger;
 

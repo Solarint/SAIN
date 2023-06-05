@@ -31,8 +31,14 @@ namespace SAIN.Helpers
 
         public static float FullAutoLength(BotOwner BotOwner, float distance)
         {
-            var weaponinfo = BotOwner.GetComponent<SAINComponent>().Info.WeaponInfo;
-            float modifier = weaponinfo.FinalModifier;
+            var component = BotOwner.GetComponent<SAINComponent>();
+
+            if (component == null)
+            {
+                return 0.001f;
+            }
+
+            float modifier = component.Info.WeaponInfo.FinalModifier;
 
             float k = 0.08f * modifier; // How fast for the burst length to falloff with distance
             float scaledDistance = InverseScaleWithLogisticFunction(distance, k, 20f);

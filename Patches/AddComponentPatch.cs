@@ -46,7 +46,8 @@ namespace SAIN.Patches
                 return;
             }
 
-            __instance.GetComponent<SAINComponent>().Dispose();
+            var component = __instance.GetComponent<SAINComponent>();
+            component?.Dispose();
         }
     }
 

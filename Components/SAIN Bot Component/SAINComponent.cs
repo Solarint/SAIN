@@ -45,7 +45,7 @@ namespace SAIN.Components
         }
 
         private const float CheckSelfFreq = 0.1f;
-        private const float CheckMoveFreq = 0.2f;
+        private const float CheckMoveFreq = 0.33f;
 
         private void Update()
         {
@@ -54,7 +54,7 @@ namespace SAIN.Components
                 if (CheckMoveTimer < Time.time)
                 {
                     CheckMoveTimer = Time.time + CheckMoveFreq;
-                    BotIsMoving = Vector3.Distance(LastPos, BotOwner.Position) > 0.05f;
+                    BotIsMoving = Vector3.Distance(LastPos, BotOwner.Position) > 0.01f;
                     LastPos = BotOwner.Position;
                 }
 
@@ -127,6 +127,8 @@ namespace SAIN.Components
             return false;
         }
 
+        public bool BotIsAtDestination => (BotOwner.Position - BotOwner.Mover.RealDestPoint).magnitude < 1;
+
         private float CheckVisTimer = 0f;
         public bool EnemyInLineOfSight { get; private set; }
         public bool EnemyIsVisible { get; private set; }
@@ -156,7 +158,7 @@ namespace SAIN.Components
         {
             target.y = BotOwner.Position.y;
             var direction = target - BotOwner.Position;
-            return Physics.Raycast(BotOwner.Position, direction, 0.5f, LayerMaskClass.HighPolyWithTerrainMask);
+            return Physics.Raycast(BotOwner.Position, direction, 0.75f, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
         public bool GoToPointRetreat(Vector3 point)

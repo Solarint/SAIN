@@ -24,25 +24,28 @@ namespace SAIN.Patches
             {
                 var component = person.GetPlayer.GetComponent<FlashLightComponent>();
 
-                if (component.WhiteLight)
+                if (component != null)
                 {
-                    Dazzle.EnemyWithFlashlight(___botOwner_0, person);
-                }
-                else if (component.Laser)
-                {
-                    Dazzle.EnemyWithLaser(___botOwner_0, person);
-                }
-                else
-                {
-                    if (___botOwner_0.NightVision.UsingNow)
+                    if (component.WhiteLight)
                     {
-                        if (component.IRLight)
+                        Dazzle.EnemyWithFlashlight(___botOwner_0, person);
+                    }
+                    else if (component.Laser)
+                    {
+                        Dazzle.EnemyWithLaser(___botOwner_0, person);
+                    }
+                    else
+                    {
+                        if (___botOwner_0.NightVision.UsingNow)
                         {
-                            Dazzle.EnemyWithFlashlight(___botOwner_0, person);
-                        }
-                        else if (component.IRLaser)
-                        {
-                            Dazzle.EnemyWithLaser(___botOwner_0, person);
+                            if (component.IRLight)
+                            {
+                                Dazzle.EnemyWithFlashlight(___botOwner_0, person);
+                            }
+                            else if (component.IRLaser)
+                            {
+                                Dazzle.EnemyWithLaser(___botOwner_0, person);
+                            }
                         }
                     }
                 }

@@ -40,10 +40,16 @@ namespace SAIN.Layers
                 return;
             }
 
-            var ActivePoint = SAIN.Cover.CurrentCoverPoint;
+            var ActivePoint = SAIN.Cover.CurrentFallBackPoint;
+
+            if (ActivePoint == null)
+            {
+                ActivePoint = SAIN.Cover.CurrentCoverPoint;
+            }
+
             if (ActivePoint != null)
             {
-                BotOwner.GoToPoint(ActivePoint.Position, true, -1, false, false);
+                BotOwner.GoToPoint(ActivePoint.Position, true, 0.15f, false, false);
                 if (Vector3.Distance(ActivePoint.Position, BotOwner.Position) < 1f)
                 {
                     SAIN.Steering.ManualUpdate();
@@ -58,28 +64,17 @@ namespace SAIN.Layers
                     SetForMove();
                 }
             }
-            return;
-            if (LastResultFallback())
+
+            if (!SAIN.BotIsMoving && SAIN.Decisions.TimeSinceChangeDecision > 2f)
             {
-                BotOwner.Steering.LookToMovingDirection();
-                SetForMove();
-            }
-            else
-            {
+                SAIN.Steering.ManualUpdate();
+
                 if (SAIN.HasEnemyAndCanShoot)
                 {
                     AimData.Update();
                 }
 
-                SAIN.Steering.ManualUpdate();
-
-                var direction = (BotOwner.Position - SAIN.CurrentTargetPosition.Value).normalized;
-                var movePoint = BotOwner.Position + direction;
-
-                if (NavMesh.SamplePosition(movePoint, out var hit, 0.25f, -1))
-                {
-                    SAIN.GoToPointRetreat(hit.position);
-                }
+                //Logger.LogWarning($"{BotOwner.name} is not moving while trying to move to cover!");
             }
         }
 

@@ -33,7 +33,7 @@ namespace SAIN.Components
                 return;
             }
 
-            if (DistanceToDestination(CurrentDestination) < 10f)
+            if (DistanceToDestination(CurrentDestination) < 6f)
             {
                 UpdateTargetPoints();
                 if (CornerPeekLoop == null)
@@ -49,7 +49,7 @@ namespace SAIN.Components
 
                 if (ShouldUpdateSteer || (soundDistance < destinationDistance && SAIN.LastSoundHeardTime > Time.time - 2f))
                 {
-                    SAIN.Steering.ManualUpdate();
+                    BotOwner.LookData.SetLookPointByHearing();
                 }
                 else
                 {
@@ -146,7 +146,7 @@ namespace SAIN.Components
                         }
 
                         PeekMoveDestination = peekDestination;
-                        BotOwner.GoToPoint(peekDestination, false, -1, false, false);
+                        BotOwner.GoToPoint(peekDestination, false, 0.15f, false, false);
                     }
 
                     float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
@@ -155,7 +155,7 @@ namespace SAIN.Components
 
                     if (ShouldUpdateSteer || (soundDistance < peekMoveDistance || soundDistance < finalDestDistance) && SAIN.LastSoundHeardTime > Time.time - 2f)
                     {
-                        SAIN.Steering.ManualUpdate();
+                        BotOwner.LookData.SetLookPointByHearing();
                     }
                     else
                     {
@@ -206,7 +206,7 @@ namespace SAIN.Components
             {
                 BotOwner.SetTargetMoveSpeed(0.85f);
                 CurrentDestination = Path.corners[CurrentCorner];
-                BotOwner.GoToPoint(CurrentDestination);
+                BotOwner.GoToPoint(CurrentDestination, false, 0.15f, false, false);
                 BotOwner.DoorOpener.Update();
             }
             else

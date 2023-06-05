@@ -15,10 +15,10 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            this.gclass105_0 = new GClass105(bot);
+            this.AimData = new GClass105(bot);
         }
 
-        private GClass105 gclass105_0;
+        private GClass105 AimData;
 
         public override void Update()
         {
@@ -26,23 +26,27 @@ namespace SAIN.Layers
 
             if (SAIN.HasEnemyAndCanShoot)
             {
-                gclass105_0.Update();
+                AimData.Update();
             }
 
-            if (SAIN.CurrentTargetPosition != null)
-            {
-                SAIN.ShiftAwayFromCloseWall(SAIN.CurrentTargetPosition.Value);
-            }
+            SAIN.Cover.DuckInCover();
 
             var enemy = BotOwner.Memory.GoalEnemy;
             if (enemy != null)
             {
-                if (enemy.TimeLastSeenReal < Time.time - 5f && !BotOwner.Memory.IsUnderFire && !SAIN.HasEnemyAndCanShoot)
+                if (Time.time - enemy.TimeLastSeenReal > 5f && !SAIN.HasEnemyAndCanShoot)
                 {
                     if (RightMovePos == null && LeftMovePos == null)
                     {
                         SetMovePoints();
-                        MoveAround();
+                    }
+                    MoveAround();
+                }
+                else
+                {
+                    if (SAIN.CurrentTargetPosition != null)
+                    {
+                        SAIN.ShiftAwayFromCloseWall(SAIN.CurrentTargetPosition.Value);
                     }
                 }
             }
@@ -64,8 +68,6 @@ namespace SAIN.Layers
 
         private void MoveAround()
         {
-            BotOwner.MovementResume();
-
             if (SAIN.HasEnemyAndCanShoot)
             {
                 BotOwner.SetTargetMoveSpeed(1f);
@@ -74,6 +76,7 @@ namespace SAIN.Layers
             }
             else
             {
+                BotOwner.SetPose(0.66f);
                 BotOwner.SetTargetMoveSpeed(0f);
             }
 
@@ -85,22 +88,22 @@ namespace SAIN.Layers
                 {
                     if (RightMovePos != null)
                     {
-                        BotOwner.GoToPoint(RightMovePos.Value, true, -1, false, false);
+                        BotOwner.GoToPoint(RightMovePos.Value, true, 0.15f, false, false);
                     }
                     else
                     {
-                        BotOwner.GoToPoint(PositionToHold, true, -1, false, false);
+                        BotOwner.GoToPoint(PositionToHold, true, 0.15f, false, false);
                     }
                 }
                 else
                 {
                     if (LeftMovePos != null)
                     {
-                        BotOwner.GoToPoint(LeftMovePos.Value, true, -1, false, false);
+                        BotOwner.GoToPoint(LeftMovePos.Value, true, 0.15f, false, false);
                     }
                     else
                     {
-                        BotOwner.GoToPoint(PositionToHold, true, -1, false, false);
+                        BotOwner.GoToPoint(PositionToHold, true, 0.15f, false, false);
                     }
                 }
 
@@ -185,7 +188,6 @@ namespace SAIN.Layers
 
         public override void Stop()
         {
-            //BotOwner.MovementResume();
             BotOwner.PatrollingData.Unpause();
         }
     }

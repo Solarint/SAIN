@@ -30,7 +30,14 @@ namespace SAIN.Patches
 
                         if (Vector3.Distance(danger, bot.Transform.position) < 80f)
                         {
-                            bot.GetComponent<SAINComponent>().Grenade.EnemyGrenadeThrown(grenade, danger);
+                            var component = bot.GetComponent<SAINComponent>();
+
+                            if (component == null)
+                            {
+                                return true;
+                            }
+
+                            component.Grenade.EnemyGrenadeThrown(grenade, danger);
                         }
                     }
                 }
@@ -53,17 +60,16 @@ namespace SAIN.Patches
             if (___botOwner_0.Memory.GoalEnemy == null)
             {
                 if (Etype == EInteractionType.Breach)
+                {
                     Etype = EInteractionType.Open;
+                }
 
                 return;
             }
 
             if (Etype == EInteractionType.Open || Etype == EInteractionType.Breach)
             {
-                NavMeshPath navMeshPath = new NavMeshPath();
-                NavMesh.CalculatePath(___botOwner_0.Transform.position, ___botOwner_0.Memory.GoalEnemy.CurrPosition, -1, navMeshPath);
-
-                bool enemyClose = navMeshPath.CalculatePathLength() < 15f;
+                bool enemyClose = Vector3.Distance(___botOwner_0.Position, ___botOwner_0.Memory.GoalEnemy.CurrPosition) < 30f;
 
                 if (enemyClose || ___botOwner_0.Memory.IsUnderFire)
                 {
@@ -73,9 +79,15 @@ namespace SAIN.Patches
                     {
                         Etype = EInteractionType.Breach;
                     }
-                    else Etype = EInteractionType.Open;
+                    else 
+                    {
+                        Etype = EInteractionType.Open;
+                    }
                 }
-                else Etype = EInteractionType.Open;
+                else
+                { 
+                    Etype = EInteractionType.Open; 
+                }
             }
         }
     }
@@ -102,8 +114,12 @@ namespace SAIN.Patches
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix()
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
+            if (___botOwner_0.Brain.ActiveLayerName() == "SAIN Combat System")
+            {
+                return false;
+            }
             return false;
         }
     }

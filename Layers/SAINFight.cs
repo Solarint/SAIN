@@ -52,6 +52,7 @@ namespace SAIN.Layers
                     break;
 
                 case SAINLogicDecision.HoldInCover:
+                case SAINLogicDecision.StandAndShoot:
                     nextAction = new Action(typeof(HoldInCoverAction), $"{CurrentDecision}");
                     break;
 

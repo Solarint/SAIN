@@ -19,11 +19,9 @@ namespace SAIN.Classes
             SAIN = GetComponent<SAINComponent>();
             CoverFinder = BotOwner.GetOrAddComponent<CoverFinderComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            FallBackPointStatus = CoverStatus.None;
-            CoverPointStatus = CoverStatus.None;
         }
 
-        private const float InCoverDist = 0.25f;
+        private const float InCoverDist = 0.75f;
         private const float CloseCoverDist = 10f;
         private const float MidCoverDist = 25f;
         private const float FarCoverDist = 50f;
@@ -38,21 +36,18 @@ namespace SAIN.Classes
                 return;
             }
 
-            if (FindCoverActions.Contains(SAIN.CurrentDecision) && (SAIN.HasGoalEnemy || SAIN.HasGoalTarget))
+            if (SAIN.HasGoalEnemy || SAIN.HasGoalTarget)
             {
                 if (UpdateTimer < Time.time)
                 {
                     AssignSettings();
 
-                    UpdateTimer = Time.time + CoverUpdateFrequency.Value;
+                    UpdateTimer = Time.time + 0.1f;
 
                     if (GetPointToHideFrom(out var target))
                     {
                         CoverFinder.LookForCover(target, BotOwner.Position);
                     }
-
-                    FallBackPointStatus = CheckCoverPointStatus(CurrentFallBackPoint);
-                    CoverPointStatus = CheckCoverPointStatus(CurrentCoverPoint);
                 }
             }
             else
@@ -94,67 +89,60 @@ namespace SAIN.Classes
             return target != Vector3.zero;
         }
 
-        private CoverStatus CheckCoverPointStatus(CoverPoint cover)
-        {
-            CoverStatus status = CoverStatus.None;
-
-            if (cover != null && Vector3.Distance(cover.Position, BotOwner.Position) < FarCoverDist)
-            {
-                float pathLength = GetPathLengthToPoint(cover.Position);
-
-                if (pathLength < InCoverDist)
-                {
-                    status = CoverStatus.InCover;
-                }
-                else if (pathLength < CloseCoverDist)
-                {
-                    status = CoverStatus.CloseToCover;
-                }
-                else if (pathLength < MidCoverDist)
-                {
-                    status = CoverStatus.MidRangeToCover;
-                }
-                else if (pathLength < FarCoverDist)
-                {
-                    status = CoverStatus.FarFromCover;
-                }
-            }
-
-            return status;
-        }
-
-        private float GetPathLengthToPoint(Vector3 point)
-        {
-            NavMeshPath path = new NavMeshPath();
-            if (NavMesh.CalculatePath(BotOwner.Transform.position, point, -1, path))
-            {
-                return path.CalculatePathLength();
-            }
-            return 999f;
-        }
-
         public bool DuckInCover(bool SetPose1ifFalse = true)
         {
-            if (BotIsAtCoverPoint)
+            if (BotIsAtCoverPoint && ActiveCoverPoint.Collider.bounds.size.y < 1f)
             {
                 SAIN.BotOwner.SetPose(0f);
-            }
-            else if (SetPose1ifFalse)
-            {
-                SAIN.BotOwner.SetPose(1f);
+                return true;
             }
 
-            return BotIsAtCoverPoint;
+            return false;
+        }
+
+        public bool CheckLimbsForCover()
+        {
+            if (!SAIN.HasGoalEnemy)
+            {
+                return false;
+            }
+
+            if (SAIN.EnemyIsVisible && SAIN.HasEnemyAndCanShoot)
+            {
+                var headPos = BotOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position;
+
+                if (CheckLimbForCover(BodyPartType.leftLeg, headPos) && CheckLimbForCover(BodyPartType.leftArm, headPos))
+                {
+                    return true;
+                }
+
+                if (CheckLimbForCover(BodyPartType.rightLeg, headPos) && CheckLimbForCover(BodyPartType.rightArm, headPos))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool CheckLimbForCover(BodyPartType bodyPartType, Vector3 target, float dist = 2f)
+        {
+            var position = BotOwner.MainParts[bodyPartType].Position;
+            Vector3 direction = target - position;
+            return Physics.Raycast(position, direction, dist, SAINComponent.SightMask);
         }
 
         public bool CheckSelfForCover(float minratio = 0.1f)
         {
+            if (!SAIN.HasGoalEnemy)
+            {
+                return false;
+            }
+
             int rays = 0;
             int cover = 0;
 
-
-            BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.head, out BodyPartClass EnemyHead);
-            var headPos = EnemyHead.Position;
+            var headPos = BotOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position;
 
             foreach (var part in BotOwner.MainParts.Values)
             {
@@ -181,9 +169,6 @@ namespace SAIN.Classes
             {
                 case SAINLogicDecision.Reload:
                 case SAINLogicDecision.FirstAid:
-                    CoverFinder.MinObstacleHeight = 1.0f;
-                    break;
-
                 case SAINLogicDecision.Surgery:
                 case SAINLogicDecision.RunAway:
                 case SAINLogicDecision.RunAwayGrenade:
@@ -198,9 +183,29 @@ namespace SAIN.Classes
 
         private SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
 
-        public CoverStatus FallBackPointStatus { get; private set; }
+        public CoverStatus FallBackPointStatus
+        {
+            get
+            {
+                if (CurrentFallBackPoint != null)
+                {
+                    return CurrentFallBackPoint.Status();
+                }
+                return CoverStatus.None;
+            }
+        }
 
-        public CoverStatus CoverPointStatus { get; private set; }
+        public CoverStatus CoverPointStatus
+        {
+            get
+            {
+                if (CurrentCoverPoint != null)
+                {
+                    return CurrentCoverPoint.Status();
+                }
+                return CoverStatus.None;
+            }
+        }
 
         private BotOwner BotOwner => SAIN.BotOwner;
 

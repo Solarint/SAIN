@@ -41,7 +41,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalAimingSettings __instance)
         {
-            __instance.SHPERE_FRIENDY_FIRE_SIZE = 0.66f;
+            __instance.SHPERE_FRIENDY_FIRE_SIZE = 0.33f;
             __instance.RECALC_MUST_TIME = 1;
             __instance.RECALC_MUST_TIME_MIN = 1;
             __instance.RECALC_MUST_TIME_MAX = 2;
@@ -63,9 +63,9 @@ namespace SAIN.Patches
         {
             __instance.MAX_DIST_COEF = 1.75f;
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
-            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 2f;
+            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.5f;
             __instance.BASE_AUTOMATIC_TIME = 0.5f;
-            __instance.RECOIL_DELTA_PRESS = 0f;
+            __instance.RECOIL_DELTA_PRESS = 0.1f;
         }
     }
 
@@ -79,8 +79,8 @@ namespace SAIN.Patches
         public static void PatchPostfix(BotGlobalsScatteringSettings __instance)
         {
             __instance.MinScatter = 0.15f;
-            __instance.WorkingScatter = 0.35f;
-            __instance.MaxScatter = 0.5f;
+            __instance.WorkingScatter = 0.25f;
+            __instance.MaxScatter = 0.33f;
         }
     }
 
@@ -96,10 +96,10 @@ namespace SAIN.Patches
         {
             __instance.SEC_TO_CHANGE_TO_RUN = 0.5f;
             __instance.RUN_TO_COVER_MIN = 0f;
-            __instance.BASE_ROTATE_SPEED = 200f;
-            __instance.FIRST_TURN_SPEED = 200f;
-            __instance.FIRST_TURN_BIG_SPEED = 200f;
-            __instance.TURN_SPEED_ON_SPRINT = 400f;
+            __instance.BASE_ROTATE_SPEED = 250f;
+            __instance.FIRST_TURN_SPEED = 250f;
+            __instance.FIRST_TURN_BIG_SPEED = 250f;
+            __instance.TURN_SPEED_ON_SPRINT = 300f;
         }
     }
 

@@ -31,6 +31,10 @@ namespace SAIN.Components
             // Check if the bot is alive before continuing
             if (Player.HealthController?.IsAlive == false || Player == null)
             {
+                if (Player != null & Player.IsYourPlayer)
+                {
+                    Dispose();
+                }
                 return;
             }
 
@@ -38,6 +42,10 @@ namespace SAIN.Components
 
             if (gameWorld == null || gameWorld.RegisteredPlayers == null)
             {
+                if (Player != null & Player.IsYourPlayer)
+                {
+                    Dispose();
+                }
                 return;
             }
 
