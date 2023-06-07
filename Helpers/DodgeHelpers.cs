@@ -21,7 +21,7 @@ namespace SAIN.Helpers
         {
             if (FindPlace(bot, out Vector3 dodgePosition))
             {
-                bot.GoToPoint(dodgePosition, false, -1, false, true, true);
+                bot.GoToPoint(dodgePosition, false, -1, false, false, true);
                 return true;
             }
             return false;

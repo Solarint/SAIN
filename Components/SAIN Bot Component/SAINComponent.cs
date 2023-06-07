@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
+using EFT.Interactive;
 using SAIN.Classes;
 using SAIN.Helpers;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace SAIN.Components
 
             Info = new BotInfoClass(bot);
 
-            Enemies = bot.GetOrAddComponent<EnemiesComponent>();
+            Enemy = bot.GetOrAddComponent<EnemyComponent>();
             HearingSensor = bot.GetOrAddComponent<AudioComponent>();
 
             BotSquad = new SquadClass(bot);
@@ -53,7 +54,10 @@ namespace SAIN.Components
             {
                 if (CheckMoveTimer < Time.time)
                 {
+                    BotIsStuck = CheckIfBotStuck();
+
                     CheckMoveTimer = Time.time + CheckMoveFreq;
+
                     BotIsMoving = Vector3.Distance(LastPos, BotOwner.Position) > 0.01f;
                     LastPos = BotOwner.Position;
                 }
@@ -65,100 +69,77 @@ namespace SAIN.Components
                     BotOwner.WeaponManager.UpdateWeaponsList();
                 }
 
-                if (CheckVisTimer < Time.time && HasGoalEnemy)
-                {
-                    CheckVisTimer = Time.time + 0.5f;
-
-                    if (!BotOwner.Memory.GoalEnemy.IsVisible)
-                    {
-                        EnemyInLineOfSight = false;
-                        EnemyIsVisible = false;
-                    }
-                    else
-                    {
-                        if (BotOwner.Memory.GoalEnemy.Person != CurrentEnemy)
-                        {
-                            EnemyInLineOfSight = false;
-                            EnemyIsVisible = false;
-                        }
-
-                        CurrentEnemy = BotOwner.Memory.GoalEnemy.Person;
-
-                        EnemyInLineOfSight = CheckEnemyVisible();
-
-                        if (EnemyInLineOfSight)
-                        {
-                            Vector3 directionEnemy = BotOwner.Position - GoalEnemyPos.Value;
-                            Vector3 lookDirection = BotOwner.LookDirection;
-
-                            EnemyIsVisible = Vector3.Dot(directionEnemy, lookDirection) > 0;
-                        }
-                    }
-                }
-
-                if (!HasGoalEnemy)
-                {
-                    CurrentEnemy = null;
-                    EnemyIsVisible = false;
-                    EnemyInLineOfSight = false;
-                }
-
                 BotSquad.ManualUpdate();
 
                 Info.ManualUpdate();
             }
         }
 
-        private bool CheckEnemyVisible()
-        {
-            if (!HasGoalEnemy) 
-            { 
-                return false;
-            }
-
-            foreach (var part in BotOwner.Memory.GoalEnemy.Person.MainParts.Values)
-            {
-                Vector3 Direction = part.Position - HeadPosition;
-                if (!Physics.Raycast(HeadPosition, Direction, Direction.magnitude, SightMask))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         public bool BotIsAtDestination => (BotOwner.Position - BotOwner.Mover.RealDestPoint).magnitude < 1;
 
-        private float CheckVisTimer = 0f;
-        public bool EnemyInLineOfSight { get; private set; }
-        public bool EnemyIsVisible { get; private set; }
-        public IAIDetails CurrentEnemy { get; private set; }
+        public bool EnemyCanShoot => Enemy.SAINEnemy?.CanShoot == true;
+        public bool EnemyInLineOfSight => Enemy.SAINEnemy?.InLineOfSight == true;
+        public bool EnemyIsVisible => Enemy.SAINEnemy?.IsVisible == true;
+        public bool HasEnemy => Enemy.SAINEnemy != null;
 
         private float ShiftTimer = 0f;
+        public bool BotIsStuck { get; private set; }
 
-        public bool ShiftAwayFromCloseWall(Vector3 target)
+        public bool CheckIfBotStuck()
         {
-            if (ShiftTimer < Time.time && CheckTooCloseToWall(target))
-            {
-                ShiftTimer = Time.time + 0.5f;
+            bool stuck = false;
 
-                var direction = (BotOwner.Position - target).normalized;
+            if (CurrentDecision != SAINLogicDecision.None && CurrentDecision != SAINLogicDecision.HoldInCover && !BotIsMoving && !BotOwner.DoorOpener.Interacting && Time.time - Decisions.ChangeDecisionTime > 2f)
+            {
+                Vector3 botPos = BodyPosition;
+                Vector3 lookDir = BotOwner.Mover.DirCurPoint;
+                if (Physics.Raycast(botPos, lookDir, out var hit, 0.5f, LayerMaskClass.HighPolyWithTerrainMask))
+                {
+                    Logger.LogWarning($"[{BotOwner.name}] stuck on [{hit.transform.name}]");
+
+                    if (hit.transform.name.ToLower().Contains("door"))
+                    {
+                        Door door = hit.transform.GetComponent<Door>();
+                        if (door != null)
+                        {
+                            Logger.LogWarning($"CheckStuck(): Found Door Component");
+                        }
+                        else
+                        {
+                            Logger.LogWarning($"CheckStuck(): No Door Component");
+                        }
+                    }
+                    stuck = true;
+                }
+            }
+            return stuck;
+        }
+
+        public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
+        {
+            const float closeDist = 0.75f;
+
+            if (CheckTooCloseToWall(target, out var rayHit, closeDist))
+            {
+                var direction = (BotOwner.Position - rayHit.point).normalized * 0.8f;
                 direction.y = 0f;
                 var movePoint = BotOwner.Position + direction;
                 if (NavMesh.SamplePosition(movePoint, out var hit, 0.1f, -1))
                 {
-                    BotOwner.GoToPoint(hit.position, true, -1, false, false);
+                    newPos = hit.position;
                     return true;
                 }
             }
+            newPos = Vector3.zero;
             return false;
         }
 
-        public bool CheckTooCloseToWall(Vector3 target)
+        public bool CheckTooCloseToWall(Vector3 target, out RaycastHit rayHit, float checkDist = 0.75f)
         {
-            target.y = BotOwner.Position.y;
-            var direction = target - BotOwner.Position;
-            return Physics.Raycast(BotOwner.Position, direction, 0.75f, LayerMaskClass.HighPolyWithTerrainMask);
+            Vector3 botPos = BotOwner.Position;
+            Vector3 direction = target - botPos;
+            botPos.y = WeaponRoot.y;
+            return Physics.Raycast(BotOwner.Position, direction, out rayHit, checkDist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
         public bool GoToPointRetreat(Vector3 point)
@@ -203,7 +184,7 @@ namespace SAIN.Components
             Lean.Dispose();
             Cover.Dispose();
             Decisions.Dispose();
-            Enemies.Dispose();
+            Enemy.Dispose();
             FlashLight.Dispose();
 
             Destroy(this);
@@ -211,7 +192,9 @@ namespace SAIN.Components
 
         public SAINLogicDecision CurrentDecision => Decisions.CurrentDecision;
 
+        public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
+        public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
 
         public Vector3? CurrentTargetPosition => HasGoalEnemy ? GoalEnemyPos : GoalTargetPos;
 
@@ -248,7 +231,7 @@ namespace SAIN.Components
 
         public CoverComponent Cover { get; private set; }
 
-        public EnemiesComponent Enemies { get; private set; }
+        public EnemyComponent Enemy { get; private set; }
 
         public BotInfoClass Info { get; private set; }
 

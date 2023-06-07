@@ -14,11 +14,13 @@ namespace SAIN
         FirstAid = 8,
         Suppress = 9,
         DogFight = 10,
-        Skirmish = 11,
+        Shoot = 11,
         Stims = 12,
         MoveToCover = 13,
         RunAwayGrenade = 14,
         StandAndShoot = 15,
+        GroupSearch = 16,
+        RegroupSquad = 17,
     }
 
     public enum CoverStatus

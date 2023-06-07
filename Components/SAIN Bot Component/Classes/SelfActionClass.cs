@@ -18,6 +18,12 @@ namespace SAIN.Classes
                 return;
             }
 
+            if (SAIN.Decisions.StartCancelReload())
+            {
+                BotCancelReload();
+                return;
+            }
+
             switch (SAIN.CurrentDecision)
             {
                 case SAINLogicDecision.Reload:
@@ -106,7 +112,7 @@ namespace SAIN.Classes
         {
             if (BotOwner.WeaponManager.Reload.Reloading)
             {
-                Logger.LogDebug($"I need to stop reloading!");
+                //Logger.LogDebug($"I need to stop reloading!");
 
                 BotOwner.WeaponManager.Reload.TryStopReload();
             }

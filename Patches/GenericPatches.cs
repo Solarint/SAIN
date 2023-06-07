@@ -137,4 +137,37 @@ namespace SAIN.Patches
             return false;
         }
     }
+
+    public class MoverPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("method_9", BindingFlags.Instance | BindingFlags.NonPublic);
+        }
+
+        [PatchPostfix]
+        public static void PatchPostfix(ref BotOwner ___botOwner_0, ref Vector3[] ___vector3_0, ref int ___Int32_0)
+        {
+            int i = ___Int32_0;
+            var way = ___vector3_0;
+
+            if (i < way.Length - 2)
+            {
+                Vector3 corner = way[i];
+                Vector3 nextCorner = way[i + 1];
+                Vector3 bot = ___botOwner_0.Position;
+
+                var directionA = corner - bot;
+                var directionB = nextCorner - bot;
+                var directionCorners = nextCorner - corner;
+
+                float angle = Vector3.Angle(directionA.normalized, directionB.normalized);
+
+                if (directionA.magnitude < 0.5f && angle > 30f && directionCorners.magnitude < 0.5f)
+                {
+                    ___botOwner_0.GetPlayer.EnableSprint(false);
+                }
+            }
+        }
+    }
 }

@@ -443,12 +443,12 @@ namespace SAIN.Classes
             var trigger = EPhraseTrigger.PhraseNone;
             var mask = ETagStatus.Aware;
 
-            var enemy = SAIN.Enemies;
+            var enemy = SAIN.Enemy;
             if (SAIN.HasEnemyAndCanShoot)
             {
                 Vector3 enemyPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
 
-                if (enemy.PriorityEnemy != null && enemy.PriorityEnemy.EnemyLookingAtMe)
+                if (enemy.SAINEnemy != null && enemy.SAINEnemy.EnemyLookingAtMe)
                 {
                     mask = ETagStatus.Combat;
                     bool injured = !SAIN.BotStatus.Healthy && !SAIN.BotStatus.Injured;
@@ -611,9 +611,9 @@ namespace SAIN.Classes
 
         private bool SayRatCheck()
         {
-            if (SAIN.Enemies.PriorityEnemy != null)
+            if (SAIN.Enemy.SAINEnemy != null && BotOwner.Memory.GoalEnemy != null)
             {
-                if (SAIN.Enemies.PriorityEnemy.LastSeen.TimeSinceSeen > 30f && RatTimer < Time.time && BotOwner.Memory.GoalEnemy != null)
+                if (SAIN.Enemy.SAINEnemy.GoalEnemy.TimeLastSeenReal > 30f && RatTimer < Time.time)
                 {
                     RatTimer = Time.time + 120f * Random.Range(0.75f, 1.25f);
 

@@ -36,7 +36,7 @@ namespace SAIN.Classes
                 return;
             }
 
-            if (SAIN.HasGoalEnemy || SAIN.HasGoalTarget)
+            if ((SAIN.HasGoalEnemy || SAIN.HasGoalTarget) && SAIN.CurrentDecision != SAINLogicDecision.None && SAIN.CurrentDecision != SAINLogicDecision.Search)
             {
                 if (UpdateTimer < Time.time)
                 {
@@ -89,12 +89,21 @@ namespace SAIN.Classes
             return target != Vector3.zero;
         }
 
-        public bool DuckInCover(bool SetPose1ifFalse = true)
+        public bool DuckInCover()
         {
-            if (BotIsAtCoverPoint && ActiveCoverPoint.Collider.bounds.size.y < 1f)
+            if (BotIsAtCoverPoint)
             {
-                SAIN.BotOwner.SetPose(0f);
-                return true;
+                if (ActiveCoverPoint.Collider.bounds.size.y < 1f && BotOwner.BotLay.CanProne)
+                {
+                    SAIN.BotOwner.BotLay.TryLay();
+                    return true;
+                }
+
+                if (ActiveCoverPoint.Collider.bounds.size.y < 1.5f)
+                {
+                    SAIN.BotOwner.SetPose(0f);
+                    return true;
+                }
             }
 
             return false;
@@ -109,14 +118,14 @@ namespace SAIN.Classes
 
             if (SAIN.EnemyIsVisible && SAIN.HasEnemyAndCanShoot)
             {
-                var headPos = BotOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position;
+                var target = BotOwner.Memory.GoalEnemy.Person.WeaponRoot.position;
 
-                if (CheckLimbForCover(BodyPartType.leftLeg, headPos) && CheckLimbForCover(BodyPartType.leftArm, headPos))
+                if (CheckLimbForCover(BodyPartType.leftLeg, target, 5f) && CheckLimbForCover(BodyPartType.leftArm, target, 5f))
                 {
                     return true;
                 }
 
-                if (CheckLimbForCover(BodyPartType.rightLeg, headPos) && CheckLimbForCover(BodyPartType.rightArm, headPos))
+                if (CheckLimbForCover(BodyPartType.rightLeg, target, 5f) && CheckLimbForCover(BodyPartType.rightArm, target, 5f))
                 {
                     return true;
                 }
@@ -129,7 +138,7 @@ namespace SAIN.Classes
         {
             var position = BotOwner.MainParts[bodyPartType].Position;
             Vector3 direction = target - position;
-            return Physics.Raycast(position, direction, dist, SAINComponent.SightMask);
+            return Physics.Raycast(position, direction, dist, SAINComponent.ShootMask);
         }
 
         public bool CheckSelfForCover(float minratio = 0.1f)
@@ -172,7 +181,7 @@ namespace SAIN.Classes
                 case SAINLogicDecision.Surgery:
                 case SAINLogicDecision.RunAway:
                 case SAINLogicDecision.RunAwayGrenade:
-                    CoverFinder.MinObstacleHeight = 1.55f;
+                    CoverFinder.MinObstacleHeight = CoverMinHeight.Value;
                     break;
 
                 default:

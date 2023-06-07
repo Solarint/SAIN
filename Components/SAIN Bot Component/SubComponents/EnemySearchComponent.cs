@@ -28,6 +28,12 @@ namespace SAIN.Components
                 return;
             }
 
+            if (SAIN.BotIsStuck && SAIN.CurrentTargetPosition != null && ResetTimer < Time.time)
+            {
+                ResetTimer = Time.time + 5f;
+                Init(SAIN.CurrentTargetPosition.Value);
+            }
+
             if (!SAIN.BotActive)
             {
                 return;
@@ -47,9 +53,9 @@ namespace SAIN.Components
                 float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
                 float destinationDistance = Vector3.Distance(CurrentDestination, BotOwner.Position);
 
-                if (ShouldUpdateSteer || (soundDistance < destinationDistance && SAIN.LastSoundHeardTime > Time.time - 2f))
+                if (ShouldUpdateSteer || (soundDistance < 10f && SAIN.LastSoundHeardTime > Time.time - 1f))
                 {
-                    BotOwner.LookData.SetLookPointByHearing();
+                    SAIN.Steering.ManualUpdate();
                 }
                 else
                 {
@@ -67,6 +73,8 @@ namespace SAIN.Components
                 }
             }
         }
+
+        private float ResetTimer = 0f;
 
         public void Init(Vector3 targetPos)
         {
@@ -146,7 +154,7 @@ namespace SAIN.Components
                         }
 
                         PeekMoveDestination = peekDestination;
-                        BotOwner.GoToPoint(peekDestination, false, 0.15f, false, false);
+                        BotOwner.GoToPoint(peekDestination, false, 0.5f, false, false);
                     }
 
                     float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
@@ -162,7 +170,8 @@ namespace SAIN.Components
                         BotOwner.Steering.LookToPoint(FinalDest);
                     }
 
-                    BotOwner.SetTargetMoveSpeed(0.4f);
+                    BotOwner.SetTargetMoveSpeed(0.33f);
+                    BotOwner.SetPose(0.66f);
 
                     if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving))
                     {
@@ -180,7 +189,7 @@ namespace SAIN.Components
             }
         }
 
-        private bool ShouldUpdateSteer => BotOwner.Memory.IsUnderFire || SAIN.Enemies.PriorityEnemy != null;
+        private bool ShouldUpdateSteer => BotOwner.Memory.IsUnderFire;
 
         private float GetSignedAngle(Vector3 a, Vector3 b, Vector3 origin)
         {
@@ -205,8 +214,9 @@ namespace SAIN.Components
             if (TotalCornerCount - 1 >= CurrentCorner)
             {
                 BotOwner.SetTargetMoveSpeed(0.85f);
+                BotOwner.SetPose(1f);
                 CurrentDestination = Path.corners[CurrentCorner];
-                BotOwner.GoToPoint(CurrentDestination, false, 0.15f, false, false);
+                BotOwner.GoToPoint(CurrentDestination, false, 0.5f, false, false);
                 BotOwner.DoorOpener.Update();
             }
             else

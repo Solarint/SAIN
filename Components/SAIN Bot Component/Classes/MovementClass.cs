@@ -13,28 +13,6 @@ namespace SAIN.Classes
 
         public void DecideMovementSpeed()
         {
-            if (SAIN.Enemies.PriorityEnemy != null)
-            {
-                if (SAIN.Enemies.PriorityEnemy.Path.RangeVeryClose)
-                {
-                    FullSpeed();
-                }
-                else if (SAIN.Enemies.PriorityEnemy.Path.RangeClose)
-                {
-                    NormalSpeed();
-                }
-                else if (ShouldBotSneak)
-                {
-                }
-                else
-                {
-                    SlowWalk();
-                }
-            }
-            else
-            {
-                SlowWalk();
-            }
         }
 
         public void SetSprint(bool value)
@@ -79,7 +57,7 @@ namespace SAIN.Classes
                 }
                 else
                 {
-                    return !SAIN.HasEnemyAndCanShoot && SAIN.Enemies.PriorityEnemy.LastSeen.TimeSinceSeen > 10f;
+                    return !SAIN.HasEnemyAndCanShoot;
                 }
             }
         }

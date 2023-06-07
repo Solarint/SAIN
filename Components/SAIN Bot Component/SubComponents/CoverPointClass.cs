@@ -1,10 +1,5 @@
-﻿using BepInEx.Logging;
-using EFT;
-using SAIN.Helpers;
-using System.Collections;
+﻿using EFT;
 using UnityEngine;
-using UnityEngine.AI;
-using static SAIN.UserSettings.CoverConfig;
 
 namespace SAIN.Components
 {

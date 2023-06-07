@@ -60,10 +60,10 @@ namespace SAIN.Classes
 
         public void LookToPriorityEnemyPos()
         {
-            var priority = SAIN.Enemies.PriorityEnemy;
+            var priority = SAIN.Enemy.SAINEnemy;
             if (priority != null && priority.IsVisible && priority.EnemyChestPosition != null)
             {
-                var enemyPos = priority.EnemyChestPosition.Value;
+                var enemyPos = priority.EnemyChestPosition;
                 BotOwner.Steering.LookToPoint(enemyPos);
             }
         }

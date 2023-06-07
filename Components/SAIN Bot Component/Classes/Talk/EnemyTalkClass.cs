@@ -71,7 +71,7 @@ namespace SAIN.Classes
         {
             bool tauntEnemy = false;
 
-            var sainEnemy = SAIN.Enemies;
+            var sainEnemy = SAIN.Enemy;
             var type = SAIN.Info.BotPersonality;
 
             float distanceToEnemy = Vector3.Distance(BotOwner.Memory.GoalEnemy.CurrPosition, BotPos);
@@ -80,7 +80,7 @@ namespace SAIN.Classes
             {
                 if (BotOwner.Memory.GoalEnemy.CanShoot && BotOwner.Memory.GoalEnemy.IsVisible)
                 {
-                    if (sainEnemy.PriorityEnemy != null && sainEnemy.PriorityEnemy.EnemyLookingAtMe)
+                    if (sainEnemy.SAINEnemy != null && sainEnemy.SAINEnemy.EnemyLookingAtMe)
                     {
                         tauntEnemy = true;
                     }
@@ -165,10 +165,14 @@ namespace SAIN.Classes
                     {
                         if (BotOwner.BotsGroup.Enemies.ContainsKey(player))
                         {
-                            bool enemyTalked;
+                            bool enemyTalked = false;
                             if (player.IsAI)
                             {
-                                enemyTalked = player.AIData.BotOwner.GetComponent<BotTalkComponent>().ThisBotTalked;
+                                var component = player.AIData.BotOwner.GetComponent<BotTalkComponent>();
+                                if (component != null)
+                                {
+                                    enemyTalked = component.ThisBotTalked;
+                                }
                             }
                             else
                             {

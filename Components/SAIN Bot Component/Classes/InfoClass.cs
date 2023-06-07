@@ -60,6 +60,40 @@ namespace SAIN.Classes
             return 1f;
         }
 
+        public float HoldGroundDelay
+        {
+            get
+            {
+                if (SAIN.Info.BotPersonality == BotPersonality.Rat || SAIN.Info.BotPersonality == BotPersonality.Coward || SAIN.Info.BotPersonality == BotPersonality.Timmy)
+                {
+                    return 0f;
+                }
+
+                if (StandAndShootRandomTimer < Time.time)
+                {
+                    StandAndShootRandomTimer = Time.time + 1f;
+
+                    if (SAIN.Info.BotPersonality == BotPersonality.GigaChad)
+                    {
+                        ShootDelay = 2f * UnityEngine.Random.Range(0.25f, 2f);
+                    }
+                    else if (SAIN.Info.BotPersonality == BotPersonality.Chad)
+                    {
+                        ShootDelay = 1.5f * UnityEngine.Random.Range(0.5f, 2f);
+                    }
+                    else
+                    {
+                        ShootDelay = 1f * UnityEngine.Random.Range(0.66f, 1.5f);
+                    }
+                }
+
+                return ShootDelay;
+            }
+        }
+
+        private float StandAndShootRandomTimer = 0f;
+        private float ShootDelay = 0f;
+
         private static float GetDifficultyMod(WildSpawnType bottype, BotDifficulty difficulty, bool isBoss, bool isFollower)
         {
             float modifier = 1f;

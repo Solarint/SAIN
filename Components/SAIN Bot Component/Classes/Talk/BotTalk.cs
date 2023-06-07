@@ -70,6 +70,7 @@ namespace SAIN.Classes
         {
             var phrase = talkPackage.phraseInfo.Phrase;
 
+            if (UserSettings.DebugConfig.DebugLayers.Value)
             Logger.LogDebug($"Bot Said After Query: Phrase: [{phrase}] Mask: [{talkPackage.Mask}]");
 
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, phrase);

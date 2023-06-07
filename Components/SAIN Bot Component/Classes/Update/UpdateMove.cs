@@ -29,7 +29,7 @@ namespace SAIN.Layers.Logic
 
             //SAIN.MovementClass.FallBack(false);
 
-            //BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
+            //BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.SAINEnemy.CurrPosition);
         }
 
         private void UpdateDoorOpener()

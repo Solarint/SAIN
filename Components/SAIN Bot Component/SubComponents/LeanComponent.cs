@@ -42,6 +42,10 @@ namespace SAIN.Components
             {
                 if (LeanCoroutine != null)
                 {
+                    Lean.SetLean(0f);
+                    BlindFire.SetBlindFire(0);
+                    SideStep.SetSideStep(0f);
+
                     StopCoroutine(LeanCoroutine);
                     LeanCoroutine = null;
 
@@ -468,9 +472,14 @@ namespace SAIN.Components
                     }
                 }
 
-                move.SetSidestep(value);
+                SetSideStep(value);
 
                 CurrentSideStep = setting;
+            }
+
+            public void SetSideStep(float value)
+            {
+                BotOwner.GetPlayer.MovementContext.SetSidestep(value);
             }
 
             private readonly ManualLogSource Logger;
@@ -533,7 +542,7 @@ namespace SAIN.Components
                 return Physics.Raycast(start, direction, magnitude, LayerMaskClass.HighPolyWithTerrainMask);
             }
 
-            private void SetBlindFire(int value)
+            public void SetBlindFire(int value)
             {
                 BotOwner.GetPlayer.MovementContext.SetBlindFire(value);
             }

@@ -8,10 +8,14 @@ using System;
 using System.Collections.Generic;
 using SAIN.Components;
 using Comfort.Common;
+using EFT;
+using UnityEngine;
+using EFT.Interactive;
+using System.Collections;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN AI", "1.0")]
+    [BepInPlugin("me.sol.sain", "SAIN AI", "2.0")]
     [BepInDependency("xyz.drakia.bigbrain", "0.1.2")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class Plugin : BaseUnityPlugin
@@ -41,9 +45,11 @@ namespace SAIN
                 SoundConfig.Init(Config);
                 DazzleConfig.Init(Config);
 
+                //new Patches.MoverPatch().Enable();
+                new Patches.SprintPatch().Enable();
+
                 new Patches.CheckFlashlightPatch().Enable();
                 new Patches.DazzlePatch().Enable();
-                new Patches.AddComponentPatch().Enable();
 
                 new Patches.AddComponentPatch().Enable();
                 new Patches.DisposeComponentPatch().Enable();
@@ -90,16 +96,48 @@ namespace SAIN
                 throw;
             }
 
-            BrainManager.AddCustomLayer(typeof(SAINFight), new List<string>(NormalBots), 90);
-            BrainManager.AddCustomLayer(typeof(SAINFight), new List<string>(Bosses), 90);
-            BrainManager.AddCustomLayer(typeof(SAINFight), new List<string>(Followers), 90);
+            //BrainManager.AddCustomLayer(typeof(SAINRoamingLayer), new List<string>(NormalBots), 1);
+
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(NormalBots), 80);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 80);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Followers), 80);
         }
 
         private void Update()
         {
             // Add Components to main player
-            AddTalkComponent.AddSingleComponent<PlayerTalkComponent>();
-            AddFlashlightComponent.AddSingleComponent<FlashLightComponent>();
+
+            if (Singleton<GameWorld>.Instance != null)
+            {
+                AddTalkComponent.AddSingleComponent<PlayerTalkComponent>();
+                AddFlashlightComponent.AddSingleComponent<FlashLightComponent>();
+                /*
+                var player = Singleton<GameWorld>.Instance.MainPlayer;
+
+                if (player != null)
+                {
+                    Vector3 botPos = player.MainParts[BodyPartType.head].Position;
+                    Vector3 lookDir = player.LookDirection;
+                    if (Physics.Raycast(botPos, lookDir, out var hit, 2f, LayerMaskClass.InteractiveMask))
+                    {
+                        Logger.LogWarning($"[{hit.transform.name}]");
+
+                        if (hit.transform.name.ToLower().Contains("door"))
+                        {
+                            Door door = hit.transform.GetComponent<Door>();
+                            if (door != null)
+                            {
+                                Logger.LogWarning($"CheckStuck(): Found Door Component");
+                            }
+                            else
+                            {
+                                Logger.LogWarning($"CheckStuck(): No Door Component");
+                            }
+                        }
+                    }
+                }
+                */
+            }
         }
 
         private readonly MainPlayerComponentSingle AddTalkComponent = new MainPlayerComponentSingle();

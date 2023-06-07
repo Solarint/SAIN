@@ -1,7 +1,9 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using EFT.Interactive;
 using SAIN.Helpers;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.CoverConfig;
@@ -18,6 +20,7 @@ namespace SAIN.Components
 
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            interactiveLayer = LayerMask.NameToLayer("Interactive");
         }
 
         public void LookForCover(Vector3 targetPosition, Vector3 originPoint)
@@ -67,9 +70,33 @@ namespace SAIN.Components
 
                     for (int i = 0; i < hits; i++)
                     {
-                        if (colliders[i] != null)
+                        var collider = colliders[i];
+
+                        if (nopath >= 35 && i < hits - 4)
                         {
-                            if (CheckColliderForCover(colliders[i], out var newPoint))
+                            collider = colliders[i + 4];
+                        }
+                        else if (nopath >= 30 && i < hits - 3)
+                        {
+                            collider = colliders[i + 3];
+                        }
+                        else if (nopath >= 20 && i < hits - 2)
+                        {
+                            collider = colliders[i + 2];
+                        }
+                        else if (nopath >= 10 && i < hits - 1)
+                        {
+                            collider = colliders[i + 1];
+                        }
+
+                        if (nopath >= 40)
+                        {
+                            break;
+                        }
+
+                        if (collider != null)
+                        {
+                            if (CheckColliderForCover(collider, out var newPoint))
                             {
                                 if (cover == null)
                                 {
@@ -90,7 +117,7 @@ namespace SAIN.Components
                                     if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
                                     {
                                         DebugLogTimer = Time.time + 1f;
-                                        Logger.LogInfo($"[{BotOwner.name}] - Found Cover!: Stats: Too Close To Friendly: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Valid Colliders checked: [{totalCount}]");
+                                        Logger.LogInfo($"[{BotOwner.name}] - Found Cover!: Stats: Too Close To Friendly: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Valid Colliders checked: [{totalCount}] Collider Array Size = [{hits}]");
                                     }
 
                                     break;
@@ -99,7 +126,7 @@ namespace SAIN.Components
 
                             pointsChecked++;
 
-                            if (pointsChecked >= max || nopath >= 50)
+                            if (pointsChecked >= max)
                             {
                                 break;
                             }
@@ -111,7 +138,7 @@ namespace SAIN.Components
                         if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
                         {
                             DebugLogTimer = Time.time + 1f;
-                            Logger.LogWarning($"[{BotOwner.name}] - No Cover Found! Oh no!: Stats: Too Close To Friendly: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Valid Colliders checked: [{totalCount}]");
+                            Logger.LogWarning($"[{BotOwner.name}] - No Cover Found! Oh no!: Stats: Too Close To Friendly: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Valid Colliders checked: [{totalCount}] Collider Array Size = [{hits}]");
                         }
                     }
                 }
@@ -134,32 +161,39 @@ namespace SAIN.Components
 
         private bool CheckColliderForCover(Collider collider, out CoverPoint newPoint)
         {
+            newPoint = null;
+
             if (collider == null || collider.bounds.size.y < MinObstacleHeight)
             {
-                newPoint = null;
                 return false;
             }
 
             totalCount++;
 
+            if (!CheckColliderPos(collider))
+            {
+                return false;
+            }
+
             Vector3 colliderPos = collider.transform.position;
 
-            // The direction from the target to the collider
+            // The botToCorner from the target to the collider
             Vector3 colliderDir = (colliderPos - TargetPosition).normalized;
+            colliderDir.y = 0f;
 
             // a farPoint on opposite side of the target
             Vector3 farPoint = colliderPos + colliderDir;
 
             // the closest edge to that farPoint
-            if (NavMesh.FindClosestEdge(farPoint, out var hit, -1))
+            if (NavMesh.SamplePosition(farPoint, out var hit, 2f, -1))
             {
                 // Shift the farPoint away from the edge so its not too close
                 Vector3 shift = (hit.position - TargetPosition).normalized / 2f;
                 Vector3 coverPosition = hit.position + shift;
 
-                if (CheckPosition(coverPosition))
+                if (CheckPathToPosition(coverPosition, collider))
                 {
-                    if (CheckPathToPosition(coverPosition))
+                    if (CheckPosition(coverPosition))
                     {
                         if (DebugCoverFinder.Value)
                         {
@@ -170,10 +204,10 @@ namespace SAIN.Components
 
                         return true;
                     }
-                    else
-                    {
-                        nopath++;
-                    }
+                }
+                else
+                {
+                    nopath++;
                 }
 
                 if (DebugCoverFinder.Value)
@@ -182,8 +216,40 @@ namespace SAIN.Components
                 }
             }
 
-            newPoint = null;
             return false;
+        }
+
+        private bool CheckColliderPos(Collider collider)
+        {
+            Vector3 pos = collider.transform.position;
+            Vector3 target = TargetPosition;
+            Vector3 bot = BotOwner.Position;
+
+            Vector3 directionToTarget = target - bot;
+            float targetDist = directionToTarget.magnitude;
+
+            Vector3 directionToCollider = pos - bot;
+            float colliderDist = directionToCollider.magnitude;
+
+            float dot = Vector3.Dot(directionToTarget.normalized, directionToCollider.normalized);
+
+            if (dot <= 0f)
+            {
+                return true;
+            }
+            if (dot <= 0.33f)
+            {
+                return colliderDist < targetDist * 2f;
+            }
+            if (dot <= 0.5f)
+            {
+                return colliderDist < targetDist * 1.5f;
+            }
+            if (dot <= 0.75f)
+            {
+                return colliderDist < targetDist;
+            }
+            return true;
         }
 
         private bool CheckPosition(Vector3 position)
@@ -214,59 +280,125 @@ namespace SAIN.Components
             return false;
         }
 
-        private bool CheckPathToPosition(Vector3 position)
+        private bool CheckPathToPosition(Vector3 position, Collider collider)
         {
             NavMeshPath path = new NavMeshPath();
             if (NavMesh.CalculatePath(BotOwner.Position, position, -1, path) && path.status == NavMeshPathStatus.PathComplete)
             {
-                for (int i = 0; i < path.corners.Length - 1; i++)
+                if (CheckForPathToEnemy(path))
                 {
-                    var corner = path.corners[i];
-                    float cornerDifference = corner.y - TargetPosition.y;
-
-                    if (cornerDifference < 1f && cornerDifference > -1f)
+                    if (CheckForInvalidDoors(path, collider))
                     {
-                        Vector3 cornerToTarget = TargetPosition - corner;
-                        Vector3 botToTarget = TargetPosition - OriginPoint;
-
-                        float cornerDistance = cornerToTarget.magnitude;
-                        float targetDistance = botToTarget.magnitude;
-
-                        if (cornerDistance < 0.25f)
-                        {
-                            if (DebugCoverFinder.Value)
-                            {
-                                DebugGizmos.SingleObjects.Ray(OriginPoint, corner - OriginPoint, Color.red, (corner - OriginPoint).magnitude, 0.05f, true, 30f);
-                            }
-
-                            return false;
-                        }
-
-                        if (cornerDistance < targetDistance - 1f)
-                        {
-                            if (i < path.corners.Length - 2)
-                            {
-                                Vector3 cornerB = path.corners[i + 1];
-                                Vector3 pathBetweenCorners = cornerB - corner;
-
-                                if (Vector3.Dot(cornerToTarget.normalized, pathBetweenCorners.normalized) > 0.33f)
-                                {
-                                    if (DebugCoverFinder.Value)
-                                    {
-                                        DebugGizmos.SingleObjects.Ray(corner, pathBetweenCorners, Color.red, pathBetweenCorners.magnitude, 0.05f, true, 30f);
-                                    }
-
-                                    return false;
-                                }
-                            }
-                        }
+                        return true;
                     }
                 }
-                return true;
             }
 
             return false;
         }
+
+        private bool CheckForPathToEnemy(NavMeshPath path)
+        {
+            for (int i = 1; i < path.corners.Length - 1; i++)
+            {
+                var corner = path.corners[i];
+                Vector3 cornerToTarget = TargetPosition - corner;
+                Vector3 botToTarget = TargetPosition - OriginPoint;
+                Vector3 botToCorner = corner - OriginPoint;
+
+                if (cornerToTarget.magnitude < 0.5f)
+                {
+                    if (DebugCoverFinder.Value)
+                    {
+                        DebugGizmos.SingleObjects.Ray(OriginPoint, corner - OriginPoint, Color.red, (corner - OriginPoint).magnitude, 0.05f, true, 30f);
+                    }
+
+                    return false;
+                }
+
+                if (i == 1)
+                {
+                    if (Vector3.Dot(botToCorner.normalized, botToTarget.normalized) > 0.75f)
+                    {
+                        if (DebugCoverFinder.Value)
+                        {
+                            DebugGizmos.SingleObjects.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
+                        }
+                        return false;
+                    }
+                }
+                else if (i < path.corners.Length - 2)
+                {
+                    Vector3 cornerB = path.corners[i + 1];
+                    Vector3 directionToNextCorner = cornerB - corner;
+
+                    if (Vector3.Dot(cornerToTarget.normalized, directionToNextCorner.normalized) > 0.75f)
+                    {
+                        if (directionToNextCorner.magnitude > cornerToTarget.magnitude)
+                        {
+                            if (DebugCoverFinder.Value)
+                            {
+                                DebugGizmos.SingleObjects.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
+                            }
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        private bool CheckForInvalidDoors(NavMeshPath path, Collider collider)
+        {
+            for (int i = 0; i < path.corners.Length - 2; i++)
+            {
+                var direction = path.corners[i + 1] - path.corners[i];
+                var start = path.corners[i];
+                start.y += 0.25f;
+                if (Physics.Raycast(start, direction, out var hit, direction.magnitude + 0.25f, LayerMaskClass.InteractiveMask))
+                {
+                    if (hit.transform.name.ToLower().Contains("door"))
+                    {
+                        Door door = hit.transform.GetComponent<Door>();
+                        if (door != null)
+                        {
+                            if (DebugCoverFinder.Value)
+                            {
+                                Logger.LogWarning($"CheckStuck(): Found Door Component");
+                            }
+                            if (!door.Operatable || door.DoorState == EDoorState.Locked)
+                            {
+                                if (DebugCoverFinder.Value)
+                                {
+                                    Logger.LogWarning($"CheckStuck(): Found not operable or locked. Blocked.");
+                                }
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            if (DebugCoverFinder.Value)
+                            {
+                                Logger.LogWarning($"CheckStuck(): No Door Component. Fake Door? Returned false");
+                            }
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (DebugCoverFinder.Value)
+                        {
+                            Logger.LogWarning($"[{hit.transform.name}]");
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        public static List<Collider> InvalidDoorColliders = new List<Collider>();
+        public static List<Vector3> InvalidDoorSpots = new List<Vector3>();
+        public static int interactiveLayer;
 
         private int totalCount = 0;
         private int baddist = 0;
@@ -282,9 +414,20 @@ namespace SAIN.Components
             {
                 distance = Vector3.Distance(CurrentCover.Position, OriginPoint);
 
-                if (distance > 30f || !CheckPosition(CurrentCover.Position))
+                if (distance > 30f)
                 {
                     CurrentCover = null;
+                }
+                else
+                {
+                    if (CheckColliderForCover(CurrentCover.Collider, out var point1))
+                    {
+                        CurrentCover = point1;
+                    }
+                    else
+                    {
+                        CurrentCover = null;
+                    }
                 }
             }
 
@@ -292,9 +435,20 @@ namespace SAIN.Components
             {
                 distance = Vector3.Distance(CurrentFallBackPoint.Position, OriginPoint);
 
-                if (distance > 30f || !CheckPosition(CurrentFallBackPoint.Position))
+                if (distance > 30f)
                 {
-                    CurrentFallBackPoint = null;
+                    CurrentCover = null;
+                }
+                else
+                {
+                    if (CheckColliderForCover(CurrentFallBackPoint.Collider, out var point2))
+                    {
+                        CurrentFallBackPoint = point2;
+                    }
+                    else
+                    {
+                        CurrentFallBackPoint = null;
+                    }
                 }
             }
 
@@ -313,24 +467,25 @@ namespace SAIN.Components
                 return true;
             }
 
-            const float DistanceToBotThresh = 1f;
             const float DistanceToBotCoverThresh = 1f;
-
-            foreach (var memberPos in SAIN.BotSquad.SquadLocations)
-            {
-                if (memberPos != null && (memberPos - BotOwner.Position).magnitude > 0.1f && Vector3.Distance(position, memberPos) < DistanceToBotThresh)
-                {
-                    return false;
-                }
-            }
 
             foreach (var member in SAIN.BotSquad.SquadMembers.Values)
             {
-                if (member != null && member.Cover.CurrentCoverPoint != null && member.BotOwner != BotOwner)
+                if (member != null && member.BotOwner != BotOwner)
                 {
-                    if (Vector3.Distance(position, member.Cover.CurrentFallBackPoint.Position) < DistanceToBotCoverThresh)
+                    if (member.Cover.CurrentCoverPoint != null)
                     {
-                        return false;
+                        if (Vector3.Distance(position, member.Cover.CurrentCoverPoint.Position) < DistanceToBotCoverThresh)
+                        {
+                            return false;
+                        }
+                    }
+                    if (member.Cover.CurrentFallBackPoint != null)
+                    {
+                        if (Vector3.Distance(position, member.Cover.CurrentFallBackPoint.Position) < DistanceToBotCoverThresh)
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -387,27 +542,17 @@ namespace SAIN.Components
 
                 float distance = Vector3.Distance(LastCheckPos, OriginPoint);
 
-                if (distance > CheckDistThresh)
+                if (distance > CheckDistThresh || !FirstCheck)
                 {
-                    Logger.LogWarning($"Getting new colliders because distance is over Threshold. Distance: [{distance}]. Threshold: [{CheckDistThresh}]");
+                    FirstCheck = true;
+
+                    //Logger.LogWarning($"Getting new colliders because distance is over Threshold. Distance: [{distance}]. Threshold: [{CheckDistThresh}]");
 
                     LastCheckPos = OriginPoint;
 
                     GetColliders();
-
-                    if (DebugCoverFinder.Value)
-                    {
-                        foreach (var collider in Colliders)
-                        {
-                            if (collider != null)
-                            {
-                                DebugGizmos.SingleObjects.Line(collider.transform.position, OriginPoint, Color.green, 0.025f, true, 10f, true);
-                            }
-                        }
-                    }
                 }
-
-                if (distance > ColliderSortDistThresh)
+                else if (distance > ColliderSortDistThresh)
                 {
                     System.Array.Sort(Colliders, ColliderArraySortComparer);
                 }
@@ -417,27 +562,39 @@ namespace SAIN.Components
             return Colliders;
         }
 
+        private bool FirstCheck = false;
         private float NewColliderTimer = 0f;
-        private Vector3 LastCheckPos = Vector3.zero;
+        private Vector3 LastCheckPos;
 
         private void GetColliders()
         {
             var colliders = new Collider[ColliderArrayCount.Value];
 
             var mask = LayerMaskClass.HighPolyWithTerrainMask;
-
             int hits = Physics.OverlapSphereNonAlloc(OriginPoint, MaxRange, colliders, mask);
-            Logger.LogDebug($"{mask}");
+            int hitReduction = 0;
 
             for (int i = 0; i < hits; i++)
             {
-                float yDiff = colliders[i].transform.position.y - OriginPoint.y;
-                if (yDiff > 5f || yDiff < -5f || colliders[i].bounds.size.y < 0.5)
+                if (InvalidDoorColliders.Contains(colliders[i]))
                 {
                     colliders[i] = null;
+                    hitReduction++;
+                }
+                else
+                {
+                    float yDiff = colliders[i].transform.position.y - OriginPoint.y;
+                    if (yDiff > 5f || yDiff < -5f || colliders[i].bounds.size.y < 0.5)
+                    {
+                        colliders[i] = null;
+                        hitReduction++;
+                    }
                 }
             }
 
+            System.Array.Sort(colliders, ColliderArraySortComparer);
+
+            hits -= hitReduction;
             LastHitCount = hits;
             Colliders = colliders;
         }
