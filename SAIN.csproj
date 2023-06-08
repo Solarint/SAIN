@@ -198,6 +198,7 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\SAIN Bot Component\Classes\BotUnstuckClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\LastHeardSoundClass.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\CoverPointClass.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\Decision\SquadDecisionComponent.cs" />
