@@ -1,10 +1,8 @@
 ﻿using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using EFT.Interactive;
 using SAIN.Classes;
 using SAIN.Helpers;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -41,7 +39,6 @@ namespace SAIN.Components
             Dodge = new DodgeClass(bot);
             Steering = new SteeringClass(bot);
             Grenade = new BotGrenadeClass(bot);
-            DebugDrawList = new DebugGizmos.DrawLists(BotColor, BotColor);
 
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -87,7 +84,6 @@ namespace SAIN.Components
         }
 
         public bool BotIsAtDestination => (BotOwner.Position - BotOwner.Mover.RealDestPoint).magnitude < 1;
-
         public bool EnemyCanShoot => Enemy.SAINEnemy?.CanShoot == true;
         public bool EnemyInLineOfSight => Enemy.SAINEnemy?.InLineOfSight == true;
         public bool EnemyIsVisible => Enemy.SAINEnemy?.IsVisible == true;
@@ -198,11 +194,12 @@ namespace SAIN.Components
 
         public SAINLogicDecision CurrentDecision => Decisions.CurrentDecision;
 
+        public Vector3 Position => BotOwner.Position;
         public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
         public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
 
-        public Vector3? CurrentTargetPosition => HasGoalEnemy ? GoalEnemyPos : GoalTargetPos;
+        public Vector3? CurrentTargetPosition => GoalEnemyPos ?? GoalTargetPos;
 
         public bool HasAnyTarget => HasGoalEnemy || HasGoalTarget;
         public bool HasGoalTarget => BotOwner.Memory.GoalTarget?.GoalTarget != null;
@@ -253,8 +250,6 @@ namespace SAIN.Components
 
         public SteeringClass Steering { get; private set; }
 
-        public DebugGizmos.DrawLists DebugDrawList { get; private set; }
-
         public bool BotActive => BotOwner.BotState == EBotState.Active && !BotOwner.IsDead && BotOwner.GetPlayer.enabled;
 
         public bool GameIsEnding
@@ -276,14 +271,6 @@ namespace SAIN.Components
         public Color BotColor { get; private set; }
 
         public BotOwner BotOwner { get; private set; }
-
-        public static LayerMask SightMask => LayerMaskClass.HighPolyWithTerrainMaskAI;
-
-        public static LayerMask ShootMask => LayerMaskClass.HighPolyWithTerrainMask;
-
-        public static LayerMask CoverMask => LayerMaskClass.HighPolyWithTerrainMask;
-
-        public static LayerMask FoliageMask => LayerMaskClass.AI;
 
         private static Color RandomColor => new Color(Random.value, Random.value, Random.value);
 
