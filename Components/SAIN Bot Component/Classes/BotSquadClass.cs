@@ -14,7 +14,7 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        public void ManualUpdate()
+        public void Update()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {

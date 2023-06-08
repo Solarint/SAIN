@@ -117,7 +117,7 @@ namespace SAIN.Classes
         {
             var position = BotOwner.MainParts[bodyPartType].Position;
             Vector3 direction = target - position;
-            return Physics.Raycast(position, direction, dist, SAINComponent.ShootMask);
+            return Physics.Raycast(position, direction, dist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
         private SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;

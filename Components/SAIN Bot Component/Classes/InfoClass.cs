@@ -23,7 +23,7 @@ namespace SAIN.Classes
             WeaponInfo = new WeaponInfo(bot);
         }
 
-        public void ManualUpdate()
+        public void Update()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
