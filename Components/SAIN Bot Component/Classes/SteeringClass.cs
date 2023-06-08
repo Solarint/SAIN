@@ -20,33 +20,39 @@ namespace SAIN.Classes
                 return;
             }
 
-            var enemy = BotOwner.Memory.GoalEnemy;
+            if (UpdateSteerTimer < Time.time)
+            {
+                UpdateSteerTimer = Time.time + 0.25f;
 
-            if (enemy != null && enemy.CanShoot && enemy.IsVisible)
-            {
-                LookToGoalEnemyPos();
-            }
-            else if (enemy != null && SAIN.EnemyIsVisible)
-            {
-                LookToGoalEnemyPos();
-            }
-            else if (BotOwner.Memory.LastTimeHit > Time.time - 1f)
-            {
-                LookToLastHitPos();
-            }
-            else if (BotOwner.Memory.IsUnderFire)
-            {
-                LookToUnderFirePos();
-            }
-            else if (SAIN.LastSoundHeardTime > Time.time - 2f)
-            {
-                LookToHearPos();
-            }
-            else
-            {
-                BotOwner.LookData.SetLookPointByHearing();
+                var enemy = BotOwner.Memory.GoalEnemy;
+                if (enemy != null && enemy.CanShoot && enemy.IsVisible)
+                {
+                    LookToGoalEnemyPos();
+                }
+                else if (SAIN.HasEnemy && SAIN.EnemyIsVisible)
+                {
+                    LookToGoalEnemyPos();
+                }
+                else if (BotOwner.Memory.LastTimeHit > Time.time - 1f)
+                {
+                    LookToLastHitPos();
+                }
+                else if (BotOwner.Memory.IsUnderFire)
+                {
+                    LookToUnderFirePos();
+                }
+                else if (SAIN.LastHeardSound != null && SAIN.LastHeardSound.TimeSinceHeard < 2f && (SAIN.LastHeardSound.Position - BotOwner.Position).magnitude < 50f)
+                {
+                    LookToHearPos();
+                }
+                else
+                {
+                    BotOwner.LookData.SetLookPointByHearing();
+                }
             }
         }
+
+        private float UpdateSteerTimer = 0f;
 
         public void LookToGoalEnemyPos()
         {
@@ -77,7 +83,7 @@ namespace SAIN.Classes
 
         public void LookToHearPos(bool visionCheck = false)
         {
-            var soundPos = SAIN.LastSoundHeardPosition;
+            var soundPos = SAIN.LastHeardSound.Position;
 
             if (visionCheck)
             {

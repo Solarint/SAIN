@@ -14,8 +14,6 @@ namespace SAIN.Layers
             SAIN = bot.GetComponent<SAINComponent>();
         }
 
-        private Vector3? SquadLeadPos;
-
         public override void Update()
         {
             SAIN.Steering.ManualUpdate();
@@ -37,77 +35,51 @@ namespace SAIN.Layers
         {
             if (UpdateTimer < Time.time)
             {
-                UpdateTimer = Time.time + 1f;
+                UpdateTimer = Time.time + 3f;
                 BotOwner.DoorOpener.Update();
-
-                UpdateLeaderPosition();
-
-                if (SquadLeadPos != null)
-                {
-                    MoveToPoint(SquadLeadPos.Value);
-                    CheckShouldSprint();
-                }
+                MoveToLead();
             }
         }
 
-        private void MoveToPoint(Vector3 point)
-        {
-            BotOwner.SetPose(1f);
-            BotOwner.SetTargetMoveSpeed(1f);
-            BotOwner.GoToPoint(point, true, -1, false, false);
-        }
-
-        private void CheckShouldSprint()
-        {
-            float dist = (SquadLeadPos.Value - BotOwner.Position).magnitude;
-            if (dist < 30f)
-            {
-                BotOwner.GetPlayer.EnableSprint(false);
-                SAIN.Steering.ManualUpdate();
-            }
-            else
-            {
-                if (SAIN.HasEnemy && SAIN.EnemyInLineOfSight && Vector3.Distance(SAIN.Enemy.SAINEnemy.Person.Position, BotOwner.Position) < 50f)
-                {
-                    BotOwner.GetPlayer.EnableSprint(false);
-                    SAIN.Steering.ManualUpdate();
-                }
-                else
-                {
-                    BotOwner.GetPlayer.EnableSprint(true);
-                    BotOwner.Steering.LookToMovingDirection();
-                }
-            }
-        }
 
         private readonly SAINComponent SAIN;
 
         public override void Start()
         {
-            UpdateLeaderPosition();
+            MoveToLead();
+        }
 
+        private void MoveToLead()
+        {
+            var SquadLeadPos = SAIN.BotSquad.LeaderComponent?.BotOwner.Position;
             if (SquadLeadPos != null)
             {
-                MoveToPoint(SquadLeadPos.Value);
+                BotOwner.SetPose(1f);
+                BotOwner.SetTargetMoveSpeed(1f);
+                BotOwner.GoToPoint(SquadLeadPos.Value, true, -1, false, false);
+                CheckShouldSprint(SquadLeadPos.Value);
             }
         }
 
-        private void UpdateLeaderPosition()
+        private void CheckShouldSprint(Vector3 pos)
         {
-            SquadLeadPos = null;
-            if (SAIN.BotSquad.SquadMembers != null)
+            bool hasEnemy = SAIN.HasEnemy;
+            bool enemyLOS = SAIN.EnemyInLineOfSight;
+            float leadDist = (pos - BotOwner.Position).magnitude;
+            float enemyDist = hasEnemy ? (SAIN.Enemy.SAINEnemy.Person.Position - BotOwner.Position).magnitude : 999f;
+
+            bool sprint = hasEnemy && leadDist > 30f && enemyLOS && enemyDist > 50f;
+
+            if (sprint)
             {
-                foreach (var member in SAIN.BotSquad.SquadMembers.Values)
-                {
-                    if (member != null)
-                    {
-                        if (member.BotSquad.IsSquadLead)
-                        {
-                            SquadLeadPos = member.BotOwner.Position;
-                        }
-                    }
-                }
+                BotOwner.Steering.LookToMovingDirection();
             }
+            else
+            {
+                SAIN.Steering.ManualUpdate();
+            }
+
+            BotOwner.GetPlayer.EnableSprint(sprint);
         }
 
         public override void Stop()

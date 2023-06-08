@@ -2,7 +2,9 @@ using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
 using SAIN.Components;
+using System.Drawing;
 using UnityEngine;
+using static SAIN.UserSettings.TalkConfig;
 
 namespace SAIN.Classes
 {
@@ -49,13 +51,29 @@ namespace SAIN.Classes
         {
             if (BotOwner.Memory.GoalEnemy != null)
             {
+                if (BegForLife())
+                {
+                    return;
+                }
+
+                var pers = SAIN.Info.BotPersonality;
+                if (pers == BotPersonality.Coward || pers == BotPersonality.Timmy || pers == BotPersonality.Rat)
+                {
+                    return;
+                }
+
+                if (FakeDeath())
+                {
+                    return;
+                }
+
                 if (LastEnemyCheckTime < Time.time)
                 {
                     LastEnemyCheckTime = Time.time + EnemyCheckFreq;
 
                     CheckForEnemyTalk();
 
-                    if (TauntTimer < Time.time)
+                    if (TauntTimer < Time.time && BotTaunts.Value)
                     {
                         TauntTimer = Time.time + TauntFreq * Random.Range(0.5f, 1.5f);
 
@@ -66,6 +84,90 @@ namespace SAIN.Classes
                 }
             }
         }
+
+        private bool FakeDeath()
+        {
+            if (SAIN.HasEnemy && !SAIN.BotSquad.BotInGroup)
+            {
+                var personality = SAIN.Info.BotPersonality;
+                if (personality == BotPersonality.GigaChad || personality == BotPersonality.Chad)
+                {
+                    if (FakeTimer < Time.time)
+                    {
+                        FakeTimer = Time.time + 10f;
+                        var health = SAIN.BotStatus.HealthStatus;
+                        if (health != ETagStatus.Healthy && health != ETagStatus.Injured)
+                        {
+                            float dist = (SAIN.Enemy.SAINEnemy.Person.Position - BotOwner.Position).magnitude;
+                            if (dist < 30f)
+                            {
+                                bool random = Helpers.EFT_Math.RandomBool(1f);
+                                if (random)
+                                {
+                                    Talk.Say(EPhraseTrigger.OnDeath);
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private float FakeTimer = 0f;
+
+        private bool BegForLife()
+        {
+            if (BegTimer < Time.time && SAIN.HasEnemy && !SAIN.BotSquad.BotInGroup)
+            {
+                bool random = Helpers.EFT_Math.RandomBool(25);
+                float timeAdd = random ? 8f : 2f;
+                BegTimer = Time.time + timeAdd;
+
+                var personality = SAIN.Info.BotPersonality;
+                if (personality == BotPersonality.Timmy || personality == BotPersonality.Coward)
+                {
+                    var health = SAIN.BotStatus.HealthStatus;
+                    if (health != ETagStatus.Healthy)
+                    {
+                        float dist = (SAIN.Enemy.SAINEnemy.Person.Position - BotOwner.Position).magnitude;
+                        if (dist < 30f)
+                        {
+                            if (random)
+                            {
+                                EPhraseTrigger trigger;
+
+                                float randomValue = Random.Range(0f, 1f);
+
+                                if (randomValue <= 0.25f)
+                                {
+                                    trigger = EPhraseTrigger.Stop;
+                                }
+                                else if (randomValue <= 0.5f)
+                                {
+                                    trigger = EPhraseTrigger.OnBeingHurtDissapoinment;
+                                }
+                                else if (randomValue <= 0.75f)
+                                {
+                                    trigger = EPhraseTrigger.NeedHelp;
+                                }
+                                else
+                                {
+                                    trigger = EPhraseTrigger.HoldFire;
+                                }
+
+                                Talk.Say(trigger);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private float BegTimer = 0f;
 
         private bool TauntEnemy()
         {

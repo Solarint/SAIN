@@ -4,6 +4,7 @@ using EFT;
 using EFT.Interactive;
 using SAIN.Classes;
 using SAIN.Helpers;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -45,32 +46,42 @@ namespace SAIN.Components
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        private const float CheckSelfFreq = 0.1f;
-        private const float CheckMoveFreq = 0.33f;
+        private float CheckStuckTimer = 0f;
 
         private void Update()
         {
             if (BotActive && !GameIsEnding)
             {
+                if (CheckStuckTimer < Time.time)
+                {
+                    CheckStuckTimer = Time.time + 0.1f;
+                    BotIsStuck = BotStuckOnObject() || BotStuckOnPlayer();
+                }
+
+                if (BotIsStuck)
+                {
+                    if (JumpTimer < Time.time)
+                    {
+                        JumpTimer = Time.time + 1f;
+                        BotOwner.GetPlayer.MovementContext.TryJump();
+                    }
+                }
+
                 if (CheckMoveTimer < Time.time)
                 {
-                    BotIsStuck = CheckIfBotStuck();
-
-                    CheckMoveTimer = Time.time + CheckMoveFreq;
-
+                    CheckMoveTimer = Time.time + 0.33f;
                     BotIsMoving = Vector3.Distance(LastPos, BotOwner.Position) > 0.01f;
                     LastPos = BotOwner.Position;
                 }
 
                 if (SelfCheckTimer < Time.time)
                 {
-                    SelfCheckTimer = Time.time + CheckSelfFreq;
+                    //SelfCheckTimer = Time.time + 0.25f;
                     SelfActions.Activate();
                     BotOwner.WeaponManager.UpdateWeaponsList();
                 }
 
                 BotSquad.ManualUpdate();
-
                 Info.ManualUpdate();
             }
         }
@@ -81,39 +92,67 @@ namespace SAIN.Components
         public bool EnemyInLineOfSight => Enemy.SAINEnemy?.InLineOfSight == true;
         public bool EnemyIsVisible => Enemy.SAINEnemy?.IsVisible == true;
         public bool HasEnemy => Enemy.SAINEnemy != null;
-
-        private float ShiftTimer = 0f;
         public bool BotIsStuck { get; private set; }
 
-        public bool CheckIfBotStuck()
+        private bool CanBeStuckDecisions(SAINLogicDecision decision)
         {
-            bool stuck = false;
+            return decision == SAINLogicDecision.Search || decision == SAINLogicDecision.MoveToCover || decision == SAINLogicDecision.GroupSearch || decision == SAINLogicDecision.DogFight || decision == SAINLogicDecision.RunForCover || decision == SAINLogicDecision.RunAway || decision == SAINLogicDecision.RegroupSquad || decision == SAINLogicDecision.UnstuckSearch || decision == SAINLogicDecision.UnstuckDogFight || decision == SAINLogicDecision.UnstuckMoveToCover;
+        }
 
-            if (CurrentDecision != SAINLogicDecision.None && CurrentDecision != SAINLogicDecision.HoldInCover && !BotIsMoving && !BotOwner.DoorOpener.Interacting && Time.time - Decisions.ChangeDecisionTime > 2f)
+        public bool BotStuckOnPlayer()
+        {
+            var decision = CurrentDecision;
+            if (!BotIsMoving && CanBeStuckDecisions(decision))
             {
-                Vector3 botPos = BodyPosition;
-                Vector3 lookDir = BotOwner.Mover.DirCurPoint;
-                if (Physics.Raycast(botPos, lookDir, out var hit, 0.5f, LayerMaskClass.HighPolyWithTerrainMask))
-                {
-                    Logger.LogWarning($"[{BotOwner.name}] stuck on [{hit.transform.name}]");
+                Vector3 botPos = BotOwner.Position;
+                Vector3 moveDir = BotOwner.Mover.DirCurPoint;
+                Vector3 lookDir = BotOwner.LookDirection;
 
-                    if (hit.transform.name.ToLower().Contains("door"))
+                var moveHits = Physics.RaycastAll(botPos, moveDir, 0.5f, LayerMaskClass.PlayerMask);
+                if (moveHits.Length > 0)
+                {
+                    foreach (var move in moveHits)
                     {
-                        Door door = hit.transform.GetComponent<Door>();
-                        if (door != null)
+                        if (move.transform.name != BotOwner.name)
                         {
-                            Logger.LogWarning($"CheckStuck(): Found Door Component");
-                        }
-                        else
-                        {
-                            Logger.LogWarning($"CheckStuck(): No Door Component");
+                            Logger.LogWarning($"[{BotOwner.name}] stuck on Player in MoveDirection. [{move.transform.name}] Hits Length: {moveHits.Length}");
+                            return true;
                         }
                     }
-                    stuck = true;
+                }
+
+                var lookHits = Physics.RaycastAll(botPos, lookDir, 0.5f, LayerMaskClass.PlayerMask);
+                if (lookHits.Length > 0)
+                {
+                    foreach (var look in lookHits)
+                    {
+                        if (look.transform.name != BotOwner.name)
+                        {
+                            Logger.LogWarning($"[{BotOwner.name}] stuck on Player in MoveDirection. [{look.transform.name}] Hits Length: {lookHits.Length}");
+                            return true;
+                        }
+                    }
                 }
             }
-            return stuck;
+            return false;
         }
+
+        public bool BotStuckOnObject()
+        {
+            if (CanBeStuckDecisions(CurrentDecision) && !BotIsMoving && !BotOwner.DoorOpener.Interacting && Decisions.TimeSinceChangeDecision > 0.5f)
+            {
+                Vector3 botPos = BotOwner.Position;
+                Vector3 moveDir = BotOwner.Mover.DirCurPoint;
+                if (Physics.Raycast(botPos, moveDir, out var hit, 0.25f, LayerMaskClass.HighPolyWithTerrainMask))
+                {
+                    Logger.LogWarning($"[{BotOwner.name}] stuck on [{hit.transform.name}]");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private float JumpTimer = 0f;
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
         {
@@ -140,39 +179,6 @@ namespace SAIN.Components
             Vector3 direction = target - botPos;
             botPos.y = WeaponRoot.y;
             return Physics.Raycast(BotOwner.Position, direction, out rayHit, checkDist, LayerMaskClass.HighPolyWithTerrainMask);
-        }
-
-        public bool GoToPointRetreat(Vector3 point)
-        {
-            NavMeshPath path = new NavMeshPath();
-            if (NavMesh.CalculatePath(BotOwner.Position, point, -1, path) && path.status == NavMeshPathStatus.PathComplete)
-            {
-                var corners = path.corners;
-
-                if (HasGoalEnemy)
-                {
-                    int max = corners.Length - 2;
-                    int i = 0;
-                    while (i < max)
-                    {
-                        Vector3 directionEnemy = GoalEnemyPos.Value - corners[i];
-                        Vector3 directionCorner = corners[i + 1] - corners[i];
-
-                        float dotProduct = Vector3.Dot(directionEnemy, directionCorner);
-
-                        if (dotProduct > 0.85f || (corners[i] - GoalEnemyPos.Value).magnitude < 1f)
-                        {
-                            return false;
-                        }
-
-                        i++;
-                    }
-                }
-
-                BotOwner.GoToByWay(corners);
-                return true;
-            }
-            return false;
         }
 
         public void Dispose()
@@ -212,10 +218,6 @@ namespace SAIN.Components
         public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
 
         public Vector3 UnderFireFromPosition { get; set; }
-
-        public Vector3 LastSoundHeardPosition { get; set; }
-
-        public float LastSoundHeardTime { get; set; }
 
         public bool BotIsMoving { get; private set; }
 
@@ -268,6 +270,8 @@ namespace SAIN.Components
                 return game.Status == GameStatus.Stopping;
             }
         }
+
+        public LastHeardSound LastHeardSound => HearingSensor.LastHeardSound;
 
         public Color BotColor { get; private set; }
 

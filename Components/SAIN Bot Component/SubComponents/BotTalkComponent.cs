@@ -4,10 +4,12 @@ using EFT;
 using SAIN.Classes;
 using SAIN.Components;
 using SAIN.Helpers;
+using SAIN.UserSettings;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static SAIN.UserSettings.TalkConfig;
 
 namespace SAIN.Components
 {
@@ -28,7 +30,7 @@ namespace SAIN.Components
 
         private void Update()
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
+            if (!SAIN.BotActive || SAIN.GameIsEnding || !Talk.CanBotTalk)
             {
                 return;
             }

@@ -2,9 +2,7 @@
 using EFT.InventoryLogic;
 using SAIN.Components;
 using UnityEngine;
-using static SAIN.UserSettings.FullAutoConfig;
-using static SAIN.UserSettings.RecoilScatterConfig;
-using static SAIN.UserSettings.SemiAutoConfig;
+using static SAIN.UserSettings.BotShootConfig;
 
 namespace SAIN.Helpers
 {

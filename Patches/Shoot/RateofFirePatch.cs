@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Helpers.Shoot;
-using static SAIN.UserSettings.FullAutoConfig;
+using static SAIN.UserSettings.BotShootConfig;
 
 namespace SAIN.Patches
 {

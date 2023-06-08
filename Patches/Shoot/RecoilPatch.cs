@@ -7,7 +7,7 @@ using SAIN.Helpers;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
-using static SAIN.UserSettings.RecoilScatterConfig;
+using static SAIN.UserSettings.BotShootConfig;
 
 namespace SAIN.Patches
 {

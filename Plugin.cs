@@ -39,9 +39,7 @@ namespace SAIN
                 VisionConfig.Init(Config);
                 DebugConfig.Init(Config);
                 CoverConfig.Init(Config);
-                FullAutoConfig.Init(Config);
-                RecoilScatterConfig.Init(Config);
-                SemiAutoConfig.Init(Config);
+                BotShootConfig.Init(Config);
                 SoundConfig.Init(Config);
                 DazzleConfig.Init(Config);
 
@@ -98,9 +96,9 @@ namespace SAIN
 
             //BrainManager.AddCustomLayer(typeof(SAINRoamingLayer), new List<string>(NormalBots), 1);
 
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(NormalBots), 80);
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 80);
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Followers), 80);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(NormalBots), 95);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 95);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Followers), 95);
         }
 
         private void Update()

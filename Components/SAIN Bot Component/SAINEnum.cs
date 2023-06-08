@@ -21,6 +21,9 @@ namespace SAIN
         StandAndShoot = 15,
         GroupSearch = 16,
         RegroupSquad = 17,
+        UnstuckSearch = 18,
+        UnstuckMoveToCover = 19,
+        UnstuckDogFight = 20,
     }
 
     public enum CoverStatus
@@ -100,5 +103,27 @@ namespace SAIN
         Regroup = 6,
         SpreadOut = 7,
         HoldPositions = 8
+    }
+
+    public enum SAINSoundType
+    {
+        FootStep = 0,
+        Reload = 1,
+        Aim = 2,
+        GrenadePin = 3,
+        Injury = 4,
+        Jump = 5,
+        Door = 6,
+        DoorBreach = 7,
+        Gunshot = 8,
+        SuppressedGunShot = 9,
+    }
+
+    public enum SoundDistanceType
+    {
+        CloseGun = 0,
+        CloseStep = 1,
+        FarGun = 2,
+        FarStep = 3,
     }
 }

@@ -18,7 +18,6 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            BotOwner.DoorOpener.Update();
         }
 
         public ManualLogSource Logger;
@@ -39,15 +38,12 @@ namespace SAIN.Layers
                 targetPosition = BotOwner.Transform.position;
             }
 
-            BotOwner.gameObject.AddComponent<EnemySearchComponent>().Init(targetPosition);
+            BotOwner.GetOrAddComponent<EnemySearchComponent>().Init(targetPosition);
         }
 
         public override void Stop()
         {
-            var component = BotOwner.gameObject.GetComponent<EnemySearchComponent>();
-            component?.Dispose();
-
-            BotOwner.PatrollingData.Unpause();
+             BotOwner.gameObject.GetComponent<EnemySearchComponent>()?.Dispose();
         }
     }
 }

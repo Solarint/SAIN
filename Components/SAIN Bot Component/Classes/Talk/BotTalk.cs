@@ -1,13 +1,15 @@
 using BepInEx.Logging;
 using EFT;
+using SAIN.UserSettings;
 using System.Collections.Generic;
 using UnityEngine;
+using static SAIN.UserSettings.TalkConfig;
 
 namespace SAIN.Classes
 {
     public class BotTalk : SAINBot
     {
-        private const float BotTalkDelaySetting = 2f;
+        private float BotTalkDelaySetting => GlobalTalkLimit.Value;
 
         public BotTalk(BotOwner bot) : base(bot)
         {
@@ -18,14 +20,52 @@ namespace SAIN.Classes
             CanTalk = BotOwner.Settings.FileSettings.Mind.CAN_TALK;
         }
 
+        public bool CanBotTalk
+        {
+            get
+            {
+                if (!CanTalk || NoTalkGlobal.Value)
+                {
+                    return false;
+                }
+
+                bool isBoss = SAIN.Info.IsBoss;
+                bool isFollower = SAIN.Info.IsFollower;
+                var type = SAIN.Info.BotType;
+
+                if (isBoss && NoBossTalk.Value)
+                {
+                    return false;
+                }
+                if (isFollower && NoFollowerTalk.Value)
+                {
+                    return false;
+                }
+
+                bool scav = type == WildSpawnType.assault || type == WildSpawnType.cursedAssault || type == WildSpawnType.marksman;
+                if (scav && NoScavTalk.Value)
+                {
+                    return false;
+                }
+
+                bool isPMC = !scav && type != WildSpawnType.pmcBot && type != WildSpawnType.exUsec && !isBoss && !isFollower;
+                if (isPMC && NoPMCTalk.Value)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
         public void Say(EPhraseTrigger type, ETagStatus? additionalMask = null, bool withGroupDelay = false)
         {
-            CheckDictionaryMissing(type);
-
-            if (!CanTalk)
+            if (!CanBotTalk)
             {
                 return;
             }
+
+            CheckDictionaryMissing(type);
 
             //if (withGroupDelay && !BotOwner.BotsGroup.GroupTalk.CanSay(BotOwner, type))
             //{
@@ -70,8 +110,10 @@ namespace SAIN.Classes
         {
             var phrase = talkPackage.phraseInfo.Phrase;
 
-            if (UserSettings.DebugConfig.DebugLayers.Value)
-            Logger.LogDebug($"Bot Said After Query: Phrase: [{phrase}] Mask: [{talkPackage.Mask}]");
+            if (DebugLogs.Value)
+            {
+                Logger.LogDebug($"Bot Said Phrase: [{phrase}] Mask: [{talkPackage.Mask}]");
+            }
 
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, phrase);
             BotOwner.GetPlayer.Say(phrase, false, 0f, talkPackage.Mask);
@@ -133,7 +175,7 @@ namespace SAIN.Classes
 
             var phrase = PhraseDictionary[type];
 
-            if (phrase.TimeLastSaid + phrase.TimeDelay < Time.time)
+            if (phrase.TimeLastSaid + phrase.TimeDelay * TalkDelayModifier.Value < Time.time)
             {
                 var data = new BotTalkPackage(phrase, mask);
 
@@ -306,7 +348,7 @@ namespace SAIN.Classes
 
         public EPhraseTrigger Phrase { get; private set; }
         public int Priority { get; private set; }
-        public float TimeDelay { get; private set; }
+        public float TimeDelay { get; set; }
 
         public float TimeLastSaid = 0f;
     }

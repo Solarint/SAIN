@@ -33,11 +33,6 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_3, object __instance)
         {
-            if (!VisionConfig.EnableSAINVision.Value)
-            {
-                return true;
-            }
-
             if (___float_3 < Time.time)
             {
                 float timeMod = 1f;
@@ -124,11 +119,6 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(ref float __result)
         {
-            if (!VisionConfig.EnableSAINVision.Value)
-            {
-                return;
-            }
-
             float weatherModifier = Modifiers.Weather.Visibility();
 
             float inverseMod = Mathf.Sqrt(2f - weatherModifier);

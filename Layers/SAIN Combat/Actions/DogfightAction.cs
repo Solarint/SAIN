@@ -93,18 +93,6 @@ namespace SAIN.Layers
             return path.CalculatePathLength() < straighDist * 1.2f;
         }
 
-        // Token: 0x04000C23 RID: 3107
-        private const float float_0 = 2f;
-
-        // Token: 0x04000C24 RID: 3108
-        private float float_1;
-
-        // Token: 0x04000C25 RID: 3109
-        private float float_2;
-
-        // Token: 0x04000C26 RID: 3110
-        private bool bool_0;
-
         // Token: 0x04000C27 RID: 3111
         private readonly NavMeshPath navMeshPath_0 = new NavMeshPath();
 

@@ -17,10 +17,8 @@ namespace SAIN.Components
         private void Awake()
         {
             Colliders = new Collider[ColliderArrayCount.Value];
-
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            interactiveLayer = LayerMask.NameToLayer("Interactive");
         }
 
         public void LookForCover(Vector3 targetPosition, Vector3 originPoint)
@@ -47,6 +45,7 @@ namespace SAIN.Components
 
         private IEnumerator FindCover()
         {
+            var Delay = new WaitForEndOfFrame();
             while (true)
             {
                 tooclose = 0;
@@ -54,60 +53,40 @@ namespace SAIN.Components
                 visible = 0;
                 nopath = 0;
                 totalCount = 0;
-
                 MinTargetDist = CoverMinEnemyDistance.Value;
 
                 if (!RecheckPoint())
                 {
                     bool found = false;
                     var colliders = CheckToGetColliders(out int hits);
-
                     CoverPoint cover = null;
                     CoverPoint FallBackPoint = null;
 
-                    int max = 150;
-                    int pointsChecked = 0;
+                    int frameWait = 0;
 
                     for (int i = 0; i < hits; i++)
                     {
                         var collider = colliders[i];
-
-                        if (nopath >= 35 && i < hits - 4)
+                        // Every 20 colliders checked, wait until the next frame before continuing.
+                        if (frameWait == 30)
                         {
-                            collider = colliders[i + 4];
-                        }
-                        else if (nopath >= 30 && i < hits - 3)
-                        {
-                            collider = colliders[i + 3];
-                        }
-                        else if (nopath >= 20 && i < hits - 2)
-                        {
-                            collider = colliders[i + 2];
-                        }
-                        else if (nopath >= 10 && i < hits - 1)
-                        {
-                            collider = colliders[i + 1];
-                        }
-
-                        if (nopath >= 40)
-                        {
-                            break;
+                            frameWait = 0;
+                            yield return null;
                         }
 
                         if (collider != null)
                         {
-                            if (CheckColliderForCover(collider, out var newPoint))
+                            totalCount++;
+                            if (CheckCollider(collider, out var newPoint))
                             {
                                 if (cover == null)
                                 {
                                     cover = newPoint;
                                 }
-
                                 if (newPoint.Collider.bounds.size.y > 1.6f)
                                 {
                                     FallBackPoint = newPoint;
                                 }
-
                                 if (cover != null && FallBackPoint != null)
                                 {
                                     found = true;
@@ -124,12 +103,7 @@ namespace SAIN.Components
                                 }
                             }
 
-                            pointsChecked++;
-
-                            if (pointsChecked >= max)
-                            {
-                                break;
-                            }
+                            frameWait++;
                         }
                     }
 
@@ -154,23 +128,14 @@ namespace SAIN.Components
                         DebugGizmos.SingleObjects.Line(CurrentFallBackPoint.Position, SAIN.HeadPosition, Color.yellow, 0.1f, true, 0.25f);
                     }
                 }
-
                 yield return new WaitForSeconds(CoverUpdateFrequency.Value);
             }
         }
 
-        private bool CheckColliderForCover(Collider collider, out CoverPoint newPoint)
+        private bool CheckCollider(Collider collider, out CoverPoint newPoint)
         {
             newPoint = null;
-
-            if (collider == null || collider.bounds.size.y < MinObstacleHeight)
-            {
-                return false;
-            }
-
-            totalCount++;
-
-            if (!CheckColliderPos(collider))
+            if (collider.bounds.size.y < MinObstacleHeight || !ColliderDirection(collider))
             {
                 return false;
             }
@@ -185,13 +150,13 @@ namespace SAIN.Components
             Vector3 farPoint = colliderPos + colliderDir;
 
             // the closest edge to that farPoint
-            if (NavMesh.SamplePosition(farPoint, out var hit, 2f, -1))
+            if (NavMesh.SamplePosition(farPoint, out var hit, 1f, -1))
             {
                 // Shift the farPoint away from the edge so its not too close
-                Vector3 shift = (hit.position - TargetPosition).normalized / 2f;
+                Vector3 shift = (hit.position - TargetPosition).normalized;
                 Vector3 coverPosition = hit.position + shift;
 
-                if (CheckPathToPosition(coverPosition, collider))
+                if (CheckPath(coverPosition))
                 {
                     if (CheckPosition(coverPosition))
                     {
@@ -199,9 +164,7 @@ namespace SAIN.Components
                         {
                             DebugGizmos.SingleObjects.Sphere(coverPosition, 0.2f, Color.blue, true, 10f);
                         }
-
                         newPoint = new CoverPoint(BotOwner, coverPosition, collider);
-
                         return true;
                     }
                 }
@@ -209,7 +172,6 @@ namespace SAIN.Components
                 {
                     nopath++;
                 }
-
                 if (DebugCoverFinder.Value)
                 {
                     DebugGizmos.SingleObjects.Sphere(coverPosition, 0.1f, Color.red, true, 10f);
@@ -219,7 +181,7 @@ namespace SAIN.Components
             return false;
         }
 
-        private bool CheckColliderPos(Collider collider)
+        private bool ColliderDirection(Collider collider)
         {
             Vector3 pos = collider.transform.position;
             Vector3 target = TargetPosition;
@@ -280,24 +242,21 @@ namespace SAIN.Components
             return false;
         }
 
-        private bool CheckPathToPosition(Vector3 position, Collider collider)
+        private bool CheckPath(Vector3 position)
         {
             NavMeshPath path = new NavMeshPath();
             if (NavMesh.CalculatePath(BotOwner.Position, position, -1, path) && path.status == NavMeshPathStatus.PathComplete)
             {
-                if (CheckForPathToEnemy(path))
+                if (PathToEnemy(path))
                 {
-                    if (CheckForInvalidDoors(path, collider))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
             return false;
         }
 
-        private bool CheckForPathToEnemy(NavMeshPath path)
+        private bool PathToEnemy(NavMeshPath path)
         {
             for (int i = 1; i < path.corners.Length - 1; i++)
             {
@@ -348,7 +307,7 @@ namespace SAIN.Components
             return true;
         }
 
-        private bool CheckForInvalidDoors(NavMeshPath path, Collider collider)
+        private bool InvalidDoors(NavMeshPath path)
         {
             for (int i = 0; i < path.corners.Length - 2; i++)
             {
@@ -396,15 +355,12 @@ namespace SAIN.Components
             return true;
         }
 
-        public static List<Collider> InvalidDoorColliders = new List<Collider>();
-        public static List<Vector3> InvalidDoorSpots = new List<Vector3>();
-        public static int interactiveLayer;
-
         private int totalCount = 0;
         private int baddist = 0;
         private int tooclose = 0;
         private int visible = 0;
         private int nopath = 0;
+
         private float DebugLogTimer = 0f;
 
         private bool RecheckPoint()
@@ -420,7 +376,7 @@ namespace SAIN.Components
                 }
                 else
                 {
-                    if (CheckColliderForCover(CurrentCover.Collider, out var point1))
+                    if (CheckCollider(CurrentCover.Collider, out var point1))
                     {
                         CurrentCover = point1;
                     }
@@ -441,7 +397,7 @@ namespace SAIN.Components
                 }
                 else
                 {
-                    if (CheckColliderForCover(CurrentFallBackPoint.Collider, out var point2))
+                    if (CheckCollider(CurrentFallBackPoint.Collider, out var point2))
                     {
                         CurrentFallBackPoint = point2;
                     }
@@ -576,19 +532,11 @@ namespace SAIN.Components
 
             for (int i = 0; i < hits; i++)
             {
-                if (InvalidDoorColliders.Contains(colliders[i]))
+                float yDiff = colliders[i].transform.position.y - OriginPoint.y;
+                if (yDiff > 5f || yDiff < -5f || colliders[i].bounds.size.y < 0.5)
                 {
                     colliders[i] = null;
                     hitReduction++;
-                }
-                else
-                {
-                    float yDiff = colliders[i].transform.position.y - OriginPoint.y;
-                    if (yDiff > 5f || yDiff < -5f || colliders[i].bounds.size.y < 0.5)
-                    {
-                        colliders[i] = null;
-                        hitReduction++;
-                    }
                 }
             }
 
@@ -628,25 +576,14 @@ namespace SAIN.Components
         }
 
         public CoverPoint CurrentCover { get; private set; }
-
         public CoverPoint CurrentFallBackPoint { get; private set; }
-
         private BotOwner BotOwner => SAIN.BotOwner;
-
         private SAINComponent SAIN;
-
         protected ManualLogSource Logger;
-
-        public float MinObstacleHeight;
-
+        public float MinObstacleHeight => CoverMinHeight.Value;
         private Coroutine TakeCoverCoroutine;
-
         private Vector3 OriginPoint;
-
         private Vector3 TargetPosition;
-
-        public const float MinObstacleXZ = 0.33f;
-
         public float MaxRange => CoverColliderRadius.Value;
         public float MinTargetDist { get; private set; }
     }

@@ -21,13 +21,6 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
 
-        private const float InCoverDist = 0.75f;
-        private const float CloseCoverDist = 10f;
-        private const float MidCoverDist = 25f;
-        private const float FarCoverDist = 50f;
-
-        public static List<SAINLogicDecision> FindCoverActions = new List<SAINLogicDecision> { SAINLogicDecision.RunAwayGrenade, SAINLogicDecision.Surgery, SAINLogicDecision.Reload, SAINLogicDecision.RunForCover, SAINLogicDecision.RunAway, SAINLogicDecision.FirstAid, SAINLogicDecision.Stims, SAINLogicDecision.MoveToCover};
-
         private void Update()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
@@ -35,19 +28,11 @@ namespace SAIN.Classes
                 CoverFinder.StopLooking();
                 return;
             }
-
             if ((SAIN.HasGoalEnemy || SAIN.HasGoalTarget) && SAIN.CurrentDecision != SAINLogicDecision.None && SAIN.CurrentDecision != SAINLogicDecision.Search)
             {
-                if (UpdateTimer < Time.time)
+                if (GetPointToHideFrom(out var target))
                 {
-                    AssignSettings();
-
-                    UpdateTimer = Time.time + 0.1f;
-
-                    if (GetPointToHideFrom(out var target))
-                    {
-                        CoverFinder.LookForCover(target, BotOwner.Position);
-                    }
+                    CoverFinder.LookForCover(target, BotOwner.Position);
                 }
             }
             else
@@ -98,14 +83,12 @@ namespace SAIN.Classes
                     SAIN.BotOwner.BotLay.TryLay();
                     return true;
                 }
-
                 if (ActiveCoverPoint.Collider.bounds.size.y < 1.5f)
                 {
                     SAIN.BotOwner.SetPose(0f);
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -115,22 +98,18 @@ namespace SAIN.Classes
             {
                 return false;
             }
-
             if (SAIN.EnemyIsVisible && SAIN.HasEnemyAndCanShoot)
             {
                 var target = BotOwner.Memory.GoalEnemy.Person.WeaponRoot.position;
-
                 if (CheckLimbForCover(BodyPartType.leftLeg, target, 5f) && CheckLimbForCover(BodyPartType.leftArm, target, 5f))
                 {
                     return true;
                 }
-
                 if (CheckLimbForCover(BodyPartType.rightLeg, target, 5f) && CheckLimbForCover(BodyPartType.rightArm, target, 5f))
                 {
                     return true;
                 }
             }
-
             return false;
         }
 
@@ -141,57 +120,7 @@ namespace SAIN.Classes
             return Physics.Raycast(position, direction, dist, SAINComponent.ShootMask);
         }
 
-        public bool CheckSelfForCover(float minratio = 0.1f)
-        {
-            if (!SAIN.HasGoalEnemy)
-            {
-                return false;
-            }
-
-            int rays = 0;
-            int cover = 0;
-
-            var headPos = BotOwner.Memory.GoalEnemy.Person.MainParts[BodyPartType.head].Position;
-
-            foreach (var part in BotOwner.MainParts.Values)
-            {
-                rays++;
-
-                Vector3 direction = headPos - part.Position;
-
-                float distance = Mathf.Clamp(direction.magnitude, 0f, 5f);
-
-                if (Physics.Raycast(part.Position, direction, distance, SAINComponent.ShootMask))
-                {
-                    cover++;
-                }
-            }
-
-            float coverRatio = (float)cover / rays;
-
-            return coverRatio > minratio;
-        }
-
-        private void AssignSettings()
-        {
-            switch (SAIN.CurrentDecision)
-            {
-                case SAINLogicDecision.Reload:
-                case SAINLogicDecision.FirstAid:
-                case SAINLogicDecision.Surgery:
-                case SAINLogicDecision.RunAway:
-                case SAINLogicDecision.RunAwayGrenade:
-                    CoverFinder.MinObstacleHeight = CoverMinHeight.Value;
-                    break;
-
-                default:
-                    CoverFinder.MinObstacleHeight = CoverMinHeight.Value;
-                    break;
-            }
-        }
-
         private SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
-
         public CoverStatus FallBackPointStatus
         {
             get
@@ -203,7 +132,6 @@ namespace SAIN.Classes
                 return CoverStatus.None;
             }
         }
-
         public CoverStatus CoverPointStatus
         {
             get
@@ -215,13 +143,9 @@ namespace SAIN.Classes
                 return CoverStatus.None;
             }
         }
-
         private BotOwner BotOwner => SAIN.BotOwner;
-
         private SAINComponent SAIN;
-
         public bool BotIsAtCoverPoint => ActiveCoverPoint != null;
-
         public CoverPoint ActiveCoverPoint
         {
             get
@@ -240,16 +164,10 @@ namespace SAIN.Classes
                 }
             }
         }
-
         public CoverFinderComponent CoverFinder { get; private set; }
-
         public CoverPoint CurrentCoverPoint => CoverFinder.CurrentCover;
-
         public CoverPoint CurrentFallBackPoint => CoverFinder.CurrentFallBackPoint;
-
         protected ManualLogSource Logger;
-
-        private float UpdateTimer = 0f;
 
         public void Dispose()
         {

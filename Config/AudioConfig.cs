@@ -4,7 +4,6 @@ namespace SAIN.UserSettings
 {
     internal class SoundConfig
     {
-        public static ConfigEntry<float> AudibleRange { get; private set; }
         public static ConfigEntry<float> SuppressorModifier { get; private set; }
         public static ConfigEntry<float> SubsonicModifier { get; private set; }
         public static ConfigEntry<bool> RaycastOcclusion { get; private set; }
@@ -15,48 +14,41 @@ namespace SAIN.UserSettings
 
         public static void Init(ConfigFile Config)
         {
-            string modeswap = "1. Bot Audio Settings";
+            string audio = "Bot Audio Settings";
 
-            AudibleRange = Config.Bind(modeswap, "Audible Range Modifier", 1.0f,
-                new ConfigDescription("Modifier for how far bots will hear gunshots",
-                new AcceptableValueRange<float>(0.1f, 2.0f),
-                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
-
-            SuppressorModifier = Config.Bind(modeswap, "Supersonic Modifier", 0.6f,
+            SuppressorModifier = Config.Bind(audio, "Supersonic Modifier", 0.6f,
                 new ConfigDescription("Modifier for how much less audible suppressed shots are when the round is super-sonic",
                 new AcceptableValueRange<float>(0.1f, 0.99f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
 
-            SubsonicModifier = Config.Bind(modeswap, "Subsonic Modifier", 0.3f,
+            SubsonicModifier = Config.Bind(audio, "Subsonic Modifier", 0.3f,
                 new ConfigDescription("Modifier for how much less audible suppressed shots are when the round is sub-sonic",
                 new AcceptableValueRange<float>(0.1f, 0.99f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
 
-            RaycastOcclusion = Config.Bind(modeswap, "Raycast Sound Occlusion", true,
+            RaycastOcclusion = Config.Bind(audio, "Raycast Sound Occlusion", true,
                 new ConfigDescription("",
                 null,
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 1 }));
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
 
 
-            string debugmode = "2. Debug Logs";
-
-            DebugSound = Config.Bind(debugmode,
+            DebugSound = Config.Bind(audio,
                 "Gunshot Audible Distance Logs",
                 false, new ConfigDescription(
                 "", null, new ConfigurationManagerAttributes
-                { IsAdvanced = true, Order = 5 }));
+                { IsAdvanced = true, Order = -10 }));
 
-            DebugSolarintSound = Config.Bind(debugmode,
+            DebugSolarintSound = Config.Bind(audio,
                 "Solarint Audio Logs",
                 false, new ConfigDescription(
                 "its not steam or oculus audio, its far worse", null, new ConfigurationManagerAttributes
-                { IsAdvanced = true, Order = 3 }));
+                { IsAdvanced = true, Order = -11 }));
 
-            DebugOcclusion = Config.Bind(debugmode,
+            DebugOcclusion = Config.Bind(audio,
                 "Sound Occlusion Logs",
                 false, new ConfigDescription(
                 "", null, new ConfigurationManagerAttributes
-                { IsAdvanced = true, Order = 2 }));
+                { IsAdvanced = true, Order = -12 }));
         }
     }
 }

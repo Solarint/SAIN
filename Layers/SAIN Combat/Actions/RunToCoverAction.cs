@@ -36,7 +36,7 @@ namespace SAIN.Layers
 
             if (CoverPoint == null)
             {
-                //SAIN.Steering.ManualUpdate();
+                SAIN.Steering.ManualUpdate();
             }
         }
 
@@ -59,10 +59,6 @@ namespace SAIN.Layers
             if (CoverPoint != null)
             {
                 MoveToPoint(CoverPoint.Position);
-            }
-            else
-            {
-                Logger.LogError($"Point null?!");
             }
         }
 

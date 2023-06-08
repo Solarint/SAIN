@@ -9,7 +9,7 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
-    internal class StandAndShootAction : CustomLogic
+    public class StandAndShootAction : CustomLogic
     {
         public StandAndShootAction(BotOwner bot) : base(bot)
         {

@@ -4,6 +4,7 @@ using UnityEngine.AI;
 using System.Collections;
 using BepInEx.Logging;
 using Comfort.Common;
+using SAIN.Helpers;
 
 namespace SAIN.Components
 {
@@ -12,32 +13,25 @@ namespace SAIN.Components
         private void Awake()
         {
             SAIN = GetComponent<SAINComponent>();
-
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-
-            NavMeshAgent = BotOwner.GetComponent<NavMeshAgent>();
-
-            AtFinalDestination = false;
+            //NavMeshAgent = BotOwner.GetComponent<NavMeshAgent>();
         }
 
         private void Update()
         {
-            if (BotOwner.IsDead || SAIN.GameIsEnding)
+            if (SAIN == null || BotOwner.IsDead || SAIN.GameIsEnding)
             {
                 Dispose();
                 return;
             }
-
-            if (SAIN.BotIsStuck && SAIN.CurrentTargetPosition != null && ResetTimer < Time.time)
-            {
-                ResetTimer = Time.time + 5f;
-                Init(SAIN.CurrentTargetPosition.Value);
-            }
-
             if (!SAIN.BotActive)
             {
                 return;
             }
+
+            CheckStuckOrReset();
+
+            CheckShouldSprint();
 
             if (DistanceToDestination(CurrentDestination) < 6f)
             {
@@ -50,23 +44,8 @@ namespace SAIN.Components
 
             if (!Peeking)
             {
-                float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
-                float destinationDistance = Vector3.Distance(CurrentDestination, BotOwner.Position);
-
-                if (ShouldUpdateSteer || (soundDistance < 10f && SAIN.LastSoundHeardTime > Time.time - 1f))
-                {
-                    SAIN.Steering.ManualUpdate();
-                }
-                else
-                {
-                    BotOwner.Steering.LookToMovingDirection();
-                }
-
-                if (CornerPeekLoop != null)
-                {
-                    CornerPeekLoop = null;
-                }
-
+                Steer(CurrentDestination);
+                CornerPeekLoop = null;
                 if (BotIsAtPoint(CurrentDestination))
                 {
                     GoToNextPoint();
@@ -74,15 +53,89 @@ namespace SAIN.Components
             }
         }
 
+        private void CheckStuckOrReset()
+        {
+            if ((SAIN.BotIsStuck || !SAIN.BotIsMoving) && SAIN.CurrentTargetPosition != null && ResetTimer < Time.time)
+            {
+                ResetTimer = Time.time + 1f;
+                Init(SAIN.CurrentTargetPosition.Value);
+            }
+
+            if (AtFinalDestination && SAIN.CurrentTargetPosition != null)
+            {
+                Init(SAIN.CurrentTargetPosition.Value);
+            }
+        }
+
+        private void CheckShouldSprint()
+        {
+            var pers = SAIN.Info.BotPersonality;
+            if (RandomSprintTimer < Time.time && (pers == BotPersonality.GigaChad || pers == BotPersonality.Chad))
+            {
+                RandomSprintTimer = Time.time + 3f * Random.Range(0.33f, 2f);
+                float chance = pers == BotPersonality.GigaChad ? 40f : 20f;
+                SprintEnabled = EFT_Math.RandomBool(chance);
+            }
+        }
+
+        private bool SprintEnabled = false;
+        private float RandomSprintTimer = 0f;
         private float ResetTimer = 0f;
 
         public void Init(Vector3 targetPos)
         {
+            AtFinalDestination = false;
             NavMesh.CalculatePath(BotOwner.Transform.position, targetPos, -1, Path);
             FinalDestination = targetPos;
             TotalCornerCount = Path.corners.Length;
-            
             GoToNextPoint();
+        }
+
+        private void Steer(Vector3 pos)
+        {
+            if (Peeking)
+            {
+                BotOwner.SetTargetMoveSpeed(0.33f);
+                BotOwner.SetPose(0.8f);
+            }
+            else if (SprintEnabled)
+            {
+                BotOwner.SetTargetMoveSpeed(1f);
+                BotOwner.SetPose(1f);
+            }
+            else
+            {
+                BotOwner.SetTargetMoveSpeed(0.85f);
+                BotOwner.SetPose(0.9f);
+            }
+
+            if (SprintEnabled && !BotOwner.Memory.IsUnderFire)
+            {
+                BotOwner.GetPlayer.EnableSprint(true);
+                BotOwner.Steering.LookToMovingDirection();
+            }
+            else
+            {
+                BotOwner.GetPlayer.EnableSprint(false);
+                float soundDistance = 999f;
+                if (SAIN.LastHeardSound != null)
+                {
+                    soundDistance = Vector3.Distance(SAIN.LastHeardSound.Position, BotOwner.Position);
+                }
+                if (BotOwner.Memory.IsUnderFire)
+                {
+                    SAIN.Steering.ManualUpdate();
+                }
+                else if (soundDistance < 30f && SAIN.LastHeardSound.TimeSinceHeard < 1f)
+                {
+                    SAIN.Steering.ManualUpdate();
+                }
+                else
+                {
+                    pos.y += 1f;
+                    BotOwner.Steering.LookToPoint(pos);
+                }
+            }
         }
 
         private void UpdateTargetPoints()
@@ -113,7 +166,7 @@ namespace SAIN.Components
 
                     if (PeekMoveDestination == Vector3.zero)
                     {
-                        PeekTimer = Time.time + 8f;
+                        PeekTimer = Time.time + 3f;
 
                         Vector3 PeekDestination;
                         if (DistanceToDestination(FinalDest) < 15f || Vector3.Distance(FinalDest, corner) < 5f)
@@ -155,25 +208,14 @@ namespace SAIN.Components
 
                         PeekMoveDestination = peekDestination;
                         BotOwner.GoToPoint(peekDestination, false, 0.5f, false, false);
+                        BotOwner.DoorOpener.Update();
                     }
 
-                    float soundDistance = Vector3.Distance(SAIN.LastSoundHeardPosition, BotOwner.Position);
-                    float peekMoveDistance = Vector3.Distance(PeekMoveDestination, BotOwner.Position);
-                    float finalDestDistance = Vector3.Distance(FinalDest, BotOwner.Position);
-
-                    if (ShouldUpdateSteer || (soundDistance < peekMoveDistance || soundDistance < finalDestDistance) && SAIN.LastSoundHeardTime > Time.time - 2f)
-                    {
-                        BotOwner.LookData.SetLookPointByHearing();
-                    }
-                    else
-                    {
-                        BotOwner.Steering.LookToPoint(FinalDest);
-                    }
-
+                    Steer(FinalDest);
                     BotOwner.SetTargetMoveSpeed(0.33f);
-                    BotOwner.SetPose(0.66f);
+                    BotOwner.SetPose(0.8f);
 
-                    if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving))
+                    if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving) || SAIN.BotIsStuck)
                     {
                         PeekMoveDestination = Vector3.zero;
                         //BotOwner.GetPlayer.MovementContext.SetTilt(0f, false);
@@ -181,15 +223,11 @@ namespace SAIN.Components
                         GoToNextPoint();
                         break;
                     }
-
-                    BotOwner.DoorOpener.Update();
                 }
 
                 yield return new WaitForEndOfFrame();
             }
         }
-
-        private bool ShouldUpdateSteer => BotOwner.Memory.IsUnderFire;
 
         private float GetSignedAngle(Vector3 a, Vector3 b, Vector3 origin)
         {
@@ -198,7 +236,7 @@ namespace SAIN.Components
             return Vector3.SignedAngle(directionToNextCorner.normalized, directionToCorner.normalized, Vector3.up);
         }
 
-        private bool BotIsAtPoint(Vector3 point, float reachDist = 0.5f)
+        private bool BotIsAtPoint(Vector3 point, float reachDist = 1f)
         {
             return DistanceToDestination(point) < reachDist;
         }

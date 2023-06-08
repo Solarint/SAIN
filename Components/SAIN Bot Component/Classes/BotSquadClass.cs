@@ -29,14 +29,16 @@ namespace SAIN.Classes
 
                     UpdateMembers();
 
-                    if (Leader == null || !Leader.HealthController.IsAlive)
+                    if (Leader == null || !Leader.HealthController.IsAlive || GroupSize != SquadMembers.Count)
                     {
+                        GroupSize = SquadMembers.Count;
                         FindSquadLeader();
                     }
                 }
             }
         }
 
+        private int GroupSize = 0;
         private float UpdateMembersTimer = 0f;
 
         private void FindSquadLeader()
@@ -59,6 +61,11 @@ namespace SAIN.Classes
             // If the current bot is the result, mark the IsSquadLead value as true
             IsSquadLead = Leader == BotOwner;
 
+            if (!this.IsSquadLead)
+            {
+                LeaderComponent = Leader.GetComponent<SAINComponent>();
+            }
+
             Console.WriteLine($"For Bot: [{BotOwner.Profile.Nickname}]: [{Leader.Profile.Nickname}] is Squad lead! Power Level = [{power}] Squad Power = [{SquadPowerLevel}] Members Count = [{SquadMembers.Count}]");
         }
 
@@ -67,6 +74,7 @@ namespace SAIN.Classes
         public bool IsSquadLead { get; private set; } = false;
 
         public BotOwner Leader { get; private set; }
+        public SAINComponent LeaderComponent { get; private set; }
 
         public bool BotInGroup => BotOwner.BotsGroup.MembersCount > 1;
 
@@ -124,7 +132,5 @@ namespace SAIN.Classes
         public Vector3[] SquadLocations { get; private set; }
 
         protected ManualLogSource Logger;
-
-        private float CheckMembersTimer = 0f;
     }
 }

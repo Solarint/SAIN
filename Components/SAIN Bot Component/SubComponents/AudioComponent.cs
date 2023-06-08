@@ -3,6 +3,7 @@ using SAIN.Helpers;
 using EFT;
 using UnityEngine;
 using static SAIN.UserSettings.SoundConfig;
+using SAIN.Classes;
 
 namespace SAIN.Components
 {
@@ -131,8 +132,7 @@ namespace SAIN.Components
 
             if (wasHeard)
             {
-                SAIN.LastSoundHeardPosition = pos;
-                SAIN.LastSoundHeardTime = Time.time;
+                LastHeardSound = new LastHeardSound(person, pos, type, power);
 
                 float dispersion = (type == AISoundType.gun) ? shooterDistance / 50f : shooterDistance / 20f;
 
@@ -145,10 +145,7 @@ namespace SAIN.Components
                 {
                     BotOwner.BotsGroup.AddPointToSearch(vector, power, BotOwner);
                 }
-                catch (System.Exception)
-                {
-
-                }
+                catch (System.Exception) { }
 
                 if (shooterDistance < BotOwner.Settings.FileSettings.Hearing.RESET_TIMER_DIST)
                 {
@@ -169,19 +166,12 @@ namespace SAIN.Components
                             SAIN.UnderFireFromPosition = vector;
                             BotOwner.Memory.SetUnderFire();
                         }
-                        catch (System.Exception)
-                        {
-
-                        }
+                        catch (System.Exception) { }
 
 
                         if (shooterDistance > 50f)
                         {
                             SAIN.Talk.Talk.Say(EPhraseTrigger.SniperPhrase);
-                        }
-                        else
-                        {
-                            //SAIN.Talk.Talk.Say(EPhraseTrigger.UnderFire);
                         }
                     }
                 }
@@ -201,21 +191,22 @@ namespace SAIN.Components
                 {
                     var estimate = GetEstimatedPoint(pos);
 
+                    LastHeardSound = new LastHeardSound(person, estimate, type, power);
+
                     SAIN.UnderFireFromPosition = estimate;
 
                     try
                     {
                         BotOwner.BotsGroup.AddPointToSearch(estimate, 50f, BotOwner);
                     }
-                    catch (System.Exception)
-                    {
-
-                    }
+                    catch (System.Exception) { }
 
                     //BotOwner.Memory.SetPanicPoint(placeForCheck2, false);
                 }
             }
         }
+
+        public LastHeardSound LastHeardSound { get; private set; }
 
         private Vector3 GetEstimatedPoint(Vector3 source)
         {
@@ -456,5 +447,13 @@ namespace SAIN.Components
         public delegate void GDelegate4(Vector3 vector, float bulletDistance, AISoundType type);
 
         public event GDelegate4 OnEnemySounHearded;
+    }
+
+    public class HeardSound
+    {
+        public HeardSound(Vector3 position, float distance, AISoundType type, IAIDetails Owner = null)
+        {
+
+        }
     }
 }

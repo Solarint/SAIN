@@ -87,8 +87,6 @@ namespace SAIN.Layers
             BotOwner.GoToPoint(point, true, 0.75f, false, false);
         }
 
-        private Vector3? TemporaryPoint;
-
         private readonly SAINComponent SAIN;
 
         public override void Start()
@@ -107,7 +105,6 @@ namespace SAIN.Layers
                 else
                 {
                     SAIN.Steering.ManualUpdate();
-                    //Logger.LogError($"Point null?!");
                 }
             }
         }

@@ -10,7 +10,7 @@ namespace SAIN.UserSettings
         public static ConfigEntry<bool> SillyMode { get; private set; }
         public static void Init(ConfigFile Config)
         {
-            string debugmode = "Flashlight Dazzle";
+            string debugmode = "Flashlight Dazzle Settings";
 
             Effectiveness = Config.Bind(debugmode, "Dazzle Intensity", 3f,
                 new ConfigDescription("Intensifies the dazzle effect",

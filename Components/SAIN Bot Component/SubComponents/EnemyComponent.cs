@@ -110,12 +110,12 @@ namespace SAIN.Classes
         {
             if (CheckVisibleTimer < Time.time)
             {
-                CheckVisibleTimer = Time.time + 0.25f;
+                CheckVisibleTimer = Time.time + 0.15f;
 
                 bool lineOfSight = CheckEnemyVisible();
 
                 bool visible = false;
-                if (lineOfSight)
+                if (lineOfSight == true && GoalEnemy?.IsVisible == true)
                 {
                     visible = BotOwner.LookSensor.IsPointInVisibleSector(Person.Position);
                 }
@@ -162,13 +162,7 @@ namespace SAIN.Classes
             {
                 CheckPathTimer = Time.time + 0.5f;
 
-                var pos = Person.Position;
-
-                if ((lastCheckPos - pos).magnitude > 0.5f)
-                {
-                    lastCheckPos = pos;
-                    CalcPath(pos);
-                }
+                CalcPath(Person.Position);
             }
         }
 

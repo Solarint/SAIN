@@ -15,7 +15,6 @@ namespace SAIN.Components
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        private const float DecisionFreq = 0.1f;
         private const float UpdateSearchFreq = 30f;
         private const float SearchRandomize = 0.25f;
 
@@ -35,38 +34,23 @@ namespace SAIN.Components
 
                 TimeBeforeSearch = GetTimeBeforeSearch();
 
-                if (SAIN.BotSquad.BotInGroup)
+                if (SAIN.BotSquad.BotInGroup && SAIN.BotSquad.IsSquadLead)
                 {
-                    int i = 1;
-                    float time = TimeBeforeSearch;
-
-                    foreach (var member in SAIN.BotSquad.SquadMembers)
-                    {
-                        i++;
-                        time += member.Value.Decisions.TimeBeforeSearch;
-                    }
-
-                    TimeBeforeSearch = time / i;
-                    TimeBeforeSearch *= Random.Range(0.9f, 1.1f);
-
-                    if (SAIN.BotSquad.IsSquadLead)
-                    {
-                        TimeBeforeSearch += 5f;
-                    }
-
-                    if (DebugMode)
-                    {
-                        Logger.LogInfo($"Time Before Search: [{TimeBeforeSearch}]");
-                    }
+                    TimeBeforeSearch += 5f;
                 }
             }
 
-            LastDecision = CurrentDecision;
-            CurrentDecision = GetDecision();
-
-            if (LastDecision != CurrentDecision)
+            if (DecisionTimer < Time.time)
             {
-                ChangeDecisionTime = Time.time;
+                DecisionTimer = Time.time + 0.1f;
+
+                LastDecision = CurrentDecision;
+                CurrentDecision = GetDecision();
+
+                if (CurrentDecision != LastDecision)
+                {
+                    ChangeDecisionTime = Time.time;
+                }
             }
         }
 
@@ -136,25 +120,22 @@ namespace SAIN.Components
             return RetreatDecisions.Contains(CurrentDecision) && !SAIN.Cover.BotIsAtCoverPoint && Time.time - ChangeDecisionTime < 3f && SAIN.BotHasStamina;
         }
 
+        private float BotUnstuckTimerDecision = 0f;
+        private float FinalBotUnstuckTimer = 0f;
+
         private SAINLogicDecision GetDecision()
         {
-            if (SAIN.BotIsStuck)
+            if (CheckStuckDecision(out SAINLogicDecision Decision))
             {
-                if (CurrentDecision != SAINLogicDecision.Search)
-                {
-                    return SAINLogicDecision.Search;
-                }
-                else if (Time.time - ChangeDecisionTime > 10f)
-                {
-                    return SAINLogicDecision.MoveToCover;
-                }
+                return Decision;
             }
-            if (CheckContinueDecision(out SAINLogicDecision Decision))
+            if (CheckContinueDecision(out Decision))
             {
                 return Decision;
             }
             if (SelfActionDecisions(out Decision))
             {
+                DecisionTimer = Time.time + 0.5f;
                 return Decision;
             }
             if (StartRegroup())
@@ -170,6 +151,44 @@ namespace SAIN.Components
                 return Decision;
             }
             return SAINLogicDecision.None;
+        }
+
+        private bool CheckStuckDecision(out SAINLogicDecision Decision)
+        {
+            Decision = SAINLogicDecision.None;
+
+            if (!SAIN.BotIsStuck && FinalBotUnstuckTimer != 0f)
+            {
+                FinalBotUnstuckTimer = 0f;
+            }
+
+            if (SAIN.BotIsStuck && BotUnstuckTimerDecision < Time.time)
+            {
+                if (FinalBotUnstuckTimer == 0f)
+                {
+                    FinalBotUnstuckTimer = Time.time + 10f;
+                }
+
+                BotUnstuckTimerDecision = Time.time + 5f;
+
+                var current = CurrentDecision;
+                if (FinalBotUnstuckTimer < Time.time && SAIN.HasEnemy)
+                {
+                    Decision = SAINLogicDecision.UnstuckDogFight;
+                    return true;
+                }
+                if (current == SAINLogicDecision.Search || current == SAINLogicDecision.UnstuckSearch)
+                {
+                    Decision = SAINLogicDecision.UnstuckMoveToCover;
+                    return true;
+                }
+                if (current == SAINLogicDecision.MoveToCover || current == SAINLogicDecision.UnstuckMoveToCover)
+                {
+                    Decision = SAINLogicDecision.UnstuckSearch;
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool CheckContinueDecision(out SAINLogicDecision Decision)
@@ -234,6 +253,11 @@ namespace SAIN.Components
             if (BotOwner.Medecine.SurgicalKit.Using)
             {
                 Decision = SAINLogicDecision.Surgery;
+                return true;
+            }
+            if (BotOwner.Medecine.Using)
+            {
+                Decision = CurrentDecision;
                 return true;
             }
             Decision = SAINLogicDecision.None;
@@ -392,7 +416,7 @@ namespace SAIN.Components
 
         private bool StartRegroup()
         {
-            if (!SAIN.BotSquad.BotInGroup)
+            if (!SAIN.BotSquad.BotInGroup || SAIN.BotSquad.IsSquadLead)
             {
                 return false;
             }
@@ -409,38 +433,31 @@ namespace SAIN.Components
                 }
             }
 
-            if (SAIN.BotSquad.BotInGroup && SAIN.BotSquad.SquadMembers != null)
+            var lead = SAIN.BotSquad.LeaderComponent;
+            if (lead != null)
             {
-                foreach (var member in SAIN.BotSquad.SquadMembers.Values)
+                Vector3 leadPos = lead.BotOwner.Position;
+                if (SAIN.HasEnemy && BotOwner.Memory.GoalEnemy != null)
                 {
-                    if (member == null || member.BotOwner == BotOwner || member.BotOwner.IsDead)
+                    Vector3 directionToEnemy = BotOwner.Memory.GoalEnemy.CurrPosition - BotOwner.Position;
+                    Vector3 directionToLead = leadPos - BotOwner.Position;
+                    if (directionToEnemy.magnitude < directionToLead.magnitude)
                     {
-                        continue;
-                    }
-
-                    if (member.BotSquad.IsSquadLead)
-                    {
-                        Vector3 leadPos = member.BotOwner.Position;
-                        if (SAIN.HasEnemy && BotOwner.Memory.GoalEnemy != null)
+                        if (Vector3.Dot(directionToEnemy.normalized, directionToLead.normalized) > 0f && Vector3.Distance(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Position) < 30f)
                         {
-                            Vector3 directionToEnemy = BotOwner.Memory.GoalEnemy.CurrPosition - BotOwner.Position;
-                            Vector3 directionToLead = leadPos - BotOwner.Position;
-                            if (Vector3.Dot(directionToEnemy.normalized, directionToLead.normalized) > 0f && Vector3.Distance(BotOwner.Memory.GoalEnemy.CurrPosition, BotOwner.Position) < 30f)
-                            {
-                                return false;
-                            }
-                        }
-
-                        float dist = Vector3.Distance(leadPos, BotOwner.Position);
-                        if (CurrentDecision == SAINLogicDecision.RegroupSquad)
-                        {
-                            return dist > 10f;
-                        }
-                        else
-                        {
-                            return dist > 30f;
+                            return false;
                         }
                     }
+                }
+
+                float dist = Vector3.Distance(leadPos, BotOwner.Position);
+                if (CurrentDecision == SAINLogicDecision.RegroupSquad)
+                {
+                    return dist > 10f;
+                }
+                else
+                {
+                    return dist > 30f;
                 }
             }
             return false;
@@ -495,8 +512,6 @@ namespace SAIN.Components
             return false;
         }
 
-        private float TimeSinceVisionChangeSolo => SAIN.HasGoalEnemy ? Time.time - BotOwner.Memory.GoalEnemy.LastChangeVisionTime : -1f;
-
         private bool StartHoldInCover()
         {
             if (SAIN.Cover.BotIsAtCoverPoint)
@@ -534,8 +549,6 @@ namespace SAIN.Components
             }
             return false;
         }
-
-        private bool StartRunAway => false;
 
         private bool StartSurgery()
         {

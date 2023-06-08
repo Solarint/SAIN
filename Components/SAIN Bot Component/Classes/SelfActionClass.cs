@@ -18,6 +18,11 @@ namespace SAIN.Classes
                 return;
             }
 
+            if (BotOwner.Medecine.Using)
+            {
+                return;
+            }
+
             if (SAIN.Decisions.StartCancelReload())
             {
                 BotCancelReload();
@@ -50,7 +55,7 @@ namespace SAIN.Classes
         public void DoFirstAid()
         {
             var heal = BotOwner.Medecine.FirstAid;
-            if (heal.ShallStartUse() && HealTimer < Time.time)
+            if (HealTimer < Time.time && heal.ShallStartUse())
             {
                 HealTimer = Time.time + 5f;
 
@@ -68,7 +73,7 @@ namespace SAIN.Classes
             var surgery = BotOwner.Medecine.SurgicalKit;
             if (surgery.ShallStartUse() && HealTimer < Time.time)
             {
-                HealTimer = Time.time + 5f;
+                HealTimer = Time.time + 20f;
 
                 if (UserSettings.DebugConfig.DebugLayers.Value)
                 {
@@ -84,7 +89,7 @@ namespace SAIN.Classes
             var stims = BotOwner.Medecine.Stimulators;
             if (StimTimer < Time.time && stims.CanUseNow())
             {
-                StimTimer = Time.time + 2f;
+                StimTimer = Time.time + 5f;
 
                 if (UserSettings.DebugConfig.DebugLayers.Value)
                 {

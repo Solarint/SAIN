@@ -198,14 +198,13 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\SAIN Bot Component\Classes\LastHeardSoundClass.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\CoverPointClass.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\Decision\SquadDecisionComponent.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Talk\SquadLeaderClass.cs" />
     <Compile Include="Config\AudioConfig.cs" />
     <Compile Include="Config\DazzleConfig.cs" />
-    <Compile Include="Config\FullautoConfig.cs" />
-    <Compile Include="Config\RecoilScatterConfig.cs" />
-    <Compile Include="Config\SemiAutoConfig.cs" />
+    <Compile Include="Config\BotShootConfig.cs" />
     <Compile Include="Config\TalkConfig.cs" />
     <Compile Include="Config\VisionConfig.cs" />
     <Compile Include="Helpers\AudioHelpers.cs" />

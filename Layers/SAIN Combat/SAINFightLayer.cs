@@ -9,7 +9,7 @@ namespace SAIN.Layers
     {
         public override string GetName()
         {
-            return "SAIN Combat System";
+            return "SAIN Combat";
         }
 
         public SAINFightLayer(BotOwner bot, int priority) : base(bot, priority)
@@ -22,10 +22,11 @@ namespace SAIN.Layers
         {
             Action nextAction;
 
-            switch (CurrentDecision)
+            var Decision = CurrentDecision;
+            switch (Decision)
             {
                 case SAINLogicDecision.RegroupSquad:
-                    nextAction = new Action(typeof(RegroupAction), $"{CurrentDecision}");
+                    nextAction = new Action(typeof(RegroupAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.Stims:
@@ -34,40 +35,43 @@ namespace SAIN.Layers
                 case SAINLogicDecision.FirstAid:
                 case SAINLogicDecision.RunAway:
                 case SAINLogicDecision.RunAwayGrenade:
-                    nextAction = new Action(typeof(RetreatAction), $"{CurrentDecision}");
+                    nextAction = new Action(typeof(RetreatAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.MoveToCover:
-                    nextAction = new Action(typeof(MoveToCoverAction), $"{CurrentDecision}");
+                case SAINLogicDecision.UnstuckMoveToCover:
+                    nextAction = new Action(typeof(MoveToCoverAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.RunForCover:
-                    nextAction = new Action(typeof(RunToCoverAction), $"{CurrentDecision}");
+                    nextAction = new Action(typeof(RunToCoverAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.Suppress:
-                    nextAction = new Action(typeof(SuppressAction), $"{CurrentDecision}");
+                    nextAction = new Action(typeof(SuppressAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.DogFight:
-                    nextAction = new Action(typeof(DogfightAction), $"{CurrentDecision}");
+                case SAINLogicDecision.UnstuckDogFight:
+                    nextAction = new Action(typeof(DogfightAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.HoldInCover:
-                    nextAction = new Action(typeof(StandAndShootAction), $"{CurrentDecision}");
+                    nextAction = new Action(typeof(StandAndShootAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.StandAndShoot:
-                    nextAction = new Action(typeof(HoldInCoverAction), $"{CurrentDecision}");
+                    nextAction = new Action(typeof(HoldInCoverAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.Shoot:
-                    nextAction = new Action(typeof(ShootAction), $"{CurrentDecision}");
+                    nextAction = new Action(typeof(ShootAction), $"{Decision}");
                     break;
 
                 case SAINLogicDecision.GroupSearch:
                 case SAINLogicDecision.Search:
-                    nextAction = new Action(typeof(SearchAction), $"{CurrentDecision}");
+                case SAINLogicDecision.UnstuckSearch:
+                    nextAction = new Action(typeof(SearchAction), $"{Decision}");
                     break;
 
                 default:
@@ -80,6 +84,8 @@ namespace SAIN.Layers
                 Logger.LogError("Action Null?");
                 nextAction = new Action(typeof(RetreatAction), $"DEFAULT!");
             }
+
+            LastActionDecision = Decision;
 
             return nextAction;
         }
@@ -102,10 +108,10 @@ namespace SAIN.Layers
 
         public override bool IsCurrentActionEnding()
         {
-            return CurrentDecision != LastDecision;
+            return CurrentDecision != LastActionDecision;
         }
 
-        public SAINLogicDecision LastDecision => SAIN.Decisions.LastDecision;
+        private SAINLogicDecision LastActionDecision = SAINLogicDecision.None;
         public SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
 
         private readonly SAINComponent SAIN;
