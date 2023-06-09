@@ -14,7 +14,6 @@ namespace SAIN.Components
         {
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            //NavMeshAgent = BotOwner.GetComponent<NavMeshAgent>();
         }
 
         private void Update()
@@ -29,7 +28,7 @@ namespace SAIN.Components
                 return;
             }
 
-            if (SAIN.AILimited)
+            if (SAIN.AILimit.Enabled)
             {
                 return;
             }
@@ -230,9 +229,9 @@ namespace SAIN.Components
                     }
                 }
 
-                if (SAIN.AILimited)
+                if (SAIN.AILimit.Enabled)
                 {
-                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                    yield return new WaitForSeconds(SAIN.AILimit.TimeAdd);
                 }
 
                 yield return null;
@@ -283,8 +282,6 @@ namespace SAIN.Components
 
         private SAINComponent SAIN;
 
-        private NavMeshAgent NavMeshAgent;
-
         protected ManualLogSource Logger;
 
         public NavMeshPath Path = new NavMeshPath();
@@ -300,8 +297,6 @@ namespace SAIN.Components
         public float DistanceToNextCorner = 0f;
 
         public bool Peeking { get; private set; }
-
-        public bool Moving { get; private set; }
 
         public bool AtFinalDestination { get; private set; }
 

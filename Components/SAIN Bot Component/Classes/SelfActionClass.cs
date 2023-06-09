@@ -13,9 +13,22 @@ namespace SAIN.Classes
             BotOwner.Medecine.RefreshCurMeds();
         }
 
+        private bool WasUsingMeds = false;
+        private bool UsingMeds => BotOwner.Medecine.Using;
+
         public void DoSelfAction()
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding || BotOwner.Medecine.Using)
+            if (!SAIN.BotActive || SAIN.GameIsEnding)
+            {
+                return;
+            }
+
+            if (!UsingMeds && WasUsingMeds)
+            {
+                BotOwner.Medecine.RefreshCurMeds();
+            }
+            WasUsingMeds = UsingMeds;
+            if (UsingMeds)
             {
                 return;
             }

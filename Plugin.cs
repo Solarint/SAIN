@@ -97,7 +97,7 @@ namespace SAIN
             //BrainManager.AddCustomLayer(typeof(SAINRoamingLayer), new List<string>(NormalBots), 1);
 
             BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(NormalBots), 95);
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 1);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), -1);
             BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Followers), 95);
         }
 

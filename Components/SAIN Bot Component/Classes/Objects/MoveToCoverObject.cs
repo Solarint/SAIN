@@ -3,7 +3,7 @@ using EFT;
 
 namespace SAIN.Classes
 {
-    internal class MoveToCoverObject
+    public class MoveToCoverObject
     {
         public MoveToCoverObject(BotOwner owner)
         {

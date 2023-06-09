@@ -68,7 +68,7 @@ namespace SAIN.Components
                     {
                         var collider = colliders[i];
 
-                        if (SAIN.AILimitTimer > 0f && frameWait == 15)
+                        if (SAIN.AILimit.Enabled && frameWait == 15)
                         {
                             yield return null;
                         }
@@ -134,7 +134,7 @@ namespace SAIN.Components
                         DebugGizmos.SingleObjects.Line(CurrentFallBackPoint.Position, SAIN.HeadPosition, Color.yellow, 0.1f, true, 0.25f);
                     }
                 }
-                yield return new WaitForSeconds(CoverUpdateFrequency.Value + SAIN.AILimitTimeAdd);
+                yield return new WaitForSeconds(CoverUpdateFrequency.Value + SAIN.AILimit.TimeAdd);
             }
         }
 
