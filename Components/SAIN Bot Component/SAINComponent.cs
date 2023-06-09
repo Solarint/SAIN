@@ -87,33 +87,6 @@ namespace SAIN.Components
 
         public SAINEnemy Enemy { get; private set; }
 
-        public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
-        {
-            const float closeDist = 0.75f;
-
-            if (CheckTooCloseToWall(target, out var rayHit, closeDist))
-            {
-                var direction = (BotOwner.Position - rayHit.point).normalized * 0.8f;
-                direction.y = 0f;
-                var movePoint = BotOwner.Position + direction;
-                if (NavMesh.SamplePosition(movePoint, out var hit, 0.1f, -1))
-                {
-                    newPos = hit.position;
-                    return true;
-                }
-            }
-            newPos = Vector3.zero;
-            return false;
-        }
-
-        public bool CheckTooCloseToWall(Vector3 target, out RaycastHit rayHit, float checkDist = 0.75f)
-        {
-            Vector3 botPos = BotOwner.Position;
-            Vector3 direction = target - botPos;
-            botPos.y = WeaponRoot.y;
-            return Physics.Raycast(BotOwner.Position, direction, out rayHit, checkDist, LayerMaskClass.HighPolyWithTerrainMask);
-        }
-
         public void Dispose()
         {
             StopAllCoroutines();
@@ -138,25 +111,11 @@ namespace SAIN.Components
         public Vector3? GoalTargetPos => BotOwner.Memory.GoalTarget?.GoalTarget?.Position;
         public Vector3? GoalEnemyPos => BotOwner.Memory.GoalEnemy?.CurrPosition;
 
-        public Vector3 MidPoint(Vector3 target, float lerpVal = 0.5f)
-        {
-            return Vector3.Lerp(BotOwner.Position, target, lerpVal);
-        }
-        public bool BotIsAtPoint(Vector3 point, float reachDist = 1f)
-        {
-            return DistanceToDestination(point) < reachDist;
-        }
-
-        public float DistanceToDestination(Vector3 point)
-        {
-            return Vector3.Distance(point, BotOwner.Transform.position);
-        }
-
         public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
 
         public Vector3 UnderFireFromPosition { get; set; }
 
-        public bool HasEnemyAndCanShoot => BotOwner.Memory.GoalEnemy?.CanShoot == true && BotOwner.Memory.GoalEnemy?.IsVisible == true;
+        public bool HasEnemyAndCanShoot => Enemy?.IsVisible == true;
 
         public AILimitClass AILimit { get; private set; }
 

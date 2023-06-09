@@ -17,9 +17,11 @@ namespace SAIN.Classes
 
         public SearchMoveObject(BotOwner bot, NavMeshAgent agent) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             Agent = agent;
+            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
+
+        private readonly ManualLogSource Logger;
 
         public bool Update(float reachDist = -1f)
         {
@@ -287,8 +289,6 @@ namespace SAIN.Classes
         public Vector3[] PathWay { get; private set; }
         public int PathWayIndex { get; private set; }
         public int PathWayIndexMax { get; private set; }
-
-        private readonly ManualLogSource Logger;
     }
 
     public class MoveDangerPoint
