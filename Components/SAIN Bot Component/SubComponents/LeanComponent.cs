@@ -70,9 +70,9 @@ namespace SAIN.Components
                     Lean.SetLean(Lean.Angle);
                 }
 
-                if (SAIN.AILimited)
+                if (SAIN.AILimit.Enabled)
                 {
-                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                    yield return new WaitForSeconds(SAIN.AILimit.TimeAdd);
                 }
 
                 yield return wait;
@@ -90,9 +90,9 @@ namespace SAIN.Components
                     SideStep.Update();
                 }
 
-                if (SAIN.AILimited)
+                if (SAIN.AILimit.Enabled)
                 {
-                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                    yield return new WaitForSeconds(SAIN.AILimit.TimeAdd);
                 }
 
                 yield return wait;
@@ -107,9 +107,9 @@ namespace SAIN.Components
             {
                 BlindFire.Update(TargetPosition.Value);
 
-                if (SAIN.AILimited)
+                if (SAIN.AILimit.Enabled)
                 {
-                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                    yield return new WaitForSeconds(SAIN.AILimit.TimeAdd);
                 }
 
                 yield return wait;

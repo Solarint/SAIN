@@ -21,6 +21,7 @@ namespace SAIN.Components
             BotColor = RandomColor;
 
             Info = new BotInfoClass(bot);
+            AILimit = new AILimitClass(bot);
             BotStuck = new BotUnstuckClass(bot);
             Hearing = new HearingSensorClass(bot);
             BotSquad = new SquadClass(bot);
@@ -35,47 +36,15 @@ namespace SAIN.Components
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        public float AILimitTimeAdd { get; private set; }
-        public float AILimitTimer { get; private set; }
-        public bool AILimited => AILimitTimer > Time.time;
-
-        private void UpdateAILimit()
-        {
-            float distanceToPlayer = DistanceToMainPlayer;
-            if (distanceToPlayer > 500f)
-            {
-                AILimitTimeAdd = 2;
-                AILimitTimer = Time.time + AILimitTimeAdd;
-            }
-            else if (distanceToPlayer > 300f)
-            {
-                AILimitTimeAdd = 0.5f;
-                AILimitTimer = Time.time + AILimitTimeAdd;
-            }
-            else if (distanceToPlayer > 200f)
-            {
-                AILimitTimeAdd = 0.15f;
-                AILimitTimer = Time.time + AILimitTimeAdd;
-            }
-            else if (distanceToPlayer > 150f)
-            {
-                AILimitTimeAdd = 0.05f;
-                AILimitTimer = Time.time + AILimitTimeAdd;
-            }
-            else
-            {
-                AILimitTimeAdd = 0f;
-                AILimitTimer = 0f;
-            }
-        }
+        public Player GoalEnemyPlayer => BotOwner.Memory.GoalEnemy?.Person?.GetPlayer;
 
         private void Update()
         {
             if (BotActive && !GameIsEnding)
             {
-                UpdateAILimit();
+                AILimit.UpdateAILimit();
 
-                if (AILimited)
+                if (AILimit.Enabled)
                 {
                     return;
                 }
@@ -115,6 +84,7 @@ namespace SAIN.Components
         }
 
         public bool HasEnemy => Enemy != null;
+
         public SAINEnemy Enemy { get; private set; }
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
@@ -172,12 +142,23 @@ namespace SAIN.Components
         {
             return Vector3.Lerp(BotOwner.Position, target, lerpVal);
         }
+        public bool BotIsAtPoint(Vector3 point, float reachDist = 1f)
+        {
+            return DistanceToDestination(point) < reachDist;
+        }
+
+        public float DistanceToDestination(Vector3 point)
+        {
+            return Vector3.Distance(point, BotOwner.Transform.position);
+        }
 
         public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
 
         public Vector3 UnderFireFromPosition { get; set; }
 
         public bool HasEnemyAndCanShoot => BotOwner.Memory.GoalEnemy?.CanShoot == true && BotOwner.Memory.GoalEnemy?.IsVisible == true;
+
+        public AILimitClass AILimit { get; private set; }
 
         public BotUnstuckClass BotStuck { get; private set; }
 
