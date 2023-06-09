@@ -33,11 +33,9 @@ namespace SAIN.Patches
             {
                 if (!Environment.StackTrace.Contains("BotTalk") && PatchHelpers.BadTriggers.Contains(@event))
                 {
-                    //Logger.LogError($"Blocked [{@event}] with Mask [{mask}] Aggressive: [{aggressive}]");
                     return false;
                 }
-
-                return PatchHelpers.CheckTalkEvent(__instance, @event, mask, aggressive);
+                return PatchHelpers.CheckTalkEvent(__instance, @event, mask);
             }
         }
     }
@@ -124,14 +122,14 @@ namespace SAIN.Patches
             return botOwner?.BotsGroup?.MembersCount > 1;
         }
 
-        public static bool CheckTalkEvent(Player player, EPhraseTrigger trigger, ETagStatus mask, bool aggressive)
+        public static bool CheckTalkEvent(Player player, EPhraseTrigger trigger, ETagStatus mask)
         {
             if (player.IsAI)
             {
                 if (BotInGroup(player.AIData.BotOwner) || GoodSoloTriggers.Contains(trigger))
                 {
                     var component = player.AIData.BotOwner.GetComponent<SAINComponent>();
-                    component?.Talk.TalkEvent(trigger, mask, aggressive);
+                    component?.Talk.TalkEvent(trigger, mask);
                     return true;
                 }
             }
@@ -146,7 +144,7 @@ namespace SAIN.Patches
                 if (GoodGroupTriggers.Contains(trigger))
                 {
                     var component = botOwner.GetComponent<SAINComponent>();
-                    component?.Talk.Talk.Say(trigger, mask);
+                    component?.Talk.Say(trigger, mask);
                 }
             }
             else
@@ -154,7 +152,7 @@ namespace SAIN.Patches
                 if (GoodSoloTriggers.Contains(trigger))
                 {
                     var component = botOwner.GetComponent<SAINComponent>();
-                    component?.Talk.Talk.Say(trigger, mask);
+                    component?.Talk.Say(trigger, mask);
                 }
             }
 

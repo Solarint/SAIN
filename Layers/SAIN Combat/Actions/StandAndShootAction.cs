@@ -2,7 +2,6 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using SAIN.Layers.Logic;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;
@@ -27,7 +26,7 @@ namespace SAIN.Layers
         {
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.HasEnemyAndCanShoot || (SAIN.EnemyIsVisible && SAIN.EnemyCanShoot))
+            if (SAIN.HasEnemyAndCanShoot || SAIN.Enemy?.IsVisible == true)
             {
                 AimData.Update();
             }

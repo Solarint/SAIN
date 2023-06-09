@@ -7,18 +7,11 @@ using SAIN.Classes;
 
 namespace SAIN.Components
 {
-    public class AudioComponent : MonoBehaviour
+    public class HearingSensorClass : SAINBot
     {
-        private void Awake()
+        public HearingSensorClass(BotOwner bot) : base(bot)
         {
-            SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-        }
-
-        public void Dispose()
-        {
-            StopAllCoroutines();
-            Destroy(this);
         }
 
         public void HearSound(IAIDetails player, Vector3 position, float power, AISoundType type)
@@ -33,11 +26,6 @@ namespace SAIN.Components
 
         private void EnemySoundHeard(IAIDetails player, Vector3 position, float power, AISoundType type)
         {
-            if (BotOwner.IsDead)
-            {
-                return;
-            }
-
             if (player != null)
             {
                 if (BotOwner.GetPlayer == player.GetPlayer)
@@ -52,7 +40,7 @@ namespace SAIN.Components
 
                     if (!BotOwner.BotsGroup.IsEnemy(player))
                     {
-                        if (gunsound && BotOwner.BotsGroup.Neutrals.ContainsKey(player))
+                        if (BotOwner.BotsGroup.Neutrals.ContainsKey(player))
                         {
                             flag = true;
                         }
@@ -114,11 +102,6 @@ namespace SAIN.Components
 
         private void ReactToSound(IAIDetails person, Vector3 pos, float power, bool wasHeard, AISoundType type)
         {
-            if (BotOwner.IsDead)
-            {
-                return;
-            }
-
             if (person != null && person.AIData.IsAI && BotOwner.BotsGroup.Contains(person.AIData.BotOwner))
             {
                 return;
@@ -132,7 +115,10 @@ namespace SAIN.Components
 
             if (wasHeard)
             {
-                LastHeardSound = new LastHeardSound(person, pos, type, power);
+                if (person != null && BotOwner.BotsGroup.IsEnemy(person))
+                {
+                    LastHeardSound = new LastHeardSound(person, pos, type, power);
+                }
 
                 float dispersion = (type == AISoundType.gun) ? shooterDistance / 50f : shooterDistance / 20f;
 
@@ -149,15 +135,13 @@ namespace SAIN.Components
 
                 if (shooterDistance < BotOwner.Settings.FileSettings.Hearing.RESET_TIMER_DIST)
                 {
-                    //BotOwner.LookData.ResetUpdateTime();
+                    BotOwner.LookData.ResetUpdateTime();
                 }
 
                 if (person != null && isGunSound)
                 {
                     Vector3 to = pos + person.LookDirection;
                     bool soundclose = IsSoundClose(out var firedAtMe, pos, to, 10f);
-
-                    //BotOwner.Memory.SetPanicPoint(placeForCheck, soundclose && firedAtMe);
 
                     if (soundclose && firedAtMe)
                     {
@@ -171,7 +155,7 @@ namespace SAIN.Components
 
                         if (shooterDistance > 50f)
                         {
-                            SAIN.Talk.Talk.Say(EPhraseTrigger.SniperPhrase);
+                            SAIN.Talk.Say(EPhraseTrigger.SniperPhrase);
                         }
                     }
                 }
@@ -191,7 +175,10 @@ namespace SAIN.Components
                 {
                     var estimate = GetEstimatedPoint(pos);
 
-                    LastHeardSound = new LastHeardSound(person, estimate, type, power);
+                    if (BotOwner.BotsGroup.IsEnemy(person))
+                    {
+                        LastHeardSound = new LastHeardSound(person, estimate, type, power);
+                    }
 
                     SAIN.UnderFireFromPosition = estimate;
 
@@ -200,8 +187,6 @@ namespace SAIN.Components
                         BotOwner.BotsGroup.AddPointToSearch(estimate, 50f, BotOwner);
                     }
                     catch (System.Exception) { }
-
-                    //BotOwner.Memory.SetPanicPoint(placeForCheck2, false);
                 }
             }
         }
@@ -265,12 +250,6 @@ namespace SAIN.Components
 
         private bool IsSoundClose(float d)
         {
-            //Check if the BotOwner is dead
-            if (BotOwner.IsDead)
-            {
-                return false;
-            }
-
             //Set the close hearing and far hearing variables
             float closehearing = 10f;
             float farhearing = 60f;
@@ -299,12 +278,6 @@ namespace SAIN.Components
 
         public bool DoIHearSound(IAIDetails enemy, Vector3 position, float power, AISoundType type, out float distance, bool withOcclusionCheck)
         {
-            if (BotOwner.IsDead)
-            {
-                distance = 0f;
-                return false;
-            }
-
             distance = (BotOwner.Transform.position - position).magnitude;
 
             // Is sound within hearing distance at all?
@@ -379,24 +352,13 @@ namespace SAIN.Components
 
         private float EnvironmentCheck(IAIDetails enemy)
         {
-            if (BotOwner.IsDead || enemy.GetPlayer == null)
-            {
-                return 1f;
-            }
-
             int botlocation = BotOwner.AIData.EnvironmentId;
             int enemylocation = enemy.GetPlayer.AIData.EnvironmentId;
-
             return botlocation == enemylocation ? 1f : 0.66f;
         }
 
         public float RaycastCheck(Vector3 botpos, Vector3 enemypos, float environmentmodifier)
         {
-            if (BotOwner.IsDead)
-            {
-                return 1f;
-            }
-
             if (raycasttimer < Time.time)
             {
                 raycasttimer = Time.time + 0.25f;
@@ -434,11 +396,7 @@ namespace SAIN.Components
             return occlusionmodifier;
         }
 
-        private SAINComponent SAIN;
-
         private ManualLogSource Logger;
-
-        private BotOwner BotOwner => SAIN.BotOwner;
 
         private float occlusionmodifier = 1f;
 
@@ -447,13 +405,5 @@ namespace SAIN.Components
         public delegate void GDelegate4(Vector3 vector, float bulletDistance, AISoundType type);
 
         public event GDelegate4 OnEnemySounHearded;
-    }
-
-    public class HeardSound
-    {
-        public HeardSound(Vector3 position, float distance, AISoundType type, IAIDetails Owner = null)
-        {
-
-        }
     }
 }

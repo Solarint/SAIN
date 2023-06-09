@@ -2,7 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using System.Drawing;
+using SAIN.Classes;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -50,7 +50,7 @@ namespace SAIN.Layers
                 }
             }
 
-            if (CoverPoint != null && !SAIN.BotIsMoving && !SAIN.Cover.BotIsAtCoverPoint)
+            if (CoverPoint != null && !SAIN.BotStuck.BotIsMoving && !SAIN.Cover.BotIsAtCoverPoint)
             {
                 BotOwner.Steering.LookToMovingDirection();
                 MoveToPoint(CoverPoint.Position);
@@ -91,6 +91,7 @@ namespace SAIN.Layers
 
         public override void Start()
         {
+            MoveToCover = new MoveToCoverObject(BotOwner);
             if (SAIN.Cover.BotIsAtCoverPoint)
             {
                 SAIN.Steering.ManualUpdate();
@@ -108,6 +109,8 @@ namespace SAIN.Layers
                 }
             }
         }
+
+        private MoveToCoverObject MoveToCover;
 
         public override void Stop()
         {

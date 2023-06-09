@@ -239,3 +239,4 @@ C:\Users\fear2\Documents\C# Projects\SAIN 2\obj\x86\3.5.7\SAIN.csproj.CoreCompil
 C:\Users\fear2\Documents\C# Projects\SAIN 2\obj\x86\3.5.7\SAIN.csproj.CopyComplete
 C:\Users\fear2\Documents\C# Projects\SAIN 2\obj\x86\3.5.7\SAIN.dll
 C:\Users\fear2\Documents\C# Projects\SAIN 2\obj\x86\3.5.7\SAIN.pdb
+C:\Users\fear2\Documents\C# Projects\SAIN 2\bin\x86\3.5.7\DrakiaXYZ-BigBrain.dll

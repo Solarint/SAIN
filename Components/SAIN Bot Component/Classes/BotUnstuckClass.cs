@@ -111,7 +111,7 @@ namespace SAIN.Classes
 
         public bool BotStuckOnObject()
         {
-            if (CanBeStuckDecisions(SAIN.CurrentDecision) && !BotIsMoving && !BotOwner.DoorOpener.Interacting && SAIN.Decisions.TimeSinceChangeDecision > 0.5f)
+            if (CanBeStuckDecisions(SAIN.CurrentDecision) && !BotIsMoving && !BotOwner.DoorOpener.Interacting && SAIN.Decision.TimeSinceChangeDecision > 0.5f)
             {
                 Vector3 botPos = BotOwner.Position;
                 botPos.y += 0.1f;

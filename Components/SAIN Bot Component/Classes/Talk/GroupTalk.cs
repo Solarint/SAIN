@@ -11,7 +11,7 @@ namespace SAIN.Classes
     public class GroupTalk : SAINBot
     {
         protected ManualLogSource Logger;
-        private BotTalk Talk => SAIN.Talk.Talk;
+        private BotTalkClass Talk => SAIN.Talk;
 
         public GroupTalk(BotOwner bot) : base(bot)
         {
@@ -77,7 +77,7 @@ namespace SAIN.Classes
             trigger |= EPhraseTrigger.LootWeapon;
             trigger |= EPhraseTrigger.OnLoot;
 
-            SAIN.Talk.Talk.Say(trigger, null, true);
+            SAIN.Talk.Say(trigger, null, true);
         }
 
         public void Dispose()
@@ -91,9 +91,9 @@ namespace SAIN.Classes
             }
         }
 
-        public void ManualUpdate()
+        public void Update()
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding || !Talk.CanBotTalk || !BotSquad.BotInGroup)
+            if (!SAIN.BotActive || SAIN.GameIsEnding || !Talk.CanTalk || !BotSquad.BotInGroup)
             {
                 if (Subscribed)
                 {
@@ -154,17 +154,17 @@ namespace SAIN.Classes
             return closeFriend;
         }
 
-        private void AllMembersSay(TalkEventObject talk, float delay = 1.5f, float chance = 100f)
+        private void AllMembersSay(EPhraseTrigger trigger, ETagStatus mask, float delay = 1.5f, float chance = 100f)
         {
-            foreach (var member in BotSquad.SquadMembers.Keys)
+            foreach (var member in BotSquad.SquadMembers.Values)
             {
-                if (member != null && !member.IsDead)
+                if (member != null && !member.BotOwner.IsDead)
                 {
-                    if (Vector3.Distance(member.Transform.position, SAIN.BotSquad.Leader.Transform.position) < 20f)
+                    if (Vector3.Distance(member.Position, SAIN.BotSquad.Leader.Position) < 20f)
                     {
                         if (EFT_Math.RandomBool(chance))
                         {
-                            member?.GetComponent<BotTalkComponent>()?.TalkAfterDelay(talk, delay);
+                            member.Talk.TalkAfterDelay(trigger, mask, delay);
                         }
                     }
                 }
@@ -185,8 +185,8 @@ namespace SAIN.Classes
                         {
                             CheckFriendliesTimer = Time.time + 10f;
 
-                            SAIN.Talk.Talk.Say(trigger, ETagStatus.Combat, true);
-                            AllMembersSay(new TalkEventObject(EPhraseTrigger.Roger, ETagStatus.Aware, false), Random.Range(0.5f, 1.5f), 60f);
+                            SAIN.Talk.Say(trigger, ETagStatus.Combat, true);
+                            AllMembersSay(EPhraseTrigger.Roger, ETagStatus.Aware, Random.Range(0.5f, 1.5f), 60f);
                         }
                     }
                 }
@@ -202,12 +202,12 @@ namespace SAIN.Classes
                 var trigger = EPhraseTrigger.PhraseNone;
                 HurtTalkTimer = Time.time + 15f * Random.Range(0.66f, 1.33f);
 
-                if (SAIN.HasEnemy && SAIN.Enemy.SAINEnemy.PathDistance < 10f)
+                if (SAIN.HasEnemy && SAIN.Enemy.PathDistance < 10f)
                 {
                     return false;
                 }
 
-                var health = SAIN.BotStatus.HealthStatus;
+                var health = SAIN.HealthStatus;
                 switch (health)
                 {
                     case ETagStatus.Injured:
@@ -234,7 +234,7 @@ namespace SAIN.Classes
             return false;
         }
 
-        public bool TalkRetreat => SAIN.EnemyIsVisible && SAIN.Decisions.RetreatDecisions.Contains(SAIN.CurrentDecision);
+        public bool TalkRetreat => SAIN.Enemy?.IsVisible == true && SAIN.Decision.RetreatDecisions.Contains(SAIN.CurrentDecision);
 
         public bool TalkCurrentAction()
         {
@@ -390,7 +390,7 @@ namespace SAIN.Classes
                 if (commandTrigger != EPhraseTrigger.PhraseNone)
                 {
                     Talk.Say(commandTrigger, commmandMask, true);
-                    AllMembersSay(new TalkEventObject(trigger, mask, false), Random.Range(0.5f, 1.5f), 50f);
+                    AllMembersSay(trigger, mask, Random.Range(0.5f, 1.5f), 50f);
                     return true;
                 }
             }
@@ -411,15 +411,15 @@ namespace SAIN.Classes
                 if (SAIN.HasEnemyAndCanShoot)
                 {
                     var enemy = SAIN.Enemy;
-                    if (enemy.HasEnemy && enemy.SAINEnemy.EnemyLookingAtMe)
+                    if (SAIN.HasEnemy && enemy.EnemyLookingAtMe)
                     {
                         mask = ETagStatus.Combat;
-                        bool injured = !SAIN.BotStatus.Healthy && !SAIN.BotStatus.Injured;
+                        bool injured = !SAIN.Healthy && !SAIN.Injured;
                         trigger = injured ? EPhraseTrigger.NeedHelp : EPhraseTrigger.OnRepeatedContact;
                     }
                     else
                     {
-                        EnemyDirectionCheck(enemy.SAINEnemy.Person.Position, out trigger, out mask);
+                        EnemyDirectionCheck(enemy.Person.Position, out trigger, out mask);
                     }
                 }
 
@@ -538,9 +538,9 @@ namespace SAIN.Classes
 
         private bool SayRatCheck()
         {
-            if (SAIN.Enemy.SAINEnemy != null && BotOwner.Memory.GoalEnemy != null)
+            if (SAIN.Enemy != null && BotOwner.Memory.GoalEnemy != null)
             {
-                if (SAIN.Enemy.SAINEnemy.GoalEnemy.TimeLastSeenReal > 30f && RatTimer < Time.time)
+                if (SAIN.Enemy.GoalEnemy.TimeLastSeenReal > 30f && RatTimer < Time.time)
                 {
                     RatTimer = Time.time + 60f * Random.Range(0.75f, 1.25f);
 
@@ -554,7 +554,7 @@ namespace SAIN.Classes
         }
 
         public SAINLogicDecision[] GroupDecisions => BotSquad.GroupDecisions;
-        public BotTalkComponent LeaderComponent => SAIN.BotSquad.LeaderComponent?.Talk;
+        public BotTalkClass LeaderComponent => SAIN.BotSquad.LeaderComponent?.Talk;
         private float Randomized => Random.Range(0.75f, 1.25f);
         private SquadClass BotSquad => SAIN.BotSquad;
 

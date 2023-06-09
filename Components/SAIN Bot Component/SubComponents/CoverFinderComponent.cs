@@ -2,6 +2,7 @@
 using EFT;
 using EFT.Interactive;
 using SAIN.Helpers;
+using SAIN.Classes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,7 +46,6 @@ namespace SAIN.Components
 
         private IEnumerator FindCover()
         {
-            var Delay = new WaitForEndOfFrame();
             while (true)
             {
                 tooclose = 0;
@@ -67,6 +67,12 @@ namespace SAIN.Components
                     for (int i = 0; i < hits; i++)
                     {
                         var collider = colliders[i];
+
+                        if (SAIN.AILimitTimer > 0f && frameWait == 15)
+                        {
+                            yield return null;
+                        }
+
                         // Every 20 colliders checked, wait until the next frame before continuing.
                         if (frameWait == 30)
                         {
@@ -83,7 +89,7 @@ namespace SAIN.Components
                                 {
                                     cover = newPoint;
                                 }
-                                if (newPoint.Collider.bounds.size.y > 1.6f)
+                                if (newPoint.Collider.bounds.size.y > 1.5f)
                                 {
                                     FallBackPoint = newPoint;
                                 }
@@ -128,7 +134,7 @@ namespace SAIN.Components
                         DebugGizmos.SingleObjects.Line(CurrentFallBackPoint.Position, SAIN.HeadPosition, Color.yellow, 0.1f, true, 0.25f);
                     }
                 }
-                yield return new WaitForSeconds(CoverUpdateFrequency.Value);
+                yield return new WaitForSeconds(CoverUpdateFrequency.Value + SAIN.AILimitTimeAdd);
             }
         }
 
@@ -365,55 +371,30 @@ namespace SAIN.Components
 
         private bool RecheckPoint()
         {
+            CoverPoint Cover = null;
+            CoverPoint FallBack = null;
+
             float distance;
-            if (CurrentCover != null)
-            {
-                distance = Vector3.Distance(CurrentCover.Position, OriginPoint);
-
-                if (distance > 30f)
-                {
-                    CurrentCover = null;
-                }
-                else
-                {
-                    if (CheckCollider(CurrentCover.Collider, out var point1))
-                    {
-                        CurrentCover = point1;
-                    }
-                    else
-                    {
-                        CurrentCover = null;
-                    }
-                }
-            }
-
             if (CurrentFallBackPoint != null)
             {
-                distance = Vector3.Distance(CurrentFallBackPoint.Position, OriginPoint);
-
-                if (distance > 30f)
+                distance = Vector3.Distance(CurrentFallBackPoint.Collider.transform.position, OriginPoint);
+                if (distance <= 30f && CheckCollider(CurrentFallBackPoint.Collider, out var point2))
                 {
-                    CurrentCover = null;
-                }
-                else
-                {
-                    if (CheckCollider(CurrentFallBackPoint.Collider, out var point2))
-                    {
-                        CurrentFallBackPoint = point2;
-                    }
-                    else
-                    {
-                        CurrentFallBackPoint = null;
-                    }
+                    FallBack = point2;
                 }
             }
 
-            if (CurrentCover == null && CurrentFallBackPoint != null)
+            bool OldPointGood = false;
+            if (CurrentCover != null)
             {
-                CurrentCover = CurrentFallBackPoint;
+                distance = Vector3.Distance(CurrentCover.Collider.transform.position, OriginPoint);
+                if (distance <= 30f && CheckCollider(CurrentCover.Collider, out var point1))
+                {
+                    Cover = point1;
+                }
             }
 
-            return CurrentCover != null && CurrentFallBackPoint != null;
+            return OldPointGood;
         }
 
         public bool CheckPositionVsOtherBots(Vector3 position)

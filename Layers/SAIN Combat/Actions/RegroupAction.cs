@@ -18,7 +18,7 @@ namespace SAIN.Layers
         {
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.HasEnemy && SAIN.EnemyIsVisible)
+            if (SAIN.Enemy?.IsVisible == true)
             {
                 BotOwner.GetPlayer.EnableSprint(false);
                 SAIN.Steering.ManualUpdate();
@@ -64,9 +64,9 @@ namespace SAIN.Layers
         private void CheckShouldSprint(Vector3 pos)
         {
             bool hasEnemy = SAIN.HasEnemy;
-            bool enemyLOS = SAIN.EnemyInLineOfSight;
+            bool enemyLOS = SAIN.Enemy?.InLineOfSight == true;
             float leadDist = (pos - BotOwner.Position).magnitude;
-            float enemyDist = hasEnemy ? (SAIN.Enemy.SAINEnemy.Person.Position - BotOwner.Position).magnitude : 999f;
+            float enemyDist = hasEnemy ? (SAIN.Enemy.Person.Position - BotOwner.Position).magnitude : 999f;
 
             bool sprint = hasEnemy && leadDist > 30f && enemyLOS && enemyDist > 50f;
 

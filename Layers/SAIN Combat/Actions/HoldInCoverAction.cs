@@ -2,7 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using SAIN.Layers.Logic;
+using SAIN.Layers;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;

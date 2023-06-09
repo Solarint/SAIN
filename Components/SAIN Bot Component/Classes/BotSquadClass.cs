@@ -110,7 +110,7 @@ namespace SAIN.Classes
                             decisions.Add(component.CurrentDecision);
                             locations.Add(member.Position);
 
-                            if (component.Decisions.RetreatDecisions.Contains(component.CurrentDecision))
+                            if (component.Decision.RetreatDecisions.Contains(component.CurrentDecision))
                             {
                                 MemberIsFallingBack = true;
                             }

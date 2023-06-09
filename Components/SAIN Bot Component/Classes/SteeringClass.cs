@@ -29,7 +29,7 @@ namespace SAIN.Classes
                 {
                     LookToGoalEnemyPos();
                 }
-                else if (SAIN.HasEnemy && SAIN.EnemyIsVisible)
+                else if (SAIN.HasEnemy && SAIN.Enemy.IsVisible)
                 {
                     LookToGoalEnemyPos();
                 }
@@ -66,7 +66,7 @@ namespace SAIN.Classes
 
         public void LookToPriorityEnemyPos()
         {
-            var priority = SAIN.Enemy.SAINEnemy;
+            var priority = SAIN.Enemy;
             if (priority != null && priority.IsVisible && priority.EnemyChestPosition != null)
             {
                 var enemyPos = priority.EnemyChestPosition;
