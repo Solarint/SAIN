@@ -32,7 +32,6 @@ namespace SAIN.Classes
                 if (CheckMoveTimer < Time.time)
                 {
                     CheckMoveTimer = Time.time + 0.1f;
-                    Vector3 CornerDest = CornerDestination.Value;
                     Vector3 FinalDest = CurrentFinalDestination.Value;
 
                     if (BotIsStuck && UnstuckMoveTimer < Time.time)
@@ -45,17 +44,18 @@ namespace SAIN.Classes
                         }
                     }
 
-                    if (BotIsAtPoint(CurrentFinalDestination.Value, 1f, true))
+                    Vector3 CornerDest = CornerDestination.Value;
+                    if (BotIsAtPoint(FinalDest, 1f, true))
                     {
                         Logger.LogDebug("Bot Arrived at Final Destination");
                         return false;
                     }
 
-                    if (!BotIsAtPoint(CornerDestination.Value))
+                    if (!BotIsAtPoint(CornerDest))
                     {
-                        if (!AgentDestinationCompare())
+                        if (!AgentDestinationCompare(CornerDest))
                         {
-                            Agent.SetDestination(CornerDestination.Value);
+                            Agent.SetDestination(CornerDest);
                         }
                     }
                     else
