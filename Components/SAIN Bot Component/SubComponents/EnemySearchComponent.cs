@@ -29,6 +29,11 @@ namespace SAIN.Components
                 return;
             }
 
+            if (SAIN.AILimited)
+            {
+                return;
+            }
+
             CheckStuckOrReset();
 
             CheckShouldSprint();
@@ -55,7 +60,7 @@ namespace SAIN.Components
 
         private void CheckStuckOrReset()
         {
-            if ((SAIN.BotIsStuck || !SAIN.BotIsMoving) && SAIN.CurrentTargetPosition != null && ResetTimer < Time.time)
+            if ((SAIN.BotStuck.BotIsStuck || !SAIN.BotStuck.BotIsMoving) && SAIN.CurrentTargetPosition != null && ResetTimer < Time.time)
             {
                 ResetTimer = Time.time + 1f;
                 Init(SAIN.CurrentTargetPosition.Value);
@@ -215,7 +220,7 @@ namespace SAIN.Components
                     BotOwner.SetTargetMoveSpeed(0.33f);
                     BotOwner.SetPose(0.8f);
 
-                    if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving) || SAIN.BotIsStuck)
+                    if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving) || SAIN.BotStuck.BotIsStuck)
                     {
                         PeekMoveDestination = Vector3.zero;
                         //BotOwner.GetPlayer.MovementContext.SetTilt(0f, false);
@@ -225,7 +230,12 @@ namespace SAIN.Components
                     }
                 }
 
-                yield return new WaitForEndOfFrame();
+                if (SAIN.AILimited)
+                {
+                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                }
+
+                yield return null;
             }
         }
 

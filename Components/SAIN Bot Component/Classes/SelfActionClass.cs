@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using UnityEngine;
+using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {
@@ -9,27 +10,24 @@ namespace SAIN.Classes
         public SelfActionClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            BotOwner.Medecine.RefreshCurMeds();
         }
 
-        public void Activate()
+        public void DoSelfAction()
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
+            if (!SAIN.BotActive || SAIN.GameIsEnding || BotOwner.Medecine.Using)
             {
                 return;
             }
 
-            if (BotOwner.Medecine.Using)
-            {
-                return;
-            }
-
-            if (SAIN.Decisions.StartCancelReload())
+            if (SAIN.Decision.StartCancelReload())
             {
                 BotCancelReload();
                 return;
             }
 
-            switch (SAIN.CurrentDecision)
+            var Decision = SAIN.CurrentDecision;
+            switch (Decision)
             {
                 case SAINLogicDecision.Reload:
                     DoReload();
@@ -58,28 +56,24 @@ namespace SAIN.Classes
             if (HealTimer < Time.time && heal.ShallStartUse())
             {
                 HealTimer = Time.time + 5f;
-
-                if (UserSettings.DebugConfig.DebugLayers.Value)
+                if (DebugBotDecisions.Value)
                 {
                     Logger.LogDebug($"I healed!");
                 }
-
-                heal.TryApplyToCurrentPart(null, null);
+                heal.TryApplyToCurrentPart();
             }
         }
 
         public void DoSurgery()
         {
             var surgery = BotOwner.Medecine.SurgicalKit;
-            if (surgery.ShallStartUse() && HealTimer < Time.time)
+            if (HealTimer < Time.time && surgery.ShallStartUse())
             {
-                HealTimer = Time.time + 20f;
-
-                if (UserSettings.DebugConfig.DebugLayers.Value)
+                HealTimer = Time.time + 5f;
+                if (DebugBotDecisions.Value)
                 {
                     Logger.LogDebug($"Used Surgery");
                 }
-
                 surgery.ApplyToCurrentPart();
             }
         }
@@ -90,26 +84,26 @@ namespace SAIN.Classes
             if (StimTimer < Time.time && stims.CanUseNow())
             {
                 StimTimer = Time.time + 5f;
-
-                if (UserSettings.DebugConfig.DebugLayers.Value)
+                if (DebugBotDecisions.Value)
                 {
                     Logger.LogDebug($"I'm Popping Stims");
                 }
 
-                stims.TryApply(true, null, null);
+                try { stims.TryApply(); }
+                catch { }
             }
         }
 
         public void DoReload()
         {
-            if (!BotOwner.WeaponManager.Reload.Reloading)
+            var reload = BotOwner.WeaponManager.Reload;
+            if (!reload.Reloading)
             {
-                if (UserSettings.DebugConfig.DebugLayers.Value)
+                if (DebugBotDecisions.Value)
                 {
                     Logger.LogDebug($"Reloading!");
                 }
-
-                BotOwner.WeaponManager.Reload.Reload();
+                reload.Reload();
             }
         }
 
@@ -117,8 +111,6 @@ namespace SAIN.Classes
         {
             if (BotOwner.WeaponManager.Reload.Reloading)
             {
-                //Logger.LogDebug($"I need to stop reloading!");
-
                 BotOwner.WeaponManager.Reload.TryStopReload();
             }
         }

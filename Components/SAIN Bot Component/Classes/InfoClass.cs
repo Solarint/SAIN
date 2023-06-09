@@ -4,6 +4,7 @@ using SAIN.Helpers;
 using System;
 using System.Linq;
 using UnityEngine;
+using static SAIN.UserSettings.TalkConfig;
 
 namespace SAIN.Classes
 {
@@ -12,15 +13,23 @@ namespace SAIN.Classes
         public BotInfoClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            Init();
+            WeaponInfo = new WeaponInfo(bot);
+        }
 
+        private void Init()
+        {
             BotType = BotOwner.Profile.Info.Settings.Role;
+            Faction = BotOwner.Profile.Side;
+
             IsBoss = CheckIsBoss(BotType);
             IsFollower = CheckIsFollower(BotType);
-            Faction = BotOwner.Profile.Side;
-            SetPersonality();
-            DifficultyModifier = CalculateDifficulty(bot);
+            IsScav = BotType == WildSpawnType.assault || BotType == WildSpawnType.cursedAssault || BotType == WildSpawnType.marksman;
+            IsPMC = BotOwner.Brain.BaseBrain.ShortName() == "PMC";
 
-            WeaponInfo = new WeaponInfo(bot);
+            DifficultyModifier = CalculateDifficulty(BotOwner);
+
+            SetPersonality();
         }
 
         public void Update()
@@ -36,6 +45,33 @@ namespace SAIN.Classes
             {
                 PersonalityTimer = Time.time + 10f;
                 SetPersonality();
+            }
+        }
+
+        public bool CanBotTalk
+        {
+            get
+            {
+                if (BotOwner.Settings.FileSettings.Mind.CAN_TALK && TalkGlobal.Value)
+                {
+                    if (IsBoss)
+                    {
+                        return BossTalk.Value;
+                    }
+                    if (IsFollower)
+                    {
+                        return FollowerTalk.Value;
+                    }
+                    if (IsScav)
+                    {
+                        return ScavTalk.Value;
+                    }
+                    if (IsPMC)
+                    {
+                        return PMCTalk.Value;
+                    }
+                }
+                return false;
             }
         }
 
@@ -233,6 +269,8 @@ namespace SAIN.Classes
             }
         }
 
+        public bool IsScav { get; private set; }
+
         public WeaponInfo WeaponInfo { get; private set; }
 
         public float DifficultyModifier { get; private set; }
@@ -249,6 +287,8 @@ namespace SAIN.Classes
 
         public bool IsFollower { get; private set; }
 
+        public bool IsPMC { get; private set; }
+
         public static bool CheckIsBoss(WildSpawnType bottype)
         {
             WildSpawnType[] bossTypes = new WildSpawnType[0];
@@ -260,12 +300,8 @@ namespace SAIN.Classes
                     bossTypes[bossTypes.Length - 1] = type;
                 }
             }
-            if (bossTypes.Contains(bottype))
-            {
-                return true;
-            }
 
-            return false;
+            return bossTypes.Contains(bottype) || bottype == WildSpawnType.sectantPriest;
         }
 
         public static bool CheckIsFollower(WildSpawnType bottype)
@@ -279,12 +315,7 @@ namespace SAIN.Classes
                     followerTypes[followerTypes.Length - 1] = type;
                 }
             }
-            if (followerTypes.Contains(bottype))
-            {
-                return true;
-            }
-
-            return false;
+            return followerTypes.Contains(bottype) || bottype == WildSpawnType.sectantWarrior;
         }
 
         private ManualLogSource Logger;

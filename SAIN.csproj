@@ -199,10 +199,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\SAIN Bot Component\Classes\BotUnstuckClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\LastHeardSoundClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\CoverPointClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\Decision\SquadDecisionComponent.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\CoverClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\CoverPointClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\DecisionClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\HearingSensorClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\LastHeardSoundClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\MoveToCoverObject.cs" />
+    <Compile Include="Components\SAIN Bot Component\SubComponents\SquadDecisionComponent.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Talk\SquadLeaderClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\SubComponents\CoverFinderComponent.cs" />
     <Compile Include="Config\AudioConfig.cs" />
     <Compile Include="Config\DazzleConfig.cs" />
     <Compile Include="Config\BotShootConfig.cs" />
@@ -241,21 +246,14 @@
     <Compile Include="Components\SAIN Bot Component\Classes\SelfActionClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\WeaponInfoClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\LightDetectionClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\AudioComponent.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\BotTalkComponent.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\Talk\BotTalk.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Talk\BotTalkClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Talk\EnemyTalkClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\Talk\EnemyTalkObject.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\EnemyTalkObject.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Talk\GroupTalk.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\BotSquadClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\BotStatusClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\DebugClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\EnemyComponent.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\SAINEnemyClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\InfoClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\CoverComponent.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\Decision\DecisionComponent.cs" />
     <Compile Include="Components\SAIN Bot Component\SAINEnum.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\CoverFinderComponent.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\GrenadeTrackerComponent.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\EnemySearchComponent.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\LeanComponent.cs" />
@@ -270,12 +268,7 @@
     <Compile Include="Layers\SAIN Combat\SAINFightLayer.cs" />
     <Compile Include="Layers\SAIN Combat\Actions\ShootAction.cs" />
     <Compile Include="Layers\SAIN Combat\Actions\RetreatAction.cs" />
-    <Compile Include="Layers\SAIN Combat\Actions\FightAction.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\MovementClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\SteeringClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\Update\UpdateShoot.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\Update\UpdateMove.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\Update\UpdateTarget.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
     <Compile Include="Helpers\DodgeHelpers.cs" />
     <Compile Include="Layers\SAIN Combat\Actions\DogfightAction.cs" />

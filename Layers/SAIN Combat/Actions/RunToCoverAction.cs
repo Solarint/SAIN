@@ -2,6 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
+using SAIN.Classes;
 using UnityEngine;
 
 namespace SAIN.Layers
@@ -18,53 +19,44 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (CoverPoint != null)
+            if (MoveToCover == null)
             {
-                if (!SAIN.BotIsMoving && !SAIN.Cover.BotIsAtCoverPoint)
-                {
-                    MoveToPoint(CoverPoint.Position);
-                }
-                if (Vector3.Distance(CoverPoint.Position, BotOwner.Position) < 0.5f)
-                {
-                    BotOwner.GetPlayer.EnableSprint(false);
-                }
-                else
-                {
-                    BotOwner.GetPlayer.EnableSprint(true);
-                }
+                Logger.LogError("Move To Cover Is Null");
+                return;
             }
 
-            if (CoverPoint == null)
+            if (MoveToCover.MoveToCoverPoint(SAIN.Cover.ClosestPoint))
+            {
+                float distance = MoveToCover.CoverDestination.Distance;
+                if (distance < 1f)
+                {
+                    SAIN.Steering.ManualUpdate();
+                    MoveToCover?.ToggleSprint(false);
+                }
+                else if (distance > 2f)
+                {
+                    BotOwner.Steering.LookToMovingDirection();
+                    MoveToCover?.ToggleSprint(false);
+                }
+            }
+            else
             {
                 SAIN.Steering.ManualUpdate();
             }
-        }
-
-        private void MoveToPoint(Vector3 point)
-        {
-            BotOwner.SetPose(1f);
-            BotOwner.SetTargetMoveSpeed(1f);
-
-            BotOwner.GoToPoint(point, false, 0.75f, false, false);
-
-            BotOwner.DoorOpener.Update();
-
-            BotOwner.Steering.LookToMovingDirection();
         }
 
         private readonly SAINComponent SAIN;
 
         public override void Start()
         {
-            if (CoverPoint != null)
-            {
-                MoveToPoint(CoverPoint.Position);
-            }
+            MoveToCover = new MoveToCoverObject(BotOwner);
         }
+
+        private MoveToCoverObject MoveToCover;
 
         public override void Stop()
         {
-            BotOwner.GetPlayer.EnableSprint(false);
+            MoveToCover?.ToggleSprint(false);
         }
 
         public ManualLogSource Logger;

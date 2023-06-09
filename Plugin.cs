@@ -97,48 +97,38 @@ namespace SAIN
             //BrainManager.AddCustomLayer(typeof(SAINRoamingLayer), new List<string>(NormalBots), 1);
 
             BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(NormalBots), 95);
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 95);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 1);
             BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Followers), 95);
         }
 
         private void Update()
         {
-            // Add Components to main player
-
-            if (Singleton<GameWorld>.Instance != null)
+            MainPlayer = Singleton<GameWorld>.Instance?.MainPlayer;
+            if (MainPlayer == null)
             {
-                AddTalkComponent.AddSingleComponent<PlayerTalkComponent>();
-                AddFlashlightComponent.AddSingleComponent<FlashLightComponent>();
-                /*
-                var player = Singleton<GameWorld>.Instance.MainPlayer;
+                ComponentAdded = false;
+                return;
+            }
 
-                if (player != null)
-                {
-                    Vector3 botPos = player.MainParts[BodyPartType.head].Position;
-                    Vector3 lookDir = player.LookDirection;
-                    if (Physics.Raycast(botPos, lookDir, out var hit, 2f, LayerMaskClass.InteractiveMask))
-                    {
-                        Logger.LogWarning($"[{hit.transform.name}]");
+            // Add Components to main player
+            if (!ComponentAdded)
+            {
+                MainPlayer.GetOrAddComponent<PlayerTalkComponent>();
+                MainPlayer.GetOrAddComponent<FlashLightComponent>();
+                ComponentAdded = true;
+            }
 
-                        if (hit.transform.name.ToLower().Contains("door"))
-                        {
-                            Door door = hit.transform.GetComponent<Door>();
-                            if (door != null)
-                            {
-                                Logger.LogWarning($"CheckStuck(): Found Door Component");
-                            }
-                            else
-                            {
-                                Logger.LogWarning($"CheckStuck(): No Door Component");
-                            }
-                        }
-                    }
-                }
-                */
+            if (UpdatePositionTimer < Time.time)
+            {
+                UpdatePositionTimer = Time.time + 1f;
+                MainPlayerPosition = MainPlayer.Position;
             }
         }
 
-        private readonly MainPlayerComponentSingle AddTalkComponent = new MainPlayerComponentSingle();
-        private readonly MainPlayerComponentSingle AddFlashlightComponent = new MainPlayerComponentSingle();
+        public static Vector3 MainPlayerPosition { get; private set; }
+        public static Player MainPlayer { get; private set; }
+
+        private bool ComponentAdded = false;
+        private float UpdatePositionTimer = 0f;
     }
 }

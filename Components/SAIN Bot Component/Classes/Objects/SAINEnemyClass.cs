@@ -1,94 +1,11 @@
 ﻿using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UIElements;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SAIN.Classes
 {
-    public class EnemyComponent : MonoBehaviour
-    {
-        private void Awake()
-        {
-            SAIN = GetComponent<SAINComponent>();
-        }
-
-        private void Update()
-        {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
-            {
-                return;
-            }
-
-            if (BotOwner.Memory.GoalEnemy != null)
-            {
-                var person = BotOwner.Memory.GoalEnemy.Person;
-
-                if (SAINEnemy == null || (SAINEnemy != null && SAINEnemy.Person != person))
-                {
-                    SAINEnemy = new SAINEnemy(BotOwner, person);
-                }
-            }
-            else
-            {
-                SAINEnemy = null;
-            }
-
-            if (SAINEnemy != null)
-            {
-                SAINEnemy.ManualUpdate();
-            }
-        }
-
-        public bool HasEnemy => SAINEnemy != null;
-
-        public SAINEnemy SAINEnemy { get; private set; }
-
-        public IAIDetails ClosestEnemy
-        {
-            get
-            {
-                IAIDetails closestEnemy = null;
-
-                if (ActiveEnemies.Count > 0)
-                {
-                    float distance = 999f;
-                    foreach (var enemy in ActiveEnemies)
-                    {
-                        if (enemy.Key != null && enemy.Value != null)
-                        {
-                            float enemydist = Vector3.Distance(enemy.Key.Position, BotOwner.Position);
-
-                            if (enemydist < distance)
-                            {
-                                distance = enemydist;
-                                closestEnemy = enemy.Key;
-                            }
-                        }
-                    }
-                }
-
-                return closestEnemy;
-            }
-        }
-
-        public Dictionary<IAIDetails, BotSettingsClass> ActiveEnemies => BotOwner.BotsGroup.Enemies;
-
-        private SAINComponent SAIN;
-
-        private BotOwner BotOwner => SAIN.BotOwner;
-
-        public void Dispose()
-        {
-            StopAllCoroutines();
-            Destroy(this);
-        }
-    }
-
     public class SAINEnemy
     {
         public BotOwner BotOwner { get; private set; }
@@ -100,7 +17,7 @@ namespace SAIN.Classes
             Person = person;
         }
 
-        public void ManualUpdate()
+        public void Update()
         {
             UpdateVisible();
             UpdatePath();
@@ -209,8 +126,6 @@ namespace SAIN.Classes
 
         public NavMeshPath Path = new NavMeshPath();
         public float PathDistance { get; private set; }
-
-        private Vector3 lastCheckPos = Vector3.zero;
 
         private float CheckPathTimer = 0f;
 

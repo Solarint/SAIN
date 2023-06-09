@@ -1,27 +1,19 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using SAIN.Classes;
 using SAIN.Components;
-using SAIN.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AI;
-using static SAIN.UserSettings.CoverConfig;
 
 namespace SAIN.Classes
 {
-    public class CoverComponent : MonoBehaviour
+    public class CoverClass : SAINBot
     {
-        private void Awake()
+        public CoverClass(BotOwner bot) : base(bot)
         {
-            SAIN = GetComponent<SAINComponent>();
             CoverFinder = BotOwner.GetOrAddComponent<CoverFinderComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
 
-        private void Update()
+        public void Update()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
@@ -32,7 +24,7 @@ namespace SAIN.Classes
             {
                 if (GetPointToHideFrom(out var target))
                 {
-                    CoverFinder.LookForCover(target, BotOwner.Position);
+                    CoverFinder.LookForCover(target.Value, BotOwner.Position);
                 }
             }
             else
@@ -41,37 +33,18 @@ namespace SAIN.Classes
             }
         }
 
-        private bool GetPointToHideFrom(out Vector3 target)
+        private bool GetPointToHideFrom(out Vector3? target)
         {
-            target = Vector3.zero;
-
+            target = null;
             if (CurrentDecision == SAINLogicDecision.RunAwayGrenade)
             {
-                var grenade = BotOwner.BewareGrenade.GrenadeDangerPoint;
-
-                if (grenade != null)
-                {
-                    target = grenade.DangerPoint;
-                }
-                else if (SAIN.HasGoalEnemy)
-                {
-                    target = SAIN.MidPoint(SAIN.GoalEnemyPos.Value);
-                }
-                else if (SAIN.HasGoalTarget)
-                {
-                    target = SAIN.MidPoint(SAIN.GoalTargetPos.Value);
-                }
+                target = BotOwner.BewareGrenade.GrenadeDangerPoint?.DangerPoint;
             }
-            else if (SAIN.HasGoalEnemy)
+            if (target == null)
             {
-                target = SAIN.GoalEnemyPos.Value;
+                target = SAIN.CurrentTargetPosition;
             }
-            else if (SAIN.HasGoalTarget)
-            {
-                target = SAIN.GoalTargetPos.Value;
-            }
-
-            return target != Vector3.zero;
+            return target != null;
         }
 
         public bool DuckInCover()
@@ -98,7 +71,7 @@ namespace SAIN.Classes
             {
                 return false;
             }
-            if (SAIN.EnemyIsVisible && SAIN.HasEnemyAndCanShoot)
+            if (SAIN.Enemy.IsVisible && SAIN.HasEnemyAndCanShoot)
             {
                 var target = BotOwner.Memory.GoalEnemy.Person.WeaponRoot.position;
                 if (CheckLimbForCover(BodyPartType.leftLeg, target, 5f) && CheckLimbForCover(BodyPartType.leftArm, target, 5f))

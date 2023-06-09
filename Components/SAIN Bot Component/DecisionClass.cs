@@ -1,17 +1,17 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Classes;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Components
 {
-    public class DecisionComponent : MonoBehaviour
+    public class DecisionClass : SAINBot
     {
-        private void Awake()
+        public DecisionClass(BotOwner bot) : base(bot)
         {
-            SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
@@ -20,7 +20,7 @@ namespace SAIN.Components
 
         public List<SAINLogicDecision> RetreatDecisions = new List<SAINLogicDecision> { SAINLogicDecision.Reload, SAINLogicDecision.RunAwayGrenade, SAINLogicDecision.RunAway, SAINLogicDecision.Surgery, SAINLogicDecision.FirstAid };
 
-        private void Update()
+        public void Update()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
@@ -115,7 +115,7 @@ namespace SAIN.Components
 
         private bool CheckContinueRetreat()
         {
-            if (SAIN.Enemy.SAINEnemy == null) return false;
+            if (SAIN.Enemy == null) return false;
 
             return RetreatDecisions.Contains(CurrentDecision) && !SAIN.Cover.BotIsAtCoverPoint && Time.time - ChangeDecisionTime < 3f && SAIN.BotHasStamina;
         }
@@ -156,13 +156,14 @@ namespace SAIN.Components
         private bool CheckStuckDecision(out SAINLogicDecision Decision)
         {
             Decision = SAINLogicDecision.None;
+            bool stuck = SAIN.BotStuck.BotIsStuck;
 
-            if (!SAIN.BotIsStuck && FinalBotUnstuckTimer != 0f)
+            if (!stuck && FinalBotUnstuckTimer != 0f)
             {
                 FinalBotUnstuckTimer = 0f;
             }
 
-            if (SAIN.BotIsStuck && BotUnstuckTimerDecision < Time.time)
+            if (stuck && BotUnstuckTimerDecision < Time.time)
             {
                 if (FinalBotUnstuckTimer == 0f)
                 {
@@ -336,8 +337,8 @@ namespace SAIN.Components
 
         private bool StartDogFightAction()
         {
-            var pathStatus = SAIN.Enemy.SAINEnemy.CheckPathDistance();
-            return pathStatus == SAINPathDistance.VeryClose && SAIN.EnemyIsVisible;
+            var pathStatus = SAIN.Enemy.CheckPathDistance();
+            return pathStatus == SAINPathDistance.VeryClose && SAIN.Enemy.IsVisible;
         }
 
         private bool HideFromFlankShot
@@ -367,7 +368,7 @@ namespace SAIN.Components
                     {
                         if (SAIN.HasEnemy && member.HasEnemy)
                         {
-                            if (SAIN.Enemy.SAINEnemy.Person == member.Enemy.SAINEnemy.Person)
+                            if (SAIN.Enemy.Person == member.Enemy.Person)
                             {
                                 start = true;
                                 break;
@@ -423,7 +424,7 @@ namespace SAIN.Components
 
             if (SAIN.HasEnemy && BotOwner.Memory.GoalEnemy != null)
             {
-                if (SAIN.HasEnemyAndCanShoot || SAIN.EnemyIsVisible)
+                if (SAIN.HasEnemyAndCanShoot || SAIN.Enemy.IsVisible)
                 {
                     return false;
                 }
@@ -467,7 +468,7 @@ namespace SAIN.Components
         {
             Decision = SAINLogicDecision.None;
 
-            if (SAIN.HasEnemyAndCanShoot || SAIN.EnemyIsVisible)
+            if (SAIN.HasEnemyAndCanShoot || SAIN.Enemy.IsVisible)
             {
                 return false;
             }
@@ -491,14 +492,14 @@ namespace SAIN.Components
 
                     if (SAIN.HasEnemy && member.HasEnemy)
                     {
-                        if (SAIN.Enemy.SAINEnemy.Person == member.Enemy.SAINEnemy.Person)
+                        if (SAIN.Enemy.Person == member.Enemy.Person)
                         {
                             if (member.CurrentDecision == SAINLogicDecision.GroupSearch)
                             {
                                 start = true;
                                 break;
                             }
-                            if (member.Enemy.SAINEnemy.PathDistance < 20f && member.EnemyIsVisible)
+                            if (member.Enemy.PathDistance < 20f && member.Enemy.IsVisible)
                             {
                                 start = true;
                                 break;
@@ -523,7 +524,7 @@ namespace SAIN.Components
 
         private bool StartStandAndShoot()
         {
-            if (SAIN.EnemyIsVisible || SAIN.HasEnemyAndCanShoot)
+            if (SAIN.Enemy.IsVisible || SAIN.HasEnemyAndCanShoot)
             {
                 float holdGround = SAIN.Info.HoldGroundDelay;
 
@@ -562,7 +563,7 @@ namespace SAIN.Components
                 }
                 else
                 {
-                    var enemy = SAIN.Enemy.SAINEnemy;
+                    var enemy = SAIN.Enemy;
                     var pathStatus = enemy.CheckPathDistance();
                     bool SeenRecent = Time.time - enemy.GoalEnemy.TimeLastSeenReal < 10f;
 
@@ -597,7 +598,7 @@ namespace SAIN.Components
                 }
                 else
                 {
-                    var enemy = SAIN.Enemy.SAINEnemy;
+                    var enemy = SAIN.Enemy;
                     var pathStatus = enemy.CheckPathDistance();
                     bool SeenRecent = Time.time - enemy.GoalEnemy.TimeLastSeenReal < 3f;
 
@@ -646,7 +647,7 @@ namespace SAIN.Components
                 }
                 else
                 {
-                    var enemy = SAIN.Enemy.SAINEnemy;
+                    var enemy = SAIN.Enemy;
                     var pathStatus = enemy.CheckPathDistance();
                     bool SeenRecent = Time.time - enemy.GoalEnemy.TimeLastSeenReal < 3f;
 
@@ -693,9 +694,9 @@ namespace SAIN.Components
                 return false;
             }
 
-            if (BotOwner.Memory.GoalEnemy != null && BotOwner.WeaponManager.Reload.Reloading && SAIN.Enemy.SAINEnemy != null)
+            if (BotOwner.Memory.GoalEnemy != null && BotOwner.WeaponManager.Reload.Reloading && SAIN.Enemy != null)
             {
-                var enemy = SAIN.Enemy.SAINEnemy;
+                var enemy = SAIN.Enemy;
                 var pathStatus = enemy.CheckPathDistance();
                 bool SeenRecent = Time.time - enemy.GoalEnemy.PersonalLastShootTime < 3f;
 
@@ -761,7 +762,8 @@ namespace SAIN.Components
                 }
                 else if (LowAmmo)
                 {
-                    if (BotOwner.Memory.GoalEnemy == null)
+                    var GoalEnemy = BotOwner.Memory.GoalEnemy;
+                    if (GoalEnemy == null)
                     {
                         if (DebugMode)
                         {
@@ -770,7 +772,7 @@ namespace SAIN.Components
 
                         needToReload = true;
                     }
-                    else if (BotOwner.Memory.GoalEnemy.TimeLastSeen < Time.time - 3f)
+                    else if (Time.time - GoalEnemy.PersonalLastShootTime > 3f)
                     {
                         if (DebugMode)
                         {
@@ -779,7 +781,7 @@ namespace SAIN.Components
 
                         needToReload = true;
                     }
-                    else if (BotOwner.Memory.GoalEnemy.Distance > 10f && !SAIN.HasEnemyAndCanShoot)
+                    else if (GoalEnemy.Distance > 10f && !GoalEnemy.IsVisible && !GoalEnemy.CanShoot)
                     {
                         if (DebugMode)
                         {
@@ -795,7 +797,6 @@ namespace SAIN.Components
         }
 
         public bool LowAmmo => AmmoRatio < LowAmmoThresh0to1;
-
         public float AmmoRatio
         {
             get
@@ -805,30 +806,13 @@ namespace SAIN.Components
                 return (float)currentAmmo / maxAmmo;
             }
         }
-
         private bool DebugMode => DebugBotDecisions.Value;
-
-        public float TimeBeforeSearch { get; private set; } = 0f;
-
+        public float TimeBeforeSearch { get; private set; }
         protected ManualLogSource Logger;
-
         private float LastStimTime = 0f;
-
         private float DecisionTimer = 0f;
-
         private float UpdateSearchTimer = 0f;
-        private BotOwner BotOwner => SAIN.BotOwner;
-
-        private SAINComponent SAIN;
-
         public SAINLogicDecision CurrentDecision { get; private set; }
-
         public SAINLogicDecision LastDecision { get; private set; }
-
-        public void Dispose()
-        {
-            StopAllCoroutines();
-            Destroy(this);
-        }
     }
 }

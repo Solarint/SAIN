@@ -19,9 +19,10 @@ namespace SAIN.Layers
         // Token: 0x060008C4 RID: 2244 RVA: 0x0002AE8C File Offset: 0x0002908C
         public override void Update()
         {
-            if (BotOwner.Memory.GoalEnemy != null)
+            var enemy = SAIN.Enemy;
+            if (enemy != null)
             {
-                if (SAIN.EnemyIsVisible)
+                if (enemy.IsVisible)
                 {
                     this.gclass112_0.Update();
                 }
@@ -39,7 +40,7 @@ namespace SAIN.Layers
                 else
                 {
                     SAIN.Steering.ManualUpdate();
-                    BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
+                    BotOwner.MoveToEnemyData.TryMoveToEnemy(enemy.Person.Position);
                 }
             }
         }
@@ -47,7 +48,7 @@ namespace SAIN.Layers
         private bool CanSeeLastCorner(out Vector3? pos)
         {
             pos = null;
-            var pathCorners = SAIN.Enemy.SAINEnemy.Path.corners;
+            var pathCorners = SAIN.Enemy.Path.corners;
             if (pathCorners.Length > 2)
             {
                 var corner = pathCorners[pathCorners.Length - 2];

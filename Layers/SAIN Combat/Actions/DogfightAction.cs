@@ -2,7 +2,7 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using SAIN.Layers.Logic;
+using SAIN.Layers;
 using UnityEngine.AI;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
@@ -22,9 +22,9 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (SAIN.Enemy.SAINEnemy != null && SAIN.Enemy.SAINEnemy.InLineOfSight)
+            if (SAIN.Enemy?.InLineOfSight == true)
             {
-                BotOwner.Steering.LookToPoint(SAIN.Enemy.SAINEnemy.EnemyChestPosition);
+                BotOwner.Steering.LookToPoint(SAIN.Enemy.EnemyChestPosition);
             }
             else
             {
@@ -38,7 +38,7 @@ namespace SAIN.Layers
                     gclass105_0.Update();
                 }
 
-                if (SAIN.EnemyIsVisible)
+                if (SAIN.Enemy?.IsVisible == true)
                 {
                     if (BackUp(out var pos))
                     {

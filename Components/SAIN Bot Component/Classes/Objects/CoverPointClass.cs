@@ -1,7 +1,7 @@
 ﻿using EFT;
 using UnityEngine;
 
-namespace SAIN.Components
+namespace SAIN.Classes
 {
     public class CoverPoint
     {
@@ -12,6 +12,15 @@ namespace SAIN.Components
             Collider = collider;
             TimeCreated = Time.time;
         }
+
+        public void MoveToCover(float pose = 1f, float speed = 1f, bool slowAtEnd = true, float reachDist = -1f)
+        {
+            BotOwner.SetPose(pose);
+            BotOwner.SetTargetMoveSpeed(speed);
+            BotOwner.GoToPoint(Position, slowAtEnd, reachDist, false, false);
+        }
+
+        public float Distance => (BotOwner.Position - Position).magnitude;
 
         public CoverStatus Status()
         {

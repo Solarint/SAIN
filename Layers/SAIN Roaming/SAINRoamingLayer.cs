@@ -35,7 +35,7 @@ namespace SAIN.Layers
             return !Active;
         }
 
-        public SAINLogicDecision LastDecision => SAIN.Decisions.LastDecision;
+        public SAINLogicDecision LastDecision => SAIN.Decision.LastDecision;
         public SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
 
         private readonly SAINComponent SAIN;

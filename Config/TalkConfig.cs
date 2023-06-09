@@ -4,11 +4,11 @@ namespace SAIN.UserSettings
 {
     internal class TalkConfig
     {
-        public static ConfigEntry<bool> NoTalkGlobal { get; private set; }
-        public static ConfigEntry<bool> NoScavTalk { get; private set; }
-        public static ConfigEntry<bool> NoPMCTalk { get; private set; }
-        public static ConfigEntry<bool> NoBossTalk { get; private set; }
-        public static ConfigEntry<bool> NoFollowerTalk { get; private set; }
+        public static ConfigEntry<bool> TalkGlobal { get; private set; }
+        public static ConfigEntry<bool> ScavTalk { get; private set; }
+        public static ConfigEntry<bool> PMCTalk { get; private set; }
+        public static ConfigEntry<bool> BossTalk { get; private set; }
+        public static ConfigEntry<bool> FollowerTalk { get; private set; }
 
         public static ConfigEntry<bool> BotTaunts { get; private set; }
         public static ConfigEntry<float> GlobalTalkLimit { get; private set; }
@@ -20,27 +20,27 @@ namespace SAIN.UserSettings
             string debugmode = "Bot Talk Settings";
 
 
-            NoTalkGlobal = Config.Bind(debugmode, "No Talk Global", false,
-                new ConfigDescription("Disables bots talking across the board. Pls no turn on, I spent a lot of time remaking their talk behavior",
+            TalkGlobal = Config.Bind(debugmode, "Bot Talk Global", true,
+                new ConfigDescription("Toggles bots being able to talk. Pls no turn off, I spent a lot of time remaking their talk behavior",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 5 }));
 
-            NoScavTalk = Config.Bind(debugmode, "No Scav Talk", false,
+            ScavTalk = Config.Bind(debugmode, "Scav Talk", true,
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
 
-            NoPMCTalk = Config.Bind(debugmode, "No PMC Talk", false,
+            PMCTalk = Config.Bind(debugmode, "PMC Talk", true,
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
 
-            NoBossTalk = Config.Bind(debugmode, "No Boss Talk", false,
+            BossTalk = Config.Bind(debugmode, "Boss Talk", true,
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
 
-            NoFollowerTalk = Config.Bind(debugmode, "No Follower Talk", false,
+            FollowerTalk = Config.Bind(debugmode, "Follower Talk", true,
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 1 }));

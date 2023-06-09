@@ -20,7 +20,6 @@ namespace SAIN.Components
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-
         private void Update()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
@@ -221,9 +220,9 @@ namespace SAIN.Components
 
 
         public Vector3 Position => BotOwner.Position;
-        public ETagStatus HealthStatus => SAIN.BotStatus.HealthStatus;
+        public ETagStatus HealthStatus => SAIN.HealthStatus;
         public SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
-        public SAINLogicDecision LastDecision => SAIN.Decisions.LastDecision;
+        public SAINLogicDecision LastDecision => SAIN.Decision.LastDecision;
         public bool AmmoStatus => BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.HaveBullets;
 
         public bool HasEnemy => SAIN.HasGoalEnemy;

@@ -1,7 +1,6 @@
 using BepInEx.Logging;
 using EFT;
 using SAIN.Helpers;
-using SAIN.Layers.Logic;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -71,6 +70,11 @@ namespace SAIN.Components
                     Lean.SetLean(Lean.Angle);
                 }
 
+                if (SAIN.AILimited)
+                {
+                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                }
+
                 yield return wait;
             }
         }
@@ -86,6 +90,11 @@ namespace SAIN.Components
                     SideStep.Update();
                 }
 
+                if (SAIN.AILimited)
+                {
+                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                }
+
                 yield return wait;
             }
         }
@@ -97,6 +106,11 @@ namespace SAIN.Components
             while (true)
             {
                 BlindFire.Update(TargetPosition.Value);
+
+                if (SAIN.AILimited)
+                {
+                    yield return new WaitForSeconds(SAIN.AILimitTimeAdd);
+                }
 
                 yield return wait;
             }

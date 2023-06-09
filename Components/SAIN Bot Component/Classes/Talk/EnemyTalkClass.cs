@@ -15,40 +15,43 @@ namespace SAIN.Classes
         public EnemyTalk(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-
             PlayerTalk = Singleton<GameWorld>.Instance.MainPlayer.GetComponent<PlayerTalkComponent>();
+        }
 
-            ResponseDist = 25f * Random.Range(0.5f, 1.5f);
-
+        private void Init()
+        {
             var type = SAIN.Info.BotPersonality;
             if (type == BotPersonality.Chad || type == BotPersonality.GigaChad)
             {
-                TauntDist = 40f;
-                TauntFreq = 6f;
-            }
-            else if (type == BotPersonality.Timmy || type == BotPersonality.Coward || type == BotPersonality.Rat)
-            {
-                TauntDist = 0f;
-                TauntFreq = 999f;
+                TauntDist = 50f;
+                TauntFreq = 8f;
             }
             else
             {
-                TauntDist = 25f;
-                TauntFreq = 15f;
+                TauntDist = 20f;
+                TauntFreq = 20f;
             }
 
+            TauntDist *= Random.Range(0.66f, 1.33f);
+            TauntFreq *= Random.Range(0.66f, 1.33f);
             TauntTimer = Time.time + TauntFreq;
+            ResponseDist = TauntDist * Random.Range(0.66f, 1.33f);
         }
 
         private readonly PlayerTalkComponent PlayerTalk;
-        private readonly float ResponseDist;
+        private float ResponseDist;
 
         private const float EnemyCheckFreq = 0.25f;
-        private readonly float TauntDist = 20f;
-        private readonly float TauntFreq = 10f;
+        private float TauntDist = 0f;
+        private float TauntFreq = 0f;
 
-        public void ManualUpdate()
+        public void Update()
         {
+            if (TauntFreq == 0f)
+            {
+                Init();
+            }
+
             if (BotOwner.Memory.GoalEnemy != null)
             {
                 if (BegForLife())
@@ -95,10 +98,10 @@ namespace SAIN.Classes
                     if (FakeTimer < Time.time)
                     {
                         FakeTimer = Time.time + 10f;
-                        var health = SAIN.BotStatus.HealthStatus;
+                        var health = SAIN.HealthStatus;
                         if (health != ETagStatus.Healthy && health != ETagStatus.Injured)
                         {
-                            float dist = (SAIN.Enemy.SAINEnemy.Person.Position - BotOwner.Position).magnitude;
+                            float dist = (SAIN.Enemy.Person.Position - BotOwner.Position).magnitude;
                             if (dist < 30f)
                             {
                                 bool random = Helpers.EFT_Math.RandomBool(1f);
@@ -128,10 +131,10 @@ namespace SAIN.Classes
                 var personality = SAIN.Info.BotPersonality;
                 if (personality == BotPersonality.Timmy || personality == BotPersonality.Coward)
                 {
-                    var health = SAIN.BotStatus.HealthStatus;
+                    var health = SAIN.HealthStatus;
                     if (health != ETagStatus.Healthy)
                     {
-                        float dist = (SAIN.Enemy.SAINEnemy.Person.Position - BotOwner.Position).magnitude;
+                        float dist = (SAIN.Enemy.Person.Position - BotOwner.Position).magnitude;
                         if (dist < 30f)
                         {
                             if (random)
@@ -182,7 +185,7 @@ namespace SAIN.Classes
             {
                 if (BotOwner.Memory.GoalEnemy.CanShoot && BotOwner.Memory.GoalEnemy.IsVisible)
                 {
-                    if (sainEnemy.SAINEnemy != null && sainEnemy.SAINEnemy.EnemyLookingAtMe)
+                    if (sainEnemy != null && sainEnemy.EnemyLookingAtMe)
                     {
                         tauntEnemy = true;
                     }
@@ -212,8 +215,6 @@ namespace SAIN.Classes
             if (tauntEnemy)
             {
                 Talk.Say(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
-
-                //Logger.LogWarning($"Bot Taunted Enemy!: [{type}]");
             }
 
             return tauntEnemy;
@@ -263,22 +264,20 @@ namespace SAIN.Classes
                     }
 
                     // Check the distance between the bots to see if they can hear them
-                    if (Vector3.Distance(player.Transform.position, BotOwner.Transform.position) < ResponseDist)
+                    if (Vector3.Distance(player.Position, BotOwner.Position) < ResponseDist)
                     {
                         if (BotOwner.BotsGroup.Enemies.ContainsKey(player))
                         {
-                            bool enemyTalked = false;
+                            bool enemyTalked;
                             if (player.IsAI)
                             {
-                                var component = player.AIData.BotOwner.GetComponent<BotTalkComponent>();
-                                if (component != null)
-                                {
-                                    enemyTalked = component.ThisBotTalked;
-                                }
+                                var recentTalk = player.AIData.BotOwner.GetComponent<SAINComponent>()?.Talk.RecentTalk;
+                                enemyTalked = recentTalk != null && recentTalk.Mask != ETagStatus.Unaware;
                             }
                             else
                             {
-                                enemyTalked = player.GetComponent<PlayerTalkComponent>().PlayerTalked;
+                                var component = player.GetComponent<PlayerTalkComponent>();
+                                enemyTalked = component?.PlayerTalked == true && component?.TagStatus != ETagStatus.Unaware;
                             }
 
                             if (enemyTalked)
@@ -309,6 +308,6 @@ namespace SAIN.Classes
         private EnemyTalkObject LastEnemyTalk;
         private float TauntTimer = 0f;
 
-        private BotTalk Talk => SAIN.Talk.Talk;
+        private BotTalkClass Talk => SAIN.Talk;
     }
 }
