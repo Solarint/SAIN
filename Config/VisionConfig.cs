@@ -7,6 +7,7 @@ namespace SAIN.UserSettings
         public static ConfigEntry<float> AbsoluteMaxVisionDistance { get; private set; }
         public static ConfigEntry<bool> NoGlobalFog { get; private set; }
         public static ConfigEntry<bool> DebugWeather { get; private set; }
+        public static ConfigEntry<bool> DebugVision { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
@@ -22,7 +23,12 @@ namespace SAIN.UserSettings
                 new AcceptableValueRange<float>(100f, 800.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
 
-            DebugWeather = Config.Bind(debugmode, "Debug Logs", false,
+            DebugWeather = Config.Bind(debugmode, "Debug Weather", false,
+                new ConfigDescription("",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
+
+            DebugVision = Config.Bind(debugmode, "Debug Vision", false,
                 new ConfigDescription("",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
