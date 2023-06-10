@@ -201,11 +201,14 @@
     <Compile Include="Components\SAIN Bot Component\Classes\AILimitClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\BotUnstuckClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\CoverClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\MoverClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Objects\CoverPointClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\DecisionClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\HearingSensorClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Objects\LastHeardSoundClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Objects\MoveToCoverObject.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\SearchMoveObject.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\NavigationPointClass.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\SquadDecisionComponent.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\CoverFinderComponent.cs" />

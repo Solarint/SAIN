@@ -37,7 +37,7 @@ namespace SAIN.Classes
                 const float FarCap = 90f;
                 const float baseTime = 0.1f;
                 const float baseTimeAdd = 0.2f;
-                const float maxTime = 0.5f;
+                const float maxTime = 0.1f;
 
                 float distance = DistanceFromLastSeen;
 
@@ -117,6 +117,7 @@ namespace SAIN.Classes
                     lineOfSight = true;
                     if (GoalEnemy?.IsVisible == true && BotOwner.LookSensor.IsPointInVisibleSector(Person.Position))
                     {
+                        visible = true;
                         if (!Reacting)
                         {
                             Reacting = true;
@@ -124,6 +125,7 @@ namespace SAIN.Classes
                         }
                         else
                         {
+                            visible = true;
                             if (ReactionTimer < Time.time)
                             {
                                 visible = true;

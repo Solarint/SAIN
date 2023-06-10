@@ -88,10 +88,12 @@ namespace SAIN.Components
                                 if (cover == null)
                                 {
                                     cover = newPoint;
+                                    CurrentCover = cover;
                                 }
                                 if (newPoint.Collider.bounds.size.y > 1.5f)
                                 {
                                     FallBackPoint = newPoint;
+                                    CurrentFallBackPoint = newPoint;
                                 }
                                 if (cover != null && FallBackPoint != null)
                                 {
@@ -313,54 +315,6 @@ namespace SAIN.Components
             return true;
         }
 
-        private bool InvalidDoors(NavMeshPath path)
-        {
-            for (int i = 0; i < path.corners.Length - 2; i++)
-            {
-                var direction = path.corners[i + 1] - path.corners[i];
-                var start = path.corners[i];
-                start.y += 0.25f;
-                if (Physics.Raycast(start, direction, out var hit, direction.magnitude + 0.25f, LayerMaskClass.InteractiveMask))
-                {
-                    if (hit.transform.name.ToLower().Contains("door"))
-                    {
-                        Door door = hit.transform.GetComponent<Door>();
-                        if (door != null)
-                        {
-                            if (DebugCoverFinder.Value)
-                            {
-                                Logger.LogWarning($"CheckStuck(): Found Door Component");
-                            }
-                            if (!door.Operatable || door.DoorState == EDoorState.Locked)
-                            {
-                                if (DebugCoverFinder.Value)
-                                {
-                                    Logger.LogWarning($"CheckStuck(): Found not operable or locked. Blocked.");
-                                }
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            if (DebugCoverFinder.Value)
-                            {
-                                Logger.LogWarning($"CheckStuck(): No Door Component. Fake Door? Returned false");
-                            }
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        if (DebugCoverFinder.Value)
-                        {
-                            Logger.LogWarning($"[{hit.transform.name}]");
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-
         private int totalCount = 0;
         private int baddist = 0;
         private int tooclose = 0;
@@ -394,7 +348,20 @@ namespace SAIN.Components
                 }
             }
 
-            return OldPointGood;
+            if (FallBack != null)
+            {
+                CurrentFallBackPoint = FallBack;
+            }
+            if (Cover != null)
+            {
+                CurrentCover = Cover;
+            }
+            if (Cover == null && FallBack != null)
+            {
+                CurrentCover = FallBack;
+            }
+
+            return Cover != null && FallBack != null;
         }
 
         public bool CheckPositionVsOtherBots(Vector3 position)

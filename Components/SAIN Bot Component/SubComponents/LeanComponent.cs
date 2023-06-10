@@ -26,7 +26,7 @@ namespace SAIN.Components
 
         private void Update()
         {
-            if (SAIN.BotActive && TargetPosition != null && !DontLeanDecisions.Contains(SAIN.CurrentDecision))
+            if (SAIN.BotActive && TargetPosition != null && !DontLeanDecisions.Contains(SAIN.CurrentDecision) && SAIN.CurrentDecision != SAINLogicDecision.Search)
             {
                 if (LeanCoroutine == null)
                 {

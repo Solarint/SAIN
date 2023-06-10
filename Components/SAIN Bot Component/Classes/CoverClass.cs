@@ -42,6 +42,11 @@ namespace SAIN.Classes
                 float? DistanceA = CoverA?.Distance;
                 float? DistanceB = CoverB?.Distance;
 
+                if (CoverA == null && CoverB == null)
+                {
+                    Logger.LogError("Both CoverPoints null");
+                }
+
                 if (DistanceA == null)
                 {
                     if (DistanceB != null)

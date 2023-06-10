@@ -22,14 +22,14 @@ namespace SAIN.Classes
 
             if (UpdateSteerTimer < Time.time)
             {
-                UpdateSteerTimer = Time.time + 0.25f;
+                //UpdateSteerTimer = Time.time + 0.25f;
 
                 var enemy = BotOwner.Memory.GoalEnemy;
                 if (enemy != null && enemy.CanShoot && enemy.IsVisible)
                 {
-                    LookToGoalEnemyPos();
+                    //LookToGoalEnemyPos();
                 }
-                else if (SAIN.HasEnemy && SAIN.Enemy.IsVisible)
+                if (SAIN.Enemy?.IsVisible == true)
                 {
                     LookToGoalEnemyPos();
                 }

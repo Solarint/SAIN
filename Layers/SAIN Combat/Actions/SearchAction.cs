@@ -1,11 +1,11 @@
 ﻿using BepInEx.Logging;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Classes;
 using SAIN.Components;
-using UnityEngine.AI;
-using UnityEngine;
 using SAIN.Helpers;
-using static SAIN.UserSettings.DebugConfig;
+using UnityEngine;
+using UnityEngine.AI;
 
 namespace SAIN.Layers
 {
@@ -14,7 +14,10 @@ namespace SAIN.Layers
         public SearchAction(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            SAIN = bot.GetComponent<SAINComponent>();
         }
+
+        private SearchMoveObject Search;
 
         public override void Start()
         {
@@ -31,6 +34,12 @@ namespace SAIN.Layers
             {
                 targetPosition = BotOwner.Transform.position;
             }
+
+            Search = new SearchMoveObject(BotOwner);
+            if (Search.GoToPoint(targetPosition) == NavMeshPathStatus.PathInvalid)
+            {
+                Logger.LogError($"Could not Start Search!");
+            }
         }
 
         public override void Stop()
@@ -39,57 +48,9 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (SAIN == null || BotOwner.IsDead || SAIN.GameIsEnding)
-            {
-                return;
-            }
-
-            if (!SAIN.BotActive)
-            {
-                return;
-            }
-
-            if (SAIN.AILimit.Enabled)
-            {
-                return;
-            }
-
-            CheckStuckOrReset();
-
             CheckShouldSprint();
-
-            if (DistanceToDestination(CurrentDestination) < 6f)
-            {
-                UpdateTargetPoints();
-                if (CornerPeekLoop == null)
-                {
-                    CornerPeekLoop = StartCoroutine(PeekCorner());
-                }
-            }
-
-            if (!Peeking)
-            {
-                Steer(CurrentDestination);
-                CornerPeekLoop = null;
-                if (BotIsAtPoint(CurrentDestination))
-                {
-                    GoToNextPoint();
-                }
-            }
-        }
-
-        private void CheckStuckOrReset()
-        {
-            if ((SAIN.BotStuck.BotIsStuck || !SAIN.BotStuck.BotIsMoving) && SAIN.CurrentTargetPosition != null && ResetTimer < Time.time)
-            {
-                ResetTimer = Time.time + 1f;
-                Init(SAIN.CurrentTargetPosition.Value);
-            }
-
-            if (AtFinalDestination && SAIN.CurrentTargetPosition != null)
-            {
-                Init(SAIN.CurrentTargetPosition.Value);
-            }
+            Search.Update(!SprintEnabled, SprintEnabled);
+            Steer(Search.ActiveDestination);
         }
 
         private void CheckShouldSprint()
@@ -107,18 +68,9 @@ namespace SAIN.Layers
         private float RandomSprintTimer = 0f;
         private float ResetTimer = 0f;
 
-        public void Init(Vector3 targetPos)
-        {
-            AtFinalDestination = false;
-            NavMesh.CalculatePath(BotOwner.Transform.position, targetPos, -1, Path);
-            FinalDestination = targetPos;
-            TotalCornerCount = Path.corners.Length;
-            GoToNextPoint();
-        }
-
         private void Steer(Vector3 pos)
         {
-            if (Peeking)
+            if (Search.PeekingCorner)
             {
                 BotOwner.SetTargetMoveSpeed(0.33f);
                 BotOwner.SetPose(0.8f);
@@ -163,138 +115,9 @@ namespace SAIN.Layers
             }
         }
 
-        private void UpdateTargetPoints()
-        {
-            CornerA = CurrentDestination;
-
-            if (BotOwner.Memory.GoalEnemy != null)
-            {
-                CornerB = BotOwner.Memory.GoalEnemy.CurrPosition;
-            }
-            else
-            {
-                CornerB = FinalDestination;
-            }
-        }
-
-        private IEnumerator PeekCorner()
-        {
-            {
-                    Peeking = true;
-
-                    Vector3 corner = CornerA;
-                    Vector3 nextCorner = CornerB;
-                    Vector3 FinalDest = FinalDestination;
-
-                    if (PeekMoveDestination == Vector3.zero)
-                    {
-                        PeekTimer = Time.time + 3f;
-
-                        Vector3 PeekDestination;
-                        if (DistanceToDestination(FinalDest) < 15f || Vector3.Distance(FinalDest, corner) < 5f)
-                        {
-                            var directionToDestination = FinalDest - BotOwner.Transform.position;
-
-                            float angle = GetSignedAngle(FinalDest, corner, BotOwner.Transform.position);
-                            float rotationAngle = angle > 0 ? -90f : 90f;
-
-                            var direction = Quaternion.Euler(0f, rotationAngle, 0f) * directionToDestination;
-
-                            PeekDestination = FinalDest + direction;
-                        }
-                        else
-                        {
-                            var directionBetweenCorners = nextCorner - corner;
-                            PeekDestination = corner - (directionBetweenCorners.normalized * 2f);
-                        }
-
-                        Vector3 peekDestination;
-                        if (NavMesh.SamplePosition(PeekDestination, out var hit, 5f, -1))
-                        {
-                            peekDestination = hit.position;
-                        }
-                        else
-                        {
-                            var random = Random.onUnitSphere * 8f;
-                            random.y = 0f;
-
-                            if (NavMesh.SamplePosition(corner + random, out var hit2, 5f, -1))
-                            {
-                                peekDestination = hit2.position;
-                            }
-                            else
-                            {
-                                peekDestination = corner;
-                            }
-                        }
-
-                        PeekMoveDestination = peekDestination;
-                        BotOwner.GoToPoint(peekDestination, false, 0.5f, false, false);
-                        BotOwner.DoorOpener.Update();
-                    }
-
-                    Steer(FinalDest);
-                    BotOwner.SetTargetMoveSpeed(0.33f);
-                    BotOwner.SetPose(0.8f);
-
-                    if (BotIsAtPoint(PeekMoveDestination) || (PeekTimer < Time.time && !BotOwner.Mover.IsMoving) || SAIN.BotStuck.BotIsStuck)
-                    {
-                        PeekMoveDestination = Vector3.zero;
-                        //BotOwner.GetPlayer.MovementContext.SetTilt(0f, false);
-                        Peeking = false;
-                        GoToNextPoint();
-                        break;
-                    }
-                }
-        }
-
-        private float GetSignedAngle(Vector3 a, Vector3 b, Vector3 origin)
-        {
-            var directionToNextCorner = a - origin;
-            var directionToCorner = b - origin;
-            return Vector3.SignedAngle(directionToNextCorner.normalized, directionToCorner.normalized, Vector3.up);
-        }
-
-        private bool BotIsAtPoint(Vector3 point, float reachDist = 1f)
-        {
-            return DistanceToDestination(point) < reachDist;
-        }
-
-        private float DistanceToDestination(Vector3 point)
-        {
-            return Vector3.Distance(point, BotOwner.Transform.position);
-        }
-
-        private void GoToNextPoint()
-        {
-            CurrentCorner++;
-            if (TotalCornerCount - 1 >= CurrentCorner)
-            {
-                BotOwner.SetTargetMoveSpeed(0.85f);
-                BotOwner.SetPose(1f);
-                CurrentDestination = Path.corners[CurrentCorner];
-                BotOwner.GoToPoint(CurrentDestination, false, 0.5f, false, false);
-                BotOwner.DoorOpener.Update();
-            }
-            else
-            {
-                AtFinalDestination = true;
-            }
-        }
 
         private SAINComponent SAIN;
         public NavMeshPath Path = new NavMeshPath();
-        public Vector3 CurrentDestination;
-        public Vector3 FinalDestination;
-        private int CurrentCorner = 0;
-        private int TotalCornerCount = 0;
-        public float DistanceToNextCorner = 0f;
-        public bool Peeking { get; private set; }
-        public bool AtFinalDestination { get; private set; }
-        private Vector3 CornerA;
-        private Vector3 CornerB;
-        private Vector3 PeekMoveDestination = Vector3.zero;
-        private float PeekTimer = 0f;
         private readonly ManualLogSource Logger;
     }
 }
