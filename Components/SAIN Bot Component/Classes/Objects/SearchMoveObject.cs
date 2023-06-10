@@ -1,98 +1,178 @@
-﻿using EFT;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.AI;
+﻿using BepInEx.Logging;
+using EFT;
+using SAIN.Helpers;
 using UnityEngine;
-using BepInEx.Logging;
+using UnityEngine.AI;
+using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {
     public class SearchMoveObject : SAINBot
     {
+        public bool PeekingCorner { get; private set; }
         public MoveDangerPoint SearchMovePoint { get; private set; }
-        private readonly NavMeshAgent Agent;
 
-        public SearchMoveObject(BotOwner bot, NavMeshAgent agent) : base(bot)
+        public SearchMoveObject(BotOwner bot) : base(bot)
         {
-            Agent = agent;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
         private readonly ManualLogSource Logger;
 
-        public bool Update(float reachDist = -1f)
+        private void MoveToNextPoint(Vector3 point)
         {
-            if (CornerDestination != null && Destination != null)
+            BotOwner.GoToPoint(point, true, ReachDistance, false, false);
+        }
+
+
+        public Vector3 ActiveDestination { get; private set; }
+        private bool FirstCheck = false;
+        private bool SecondCheck = false;
+        private bool ThirdCheck = false;
+        private float DebugDrawTimer = 0f;
+
+        public bool Update(bool lean, bool sprint, float reachDist = -1f)
+        {
+            if (DebugLayers.Value && ActiveDestination != null && DebugDrawTimer < Time.time)
             {
-                if (reachDist > 0)
+                float freq = 0.05f;
+                DebugDrawTimer = Time.time + freq;
+                DebugGizmos.SingleObjects.Line(BotOwner.Position, ActiveDestination, Color.magenta, 0.1f, true, freq, true);
+            }
+
+            if (reachDist > 0)
+            {
+                ReachDistance = reachDist;
+            }
+
+            if (SearchMovePoint == null)
+            {
+                if (TargetPosition == null)
                 {
-                    ReachDistance = reachDist;
+                    TargetPosition = SAIN.CurrentTargetPosition;
+                }
+                if (!FirstCheck && TargetPosition != null)
+                {
+                    FirstCheck = true;
+                    MoveToNextPoint(TargetPosition.Value);
+                    ActiveDestination = TargetPosition.Value;
+                    return true;
+                }
+                return false;
+            }
+
+            if (SearchMovePoint != null)
+            {
+                if (lean)
+                {
+                    UpdateLean();
+                }
+
+                if (!FirstCheck)
+                {
+                    FirstCheck = true;
+                    MoveToNextPoint(SearchMovePoint.StartPosition);
+                    ActiveDestination = SearchMovePoint.StartPosition;
+                    return true;
+                }
+
+                if (FirstCheck && !SecondCheck)
+                {
+                    if (lean)
+                    {
+                        UpdateLean();
+                    }
+                    if (BotIsAtPoint(ActiveDestination))
+                    {
+                        PeekingCorner = true;
+                        SecondCheck = true;
+                        MoveToNextPoint(SearchMovePoint.EndPosition);
+                        ActiveDestination = SearchMovePoint.EndPosition;
+                        return true;
+                    }
+                }
+
+                if (FirstCheck && SecondCheck && !ThirdCheck)
+                {
+                    if (BotIsAtPoint(ActiveDestination))
+                    {
+                        BotOwner.GetPlayer.MovementContext.SetTilt(0f);
+                        PeekingCorner = false;
+                        ThirdCheck = true;
+                        MoveToNextPoint(SearchMovePoint.DangerPoint);
+                        ActiveDestination = SearchMovePoint.DangerPoint;
+                        return true;
+                    }
+                }
+
+                if (FirstCheck && SecondCheck && ThirdCheck)
+                {
+                    if (BotIsAtPoint(ActiveDestination))
+                    {
+                        TargetPosition = SAIN.CurrentTargetPosition;
+                        if (TargetPosition != null)
+                        {
+                            var pathStatus = GoToPoint(TargetPosition.Value, false);
+                            if (pathStatus == NavMeshPathStatus.PathInvalid)
+                            {
+                                return false;
+                            }
+                            return true;
+                        }
+                    }
                 }
 
                 if (CheckMoveTimer < Time.time)
                 {
-                    CheckMoveTimer = Time.time + 0.1f;
-                    Vector3 FinalDest = Destination.Value;
-
+                    CheckMoveTimer = Time.time + 0.25f;
                     if (BotIsStuck && UnstuckMoveTimer < Time.time)
                     {
                         UnstuckMoveTimer = Time.time + 1f;
-                        var pathStatus = GoToPoint(FinalDest, false);
-                        if (pathStatus == NavMeshPathStatus.PathInvalid)
+                        TargetPosition = SAIN.CurrentTargetPosition;
+                        if (TargetPosition != null)
                         {
-                            return false;
+                            var pathStatus2 = GoToPoint(TargetPosition.Value, false);
+                            return pathStatus2 != NavMeshPathStatus.PathInvalid;
                         }
                     }
 
-                    Vector3 CornerDest = CornerDestination.Value;
-                    if (BotIsAtPoint(FinalDest, 1f, true))
-                    {
-                        Logger.LogDebug("Bot Arrived at Final Destination");
-                        return false;
-                    }
-
-                    if (!BotIsAtPoint(CornerDest))
-                    {
-                        if (!AgentDestinationCompare(CornerDest))
-                        {
-                            Agent.SetDestination(CornerDest);
-                        }
-                    }
-                    else
-                    {
-                        Logger.LogDebug("Bot Arrived at Corner, Moving to Next");
-                        MoveNext();
-                    }
                 }
                 return true;
             }
             return false;
         }
 
-        private float UnstuckMoveTimer = 0f;
-        public bool BotIsStuck => SAIN.BotStuck.BotIsStuck;
-        private float CheckMoveTimer = 0f;
-
-        private void MoveNext()
+        private void UpdateLean()
         {
-            PathWayIndex++;
-            if (PathWayIndex <= PathWayIndexMax)
+            if (UpdateLeanTimer < Time.time)
             {
-                CornerDestination = PathWay[PathWayIndex];
+                UpdateLeanTimer = Time.time + 0.25f;
+                Vector3 directionToDanger = SearchMovePoint.DangerPoint - BotOwner.Position;
+                Vector3 directionToCorner = SearchMovePoint.Corner - BotOwner.Position;
+                float signAngle = GetSignedAngle(directionToCorner, directionToDanger);
+                var lean = SearchMovePoint.GetDirectionToLean(signAngle);
+                SetLean(lean);
             }
         }
 
-        public bool AgentDestinationCompare(Vector3 point)
+        private float UpdateLeanTimer = 0f;
+        private float UnstuckMoveTimer = 0f;
+        public bool BotIsStuck => SAIN.BotStuck.BotIsStuck;
+        private float CheckMoveTimer = 0f;
+        public Vector3? TargetPosition { get; private set; }
+
+        private void Reset()
         {
-            return (Agent.destination - point).sqrMagnitude < 0.01f;
+            SearchMovePoint = null;
+            FirstCheck = false;
+            SecondCheck = false;
+            ThirdCheck = false;
         }
 
         public NavMeshPathStatus GoToPoint(Vector3 point, bool MustHavePath = true, float reachDist = 0.5f)
         {
-            SearchMovePoint = null;
+            Reset();
+
             if (NavMesh.SamplePosition(point, out var hit, 0.5f, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
@@ -104,6 +184,7 @@ namespace SAIN.Classes
                     }
                     else if (Path.status == NavMeshPathStatus.PathComplete || !MustHavePath)
                     {
+                        TargetPosition = hit.position;
                         ReachDistance = reachDist > 0 ? reachDist : 0.5f;
 
                         for (int i = 1; i < Path.corners.Length - 2; i++)
@@ -131,13 +212,11 @@ namespace SAIN.Classes
                             }
                         }
 
-                        Destination = SearchMovePoint == null ? hit.position : SearchMovePoint?.StartPosition;
-
-                        Logger.LogDebug($"{Path.status}");
+                        //Logger.LogDebug($"{Path.status}");
                         return Path.status;
                     }
                 }
-                Logger.LogWarning($"{Path.status}");
+                //Logger.LogWarning($"{Path.status}");
                 return Path.status;
             }
 
@@ -179,7 +258,7 @@ namespace SAIN.Classes
             direction *= OppositePointMagnitude;
 
             Vector3 PeekEndPosition;
-            // if we hit an object on the way to our Peek Destination, change the peek startPeekPos to be the resulting hit position;
+            // if we hit an object on the way to our Peek FinalDestination, change the peek startPeekPos to be the resulting hit position;
             if (CheckForObstacles(PeekStartPosition, direction, out Vector3 result))
             {
                 // Shorten the direction as to not try to path directly into a wall.
@@ -239,22 +318,6 @@ namespace SAIN.Classes
             BotOwner.GetPlayer.SlowLean(num);
         }
 
-        public float LeanSetNum { get; private set; }
-
-        public bool BotIsAtPoint()
-        {
-            return CornerDestDistance < 0.5f;
-        }
-
-        public bool BotIsAtPoint(float reachDist = 1f, bool Sqr = true)
-        {
-            if (Sqr)
-            {
-                return CornerDestSqrDistance < reachDist;
-            }
-            return CornerDestDistance < reachDist;
-        }
-
         public bool BotIsAtPoint(Vector3 point, float reachDist = 1f, bool Sqr = true)
         {
             if (Sqr)
@@ -275,20 +338,13 @@ namespace SAIN.Classes
         }
 
         private float GetSignedAngle(Vector3 dirCenter, Vector3 dirOther, Vector3? axis = null)
-        {            
+        {
             // Calculate the signed angle between the corners, value will be negative if its to the left of the startPeekPos.
             Vector3 angleAxis = axis ?? Vector3.up;
             return Vector3.SignedAngle(dirCenter, dirOther, angleAxis);
         }
 
         public float ReachDistance { get; private set; }
-        public Vector3? Destination { get; set; }
-        public Vector3? CornerDestination { get; set; }
-        public float CornerDestDistance => (BotOwner.Position - CornerDestination.Value).magnitude;
-        public float CornerDestSqrDistance => (BotOwner.Position - CornerDestination.Value).sqrMagnitude;
-        public Vector3[] PathWay { get; private set; }
-        public int PathWayIndex { get; private set; }
-        public int PathWayIndexMax { get; private set; }
     }
 
     public class MoveDangerPoint

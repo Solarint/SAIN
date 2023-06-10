@@ -13,6 +13,8 @@ namespace SAIN.Classes
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             PhraseObjectsAdd();
+            GroupTalk = new GroupTalk(bot);
+            EnemyTalk = new EnemyTalk(bot);
         }
 
         public bool CanTalk => SAIN.Info.CanBotTalk;

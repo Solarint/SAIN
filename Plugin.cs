@@ -97,7 +97,7 @@ namespace SAIN
             //BrainManager.AddCustomLayer(typeof(SAINRoamingLayer), new List<string>(NormalBots), 1);
 
             BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(NormalBots), 95);
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), -1);
+            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 95);
             BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Followers), 95);
         }
 
@@ -120,7 +120,7 @@ namespace SAIN
 
             if (UpdatePositionTimer < Time.time)
             {
-                UpdatePositionTimer = Time.time + 1f;
+                UpdatePositionTimer = Time.time + 0.5f;
                 MainPlayerPosition = MainPlayer.Position;
             }
         }

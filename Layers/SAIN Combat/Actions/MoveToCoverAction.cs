@@ -13,6 +13,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
+            Shoot = new GClass105(BotOwner);
         }
 
         public override void Update()
@@ -21,9 +22,9 @@ namespace SAIN.Layers
 
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Enemy?.IsVisible == true && SAIN.Enemy?.CanShoot == true)
+            if (SAIN.Enemy?.IsVisible == true)
             {
-                Shoot?.Update();
+                Shoot.Update();
             }
 
             BotOwner.DoorOpener.Update();
@@ -32,7 +33,6 @@ namespace SAIN.Layers
         public override void Start()
         {
             MoveToCover = new MoveToCoverObject(BotOwner);
-            Shoot = new GClass105(BotOwner);
         }
 
         private MoveToCoverObject MoveToCover;

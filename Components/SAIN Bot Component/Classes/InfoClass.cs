@@ -17,6 +17,8 @@ namespace SAIN.Classes
             WeaponInfo = new WeaponInfo(bot);
         }
 
+        private bool BrainWait = false;
+
         private void Init()
         {
             BotType = BotOwner.Profile.Info.Settings.Role;
@@ -25,7 +27,7 @@ namespace SAIN.Classes
             IsBoss = CheckIsBoss(BotType);
             IsFollower = CheckIsFollower(BotType);
             IsScav = BotType == WildSpawnType.assault || BotType == WildSpawnType.cursedAssault || BotType == WildSpawnType.marksman;
-            IsPMC = BotOwner.Brain.BaseBrain.ShortName() == "PMC";
+            //IsPMC = BotOwner.Brain.BaseBrain.ShortName() == "PMC";
 
             DifficultyModifier = CalculateDifficulty(BotOwner);
 
