@@ -20,6 +20,10 @@ namespace SAIN.Classes
             {
                 return false;
             }
+            if (!SAIN.HasEnemy ||! SAIN.HasGoalEnemy)
+            {
+                return false;
+            }
             if (SAIN.Enemy?.IsVisible == true || BotOwner.Memory.GoalEnemy?.PersonalLastShootTime < 3f)
             {
                 return false;
