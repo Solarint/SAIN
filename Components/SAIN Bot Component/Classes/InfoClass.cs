@@ -22,7 +22,7 @@ namespace SAIN.Classes
 
         private void Init()
         {
-            IsBoss = CheckIsBoss(BotType);
+            IAmBoss = CheckIsBoss(BotType);
             IsFollower = CheckIsFollower(BotType);
             IsScav = BotType == WildSpawnType.assault || BotType == WildSpawnType.cursedAssault || BotType == WildSpawnType.marksman;
             string botTypeString = BotType.ToString();
@@ -54,7 +54,7 @@ namespace SAIN.Classes
             {
                 if (BotOwner.Settings.FileSettings.Mind.CAN_TALK && TalkGlobal.Value)
                 {
-                    if (IsBoss)
+                    if (IAmBoss)
                     {
                         return BossTalk.Value;
                     }
@@ -81,7 +81,7 @@ namespace SAIN.Classes
 
             if (settings != null)
             {
-                return GetDifficultyMod(settings.Role, settings.BotDifficulty, IsBoss, IsFollower);
+                return GetDifficultyMod(settings.Role, settings.BotDifficulty, IAmBoss, IsFollower);
             }
 
             return 1f;
@@ -131,7 +131,7 @@ namespace SAIN.Classes
             {
                 searchTime = 3f;
             }
-            else if (IsBoss && group.BotInGroup)
+            else if (IAmBoss && group.BotInGroup)
             {
                 searchTime = 20f;
             }
@@ -169,7 +169,7 @@ namespace SAIN.Classes
 
             if (DebugBotInfo.Value)
             {
-                Logger.LogDebug($"Search Time = [{searchTime}] because: IsBoss? [{IsBoss}] IsFollower? [{IsFollower}] Personality [{BotPersonality}] SquadLead? [{group.IsSquadLead}] Squad Members: [{group.SquadMembers.Count}]");
+                Logger.LogDebug($"Search Time = [{searchTime}] because: IsBoss? [{IAmBoss}] IsFollower? [{IsFollower}] Personality [{BotPersonality}] SquadLead? [{group.IAmLeader}] Squad Members: [{group.SquadMembers.Count}]");
             }
 
             TimeBeforeSearch = searchTime;
@@ -330,7 +330,7 @@ namespace SAIN.Classes
 
         public EPlayerSide Faction => BotOwner.Profile.Side;
 
-        public bool IsBoss { get; private set; }
+        public bool IAmBoss { get; private set; }
 
         public bool IsFollower { get; private set; }
 

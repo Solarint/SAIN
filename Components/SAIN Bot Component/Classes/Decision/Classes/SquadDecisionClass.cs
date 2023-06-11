@@ -16,11 +16,11 @@ namespace SAIN.Classes
         public bool GetDecision(out SAINSquadDecision Decision)
         {
             Decision = SAINSquadDecision.None;
-            if (!SAIN.BotSquad.BotInGroup || SAIN.BotSquad.SquadMembers == null)
+            if (!SAIN.BotSquad.BotInGroup || SAIN.BotSquad.SquadMembers == null || SAIN.BotSquad.Leader?.IsDead == true)
             {
                 return false;
             }
-            if (SAIN.Enemy?.IsVisible == true)
+            if (SAIN.Enemy?.IsVisible == true || BotOwner.Memory.GoalEnemy?.PersonalLastShootTime < 3f)
             {
                 return false;
             }
@@ -132,7 +132,7 @@ namespace SAIN.Classes
         public bool StartRegroup()
         {
             var squad = SAIN.BotSquad;
-            if (squad.IsSquadLead)
+            if (squad.IAmLeader)
             {
                 return false;
             }

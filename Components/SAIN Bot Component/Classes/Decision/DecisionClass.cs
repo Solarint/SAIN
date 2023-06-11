@@ -44,12 +44,13 @@ namespace SAIN.Classes
             {
                 MainDecision = SAINSoloDecision.None;
                 CurrentSquadDecision = SAINSquadDecision.None;
+                CurrentSelfDecision = SAINSelfDecision.None;
                 return;
             }
 
             if (DecisionTimer < Time.time)
             {
-                DecisionTimer = Time.time + 0.03f;
+                DecisionTimer = Time.time + 0.05f;
 
                 if (UpdateEnemyTimer < Time.time)
                 {
@@ -63,23 +64,24 @@ namespace SAIN.Classes
 
         private void GetDecision()
         {
-            SAINSquadDecision squadDecision = SAINSquadDecision.None;
-            SAINSelfDecision selfDecision = SAINSelfDecision.None;
+            var soloDecision = SAINSoloDecision.None;
+            var squadDecision = SAINSquadDecision.None;
+            var selfDecision = SAINSelfDecision.None;
 
-            if (!CheckStuckDecision(out SAINSoloDecision soloDecision))
+            if (SelfActionDecisions.GetDecision(out selfDecision))
             {
-                if (!SelfActionDecisions.GetDecision(out selfDecision))
-                {
-                    if (!SquadDecisions.GetDecision(out squadDecision))
-                    {
-                        if (!EnemyDecisions.GetDecision(out soloDecision))
-                        {
-                            if (!GoalTargetDecisions.GetDecision(out soloDecision))
-                            {
-                            }
-                        }
-                    }
-                }
+            }
+            else if (CheckStuckDecision(out soloDecision))
+            {
+            }
+            else if (SquadDecisions.GetDecision(out squadDecision))
+            {
+            }
+            else if (EnemyDecisions.GetDecision(out soloDecision))
+            {
+            }
+            else if (GoalTargetDecisions.GetDecision(out soloDecision))
+            {
             }
 
             UpdateDecisionProperties(soloDecision, squadDecision, selfDecision);

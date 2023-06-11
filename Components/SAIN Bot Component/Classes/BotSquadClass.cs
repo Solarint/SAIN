@@ -10,6 +10,8 @@ namespace SAIN.Classes
 {
     public class SquadClass : SAINBot
     {
+        public string SquadID { get; private set; } = "None";
+
         public SquadClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
@@ -25,63 +27,93 @@ namespace SAIN.Classes
 
                     UpdateMembers();
 
-                    if (Leader == null || !Leader.HealthController.IsAlive || GroupSize != SquadMembers.Count)
+                    if (Leader != null || Leader.IsDead)
+                    {
+                        if (LeaderDieTime == 0f)
+                        {
+                            LeaderDieTime = Time.time;
+                        }
+                        if (TimeSinceLeaderDied > 30f)
+                        {
+                            FindSquadLeader();
+                        }
+                    }
+
+                    if ((Leader == null || GroupSize != SquadMembers.Count) && TimeSinceLeaderDied == 0f)
                     {
                         GroupSize = SquadMembers.Count;
                         FindSquadLeader();
                     }
                 }
+
+                if (SquadID == "None" && LeaderComponent != null && !IAmLeader)
+                {
+                    SquadID = LeaderComponent.BotSquad.SquadID;
+                }
             }
         }
 
+        public float TimeSinceLeaderDied => LeaderDieTime == 0f ? 0f : Time.time - LeaderDieTime;
+        public float LeaderDieTime { get; private set; } = 0f;
         private int GroupSize = 0;
         private float UpdateMembersTimer = 0f;
 
         private void FindSquadLeader()
         {
-            // If this bot is a boss type, they are the squad leader
-            if (SAIN.Info.IsBoss)
+            // Assign current bot as leader to start
+            float power = SAIN.Info.PowerLevel;
+            var leadComponent = SAIN;
+
+            if (SAIN.Info.IAmBoss)
             {
-                IsSquadLead = true;
-                Leader = BotOwner;
-                LeaderComponent = SAIN;
+                AddLeader(leadComponent);
                 return;
             }
-            // Assign current bot as leader to start
-            BotOwner newSquadLead = BotOwner;
-            float power = SAIN.Info.PowerLevel;
 
             // Iterate through each bot component in friendly group to see who has the highest power level or if any are bosses
             foreach (var bot in SquadMembers.Values)
             {
+                if (bot == null || bot.IsDead) continue;
+
                 // If this bot is a boss type, they are the squad leader
-                if (bot.Info.IsBoss)
+                if (bot.Info.IAmBoss)
                 {
-                    newSquadLead = bot.BotOwner;
+                    leadComponent = bot;
                     break;
                 }
                 // else If this bot has a higher power level than the last one we checked, they are the squad leader
                 if (bot.Info.PowerLevel > power)
                 {
                     power = bot.Info.PowerLevel;
-                    newSquadLead = bot.BotOwner;
+                    leadComponent = bot;
                 }
             }
 
-            // If the current bot is the result, mark the IsSquadLead value as true
-            IsSquadLead = newSquadLead.ProfileId == BotOwner.ProfileId;
-            Leader = newSquadLead;
-            LeaderComponent = newSquadLead.GetComponent<SAINComponent>();
+            AddLeader(leadComponent);
+        }
 
+        private void AddLeader(SAINComponent sain)
+        {
+            LeaderDieTime = 0f;
+            IAmLeader = sain.ProfileId == BotOwner.ProfileId;
+            LeaderComponent = sain;
+            if (IAmLeader && SquadID == "None")
+            {
+                SquadID = Guid.NewGuid().ToString("N");
+            }
             if (DebugBotInfo.Value)
-            Logger.LogDebug($"For Bot: [{BotOwner.Profile.Nickname}]: [{newSquadLead.Profile.Nickname}] is Squad lead! Power Level = [{power}] Squad Power = [{SquadPowerLevel}] Members Count = [{SquadMembers.Count}]");
+            {
+                Logger.LogDebug($"For Bot: [{SAIN.BotOwner.name}]: [{sain.BotOwner.name}] is Squad lead! " +
+                    $"Lead is Boss? {sain.Info.IAmBoss} Lead Power: [{sain.Info.PowerLevel}] My Power: [{SAIN.Info.PowerLevel}] " +
+                    $"Squad Power = [{SquadPowerLevel}] Members Count = [{SquadMembers.Count}]");
+            }
         }
 
         public float SquadPowerLevel { get; private set; }
 
-        public bool IsSquadLead { get; private set; } = false;
+        public bool IAmLeader { get; private set; } = false;
 
-        public BotOwner Leader { get; private set; }
+        public BotOwner Leader => LeaderComponent.BotOwner;
         public SAINComponent LeaderComponent { get; private set; }
 
         public bool BotInGroup => BotOwner.BotsGroup.MembersCount > 1;

@@ -15,6 +15,9 @@ namespace SAIN.Components
             Init(BotOwner);
         }
 
+        public string ProfileId => BotOwner.ProfileId;
+        public string SquadId => BotSquad.SquadID;
+
         private void Init(BotOwner bot)
         {
             BotColor = RandomColor;
@@ -41,6 +44,10 @@ namespace SAIN.Components
 
         private void Update()
         {
+            if (GameHasEnded)
+            {
+                Dispose();
+            }
             if (BotActive && !GameIsEnding)
             {
                 var goalEnemy = BotOwner.Memory.GoalEnemy;
@@ -75,7 +82,13 @@ namespace SAIN.Components
                     }
                 }
 
-                AILimit.Update();
+                if (UpdateHealthTimer < Time.time)
+                {
+                    UpdateHealthTimer = Time.time + 0.25f;
+                    HealthStatus = BotOwner.GetPlayer.HealthStatus;
+                }
+
+                //AILimit.Update();
                 if (AILimit.Enabled)
                 {
                     return;
@@ -87,9 +100,53 @@ namespace SAIN.Components
                 Cover.Update();
                 Talk.Update();
                 SelfActions.Update();
+                UpdateFriendlyFire();
             }
         }
 
+        private void UpdateFriendlyFire()
+        {
+            if (CheckFriendlyFire() == FriendlyFireStatus.FriendlyBlock)
+            {
+                StopShooting();
+            }
+        }
+
+        public FriendlyFireStatus CheckFriendlyFire(Vector3? target = null)
+        {
+            var friendlyFire = FriendlyFireStatus.None;
+            if (!BotSquad.BotInGroup || !BotOwner.ShootData.Shooting)
+            {
+                return friendlyFire;
+            }
+            if (target == null)
+            {
+                if (BotOwner.AimingData == null)
+                {
+                    return friendlyFire;
+                }
+                target = BotOwner.AimingData.RealTargetPoint;
+            }
+            if (BotOwner.ShootData.ChecFriendlyFire(WeaponRoot, target.Value))
+            {
+                friendlyFire = FriendlyFireStatus.FriendlyBlock;
+            }
+            else
+            {
+                friendlyFire = FriendlyFireStatus.Clear;
+            }
+            return friendlyFire;
+        }
+
+        public void StopShooting()
+        {
+            BotOwner.ShootData.EndShoot();
+            BotOwner.AimingData?.LoseTarget();
+        }
+
+        public FriendlyFireStatus FriendlyFireStatus { get; private set; }
+
+        private float UpdateHealthTimer = 0f;
         public float DifficultyModifier => Info.DifficultyModifier;
 
         public bool HasEnemy => Enemy != null;
@@ -100,9 +157,9 @@ namespace SAIN.Components
         public void Dispose()
         {
             StopAllCoroutines();
-            Lean.Dispose();
-            Cover.CoverFinder.Dispose();
-            FlashLight.Dispose();
+            Lean?.Dispose();
+            Cover?.CoverFinder?.Dispose();
+            FlashLight?.Dispose();
             Destroy(this);
         }
 
@@ -153,28 +210,17 @@ namespace SAIN.Components
 
         public SteeringClass Steering { get; private set; }
 
-        public bool BotActive => BotOwner.BotState == EBotState.Active && !BotOwner.IsDead && BotOwner.GetPlayer.enabled;
-
-        public bool GameIsEnding
-        {
-            get
-            {
-                var game = Singleton<IBotGame>.Instance;
-                if (game == null)
-                {
-                    return false;
-                }
-
-                return game.Status == GameStatus.Stopping;
-            }
-        }
+        public bool IsDead => BotOwner?.IsDead == true;
+        public bool BotActive => BotOwner.BotState == EBotState.Active && !IsDead && BotOwner?.GetPlayer?.enabled == true;
+        public bool GameIsEnding => GameHasEnded || Singleton<IBotGame>.Instance?.Status == GameStatus.Stopping;
+        public bool GameHasEnded => Singleton<IBotGame>.Instance == null;
 
         public bool Healthy => HealthStatus == ETagStatus.Healthy;
         public bool Injured => HealthStatus == ETagStatus.Injured;
         public bool BadlyInjured => HealthStatus == ETagStatus.BadlyInjured;
         public bool Dying => HealthStatus == ETagStatus.Dying;
 
-        public ETagStatus HealthStatus => BotOwner.GetPlayer.HealthStatus;
+        public ETagStatus HealthStatus { get; private set; }
 
         public LastHeardSound LastHeardSound => Hearing.LastHeardSound;
 

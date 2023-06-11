@@ -13,7 +13,7 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        public bool ManualUpdate()
+        public bool ManualUpdate(bool useDefaultHear = true)
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
@@ -42,12 +42,13 @@ namespace SAIN.Classes
             }
             else
             {
-                BotOwner.LookData.SetLookPointByHearing();
+                if (useDefaultHear)
+                {
+                    BotOwner.LookData.SetLookPointByHearing();
+                }
                 return false;
             }
         }
-
-        private float UpdateSteerTimer = 0f;
 
         public void LookToGoalEnemyPos()
         {
