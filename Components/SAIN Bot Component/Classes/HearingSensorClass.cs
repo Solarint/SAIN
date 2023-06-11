@@ -115,7 +115,7 @@ namespace SAIN.Components
 
             if (wasHeard)
             {
-                if (person != null && BotOwner.BotsGroup.IsEnemy(person))
+                if (person != null)
                 {
                     LastHeardSound = new LastHeardSound(person, pos, type, power);
                 }
@@ -175,10 +175,7 @@ namespace SAIN.Components
                 {
                     var estimate = GetEstimatedPoint(pos);
 
-                    if (BotOwner.BotsGroup.IsEnemy(person))
-                    {
-                        LastHeardSound = new LastHeardSound(person, estimate, type, power);
-                    }
+                    LastHeardSound = new LastHeardSound(person, estimate, type, power);
 
                     SAIN.UnderFireFromPosition = estimate;
 
@@ -252,7 +249,7 @@ namespace SAIN.Components
         {
             //Set the close hearing and far hearing variables
             float closehearing = 10f;
-            float farhearing = 60f;
+            float farhearing = 50f;
 
             //Check if the distance is less than or equal to the close hearing
             if (d <= closehearing)

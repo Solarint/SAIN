@@ -13,10 +13,13 @@ namespace SAIN.Classes
         public BotOwner BotOwner { get; private set; }
         public GClass475 GoalEnemy => BotOwner.Memory.GoalEnemy;
 
-        public SAINEnemy(BotOwner bot, IAIDetails person)
+        private readonly float BotDifficultyModifier;
+
+        public SAINEnemy(BotOwner bot, IAIDetails person, float BotDifficultyMod)
         {
             BotOwner = bot;
             Person = person;
+            BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
@@ -25,7 +28,7 @@ namespace SAIN.Classes
         public void Update()
         {
             UpdateDistance();
-            UpdateVisible();
+            CheckEnemyVisible();
             UpdatePath();
         }
 
@@ -36,8 +39,8 @@ namespace SAIN.Classes
                 const float CloseCap = 10f;
                 const float FarCap = 90f;
                 const float baseTime = 0.1f;
-                const float baseTimeAdd = 0.2f;
-                const float maxTime = 0.1f;
+                const float baseTimeAdd = 0.1f;
+                const float maxTime = 0.33f;
 
                 float distance = DistanceFromLastSeen;
 
@@ -93,75 +96,66 @@ namespace SAIN.Classes
         public float LastSeenDistance { get; private set; }
         public Vector3 PositionLastSeen { get; private set; }
         public float TimeSinceSeen { get; private set; }
-        public float TimeSeen { get; private set; }
         public bool Seen { get; private set; }
         public float TimeFirstSeen { get; private set; }
         public float TimeLastSeen { get; private set; }
+
+        private ReactionTimeChecker ReactionTime;
         
         private float DistanceTimer = 0f;
-        private bool Reacting = false;
-        private float ReactionTimer = 0f;
 
-        private void UpdateVisible()
+        private void CheckEnemyVisible()
         {
             if (CheckVisibleTimer < Time.time)
             {
-                CheckVisibleTimer = Time.time + RayCastFreq;
+                CheckVisibleTimer = Time.time + 0.1f;
 
-                bool lineOfSight = false;
+                bool lineOfSight = RayCastBodyParts();
                 bool visible = false;
-                bool wasVisible = IsVisible;
-
-                if (CheckPartsVisible())
+                if (lineOfSight)
                 {
-                    lineOfSight = true;
-                    if (GoalEnemy?.IsVisible == true && BotOwner.LookSensor.IsPointInVisibleSector(Person.Position))
+                    if (BotOwner.LookSensor.IsPointInVisibleSector(Person.Position))
                     {
-                        visible = true;
-                        if (!Reacting)
-                        {
-                            Reacting = true;
-                            ReactionTimer = Time.time + 0.2f;
-                        }
-                        else
+                        if (GoalEnemy?.IsVisible == true)
                         {
                             visible = true;
-                            if (ReactionTimer < Time.time)
-                            {
-                                visible = true;
-                            }
                         }
                     }
                 }
-                if (visible == true)
-                {
-                    TimeSeen = Time.time;
-                    if (!Seen)
-                    {
-                        TimeFirstSeen = Time.time;
-                        Seen = true;
-                    }
-                }
-                if (visible == false)
-                {
-                    if (wasVisible)
-                    {
-                        TimeLastSeen = Time.time;
-                        PositionLastSeen = Person.Position;
-                    }
-                    if (Seen)
-                    {
-                        TimeSinceSeen = Time.time - TimeLastSeen;
-                    }
-                    Reacting = false;
-                }
 
-                InLineOfSight = lineOfSight;
-                IsVisible = visible;
+                UpdateVisible(visible, lineOfSight);
             }
         }
 
-        private bool CheckPartsVisible()
+        private void UpdateVisible(bool isVisible, bool inLineOfSight)
+        {
+            InLineOfSight = inLineOfSight;
+            bool wasVisible = IsVisible;
+            IsVisible = isVisible;
+
+            if (isVisible)
+            {
+                if (!Seen)
+                {
+                    TimeFirstSeen = Time.time;
+                    Seen = true;
+                }
+            }
+            if (!isVisible)
+            {
+                if (wasVisible)
+                {
+                    TimeLastSeen = Time.time;
+                    PositionLastSeen = Person.Position;
+                }
+                if (Seen)
+                {
+                    TimeSinceSeen = Time.time - TimeLastSeen;
+                }
+            }
+        }
+
+        private bool RayCastBodyParts()
         {
             Vector3 HeadPosition = BotOwner.LookSensor._headPoint;
             float distance = (Person.Position - BotOwner.Position).magnitude;
@@ -203,22 +197,17 @@ namespace SAIN.Classes
                         Vector3 hitToTarget = part.Position - hitPos;
                         if (hitToTarget.magnitude < 1f)
                         {
-                            Vector3 directionAwayFromTarget = -hitToTarget.normalized * 0.1f;
-                            Vector3 newRayPos = hitPos + directionAwayFromTarget;
-                            Direction = part.Position - newRayPos;
-                            if (!Physics.Raycast(newRayPos, Direction.normalized, Direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                            if (!Physics.Raycast(HeadPosition, Direction, Direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                             {
                                 if (DebugVision.Value)
                                 {
-                                    DebugGizmos.SingleObjects.Line(newRayPos, EnemyChestPosition, Color.red, 0.01f, true, 1f, true);
+                                    DebugGizmos.SingleObjects.Line(HeadPosition, EnemyChestPosition, Color.red, 0.01f, true, 1f, true);
                                     Logger.LogDebug($"[{BotOwner.name}] can see through foliage because distance < 1f");
                                 }
 
                                 return true;
                             }
                         }
-
-                        //Vector3 StartToHit = hitPos - HeadPosition;
                     }
                 }
             }
@@ -242,35 +231,35 @@ namespace SAIN.Classes
             PathDistance = Path.CalculatePathLength();
         }
 
-        public SAINPathDistance CheckPathDistance()
+        public SAINEnemyPath CheckPathDistance()
         {
             const float VeryCloseDist = 5f;
             const float CloseDist = 20f;
             const float FarDist = 80f;
             const float VeryFarDist = 120f;
 
-            SAINPathDistance pathDistance;
+            SAINEnemyPath pathDistance;
             float distance = PathDistance;
 
             if (distance <= VeryCloseDist)
             {
-                pathDistance = SAINPathDistance.VeryClose;
+                pathDistance = SAINEnemyPath.VeryClose;
             }
             else if (distance <= CloseDist)
             {
-                pathDistance = SAINPathDistance.Close;
+                pathDistance = SAINEnemyPath.Close;
             }
             else if (distance <= FarDist)
             {
-                pathDistance = SAINPathDistance.Mid;
+                pathDistance = SAINEnemyPath.Mid;
             }
             else if (distance <= VeryFarDist)
             {
-                pathDistance = SAINPathDistance.Far;
+                pathDistance = SAINEnemyPath.Far;
             }
             else
             {
-                pathDistance = SAINPathDistance.VeryFar;
+                pathDistance = SAINEnemyPath.VeryFar;
             }
 
             return pathDistance;
@@ -305,12 +294,20 @@ namespace SAIN.Classes
         private float CheckVisibleTimer = 0f;
     }
 
-    public enum SAINPathDistance
+    public class ReactionTimeChecker
     {
-        VeryClose = 0,
-        Close = 1,
-        Mid = 2,
-        Far = 3,
-        VeryFar = 4
+        public ReactionTimeChecker(float reactionTime)
+        {
+            ReactionTime = reactionTime;
+            startTime = Time.time;
+        }
+
+        private readonly float ReactionTime;
+        private readonly float startTime;
+
+        public bool Update()
+        {
+            return Time.time - startTime >= ReactionTime;
+        }
     }
 }

@@ -14,21 +14,27 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            this.AimData = new GClass105(bot);
+            Shoot = new GClass105(bot);
         }
 
         private CoverStatus CurrentCoverPointStatus;
         private CoverStatus CurrentFallBackStatus;
 
-        private GClass105 AimData;
+        private GClass105 Shoot;
 
         public override void Update()
         {
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.HasEnemyAndCanShoot || SAIN.Enemy?.IsVisible == true)
+            if ((!Stopped && Time.time - StartTime > 1f) || SAIN.Cover.CheckLimbsForCover())
             {
-                AimData.Update();
+                Stopped = true;
+                BotOwner.StopMove();
+            }
+
+            if (SAIN.Enemy?.IsVisible == true)
+            {
+                Shoot.Update();
             }
 
             if (SAIN.Cover.BotIsAtCoverPoint)
@@ -55,24 +61,15 @@ namespace SAIN.Layers
         public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
+        private float StartTime = 0f;
+        private bool Stopped = false;
 
         public override void Start()
         {
-            BotOwner.StopMove();
-
-            if (SAIN.Cover.CurrentCoverPoint != null)
-            {
-                CurrentCoverPointStatus = SAIN.Cover.CurrentCoverPoint.Status();
-            }
-            if (SAIN.Cover.CurrentFallBackPoint != null)
-            {
-                CurrentFallBackStatus = SAIN.Cover.CurrentFallBackPoint.Status();
-            }
+            StartTime = Time.time;
+            CurrentCoverPointStatus = SAIN.Cover.CoverPointStatus;
+            CurrentFallBackStatus = SAIN.Cover.FallBackPointStatus;
         }
-
-        private Vector3 PositionToHold;
-        private Vector3? RightMovePos;
-        private Vector3? LeftMovePos;
 
         public override void Stop()
         {

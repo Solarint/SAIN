@@ -16,51 +16,45 @@ namespace SAIN.Classes
         private bool WasUsingMeds = false;
         private bool UsingMeds => BotOwner.Medecine.Using;
 
-        public void DoSelfAction()
+        public void Update()
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
+            if (!UsingMeds)
             {
-                return;
+                if (WasUsingMeds)
+                {
+                    BotOwner.Medecine.RefreshCurMeds();
+                }
+                if (SAIN.Decision.SelfActionDecisions.StartCancelReload())
+                {
+                    BotCancelReload();
+                }
+                else
+                {
+                    switch (SelfDecision)
+                    {
+                        case SAINSelfDecision.Reload:
+                            DoReload();
+                            break;
+
+                        case SAINSelfDecision.Surgery:
+                            DoSurgery();
+                            break;
+
+                        case SAINSelfDecision.FirstAid:
+                            DoFirstAid();
+                            break;
+
+                        case SAINSelfDecision.Stims:
+                            DoStims();
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
             }
 
-            if (!UsingMeds && WasUsingMeds)
-            {
-                BotOwner.Medecine.RefreshCurMeds();
-            }
             WasUsingMeds = UsingMeds;
-            if (UsingMeds)
-            {
-                return;
-            }
-
-            if (SAIN.Decision.StartCancelReload())
-            {
-                BotCancelReload();
-                return;
-            }
-
-            var Decision = SAIN.CurrentDecision;
-            switch (Decision)
-            {
-                case SAINLogicDecision.Reload:
-                    DoReload();
-                    break;
-
-                case SAINLogicDecision.Surgery:
-                    DoSurgery();
-                    break;
-
-                case SAINLogicDecision.FirstAid:
-                    DoFirstAid();
-                    break;
-
-                case SAINLogicDecision.Stims:
-                    DoStims();
-                    break;
-
-                default:
-                    break;
-            }
         }
 
         public void DoFirstAid()

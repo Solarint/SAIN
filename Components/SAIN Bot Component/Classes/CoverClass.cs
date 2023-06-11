@@ -20,7 +20,7 @@ namespace SAIN.Classes
                 CoverFinder.StopLooking();
                 return;
             }
-            if ((SAIN.HasGoalEnemy || SAIN.HasGoalTarget) && SAIN.CurrentDecision != SAINLogicDecision.None && SAIN.CurrentDecision != SAINLogicDecision.Search)
+            if ((SAIN.HasGoalEnemy || SAIN.HasGoalTarget))
             {
                 if (GetPointToHideFrom(out var target))
                 {
@@ -70,15 +70,7 @@ namespace SAIN.Classes
 
         private bool GetPointToHideFrom(out Vector3? target)
         {
-            target = null;
-            if (CurrentDecision == SAINLogicDecision.RunAwayGrenade)
-            {
-                target = BotOwner.BewareGrenade.GrenadeDangerPoint?.DangerPoint;
-            }
-            if (target == null)
-            {
-                target = SAIN.CurrentTargetPosition;
-            }
+            target = SAIN.CurrentTargetPosition;
             return target != null;
         }
 
@@ -102,24 +94,33 @@ namespace SAIN.Classes
 
         public bool CheckLimbsForCover()
         {
-            if (!SAIN.HasGoalEnemy)
+            if (SAIN.Enemy?.IsVisible == true)
             {
-                return false;
+                if (CheckLimbTimer < Time.time)
+                {
+                    CheckLimbTimer = Time.time + 0.1f;
+                    bool cover = false;
+                    var target = BotOwner.Memory.GoalEnemy.Person.WeaponRoot.position;
+                    if (CheckLimbForCover(BodyPartType.leftLeg, target, 5f) && CheckLimbForCover(BodyPartType.leftArm, target, 5f))
+                    {
+                        cover = true;
+                    }
+                    else if (CheckLimbForCover(BodyPartType.rightLeg, target, 5f) && CheckLimbForCover(BodyPartType.rightArm, target, 5f))
+                    {
+                        cover = true;
+                    }
+                    HasLimbCover = cover;
+                }
             }
-            if (SAIN.Enemy.IsVisible && SAIN.HasEnemyAndCanShoot)
+            else
             {
-                var target = BotOwner.Memory.GoalEnemy.Person.WeaponRoot.position;
-                if (CheckLimbForCover(BodyPartType.leftLeg, target, 5f) && CheckLimbForCover(BodyPartType.leftArm, target, 5f))
-                {
-                    return true;
-                }
-                if (CheckLimbForCover(BodyPartType.rightLeg, target, 5f) && CheckLimbForCover(BodyPartType.rightArm, target, 5f))
-                {
-                    return true;
-                }
+                HasLimbCover = false;
             }
-            return false;
+            return HasLimbCover;
         }
+
+        private bool HasLimbCover;
+        private float CheckLimbTimer = 0f;
 
         private bool CheckLimbForCover(BodyPartType bodyPartType, Vector3 target, float dist = 2f)
         {
@@ -128,7 +129,6 @@ namespace SAIN.Classes
             return Physics.Raycast(position, direction, dist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
-        private SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
         public CoverStatus FallBackPointStatus
         {
             get

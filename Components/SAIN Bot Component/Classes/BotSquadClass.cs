@@ -4,6 +4,7 @@ using SAIN.Components;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {
@@ -16,11 +17,6 @@ namespace SAIN.Classes
 
         public void Update()
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
-            {
-                return;
-            }
-
             if (BotInGroup)
             {
                 if (UpdateMembersTimer < Time.time)
@@ -43,30 +39,42 @@ namespace SAIN.Classes
 
         private void FindSquadLeader()
         {
+            // If this bot is a boss type, they are the squad leader
+            if (SAIN.Info.IsBoss)
+            {
+                IsSquadLead = true;
+                Leader = BotOwner;
+                LeaderComponent = SAIN;
+                return;
+            }
             // Assign current bot as leader to start
-            Leader = BotOwner;
+            BotOwner newSquadLead = BotOwner;
             float power = SAIN.Info.PowerLevel;
 
-
-            // Iterate through each bot component in friendly group to see who has the highest power level
+            // Iterate through each bot component in friendly group to see who has the highest power level or if any are bosses
             foreach (var bot in SquadMembers.Values)
             {
+                // If this bot is a boss type, they are the squad leader
+                if (bot.Info.IsBoss)
+                {
+                    newSquadLead = bot.BotOwner;
+                    break;
+                }
+                // else If this bot has a higher power level than the last one we checked, they are the squad leader
                 if (bot.Info.PowerLevel > power)
                 {
                     power = bot.Info.PowerLevel;
-                    Leader = bot.BotOwner;
+                    newSquadLead = bot.BotOwner;
                 }
             }
 
             // If the current bot is the result, mark the IsSquadLead value as true
-            IsSquadLead = Leader == BotOwner;
+            IsSquadLead = newSquadLead.ProfileId == BotOwner.ProfileId;
+            Leader = newSquadLead;
+            LeaderComponent = newSquadLead.GetComponent<SAINComponent>();
 
-            if (!this.IsSquadLead)
-            {
-                LeaderComponent = Leader.GetComponent<SAINComponent>();
-            }
-
-            Console.WriteLine($"For Bot: [{BotOwner.Profile.Nickname}]: [{Leader.Profile.Nickname}] is Squad lead! Power Level = [{power}] Squad Power = [{SquadPowerLevel}] Members Count = [{SquadMembers.Count}]");
+            if (DebugBotInfo.Value)
+            Logger.LogDebug($"For Bot: [{BotOwner.Profile.Nickname}]: [{newSquadLead.Profile.Nickname}] is Squad lead! Power Level = [{power}] Squad Power = [{SquadPowerLevel}] Members Count = [{SquadMembers.Count}]");
         }
 
         public float SquadPowerLevel { get; private set; }
@@ -80,13 +88,15 @@ namespace SAIN.Classes
 
         public Dictionary<BotOwner, SAINComponent> SquadMembers { get; private set; } = new Dictionary<BotOwner, SAINComponent>();
 
-        public SAINLogicDecision[] GroupDecisions { get; private set; }
+        public SAINSoloDecision[] SquadSoloDecisions { get; private set; }
+        public SAINSquadDecision[] SquadDecisions { get; private set; }
 
         private void UpdateMembers()
         {
             var locations = new List<Vector3>();
             var dictionary = new Dictionary<BotOwner, SAINComponent>();
-            var decisions = new List<SAINLogicDecision>();
+            var decisions = new List<SAINSoloDecision>();
+            var squadDecisions = new List<SAINSquadDecision>();
 
             MemberIsFallingBack = false;
 
@@ -108,9 +118,10 @@ namespace SAIN.Classes
                         {
                             dictionary.Add(member, component);
                             decisions.Add(component.CurrentDecision);
+                            squadDecisions.Add(component.Decision.SquadDecision);
                             locations.Add(member.Position);
 
-                            if (component.Decision.RetreatDecisions.Contains(component.CurrentDecision))
+                            if (component.CurrentDecision == SAINSoloDecision.Retreat)
                             {
                                 MemberIsFallingBack = true;
                             }
@@ -121,7 +132,8 @@ namespace SAIN.Classes
             }
 
             SquadLocations = locations.ToArray();
-            GroupDecisions = decisions.ToArray();
+            SquadSoloDecisions = decisions.ToArray();
+            SquadDecisions = squadDecisions.ToArray();
 
             SquadPowerLevel = BotOwner.BotsGroup.GroupPower;
             SquadMembers = dictionary;

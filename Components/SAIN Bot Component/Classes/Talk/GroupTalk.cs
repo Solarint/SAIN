@@ -294,21 +294,19 @@ namespace SAIN.Classes
 
         private bool TalkBotDecision(out EPhraseTrigger trigger, out ETagStatus mask)
         {
-            var decision = SAIN.CurrentDecision;
             mask = ETagStatus.Combat;
-
-            switch (decision)
+            switch (SelfDecision)
             {
-                case SAINLogicDecision.Reload:
+                case SAINSelfDecision.Reload:
                     trigger = EPhraseTrigger.OnWeaponReload;
                     break;
 
-                case SAINLogicDecision.RunAway:
+                case SAINSelfDecision.RunAway:
                     trigger = EPhraseTrigger.OnYourOwn;
                     break;
 
-                case SAINLogicDecision.FirstAid:
-                case SAINLogicDecision.Surgery:
+                case SAINSelfDecision.FirstAid:
+                case SAINSelfDecision.Stims:
                     trigger = EPhraseTrigger.CoverMe;
                     break;
 
@@ -330,7 +328,7 @@ namespace SAIN.Classes
                 var trigger = EPhraseTrigger.PhraseNone;
                 var mask = ETagStatus.Unaware;
 
-                if (GroupDecisions.Contains(SAINLogicDecision.Suppress))
+                if (SquadDecisions.Contains(SAINSquadDecision.Suppress))
                 {
                     commandTrigger = EPhraseTrigger.Suppress;
                     commmandMask = ETagStatus.Combat;
@@ -338,7 +336,7 @@ namespace SAIN.Classes
                     trigger = EPhraseTrigger.Roger;
                     mask = ETagStatus.Aware;
                 }
-                else if (SAIN.CurrentDecision == SAINLogicDecision.Search)
+                else if (SAIN.CurrentDecision == SAINSoloDecision.Search)
                 {
                     commandTrigger = EPhraseTrigger.FollowMe;
                     commmandMask = ETagStatus.Aware;
@@ -346,7 +344,7 @@ namespace SAIN.Classes
                     trigger = EPhraseTrigger.Going;
                     mask = ETagStatus.Aware;
                 }
-                else if (GroupDecisions.Contains(SAINLogicDecision.Search))
+                else if (SoloDecisions.Contains(SAINSoloDecision.Search))
                 {
                     commandTrigger = EFT_Math.RandomBool() ? EPhraseTrigger.GoForward : EPhraseTrigger.Gogogo;
                     commmandMask = ETagStatus.Combat;
@@ -354,7 +352,7 @@ namespace SAIN.Classes
                     trigger = EPhraseTrigger.Going;
                     mask = ETagStatus.Combat;
                 }
-                else if (GroupDecisions.Contains(SAINLogicDecision.RunForCover) || GroupDecisions.Contains(SAINLogicDecision.MoveToCover))
+                else if (SoloDecisions.Contains(SAINSoloDecision.RunForCover) || SoloDecisions.Contains(SAINSoloDecision.MoveToCover))
                 {
                     commandTrigger = EPhraseTrigger.GetBack;
                     commmandMask = ETagStatus.Combat;
@@ -370,7 +368,7 @@ namespace SAIN.Classes
                     trigger = EPhraseTrigger.Roger;
                     mask = ETagStatus.Aware;
                 }
-                else if (SAIN.CurrentDecision == SAINLogicDecision.RunAway)
+                else if (SAIN.CurrentDecision == SAINSoloDecision.RunAway)
                 {
                     commandTrigger = EPhraseTrigger.OnYourOwn;
                     commmandMask = ETagStatus.Aware;
@@ -378,7 +376,7 @@ namespace SAIN.Classes
                     trigger = EFT_Math.RandomBool() ? EPhraseTrigger.Repeat : EPhraseTrigger.Stop;
                     mask = ETagStatus.Aware;
                 }
-                else if (!GroupDecisions.Contains(SAINLogicDecision.Search) && SAIN.CurrentDecision != SAINLogicDecision.Search)
+                else if (!SoloDecisions.Contains(SAINSoloDecision.Search) && SAIN.CurrentDecision != SAINSoloDecision.Search)
                 {
                     commandTrigger = EPhraseTrigger.HoldPosition;
                     commmandMask = ETagStatus.Aware;
@@ -516,7 +514,7 @@ namespace SAIN.Classes
             {
                 trigger = EPhraseTrigger.Spreadout;
             }
-            else if (BotSquad.GroupDecisions.Contains(SAINLogicDecision.RegroupSquad))
+            else if (SquadDecisions.Contains(SAINSquadDecision.Regroup))
             {
                 trigger = EPhraseTrigger.Regroup;
             }
@@ -553,7 +551,8 @@ namespace SAIN.Classes
             return false;
         }
 
-        public SAINLogicDecision[] GroupDecisions => BotSquad.GroupDecisions;
+        public SAINSoloDecision[] SoloDecisions => BotSquad.SquadSoloDecisions;
+        public SAINSquadDecision[] SquadDecisions => BotSquad.SquadDecisions;
         public BotTalkClass LeaderComponent => SAIN.BotSquad.LeaderComponent?.Talk;
         private float Randomized => Random.Range(0.75f, 1.25f);
         private SquadClass BotSquad => SAIN.BotSquad;

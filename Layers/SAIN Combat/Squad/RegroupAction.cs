@@ -18,10 +18,9 @@ namespace SAIN.Layers
         {
             SAIN.Steering.ManualUpdate();
 
-            if (SAIN.Enemy?.IsVisible == true)
+            if (SAIN.Steering.ManualUpdate())
             {
                 BotOwner.GetPlayer.EnableSprint(false);
-                SAIN.Steering.ManualUpdate();
             }
             else
             {

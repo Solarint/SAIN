@@ -41,7 +41,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalAimingSettings __instance)
         {
-            __instance.SHPERE_FRIENDY_FIRE_SIZE = 0.33f;
+            __instance.SHPERE_FRIENDY_FIRE_SIZE = 0.15f;
             __instance.RECALC_MUST_TIME = 1;
             __instance.RECALC_MUST_TIME_MIN = 1;
             __instance.RECALC_MUST_TIME_MAX = 2;
@@ -94,12 +94,12 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsMoveSettings __instance)
         {
-            __instance.SEC_TO_CHANGE_TO_RUN = 0.5f;
-            __instance.RUN_TO_COVER_MIN = 0f;
+            __instance.SEC_TO_CHANGE_TO_RUN = 9999f;
+            __instance.RUN_TO_COVER_MIN = 9999f;
             __instance.BASE_ROTATE_SPEED = 250f;
             __instance.FIRST_TURN_SPEED = 250f;
             __instance.FIRST_TURN_BIG_SPEED = 250f;
-            __instance.TURN_SPEED_ON_SPRINT = 300f;
+            __instance.TURN_SPEED_ON_SPRINT = 250f;
         }
     }
 
@@ -113,7 +113,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(GClass559 __instance)
         {
-            __instance.MIN_DIST_TO_STOP_RUN = 0f;
+            __instance.MIN_DIST_TO_STOP_RUN = 9999f;
             //__instance.SHOOT_TO_CHANGE_RND_PART_DELTA = 0.01f;
             //__instance.CAN_SHOOT_TO_HEAD = false;
             __instance.ARMOR_CLASS_COEF = 7f;
@@ -151,7 +151,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalLookData __instance)
         {
-            __instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 1000f;
+            //__instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 1000f;
 
             __instance.NIGHT_VISION_ON = 75f;
             __instance.NIGHT_VISION_OFF = 125f;

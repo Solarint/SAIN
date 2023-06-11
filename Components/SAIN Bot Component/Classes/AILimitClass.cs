@@ -13,7 +13,7 @@ namespace SAIN.Classes
 
         private float UpdateLimitFreqTimer = 0f;
 
-        public void UpdateAILimit()
+        public void Update()
         {
             if (UpdateLimitFreqTimer < Time.time)
             {

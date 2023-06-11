@@ -1,18 +1,19 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Helpers;
+using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {
-    public class SearchMoveObject : SAINBot
+    public class SearchClass : SAINBot
     {
         public bool PeekingCorner { get; private set; }
         public MoveDangerPoint SearchMovePoint { get; private set; }
 
-        public SearchMoveObject(BotOwner bot) : base(bot)
+        public SearchClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -24,14 +25,14 @@ namespace SAIN.Classes
             BotOwner.GoToPoint(point, true, ReachDistance, false, false);
         }
 
-
         public Vector3 ActiveDestination { get; private set; }
+        private bool DirectMove = false;
         private bool FirstCheck = false;
         private bool SecondCheck = false;
         private bool ThirdCheck = false;
         private float DebugDrawTimer = 0f;
 
-        public bool Update(bool lean, bool sprint, float reachDist = -1f)
+        public void Update(bool shallLean, bool shallSprint, float reachDist = -1f)
         {
             if (DebugLayers.Value && ActiveDestination != null && DebugDrawTimer < Time.time)
             {
@@ -45,40 +46,54 @@ namespace SAIN.Classes
                 ReachDistance = reachDist;
             }
 
-            if (SearchMovePoint == null)
+            if (MoveDirect(shallSprint))
+            {
+                return;
+            }
+
+            if (MoveToPeek(shallLean))
+            {
+                return;
+            }
+
+            if (CheckIfStuck())
+            {
+                return;
+            }
+        }
+
+        private bool MoveDirect(bool shallSprint)
+        {
+            if (SearchMovePoint == null || shallSprint)
             {
                 if (TargetPosition == null)
                 {
                     TargetPosition = SAIN.CurrentTargetPosition;
                 }
-                if (!FirstCheck && TargetPosition != null)
+                if (!DirectMove && TargetPosition != null)
                 {
-                    FirstCheck = true;
+                    DirectMove = true;
                     MoveToNextPoint(TargetPosition.Value);
                     ActiveDestination = TargetPosition.Value;
-                    return true;
                 }
-                return false;
+                return true;
             }
+            return false;
+        }
 
+        private bool MoveToPeek(bool shallLean)
+        {
             if (SearchMovePoint != null)
             {
-                if (lean)
-                {
-                    UpdateLean();
-                }
-
                 if (!FirstCheck)
                 {
                     FirstCheck = true;
                     MoveToNextPoint(SearchMovePoint.StartPosition);
                     ActiveDestination = SearchMovePoint.StartPosition;
-                    return true;
                 }
-
-                if (FirstCheck && !SecondCheck)
+                else if (!SecondCheck)
                 {
-                    if (lean)
+                    if (shallLean)
                     {
                         UpdateLean();
                     }
@@ -88,11 +103,9 @@ namespace SAIN.Classes
                         SecondCheck = true;
                         MoveToNextPoint(SearchMovePoint.EndPosition);
                         ActiveDestination = SearchMovePoint.EndPosition;
-                        return true;
                     }
                 }
-
-                if (FirstCheck && SecondCheck && !ThirdCheck)
+                else if (!ThirdCheck)
                 {
                     if (BotIsAtPoint(ActiveDestination))
                     {
@@ -101,41 +114,36 @@ namespace SAIN.Classes
                         ThirdCheck = true;
                         MoveToNextPoint(SearchMovePoint.DangerPoint);
                         ActiveDestination = SearchMovePoint.DangerPoint;
-                        return true;
                     }
                 }
-
-                if (FirstCheck && SecondCheck && ThirdCheck)
+                else
                 {
                     if (BotIsAtPoint(ActiveDestination))
                     {
                         TargetPosition = SAIN.CurrentTargetPosition;
                         if (TargetPosition != null)
                         {
-                            var pathStatus = GoToPoint(TargetPosition.Value, false);
-                            if (pathStatus == NavMeshPathStatus.PathInvalid)
-                            {
-                                return false;
-                            }
-                            return true;
+                            GoToPoint(TargetPosition.Value, false);
                         }
                     }
                 }
+                return true;
+            }
+            return false;
+        }
 
-                if (CheckMoveTimer < Time.time)
+        private bool CheckIfStuck()
+        {
+            if (BotIsStuck)
+            {
+                if (UnstuckMoveTimer < Time.time)
                 {
-                    CheckMoveTimer = Time.time + 0.25f;
-                    if (BotIsStuck && UnstuckMoveTimer < Time.time)
+                    UnstuckMoveTimer = Time.time + 2f;
+                    TargetPosition = SAIN.CurrentTargetPosition;
+                    if (TargetPosition != null)
                     {
-                        UnstuckMoveTimer = Time.time + 1f;
-                        TargetPosition = SAIN.CurrentTargetPosition;
-                        if (TargetPosition != null)
-                        {
-                            var pathStatus2 = GoToPoint(TargetPosition.Value, false);
-                            return pathStatus2 != NavMeshPathStatus.PathInvalid;
-                        }
+                        GoToPoint(TargetPosition.Value, false);
                     }
-
                 }
                 return true;
             }
@@ -163,14 +171,24 @@ namespace SAIN.Classes
 
         private void Reset()
         {
+            TargetPosition = null;
             SearchMovePoint = null;
             FirstCheck = false;
             SecondCheck = false;
             ThirdCheck = false;
+            PeekingCorner = false;
+            DirectMove = false;
         }
 
         public NavMeshPathStatus GoToPoint(Vector3 point, bool MustHavePath = true, float reachDist = 0.5f)
         {
+            var SqrMagnitude = (point - BotOwner.Position).sqrMagnitude;
+            if (SqrMagnitude <= 0.5f)
+            {
+                Logger.LogInfo($"Search Destination is too close. SqrMagnitude: [{SqrMagnitude}]");
+                return NavMeshPathStatus.PathInvalid;
+            }
+
             Reset();
 
             if (NavMesh.SamplePosition(point, out var hit, 0.5f, -1))
@@ -180,7 +198,10 @@ namespace SAIN.Classes
                 {
                     if (Path.corners.Length < 3)
                     {
-                        Logger.LogError($"Corners Length too low! [{Path.corners.Length}]");
+                        if (DebugLayers.Value)
+                        {
+                            Logger.LogError($"Corners Length too low! [{Path.corners.Length}]");
+                        }
                     }
                     else if (Path.status == NavMeshPathStatus.PathComplete || !MustHavePath)
                     {
@@ -211,12 +232,9 @@ namespace SAIN.Classes
                                 }
                             }
                         }
-
-                        //Logger.LogDebug($"{Path.status}");
                         return Path.status;
                     }
                 }
-                //Logger.LogWarning($"{Path.status}");
                 return Path.status;
             }
 

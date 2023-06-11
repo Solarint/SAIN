@@ -2,9 +2,8 @@
 using Comfort.Common;
 using EFT;
 using SAIN.Classes;
-using SAIN.Helpers;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
 namespace SAIN.Components
 {
@@ -20,11 +19,13 @@ namespace SAIN.Components
         {
             BotColor = RandomColor;
 
+            // Must be first, other classes use it
+            BotSquad = new SquadClass(bot);
+
             Info = new BotInfoClass(bot);
             AILimit = new AILimitClass(bot);
             BotStuck = new BotUnstuckClass(bot);
             Hearing = new HearingSensorClass(bot);
-            BotSquad = new SquadClass(bot);
             Talk = new BotTalkClass(bot);
             Lean = bot.GetOrAddComponent<LeanComponent>();
             Decision = new DecisionClass(bot);
@@ -42,50 +43,59 @@ namespace SAIN.Components
         {
             if (BotActive && !GameIsEnding)
             {
-                AILimit.UpdateAILimit();
+                var goalEnemy = BotOwner.Memory.GoalEnemy;
+                if (goalEnemy != null)
+                {
+                    SAINEnemy sainEnemy;
+                    string profile = goalEnemy.Person.ProfileId;
+                    if (Enemies.ContainsKey(profile))
+                    {
+                        sainEnemy = Enemies[profile];
+                    }
+                    else
+                    {
+                        sainEnemy = new SAINEnemy(BotOwner, goalEnemy.Person, DifficultyModifier);
+                        Enemies.Add(profile, sainEnemy);
+                    }
+                    Enemy = sainEnemy;
+                    Enemy?.Update();
+                }
+                else
+                {
+                    Enemy = null;
+                    Enemies.Clear();
+                }
 
+                if (BotSquad.BotInGroup && BotOwner.ShootData.Shooting && BotOwner.AimingData != null)
+                {
+                    Vector3 target = BotOwner.AimingData.RealTargetPoint;
+                    if (BotOwner.ShootData.ChecFriendlyFire(WeaponRoot, target))
+                    {
+                        BotOwner.ShootData.EndShoot();
+                    }
+                }
+
+                AILimit.Update();
                 if (AILimit.Enabled)
                 {
                     return;
                 }
-
-                if (SelfCheckTimer < Time.time)
-                {
-                    SelfCheckTimer = Time.time + 0.1f;
-                    SelfActions.DoSelfAction();
-                    BotOwner.WeaponManager.UpdateWeaponsList();
-                }
-
                 Info.Update();
-                UpdateEnemy();
                 BotStuck.Update();
                 BotSquad.Update();
                 Decision.Update();
                 Cover.Update();
                 Talk.Update();
+                SelfActions.Update();
             }
         }
 
-        private void UpdateEnemy()
-        {
-            if (!BotActive || GameIsEnding || BotOwner.Memory.GoalEnemy == null)
-            {
-                Enemy = null;
-                return;
-            }
-
-            var person = BotOwner.Memory.GoalEnemy.Person;
-            if (Enemy == null || Enemy?.Person != person)
-            {
-                Enemy = new SAINEnemy(BotOwner, person);
-            }
-
-            Enemy?.Update();
-        }
+        public float DifficultyModifier => Info.DifficultyModifier;
 
         public bool HasEnemy => Enemy != null;
 
         public SAINEnemy Enemy { get; private set; }
+        public Dictionary<string, SAINEnemy> Enemies { get; private set; } = new Dictionary<string, SAINEnemy>();
 
         public void Dispose()
         {
@@ -96,8 +106,8 @@ namespace SAIN.Components
             Destroy(this);
         }
 
-        public SAINLogicDecision CurrentDecision => Decision.CurrentDecision;
-
+        public bool NoDecisions => CurrentDecision == SAINSoloDecision.None && Decision.SquadDecision == SAINSquadDecision.None && Decision.SelfDecision == SAINSelfDecision.None;
+        public SAINSoloDecision CurrentDecision => Decision.MainDecision;
         public float DistanceToMainPlayer => (Plugin.MainPlayerPosition - BotOwner.Position).magnitude;
         public Vector3 Position => BotOwner.Position;
         public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
@@ -173,8 +183,6 @@ namespace SAIN.Components
         public BotOwner BotOwner { get; private set; }
 
         private static Color RandomColor => new Color(Random.value, Random.value, Random.value);
-
-        private float SelfCheckTimer = 0f;
 
         private ManualLogSource Logger;
     }

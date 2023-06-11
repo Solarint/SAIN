@@ -11,38 +11,38 @@ namespace SAIN.Layers
     {
         public MoveToCoverAction(BotOwner bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            Shoot = new GClass105(BotOwner);
+            MoveToCover = new MoveToCoverObject(BotOwner);
         }
+
+        private SAINSoloDecision Decision => SAIN.CurrentDecision;
+        private bool Sprint => Decision == SAINSoloDecision.RunForCover || Decision == SAINSoloDecision.Retreat;
 
         public override void Update()
         {
-            MoveToCover?.MoveToCoverPoint(SAIN.Cover.ClosestPoint);
-
-            SAIN.Steering.ManualUpdate();
-
-            if (SAIN.Enemy?.IsVisible == true)
+            if (SAIN.Cover.DuckInCover())
             {
-                Shoot.Update();
+                MoveToCover.ToggleSprint(false);
+                return;
             }
-
-            BotOwner.DoorOpener.Update();
+            BotOwner.SetTargetMoveSpeed(1f);
+            BotOwner.SetPose(1f);
+            MoveToCover.MoveToCoverPoint(SAIN.Cover.ClosestPoint, Sprint);
         }
 
         public override void Start()
         {
-            MoveToCover = new MoveToCoverObject(BotOwner);
+            BotOwner.SetTargetMoveSpeed(1f);
+            BotOwner.SetPose(1f);
+            MoveToCover.MoveToCoverPoint(SAIN.Cover.ClosestPoint, Sprint);
         }
-
-        private MoveToCoverObject MoveToCover;
-        private GClass105 Shoot;
 
         public override void Stop()
         {
+            MoveToCover.ToggleSprint(false);
         }
 
-        private readonly ManualLogSource Logger;
+        private MoveToCoverObject MoveToCover;
         private readonly SAINComponent SAIN;
     }
 }

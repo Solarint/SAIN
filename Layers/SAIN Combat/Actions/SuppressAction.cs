@@ -13,7 +13,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            this.gclass112_0 = new GClass112(bot);
+            Shoot = new GClass112(bot);
         }
 
         // Token: 0x060008C4 RID: 2244 RVA: 0x0002AE8C File Offset: 0x0002908C
@@ -24,7 +24,8 @@ namespace SAIN.Layers
             {
                 if (enemy.IsVisible)
                 {
-                    this.gclass112_0.Update();
+                    BotOwner.StopMove();
+                    Shoot.Update();
                 }
                 else if (CanSeeLastCorner(out var pos))
                 {
@@ -63,14 +64,14 @@ namespace SAIN.Layers
 
                 if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
-                    pos = corner + Random.onUnitSphere * 0.25f;
+                    pos = corner + Random.onUnitSphere * 0.15f;
                     return true;
                 }
             }
             return false;
         }
 
-        private readonly GClass112 gclass112_0;
+        private readonly GClass112 Shoot;
 
         private readonly SAINComponent SAIN;
 
@@ -86,15 +87,15 @@ namespace SAIN.Layers
             }
             if (BotOwner.SuppressShoot.InitToPoints(list))
             {
-                Logger.LogDebug("Init to Points List Success");
+                //Logger.LogDebug("Init to Points List Success");
             }
             else if (BotOwner.SuppressShoot.InitToPoint(BotOwner.Memory.GoalEnemy.EnemyLastPositionReal))
             {
-                Logger.LogDebug("Init to Point Success");
+                //Logger.LogDebug("Init to Point Success");
             }
             else if (BotOwner.SuppressShoot.Init(BotOwner.Memory.GoalEnemy))
             {
-                Logger.LogDebug("Init to GoalEnemy Success");
+                //Logger.LogDebug("Init to GoalEnemy Success");
             }
             else
             {

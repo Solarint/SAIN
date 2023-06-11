@@ -201,15 +201,18 @@
     <Compile Include="Components\SAIN Bot Component\Classes\AILimitClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\BotUnstuckClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\CoverClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Decision\Classes\EnemyDecisionClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Decision\Classes\TargetDecisionClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Decision\Classes\SelfActionDecisionClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\MoverClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Objects\CoverPointClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\DecisionClass.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Decision\DecisionClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\HearingSensorClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Objects\LastHeardSoundClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Objects\MoveToCoverObject.cs" />
-    <Compile Include="Components\SAIN Bot Component\Classes\Objects\SearchMoveObject.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Objects\SearchClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Objects\NavigationPointClass.cs" />
-    <Compile Include="Components\SAIN Bot Component\SubComponents\SquadDecisionComponent.cs" />
+    <Compile Include="Components\SAIN Bot Component\Classes\Decision\Classes\SquadDecisionClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\SAIN Bot Component\SubComponents\CoverFinderComponent.cs" />
     <Compile Include="Config\AudioConfig.cs" />
@@ -227,10 +230,10 @@
     <Compile Include="Helpers\ShootHelpers.cs" />
     <Compile Include="Helpers\Generic\VectorHelpers.cs" />
     <Compile Include="Helpers\VisibilityHelpers.cs" />
-    <Compile Include="Layers\SAIN Combat\Actions\RegroupAction.cs" />
+    <Compile Include="Layers\SAIN Combat\Squad\RegroupAction.cs" />
     <Compile Include="Layers\SAIN Combat\Actions\StandAndShootAction.cs" />
-    <Compile Include="Layers\SAIN Combat\Actions\RunToCoverAction.cs" />
     <Compile Include="Layers\SAIN Combat\Actions\MoveToCoverAction.cs" />
+    <Compile Include="Layers\SAIN Combat\SAINCombatSquadLayer.cs" />
     <Compile Include="Layers\SAIN Extract\ExtractAction.cs" />
     <Compile Include="Layers\SAIN Extract\SAINExtractLayer.cs" />
     <Compile Include="Layers\SAIN Roaming\RoamingAction.cs" />
@@ -269,9 +272,8 @@
     <Compile Include="Components\SAIN Bot Component\SAINComponent.cs" />
     <Compile Include="Config\CoverConfig.cs" />
     <Compile Include="Helpers\Generic\HelperClasses.cs" />
-    <Compile Include="Layers\SAIN Combat\SAINFightLayer.cs" />
+    <Compile Include="Layers\SAIN Combat\SAINCombatSoloLayer.cs" />
     <Compile Include="Layers\SAIN Combat\Actions\ShootAction.cs" />
-    <Compile Include="Layers\SAIN Combat\Actions\RetreatAction.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\SteeringClass.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
     <Compile Include="Helpers\DodgeHelpers.cs" />
@@ -294,7 +296,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Layers\SAIN Combat\Solo\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
