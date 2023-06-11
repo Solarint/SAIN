@@ -72,7 +72,6 @@ namespace SAIN.Layers
 
         private bool SprintEnabled = false;
         private float RandomSprintTimer = 0f;
-        private float ResetTimer = 0f;
 
         private void Steer(Vector3 pos)
         {

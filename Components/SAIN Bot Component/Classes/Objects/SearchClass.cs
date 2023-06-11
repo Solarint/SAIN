@@ -1,7 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Helpers;
-using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;
@@ -166,7 +165,6 @@ namespace SAIN.Classes
         private float UpdateLeanTimer = 0f;
         private float UnstuckMoveTimer = 0f;
         public bool BotIsStuck => SAIN.BotStuck.BotIsStuck;
-        private float CheckMoveTimer = 0f;
         public Vector3? TargetPosition { get; private set; }
 
         private void Reset()
@@ -217,6 +215,10 @@ namespace SAIN.Classes
                                 Vector3 blindCorner = Path.corners[i];
                                 Vector3 dangerPoint = Path.corners[i + 1];
                                 Vector3 dirToBlind = blindCorner - Start;
+                                if (dirToBlind.magnitude < 1f)
+                                {
+                                    continue;
+                                }
                                 Vector3 dirToDanger = dangerPoint - Start;
                                 Vector3 startPeekPos = GetPeekStartAndEnd(blindCorner, dangerPoint, dirToBlind, dirToDanger, out var endPeekPos);
 
@@ -246,7 +248,7 @@ namespace SAIN.Classes
         {
             const float maxMagnitude = 5f;
             const float minMagnitude = 1f;
-            const float OppositePointMagnitude = 10f;
+            const float OppositePointMagnitude = 5f;
 
             Vector3 directionToStart = BotOwner.Position - blindCorner;
 
@@ -257,7 +259,7 @@ namespace SAIN.Classes
             }
             else if (directionToStart.magnitude < minMagnitude)
             {
-                cornerStartDir = directionToStart.normalized;
+                cornerStartDir = directionToStart.normalized * minMagnitude;
             }
             else
             {

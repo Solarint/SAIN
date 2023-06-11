@@ -31,6 +31,14 @@ namespace SAIN
         Surgery = 6,
     }
 
+    public enum FriendlyFireStatus
+    {
+        None,
+        FriendlyBlock,
+        FriendlyClose,
+        Clear,
+    }
+
     public enum CoverStatus
     {
         None = 0,

@@ -124,7 +124,7 @@ namespace SAIN.Classes
                         }
                     }
 
-                    if (BotOwner.Memory.GoalEnemy != null && SAIN.BotSquad.IsSquadLead)
+                    if (BotOwner.Memory.GoalEnemy != null && SAIN.BotSquad.IAmLeader)
                     {
                         UpdateLeaderCommand();
                     }
@@ -175,7 +175,7 @@ namespace SAIN.Classes
         {
             if (LeaderComponent != null)
             {
-                if (BotSquad.IsSquadLead && LeaderTimer < Time.time)
+                if (BotSquad.IAmLeader && LeaderTimer < Time.time)
                 {
                     LeaderTimer = Time.time + LeaderFreq * Randomized;
 
