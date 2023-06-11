@@ -2,7 +2,6 @@
 using DrakiaXYZ.VersionChecker;
 using DrakiaXYZ.BigBrain.Brains;
 using SAIN.Layers;
-using SAIN.Helpers;
 using SAIN.UserSettings;
 using System;
 using System.Collections.Generic;
@@ -10,8 +9,6 @@ using SAIN.Components;
 using Comfort.Common;
 using EFT;
 using UnityEngine;
-using EFT.Interactive;
-using System.Collections;
 
 namespace SAIN
 {
@@ -94,11 +91,13 @@ namespace SAIN
                 throw;
             }
 
-            //BrainManager.AddCustomLayer(typeof(SAINRoamingLayer), new List<string>(NormalBots), 1);
+            BrainManager.AddCustomLayer(typeof(SAINCombatSquadLayer), new List<string>(NormalBots), 95);
+            BrainManager.AddCustomLayer(typeof(SAINCombatSquadLayer), new List<string>(Bosses), 61);
+            BrainManager.AddCustomLayer(typeof(SAINCombatSquadLayer), new List<string>(Followers), 95);
 
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(NormalBots), 95);
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Bosses), 95);
-            BrainManager.AddCustomLayer(typeof(SAINFightLayer), new List<string>(Followers), 95);
+            BrainManager.AddCustomLayer(typeof(SAINCombatSoloLayer), new List<string>(NormalBots), 94);
+            BrainManager.AddCustomLayer(typeof(SAINCombatSoloLayer), new List<string>(Bosses), 60);
+            BrainManager.AddCustomLayer(typeof(SAINCombatSoloLayer), new List<string>(Followers), 94);
         }
 
         private void Update()

@@ -63,9 +63,9 @@ namespace SAIN.Classes
 
         public bool BotIsStuck { get; private set; }
 
-        private bool CanBeStuckDecisions(SAINLogicDecision decision)
+        private bool CanBeStuckDecisions(SAINSoloDecision decision)
         {
-            return decision == SAINLogicDecision.Search || decision == SAINLogicDecision.MoveToCover || decision == SAINLogicDecision.GroupSearch || decision == SAINLogicDecision.DogFight || decision == SAINLogicDecision.RunForCover || decision == SAINLogicDecision.RunAway || decision == SAINLogicDecision.RegroupSquad || decision == SAINLogicDecision.UnstuckSearch || decision == SAINLogicDecision.UnstuckDogFight || decision == SAINLogicDecision.UnstuckMoveToCover;
+            return decision == SAINSoloDecision.Search || decision == SAINSoloDecision.MoveToCover || decision == SAINSoloDecision.DogFight || decision == SAINSoloDecision.RunForCover || decision == SAINSoloDecision.RunAway || decision == SAINSoloDecision.UnstuckSearch || decision == SAINSoloDecision.UnstuckDogFight || decision == SAINSoloDecision.UnstuckMoveToCover;
         }
 
         public bool BotStuckOnPlayer()

@@ -2,7 +2,6 @@ using BepInEx.Logging;
 using EFT;
 using EFT.InventoryLogic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SAIN.Classes
 {
@@ -16,22 +15,10 @@ namespace SAIN.Classes
 
         public void ManualUpdate()
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
-            {
-                return;
-            }
-
-            if (Modifiers == null)
-            {
-                Modifiers = new EquipmentModifiers(BotOwner);
-            }
-
-            if (ShouldIRecalc)
+            if (BotOwner.WeaponManager?.IsWeaponReady == true && BotOwner.WeaponManager.CurrentWeapon?.Template != LastCheckedWeapon)
             {
                 LastCheckedWeapon = CurrentWeapon.Template;
                 FinalModifier = Modifiers.FinalModifier;
-
-                //Logger.LogInfo($"Final Modifier: [{FinalModifier}] Class: [{WeaponClass}] Caliber: [{AmmoCaliber}] Role: [{Modifiers.Role}]");
             }
         }
 
@@ -46,8 +33,6 @@ namespace SAIN.Classes
         private readonly ManualLogSource Logger;
 
         private WeaponTemplate LastCheckedWeapon;
-
-        private bool ShouldIRecalc => BotOwner?.WeaponManager?.IsWeaponReady == true && BotOwner?.WeaponManager?.CurrentWeapon?.Template != LastCheckedWeapon;
 
         public EquipmentModifiers Modifiers { get; private set; }
 

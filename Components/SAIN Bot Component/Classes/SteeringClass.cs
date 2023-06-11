@@ -13,42 +13,37 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        public void ManualUpdate()
+        public bool ManualUpdate()
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
-                return;
+                return false;
             }
 
-            if (UpdateSteerTimer < Time.time)
+            if (SAIN.Enemy?.IsVisible == true)
             {
-                //UpdateSteerTimer = Time.time + 0.25f;
-
-                var enemy = BotOwner.Memory.GoalEnemy;
-                if (enemy != null && enemy.CanShoot && enemy.IsVisible)
-                {
-                    //LookToGoalEnemyPos();
-                }
-                if (SAIN.Enemy?.IsVisible == true)
-                {
-                    LookToGoalEnemyPos();
-                }
-                else if (BotOwner.Memory.LastTimeHit > Time.time - 1f)
-                {
-                    LookToLastHitPos();
-                }
-                else if (BotOwner.Memory.IsUnderFire)
-                {
-                    LookToUnderFirePos();
-                }
-                else if (SAIN.LastHeardSound != null && SAIN.LastHeardSound.TimeSinceHeard < 2f && (SAIN.LastHeardSound.Position - BotOwner.Position).magnitude < 50f)
-                {
-                    LookToHearPos();
-                }
-                else
-                {
-                    BotOwner.LookData.SetLookPointByHearing();
-                }
+                LookToGoalEnemyPos();
+                return true;
+            }
+            if (BotOwner.Memory.LastTimeHit > Time.time - 1f)
+            {
+                LookToLastHitPos();
+                return true;
+            }
+            if (BotOwner.Memory.IsUnderFire)
+            {
+                LookToUnderFirePos();
+                return true;
+            }
+            if (SAIN.LastHeardSound != null && SAIN.LastHeardSound.TimeSinceHeard < 2f && (SAIN.LastHeardSound.Position - BotOwner.Position).magnitude < 50f)
+            {
+                LookToHearPos();
+                return true;
+            }
+            else
+            {
+                BotOwner.LookData.SetLookPointByHearing();
+                return false;
             }
         }
 

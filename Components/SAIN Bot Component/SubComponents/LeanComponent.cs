@@ -11,7 +11,7 @@ namespace SAIN.Components
 {
     public class LeanComponent : MonoBehaviour
     {
-        public List<SAINLogicDecision> DontLeanDecisions = new List<SAINLogicDecision> { SAINLogicDecision.Surgery, SAINLogicDecision.None, SAINLogicDecision.Reload, SAINLogicDecision.RunForCover, SAINLogicDecision.RunAway, SAINLogicDecision.FirstAid, SAINLogicDecision.Stims, SAINLogicDecision.RunAwayGrenade };
+        public List<SAINSoloDecision> DontLeanDecisions = new List<SAINSoloDecision> { SAINSoloDecision.Retreat, SAINSoloDecision.None, SAINSoloDecision.RunForCover, SAINSoloDecision.RunAway };
 
         private void Awake()
         {
@@ -26,7 +26,7 @@ namespace SAIN.Components
 
         private void Update()
         {
-            if (SAIN.BotActive && TargetPosition != null && !DontLeanDecisions.Contains(SAIN.CurrentDecision) && SAIN.CurrentDecision != SAINLogicDecision.Search)
+            if (SAIN.BotActive && TargetPosition != null && !DontLeanDecisions.Contains(SAIN.CurrentDecision) && SAIN.CurrentDecision != SAINSoloDecision.Search)
             {
                 if (LeanCoroutine == null)
                 {
@@ -59,7 +59,7 @@ namespace SAIN.Components
 
         private IEnumerator BotLeanLoop()
         {
-            var wait = new WaitForSeconds(0.33f);
+            var wait = new WaitForSeconds(0.25f);
 
             while (true)
             {
@@ -68,6 +68,7 @@ namespace SAIN.Components
                 if (!DontLeanDecisions.Contains(SAIN.CurrentDecision))
                 {
                     Lean.SetLean(Lean.Angle);
+                    yield return wait;
                 }
 
                 if (SAIN.AILimit.Enabled)
@@ -85,7 +86,7 @@ namespace SAIN.Components
 
             while (true)
             {
-                if (SAIN.CurrentDecision == SAINLogicDecision.HoldInCover)
+                if (SAIN.CurrentDecision == SAINSoloDecision.HoldInCover)
                 {
                     SideStep.Update();
                 }
@@ -229,35 +230,6 @@ namespace SAIN.Components
                 return RayCast.FindLeanDirectionRayCast(targetPos);
             }
 
-            private LeanSetting FindLeanDirection(Vector3 targetPos)
-            {
-                NavMeshPath path = new NavMeshPath();
-                if (NavMesh.CalculatePath(BotOwner.Transform.position, targetPos, -1, path))
-                {
-                    // Corner 0 is at BotOwner position. So we need corner 1 and 2 to check lean angle.
-                    if (path.corners.Length > 2)
-                    {
-                        Vector3 cornerADirection = (path.corners[1] - BotOwner.Transform.position).normalized;
-
-                        var dirToEnemy = (targetPos - BotOwner.Transform.position).normalized;
-                        Quaternion rotation = Quaternion.Euler(0, 90, 0);
-
-                        var rightOfEnemy = rotation * dirToEnemy;
-
-                        if (Vector3.Dot(cornerADirection, rightOfEnemy) > 0f)
-                        {
-                            return LeanSetting.Right;
-                        }
-                        else
-                        {
-                            return LeanSetting.Left;
-                        }
-                    }
-                }
-
-                return LeanSetting.None;
-            }
-
             private readonly ManualLogSource Logger;
 
             public class LeanRayCast : SAIN.SAINBot
@@ -345,7 +317,7 @@ namespace SAIN.Components
 
                     if (BotOwner.Memory.GoalEnemy != null && DirectLineOfSight)
                     {
-                        //return LeanSetting.None;
+                        //return LeanSetting.Normal;
                     }
 
                     if ((LeftLos || LeftHalfLos) && !RightLos)
@@ -400,13 +372,7 @@ namespace SAIN.Components
                 {
                     var direction = target - start;
                     float distance = Mathf.Clamp(direction.magnitude, 0f, 8f);
-                    //DebugGizmos.SingleObjects.Ray(start, direction, Color.yellow, distance, 0.01f, true, 0.25f, true);
-
-                    if (!Physics.Raycast(start, direction, distance, LayerMaskClass.HighPolyWithTerrainMask))
-                    {
-                        return true;
-                    }
-                    return false;
+                    return !Physics.Raycast(start, direction, distance, LayerMaskClass.HighPolyWithTerrainMask);
                 }
 
                 private Vector3 FindOffset(Vector3 start, Vector3 direction, float distance)

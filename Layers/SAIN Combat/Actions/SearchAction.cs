@@ -17,7 +17,7 @@ namespace SAIN.Layers
             SAIN = bot.GetComponent<SAINComponent>();
         }
 
-        private SearchMoveObject Search;
+        private SearchClass Search;
 
         public override void Start()
         {
@@ -35,7 +35,7 @@ namespace SAIN.Layers
                 targetPosition = BotOwner.Transform.position;
             }
 
-            Search = new SearchMoveObject(BotOwner);
+            Search = new SearchClass(BotOwner);
             if (Search.GoToPoint(targetPosition) == NavMeshPathStatus.PathInvalid)
             {
                 Logger.LogError($"Could not Start Search!");
@@ -55,6 +55,12 @@ namespace SAIN.Layers
 
         private void CheckShouldSprint()
         {
+            if (Search.PeekingCorner)
+            {
+                SprintEnabled = false;
+                return;
+            }
+
             var pers = SAIN.Info.BotPersonality;
             if (RandomSprintTimer < Time.time && (pers == BotPersonality.GigaChad || pers == BotPersonality.Chad))
             {

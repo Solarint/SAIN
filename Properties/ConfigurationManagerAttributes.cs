@@ -95,7 +95,7 @@ internal sealed class ConfigurationManagerAttributes
     public string Category;
 
     /// <summary>
-    /// If set, a "Default" button will be shown next to the setting to allow resetting to default.
+    /// If set, a "Normal" button will be shown next to the setting to allow resetting to default.
     /// </summary>
     public object DefaultValue;
 

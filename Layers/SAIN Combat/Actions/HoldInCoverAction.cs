@@ -15,10 +15,10 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            this.AimData = new GClass105(bot);
+            Shoot = new GClass105(bot);
         }
 
-        private GClass105 AimData;
+        private GClass105 Shoot;
 
         public override void Update()
         {
@@ -26,7 +26,7 @@ namespace SAIN.Layers
 
             if (SAIN.HasEnemyAndCanShoot)
             {
-                AimData.Update();
+                Shoot.Update();
             }
 
             SAIN.Cover.DuckInCover();
@@ -170,7 +170,15 @@ namespace SAIN.Layers
         {
             BotOwner.StopMove();
 
-            PositionToHold = BotOwner.Position;
+            var cover = SAIN.Cover.ClosestPoint;
+            if (cover != null)
+            {
+                PositionToHold = SAIN.Cover.ClosestPoint.Position;
+            }
+            else
+            {
+                PositionToHold = BotOwner.Position;
+            }
         }
 
         private Vector3 PositionToHold;

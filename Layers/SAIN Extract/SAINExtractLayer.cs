@@ -28,15 +28,15 @@ namespace SAIN.Layers
             return Active;
         }
 
-        private bool Active => CurrentDecision == SAINLogicDecision.None && !SAIN.HasGoalEnemy && !SAIN.HasGoalTarget && BotOwner.Memory.IsPeace;
+        private bool Active => CurrentDecision == SAINSoloDecision.None && !SAIN.HasGoalEnemy && !SAIN.HasGoalTarget && BotOwner.Memory.IsPeace;
 
         public override bool IsCurrentActionEnding()
         {
             return !Active;
         }
 
-        public SAINLogicDecision LastDecision => SAIN.Decision.LastDecision;
-        public SAINLogicDecision CurrentDecision => SAIN.CurrentDecision;
+        public SAINSoloDecision LastDecision => SAIN.Decision.OldMainDecision;
+        public SAINSoloDecision CurrentDecision => SAIN.CurrentDecision;
 
         private readonly SAINComponent SAIN;
         protected ManualLogSource Logger;

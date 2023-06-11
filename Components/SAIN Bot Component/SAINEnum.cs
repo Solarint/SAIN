@@ -1,29 +1,34 @@
 ﻿
 namespace SAIN
 {
-    public enum SAINLogicDecision
+    public enum SAINSoloDecision
+    {
+        None,
+        Retreat,
+        Fight,
+        RunForCover,
+        Search,
+        HoldInCover,
+        RunAway,
+        DogFight,
+        Shoot,
+        MoveToCover,
+        StandAndShoot,
+
+        UnstuckSearch,
+        UnstuckMoveToCover,
+        UnstuckDogFight,
+    }
+
+    public enum SAINSelfDecision
     {
         None = 0,
-        Surgery = 1,
-        Reload = 2,
-        Fight = 3,
-        RunForCover = 4,
-        Search = 5,
-        HoldInCover = 6,
-        RunAway = 7,
-        FirstAid = 8,
-        Suppress = 9,
-        DogFight = 10,
-        Shoot = 11,
-        Stims = 12,
-        MoveToCover = 13,
-        RunAwayGrenade = 14,
-        StandAndShoot = 15,
-        GroupSearch = 16,
-        RegroupSquad = 17,
-        UnstuckSearch = 18,
-        UnstuckMoveToCover = 19,
-        UnstuckDogFight = 20,
+        Reload = 1,
+        RunAway = 2,
+        FirstAid = 3,
+        RunAwayGrenade = 4,
+        Stims = 5,
+        Surgery = 6,
     }
 
     public enum CoverStatus
@@ -60,7 +65,7 @@ namespace SAIN
 
     public enum BotPersonality
     {
-        None = 0,
+        Normal = 0,
         Timmy = 1,
         Coward = 2,
         Rat = 3,
@@ -92,7 +97,7 @@ namespace SAIN
         Far = 3
     }
 
-    public enum SAINSquadDecisions
+    public enum SAINSquadDecision
     {
         None = 0,
         Surround = 1,
@@ -102,7 +107,9 @@ namespace SAIN
         BoundingRetreat = 5,
         Regroup = 6,
         SpreadOut = 7,
-        HoldPositions = 8
+        HoldPositions = 8,
+        Help = 9,
+        Search = 10,
     }
 
     public enum SAINSoundType
@@ -125,5 +132,14 @@ namespace SAIN
         CloseStep = 1,
         FarGun = 2,
         FarStep = 3,
+    }
+    public enum SAINEnemyPath
+    {
+        VeryClose = 0,
+        Close = 1,
+        Mid = 2,
+        Far = 3,
+        VeryFar = 4,
+        NoEnemy = 5,
     }
 }
