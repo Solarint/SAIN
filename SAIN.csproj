@@ -222,12 +222,12 @@
     <Compile Include="Config\TalkConfig.cs" />
     <Compile Include="Config\VisionConfig.cs" />
     <Compile Include="Helpers\AudioHelpers.cs" />
+    <Compile Include="Helpers\CoverPointHelpers.cs" />
     <Compile Include="Helpers\Generic\DebugDraw.cs" />
     <Compile Include="Helpers\Generic\EFT_Math.cs" />
     <Compile Include="Helpers\FlashlightHelpers.cs" />
     <Compile Include="Helpers\Generic\GetComponentsHelpers.cs" />
     <Compile Include="Helpers\Generic\JsonUtility.cs" />
-    <Compile Include="Helpers\Generic\RayCast.cs" />
     <Compile Include="Helpers\ShootHelpers.cs" />
     <Compile Include="Helpers\Generic\VectorHelpers.cs" />
     <Compile Include="Helpers\VisibilityHelpers.cs" />
@@ -277,7 +277,6 @@
     <Compile Include="Layers\SAIN Combat\Actions\ShootAction.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\SteeringClass.cs" />
     <Compile Include="Config\DebugConfigs.cs" />
-    <Compile Include="Helpers\DodgeHelpers.cs" />
     <Compile Include="Layers\SAIN Combat\Actions\DogfightAction.cs" />
     <Compile Include="Helpers\CornersHelper.cs" />
     <Compile Include="Patches\GlobalSettingsPatches.cs" />
