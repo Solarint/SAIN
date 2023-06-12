@@ -12,15 +12,12 @@ namespace SAIN.Classes
         public SquadDecisionClass(BotOwner bot) : base(bot) { }
 
         protected ManualLogSource Logger => SAIN.Decision.Logger;
+        private SquadClass Squad => SAIN.BotSquad;
 
         public bool GetDecision(out SAINSquadDecision Decision)
         {
             Decision = SAINSquadDecision.None;
-            if (!SAIN.BotSquad.BotInGroup || SAIN.BotSquad.SquadMembers == null || SAIN.BotSquad.Leader?.IsDead == true)
-            {
-                return false;
-            }
-            if (!SAIN.HasEnemy ||! SAIN.HasGoalEnemy)
+            if (!Squad.BotInGroup || Squad.Leader?.IsDead == true)
             {
                 return false;
             }
@@ -29,15 +26,17 @@ namespace SAIN.Classes
                 return false;
             }
 
-            if (!EnemyDecision(out Decision))
+            if (EnemyDecision(out Decision))
             {
-                if (StartRegroup())
-                {
-                    Decision = SAINSquadDecision.Regroup;
-                }
+                return true;
+            }
+            if (StartRegroup())
+            {
+                Decision = SAINSquadDecision.Regroup;
+                return true;
             }
 
-            return Decision != SAINSquadDecision.None;
+            return false;
         }
 
         private bool EnemyDecision(out SAINSquadDecision Decision)

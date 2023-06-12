@@ -48,9 +48,10 @@ namespace SAIN.Classes
                     {
                         if (component != null)
                         {
-                            if (component.OwnerSquadId == SAIN.SquadId)
+                            if (component.CheckIfComponentIsForGroup(SAIN))
                             {
                                 EnemyComponent = component;
+                                component.AddOwner(SAIN);
                                 break;
                             }
                         }
@@ -67,6 +68,7 @@ namespace SAIN.Classes
         {
             Logger.LogDebug($"New Enemy Component added for enemy: [{EnemyPlayer.name}] for SquadID: [{SAIN.SquadId}]");
             EnemyComponent = EnemyPlayer.gameObject.AddComponent<EnemyComponent>();
+            EnemyComponent.AddOwner(SAIN);
         }
 
         private readonly ManualLogSource Logger;
@@ -149,6 +151,16 @@ namespace SAIN.Classes
         public bool EnemyClose { get; private set; }
         
         private float DistanceTimer = 0f;
+
+        public void OnGainSight()
+        {
+
+        }
+
+        public void OnLoseSight()
+        {
+
+        }
 
         private void CheckEnemyVisible()
         {

@@ -109,6 +109,8 @@ namespace SAIN
                 return;
             }
 
+            Singleton<GameWorld>.Instance.GetOrAddComponent<EnemyLineOfSightManager>();
+
             // Add Components to main player
             if (!ComponentAdded)
             {

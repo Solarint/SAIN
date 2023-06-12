@@ -198,6 +198,7 @@
     <None Include="VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\EnemyLineOfSightManager.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\AILimitClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\BotUnstuckClass.cs" />
     <Compile Include="Components\SAIN Bot Component\Classes\CoverClass.cs" />
@@ -306,6 +307,6 @@
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "C:\Games\spt 3.5.7\BepInEx\plugins\$(TargetName)-$(ConfigurationName).dll"
 
-copy "$(TargetPath)" "$(SolutionDir)Release\$(TargetName)\BepInEx\plugins\$(TargetName)-$(ConfigurationName).dll"</PostBuildEvent>
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

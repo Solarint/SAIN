@@ -38,11 +38,13 @@ namespace SAIN.Classes
                             FindSquadLeader();
                         }
                     }
-
-                    if ((Leader == null || GroupSize != SquadMembers.Count) && TimeSinceLeaderDied == 0f)
+                    if (SquadMembers != null)
                     {
-                        GroupSize = SquadMembers.Count;
-                        FindSquadLeader();
+                        if ((Leader == null || GroupSize != SquadMembers.Count) && TimeSinceLeaderDied == 0f)
+                        {
+                            GroupSize = SquadMembers.Count;
+                            FindSquadLeader();
+                        }
                     }
                 }
 
@@ -97,6 +99,7 @@ namespace SAIN.Classes
             LeaderDieTime = 0f;
             IAmLeader = sain.ProfileId == BotOwner.ProfileId;
             LeaderComponent = sain;
+            Leader = sain.BotOwner;
             if (IAmLeader && SquadID == "None")
             {
                 SquadID = Guid.NewGuid().ToString("N");
@@ -113,7 +116,8 @@ namespace SAIN.Classes
 
         public bool IAmLeader { get; private set; } = false;
 
-        public BotOwner Leader => LeaderComponent.BotOwner;
+        public BotOwner Leader { get; private set; }
+
         public SAINComponent LeaderComponent { get; private set; }
 
         public bool BotInGroup => BotOwner.BotsGroup.MembersCount > 1;
@@ -169,6 +173,12 @@ namespace SAIN.Classes
 
             SquadPowerLevel = BotOwner.BotsGroup.GroupPower;
             SquadMembers = dictionary;
+
+            if (Leader == null)
+            {
+                GroupSize = SquadMembers.Count;
+                FindSquadLeader();
+            }
         }
 
         public bool MemberIsFallingBack { get; private set; }
