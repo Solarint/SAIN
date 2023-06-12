@@ -39,7 +39,6 @@ namespace SAIN.Layers
 
         public override void Stop()
         {
-            MoveToCover.ToggleSprint(false);
         }
 
         private MoveToCoverObject MoveToCover;

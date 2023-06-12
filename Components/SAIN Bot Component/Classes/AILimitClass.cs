@@ -33,7 +33,7 @@ namespace SAIN.Classes
                     float distanceToPlayer = SAIN.DistanceToMainPlayer;
                     if (distanceToPlayer > 500f)
                     {
-                        TimeAdd = 3;
+                        TimeAdd = 3f;
                     }
                     else if (distanceToPlayer > 300f)
                     {

@@ -2,13 +2,16 @@
 using Comfort.Common;
 using EFT;
 using SAIN.Classes;
+using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
+using static SAIN.UserSettings.VisionConfig;
 
 namespace SAIN.Components
 {
     public class SAINComponent : MonoBehaviour
     {
+        public List<Player> VisiblePlayers = new List<Player>();
         private void Awake()
         {
             BotOwner = GetComponent<BotOwner>();
@@ -46,10 +49,18 @@ namespace SAIN.Components
         {
             if (GameHasEnded)
             {
-                Dispose();
+                //Dispose();
             }
             if (BotActive && !GameIsEnding)
             {
+                if (VisiblePlayers.Count > 0 && DebugVision.Value)
+                {
+                    foreach (var player in VisiblePlayers)
+                    {
+                        DebugGizmos.SingleObjects.Line(HeadPosition, player.MainParts[BodyPartType.body].Position, Color.blue, 0.025f, true, 0.1f, true);
+                    }
+                }
+
                 var goalEnemy = BotOwner.Memory.GoalEnemy;
                 if (goalEnemy != null)
                 {
@@ -91,11 +102,11 @@ namespace SAIN.Components
                 //AILimit.Update();
                 if (AILimit.Enabled)
                 {
-                    return;
+                    //return;
                 }
+                BotSquad.Update();
                 Info.Update();
                 BotStuck.Update();
-                BotSquad.Update();
                 Decision.Update();
                 Cover.Update();
                 Talk.Update();
