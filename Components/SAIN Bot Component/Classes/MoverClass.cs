@@ -15,22 +15,35 @@ namespace SAIN.Classes
         public MoverClass(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            Agent = BotOwner.GetComponent<NavMeshAgent>();
         }
 
-        private readonly NavMeshAgent Agent;
+        public void Update()
+        {
+            if (NavigationPoint != null)
+            {
+                NavigationPoint.Update();
+                if (NavigationPoint.FinishedPath)
+                {
+                    NavigationPoint = null;
+                }
+            }
+        }
 
         public bool GoToPoint(Vector3 point, bool forceNew = true, bool mustHaveWay = true, float reachDist = 0.5f)
         {
             if (forceNew || NavigationPoint == null)
             {
-                NavigationPoint = new NavigationPointObject(BotOwner, Agent);
-                var pathStatus = NavigationPoint.GoToPoint(point, mustHaveWay);
-                if (mustHaveWay)
+                var navPoint = new NavigationPointObject(BotOwner);
+                var pathStatus = navPoint.GoToPoint(point, mustHaveWay);
+                if (pathStatus != NavMeshPathStatus.PathInvalid)
                 {
-                    return pathStatus == NavMeshPathStatus.PathComplete;
+                    if (mustHaveWay && pathStatus != NavMeshPathStatus.PathComplete)
+                    {
+                        return false;
+                    }
+                    NavigationPoint = navPoint;
+                    return true;
                 }
-                return pathStatus != NavMeshPathStatus.PathInvalid;
             }
             return false;
         }
@@ -38,15 +51,19 @@ namespace SAIN.Classes
         public void StopMove()
         {
             NavigationPoint = null;
-            Agent.isStopped = true;
-            Agent.isStopped = false;
+            BotOwner.StopMove();
+            BotOwner.Mover.Stop();
+        }
+
+        public void StopSprint()
+        {
+            BotOwner.GetPlayer.EnableSprint(false);
         }
 
         public NavigationPointObject NavigationPoint { get; private set; }
         public bool HasDestination => NavigationPoint != null;
         public MoveToCoverObject MoveToCover { get; set; }
-        public CoverPoint CoverDestination => MoveToCover.CoverDestination;
-        public float? CoverDestinationDistance => MoveToCover?.Distance;
+        public CoverPoint CoverDestination { get; private set; }
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
         {
@@ -89,6 +106,17 @@ namespace SAIN.Classes
         {
             return Vector3.Distance(point, BotOwner.Transform.position);
         }
+
+        public void TryJump()
+        {
+            if (JumpTimer < Time.time)
+            {
+                JumpTimer = Time.time + 1f;
+                BotOwner.GetPlayer.MovementContext.TryJump();
+            }
+        }
+
+        private float JumpTimer = 0f;
 
         private readonly ManualLogSource Logger;
     }

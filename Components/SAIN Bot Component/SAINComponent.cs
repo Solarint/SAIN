@@ -40,6 +40,7 @@ namespace SAIN.Components
             SelfActions = new SelfActionClass(bot);
             Steering = new SteeringClass(bot);
             Grenade = new BotGrenadeClass(bot);
+            Mover = new MoverClass(bot);
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
@@ -194,6 +195,8 @@ namespace SAIN.Components
         public Vector3 UnderFireFromPosition { get; set; }
 
         public bool HasEnemyAndCanShoot => Enemy?.IsVisible == true;
+
+        public MoverClass Mover { get; private set; }
 
         public AILimitClass AILimit { get; private set; }
 
