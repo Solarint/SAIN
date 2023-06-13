@@ -113,9 +113,7 @@ namespace SAIN
             // Add Components to main player
             if (!ComponentAdded)
             {
-                gameWorld.GetOrAddComponent<LineOfSightManager>();
                 gameWorld.GetOrAddComponent<BotController>();
-
                 MainPlayer.GetOrAddComponent<PlayerTalkComponent>();
                 MainPlayer.GetOrAddComponent<FlashLightComponent>();
                 ComponentAdded = true;
