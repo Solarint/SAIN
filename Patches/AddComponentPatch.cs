@@ -4,6 +4,7 @@ using HarmonyLib;
 using SAIN.Components;
 using System.Reflection;
 using SAIN.Helpers;
+using Comfort.Common;
 
 namespace SAIN.Patches
 {
@@ -22,7 +23,8 @@ namespace SAIN.Patches
                 return;
             }
 
-            __instance.GetOrAddComponent<SAINComponent>();
+            var component = __instance.GetOrAddComponent<SAINComponent>();
+            Singleton<GameWorld>.Instance.GetComponent<BotController>()?.AddBot(component);
         }
     }
 
@@ -47,7 +49,11 @@ namespace SAIN.Patches
             }
 
             var component = __instance.GetComponent<SAINComponent>();
-            component?.Dispose();
+            if (component != null)
+            {
+                Singleton<GameWorld>.Instance.GetComponent<BotController>()?.RemoveBot(component);
+                component?.Dispose();
+            }
         }
     }
 

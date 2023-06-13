@@ -102,18 +102,20 @@ namespace SAIN
 
         private void Update()
         {
-            MainPlayer = Singleton<GameWorld>.Instance?.MainPlayer;
+            var gameWorld = Singleton<GameWorld>.Instance;
+            MainPlayer = gameWorld?.MainPlayer;
             if (MainPlayer == null)
             {
                 ComponentAdded = false;
                 return;
             }
 
-            Singleton<GameWorld>.Instance.GetOrAddComponent<EnemyLineOfSightManager>();
-
             // Add Components to main player
             if (!ComponentAdded)
             {
+                gameWorld.GetOrAddComponent<LineOfSightManager>();
+                gameWorld.GetOrAddComponent<BotController>();
+
                 MainPlayer.GetOrAddComponent<PlayerTalkComponent>();
                 MainPlayer.GetOrAddComponent<FlashLightComponent>();
                 ComponentAdded = true;
@@ -121,7 +123,7 @@ namespace SAIN
 
             if (UpdatePositionTimer < Time.time)
             {
-                UpdatePositionTimer = Time.time + 0.5f;
+                UpdatePositionTimer = Time.time + 0.15f;
                 MainPlayerPosition = MainPlayer.Position;
             }
         }

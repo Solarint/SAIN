@@ -1,11 +1,6 @@
 ﻿using Aki.Reflection.Patching;
-using EFT;
-using EFT.Interactive;
 using HarmonyLib;
-using SAIN.Components;
 using System.Reflection;
-using UnityEngine;
-using UnityEngine.AI;
 
 namespace SAIN.Patches
 {
@@ -19,10 +14,8 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsMindSettings __instance)
         {
-            __instance.DOG_FIGHT_IN = 0f;
-            __instance.DOG_FIGHT_OUT = 0.1f;
             __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
-            __instance.NO_RUN_AWAY_FOR_SAFE = false;
+            __instance.NO_RUN_AWAY_FOR_SAFE = true;
             __instance.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
             __instance.CAN_USE_MEDS = true;
             __instance.CAN_USE_FOOD_DRINK = true;
@@ -41,7 +34,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalAimingSettings __instance)
         {
-            //__instance.SHPERE_FRIENDY_FIRE_SIZE = 0.33f;
+            __instance.SHPERE_FRIENDY_FIRE_SIZE = 0.2f;
             __instance.RECALC_MUST_TIME = 1;
             __instance.RECALC_MUST_TIME_MIN = 1;
             __instance.RECALC_MUST_TIME_MAX = 2;
@@ -65,7 +58,7 @@ namespace SAIN.Patches
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
             __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.5f;
             __instance.BASE_AUTOMATIC_TIME = 0.5f;
-            __instance.RECOIL_DELTA_PRESS = 0.1f;
+            __instance.RECOIL_DELTA_PRESS = 0f;
         }
     }
 
@@ -78,9 +71,9 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsScatteringSettings __instance)
         {
-            __instance.MinScatter = 0.15f;
-            __instance.WorkingScatter = 0.25f;
-            __instance.MaxScatter = 0.33f;
+            //__instance.MinScatter = 0.15f;
+            // __instance.WorkingScatter = 0.25f;
+            //__instance.MaxScatter = 0.33f;
         }
     }
 
@@ -97,8 +90,8 @@ namespace SAIN.Patches
             __instance.SEC_TO_CHANGE_TO_RUN = 9999f;
             __instance.RUN_TO_COVER_MIN = 9999f;
             __instance.BASE_ROTATE_SPEED = 250f;
-            __instance.FIRST_TURN_SPEED = 250f;
-            __instance.FIRST_TURN_BIG_SPEED = 250f;
+            //__instance.FIRST_TURN_SPEED = 250f;
+            //__instance.FIRST_TURN_BIG_SPEED = 250f;
             __instance.TURN_SPEED_ON_SPRINT = 250f;
         }
     }
@@ -113,11 +106,11 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(GClass559 __instance)
         {
+            __instance.BOT_MOVE_CAST_ONLYVERTICAL = false;
             __instance.MIN_DIST_TO_STOP_RUN = 9999f;
-            //__instance.SHOOT_TO_CHANGE_RND_PART_DELTA = 0.01f;
-            //__instance.CAN_SHOOT_TO_HEAD = false;
-            __instance.ARMOR_CLASS_COEF = 7f;
-            __instance.SHOTGUN_POWER = 70f;
+            __instance.CAN_SHOOT_TO_HEAD = false;
+            __instance.ARMOR_CLASS_COEF = 6f;
+            __instance.SHOTGUN_POWER = 60f;
             __instance.RIFLE_POWER = 50f;
             __instance.PISTOL_POWER = 30f;
             __instance.SMG_POWER = 100f;
@@ -164,8 +157,8 @@ namespace SAIN.Patches
             __instance.VISIBLE_ANG_LIGHT = 30f;
             __instance.VISIBLE_DISNACE_WITH_LIGHT = 50f;
 
-            __instance.GOAL_TO_FULL_DISSAPEAR = 0.5f;
-            __instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.25f;
+            __instance.GOAL_TO_FULL_DISSAPEAR = 0.25f;
+            __instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;
             __instance.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.0001f;
 
             //__instance.MAX_VISION_GRASS_METERS = 1f;
