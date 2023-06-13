@@ -134,14 +134,21 @@ public class LineOfSightManager : MonoBehaviour
             int partVisCount = 0;
             bool visible = false;
             var bot = botsWithEnemy[i];
-            for (int j = i; j < BodyPartCount; j++)
+            int debugDrawPartCount = 0;
+            var bodyParts = bot.Enemy.EnemyPlayer.MainParts.Values.ToList();
+            for (int j = 0; j < BodyPartCount; j++)
             {
                 debugParts++;
-                if (raycastHits[j].collider == null)
+                if (raycastHits[j + i].collider == null)
                 {
+                    if (DebugVision.Value)
+                    {
+                        DebugGizmos.SingleObjects.Line(bot.HeadPosition, bodyParts[debugDrawPartCount].Position, Color.red, 0.01f, true, 0.25f, true);
+                    }
                     partVisCount++;
                     visible = true;
                 }
+                debugDrawPartCount++;
             }
 
             if (visible)
