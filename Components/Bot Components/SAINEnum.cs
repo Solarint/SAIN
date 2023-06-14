@@ -14,6 +14,7 @@ namespace SAIN
         Shoot,
         MoveToCover,
         StandAndShoot,
+        Investigate,
 
         UnstuckSearch,
         UnstuckMoveToCover,

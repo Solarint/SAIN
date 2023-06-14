@@ -199,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\ShootClass.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\InvestigateAction.cs" />
     <Compile Include="Components\Bot Controller Components\BotController.cs" />
     <Compile Include="Components\Bot Controller Components\DecisionManager.cs" />
     <Compile Include="Components\Bot Controller Components\PathManager.cs" />
@@ -216,7 +217,7 @@
     <Compile Include="Components\Bot Components\Classes\Decision\DecisionClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Sense\HearingSensorClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Sense\LastHeardSoundClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\Cover\MoveToCoverObject.cs" />
+    <Compile Include="Components\Bot Components\Classes\Cover\MoveToCoverClass.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\SearchClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Movement\NavigationPointClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Decision\Classes\SquadDecisionClass.cs" />
@@ -241,7 +242,7 @@
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Squad Actions\RegroupAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\StandAndShootAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToCoverAction.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINCombatSquadLayer.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSquad.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\ExtractAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\SAINExtractLayer.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Roaming\RoamingAction.cs" />
@@ -278,7 +279,7 @@
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\BotGrenadeClass.cs" />
     <Compile Include="Components\Bot Components\SAINComponent.cs" />
     <Compile Include="Config\CoverConfig.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINCombatSoloLayer.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSolo.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ShootAction.cs" />
     <Compile Include="Components\Bot Components\Classes\Core\SteeringClass.cs" />
     <Compile Include="Config\DebugConfigs.cs" />

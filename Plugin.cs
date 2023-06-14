@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN AI", "2.0")]
+    [BepInPlugin("me.sol.sain", "SAIN AI", "2.1")]
     [BepInDependency("xyz.drakia.bigbrain", "0.1.2")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class Plugin : BaseUnityPlugin
@@ -29,76 +29,139 @@ namespace SAIN
             {
                 throw new Exception($"Invalid EFT Version");
             }
-
-            try
+            else
             {
-                TalkConfig.Init(Config);
-                VisionConfig.Init(Config);
-                DebugConfig.Init(Config);
-                CoverConfig.Init(Config);
-                BotShootConfig.Init(Config);
-                SoundConfig.Init(Config);
-                DazzleConfig.Init(Config);
+                ConfigInit();
 
-                //new Patches.MoverPatch().Enable();
-                new Patches.SprintPatch().Enable();
+                GenericPatches();
+                MovementPatches();
+                ComponentPatches();
+                HearingPatches();
+                TalkPatches();
+                VisionPatches();
+                GlobalSettingsPatches();
+                ShootPatches();
 
-                new Patches.CheckFlashlightPatch().Enable();
-                new Patches.DazzlePatch().Enable();
-
-                new Patches.AddComponentPatch().Enable();
-                new Patches.DisposeComponentPatch().Enable();
-                new Patches.InitHelper().Enable();
-
-                new Patches.InitiateShotPatch().Enable();
-                new Patches.TryPlayShootSoundPatch().Enable();
-                new Patches.HearingSensorPatch().Enable();
-
-                new Patches.PlayerTalkPatch().Enable();
-                new Patches.TalkDisablePatch1().Enable();
-                new Patches.TalkDisablePatch2().Enable();
-                new Patches.TalkDisablePatch3().Enable();
-                new Patches.TalkDisablePatch4().Enable();
-
-                new Patches.VisibleDistancePatch().Enable();
-                new Patches.GainSightPatch().Enable();
-
-                new Patches.KickPatch().Enable();
-                new Patches.GrenadeThrownActionPatch().Enable();
-                new Patches.AddEnemyToAllGroupsInBotZonePatch().Enable();
-                new Patches.AddEnemyToAllGroupsPatch().Enable();
-
-                new Patches.BotGlobalLookPatch().Enable();
-                new Patches.BotGlobalShootPatch().Enable();
-                new Patches.BotGlobalGrenadePatch().Enable();
-                new Patches.BotGlobalMindPatch().Enable();
-                new Patches.BotGlobalMovePatch().Enable();
-                new Patches.BotGlobalCorePatch().Enable();
-                new Patches.BotGlobalAimPatch().Enable();
-                new Patches.BotGlobalScatterPatch().Enable();
-
-                new Patches.AimOffsetPatch().Enable();
-                new Patches.RecoilPatch().Enable();
-                new Patches.LoseRecoilPatch().Enable();
-                new Patches.EndRecoilPatch().Enable();
-                new Patches.FullAutoPatch().Enable();
-                new Patches.SemiAutoPatch().Enable();
-                new Patches.FiremodePatch().Enable();
+                AddLayers();
+                RemoveLayers();
             }
-            catch (Exception ex)
-            {
-                Logger.LogError($"{GetType().Name}: {ex}");
-                throw;
-            }
-
-            BrainManager.AddCustomLayer(typeof(SAINCombatSquadLayer), new List<string>(NormalBots), 95);
-            BrainManager.AddCustomLayer(typeof(SAINCombatSquadLayer), new List<string>(Bosses), 61);
-            BrainManager.AddCustomLayer(typeof(SAINCombatSquadLayer), new List<string>(Followers), 95);
-
-            BrainManager.AddCustomLayer(typeof(SAINCombatSoloLayer), new List<string>(NormalBots), 94);
-            BrainManager.AddCustomLayer(typeof(SAINCombatSoloLayer), new List<string>(Bosses), 60);
-            BrainManager.AddCustomLayer(typeof(SAINCombatSoloLayer), new List<string>(Followers), 94);
         }
+
+        private void ConfigInit()
+        {
+            TalkConfig.Init(Config);
+            VisionConfig.Init(Config);
+            DebugConfig.Init(Config);
+            CoverConfig.Init(Config);
+            BotShootConfig.Init(Config);
+            SoundConfig.Init(Config);
+            DazzleConfig.Init(Config);
+        }
+
+        private void GenericPatches()
+        {
+            new Patches.GrenadeThrownActionPatch().Enable();
+            new Patches.AddEnemyToAllGroupsInBotZonePatch().Enable();
+            new Patches.AddEnemyToAllGroupsPatch().Enable();
+        }
+
+        private void ShootPatches()
+        {
+            new Patches.AimOffsetPatch().Enable();
+            new Patches.RecoilPatch().Enable();
+            new Patches.LoseRecoilPatch().Enable();
+            new Patches.EndRecoilPatch().Enable();
+            new Patches.FullAutoPatch().Enable();
+            new Patches.SemiAutoPatch().Enable();
+            new Patches.FiremodePatch().Enable();
+        }
+
+        private void MovementPatches()
+        {
+            new Patches.KickPatch().Enable();
+            new Patches.SprintPatch1().Enable();
+            new Patches.BotRunDisable().Enable();
+            new Patches.TargetSpeedPatch1().Enable();
+            new Patches.TargetSpeedPatch2().Enable();
+            new Patches.SetPosePatch1().Enable();
+            new Patches.SetPosePatch2().Enable();
+            new Patches.HoldOrCoverPatch1().Enable();
+            new Patches.HoldOrCoverPatch2().Enable();
+        }
+
+        private void ComponentPatches()
+        {
+            new Patches.AddComponentPatch().Enable();
+            new Patches.DisposeComponentPatch().Enable();
+            new Patches.InitHelper().Enable();
+        }
+
+        private void VisionPatches()
+        {
+            new Patches.VisibleDistancePatch().Enable();
+            new Patches.GainSightPatch().Enable();
+            new Patches.CheckFlashlightPatch().Enable();
+            new Patches.DazzlePatch().Enable();
+        }
+
+        private void HearingPatches()
+        {
+            new Patches.InitiateShotPatch().Enable();
+            new Patches.TryPlayShootSoundPatch().Enable();
+            new Patches.HearingSensorPatch().Enable();
+        }
+
+        private void TalkPatches()
+        {
+            new Patches.PlayerTalkPatch().Enable();
+            new Patches.TalkDisablePatch1().Enable();
+            new Patches.TalkDisablePatch2().Enable();
+            new Patches.TalkDisablePatch3().Enable();
+            new Patches.TalkDisablePatch4().Enable();
+        }
+
+        private void GlobalSettingsPatches()
+        {
+            new Patches.BotGlobalLookPatch().Enable();
+            new Patches.BotGlobalShootPatch().Enable();
+            new Patches.BotGlobalGrenadePatch().Enable();
+            new Patches.BotGlobalMindPatch().Enable();
+            new Patches.BotGlobalMovePatch().Enable();
+            new Patches.BotGlobalCorePatch().Enable();
+            new Patches.BotGlobalAimPatch().Enable();
+            new Patches.BotGlobalScatterPatch().Enable();
+        }
+
+        private void AddLayers()
+        {
+            // SAIN Squad
+            BrainManager.AddCustomLayer(typeof(SAINSquad), new List<string>(NormalBots), 24);
+            BrainManager.AddCustomLayer(typeof(SAINSquad), new List<string>(Bosses), 24);
+            BrainManager.AddCustomLayer(typeof(SAINSquad), new List<string>(Followers), 24);
+            SAINLayers.Add(SAINSquad.Name);
+
+            // SAIN Solo
+            BrainManager.AddCustomLayer(typeof(SAINSolo), new List<string>(NormalBots), 20);
+            BrainManager.AddCustomLayer(typeof(SAINSolo), new List<string>(Bosses), 20);
+            BrainManager.AddCustomLayer(typeof(SAINSolo), new List<string>(Followers), 20);
+            SAINLayers.Add(SAINSolo.Name);
+        }
+
+
+        private void RemoveLayers()
+        {
+            BrainManager.RemoveLayer("AdvAssaultTarget", new List<string>(NormalBots));
+            BrainManager.RemoveLayer("AdvAssaultTarget", new List<string>(Bosses));
+            BrainManager.RemoveLayer("AdvAssaultTarget", new List<string>(Followers));
+            BrainManager.RemoveLayer("Pmc", new List<string>(NormalBots));
+            BrainManager.RemoveLayer("Pmc", new List<string>(Bosses));
+            BrainManager.RemoveLayer("Pmc", new List<string>(Followers));
+            BrainManager.RemoveLayer("AssaultHaveEnemy", new List<string>(NormalBots));
+            BrainManager.RemoveLayer("AssaultHaveEnemy", new List<string>(Bosses));
+            BrainManager.RemoveLayer("AssaultHaveEnemy", new List<string>(Followers));
+        }
+
+        public static List<string> SAINLayers { get; private set; } = new List<string>();
 
         private void Update()
         {

@@ -51,52 +51,13 @@ namespace SAIN.Classes
 
         public bool Activated = false;
 
-        public void Update( float targetSpeed = 1f, float targetPose = 1f, float reachDist = -1f)
+        public void Update( float targetSpeed = 1f, float targetPose = 1f )
         {
-            if (CornerDestination == null || ActivePath == null)
-            {
-                Logger.LogError("Active Path is null, Cannot Update.");
-                return;
-            }
-            if (!Activated)
-            {
-                Logger.LogError("Path is not Activated. Cannot Update.");
-                return;
-            }
-
-            BotOwner.SetTargetMoveSpeed(targetSpeed);
-            BotOwner.SetPose(targetPose);
-
-            if (reachDist > 0)
-            {
-                ReachDistance = reachDist;
-            }
-
-            if (CornerDestination.ShallJump)
-            {
-                if (BotIsAtPoint(true, 0.5f))
-                {
-                    SAIN.Mover.TryJump();
-                    MoveNext();
-                    return;
-                }
-            }
-
-            if (BotIsComeTo())
-            {
-                if (MoveNext())
-                {
-                    return;
-                }
-                FinishedPath = true;
-            }
+            SAIN.Mover.SetTargetMoveSpeed(targetSpeed);
+            SAIN.Mover.SetTargetPose(targetPose);
+            BotOwner.DoorOpener.Update();
         }
 
-
-        private bool BotIsAtFinal()
-        {
-            return BotIsAtPoint(FinalDestination.Point, true);
-        }
 
         private bool MoveNext()
         {
@@ -116,7 +77,7 @@ namespace SAIN.Classes
             return hasNext;
         }
 
-        public NavMeshPathStatus GoToPointJump(Vector3 point, bool MustHavePath = true, float reachDist = -1f)
+        public NavMeshPathStatus GoToPointJump(Vector3 point, bool MustHavePath = true, float reachDist = 0.5f)
         {
             Activated = false;
             if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
@@ -130,18 +91,11 @@ namespace SAIN.Classes
                     }
                     else if (Path.status == NavMeshPathStatus.PathComplete || !MustHavePath)
                     {
-                        BotOwner.Mover.Stop();
-
-                        var jumpPath = GetJumpPath(Path);
-
-                        ReachDistance = reachDist > 0 ? reachDist : 0.5f;
-
-                        ActivePath = jumpPath;
-
-                        PathWayIndex = 0;
-                        PathWayIndexMax = jumpPath.Length - 1;
-                        FinalDestination = jumpPath[PathWayIndexMax];
-                        Activate();
+                        if (reachDist < 0f)
+                        {
+                            reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
+                        }
+                        BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
 
                         return Path.status;
                     }
@@ -152,30 +106,19 @@ namespace SAIN.Classes
             return NavMeshPathStatus.PathInvalid;
         }
 
-        public bool GoToPoint(Vector3 point)
+        public bool GoToPoint(Vector3 point, float reachDist = -1f)
         {
-            Activated = false;
-            ActivePath = null;
-            FinalDestination = null;
-
             if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
-                if (NavMesh.CalculatePath(BotPosition, navHit.position, -1, Path))
+                if (NavMesh.CalculatePath(BotPosition, navHit.position, -1, Path) && Path.corners.Length > 1)
                 {
-                    bool start = Path.status == NavMeshPathStatus.PathComplete;
-                    if (Path.corners.Length > 1 && start)
+                    if (reachDist < 0f)
                     {
-                        BotOwner.Mover.Stop();
-                        var path = GetPath(Path.corners);
-                        ReachDistance = 0.5f;
-                        ActivePath = path;
-                        PathWayIndex = 0;
-                        PathWayIndexMax = path.Length - 1;
-                        FinalDestination = path[PathWayIndexMax];
-                        Activate();
-                        return true;
+                        reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
                     }
+                    BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
+                    return true;
                 }
             }
 

@@ -23,12 +23,9 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAIN.Steering.ManualUpdate();
+            SAIN.Steering.Steer();
 
-            if (SAIN.HasEnemyAndCanShoot)
-            {
-                Shoot.Update();
-            }
+            Shoot.Update();
 
             SAIN.Cover.DuckInCover();
 
@@ -47,11 +44,11 @@ namespace SAIN.Layers
 
             if (BotOwner.Memory.IsUnderFire)
             {
-                BotOwner.SetPose(0f);
+                SAIN.Mover.SetTargetPose(0f);
             }
             else
             {
-                BotOwner.SetPose(0.66f);
+                SAIN.Mover.SetTargetPose(0.66f);
             }
         }
 
@@ -64,14 +61,14 @@ namespace SAIN.Layers
         {
             if (SAIN.HasEnemyAndCanShoot)
             {
-                BotOwner.SetTargetMoveSpeed(1f);
+                SAIN.Mover.SetTargetMoveSpeed(1f);
                 BotOwner.GoToPoint(PositionToHold, false, -1, false, false);
                 return;
             }
             else
             {
-                BotOwner.SetPose(0.66f);
-                BotOwner.SetTargetMoveSpeed(0f);
+                SAIN.Mover.SetTargetPose(0.66f);
+                SAIN.Mover.SetTargetMoveSpeed(0f);
             }
 
             if (MoveTimer < Time.time)

@@ -46,8 +46,8 @@ namespace SAIN.Layers.Actions
 
         public override void Start()
         {
-            BotOwner.SetTargetMoveSpeed(1f);
-            BotOwner.SetPose(1f);
+            SAIN.Mover.SetTargetMoveSpeed(1f);
+            SAIN.Mover.SetTargetPose(1f);
             Move = new NavigationPointObject(BotOwner);
             Move.GoToPoint(Plugin.MainPlayerPosition, false);
         }

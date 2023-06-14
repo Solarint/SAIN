@@ -5,14 +5,16 @@ using SAIN.Components;
 
 namespace SAIN.Layers
 {
-    internal class SAINCombatSquadLayer : CustomLayer
+    internal class SAINSquad : CustomLayer
     {
         public override string GetName()
         {
-            return "SAIN Combat Squad";
+            return Name;
         }
 
-        public SAINCombatSquadLayer(BotOwner bot, int priority) : base(bot, priority)
+        public static string Name => "SAIN Combat Squad";
+
+        public SAINSquad(BotOwner bot, int priority) : base(bot, priority)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();

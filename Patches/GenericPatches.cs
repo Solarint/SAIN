@@ -6,7 +6,9 @@ using SAIN.Components;
 using SAIN.Helpers;
 using System.Reflection;
 using UnityEngine;
+using DrakiaXYZ.BigBrain.Brains;
 using UnityEngine.AI;
+using SAIN.Layers;
 
 namespace SAIN.Patches
 {
@@ -102,11 +104,41 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix()
         {
+            return true;
+        }
+    }
+
+    public class HoldOrCoverPatch1 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(GClass29), "HoldOrCover");
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotLogicDecision __result)
+        {
+            __result = BotLogicDecision.holdPosition;
             return false;
         }
     }
 
-    public class SprintPatch : ModulePatch
+    public class HoldOrCoverPatch2 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(GClass29), "HoldOrCoverRun");
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotLogicDecision __result)
+        {
+            __result = BotLogicDecision.holdPosition;
+            return false;
+        }
+    }
+
+    public class SprintPatch1 : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -116,11 +148,102 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            if (___botOwner_0.Brain.ActiveLayerName() == "SAIN Combat System")
+            string layer = ___botOwner_0.Brain.ActiveLayerName();
+            if (Plugin.SAINLayers.Contains(layer))
             {
                 return false;
             }
+            return true;
+        }
+    }
+
+    public class BotRunDisable : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("BotRun")?.PropertyType?.GetMethod("Run", BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(CoverShootType), typeof(ShootPointClass), typeof(float), typeof(bool), typeof(bool), typeof(bool) }, null);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix()
+        {
             return false;
+        }
+    }
+
+    public class TargetSpeedPatch1 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("SetTargetMoveSpeed", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0)
+        {
+            string layer = ___botOwner_0.Brain.ActiveLayerName();
+            if (Plugin.SAINLayers.Contains(layer))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    public class TargetSpeedPatch2 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("method_13", BindingFlags.Instance | BindingFlags.NonPublic);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0)
+        {
+            string layer = ___botOwner_0.Brain.ActiveLayerName();
+            if (Plugin.SAINLayers.Contains(layer))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    public class SetPosePatch1 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("method_12", BindingFlags.Instance | BindingFlags.NonPublic);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0)
+        {
+            string layer = ___botOwner_0.Brain.ActiveLayerName();
+            if (Plugin.SAINLayers.Contains(layer))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    public class SetPosePatch2 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("SetPose", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0)
+        {
+            string layer = ___botOwner_0.Brain.ActiveLayerName();
+            if (Plugin.SAINLayers.Contains(layer))
+            {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -134,40 +257,7 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix()
         {
-            return false;
-        }
-    }
-
-    public class MoverPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("method_9", BindingFlags.Instance | BindingFlags.NonPublic);
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(ref BotOwner ___botOwner_0, ref Vector3[] ___vector3_0, ref int ___Int32_0)
-        {
-            int i = ___Int32_0;
-            var way = ___vector3_0;
-
-            if (i < way.Length - 2)
-            {
-                Vector3 corner = way[i];
-                Vector3 nextCorner = way[i + 1];
-                Vector3 bot = ___botOwner_0.Position;
-
-                var directionA = corner - bot;
-                var directionB = nextCorner - bot;
-                var directionCorners = nextCorner - corner;
-
-                float angle = Vector3.Angle(directionA.normalized, directionB.normalized);
-
-                if (directionA.magnitude < 0.5f && angle > 30f && directionCorners.magnitude < 0.5f)
-                {
-                    ___botOwner_0.GetPlayer.EnableSprint(false);
-                }
-            }
+            return true;
         }
     }
 }

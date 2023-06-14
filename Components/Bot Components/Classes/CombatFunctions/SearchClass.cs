@@ -141,7 +141,7 @@ namespace SAIN.Classes
                     TargetPosition = SAIN.CurrentTargetPosition;
                     if (TargetPosition != null)
                     {
-                        GoToPoint(TargetPosition.Value, false);
+                        //GoToPoint(TargetPosition.Value, false);
                     }
                 }
                 return true;

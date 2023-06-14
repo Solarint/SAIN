@@ -1,5 +1,6 @@
 ﻿using EFT;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace SAIN.Classes
 {
@@ -11,14 +12,25 @@ namespace SAIN.Classes
             Position = point;
             Collider = collider;
             TimeCreated = Time.time;
+            CalcPathLength();
         }
 
-        public void MoveToCover(float pose = 1f, float speed = 1f, bool slowAtEnd = true, float reachDist = -1f)
+        public bool Spotted { get; set; }
+
+        public void CalcPathLength()
         {
-            BotOwner.SetPose(pose);
-            BotOwner.SetTargetMoveSpeed(speed);
-            BotOwner.GoToPoint(Position, false, reachDist, false, false);
+            NavMeshPath path = new NavMeshPath();
+            if (NavMesh.CalculatePath(BotOwner.Position, Position, -1, path))
+            {
+                PathLengthAtCreation = path.CalculatePathLength();
+            }
+            else
+            {
+                PathLengthAtCreation = Mathf.Infinity;
+            }
         }
+
+        public float PathLengthAtCreation { get; private set; }
 
         public float Distance => (BotOwner.Position - Position).magnitude;
 

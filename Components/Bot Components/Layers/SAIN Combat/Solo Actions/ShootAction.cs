@@ -35,14 +35,14 @@ namespace SAIN.Layers
         {
             //SAIN.Movement.DecideMovementSpeed();
 
-            SAIN.Steering.ManualUpdate();
+            SAIN.Steering.Steer();
 
             if (SAIN.HasEnemyAndCanShoot)
             {
                 Shoot.Update();
             }
 
-            BotOwner.SetPose(1f);
+            SAIN.Mover.SetTargetPose(1f);
         }
 
         public bool DebugMode => DebugLayers.Value;

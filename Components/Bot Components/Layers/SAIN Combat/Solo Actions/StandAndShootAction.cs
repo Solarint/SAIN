@@ -25,7 +25,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAIN.Steering.ManualUpdate();
+            SAIN.Steering.Steer();
 
             if ((!Stopped && Time.time - StartTime > 1f) || SAIN.Cover.CheckLimbsForCover())
             {
@@ -52,7 +52,7 @@ namespace SAIN.Layers
                     }
                     else
                     {
-                        BotOwner.SetPose(0f);
+                        SAIN.Mover.SetTargetPose(0f);
                     }
                 }
             }

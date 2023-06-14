@@ -5,14 +5,16 @@ using SAIN.Components;
 
 namespace SAIN.Layers
 {
-    internal class SAINCombatSoloLayer : CustomLayer
+    internal class SAINSolo : CustomLayer
     {
         public override string GetName()
         {
-            return "SAIN Combat Solo";
+            return Name;
         }
 
-        public SAINCombatSoloLayer(BotOwner bot, int priority) : base(bot, priority)
+        public static string Name => "SAIN Combat Solo";
+
+        public SAINSolo(BotOwner bot, int priority) : base(bot, priority)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
@@ -27,6 +29,9 @@ namespace SAIN.Layers
             switch (Decision)
             {
                 case SAINSoloDecision.Retreat:
+                    nextAction = new Action(typeof(MoveToCoverAction), $"{Decision} + {SelfDecision}");
+                    break;
+
                 case SAINSoloDecision.RunForCover:
                 case SAINSoloDecision.MoveToCover:
                 case SAINSoloDecision.UnstuckMoveToCover:
@@ -55,6 +60,10 @@ namespace SAIN.Layers
                     nextAction = new Action(typeof(SearchAction), $"{Decision}");
                     break;
 
+                case SAINSoloDecision.Investigate:
+                    nextAction = new Action(typeof(InvestigateAction), $"{Decision}");
+                    break;
+
                 default:
                     nextAction = new Action(typeof(MoveToCoverAction), $"DEFAULT!");
                     break;
@@ -73,16 +82,22 @@ namespace SAIN.Layers
         public override bool IsActive()
         {
             bool Active = CurrentDecision != SAINSoloDecision.None && (SAIN.HasGoalEnemy || SAIN.HasGoalTarget);
-            if (Active)
+            bool patrolPaused = PatrolStatus == PatrolStatus.pause;
+
+            if (Active && !patrolPaused)
             {
                 BotOwner.PatrollingData.Pause();
             }
-            else
+            else if (!Active && patrolPaused)
             {
                 BotOwner.PatrollingData.Unpause();
             }
+
             return Active;
         }
+
+        private GClass430 Patrol => BotOwner.PatrollingData;
+        private PatrolStatus PatrolStatus => Patrol.Status;
 
         public override bool IsCurrentActionEnding()
         {

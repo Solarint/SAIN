@@ -71,6 +71,7 @@ namespace SAIN.Components
                 Cover.Update();
                 Talk.Update();
                 SelfActions.Update();
+                Steering.Update();
             }
         }
 
