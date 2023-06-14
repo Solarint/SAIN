@@ -56,7 +56,6 @@ namespace SAIN.Components
         }
 
         private float DrawCollidersTimers = 0f;
-        private float CheckHitResetTimer = 0f;
 
         public void LookForCover(Vector3 targetPosition, Vector3 originPoint)
         {

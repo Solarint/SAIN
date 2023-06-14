@@ -36,8 +36,10 @@ namespace SAIN.Layers
             var target = TargetType;
             if (target != null && UpdateCoverTimer < Time.time && (DestinationPosition - target.Position).sqrMagnitude > 1f)
             {
-                UpdateCoverTimer = Time.time + 0.5f;
-                MoveToCoverPoint(target);
+                if (MoveToCoverPoint(target))
+                {
+                    UpdateCoverTimer = Time.time + 1f;
+                }
             }
 
             if (Sprint)
@@ -89,17 +91,21 @@ namespace SAIN.Layers
 
         private float UpdateCoverTimer = 0f;
 
-        private void MoveToCoverPoint(CoverPoint point)
+        private bool MoveToCoverPoint(CoverPoint point)
         {
             if (point != null)
             {
-                System.Console.WriteLine("Moving to cover");
-                DestinationPosition = point.Position;
-                NavigationPoint.GoToPoint(point.Position, -1f);
-                SAIN.Mover.SetTargetMoveSpeed(1f);
-                SAIN.Mover.SetTargetPose(1f);
-                BotOwner.DoorOpener.Update();
+                if (GoToPoint(point.Position, -1f))
+                {
+                    System.Console.WriteLine("Moving to cover");
+                    DestinationPosition = point.Position;
+                    SAIN.Mover.SetTargetMoveSpeed(1f);
+                    SAIN.Mover.SetTargetPose(1f);
+                    //BotOwner.DoorOpener.Update();
+                    return true;
+                }
             }
+            return false;
         }
 
         private Vector3 DestinationPosition;
@@ -140,7 +146,8 @@ namespace SAIN.Layers
                     {
                         reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
                     }
-                    BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
+                    //BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
+                    BotOwner.Mover.GoToPoint(navHit.position, false, reachDist, false, false, false);
                     return true;
                 }
             }
@@ -153,11 +160,11 @@ namespace SAIN.Layers
 
         public override void Start()
         {
-            MoveToCoverPoint(SAIN.Cover.ClosestPoint);
         }
 
         public override void Stop()
         {
+            ToggleSprint(false);
         }
 
         private readonly SAINComponent SAIN;

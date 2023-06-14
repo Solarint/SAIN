@@ -103,14 +103,13 @@ namespace SAIN.Classes
 
         public void DoReload()
         {
-            var reload = BotOwner.WeaponManager.Reload;
-            if (!reload.Reloading)
+            var reloadClass = BotOwner.WeaponManager.Reload;
+            if (reloadClass.TryReload())
             {
                 if (DebugBotDecisions.Value)
                 {
                     Logger.LogDebug($"Reloading!");
                 }
-                reload.Reload();
             }
         }
 
