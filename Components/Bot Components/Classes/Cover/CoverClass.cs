@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Components;
+using System.Linq;
 using UnityEngine;
 
 namespace SAIN.Classes
@@ -37,34 +38,56 @@ namespace SAIN.Classes
         {
             get
             {
-                var CoverA = CurrentCoverPoint;
-                var CoverB = CurrentFallBackPoint;
-                float? DistanceA = CoverA?.Distance;
-                float? DistanceB = CoverB?.Distance;
-
-                if (CoverA == null && CoverB == null)
+                if (CoverFinder.CoverPoints.Count > 0)
                 {
-                    Logger.LogError("Both CoverPoints null");
+                    return CoverFinder.CoverPoints[0];
                 }
+                return null;
+            }
+        }
 
-                if (DistanceA == null)
+        public CoverPoint FarPointEnemy
+        {
+            get
+            {
+                if (CoverFinder.CoverPoints.Count == 1)
                 {
-                    if (DistanceB != null)
-                    {
-                        return CoverB;
-                    }
-                    return null;
+                    return CoverFinder.CoverPoints.First();
                 }
-                if (DistanceB == null)
+                if (CoverFinder.CoverPoints.Count > 1)
                 {
-                    if (DistanceA != null)
-                    {
-                        return CoverA;
-                    }
-                    return null;
+                    var points = CoverFinder.CoverPoints.ToArray();
+                    System.Array.Sort(points, CoverPointEnemyComparerer);
+                    return points.Last();
                 }
+                return null;
+            }
+        }
 
-                return DistanceA.Value < DistanceB.Value ? CoverA : CoverB;
+        private int CoverPointEnemyComparerer(CoverPoint A,  CoverPoint B)
+        {
+            if (A == null && B != null)
+            {
+                return 1;
+            }
+            else if (A != null && B == null)
+            {
+                return -1;
+            }
+            else if (A == null && B == null)
+            {
+                return 0;
+            }
+            else
+            {
+                if (SAIN.CurrentTargetPosition == null)
+                {
+                    return 0;
+                }
+                Vector3 enemy = SAIN.CurrentTargetPosition.Value;
+                float ADist = (enemy - A.Position).sqrMagnitude;
+                float BDist = (enemy - B.Position).sqrMagnitude;
+                return ADist.CompareTo(BDist);
             }
         }
 
@@ -85,7 +108,7 @@ namespace SAIN.Classes
                 }
                 if (ActiveCoverPoint.Collider.bounds.size.y < 1.5f)
                 {
-                    SAIN.BotOwner.SetPose(0f);
+                    SAIN.Mover.SetTargetPose(0f);
                     return true;
                 }
             }
@@ -171,8 +194,8 @@ namespace SAIN.Classes
             }
         }
         public CoverFinderComponent CoverFinder { get; private set; }
-        public CoverPoint CurrentCoverPoint => CoverFinder.CurrentCover;
-        public CoverPoint CurrentFallBackPoint => CoverFinder.CurrentFallBackPoint;
+        public CoverPoint CurrentCoverPoint => ClosestPoint;
+        public CoverPoint CurrentFallBackPoint => ClosestPoint;
         protected ManualLogSource Logger;
     }
 }

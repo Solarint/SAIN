@@ -13,7 +13,33 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        public bool ManualUpdate(bool useDefaultHear = true)
+        public void Update()
+        {
+            UpdateAimSway();
+            UpdateSmoothLook();
+        }
+
+        private void UpdateAimSway()
+        {
+            if (AimSwayTimer < Time.time)
+            {
+                AimSwayTimer = Time.time + 0.66f;
+                AimSway();
+            }
+        }
+
+        private void AimSway()
+        {
+            Vector3 random = Random.insideUnitSphere * 0.5f;
+            Quaternion randomRotation = Quaternion.Euler(random.x, random.y, random.z);
+            TargetSteerPoint = randomRotation * RealSteerTarget;
+        }
+
+        private float AimSwayTimer = 0f;
+
+        public bool SteerComplete => (TargetSteerPoint - RealSteerTarget).sqrMagnitude < 1f;
+
+        public bool Steer(bool useDefaultHear = true)
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
@@ -22,7 +48,7 @@ namespace SAIN.Classes
 
             if (SAIN.Enemy?.IsVisible == true)
             {
-                LookToGoalEnemyPos();
+                LookToEnemy();
                 return true;
             }
             if (BotOwner.Memory.LastTimeHit > Time.time - 1f)
@@ -35,9 +61,10 @@ namespace SAIN.Classes
                 LookToUnderFirePos();
                 return true;
             }
-            if (SAIN.LastHeardSound != null && SAIN.LastHeardSound.TimeSinceHeard < 2f && (SAIN.LastHeardSound.Position - BotOwner.Position).magnitude < 50f)
+            var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 100f, false);
+            if (sound != null && Time.time - sound.CreatedTime < 2f)
             {
-                LookToHearPos();
+                LookToHearPos(sound.Position);
                 return true;
             }
             else
@@ -46,17 +73,78 @@ namespace SAIN.Classes
                 {
                     BotOwner.LookData.SetLookPointByHearing();
                 }
+                else
+                {
+                    LookToRandomPosition();
+                }
                 return false;
             }
         }
 
-        public void LookToGoalEnemyPos()
+        private Vector3 RealSteerTarget;
+
+        public Vector3 CurrentSteerPoint { get; private set; }
+
+        public Vector3 TargetSteerPoint { get; private set; }
+
+        public Vector3 CurrentSteerDirection => CurrentSteerPoint - BotPosition;
+
+        public Vector3 TargetSteerDirection => TargetSteerPoint - BotPosition;
+
+        private void UpdateSmoothLook()
         {
-            var enemy = BotOwner.Memory.GoalEnemy;
+            float angle = Vector3.Angle(CurrentSteerDirection, TargetSteerDirection);
+            float divisor = angle > 10f ? 0.5f : 0.66f;
+            float lerp = Time.deltaTime / divisor;
+            Vector3 pos = Vector3.Lerp(CurrentSteerPoint, TargetSteerPoint, lerp);
+            CurrentSteerPoint = pos;
+            BotOwner.Steering.LookToPoint(pos, 999f);
+        }
+
+        public void LookToPoint(Vector3 point)
+        {
+            RealSteerTarget = point;
+            AimSway();
+        }
+
+        public void LookToDirection(Vector3 direction, bool flat)
+        {
+            if (flat)
+            {
+                direction.y = 0f;
+            }
+            Vector3 pos = SAIN.HeadPosition + direction;
+            LookToPoint(pos);
+        }
+
+        public void LookToRandomPosition()
+        {
+            if (RandomLookTimer < Time.time)
+            {
+                var Mask = LayerMaskClass.HighPolyWithTerrainMask;
+                var Start = SAIN.HeadPosition;
+                for (int i = 0; i < 10;  i++)
+                {
+                    var random = Random.onUnitSphere * 5f;
+                    if (!Physics.Raycast(Start, random, 3f, Mask))
+                    {
+                        RandomLookTimer = Time.time + 2f * Random.Range(0.5f, 1.5f);
+                        SAIN.Steering.LookToDirection(random, true);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private float RandomLookTimer = 0f;
+
+        public void LookToEnemy()
+        {
+            var enemy = SAIN.Enemy;
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
                 var pos = enemy.Person.MainParts[BodyPartType.body].Position;
-                BotOwner.Steering.LookToPoint(pos);
+                TargetSteerPoint = pos;
             }
         }
 
@@ -65,22 +153,20 @@ namespace SAIN.Classes
             var priority = SAIN.Enemy;
             if (priority != null && priority.IsVisible && priority.EnemyChestPosition != null)
             {
-                var enemyPos = priority.EnemyChestPosition;
-                BotOwner.Steering.LookToPoint(enemyPos);
+                var pos = priority.EnemyChestPosition;
+                LookToPoint(pos);
             }
         }
 
         public void LookToUnderFirePos()
         {
-            var underFirePos = SAIN.UnderFireFromPosition;
-            underFirePos.y += 1f;
-            BotOwner.Steering.LookToPoint(underFirePos);
+            var pos = SAIN.UnderFireFromPosition;
+            pos.y += 1f;
+            LookToPoint(pos);
         }
 
-        public void LookToHearPos(bool visionCheck = false)
+        public void LookToHearPos(Vector3 soundPos, bool visionCheck = false)
         {
-            var soundPos = SAIN.LastHeardSound.Position;
-
             if (visionCheck)
             {
                 soundPos.y += 0.1f;
@@ -88,20 +174,20 @@ namespace SAIN.Classes
 
                 if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
-                    BotOwner.Steering.LookToPoint(soundPos);
+                    LookToPoint(soundPos);
                 }
             }
             else
             {
-                BotOwner.Steering.LookToPoint(soundPos);
+                LookToPoint(soundPos);
             }
         }
 
         public void LookToLastHitPos()
         {
-            var lastHitPos = BotOwner.Memory.LastHitPos;
-            lastHitPos.y += 1f;
-            BotOwner.Steering.LookToPoint(lastHitPos);
+            var pos = BotOwner.Memory.LastHitPos;
+            pos.y += 1f;
+            LookToPoint(pos);
         }
 
 

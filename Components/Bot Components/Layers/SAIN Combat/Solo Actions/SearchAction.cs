@@ -81,18 +81,18 @@ namespace SAIN.Layers
         {
             if (Search.PeekingCorner)
             {
-                BotOwner.SetTargetMoveSpeed(0.33f);
-                BotOwner.SetPose(0.8f);
+                SAIN.Mover.SetTargetMoveSpeed(0.33f);
+                SAIN.Mover.SetTargetPose(0.8f);
             }
             else if (SprintEnabled)
             {
-                BotOwner.SetTargetMoveSpeed(1f);
-                BotOwner.SetPose(1f);
+                SAIN.Mover.SetTargetMoveSpeed(1f);
+                SAIN.Mover.SetTargetPose(1f);
             }
             else
             {
-                BotOwner.SetTargetMoveSpeed(0.85f);
-                BotOwner.SetPose(0.9f);
+                SAIN.Mover.SetTargetMoveSpeed(0.75f);
+                SAIN.Mover.SetTargetPose(0.9f);
             }
 
             if (SprintEnabled && !BotOwner.Memory.IsUnderFire)
@@ -110,11 +110,11 @@ namespace SAIN.Layers
                 }
                 if (BotOwner.Memory.IsUnderFire)
                 {
-                    SAIN.Steering.ManualUpdate();
+                    SAIN.Steering.Steer();
                 }
                 else if (soundDistance < 30f && SAIN.LastHeardSound.TimeSinceHeard < 1f)
                 {
-                    SAIN.Steering.ManualUpdate();
+                    SAIN.Steering.Steer();
                 }
                 else
                 {

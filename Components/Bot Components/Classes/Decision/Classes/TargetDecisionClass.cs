@@ -16,27 +16,48 @@ namespace SAIN.Classes
             {
                 return false;
             }
-            var realTarget = BotOwner.Memory.GoalTarget.GoalTarget;
-            if (realTarget?.IsDanger == true || SAIN.Info.IsPMC)
+
+            if (StartInvestigate())
             {
-                if (realTarget?.Position != null)
+                Decision = SAINSoloDecision.Investigate;
+                return true;
+            }
+
+            var realTarget = BotOwner.Memory.GoalTarget.GoalTarget;
+            if (realTarget?.Position != null)
+            {
+                if (BotOwner.Memory.IsUnderFire)
                 {
-                    if (BotOwner.Memory.IsUnderFire)
-                    {
-                        Decision = SAINSoloDecision.RunForCover;
-                    }
-                    else if (StartSearch())
-                    {
-                        Decision = SAINSoloDecision.Search;
-                    }
-                    else
-                    {
-                        Decision = SAINSoloDecision.MoveToCover;
-                    }
+                    Decision = SAINSoloDecision.RunForCover;
+                }
+                else if (StartSearch())
+                {
+                    Decision = SAINSoloDecision.Search;
+                }
+                else
+                {
+                    Decision = SAINSoloDecision.MoveToCover;
                 }
             }
 
             return Decision != SAINSoloDecision.None;
+        }
+
+        private bool StartInvestigate()
+        {
+            var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 100f, true);
+            if (sound != null)
+            {
+                if (sound.IsDanger)
+                {
+                    return true;
+                }
+                if (SAIN.Info.IsPMC)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool StartSearch()

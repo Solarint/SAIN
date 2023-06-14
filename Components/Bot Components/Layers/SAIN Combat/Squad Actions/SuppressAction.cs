@@ -40,7 +40,7 @@ namespace SAIN.Layers
                 }
                 else
                 {
-                    SAIN.Steering.ManualUpdate();
+                    SAIN.Steering.Steer();
                     BotOwner.MoveToEnemyData.TryMoveToEnemy(enemy.Person.Position);
                 }
             }

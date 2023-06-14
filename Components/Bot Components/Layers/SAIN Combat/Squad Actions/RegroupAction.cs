@@ -16,9 +16,9 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAIN.Steering.ManualUpdate();
+            SAIN.Steering.Steer();
 
-            if (SAIN.Steering.ManualUpdate())
+            if (SAIN.Steering.Steer())
             {
                 BotOwner.GetPlayer.EnableSprint(false);
             }
@@ -53,8 +53,8 @@ namespace SAIN.Layers
             var SquadLeadPos = SAIN.Squad.LeaderComponent?.BotOwner.Position;
             if (SquadLeadPos != null)
             {
-                BotOwner.SetPose(1f);
-                BotOwner.SetTargetMoveSpeed(1f);
+                SAIN.Mover.SetTargetPose(1f);
+                SAIN.Mover.SetTargetMoveSpeed(1f);
                 BotOwner.GoToPoint(SquadLeadPos.Value, false, -1, false, false);
                 CheckShouldSprint(SquadLeadPos.Value);
             }
@@ -75,7 +75,7 @@ namespace SAIN.Layers
             }
             else
             {
-                SAIN.Steering.ManualUpdate();
+                SAIN.Steering.Steer();
             }
 
             BotOwner.GetPlayer.EnableSprint(sprint);

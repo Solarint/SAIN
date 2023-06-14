@@ -19,15 +19,69 @@ namespace SAIN.Classes
 
         public void Update()
         {
+            UpdateTargetMoveSpeed();
+            UpdateTargetPose();
+            UpdateLean();
+
             if (NavigationPoint != null)
             {
-                NavigationPoint.Update();
+                //NavigationPoint.Update();
                 if (NavigationPoint.FinishedPath)
                 {
                     NavigationPoint = null;
                 }
             }
-            UpdateLean();
+        }
+
+        private void UpdateTargetMoveSpeed()
+        {
+            if (BotOwner.DoorOpener.NearDoor)
+            {
+                DestMoveSpeed = 0.5f;
+            }
+            float num = DestMoveSpeed - Player.Speed;
+            if (Math.Abs(num) >= 1E-45f)
+            {
+                Player.ChangeSpeed(num); 
+            }
+        }
+
+        private void UpdateTargetPose()
+        {
+            if (BotOwner.BotLay.IsLay)
+            {
+                return;
+            }
+            float num = Math.Abs(this.TargetPose - Player.PoseLevel);
+            if (num >= 1E-45f)
+            {
+                Player.ChangePose(0.05f * (this.TargetPose - this.Player.PoseLevel)); 
+            }
+        }
+
+        public void SetTargetPose(float pose)
+        {
+            if (TargetPose != pose)
+            {
+                TargetPose = pose;
+                Logger.LogInfo($"New Target Pose {TargetPose}");
+            }
+        }
+
+        public void SetTargetMoveSpeed(float speed)
+        {
+            if (DestMoveSpeed != speed)
+            {
+                DestMoveSpeed = speed;
+                Logger.LogInfo($"New Target Speed {DestMoveSpeed}");
+            }
+        }
+
+        public float TargetPose { get; private set; }
+        public float DestMoveSpeed { get; private set; }
+
+        private void PoseChangeScatter(float obj)
+        {
         }
 
         public bool GoToPoint(Vector3 point, bool forceNew = true, bool mustHaveWay = true, float reachDist = 0.5f)
@@ -35,13 +89,8 @@ namespace SAIN.Classes
             if (forceNew || NavigationPoint == null)
             {
                 var navPoint = new NavigationPointObject(BotOwner);
-                var pathStatus = navPoint.GoToPoint(point, mustHaveWay);
-                if (pathStatus != NavMeshPathStatus.PathInvalid)
+                if (navPoint.GoToPoint(point, reachDist))
                 {
-                    if (mustHaveWay && pathStatus != NavMeshPathStatus.PathComplete)
-                    {
-                        return false;
-                    }
                     NavigationPoint = navPoint;
                     return true;
                 }
@@ -63,7 +112,7 @@ namespace SAIN.Classes
 
         public NavigationPointObject NavigationPoint { get; private set; }
         public bool HasDestination => NavigationPoint != null;
-        public MoveToCoverObject MoveToCover { get; set; }
+        public MoveToCoverClass MoveToCover { get; set; }
         public CoverPoint CoverDestination { get; private set; }
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)

@@ -9,44 +9,45 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
-    internal class DogfightAction : CustomLogic
+    internal class InvestigateAction : CustomLogic
     {
-        public DogfightAction(BotOwner bot) : base(bot)
+        public InvestigateAction(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
             Shoot = new ShootClass(bot);
         }
 
-        private ShootClass Shoot;
+        private readonly ShootClass Shoot;
 
         public override void Update()
         {
             if (SAIN.Enemy == null)
             {
-                return;
-            }
-
-            if (SAIN.Enemy.InLineOfSight)
-            {
-                BotOwner.Steering.LookToPoint(SAIN.Enemy.EnemyChestPosition);
+                if (Sound != null)
+                {
+                    SAIN.Steering.Steer();
+                    if ((Sound.Position - MovePos).sqrMagnitude > 25f)
+                    {
+                        MovePos = Sound.Position;
+                        SAIN.Mover.GoToPoint(MovePos, false, false);
+                    }
+                }
+                else
+                {
+                    Sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 150f, true);
+                    SAIN.Steering.LookToRandomPosition();
+                }
             }
             else
             {
                 SAIN.Steering.Steer();
+                Shoot.Update();
             }
-
-            if (SAIN.Enemy.IsVisible && BackUp(out var pos))
-            {
-                BotOwner.GoToPoint(pos, false, -1, false, false);
-            }
-            else
-            {
-                BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
-            }
-
-            Shoot.Update();
         }
+
+        private Vector3 MovePos;
+        private float RandomLookTimer = 0f;
 
         private bool BackUp(out Vector3 trgPos)
         {
@@ -71,11 +72,11 @@ namespace SAIN.Layers
             }
             if (num != 0f && num > BotOwner.Settings.FileSettings.Move.REACH_DIST)
             {
-                this.navMeshPath_0.ClearCorners();
-                if (NavMesh.CalculatePath(BotOwner.Position, trgPos, -1, this.navMeshPath_0) && this.navMeshPath_0.status == NavMeshPathStatus.PathComplete)
+                this.NavPath.ClearCorners();
+                if (NavMesh.CalculatePath(BotOwner.Position, trgPos, -1, this.NavPath) && this.NavPath.status == NavMeshPathStatus.PathComplete)
                 {
-                    trgPos = this.navMeshPath_0.corners[this.navMeshPath_0.corners.Length - 1];
-                    return this.CheckLength(this.navMeshPath_0, num);
+                    trgPos = this.NavPath.corners[this.NavPath.corners.Length - 1];
+                    return this.CheckLength(this.NavPath, num);
                 }
             }
             return false;
@@ -87,7 +88,7 @@ namespace SAIN.Layers
         }
 
         // Token: 0x04000C27 RID: 3111
-        private readonly NavMeshPath navMeshPath_0 = new NavMeshPath();
+        private readonly NavMeshPath NavPath = new NavMeshPath();
 
         private readonly SAINComponent SAIN;
         public bool DebugMode => DebugLayers.Value;
@@ -96,7 +97,15 @@ namespace SAIN.Layers
 
         public override void Start()
         {
+            Sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 150f, true);
+            if (Sound != null)
+            {
+                MovePos = Sound.Position;
+                SAIN.Mover.GoToPoint(MovePos, false, false);
+            }
         }
+
+        private GClass270 Sound;
 
         public override void Stop()
         {

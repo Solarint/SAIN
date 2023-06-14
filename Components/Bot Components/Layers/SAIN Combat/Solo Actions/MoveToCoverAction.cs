@@ -5,6 +5,7 @@ using SAIN.Components;
 using SAIN.Classes;
 using SAIN.Classes.CombatFunctions;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace SAIN.Layers
 {
@@ -12,157 +13,153 @@ namespace SAIN.Layers
     {
         public MoveToCoverAction(BotOwner bot) : base(bot)
         {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            MoveToCover = new MoveToCoverObject(BotOwner);
             Shoot = new ShootClass(bot);
+            NavigationPoint = new NavigationPointObject(bot);
         }
 
-        private ShootClass Shoot;
-
-        private SAINSoloDecision Decision => SAIN.CurrentDecision;
-        private bool Sprint => Decision == SAINSoloDecision.RunForCover || Decision == SAINSoloDecision.Retreat;
+        private readonly ManualLogSource Logger;
+        private readonly NavigationPointObject NavigationPoint;
 
         public override void Update()
         {
             if (SAIN.Cover.DuckInCover())
             {
-                MoveToCover.ToggleSprint(false);
+                BotOwner.Mover.Stop();
+                ToggleSprint(false);
                 return;
             }
-            BotOwner.SetTargetMoveSpeed(1f);
-            BotOwner.SetPose(1f);
-            MoveToCover.MoveToCoverPoint(SAIN.Cover.ClosestPoint, Sprint);
+
+            NavigationPoint.Update(1f, 1f);
+
+            var target = TargetType;
+            if (target != null && UpdateCoverTimer < Time.time && (DestinationPosition - target.Position).sqrMagnitude > 1f)
+            {
+                UpdateCoverTimer = Time.time + 0.5f;
+                MoveToCoverPoint(target);
+            }
+
+            if (Sprint)
+            {
+                float distance = (DestinationPosition - SAIN.Position).magnitude;
+                if (distance < 0.5f)
+                {
+                    FarFromCover = false;
+                }
+                else if (distance > 1f)
+                {
+                    FarFromCover = true;
+                }
+                ToggleSprint(FarFromCover);
+            }
+            else
+            {
+                EngageEnemy();
+            }
         }
 
-        private bool ShallSprint;
-        public bool CloseToCover { get; private set; }
-
-        public bool MoveToCoverPoint(CoverPoint point, float targetPose = 1f, float targetSpeed = 1f)
+        private CoverPoint TargetType
         {
-            float reachDist = Sprint ? 0.75f : -1f;
-            bool close = false;
+            get
+            {
+                CoverPoint result;
+                var cover = SAIN.Cover;
+                switch (Decision)
+                {
+                    case SAINSoloDecision.RunForCover:
+                        result = cover.ClosestPoint;
+                        break;
+
+                    case SAINSoloDecision.MoveToCover:
+                        result = cover.ClosestPoint;
+                        break;
+
+                    case SAINSoloDecision.Retreat:
+                        result = cover.CurrentFallBackPoint ?? cover.ClosestPoint;
+                        break;
+
+                    default:
+                        result = cover.ClosestPoint;
+                        break;
+                }
+                return result;
+            }
+        }
+
+        private float UpdateCoverTimer = 0f;
+
+        private void MoveToCoverPoint(CoverPoint point)
+        {
             if (point != null)
             {
-                CoverDestination = point;
-                BotOwner.GoToPoint(point.Position, false, reachDist, false, false);
-                BotOwner.SetTargetMoveSpeed(targetSpeed);
-                BotOwner.SetPose(targetPose);
+                System.Console.WriteLine("Moving to cover");
+                DestinationPosition = point.Position;
+                NavigationPoint.GoToPoint(point.Position, -1f);
+                SAIN.Mover.SetTargetMoveSpeed(1f);
+                SAIN.Mover.SetTargetPose(1f);
                 BotOwner.DoorOpener.Update();
             }
-
-            if (CoverDestination != null)
-            {
-                float distance = CoverDestination.Distance;
-                if (distance < 0.5f)
-                {
-                    close = true;
-                    ToggleSprint(false);
-                }
-                else if (distance > 1f)
-                {
-                    close = false;
-                    ToggleSprint(true);
-                }
-            }
-            else
-            {
-                EngageEnemy();
-            }
-            CloseToCover = close;
-            return CoverDestination != null;
         }
 
-        private void AdjustMoveSpeed()
+        private Vector3 DestinationPosition;
+
+        private void EngageEnemy()
         {
-            if (CoverDestination != null)
-            {
-                float distance = CoverDestination.Distance;
-                if (distance < 0.5f)
-                {
-                    CloseToCover = true;
-                    ToggleSprint(false);
-                }
-                else if (distance > 1f)
-                {
-                    CloseToCover = false;
-                    ToggleSprint(true);
-                }
-            }
-            else
-            {
-                EngageEnemy();
-            }
+            SAIN.Steering.Steer(false);
+            Shoot.Update();
         }
 
-        public static float SqrDist(Vector3 direction)
+        private void ToggleSprint(bool value)
         {
-            if (direction == Vector3.zero)
+            if (value)
             {
-                return 0f;
-            }
-            return direction.sqrMagnitude;
-        }
-
-        public static Vector3 CoverDirection(CoverPoint point, Vector3 origin)
-        {
-            if (point == null)
-            {
-                return Vector3.zero;
-            }
-            return point.Position - origin;
-        }
-
-        public static float CoverSqrDistance(CoverPoint point, Vector3 origin)
-        {
-            if (point == null)
-            {
-                return Mathf.Infinity;
-            }
-            return SqrDist(CoverDirection(point, origin));
-        }
-
-        public void EngageEnemy()
-        {
-            SAIN.Steering.ManualUpdate();
-            if (SAIN.Enemy?.IsVisible == true)
-            {
-                Shoot.Update();
-            }
-        }
-
-        public void ToggleSprint(bool value)
-        {
-            if (BotOwner.GetPlayer.MovementContext.IsSprintEnabled != value)
-            {
-                BotOwner.GetPlayer.EnableSprint(value);
-            }
-            if (value && SAIN.BotHasStamina)
-            {
-                BotOwner.SetTargetMoveSpeed(1f);
-                BotOwner.SetPose(1f);
                 BotOwner.Steering.LookToMovingDirection();
+                SAIN.Player.MovementContext.EnableSprint(true);
             }
             else
             {
+                SAIN.Player.EnableSprint(false);
                 EngageEnemy();
             }
         }
 
-        public float? Distance => CoverDestination?.Distance;
-        public CoverPoint CoverDestination { get; private set; }
+        private readonly ShootClass Shoot;
+
+        private SAINSoloDecision Decision => SAIN.CurrentDecision;
+        private bool Sprint => Decision == SAINSoloDecision.RunForCover || Decision == SAINSoloDecision.Retreat;
+
+        public bool GoToPoint(Vector3 point, float reachDist = -1f)
+        {
+            if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
+            {
+                NavMeshPath Path = new NavMeshPath();
+                if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
+                {
+                    if (reachDist < 0f)
+                    {
+                        reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
+                    }
+                    BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
+                    return true;
+                }
+            }
+
+            Logger.LogWarning($"{NavMeshPathStatus.PathInvalid}");
+            return false;
+        }
+
+        private bool FarFromCover;
 
         public override void Start()
         {
-            BotOwner.SetTargetMoveSpeed(1f);
-            BotOwner.SetPose(1f);
-            MoveToCover.MoveToCoverPoint(SAIN.Cover.ClosestPoint, Sprint);
+            MoveToCoverPoint(SAIN.Cover.ClosestPoint);
         }
 
         public override void Stop()
         {
         }
 
-        private MoveToCoverObject MoveToCover;
         private readonly SAINComponent SAIN;
     }
 }
