@@ -26,23 +26,57 @@ namespace SAIN.Layers
         {
             if (SAIN.Cover.DuckInCover())
             {
-                BotOwner.Mover.Stop();
-                ToggleSprint(false);
+                SAIN.Mover.StopMove();
+                SAIN.Mover.Sprint(false);
                 return;
             }
 
             NavigationPoint.Update(1f, 1f);
+            bool isProne = SAIN.Player.MovementContext.IsInPronePose;
 
             var target = TargetType;
-            if (target != null && UpdateCoverTimer < Time.time && (DestinationPosition - target.Position).sqrMagnitude > 1f)
+            if (target != null)
+            {
+                if (Decision != SAINSoloDecision.Retreat)
+                {
+                    if (SAIN.Mover.ShallProne(target, true) || isProne)
+                    {
+                        SAIN.Mover.SetBotProne(true);
+                        EngageEnemy();
+                        return;
+                    }
+                    Move(target);
+                    CheckSprint();
+                    return;
+                }
+
+                if (UpdateCoverTimer < Time.time && (DestinationPosition - target.Position).sqrMagnitude > 1f)
+                {
+                    if (MoveToCoverPoint(target))
+                    {
+                        UpdateCoverTimer = Time.time + 0.33f;
+                    }
+                }
+                Move(target);
+            }
+
+            CheckSprint();
+        }
+
+        private void Move(CoverPoint target)
+        {
+            if (UpdateCoverTimer < Time.time)
             {
                 if (MoveToCoverPoint(target))
                 {
-                    UpdateCoverTimer = Time.time + 1f;
+                    UpdateCoverTimer = Time.time + 0.33f;
                 }
             }
+        }
 
-            if (Sprint)
+        private void CheckSprint()
+        {
+            if (Sprint && SAIN.Mover.CanSprint)
             {
                 float distance = (DestinationPosition - SAIN.Position).magnitude;
                 if (distance < 0.5f)
@@ -53,10 +87,15 @@ namespace SAIN.Layers
                 {
                     FarFromCover = true;
                 }
-                ToggleSprint(FarFromCover);
+                SAIN.Mover.Sprint(FarFromCover);
+                if (!FarFromCover)
+                {
+                    EngageEnemy();
+                }
             }
             else
             {
+                SAIN.Mover.Sprint(false);
                 EngageEnemy();
             }
         }
@@ -93,17 +132,13 @@ namespace SAIN.Layers
 
         private bool MoveToCoverPoint(CoverPoint point)
         {
-            if (point != null)
+            if (point != null && GoToPoint(point.Position, -1f))
             {
-                if (GoToPoint(point.Position, -1f))
-                {
-                    System.Console.WriteLine("Moving to cover");
-                    DestinationPosition = point.Position;
-                    SAIN.Mover.SetTargetMoveSpeed(1f);
-                    SAIN.Mover.SetTargetPose(1f);
-                    //BotOwner.DoorOpener.Update();
-                    return true;
-                }
+                DestinationPosition = point.Position;
+                SAIN.Mover.SetTargetMoveSpeed(1f);
+                SAIN.Mover.SetTargetPose(1f);
+                BotOwner.DoorOpener.Update();
+                return true;
             }
             return false;
         }
@@ -112,32 +147,21 @@ namespace SAIN.Layers
 
         private void EngageEnemy()
         {
-            SAIN.Steering.Steer(false);
+            SAIN.Steering.SteerByPriority(false);
             Shoot.Update();
-        }
-
-        private void ToggleSprint(bool value)
-        {
-            if (value)
-            {
-                BotOwner.Steering.LookToMovingDirection();
-                SAIN.Player.MovementContext.EnableSprint(true);
-            }
-            else
-            {
-                SAIN.Player.EnableSprint(false);
-                EngageEnemy();
-            }
         }
 
         private readonly ShootClass Shoot;
 
         private SAINSoloDecision Decision => SAIN.CurrentDecision;
-        private bool Sprint => Decision == SAINSoloDecision.RunForCover || Decision == SAINSoloDecision.Retreat;
+        private bool Sprint => Decision == SAINSoloDecision.RunForCover || NormalRetreat || GrenadeClose;
+        private bool GrenadeClose => GrenadeDanger != null && (GrenadeDanger.Value - BotOwner.Position).sqrMagnitude < 100f && SAIN.Decision.SelfDecision == SAINSelfDecision.RunAwayGrenade;
+        private Vector3? GrenadeDanger => SAIN.Grenade.GrenadeDangerPoint;
+        private bool NormalRetreat => Decision == SAINSoloDecision.Retreat && SAIN.Decision.SelfDecision != SAINSelfDecision.RunAwayGrenade;
 
         public bool GoToPoint(Vector3 point, float reachDist = -1f)
         {
-            if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
+            if (NavMesh.SamplePosition(point, out var navHit, 0.1f, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
                 if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
@@ -164,7 +188,7 @@ namespace SAIN.Layers
 
         public override void Stop()
         {
-            ToggleSprint(false);
+            SAIN.Mover.Sprint(false);
         }
 
         private readonly SAINComponent SAIN;

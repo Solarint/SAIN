@@ -3,25 +3,40 @@ using SAIN.Helpers;
 using EFT;
 using UnityEngine;
 using static SAIN.UserSettings.SoundConfig;
-using SAIN.Classes;
+using Comfort.Common;
+using EFT.InventoryLogic;
 
-namespace SAIN.Components
+namespace SAIN.Classes
 {
     public class HearingSensorClass : SAINBot
     {
         public HearingSensorClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            Init();
+        }
+
+        private void Init()
+        {
+            Singleton<GClass629>.Instance.OnSoundPlayed += HearSound;
+        }
+
+        public void Dispose()
+        {
+            Singleton<GClass629>.Instance.OnSoundPlayed -= HearSound;
         }
 
         public void HearSound(IAIDetails player, Vector3 position, float power, AISoundType type)
         {
-            if (SAIN == null || !SAIN.BotActive || SAIN.GameIsEnding)
+            if (SAIN == null)
             {
                 return;
             }
 
-            EnemySoundHeard(player, position, power, type);
+            if (!SAIN.GameIsEnding)
+            {
+                EnemySoundHeard(player, position, power, type);
+            }
         }
 
         private void EnemySoundHeard(IAIDetails player, Vector3 position, float power, AISoundType type)
@@ -40,7 +55,7 @@ namespace SAIN.Components
 
                     if (!BotOwner.BotsGroup.IsEnemy(player))
                     {
-                        if (BotOwner.BotsGroup.Neutrals.ContainsKey(player))
+                        if (gunsound && BotOwner.BotsGroup.Neutrals.ContainsKey(player))
                         {
                             flag = true;
                         }
@@ -81,17 +96,30 @@ namespace SAIN.Components
 
             if (wasHeard)
             {
+                if (SAIN.Equipment.HasEarPiece)
+                {
+                    range *= 1.5f;
+                }
+                if (SAIN.Equipment.HasHeavyHelmet)
+                {
+                    range *= 0.66f;
+                }
                 if (BotOwner.GetPlayer.HealthStatus == ETagStatus.Dying)
                 {
                     range *= 0.66f;
                 }
-                if (BotOwner.Mover.Sprinting)
+                var move = Player.MovementContext;
+                if (move.IsSprintEnabled)
                 {
                     range *= 0.66f;
                 }
-                else if (BotOwner.Mover.IsMoving && BotOwner.Mover.DestMoveSpeed > 0.8f)
+                else if (move.CharacterMovementSpeed > 0.5f)
                 {
                     range *= 0.85f;
+                }
+                else if (move.CharacterMovementSpeed == 0f)
+                {
+                    range *= 1.25f;
                 }
 
                 return DoIHearSound(player, position, range, type, out distance, false);
@@ -313,7 +341,7 @@ namespace SAIN.Components
             if (Physics.Raycast(botheadpos, (botheadpos - position).normalized, power, LayerMaskClass.HighPolyWithTerrainNoGrassMask))
             {
                 // If the sound source is the player, raycast and find number of collisions
-                if (isrealplayer && RaycastOcclusion.Value)
+                if (isrealplayer)
                 {
                     // Check if the sound originates from an environment other than the BotOwner's
                     float environmentmodifier = EnvironmentCheck(player);

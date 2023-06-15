@@ -4,15 +4,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Helpers
 {
     public class DebugGizmos
     {
+        public static bool DrawGizmos => ToggleDebugGizmos.Value;
+
         public class SingleObjects
         {
             public static GameObject Sphere(Vector3 position, float size, Color color, bool temporary = false, float expiretime = 1f)
             {
+                if (!DrawGizmos)
+                {
+                    return null;
+                }
+
                 var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 sphere.GetComponent<Renderer>().material.color = color;
                 sphere.GetComponent<Collider>().enabled = false;
@@ -29,6 +37,11 @@ namespace SAIN.Helpers
 
             public static GameObject Line(Vector3 startPoint, Vector3 endPoint, Color color, float lineWidth = 0.1f, bool temporary = false, float expiretime = 1f, bool taperLine = false)
             {
+                if (!DrawGizmos)
+                {
+                    return null;
+                }
+
                 var lineObject = new GameObject();
                 var lineRenderer = lineObject.AddComponent<LineRenderer>();
 
@@ -51,6 +64,11 @@ namespace SAIN.Helpers
 
             public static GameObject Ray(Vector3 startPoint, Vector3 direction, Color color, float length = 0.35f, float lineWidth = 0.1f, bool temporary = false, float expiretime = 1f, bool taperLine = false)
             {
+                if (!DrawGizmos)
+                {
+                    return null;
+                }
+
                 var rayObject = new GameObject();
                 var lineRenderer = rayObject.AddComponent<LineRenderer>();
 
@@ -98,6 +116,11 @@ namespace SAIN.Helpers
 
             public void DrawTempPath(NavMeshPath Path, bool active, Color colorActive, Color colorInActive, float lineSize = 0.05f, float expireTime = 0.5f, bool useDrawerSetColors = false)
             {
+                if (!DrawGizmos)
+                {
+                    return;
+                }
+
                 for (int i = 0; i < Path.corners.Length - 1; i++)
                 {
                     Vector3 corner1 = Path.corners[i];
@@ -119,6 +142,11 @@ namespace SAIN.Helpers
 
             public void Draw(List<Vector3> list, bool destroy, float size = 0.1f, bool rays = false, float rayLength = 0.35f)
             {
+                if (!DrawGizmos)
+                {
+                    DestroyDebug();
+                    return;
+                }
                 if (destroy)
                 {
                     DestroyDebug();
@@ -133,6 +161,11 @@ namespace SAIN.Helpers
 
             public void Draw(Vector3[] array, bool destroy, float size = 0.1f, bool rays = false, float rayLength = 0.35f)
             {
+                if (!DrawGizmos)
+                {
+                    DestroyDebug();
+                    return;
+                }
                 if (destroy)
                 {
                     DestroyDebug();

@@ -52,6 +52,11 @@ namespace SAIN.Classes
                 {
                     if (SAIN.Enemy.Person == member.Enemy.Person)
                     {
+                        if (HasRadioComms && (SAIN.Position - member.Position).sqrMagnitude > 900f)
+                        {
+                            return false;
+                        }
+
                         if (StartHelp(member))
                         {
                             Decision = SAINSquadDecision.Help;
@@ -72,6 +77,8 @@ namespace SAIN.Classes
             }
             return false;
         }
+
+        private bool HasRadioComms => SAIN.Equipment.HasEarPiece;
 
         private bool StartSuppression(SAINComponent member)
         {

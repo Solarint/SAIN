@@ -20,14 +20,11 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref IAIDetails player, ref Vector3 position, ref float power, ref AISoundType type)
         {
-            var component = ___botOwner_0.GetComponent<HearingSensorClass>();
-
-            if (component != null)
+            if (SAINPlugin.BotController.SAINBots.ContainsKey(___botOwner_0.ProfileId))
             {
-                component.HearSound(player, position, power, type);
+                return false;
             }
-
-            return false;
+            return true;
         }
     }
 }

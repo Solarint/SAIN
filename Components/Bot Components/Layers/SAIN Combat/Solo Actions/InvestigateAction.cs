@@ -26,7 +26,7 @@ namespace SAIN.Layers
             {
                 if (Sound != null)
                 {
-                    SAIN.Steering.Steer();
+                    SAIN.Steering.SteerByPriority();
                     if ((Sound.Position - MovePos).sqrMagnitude > 25f)
                     {
                         MovePos = Sound.Position;
@@ -41,7 +41,7 @@ namespace SAIN.Layers
             }
             else
             {
-                SAIN.Steering.Steer();
+                SAIN.Steering.SteerByPriority();
                 Shoot.Update();
             }
         }

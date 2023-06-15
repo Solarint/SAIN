@@ -7,6 +7,7 @@ namespace SAIN.UserSettings
         public static ConfigEntry<bool> DebugLayers { get; private set; }
         public static ConfigEntry<bool> DebugBotDecisions { get; private set; }
         public static ConfigEntry<bool> DebugBotInfo { get; private set; }
+        public static ConfigEntry<bool> ToggleDebugGizmos { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
@@ -24,6 +25,11 @@ namespace SAIN.UserSettings
 
             DebugBotInfo = Config.Bind(debugmode, "Debug Bot Info", false,
                 new ConfigDescription("Shows Logs of the results of Created Bot Information",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
+
+            ToggleDebugGizmos = Config.Bind(debugmode, "Toggle Debug Gizmos", false,
+                new ConfigDescription("Global Toggle for all Debug Gizmos",
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 5 }));
         }

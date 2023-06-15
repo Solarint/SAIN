@@ -19,7 +19,7 @@ namespace SAIN.Helpers
         /// <param name="force">The force to be applied.</param>
         /// <param name="mass">The mass of the object.</param>
         /// <returns>The point between the two vectors.</returns>
-        public static Vector3 Point(Vector3 position, Vector3 force, float mass)
+        public static Vector3 DangerPoint(Vector3 position, Vector3 force, float mass)
         {
             force /= mass;
 

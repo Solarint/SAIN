@@ -26,13 +26,13 @@ namespace SAIN.Classes
                 Decision = CurrentSelfAction;
                 return true;
             }
-            else if (BotOwner.BewareGrenade?.GrenadeDangerPoint != null)
+            if (!CheckContinueSelfAction(out Decision))
             {
-                Decision = SAINSelfDecision.RunAwayGrenade;
-            }
-            else if (!CheckContinueSelfAction(out Decision))
-            {
-                if (StartUseStims())
+                if (StartRunGrenade())
+                {
+                    Decision = SAINSelfDecision.RunAwayGrenade;
+                }
+                else if (StartUseStims())
                 {
                     Decision = SAINSelfDecision.Stims;
                 }
@@ -53,6 +53,21 @@ namespace SAIN.Classes
             return Decision != SAINSelfDecision.None;
         }
 
+        private bool StartRunGrenade()
+        {
+            var grenadePos = SAIN.Grenade.GrenadeDangerPoint; 
+            if (grenadePos != null)
+            {
+                Vector3 botPos = BotPosition;
+                Vector3 direction = grenadePos.Value - botPos;
+                if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private bool CheckContinueRetreat()
         {
             if (SAIN.Enemy == null) return false;
@@ -62,11 +77,12 @@ namespace SAIN.Classes
 
         private bool CheckContinueSelfAction(out SAINSelfDecision Decision)
         {
-            bool continueAction = UsingMeds || ContinueReload;
+            bool continueAction = UsingMeds || ContinueReload || ContinueRunGrenade;
             Decision = continueAction ? CurrentSelfAction : SAINSelfDecision.None;
             return continueAction;
         }
 
+        private bool ContinueRunGrenade => CurrentSelfAction == SAINSelfDecision.RunAwayGrenade && SAIN.Grenade.GrenadeDangerPoint != null;
         public bool UsingMeds => BotOwner.Medecine.Using;
         private bool ContinueReload => BotOwner.WeaponManager.Reload?.Reloading == true && !StartCancelReload();
         public bool CanUseStims

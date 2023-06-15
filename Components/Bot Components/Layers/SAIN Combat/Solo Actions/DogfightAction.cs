@@ -18,7 +18,7 @@ namespace SAIN.Layers
             Shoot = new ShootClass(bot);
         }
 
-        private ShootClass Shoot;
+        private readonly ShootClass Shoot;
 
         public override void Update()
         {
@@ -27,22 +27,11 @@ namespace SAIN.Layers
                 return;
             }
 
-            if (SAIN.Enemy.InLineOfSight)
-            {
-                BotOwner.Steering.LookToPoint(SAIN.Enemy.EnemyChestPosition);
-            }
-            else
-            {
-                SAIN.Steering.Steer();
-            }
+            SAIN.Steering.SteerByPriority(true);
 
             if (SAIN.Enemy.IsVisible && BackUp(out var pos))
             {
-                BotOwner.GoToPoint(pos, false, -1, false, false);
-            }
-            else
-            {
-                BotOwner.MoveToEnemyData.TryMoveToEnemy(BotOwner.Memory.GoalEnemy.CurrPosition);
+                BotOwner.GoToPoint(pos, false, -1, false, false, false);
             }
 
             Shoot.Update();

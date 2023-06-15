@@ -35,7 +35,7 @@ namespace SAIN.Layers
         {
             //SAIN.Movement.DecideMovementSpeed();
 
-            SAIN.Steering.Steer();
+            SAIN.Steering.SteerByPriority();
 
             if (SAIN.HasEnemyAndCanShoot)
             {

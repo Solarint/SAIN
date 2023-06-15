@@ -108,7 +108,7 @@ namespace SAIN.Classes
 
                 float clampedResult = Mathf.Clamp(result, 0f, maxTime);
 
-                if (DebugTimer < Time.time && DebugVision.Value && Person.GetPlayer.ProfileId == Plugin.MainPlayer.ProfileId)
+                if (DebugTimer < Time.time && DebugVision.Value && Person.GetPlayer.ProfileId == SAINBotController.MainPlayer.ProfileId)
                 {
                     DebugTimer = Time.time + 1f;
                     Logger.LogDebug($"RayCast Frequency result: [{clampedResult}]");

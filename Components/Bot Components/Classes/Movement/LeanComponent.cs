@@ -41,7 +41,7 @@ namespace SAIN.Components
             {
                 if (LeanCoroutine != null)
                 {
-                    Lean.SetLean(0f);
+                    SAIN.Mover.FastLean(0f);
                     BlindFire.SetBlindFire(0);
                     SideStep.SetSideStep(0f);
 
@@ -102,7 +102,7 @@ namespace SAIN.Components
 
         private IEnumerator BotBlindFireLoop()
         {
-            var wait = new WaitForSeconds(0.66f);
+            var wait = new WaitForSeconds(0.5f);
 
             while (true)
             {
@@ -111,6 +111,10 @@ namespace SAIN.Components
                 if (SAIN.AILimit.Enabled)
                 {
                     yield return new WaitForSeconds(SAIN.AILimit.TimeAdd);
+                }
+                if (BlindFire.CurrentBlindFireSetting != 0)
+                {
+                    yield return new WaitForSeconds(1f);
                 }
 
                 yield return wait;
@@ -138,25 +142,7 @@ namespace SAIN.Components
             }
         }
 
-        public Vector3? TargetPosition
-        {
-            get
-            {
-                if (BotOwner.Memory.GoalEnemy != null)
-                {
-                    BotOwner.Memory.GoalEnemy.Person.MainParts.TryGetValue(BodyPartType.body, out BodyPartClass body);
-                    return body.Position;
-                }
-                else if (BotOwner.Memory.GoalTarget?.GoalTarget?.Position != null)
-                {
-                    return BotOwner.Memory.GoalTarget.GoalTarget.Position;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
+        public Vector3? TargetPosition => SAIN.CurrentTargetPosition;
 
         public LeanSetting LeanDirection => Lean.LeanDirection;
 
@@ -199,7 +185,7 @@ namespace SAIN.Components
 
             public void SetLean(float num)
             {
-                BotOwner.GetPlayer.MovementContext.SetTilt(num);
+                SAIN.Mover.SlowLean(num);
             }
 
             public float Angle
@@ -472,6 +458,8 @@ namespace SAIN.Components
                 Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             }
 
+            private bool CouldShoot;
+
             public void Update(Vector3 targetPos)
             {
                 if (BotOwner.Memory.GoalEnemy == null)
@@ -484,11 +472,16 @@ namespace SAIN.Components
                     return;
                 }
 
+
                 var enemy = BotOwner.Memory.GoalEnemy;
                 int blindfire = 0;
 
                 if (!enemy.CanShoot)
                 {
+                    if (CurrentBlindFireSetting == 0)
+                    {
+                        CouldShoot = false;
+                    }
                     if (RayCastCheck(BotOwner.WeaponRoot.position, targetPos))
                     {
                         Vector3 rayPoint = BotOwner.LookSensor._headPoint;
@@ -504,15 +497,21 @@ namespace SAIN.Components
                 if (blindfire == 1 && BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.HaveBullets)
                 {
                     SetBlindFire(blindfire);
-                    BotOwner.Steering.LookToPoint(targetPos);
+                    SAIN.Steering.LookToPoint(targetPos);
                     //BotOwner.ShootData.Shoot();
                 }
                 else
                 {
                     SetBlindFire(0);
                 }
+
+                if (CurrentBlindFireSetting == 0)
+                {
+                    CouldShoot = false;
+                }
             }
 
+            public int CurrentBlindFireSetting { get; private set; }
             private float BlindFireTimer = 0f;
 
             private bool RayCastCheck(Vector3 start, Vector3 targetPos)
@@ -524,6 +523,7 @@ namespace SAIN.Components
 
             public void SetBlindFire(int value)
             {
+                CurrentBlindFireSetting = value;
                 BotOwner.GetPlayer.MovementContext.SetBlindFire(value);
             }
 

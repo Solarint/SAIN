@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
+using HarmonyLib;
 using SAIN.Classes;
 using SAIN.Helpers;
 using System.Collections.Generic;
@@ -18,6 +19,14 @@ namespace SAIN.Components
             Init(BotOwner);
         }
 
+        public List<Vector3> ExitsToLocation { get; private set; } = new List<Vector3>();
+
+        public void UpdateExitsToLoc(Vector3[] exits)
+        {
+            ExitsToLocation.Clear();
+            ExitsToLocation.AddRange(exits);
+        }
+
         public string ProfileId => BotOwner.ProfileId;
         public string SquadId => Squad.SquadID;
         public Player Player => BotOwner.GetPlayer;
@@ -28,6 +37,7 @@ namespace SAIN.Components
 
             // Must be first, other classes use it
             Squad = new SquadClass(bot);
+            Equipment = new BotEquipmentClass(bot);
 
             Info = new BotInfoClass(bot);
             AILimit = new AILimitClass(bot);
@@ -42,14 +52,15 @@ namespace SAIN.Components
             Steering = new SteeringClass(bot);
             Grenade = new BotGrenadeClass(bot);
             Mover = new MoverClass(bot);
-            FriendlyFire = new FriendlyFireClass(bot);
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        public Player GoalEnemyPlayer => BotOwner.Memory.GoalEnemy?.Person?.GetPlayer;
+        private float DebugPathTimer = 0f;
 
         private void Update()
         {
+            UpdatePatrolData();
+
             if (BotActive && !GameIsEnding)
             {
                 if (VisiblePlayers.Count > 0 && DebugVision.Value)
@@ -60,9 +71,22 @@ namespace SAIN.Components
                     }
                 }
 
-                FriendlyFire.Update();
+                var move = BotOwner.Mover;
+                if (move.CurPath != null && DebugPathTimer < Time.time)
+                {
+                    DebugPathTimer = Time.time + 0.25f;
+                    for (int i = 0;  i < move.CurPath.Length - 2; i++)
+                    {
+                        //DebugGizmos.SingleObjects.Line(move.CurPath[i], move.CurPath[i + 1], Color.blue, 0.1f, true, 0.25f);
+                    }
+                }
+                //DebugGizmos.SingleObjects.Line(BodyPosition, move.RealDestPoint, Color.magenta, 0.25f, true, Time.deltaTime, true);
+                //DebugGizmos.SingleObjects.Line(BodyPosition, move.CurPathLastPoint, Color.green, 0.25f, true, Time.deltaTime, true);
+
                 UpdateHealth();
                 UpdateEnemy();
+                Equipment.Update();
+                Grenade.Update();
                 Mover.Update();
                 Squad.Update();
                 Info.Update();
@@ -74,6 +98,28 @@ namespace SAIN.Components
                 Steering.Update();
             }
         }
+
+        private void UpdatePatrolData()
+        {
+            var patrol = BotOwner.PatrollingData;
+            bool patrolPaused = patrol.Status == PatrolStatus.pause;
+
+            if (SAINLayersActive && !patrolPaused)
+            {
+                patrol.Pause();
+            }
+
+            if (!SAINLayersActive && patrolPaused && SAINLayersWereActive)
+            {
+                patrol.Unpause();
+            }
+
+            SAINLayersWereActive = SAINLayersActive;
+        }
+
+        public string ActiveLayerName => BotOwner.Brain.Agent == null ? "None" : BotOwner.Brain.ActiveLayerName();
+        public bool SAINLayersActive => SAINPlugin.SAINLayers.Contains(ActiveLayerName);
+        public bool SAINLayersWereActive { get; private set; }
 
         private void UpdateEnemy()
         {
@@ -123,15 +169,18 @@ namespace SAIN.Components
         public void Dispose()
         {
             StopAllCoroutines();
+
+            Hearing?.Dispose();
             Lean?.Dispose();
             Cover?.CoverFinder?.Dispose();
             FlashLight?.Dispose();
+
             Destroy(this);
         }
 
         public bool NoDecisions => CurrentDecision == SAINSoloDecision.None && Decision.SquadDecision == SAINSquadDecision.None && Decision.SelfDecision == SAINSelfDecision.None;
         public SAINSoloDecision CurrentDecision => Decision.MainDecision;
-        public float DistanceToMainPlayer => (Plugin.MainPlayerPosition - BotOwner.Position).magnitude;
+        public float DistanceToMainPlayer => (SAINBotController.MainPlayerPosition - BotOwner.Position).magnitude;
         public Vector3 Position => BotOwner.Position;
         public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
@@ -150,7 +199,7 @@ namespace SAIN.Components
 
         public bool HasEnemyAndCanShoot => Enemy?.IsVisible == true;
 
-        public FriendlyFireClass FriendlyFire { get; private set; }
+        public BotEquipmentClass Equipment { get; private set; }
 
         public MoverClass Mover { get; private set; }
 

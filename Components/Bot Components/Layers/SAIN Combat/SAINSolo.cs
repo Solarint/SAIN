@@ -81,18 +81,7 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            bool Active = CurrentDecision != SAINSoloDecision.None && (SAIN.HasGoalEnemy || SAIN.HasGoalTarget);
-            bool patrolPaused = PatrolStatus == PatrolStatus.pause;
-
-            if (Active && !patrolPaused)
-            {
-                BotOwner.PatrollingData.Pause();
-            }
-            else if (!Active && patrolPaused)
-            {
-                BotOwner.PatrollingData.Unpause();
-            }
-
+            bool Active = CurrentDecision != SAINSoloDecision.None;
             return Active;
         }
 

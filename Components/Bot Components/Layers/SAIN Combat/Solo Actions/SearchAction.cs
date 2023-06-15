@@ -98,7 +98,7 @@ namespace SAIN.Layers
             if (SprintEnabled && !BotOwner.Memory.IsUnderFire)
             {
                 BotOwner.GetPlayer.EnableSprint(true);
-                BotOwner.Steering.LookToMovingDirection();
+                SAIN.Steering.LookToMovingDirection();
             }
             else
             {
@@ -110,20 +110,33 @@ namespace SAIN.Layers
                 }
                 if (BotOwner.Memory.IsUnderFire)
                 {
-                    SAIN.Steering.Steer();
+                    SAIN.Steering.SteerByPriority();
                 }
                 else if (soundDistance < 30f && SAIN.LastHeardSound.TimeSinceHeard < 1f)
                 {
-                    SAIN.Steering.Steer();
+                    SAIN.Steering.SteerByPriority();
                 }
                 else
                 {
                     pos.y += 1f;
-                    BotOwner.Steering.LookToPoint(pos);
+                    if (!SeenSearchPoint && !Physics.Raycast(SAIN.HeadPosition, pos - SAIN.HeadPosition, (pos - SAIN.HeadPosition).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                    {
+                        SeenSearchPoint = true;
+                    }
+
+                    if (SeenSearchPoint)
+                    {
+                        SAIN.Steering.SteerByPriority();
+                    }
+                    else
+                    {
+                        SAIN.Steering.LookToPoint(pos);
+                    }
                 }
             }
         }
 
+        private bool SeenSearchPoint = false;
 
         private SAINComponent SAIN;
         public NavMeshPath Path = new NavMeshPath();

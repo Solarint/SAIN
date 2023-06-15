@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using System.Collections.Generic;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
 
@@ -33,7 +34,7 @@ namespace SAIN.Classes
                     switch (SelfDecision)
                     {
                         case SAINSelfDecision.Reload:
-                            DoReload();
+                            TryReload();
                             break;
 
                         case SAINSelfDecision.Surgery:
@@ -101,15 +102,26 @@ namespace SAIN.Classes
             }
         }
 
-        public void DoReload()
+        public void TryReload()
         {
             var reloadClass = BotOwner.WeaponManager.Reload;
-            if (reloadClass.TryReload())
+            if (reloadClass.Reloading)
+            {
+                reloadClass.CheckReloadLongTime();
+                return;
+            }
+            if (reloadClass.CanReload(false))
             {
                 if (DebugBotDecisions.Value)
                 {
                     Logger.LogDebug($"Reloading!");
                 }
+                reloadClass.Reload();
+                return;
+            }
+            if (reloadClass.NoAmmoForReloadCached)
+            {
+                BotOwner.WeaponManager.Selector.TryChangeWeapon(true);
             }
         }
 

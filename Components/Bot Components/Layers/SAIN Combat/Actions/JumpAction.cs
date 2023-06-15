@@ -24,21 +24,6 @@ namespace SAIN.Layers.Actions
 
         public override void Update()
         {
-            Vector3 playerPos = Plugin.MainPlayerPosition;
-            if (Move.FinishedPath || Move.ActivePath == null)
-            {
-                Move = new NavigationPointObject(BotOwner);
-                Move.GoToPoint(Plugin.MainPlayerPosition, false);
-            }
-            if (Move.FinalDestination != null && (playerPos - Move.FinalDestination.Point).magnitude > 3f)
-            {
-                Move = new NavigationPointObject(BotOwner);
-                Move.GoToPoint(Plugin.MainPlayerPosition, false);
-            }
-
-            Move.Update();
-            playerPos.y += 1.4f;
-            BotOwner.Steering.LookToPoint(playerPos);
         }
 
         private bool Stopped = false;
@@ -49,7 +34,6 @@ namespace SAIN.Layers.Actions
             SAIN.Mover.SetTargetMoveSpeed(1f);
             SAIN.Mover.SetTargetPose(1f);
             Move = new NavigationPointObject(BotOwner);
-            Move.GoToPoint(Plugin.MainPlayerPosition, false);
         }
 
         public override void Stop()

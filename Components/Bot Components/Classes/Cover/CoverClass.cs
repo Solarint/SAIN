@@ -93,7 +93,7 @@ namespace SAIN.Classes
 
         private bool GetPointToHideFrom(out Vector3? target)
         {
-            target = SAIN.CurrentTargetPosition;
+            target = SAIN.Grenade.GrenadeDangerPoint ?? SAIN.CurrentTargetPosition;
             return target != null;
         }
 
@@ -101,7 +101,7 @@ namespace SAIN.Classes
         {
             if (BotIsAtCoverPoint)
             {
-                if (ActiveCoverPoint.Collider.bounds.size.y < 1f && BotOwner.BotLay.CanProne)
+                if (ActiveCoverPoint.Collider.bounds.size.y < 0.8f && BotOwner.BotLay.CanProne)
                 {
                     SAIN.BotOwner.BotLay.TryLay();
                     return true;
@@ -152,50 +152,31 @@ namespace SAIN.Classes
             return Physics.Raycast(position, direction, dist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
-        public CoverStatus FallBackPointStatus
-        {
-            get
-            {
-                if (CurrentFallBackPoint != null)
-                {
-                    return CurrentFallBackPoint.Status();
-                }
-                return CoverStatus.None;
-            }
-        }
-        public CoverStatus CoverPointStatus
-        {
-            get
-            {
-                if (CurrentCoverPoint != null)
-                {
-                    return CurrentCoverPoint.Status();
-                }
-                return CoverStatus.None;
-            }
-        }
         public bool BotIsAtCoverPoint => ActiveCoverPoint != null;
         public CoverPoint ActiveCoverPoint
         {
             get
             {
-                if (CoverPointStatus == CoverStatus.InCover)
+                foreach (var point in CoverFinder.CoverPoints)
                 {
-                    return CurrentCoverPoint;
+                    if (point != null)
+                    {
+                        if (point.CoverStatus == CoverStatus.InCover)
+                        {
+                            return point;
+                        }
+                    }
                 }
-                else if (FallBackPointStatus == CoverStatus.InCover)
-                {
-                    return CurrentFallBackPoint;
-                }
-                else
-                {
-                    return null;
-                }
+                return null;
             }
         }
+
         public CoverFinderComponent CoverFinder { get; private set; }
+
         public CoverPoint CurrentCoverPoint => ClosestPoint;
+
         public CoverPoint CurrentFallBackPoint => ClosestPoint;
+
         protected ManualLogSource Logger;
     }
 }

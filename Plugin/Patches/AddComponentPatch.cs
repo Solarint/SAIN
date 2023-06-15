@@ -6,7 +6,7 @@ using System.Reflection;
 using SAIN.Helpers;
 using Comfort.Common;
 
-namespace SAIN.Patches
+namespace SAIN.Patches.Components
 {
     public class AddComponentPatch : ModulePatch
     {
@@ -24,7 +24,7 @@ namespace SAIN.Patches
             }
 
             var component = __instance.GetOrAddComponent<SAINComponent>();
-            Singleton<GameWorld>.Instance.GetComponent<BotController>()?.AddBot(component);
+            Singleton<GameWorld>.Instance.GetComponent<SAINBotController>()?.AddBot(component);
         }
     }
 
@@ -51,23 +51,9 @@ namespace SAIN.Patches
             var component = __instance.GetComponent<SAINComponent>();
             if (component != null)
             {
-                Singleton<GameWorld>.Instance.GetComponent<BotController>()?.RemoveBot(component);
+                Singleton<GameWorld>.Instance.GetComponent<SAINBotController>()?.RemoveBot(component);
                 component?.Dispose();
             }
-        }
-    }
-
-    public class InitHelper : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotControllerClass), "Init");
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(ref BotOwner __instance)
-        {
-            VectorHelpers.Init();
         }
     }
 }
