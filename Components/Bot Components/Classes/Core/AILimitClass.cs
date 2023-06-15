@@ -1,4 +1,5 @@
 ﻿using EFT;
+using SAIN.Components;
 using UnityEngine;
 
 namespace SAIN.Classes
@@ -20,11 +21,11 @@ namespace SAIN.Classes
                 UpdateLimitFreqTimer = Time.time + 0.5f;
 
                 float TimeAdd;
-                if (SAIN.GoalEnemyPlayer?.ProfileId == Plugin.MainPlayer?.ProfileId)
+                if (BotOwner.Memory.GoalEnemy?.Person?.GetPlayer?.ProfileId == SAINBotController.MainPlayer?.ProfileId)
                 {
                     TimeAdd = 0f;
                 }
-                else if (SAIN.GoalTargetPos != null && (SAIN.GoalTargetPos.Value - Plugin.MainPlayerPosition).sqrMagnitude < 2500f)
+                else if (SAIN.GoalTargetPos != null && (SAIN.GoalTargetPos.Value - SAINBotController.MainPlayerPosition).sqrMagnitude < 2500f)
                 {
                     TimeAdd = 0f;
                 }

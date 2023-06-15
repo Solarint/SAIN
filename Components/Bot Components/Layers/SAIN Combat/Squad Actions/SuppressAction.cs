@@ -31,7 +31,7 @@ namespace SAIN.Layers
                 {
                     BotOwner.StopMove();
 
-                    BotOwner.Steering.LookToPoint(pos.Value);
+                    SAIN.Steering.LookToPoint(pos.Value);
 
                     if (BotOwner.WeaponManager.HaveBullets)
                     {
@@ -40,7 +40,7 @@ namespace SAIN.Layers
                 }
                 else
                 {
-                    SAIN.Steering.Steer();
+                    SAIN.Steering.SteerByPriority();
                     BotOwner.MoveToEnemyData.TryMoveToEnemy(enemy.Person.Position);
                 }
             }
@@ -91,7 +91,7 @@ namespace SAIN.Layers
             }
             else if (BotOwner.SuppressShoot.InitToPoint(BotOwner.Memory.GoalEnemy.EnemyLastPositionReal))
             {
-                //Logger.LogDebug("Init to Point Success");
+                //Logger.LogDebug("Init to DangerPoint Success");
             }
             else if (BotOwner.SuppressShoot.Init(BotOwner.Memory.GoalEnemy))
             {

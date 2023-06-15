@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using UnityEngine.AI;
 using UnityEngine;
 using BepInEx.Logging;
+using System.Reflection;
+using HarmonyLib;
 
 namespace SAIN.Classes
 {
@@ -15,10 +17,48 @@ namespace SAIN.Classes
         public MoverClass(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            var botlay = AccessTools.Property(typeof(BotOwner), "BotLay");
+            BotLayProperty = botlay.PropertyType.GetProperty("IsLay");
+        }
+
+        private readonly PropertyInfo BotLayProperty;
+
+        public bool GoToPoint(Vector3 point, bool slowAtTheEnd = false, float reachDist = -1f, bool crawl = false)
+        {
+            if (NavMesh.SamplePosition(point, out var navHit, 0.1f, -1))
+            {
+                NavMeshPath Path = new NavMeshPath();
+                if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
+                {
+                    if (reachDist < 0f)
+                    {
+                        reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
+                    }
+                    //BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
+                    BotOwner.Mover.GoToPoint(navHit.position, false, reachDist, false, false, !crawl);
+                    if (crawl)
+                    {
+                        SetBotProne(true);
+                    }
+                    return true;
+                }
+            }
+
+            Logger.LogWarning($"{NavMeshPathStatus.PathInvalid}");
+            return false;
+        }
+
+        public void SetBotProne(bool value)
+        {
+            if (BotLay.IsLay != value)
+            {
+                BotLayProperty.SetValue(BotLay, value);
+            }
         }
 
         public void Update()
         {
+            //SetBotProne(true);
             UpdateTargetMoveSpeed();
             UpdateTargetPose();
             UpdateLean();
@@ -52,29 +92,98 @@ namespace SAIN.Classes
             {
                 return;
             }
-            float num = Math.Abs(this.TargetPose - Player.PoseLevel);
+            float poseDiff = TargetPose - Player.PoseLevel;
+            float num = Math.Abs(poseDiff);
             if (num >= 1E-45f)
             {
-                Player.ChangePose(0.05f * (this.TargetPose - this.Player.PoseLevel)); 
+                Player.ChangePose(0.05f * poseDiff); 
             }
         }
 
+        public bool ShallProne(CoverPoint point, bool withShoot)
+        {
+            var status = point.CoverStatus;
+            if (status == CoverStatus.FarFromCover || status == CoverStatus.None)
+            {
+                if (Player.MovementContext.CanProne)
+                {
+                    var enemy = SAIN.Enemy;
+                    if (enemy != null)
+                    {
+                        float distance = (enemy.Position - BotPosition).magnitude;
+                        if (distance > 30f)
+                        {
+                            if (withShoot)
+                            {
+                                return CanShootFromProne(enemy.Position);
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool ShallProne(bool withShoot, float mindist = 30f)
+        {
+            if (Player.MovementContext.CanProne)
+            {
+                var enemy = SAIN.Enemy;
+                if (enemy != null)
+                {
+                    float distance = (enemy.Position - BotPosition).magnitude;
+                    if (distance > mindist)
+                    {
+                        if (withShoot)
+                        {
+                            return CanShootFromProne(enemy.Position);
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool ShallProneHide(float mindist = 30f)
+        {
+            if (Player.MovementContext.CanProne)
+            {
+                var enemy = SAIN.Enemy;
+                if (enemy != null)
+                {
+                    float distance = (enemy.Position - BotPosition).magnitude;
+                    if (distance > mindist)
+                    {
+                        return !CanShootFromProne(enemy.Position);
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool CanShootFromProne(Vector3 target)
+        {
+            Vector3 vector = BotPosition + Vector3.up * 0.14f;
+            Vector3 vector2 = target + Vector3.up - vector;
+            Vector3 from = vector2;
+            from.y = vector.y;
+            float num = Vector3.Angle(from, vector2);
+            float lay_DOWN_ANG_SHOOT = GClass560.Core.LAY_DOWN_ANG_SHOOT;
+            return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && GClass252.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
+        }
+
+        public BotLayClass BotLay => BotOwner.BotLay;
+
         public void SetTargetPose(float pose)
         {
-            if (TargetPose != pose)
-            {
-                TargetPose = pose;
-                Logger.LogInfo($"New Target Pose {TargetPose}");
-            }
+            TargetPose = pose;
         }
 
         public void SetTargetMoveSpeed(float speed)
         {
-            if (DestMoveSpeed != speed)
-            {
-                DestMoveSpeed = speed;
-                Logger.LogInfo($"New Target Speed {DestMoveSpeed}");
-            }
+            DestMoveSpeed = speed;
         }
 
         public float TargetPose { get; private set; }
@@ -101,18 +210,28 @@ namespace SAIN.Classes
         public void StopMove()
         {
             NavigationPoint = null;
-            BotOwner.StopMove();
             BotOwner.Mover.Stop();
         }
 
-        public void StopSprint()
+        public bool CanSprint => Player.Physical.CanSprint;
+
+        public void Sprint(bool value)
         {
-            BotOwner.GetPlayer.EnableSprint(false);
+            if (IsSprinting != value || Player.Physical.Sprinting != value)
+            {
+                Player.EnableSprint(value);
+                IsSprinting = value;
+            }
+            if (value)
+            {
+                SAIN.Steering.LookToMovingDirection();
+            }
         }
+
+        public bool IsSprinting { get; private set; }
 
         public NavigationPointObject NavigationPoint { get; private set; }
         public bool HasDestination => NavigationPoint != null;
-        public MoveToCoverClass MoveToCover { get; set; }
         public CoverPoint CoverDestination { get; private set; }
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)

@@ -155,18 +155,6 @@ namespace SAIN.Classes
             return false;
         }
 
-        public bool NewDecision(SAINSoloDecision Decision)
-        {
-            return false;
-        }
-
-        public bool NewDecision(SAINSelfDecision SelfDecision, out SAINSoloDecision NewDecision)
-        {
-            bool FoundDecision = SelfDecision != SAINSelfDecision.None;
-            NewDecision = FoundDecision ? SAINSoloDecision.Retreat : SAINSoloDecision.None;
-            return FoundDecision;
-        }
-
         private float UpdateEnemyTimer = 0f;
         private float BotUnstuckTimerDecision = 0f;
         private float FinalBotUnstuckTimer = 0f;

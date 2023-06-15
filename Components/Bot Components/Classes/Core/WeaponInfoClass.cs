@@ -319,7 +319,7 @@ namespace SAIN.Classes
                         botTypeModifier = 0.8f;
                         break;
 
-                    default: // PMC
+                    default: // PMCRaider
                         botTypeModifier = 0.1f;
                         break;
                 }

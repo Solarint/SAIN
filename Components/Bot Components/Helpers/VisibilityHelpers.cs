@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using SAIN.UserSettings;
+using static SAIN.UserSettings.VisionConfig;
 
 namespace SAIN.Helpers
 {
@@ -37,7 +38,7 @@ namespace SAIN.Helpers
                 weathermodifier = Mathf.Clamp(weathermodifier, 0.2f, 1f);
 
                 // Log Everything!
-                if (VisionConfig.DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
+                if (DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
                 {
                     DebugTimer = UnityEngine.Time.time + 5f;
                     System.Console.WriteLine($"SAIN Weather: Final Weather Modifier: [{weathermodifier}], Fog: [{fogmod}], Rain: [{rainmod}], Clouds: [{cloudsmod}]");
@@ -186,6 +187,7 @@ namespace SAIN.Helpers
                 return value;
             }
         }
+
         public class Time
         {
             public static float Visibilty(DateTime time)
@@ -238,12 +240,10 @@ namespace SAIN.Helpers
                 {
                     timemodifier = 1f;
                 }
-                /*
                 if (DebugWeather.Value)
                 {
                     System.Console.WriteLine($"SAIN Weather: TimeModifier: [{timemodifier}], TimeofDay: [{timeofday}]");
                 }
-                */
                 return timemodifier;
             }
         }

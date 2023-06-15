@@ -51,27 +51,13 @@ namespace SAIN.Layers
                 Logger.LogError("Action Null?");
                 nextAction = new Action(typeof(RegroupAction), $"DEFAULT!");
             }
-
             LastActionDecision = Decision;
             return nextAction;
         }
 
         public override bool IsActive()
         {
-            if (SAIN == null || !SAIN.Squad.BotInGroup)
-            {
-                return false;
-            }
-
             bool Active = SAIN.Decision.SquadDecision != SAINSquadDecision.None;
-            if (Active)
-            {
-                BotOwner.PatrollingData.Pause();
-            }
-            else
-            {
-                BotOwner.PatrollingData.Unpause();
-            }
             return Active;
         }
 

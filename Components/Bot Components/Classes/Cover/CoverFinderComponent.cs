@@ -29,38 +29,26 @@ namespace SAIN.Components
             {
                 if (CoverPoints.Count > 0)
                 {
-                    var points = new List<CoverPoint>();
-                    points.AddRange(CoverPoints);
-                    foreach (var c in points)
-                    {
-                        if (c != null)
-                        {
-                            DebugGizmos.SingleObjects.Line(c.Position, SAIN.HeadPosition, Color.yellow, 0.1f, true, 0.25f);
-                        }
-                    }
-                }
-                if (DrawCollidersTimers < Time.time && Colliders != null)
-                {
-                    DrawCollidersTimers = Time.time + 3f;
-                    var colliders = new List<Collider>();
-                    colliders.AddRange(Colliders);
-                    foreach (var c in colliders)
-                    {
-                        if (c != null)
-                        {
-                            DebugGizmos.SingleObjects.Line(c.transform.position, SAIN.HeadPosition, Color.green, 0.025f, true, 3f);
-                        }
-                    }
+                    DebugGizmos.SingleObjects.Line(CoverPoints.PickRandom().Position, SAIN.HeadPosition, Color.yellow, 0.025f, true, 0.1f);
                 }
             }
         }
-
-        private float DrawCollidersTimers = 0f;
 
         public void LookForCover(Vector3 targetPosition, Vector3 originPoint)
         {
             TargetPosition = targetPosition;
             OriginPoint = originPoint;
+
+            if (SAIN.Decision.CurrentSelfDecision == SAINSelfDecision.RunAwayGrenade)
+            {
+                MinObstacleHeight = 1.5f;
+                MinDistance = 10f;
+            }
+            else
+            {
+                MinObstacleHeight = CoverMinHeight.Value;
+                MinDistance = CoverMinEnemyDistance.Value;
+            }
 
             if (TakeCoverCoroutine == null)
             {
@@ -103,7 +91,7 @@ namespace SAIN.Components
                             CoverPoints.Add(newPoint);
                             coverCount++;
                         }
-                        // Every 20 colliders checked, wait until the next frame before continuing.
+                        // Every 10 colliders checked, wait until the next frame before continuing.
                         if (frameWait == 10)
                         {
                             frameWait = 0;
@@ -148,8 +136,10 @@ namespace SAIN.Components
 
         private bool CheckCollider(Collider collider, out CoverPoint newPoint)
         {
+            const float ExtendLengthThresh = 1.5f;
+
             newPoint = null;
-            if (collider == null || collider.bounds.size.y < CoverMinHeight.Value || !ColliderDirection(collider))
+            if (collider == null || collider.bounds.size.y < MinObstacleHeight || !ColliderDirection(collider))
             {
                 return false;
             }
@@ -160,11 +150,16 @@ namespace SAIN.Components
             Vector3 colliderDir = (colliderPos - TargetPosition).normalized;
             colliderDir.y = 0f;
 
+            if (collider.bounds.size.z > ExtendLengthThresh && collider.bounds.size.x > ExtendLengthThresh)
+            {
+                colliderDir *= ExtendLengthThresh;
+            }
+
             // a farPoint on opposite side of the target
             Vector3 farPoint = colliderPos + colliderDir;
 
             // the closest edge to that farPoint
-            if (NavMesh.SamplePosition(farPoint, out var hit, 5f, -1))
+            if (NavMesh.SamplePosition(farPoint, out var hit, 1f, -1))
             {
                 if (CheckPath(hit.position))
                 {
@@ -212,7 +207,7 @@ namespace SAIN.Components
         }
 
 
-        private float MinDistance => CoverMinEnemyDistance.Value * CoverMinEnemyDistance.Value;
+        private float MinDistance;
 
         private bool CheckPosition(Vector3 position)
         {
@@ -472,6 +467,8 @@ namespace SAIN.Components
             {
                 Vector3 box = new Vector3(width, height, width);
                 hits = Physics.OverlapBoxNonAlloc(origin, box, Colliders, orientation, mask);
+                hits = FilterColliders(hits);
+
                 if (hits > 50)
                 {
                     break;
@@ -484,19 +481,27 @@ namespace SAIN.Components
                 }
             }
 
-            int hitReduction = 0;
+            System.Array.Sort(Colliders, ColliderArraySortComparer);
+        }
 
+        private int FilterColliders(int hits)
+        {
+            int hitReduction = 0;
             for (int i = 0; i < hits; i++)
             {
-                if (Colliders[i].bounds.size.y < 0.5)
+                if (Colliders[i].bounds.size.y < 0.66)
+                {
+                    Colliders[i] = null;
+                    hitReduction++;
+                }
+                else if (Colliders[i].bounds.size.x < 0.1f && Colliders[i].bounds.size.z < 0.1f)
                 {
                     Colliders[i] = null;
                     hitReduction++;
                 }
             }
-
-            System.Array.Sort(Colliders, ColliderArraySortComparer);
             hits -= hitReduction;
+            return hits;
         }
 
         private int LastHitCount = 0;
@@ -574,10 +579,9 @@ namespace SAIN.Components
         private BotOwner BotOwner => SAIN.BotOwner;
         private SAINComponent SAIN;
         protected ManualLogSource Logger;
-        public float MinObstacleHeight => CoverMinHeight.Value;
+        private float MinObstacleHeight;
         private Coroutine TakeCoverCoroutine;
         private Vector3 OriginPoint;
-        private Vector3 TargetPosition;
-        public float MinTargetDist { get; private set; }
+        public Vector3 TargetPosition { get; private set; }
     }
 }

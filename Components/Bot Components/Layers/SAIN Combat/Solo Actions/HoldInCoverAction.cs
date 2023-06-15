@@ -23,7 +23,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAIN.Steering.Steer();
+            SAIN.Steering.SteerByPriority();
 
             Shoot.Update();
 

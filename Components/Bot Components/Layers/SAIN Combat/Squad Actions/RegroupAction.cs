@@ -16,11 +16,9 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAIN.Steering.Steer();
-
-            if (SAIN.Steering.Steer())
+            if (SAIN.Steering.SteerByPriority())
             {
-                BotOwner.GetPlayer.EnableSprint(false);
+                SAIN.Mover.Sprint(false);
             }
             else
             {
@@ -35,7 +33,6 @@ namespace SAIN.Layers
             if (UpdateTimer < Time.time)
             {
                 UpdateTimer = Time.time + 3f;
-                BotOwner.DoorOpener.Update();
                 MoveToLead();
             }
         }
@@ -55,8 +52,9 @@ namespace SAIN.Layers
             {
                 SAIN.Mover.SetTargetPose(1f);
                 SAIN.Mover.SetTargetMoveSpeed(1f);
-                BotOwner.GoToPoint(SquadLeadPos.Value, false, -1, false, false);
+                SAIN.Mover.GoToPoint(SquadLeadPos.Value, false, -1f);
                 CheckShouldSprint(SquadLeadPos.Value);
+                BotOwner.DoorOpener.Update();
             }
         }
 
@@ -69,16 +67,19 @@ namespace SAIN.Layers
 
             bool sprint = hasEnemy && leadDist > 30f && enemyLOS && enemyDist > 50f;
 
-            if (sprint)
+            if (SAIN.Steering.SteerByPriority())
             {
-                BotOwner.Steering.LookToMovingDirection();
+                sprint = false;
+            }
+            else if (sprint)
+            {
+                SAIN.Steering.LookToMovingDirection();
             }
             else
             {
-                SAIN.Steering.Steer();
+                SAIN.Steering.LookToRandomPosition();
             }
-
-            BotOwner.GetPlayer.EnableSprint(sprint);
+            SAIN.Mover.Sprint(sprint);
         }
 
         public override void Stop()

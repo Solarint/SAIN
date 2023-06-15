@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using CustomPlayerLoopSystem;
+using EFT;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,23 @@ namespace SAIN.Components
             DangerPoint = dangerPoint;
             Grenade = grenade;
             ReactionTime = reactionTime;
+
+            if (EnemyGrenadeHeard())
+            {
+                SpotGrenade();
+            }
         }
 
         private void Awake()
         {
             BotOwner = GetComponent<BotOwner>();
+        }
+
+        private int FrameCount = 0; 
+
+        private bool EnemyGrenadeHeard()
+        {
+            return (Grenade.transform.position - BotOwner.Position).sqrMagnitude < 100f;
         }
 
         private void Update()
@@ -33,42 +46,43 @@ namespace SAIN.Components
                 return;
             }
 
-            if (!GrenadeSpotted)
+            if (!GrenadeSpotted && FrameCount == 5)
             {
-                if (BotOwner.LookSensor.IsPointInVisibleSector(Grenade.transform.position))
+                FrameCount = 0;
+                Vector3 grenadePos = Grenade.transform.position;
+                Vector3 headPos = BotOwner.LookSensor._headPoint;
+                Vector3 grenadeDir = grenadePos - headPos;
+                if (Vector3.Dot(grenadeDir.normalized, BotOwner.LookDirection.normalized) > 0f && NadeVisible(grenadePos, headPos))
                 {
-                    if (NadeVisible(Grenade.transform.position, BotOwner.LookSensor._headPoint))
-                    {
-                        GrenadeSpotted = true;
-                        TimeSeen = Time.time;
-                    }
+                    SpotGrenade();
                 }
             }
-            else
+
+            if (GrenadeSpotted && !CanReact && TimeSeen + ReactionTime < Time.time)
             {
-                if (TimeSeen + ReactionTime < Time.time)
-                {
-                    BotOwner.BewareGrenade.AddGrenadeDanger(DangerPoint, Grenade);
-                }
+                CanReact = true;
             }
+
+            FrameCount++;
         }
 
-        private Grenade Grenade;
-        private Vector3 DangerPoint;
-        private bool GrenadeSpotted = false;
+        private void SpotGrenade()
+        {
+            GrenadeSpotted = true;
+            TimeSeen = Time.time;
+        }
+
+        public Grenade Grenade { get; private set; }
+        public Vector3 DangerPoint { get; private set; }
+        public bool GrenadeSpotted { get; private set; }
+        public bool CanReact { get; private set; }
+
         private float TimeSeen = 0f;
         private float ReactionTime = 0f;
 
-        private static bool NadeVisible(Vector3 grenadePosition, Vector3 playerPosition)
+        private bool NadeVisible(Vector3 grenadeDirection, Vector3 headPosition)
         {
-            Vector3 direction = grenadePosition - playerPosition;
-
-            if (!Physics.Raycast(grenadePosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-            {
-                return true;
-            }
-
-            return false;
+            return !Physics.Raycast(headPosition, grenadeDirection, grenadeDirection.magnitude, LayerMaskClass.HighPolyWithTerrainMask);
         }
     }
 }

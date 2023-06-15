@@ -1,6 +1,7 @@
 ﻿using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SAIN.Classes
@@ -9,8 +10,45 @@ namespace SAIN.Classes
     {
         public BotGrenadeClass(BotOwner bot) : base(bot) { }
 
-        public void ManualUpdate()
+        public void Update()
         {
+            if (ActiveGrenades.Count > 0)
+            {
+                List<GrenadeTracker> grenades = new List<GrenadeTracker>();
+                foreach (var grenade in ActiveGrenades)
+                {
+                    if (grenade != null)
+                    {
+                        grenades.Add(grenade);
+                    }
+                }
+                ActiveGrenades.Clear();
+                if (grenades.Count > 0)
+                {
+                    var array = grenades.ToArray();
+                    grenades.Clear();
+                    System.Array.Sort(array, GrenadePositionComparerer);
+                    ActiveGrenades.AddRange(array);
+                }
+            }
+        }
+
+        public Vector3? GrenadeDangerPoint
+        {
+            get
+            {
+                if (ActiveGrenades.Count > 0)
+                {
+                    foreach (var tracker in ActiveGrenades)
+                    {
+                        if (tracker?.Grenade != null && tracker.CanReact)
+                        {
+                            return tracker.DangerPoint;
+                        }
+                    }
+                }
+                return null;
+            }
         }
 
         public void ExecuteThrow()
@@ -176,15 +214,34 @@ namespace SAIN.Classes
         {
             if (SAIN.BotActive && !SAIN.GameIsEnding)
             {
-                if (EnemyGrenadeHeard(grenade.transform.position, BotOwner.Transform.position, 12f))
-                {
-                    BotOwner.BewareGrenade.AddGrenadeDanger(dangerPoint, grenade);
-                }
-                else
-                {
-                    float reactionTime = GetReactionTime(SAIN.Info.DifficultyModifier);
-                    BotOwner.gameObject.AddComponent<GrenadeTracker>().Initialize(grenade, dangerPoint, reactionTime);
-                }
+                float reactionTime = GetReactionTime(SAIN.Info.DifficultyModifier);
+                var tracker = BotOwner.gameObject.AddComponent<GrenadeTracker>();
+                tracker.Initialize(grenade, dangerPoint, reactionTime);
+                ActiveGrenades.Add(tracker);
+            }
+        }
+
+        public List<GrenadeTracker> ActiveGrenades { get; private set; } = new List<GrenadeTracker>();
+
+        private int GrenadePositionComparerer(GrenadeTracker A, GrenadeTracker B)
+        {
+            if (A == null && B != null)
+            {
+                return 1;
+            }
+            else if (A != null && B == null)
+            {
+                return -1;
+            }
+            else if (A == null && B == null)
+            {
+                return 0;
+            }
+            else
+            {
+                float AMag = (BotPosition - A.DangerPoint).sqrMagnitude;
+                float BMag = (BotPosition - B.DangerPoint).sqrMagnitude;
+                return AMag.CompareTo(BMag);
             }
         }
 

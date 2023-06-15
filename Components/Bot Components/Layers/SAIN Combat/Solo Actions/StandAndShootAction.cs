@@ -18,14 +18,11 @@ namespace SAIN.Layers
             Shoot = new ShootClass(bot);
         }
 
-        private ShootClass Shoot;
-
-        private CoverStatus CurrentCoverPointStatus;
-        private CoverStatus CurrentFallBackStatus;
+        private readonly ShootClass Shoot;
 
         public override void Update()
         {
-            SAIN.Steering.Steer();
+            SAIN.Steering.SteerByPriority();
 
             if ((!Stopped && Time.time - StartTime > 1f) || SAIN.Cover.CheckLimbsForCover())
             {
@@ -44,17 +41,8 @@ namespace SAIN.Layers
             }
             else
             {
-                if (CurrentCoverPointStatus != CoverStatus.InCover && CurrentCoverPointStatus != CoverStatus.CloseToCover && CurrentFallBackStatus != CoverStatus.InCover && CurrentFallBackStatus != CoverStatus.CloseToCover)
-                {
-                    if (BotOwner.BotLay.CanProne && (BotOwner.Position - BotOwner.Memory.GoalEnemy.CurrPosition).magnitude > 20f)
-                    {
-                        BotOwner.BotLay.TryLay();
-                    }
-                    else
-                    {
-                        SAIN.Mover.SetTargetPose(0f);
-                    }
-                }
+                bool prone = SAIN.Mover.ShallProne(true);
+                SAIN.Mover.SetBotProne(prone);
             }
         }
 
@@ -68,8 +56,6 @@ namespace SAIN.Layers
         public override void Start()
         {
             StartTime = Time.time;
-            CurrentCoverPointStatus = SAIN.Cover.CoverPointStatus;
-            CurrentFallBackStatus = SAIN.Cover.FallBackPointStatus;
         }
 
         public override void Stop()

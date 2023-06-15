@@ -12,53 +12,69 @@ namespace SAIN.Classes
             Position = point;
             Collider = collider;
             TimeCreated = Time.time;
-            CalcPathLength();
+            ReCheckStatusTimer = Time.time;
+            PathLengthAtCreation = CalcPathLength();
         }
 
         public bool Spotted { get; set; }
 
-        public void CalcPathLength()
+        public float CalcPathLength()
         {
             NavMeshPath path = new NavMeshPath();
             if (NavMesh.CalculatePath(BotOwner.Position, Position, -1, path))
             {
-                PathLengthAtCreation = path.CalculatePathLength();
+                return path.CalculatePathLength();
             }
             else
             {
-                PathLengthAtCreation = Mathf.Infinity;
+                return Mathf.Infinity;
             }
         }
+
+        public float PathDistance { get; private set; }
 
         public float PathLengthAtCreation { get; private set; }
 
         public float Distance => (BotOwner.Position - Position).magnitude;
 
-        public CoverStatus Status()
+        public CoverStatus CoverStatus
         {
-            CoverStatus status = CoverStatus.None;
+            get
+            {
+                ReCheckStatusTimer += Time.deltaTime;
+                if (ReCheckStatusTimer < 0.33f)
+                {
+                    return OldStatus;
+                }
+                ReCheckStatusTimer = 0f;
 
-            float distance = Vector3.Distance(Position, BotOwner.Position);
+                CoverStatus status = CoverStatus.None;
 
-            if (distance <= InCoverDist)
-            {
-                status = CoverStatus.InCover;
-            }
-            else if (distance <= CloseCoverDist)
-            {
-                status = CoverStatus.CloseToCover;
-            }
-            else if (distance <= MidCoverDist)
-            {
-                status = CoverStatus.MidRangeToCover;
-            }
-            else if (distance <= FarCoverDist)
-            {
-                status = CoverStatus.FarFromCover;
-            }
+                PathDistance = CalcPathLength();
 
-            return status;
+                if (PathDistance <= InCoverDist)
+                {
+                    status = CoverStatus.InCover;
+                }
+                else if (PathDistance <= CloseCoverDist)
+                {
+                    status = CoverStatus.CloseToCover;
+                }
+                else if (PathDistance <= MidCoverDist)
+                {
+                    status = CoverStatus.MidRangeToCover;
+                }
+                else if (PathDistance <= FarCoverDist)
+                {
+                    status = CoverStatus.FarFromCover;
+                }
+                OldStatus = status;
+                return status;
+            }
         }
+
+        private CoverStatus OldStatus;
+        private float ReCheckStatusTimer;
 
         public BotOwner BotOwner { get; private set; }
         public Collider Collider { get; private set; }
