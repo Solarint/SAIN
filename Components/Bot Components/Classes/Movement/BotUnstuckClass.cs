@@ -74,13 +74,13 @@ namespace SAIN.Classes
             if (!BotIsMoving && CanBeStuckDecisions(decision))
             {
                 Vector3 botPos = BotOwner.Position;
-                botPos.y += 0.1f;
+                botPos.y += 0.4f;
                 Vector3 moveDir = BotOwner.Mover.DirCurPoint;
                 moveDir.y = 0;
                 Vector3 lookDir = BotOwner.LookDirection;
                 lookDir.y = 0;
 
-                var moveHits = Physics.RaycastAll(botPos, moveDir, 0.5f, LayerMaskClass.PlayerMask);
+                var moveHits = Physics.SphereCastAll(botPos, 0.15f, moveDir, 0.5f, LayerMaskClass.PlayerMask);
                 if (moveHits.Length > 0)
                 {
                     foreach (var move in moveHits)
@@ -93,7 +93,7 @@ namespace SAIN.Classes
                     }
                 }
 
-                var lookHits = Physics.RaycastAll(botPos, lookDir, 0.5f, LayerMaskClass.PlayerMask);
+                var lookHits = Physics.SphereCastAll(botPos, 0.15f, lookDir, 0.5f, LayerMaskClass.PlayerMask);
                 if (lookHits.Length > 0)
                 {
                     foreach (var look in lookHits)
@@ -114,10 +114,10 @@ namespace SAIN.Classes
             if (CanBeStuckDecisions(SAIN.CurrentDecision) && !BotIsMoving && !BotOwner.DoorOpener.Interacting && SAIN.Decision.TimeSinceChangeDecision > 0.5f)
             {
                 Vector3 botPos = BotOwner.Position;
-                botPos.y += 0.1f;
+                botPos.y += 0.4f;
                 Vector3 moveDir = BotOwner.Mover.DirCurPoint;
                 moveDir.y = 0;
-                if (Physics.Raycast(botPos, moveDir, out var hit, 0.25f, LayerMaskClass.HighPolyWithTerrainMask))
+                if (Physics.SphereCast(botPos, 0.15f, moveDir, out var hit, 0.25f, LayerMaskClass.HighPolyWithTerrainMask))
                 {
                     StuckHit = hit;
                     return true;

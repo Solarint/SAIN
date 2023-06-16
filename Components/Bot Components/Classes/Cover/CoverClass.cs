@@ -99,14 +99,15 @@ namespace SAIN.Classes
 
         public bool DuckInCover()
         {
-            if (BotIsAtCoverPoint)
+            var point = ActiveCoverPoint;
+            if (point != null)
             {
-                if (ActiveCoverPoint.Collider.bounds.size.y < 0.8f && BotOwner.BotLay.CanProne)
+                if (point.Collider.bounds.size.y < 0.7f && SAIN.Mover.ShallProneHide())
                 {
-                    SAIN.BotOwner.BotLay.TryLay();
+                    SAIN.Mover.SetBotProne(true);
                     return true;
                 }
-                if (ActiveCoverPoint.Collider.bounds.size.y < 1.5f)
+                if (point.Collider.bounds.size.y < 1.3f)
                 {
                     SAIN.Mover.SetTargetPose(0f);
                     return true;

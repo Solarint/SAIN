@@ -8,9 +8,13 @@ namespace SAIN
 {
     public abstract class SAINControl
     {
-        public SAINControl()
+        public void Awake()
         {
             BotController = GameWorld.GetOrAddComponent<SAINBotController>();
+        }
+
+        public SAINControl()
+        {
             Logger = BepInEx.Logging.Logger.CreateLogSource("SAIN Bot Controller");
         }
 

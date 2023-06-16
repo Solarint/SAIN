@@ -39,7 +39,11 @@ namespace SAIN.Components
 
         private void Awake()
         {
-            CoverManager = new CoverManager();
+            TimeClass.Awake();
+            LineOfSightManager.Awake();
+            CoverManager.Awake();
+            PathManager.Awake();
+
             Singleton<GClass629>.Instance.OnGrenadeThrow += GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive += GrenadeExplosion;
         }

@@ -141,7 +141,7 @@ namespace SAIN.Classes
                     TargetPosition = SAIN.CurrentTargetPosition;
                     if (TargetPosition != null)
                     {
-                        //GoToPoint(TargetPosition.Value, false);
+                        GoToPoint(TargetPosition.Value, false);
                     }
                 }
                 return true;
@@ -189,7 +189,7 @@ namespace SAIN.Classes
 
             Reset();
 
-            if (NavMesh.SamplePosition(point, out var hit, 0.5f, -1))
+            if (NavMesh.SamplePosition(point, out var hit, 10f, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
                 if (NavMesh.CalculatePath(BotOwner.Position, hit.position, -1, Path))
@@ -240,7 +240,7 @@ namespace SAIN.Classes
                 return Path.status;
             }
 
-            Logger.LogError($"Couldn't Find NavMesh at source");
+            Logger.LogError($"Couldn't Find NavMesh at Point {point}");
             return NavMeshPathStatus.PathInvalid;
         }
 
@@ -335,7 +335,7 @@ namespace SAIN.Classes
                 default:
                     num = 0f; break;
             }
-            BotOwner.GetPlayer.SlowLean(num);
+            SAIN.Mover.SlowLean(num);
         }
 
         public bool BotIsAtPoint(Vector3 point, float reachDist = 1f, bool Sqr = true)
