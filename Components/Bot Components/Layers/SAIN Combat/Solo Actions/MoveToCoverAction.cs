@@ -79,11 +79,11 @@ namespace SAIN.Layers
             if (Sprint && SAIN.Mover.CanSprint)
             {
                 float distance = (DestinationPosition - SAIN.Position).magnitude;
-                if (distance < 0.5f)
+                if (distance < 1.5f)
                 {
                     FarFromCover = false;
                 }
-                else if (distance > 1f)
+                else if (distance > 3f)
                 {
                     FarFromCover = true;
                 }

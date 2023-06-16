@@ -17,14 +17,12 @@ namespace SAIN.Components
     {
         public LineOfSightManager()
         {
-
         }
 
         private float SpherecastRadius = 0.05f;
         private LayerMask SightLayers => LayerMaskClass.HighPolyWithTerrainMask;
         private int MinJobSize = 1;
         private List<Player> RegisteredPlayers => Singleton<GameWorld>.Instance.RegisteredPlayers;
-        private List<SAINComponent> SAINComponentsList => BotController.SAINBots.Values.ToList();
 
         private int Frames = 0;
 
@@ -71,7 +69,7 @@ namespace SAIN.Components
         private void EnemyRaycastJob()
         {
             List<SAINComponent> botsWithEnemy = new List<SAINComponent>();
-            foreach (var bot in SAINComponentsList)
+            foreach (var bot in BotController.SAINBots.Values)
             {
                 if (bot.Enemy != null)
                 {
@@ -183,19 +181,21 @@ namespace SAIN.Components
         private void GlobalRaycastJob()
         {
             NativeArray<SpherecastCommand> allSpherecastCommands = new NativeArray<SpherecastCommand>(
-                SAINComponentsList.Count * RegisteredPlayers.Count,
+                BotController.SAINBots.Values.Count * RegisteredPlayers.Count,
                 Allocator.TempJob
             );
             NativeArray<RaycastHit> allRaycastHits = new NativeArray<RaycastHit>(
-                SAINComponentsList.Count * RegisteredPlayers.Count,
+                BotController.SAINBots.Values.Count * RegisteredPlayers.Count,
                 Allocator.TempJob
             );
 
             int currentIndex = 0;
 
-            for (int i = 0; i < SAINComponentsList.Count; i++)
+            var list = BotController.SAINBots.Values.ToList();
+
+            for (int i = 0; i < list.Count; i++)
             {
-                var bot = SAINComponentsList[i];
+                var bot = list[i];
                 Vector3 head = HeadPos(bot.BotOwner.GetPlayer);
 
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
@@ -225,10 +225,10 @@ namespace SAIN.Components
             int visiblecount = 0;
             spherecastJob.Complete();
 
-            for (int i = 0; i < SAINComponentsList.Count; i++)
+            for (int i = 0; i < list.Count; i++)
             {
                 int startIndex = i * RegisteredPlayers.Count;
-                var visiblePlayers = SAINComponentsList[i].VisiblePlayers;
+                var visiblePlayers = list[i].VisiblePlayers;
 
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
                 {

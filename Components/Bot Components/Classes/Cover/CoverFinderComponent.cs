@@ -1,6 +1,5 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using EFT.Interactive;
 using SAIN.Helpers;
 using SAIN.Classes;
 using System.Collections;
@@ -8,7 +7,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.CoverConfig;
-using System.Linq;
 
 namespace SAIN.Components
 {
@@ -316,8 +314,19 @@ namespace SAIN.Components
             for (int i = 0; i < CoverPoints.Count; i++)
             {
                 var point = CoverPoints[i];
-                float sqrMag = (point.Collider.transform.position - OriginPoint).sqrMagnitude;
-                if (sqrMag <= 2500f && CheckCollider(point.Collider, out var point2))
+                Vector3 coverPos = point.Collider.transform.position;
+                BotOwner Leader = SAIN.Squad.Leader;
+                if (Leader != null && !Leader.IsDead)
+                {
+                    float leadDist = (point.Position - Leader.Position).sqrMagnitude;
+                    if (leadDist > 1600f)
+                    {
+                        continue;
+                    }
+                }
+
+                float sqrMag = (point.Position - OriginPoint).sqrMagnitude;
+                if (sqrMag <= 2500 && CheckCollider(point.Collider, out var point2))
                 {
                     checkedPoints.Add(point2);
                 }
@@ -344,6 +353,16 @@ namespace SAIN.Components
             if (SAIN.Squad.SquadLocations == null || SAIN.Squad.SquadMembers == null || SAIN.Squad.SquadMembers.Count < 2)
             {
                 return true;
+            }
+
+            BotOwner Leader = SAIN.Squad.Leader;
+            if (Leader != null && !Leader.IsDead)
+            {
+                float leadDist = (position - Leader.Position).sqrMagnitude;
+                if (leadDist > 1600f)
+                {
+                    return false;
+                }
             }
 
             const float DistanceToBotCoverThresh = 1f;

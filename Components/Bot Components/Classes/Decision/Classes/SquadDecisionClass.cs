@@ -54,7 +54,7 @@ namespace SAIN.Classes
                     {
                         if (HasRadioComms && (SAIN.Position - member.Position).sqrMagnitude > 900f)
                         {
-                            return false;
+                            continue;
                         }
 
                         if (StartHelp(member))
@@ -182,45 +182,11 @@ namespace SAIN.Classes
                 }
                 else
                 {
-                    return leadDistance > 30f;
+                    return leadDistance > 40f;
                 }
             }
             return false;
         }
-
-        private void Update()
-        {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
-            {
-                return;
-            }
-
-            if (!SAIN.Squad.BotInGroup)
-            {
-                return;
-            }
-
-            if (UpdateTimer < Time.time)
-            {
-                UpdateTimer = Time.time + 0.25f;
-
-                UpdateMembers();
-
-                if (UpdateVisibleTimer < Time.time)
-                {
-                    UpdateVisibleTimer = Time.time + 1f;
-
-                    UpdateVisibleMembers();
-                }
-
-                UpdateVisibleEnemies();
-
-                GetSquadDecision();
-            }
-        }
-
-        private float UpdateTimer = 0f;
-        private float UpdateVisibleTimer = 0f;
 
         private SAINSquadDecision GetSquadDecision()
         {
