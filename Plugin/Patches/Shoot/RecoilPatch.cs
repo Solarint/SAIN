@@ -48,8 +48,12 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(ref Vector3 ___vector3_0, ref BotOwner ___botOwner_0, ref float ___float_0)
         {
-            var stats = ___botOwner_0.GetComponent<SAINComponent>().Info.WeaponInfo;
-            float modifier = stats.FinalModifier;
+            float modifier = 1f;
+            var stats = ___botOwner_0.GetComponent<SAINComponent>()?.Info?.WeaponInfo;
+            if (stats != null)
+            {
+                modifier = stats.FinalModifier;
+            }
 
             Vector3 recoilVector;
             if (___float_0 < Time.time)
