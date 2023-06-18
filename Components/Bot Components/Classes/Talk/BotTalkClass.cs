@@ -25,6 +25,11 @@ namespace SAIN.Classes
             {
                 ETagStatus mask = SetETagMask(additionalMask);
                 CheckPhrase(type, mask);
+                if (BotOwner.BotsGroup.GroupTalk.CanSay(BotOwner, type) || type == EPhraseTrigger.OnAgony || type == EPhraseTrigger.OnBeingHurt || type == EPhraseTrigger.OnDeath)
+                {
+                    //ETagStatus mask = SetETagMask(additionalMask);
+                    //CheckPhrase(type, mask);
+                }
             }
         }
 
@@ -253,16 +258,16 @@ namespace SAIN.Classes
 
         private void PhraseObjectsAdd()
         {
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnGoodWork, 1, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnGoodWork, 1, 60f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnBreath, 3, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.EnemyHit, 4, 3f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Rat, 5, 120f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnMutter, 6, 20f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyDown, 7, 10f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyConversation, 8, 30f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.GoForward, 9, 30f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Gogogo, 10, 30f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Going, 11, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.GoForward, 9, 40f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Gogogo, 10, 40f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Going, 11, 60f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnFight, 12, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyShot, 13, 3f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnLostVisual, 14, 10f));
@@ -280,8 +285,8 @@ namespace SAIN.Classes
             Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtNearDeath, 26, 20f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnFriendlyDown, 27, 10f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.FriendlyFire, 28, 2f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.NeedHelp, 29, 20f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.GetInCover, 30, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.NeedHelp, 29, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.GetInCover, 30, 40f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LeftFlank, 31, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.RightFlank, 32, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.NeedWeapon, 33, 15f));
@@ -293,21 +298,23 @@ namespace SAIN.Classes
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnAgony, 39, 1f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnDeath, 40, 1f));
 
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnSix, 15, 5f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Regroup, 10, 90f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnSix, 15, 10f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.InTheFront, 15, 20f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.FollowMe, 15, 30f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.HoldPosition, 6, 40f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Suppress, 20, 20f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Roger, 10, 8f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Negative, 10, 8f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.FollowMe, 15, 45f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.HoldPosition, 6, 60f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Suppress, 20, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Roger, 10, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Negative, 10, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.PhraseNone, 1, 1f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Attention, 25, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Attention, 25, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnYourOwn, 25, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Repeat, 25, 15f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.CoverMe, 25, 20f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.CoverMe, 25, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.NoisePhrase, 5, 120f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.UnderFire, 34, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.MumblePhrase, 10, 35f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.GetBack, 10, 40f));
 
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LootBody, 5, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LootContainer, 5, 30f));

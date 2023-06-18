@@ -4,13 +4,13 @@ using SAIN.UserSettings;
 using System;
 using System.Collections.Generic;
 using SAIN.Components;
-using Comfort.Common;
 using EFT;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN
 {
     [BepInPlugin("me.sol.sain", "SAIN AI Beta 2", "2.0")]
-    [BepInDependency("xyz.drakia.bigbrain", "0.1.2")]
+    [BepInDependency("xyz.drakia.bigbrain", "0.1.3")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
     {
@@ -23,7 +23,7 @@ namespace SAIN
 
             ConfigInit();
             EFTPatches.Init();
-            BigBrainLayers.Init();
+            BigBrainSAIN.Init();
         }
 
         private void ConfigInit()
@@ -42,7 +42,7 @@ namespace SAIN
             BotControllerHandler.Update();
         }
 
-        public static List<string> SAINLayers => BigBrainLayers.SAINLayers;
+        public static List<string> SAINLayers => BigBrainSAIN.SAINLayers;
         public static SAINBotController BotController => BotControllerHandler.BotController;
     }
 }

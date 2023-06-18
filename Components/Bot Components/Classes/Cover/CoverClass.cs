@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Components;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -12,6 +13,16 @@ namespace SAIN.Classes
         {
             CoverFinder = BotOwner.GetOrAddComponent<CoverFinderComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            SAIN.Player.BeingHitAction += OnBeingHit;
+        }
+
+        private void OnBeingHit(DamageInfo damage, EBodyPart part, float unused)
+        {
+            CoverPoint activePoint = CoverInUse;
+            if (activePoint != null && activePoint.BotIsHere)
+            {
+                activePoint.Spotted = true;
+            }
         }
 
         public void Update()
@@ -21,7 +32,7 @@ namespace SAIN.Classes
                 CoverFinder.StopLooking();
                 return;
             }
-            if ((SAIN.HasGoalEnemy || SAIN.HasGoalTarget))
+            if (SAIN.Enemy != null || BotOwner.Memory.GoalTarget.HaveMainTarget())
             {
                 if (GetPointToHideFrom(out var target))
                 {
@@ -34,13 +45,27 @@ namespace SAIN.Classes
             }
         }
 
+        public void Dispose()
+        {
+            SAIN.Player.BeingHitAction -= OnBeingHit;
+        }
+
         public CoverPoint ClosestPoint
         {
             get
             {
-                if (CoverFinder.CoverPoints.Count > 0)
+                var points = CoverPoints;
+                if (points.Count == 1)
                 {
-                    return CoverFinder.CoverPoints[0];
+                    return points.First();
+                }
+                if (points.Count > 0)
+                {
+                    var pointsArray = points.ToArray();
+                    System.Array.Sort(pointsArray, CoverFinder.CoverPointPathComparerer);
+                    CoverPoints.Clear();
+                    CoverPoints.AddRange(pointsArray);
+                    return CoverPoints.First();
                 }
                 return null;
             }
@@ -50,11 +75,11 @@ namespace SAIN.Classes
         {
             get
             {
-                if (CoverFinder.CoverPoints.Count == 1)
+                if (CoverPoints.Count == 1)
                 {
-                    return CoverFinder.CoverPoints.First();
+                    return CoverPoints.First();
                 }
-                if (CoverFinder.CoverPoints.Count > 1)
+                if (CoverPoints.Count > 1)
                 {
                     var points = CoverFinder.CoverPoints.ToArray();
                     System.Array.Sort(points, CoverPointEnemyComparerer);
@@ -99,17 +124,18 @@ namespace SAIN.Classes
 
         public bool DuckInCover()
         {
-            var point = ActiveCoverPoint;
+            var point = CoverInUse;
             if (point != null)
             {
-                if (point.Collider.bounds.size.y < 0.7f && SAIN.Mover.ShallProneHide())
+                var move = SAIN.Mover;
+                var prone = move.Prone;
+                if (point.Collider.bounds.size.y < 0.7f && prone.ShallProneHide())
                 {
-                    SAIN.Mover.SetBotProne(true);
+                    prone.SetProne(true);
                     return true;
                 }
-                if (point.Collider.bounds.size.y < 1.3f)
+                if (move.Pose.SetPoseToCover())
                 {
-                    SAIN.Mover.SetTargetPose(0f);
                     return true;
                 }
             }
@@ -153,29 +179,42 @@ namespace SAIN.Classes
             return Physics.Raycast(position, direction, dist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
-        public bool BotIsAtCoverPoint => ActiveCoverPoint != null;
-        public CoverPoint ActiveCoverPoint
+        public bool BotIsAtCoverPoint
         {
             get
             {
-                foreach (var point in CoverFinder.CoverPoints)
+                var point = CoverInUse;
+                return point != null && point.BotIsHere;
+            }
+        }
+
+        public bool BotIsMovingToPoint
+        {
+            get
+            {
+                var point = CoverInUse;
+                return point != null && (point.Position - BotOwner.Mover.CurPathLastPoint).sqrMagnitude < 1f;
+            }
+        }
+
+        public CoverPoint CoverInUse
+        {
+            get
+            {
+                foreach (var point in CoverPoints)
                 {
-                    if (point != null)
+                    if (point != null && point.BotIsUsingThis)
                     {
-                        if (point.CoverStatus == CoverStatus.InCover)
-                        {
-                            return point;
-                        }
+                        return point;
                     }
                 }
                 return null;
             }
         }
 
+        public List<CoverPoint> CoverPoints => CoverFinder.CoverPoints;
         public CoverFinderComponent CoverFinder { get; private set; }
-
         public CoverPoint CurrentCoverPoint => ClosestPoint;
-
         public CoverPoint CurrentFallBackPoint => ClosestPoint;
 
         protected ManualLogSource Logger;

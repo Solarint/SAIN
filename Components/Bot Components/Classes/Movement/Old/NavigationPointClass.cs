@@ -53,8 +53,6 @@ namespace SAIN.Classes
 
         public void Update( float targetSpeed = 1f, float targetPose = 1f )
         {
-            SAIN.Mover.SetTargetMoveSpeed(targetSpeed);
-            SAIN.Mover.SetTargetPose(targetPose);
             BotOwner.DoorOpener.Update();
         }
 

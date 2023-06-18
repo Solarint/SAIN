@@ -38,14 +38,15 @@ namespace SAIN
 
         private static void MovementPatches()
         {
+            new Patches.Movement.SteerDisablePatch().Enable();
             new Patches.Movement.StopMoveDisable().Enable();
             new Patches.Movement.KickPatch().Enable();
             new Patches.Movement.SprintDisable().Enable();
             new Patches.Movement.BotRunDisable().Enable();
             new Patches.Movement.TargetSpeedDisable1().Enable();
             new Patches.Movement.TargetSpeedDisable2().Enable();
-            new Patches.Movement.SetPoseDisable1().Enable();
-            new Patches.Movement.SetPoseDisable2().Enable();
+            //new Patches.Movement.SetPoseDisable1().Enable();
+            //new Patches.Movement.SetPoseDisable2().Enable();
             //new Patches.Movement.HoldOrCoverDisable1().Enable();
             //new Patches.Movement.HoldOrCoverDisable2().Enable();
         }

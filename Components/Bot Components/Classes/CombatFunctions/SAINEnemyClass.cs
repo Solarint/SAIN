@@ -79,46 +79,6 @@ namespace SAIN.Classes
             UpdatePath();
         }
 
-        private float RayCastFreq
-        {
-            get
-            {
-                const float CloseCap = 10f;
-                const float FarCap = 90f;
-                const float baseTime = 0.1f;
-                const float baseTimeAdd = 0.1f;
-                const float maxTime = 0.33f;
-
-                float distance = DistanceFromLastSeen;
-
-                float clampedClose = Mathf.Clamp(distance, 0f, CloseCap);
-                float scaled = clampedClose / CloseCap;
-                scaled *= baseTimeAdd;
-                scaled += baseTime;
-
-                float result = scaled;
-
-                if (distance > CloseCap)
-                {
-                    float clampedFar = Mathf.Clamp(distance - CloseCap, 0f, FarCap);
-                    float farScale = clampedFar / FarCap;
-                    farScale *= baseTimeAdd;
-                    result += farScale;
-                }
-
-                float clampedResult = Mathf.Clamp(result, 0f, maxTime);
-
-                if (DebugTimer < Time.time && DebugVision.Value && Person.GetPlayer.ProfileId == SAINBotController.MainPlayer.ProfileId)
-                {
-                    DebugTimer = Time.time + 1f;
-                    Logger.LogDebug($"RayCast Frequency result: [{clampedResult}]");
-                }
-                return clampedResult;
-            }
-        }
-
-        private float DebugTimer = 0f;
-
         private void UpdateDistance()
         {
             if (DistanceTimer < Time.time)
@@ -176,12 +136,12 @@ namespace SAIN.Classes
 
         private void UpdateVisible(bool inLineOfSight)
         {
+            CanShoot = inLineOfSight;
             InLineOfSight = inLineOfSight;
 
             bool visible = GoalEnemy != null
                 && BotOwner.LookSensor.IsPointInVisibleSector(GoalEnemy.CurrPosition)
                 && GoalEnemy.IsVisible == true
-                && GoalEnemy.CanShoot == true
                 && inLineOfSight;
 
             bool wasVisible = IsVisible;
@@ -221,65 +181,6 @@ namespace SAIN.Classes
             EnemyClose = close;
             CanHearCloseVisible = canHear;
             EnemyComponent?.UpdateVisible(SAIN.ProfileId, IsVisible, EnemyClose, CanHearCloseVisible);
-        }
-
-        private bool RayCastBodyParts()
-        {
-            Vector3 HeadPosition = BotOwner.LookSensor._headPoint;
-            float distance = (Person.Position - BotOwner.Position).magnitude;
-            float maxDistance = BotOwner.Settings.Current.CurrentVisibleDistance;
-
-            if (distance >= maxDistance)
-            {
-                return false;
-            }
-
-            var NoFoliageMask = LayerMaskClass.HighPolyWithTerrainMask;
-            var FoliageMask = LayerMaskClass.HighPolyWithTerrainMaskAI;
-            LayerMask Mask = distance < 5f ? NoFoliageMask : FoliageMask;
-
-            foreach (var part in Person.MainParts.Values)
-            {
-                Vector3 partPos = part.Position;
-                Vector3 Direction = partPos - HeadPosition;
-                float visionCap = Mathf.Clamp(Direction.magnitude, 0f, BotOwner.Settings.Current.CurrentVisibleDistance);
-                if (!Physics.Raycast(HeadPosition, Direction, out var hit, visionCap, Mask))
-                {
-                    var weapon = BotOwner.WeaponRoot.position;
-                    Direction = partPos - weapon;
-                    CanShoot = !Physics.Raycast(weapon, Direction, Direction.magnitude, Mask);
-
-                    if (DebugVision.Value && Mask == NoFoliageMask)
-                    {
-                        DebugGizmos.SingleObjects.Line(HeadPosition, EnemyChestPosition, Color.red, 0.01f, true, 1f, true);
-                        Logger.LogDebug($"[{BotOwner.name}] can see through foliage because distance < 5f");
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    if (Mask == LayerMaskClass.HighPolyWithTerrainMaskAI)
-                    {
-                        Vector3 hitPos = hit.point;
-                        Vector3 hitToTarget = part.Position - hitPos;
-                        if (hitToTarget.magnitude < 1f)
-                        {
-                            if (!Physics.Raycast(HeadPosition, Direction, Direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                            {
-                                if (DebugVision.Value)
-                                {
-                                    DebugGizmos.SingleObjects.Line(HeadPosition, EnemyChestPosition, Color.red, 0.01f, true, 1f, true);
-                                    Logger.LogDebug($"[{BotOwner.name}] can see through foliage because distance < 1f");
-                                }
-
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
         }
 
         public void UpdatePath()
@@ -358,8 +259,6 @@ namespace SAIN.Classes
         public bool IsVisible { get; private set; }
 
         public bool CanShoot { get; private set; }
-
-        private float CheckVisibleTimer = 0f;
     }
 
     public class GroupMemberComponent : MonoBehaviour

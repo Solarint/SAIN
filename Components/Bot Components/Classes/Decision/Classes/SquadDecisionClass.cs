@@ -48,15 +48,14 @@ namespace SAIN.Classes
                 {
                     continue;
                 }
+                if (!HasRadioComms && (SAIN.Position - member.Position).sqrMagnitude > 1200f)
+                {
+                    continue;
+                }
                 if (SAIN.HasEnemy && member.HasEnemy)
                 {
                     if (SAIN.Enemy.Person == member.Enemy.Person)
                     {
-                        if (HasRadioComms && (SAIN.Position - member.Position).sqrMagnitude > 900f)
-                        {
-                            continue;
-                        }
-
                         if (StartHelp(member))
                         {
                             Decision = SAINSquadDecision.Help;
@@ -150,7 +149,7 @@ namespace SAIN.Classes
             var enemy = SAIN.Enemy;
             if (enemy != null)
             {
-                if (enemy.IsVisible || (enemy.Seen && enemy.TimeSinceSeen < 20f))
+                if (enemy.IsVisible || (enemy.Seen && enemy.TimeSinceSeen < 60f))
                 {
                     return false;
                 }
@@ -178,11 +177,11 @@ namespace SAIN.Classes
                 }
                 if (SquadDecision == SAINSquadDecision.Regroup)
                 {
-                    return leadDistance > 10f;
+                    return leadDistance > 15f;
                 }
                 else
                 {
-                    return leadDistance > 40f;
+                    return leadDistance > 50f;
                 }
             }
             return false;

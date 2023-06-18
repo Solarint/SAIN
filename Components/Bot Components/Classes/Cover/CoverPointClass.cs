@@ -1,4 +1,5 @@
 ﻿using EFT;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -14,7 +15,14 @@ namespace SAIN.Classes
             TimeCreated = Time.time;
             ReCheckStatusTimer = Time.time;
             PathLengthAtCreation = CalcPathLength();
+            Id = Guid.NewGuid().ToString();
         }
+
+        public string Id { get; set; }
+
+        public bool BotIsUsingThis { get; set; }
+
+        public bool BotIsHere => BotIsUsingThis && Distance < 1f && !Spotted;
 
         public bool Spotted { get; set; }
 

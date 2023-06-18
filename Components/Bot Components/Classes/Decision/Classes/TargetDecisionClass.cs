@@ -8,36 +8,44 @@ namespace SAIN.Classes
     {
         public TargetDecisionClass(BotOwner bot) : base(bot) { }
 
+        public float FoundTargetTimer;
+
         public bool GetDecision(out SAINSoloDecision Decision)
         {
             Decision = SAINSoloDecision.None;
 
-            if (!SAIN.HasGoalTarget)
+            if (!BotOwner.Memory.GoalTarget.HaveMainTarget())
             {
+                FoundTargetTimer = -1f;
                 return false;
+            }
+            else
+            {
+                if (FoundTargetTimer < 0f)
+                {
+                    FoundTargetTimer = Time.time;
+                }
             }
 
             if (StartInvestigate())
             {
                 Decision = SAINSoloDecision.Investigate;
-                return true;
             }
-
-            var realTarget = BotOwner.Memory.GoalTarget.GoalTarget;
-            if (realTarget?.Position != null)
+            else if (BotOwner.Memory.IsUnderFire)
             {
-                if (BotOwner.Memory.IsUnderFire)
-                {
-                    Decision = SAINSoloDecision.RunForCover;
-                }
-                else if (StartSearch())
-                {
-                    Decision = SAINSoloDecision.Search;
-                }
-                else
-                {
-                    Decision = SAINSoloDecision.MoveToCover;
-                }
+                Decision = SAINSoloDecision.RunToCover;
+            }
+            else if (StartSearch())
+            {
+                Decision = SAINSoloDecision.Search;
+            }
+            else if (SAIN.Cover.CoverInUse == null)
+            {
+                Decision = SAINSoloDecision.WalkToCover;
+            }
+            else
+            {
+                Decision = SAINSoloDecision.HoldInCover;
             }
 
             return Decision != SAINSoloDecision.None;
@@ -62,7 +70,7 @@ namespace SAIN.Classes
 
         private bool StartSearch()
         {
-            return Time.time - BotOwner.Memory.GoalTarget?.CreatedTime > SAIN.Info.TimeBeforeSearch;
+            return Time.time - FoundTargetTimer > SAIN.Info.TimeBeforeSearch;
         }
     }
 }

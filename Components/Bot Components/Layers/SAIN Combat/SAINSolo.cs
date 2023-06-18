@@ -28,27 +28,38 @@ namespace SAIN.Layers
             var SelfDecision = SAIN.Decision.SelfDecision;
             switch (Decision)
             {
-                case SAINSoloDecision.Retreat:
-                    nextAction = new Action(typeof(MoveToCoverAction), $"{Decision} + {SelfDecision}");
+                case SAINSoloDecision.ThrowGrenade:
+                    nextAction = new Action(typeof(ThrowGrenade), $"{Decision}");
                     break;
 
-                case SAINSoloDecision.RunForCover:
-                case SAINSoloDecision.MoveToCover:
+                case SAINSoloDecision.ShiftCover:
+                    nextAction = new Action(typeof(ShiftCover), $"{Decision}");
+                    break;
+
+                case SAINSoloDecision.RunToCover:
+                    nextAction = new Action(typeof(RunToCover), $"{Decision}");
+                    break;
+
+                case SAINSoloDecision.Retreat:
+                    nextAction = new Action(typeof(RunToCover), $"{Decision} + {SelfDecision}");
+                    break;
+
+                case SAINSoloDecision.WalkToCover:
                 case SAINSoloDecision.UnstuckMoveToCover:
-                    nextAction = new Action(typeof(MoveToCoverAction), $"{Decision}");
+                    nextAction = new Action(typeof(WalkToCover), $"{Decision}");
                     break;
 
                 case SAINSoloDecision.DogFight:
                 case SAINSoloDecision.UnstuckDogFight:
-                    nextAction = new Action(typeof(DogfightAction), $"{Decision}");
-                    break;
-
-                case SAINSoloDecision.HoldInCover:
-                    nextAction = new Action(typeof(StandAndShootAction), $"{Decision}");
+                    nextAction = new Action(typeof(DogFight), $"{Decision}");
                     break;
 
                 case SAINSoloDecision.StandAndShoot:
-                    nextAction = new Action(typeof(HoldInCoverAction), $"{Decision}");
+                    nextAction = new Action(typeof(StandAndShoot), $"{Decision}");
+                    break;
+
+                case SAINSoloDecision.HoldInCover:
+                    nextAction = new Action(typeof(HoldinCover), $"{Decision}");
                     break;
 
                 case SAINSoloDecision.Shoot:
@@ -65,14 +76,14 @@ namespace SAIN.Layers
                     break;
 
                 default:
-                    nextAction = new Action(typeof(MoveToCoverAction), $"DEFAULT!");
+                    nextAction = new Action(typeof(WalkToCover), $"DEFAULT!");
                     break;
             }
 
             if (nextAction == null)
             {
                 Logger.LogError("Action Null?");
-                nextAction = new Action(typeof(MoveToCoverAction), $"DEFAULT!");
+                nextAction = new Action(typeof(WalkToCover), $"DEFAULT!");
             }
 
             LastActionDecision = Decision;

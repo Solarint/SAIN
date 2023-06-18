@@ -1,39 +1,36 @@
 ﻿using BepInEx.Logging;
+using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using EFT.InventoryLogic;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
-    public class StandAndShootAction : CustomLogic
+    public class ThrowGrenade : CustomLogic
     {
-        public StandAndShootAction(BotOwner bot) : base(bot)
+        public ThrowGrenade(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            Shoot = new ShootClass(bot);
         }
-
-        private readonly ShootClass Shoot;
 
         public override void Update()
         {
-            SAIN.Steering.SteerByPriority();
-
             if ((!Stopped && Time.time - StartTime > 1f) || SAIN.Cover.CheckLimbsForCover())
             {
                 Stopped = true;
                 BotOwner.StopMove();
             }
 
-            if (SAIN.Enemy?.IsVisible == true)
-            {
-                Shoot.Update();
-            }
+            ExecuteThrow();
 
             if (SAIN.Cover.BotIsAtCoverPoint)
             {
@@ -41,9 +38,16 @@ namespace SAIN.Layers
             }
             else
             {
-                bool prone = SAIN.Mover.ShallProne(true);
-                SAIN.Mover.SetBotProne(prone);
+                bool prone = SAIN.Mover.Prone.ShallProne(true);
+                SAIN.Mover.Prone.SetProne(prone);
             }
+        }
+
+
+        public void ExecuteThrow()
+        {
+            BotOwner.WeaponManager.Grenades.DoThrow();
+            SAIN.Talk.Say(EPhraseTrigger.OnGrenade);
         }
 
         private readonly SAINComponent SAIN;

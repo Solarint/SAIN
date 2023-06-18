@@ -29,7 +29,7 @@ namespace SAIN.Layers
                 {
                     SAIN.Steering.SteerByPriority();
                     MovePos = Sound.Position;
-                    SAIN.Mover.GoToPoint(MovePos, false, false);
+                    SAIN.Mover.GoToPoint(MovePos);
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace SAIN.Layers
                 Shoot.Update();
                 if (SAIN.CurrentTargetPosition != null)
                 {
-                    SAIN.Mover.GoToPoint(SAIN.CurrentTargetPosition.Value, false, false);
+                    SAIN.Mover.GoToPoint(SAIN.                    CurrentTargetPosition.Value);
                 }
             }
         }

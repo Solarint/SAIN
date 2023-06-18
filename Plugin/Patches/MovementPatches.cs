@@ -63,47 +63,13 @@ namespace SAIN.Patches.Movement
         protected override MethodBase GetTargetMethod()
         {
             var SteeringProp = AccessTools.Property(typeof(BotOwner), "Steering");
-            return AccessTools.Method(SteeringProp.PropertyType, "method_1");
+            return AccessTools.Method(SteeringProp.PropertyType, "ManualFixedUpdate");
         }
 
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            string layer = ___botOwner_0.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                return false;
-            }
-            return true;
-        }
-    }
-    public class HoldOrCoverDisable1 : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(GClass29), "HoldOrCover");
-        }
-
-        [PatchPrefix]
-        public static bool PatchPrefix(ref BotLogicDecision __result)
-        {
-            __result = BotLogicDecision.holdPosition;
-            return false;
-        }
-    }
-
-    public class HoldOrCoverDisable2 : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(GClass29), "HoldOrCoverRun");
-        }
-
-        [PatchPrefix]
-        public static bool PatchPrefix(ref BotLogicDecision __result)
-        {
-            __result = BotLogicDecision.holdPosition;
-            return false;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(___botOwner_0);
         }
     }
 
@@ -117,12 +83,7 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            string layer = ___botOwner_0.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                return false;
-            }
-            return true;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(___botOwner_0);
         }
     }
 
@@ -136,12 +97,7 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            string layer = ___botOwner_0.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                return false;
-            }
-            return true;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(___botOwner_0);
         }
     }
 
@@ -155,13 +111,7 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner __instance)
         {
-            string layer = __instance.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                //Logger.LogWarning(Environment.StackTrace);
-                return false;
-            }
-            return true;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(__instance);
         }
     }
 
@@ -175,12 +125,7 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            string layer = ___botOwner_0.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                return false;
-            }
-            return true;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(___botOwner_0);
         }
     }
 
@@ -194,12 +139,7 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            string layer = ___botOwner_0.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                return false;
-            }
-            return true;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(___botOwner_0);
         }
     }
 
@@ -213,12 +153,7 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            string layer = ___botOwner_0.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                return false;
-            }
-            return true;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(___botOwner_0);
         }
     }
 
@@ -232,12 +167,7 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0)
         {
-            string layer = ___botOwner_0.Brain.ActiveLayerName();
-            if (SAINPlugin.SAINLayers.Contains(layer))
-            {
-                return false;
-            }
-            return true;
+            return !BigBrainSAIN.IsBotUsingSAINLayer(___botOwner_0);
         }
     }
 }

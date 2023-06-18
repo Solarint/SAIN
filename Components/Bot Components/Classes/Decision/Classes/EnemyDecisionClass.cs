@@ -22,6 +22,10 @@ namespace SAIN.Classes
             {
                 Decision = SAINSoloDecision.DogFight;
             }
+            else if (StartThrowNade())
+            {
+                Decision = SAINSoloDecision.ThrowGrenade;
+            }
             else if (StartStandAndShoot())
             {
                 Decision = SAINSoloDecision.StandAndShoot;
@@ -30,17 +34,21 @@ namespace SAIN.Classes
             {
                 Decision = SAINSoloDecision.Search;
             }
+            else if (StartShiftCover())
+            {
+                Decision = SAINSoloDecision.ShiftCover;
+            }
             else if (StartHoldInCover())
             {
                 Decision = SAINSoloDecision.HoldInCover;
             }
             else if (StartMoveToCover())
             {
-                Decision = SAINSoloDecision.MoveToCover;
+                Decision = SAINSoloDecision.WalkToCover;
 
                 if (StartRunForCover())
                 {
-                    Decision = SAINSoloDecision.RunForCover;
+                    Decision = SAINSoloDecision.RunToCover;
                 }
             }
             else
@@ -48,7 +56,7 @@ namespace SAIN.Classes
                 Decision = SAINSoloDecision.Shoot;
             }
 
-            if (Decision != SAINSoloDecision.MoveToCover && Decision != SAINSoloDecision.RunForCover)
+            if (Decision != SAINSoloDecision.WalkToCover && Decision != SAINSoloDecision.RunToCover)
             {
                 StartRunCoverTimer = 0f;
             }
@@ -56,10 +64,107 @@ namespace SAIN.Classes
             return true;
         }
 
+        private bool StartShiftCover()
+        {
+            if (ContinueShiftCover())
+            {
+                return true;
+            }
+
+            if (CurrentDecision == SAINSoloDecision.HoldInCover)
+            {
+                if (SAIN.Decision.TimeSinceChangeDecision > 3f)
+                {
+                    var enemy = SAIN.Enemy;
+                    if (enemy != null && enemy.Seen && !enemy.IsVisible && enemy.TimeSinceSeen > 5f)
+                    {
+                        ShiftResetTimer = Time.time + 5f;
+                        return true;
+                    }
+                    if (enemy == null && SAIN.Decision.TimeSinceChangeDecision > 6f)
+                    {
+                        ShiftResetTimer = Time.time + 5f;
+                        return true;
+                    }
+                }
+            }
+
+            ShiftResetTimer = -1f;
+            return false;
+        }
+
+        private bool ContinueShiftCover()
+        {
+            if (CurrentDecision == SAINSoloDecision.ShiftCover)
+            {
+                if (ShiftResetTimer > 0f && ShiftResetTimer < Time.time)
+                {
+                    ShiftResetTimer = -1f;
+                    return false;
+                }
+                if (!ShiftCoverComplete)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private float ShiftResetTimer;
+        public bool ShiftCoverComplete { get; set; }
+
         private bool StartDogFightAction()
         {
             var pathStatus = SAIN.Enemy.CheckPathDistance();
             return pathStatus == SAINEnemyPath.VeryClose && SAIN.Enemy.IsVisible;
+        }
+
+        private bool StartThrowNade()
+        {
+            if (ContinueThrow())
+            {
+                return true;
+            }
+
+            var nade = BotOwner.WeaponManager.Grenades;
+
+            if (!nade.HaveGrenade)
+            {
+                return false;
+            }
+
+            var enemy = SAIN.Enemy;
+
+            if (enemy == null)
+            {
+                return false;
+            }
+            if (enemy.IsVisible)
+            {
+                return false;
+            }
+
+            if (enemy.TimeSinceSeen > 3f && enemy.TimeSinceSeen < 15f && enemy.Seen)
+            {
+                if (SAIN.Grenade.EFTBotGrenade.CanThrowGrenade(enemy.Position))
+                {
+                    EndThrowTimer = Time.time;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private float EndThrowTimer = 0f;
+
+        private bool ContinueThrow()
+        {
+            if (SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData == null || Time.time - EndThrowTimer > 3f)
+            {
+                return false;
+            }
+            return CurrentDecision == SAINSoloDecision.ThrowGrenade && SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData?.ThrowComplete == false;
         }
 
         private bool HideFromFlankShot()
@@ -81,7 +186,7 @@ namespace SAIN.Classes
 
             if (start)
             {
-                if (CurrentDecision != SAINSoloDecision.MoveToCover && CurrentDecision != SAINSoloDecision.RunForCover)
+                if (CurrentDecision != SAINSoloDecision.WalkToCover && CurrentDecision != SAINSoloDecision.RunToCover)
                 {
                     StartRunCoverTimer = Time.time + 3f * Random.Range(0.66f, 1.33f);
                 }
@@ -109,7 +214,8 @@ namespace SAIN.Classes
 
         private bool StartHoldInCover()
         {
-            if (SAIN.Cover.BotIsAtCoverPoint)
+            var cover = SAIN.Cover.CoverInUse;
+            if (cover != null && (cover.Position - BotOwner.Position).sqrMagnitude < 1.5f)
             {
                 return true;
             }

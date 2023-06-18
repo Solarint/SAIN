@@ -56,6 +56,7 @@ namespace SAIN.Components
         }
 
         private float DebugPathTimer = 0f;
+        public bool NoBushESPActive { get; private set; }
 
         private void Update()
         {
@@ -71,17 +72,12 @@ namespace SAIN.Components
                     }
                 }
 
-                var move = BotOwner.Mover;
-                if (move.CurPath != null && DebugPathTimer < Time.time)
+                NoBushESPActive = NoBushESP(Enemy, HeadPosition);
+                if (NoBushESPActive)
                 {
-                    DebugPathTimer = Time.time + 0.25f;
-                    for (int i = 0;  i < move.CurPath.Length - 2; i++)
-                    {
-                        //DebugGizmos.SingleObjects.Line(move.CurPath[i], move.CurPath[i + 1], Color.blue, 0.1f, true, 0.25f);
-                    }
+                    BotOwner.ShootData?.EndShoot();
+                    BotOwner.AimingData?.LoseTarget();
                 }
-                //DebugGizmos.SingleObjects.Line(BodyPosition, move.RealDestPoint, Color.magenta, 0.25f, true, Time.deltaTime, true);
-                //DebugGizmos.SingleObjects.Line(BodyPosition, move.CurPathLastPoint, Color.green, 0.25f, true, Time.deltaTime, true);
 
                 UpdateHealth();
                 UpdateEnemy();
@@ -101,25 +97,45 @@ namespace SAIN.Components
 
         private void UpdatePatrolData()
         {
-            var patrol = BotOwner.PatrollingData;
-            bool patrolPaused = patrol.Status == PatrolStatus.pause;
-
-            if (SAINLayersActive && !patrolPaused)
+            if (CheckActiveLayer)
             {
-                patrol.Pause();
+                BotOwner.PatrollingData.Pause();
             }
-
-            if (!SAINLayersActive && patrolPaused && SAINLayersWereActive)
+            else
             {
-                patrol.Unpause();
+                if (Enemy == null)
+                {
+                    BotOwner.PatrollingData.Unpause();
+                }
             }
-
-            SAINLayersWereActive = SAINLayersActive;
         }
 
-        public string ActiveLayerName => BotOwner.Brain.Agent == null ? "None" : BotOwner.Brain.ActiveLayerName();
-        public bool SAINLayersActive => SAINPlugin.SAINLayers.Contains(ActiveLayerName);
-        public bool SAINLayersWereActive { get; private set; }
+        public bool SAINLayersActive => BigBrainSAIN.IsBotUsingSAINLayer(BotOwner);
+        public bool CheckActiveLayer
+        {
+            get
+            {
+                if (RecheckTimer < Time.time)
+                {
+                    if (SAINLayersActive)
+                    {
+                        RecheckTimer = Time.time + 1f;
+                        Active = true;
+                    }
+                    else
+                    {
+                        RecheckTimer = Time.time + 0.05f;
+                        Active = false;
+                    }
+                }
+                return Active;
+            }
+        }
+
+        private bool Active;
+        private float RecheckTimer = 0f;
+        private bool PatrolPaused { get; set; }
+        private float DebugPatrolTimer = 0f;
 
         private void UpdateEnemy()
         {
@@ -170,6 +186,7 @@ namespace SAIN.Components
         {
             StopAllCoroutines();
 
+            Cover?.Dispose();
             Hearing?.Dispose();
             Lean?.Dispose();
             Cover?.CoverFinder?.Dispose();
@@ -186,7 +203,58 @@ namespace SAIN.Components
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
         public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
 
-        public Vector3? CurrentTargetPosition => GoalEnemyPos ?? GoalTargetPos;
+        public static bool NoBushESP(SAINEnemy enemy, Vector3 botHead)
+        {
+            if (enemy != null && enemy.IsVisible)
+            {
+                if (enemy.Player.IsYourPlayer)
+                {
+                    Vector3 direction = enemy.EnemyChestPosition - botHead;
+                    if (Physics.Raycast(botHead, direction, out var hitInfo, direction.magnitude, NoBushMask))
+                    {
+                        string ObjectName = hitInfo.transform.parent?.gameObject?.name;
+                        foreach (string exclusion in ExclusionList)
+                        {
+                            if (ObjectName.ToLower().Contains(exclusion))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        private static LayerMask NoBushMask => LayerMaskClass.HighPolyWithTerrainMaskAI;
+        public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider",
+        "timber", "spruce", "bush", "metal", "wood"};
+
+
+        public Vector3? CurrentTargetPosition
+        {
+            get
+            {
+                if (Enemy != null)
+                {
+                    return Enemy.Position;
+                }
+                if (Time.time - BotOwner.Memory.LastTimeHit < 120f && !BotOwner.Memory.IsPeace)
+                {
+                    return BotOwner.Memory.LastHitPos;
+                }
+                var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 500f, true);
+                if (sound != null && !sound.IsCome)
+                {
+                    return sound.Position;
+                }
+                var Target = BotOwner.Memory.GoalTarget?.GoalTarget;
+                if (Target != null)
+                {
+                    return Target.Position;
+                }
+                return null;
+            }
+        }
 
         public bool HasGoalTarget => BotOwner.Memory.GoalTarget?.GoalTarget != null;
         public bool HasGoalEnemy => BotOwner.Memory.GoalEnemy != null;

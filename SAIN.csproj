@@ -106,8 +106,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
     </Reference>
-    <Reference Include="DrakiaXYZ-BigBrain">
-      <HintPath>..\..\BepInEx\plugins\DrakiaXYZ-BigBrain.dll</HintPath>
+    <Reference Include="DrakiaXYZ-BigBrain-0.13rc">
+      <HintPath>..\..\BepInEx\plugins\DrakiaXYZ-BigBrain-0.13rc.dll</HintPath>
     </Reference>
     <Reference Include="ItemComponent.Types, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -202,7 +202,15 @@
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Plugin\BigBrainLayers.cs" />
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\EFTBotGrenade.cs" />
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\ThrowGrenadeClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\PoseClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\ProneClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Steering\EFTSteeringCopy.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\RunToCover.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\ShiftCover.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ThrowGrenade.cs" />
+    <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\ShootClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Core\BotEquipmentClass.cs" />
@@ -223,13 +231,13 @@
     <Compile Include="Components\Bot Components\Classes\Decision\Classes\SelfActionDecisionClass.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\FriendlyFireClass.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\JumpClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\MoverClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\MoverClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Cover\CoverPointClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Decision\DecisionClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Sense\HearingSensorClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Sense\LastHeardSoundClass.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\SearchClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\NavigationPointClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Old\NavigationPointClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Decision\Classes\SquadDecisionClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
@@ -250,8 +258,8 @@
     <Compile Include="Components\Bot Components\Helpers\VisibilityHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Actions\JumpAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Squad Actions\RegroupAction.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\StandAndShootAction.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToCoverAction.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\StandAndShoot.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\WalkToCover.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSquad.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\ExtractAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\SAINExtractLayer.cs" />
@@ -282,20 +290,20 @@
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\SAINEnemyClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Core\InfoClass.cs" />
     <Compile Include="Components\Bot Components\SAINEnum.cs" />
-    <Compile Include="Components\Bot Components\Classes\CombatFunctions\GrenadeTrackerComponent.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\LeanComponent.cs" />
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\GrenadeTrackerComponent.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\LeanComponent.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\SearchAction.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\HoldInCoverAction.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\HoldinCover.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Squad Actions\SuppressAction.cs" />
     <Compile Include="Plugin\Patches\Shoot\GrenadeSound.cs" />
-    <Compile Include="Components\Bot Components\Classes\CombatFunctions\BotGrenadeClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\BotGrenadeClass.cs" />
     <Compile Include="Components\Bot Components\SAINComponent.cs" />
     <Compile Include="Plugin\Config\CoverConfig.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSolo.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ShootAction.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\SteeringClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Steering\SteeringClass.cs" />
     <Compile Include="Plugin\Config\DebugConfigs.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\DogfightAction.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\DogFight.cs" />
     <Compile Include="Components\Bot Components\Helpers\CornersHelper.cs" />
     <Compile Include="Plugin\Patches\GlobalSettingsPatches.cs" />
     <Compile Include="Plugin\Patches\AddComponentPatch.cs" />
@@ -313,6 +321,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Components\Bot Components\Classes\Movement\EFTClasses\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

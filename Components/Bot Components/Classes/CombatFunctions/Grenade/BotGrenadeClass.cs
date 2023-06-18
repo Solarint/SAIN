@@ -1,14 +1,25 @@
 ﻿using EFT;
+using EFT.InventoryLogic;
 using SAIN.Components;
 using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using Comfort.Common;
+using HarmonyLib;
 
 namespace SAIN.Classes
 {
     public class BotGrenadeClass : SAINBot
     {
-        public BotGrenadeClass(BotOwner bot) : base(bot) { }
+        public BotGrenadeClass(BotOwner bot) : base(bot) 
+        {
+            EFTBotGrenade = new EFTBotGrenade(bot);
+        }
+
+        public EFTBotGrenade EFTBotGrenade { get; private set; }
 
         public void Update()
         {
@@ -51,16 +62,12 @@ namespace SAIN.Classes
             }
         }
 
-        public void ExecuteThrow()
-        {
-        }
-
         public bool ShallThrowGrenade()
         {
             return false;
         }
 
-        private GrenadeThrowType GetType(out GrenadeThrowDirection direction, out Vector3 ThrowAtPoint)
+        public GrenadeThrowType GetThrowType(out GrenadeThrowDirection direction, out Vector3 ThrowAtPoint)
         {
             ThrowAtPoint = default;
 

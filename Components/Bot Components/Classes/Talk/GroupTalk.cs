@@ -27,6 +27,19 @@ namespace SAIN.Classes
                 BotOwner.BotsGroup.OnMemberRemove += FriendlyDown;
                 BotOwner.BotsGroup.OnReportEnemy += Contact;
                 BotOwner.DeadBodyWork.OnStartLookToBody += LootStuff;
+                BotOwner.BotsGroup.OnEnemyRemove += EnemyDown;
+            }
+        }
+
+        private void EnemyDown(IAIDetails person)
+        {
+            if (SAIN.Squad.IAmLeader)
+            {
+                Talk.Say(EPhraseTrigger.GoodWork);
+            }
+            else
+            {
+                Talk.Say(EPhraseTrigger.EnemyDown);
             }
         }
 
@@ -322,7 +335,7 @@ namespace SAIN.Classes
         {
             if (CommandSayTimer < Time.time)
             {
-                CommandSayTimer = Time.time + 3f;
+                CommandSayTimer = Time.time + 5f;
                 var commandTrigger = EPhraseTrigger.PhraseNone;
                 var commmandMask = ETagStatus.Unaware;
                 var trigger = EPhraseTrigger.PhraseNone;
@@ -330,38 +343,34 @@ namespace SAIN.Classes
 
                 if (SquadDecisions.Contains(SAINSquadDecision.Suppress))
                 {
+                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.Suppress;
                     commmandMask = ETagStatus.Combat;
 
                     trigger = EPhraseTrigger.Roger;
                     mask = ETagStatus.Aware;
                 }
-                else if (SAIN.CurrentDecision == SAINSoloDecision.Search)
+                else if (SquadDecision == SAINSquadDecision.Search)
                 {
+                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.FollowMe;
                     commmandMask = ETagStatus.Aware;
 
                     trigger = EPhraseTrigger.Going;
                     mask = ETagStatus.Aware;
                 }
-                else if (SoloDecisions.Contains(SAINSoloDecision.Search))
+                else if (SoloDecisions.Contains(SAINSoloDecision.RunToCover))
                 {
-                    commandTrigger = EFTMath.RandomBool() ? EPhraseTrigger.GoForward : EPhraseTrigger.Gogogo;
-                    commmandMask = ETagStatus.Combat;
-
-                    trigger = EPhraseTrigger.Going;
-                    mask = ETagStatus.Combat;
-                }
-                else if (SoloDecisions.Contains(SAINSoloDecision.RunForCover) || SoloDecisions.Contains(SAINSoloDecision.MoveToCover))
-                {
+                    Player.HandsController.ShowGesture(EGesture.ComeToMe);
                     commandTrigger = EPhraseTrigger.GetBack;
                     commmandMask = ETagStatus.Combat;
 
-                    trigger = EPhraseTrigger.Going;
+                    trigger = EPhraseTrigger.PhraseNone;
                     mask = ETagStatus.Combat;
                 }
                 else if (BotOwner.DoorOpener.Interacting && EFTMath.RandomBool(33f))
                 {
+                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.OpenDoor;
                     commmandMask = ETagStatus.Aware;
 
@@ -370,14 +379,34 @@ namespace SAIN.Classes
                 }
                 else if (SAIN.CurrentDecision == SAINSoloDecision.RunAway)
                 {
+                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.OnYourOwn;
                     commmandMask = ETagStatus.Aware;
 
                     trigger = EFTMath.RandomBool() ? EPhraseTrigger.Repeat : EPhraseTrigger.Stop;
                     mask = ETagStatus.Aware;
                 }
-                else if (!SoloDecisions.Contains(SAINSoloDecision.Search) && SAIN.CurrentDecision != SAINSoloDecision.Search)
+                else if (SAIN.Squad.SquadDecisions.Contains(SAINSquadDecision.Regroup))
                 {
+                    Player.HandsController.ShowGesture(EGesture.ComeToMe);
+                    commandTrigger = EPhraseTrigger.Regroup;
+                    commmandMask = ETagStatus.Aware;
+
+                    trigger = EPhraseTrigger.Roger;
+                    mask = ETagStatus.Aware;
+                }
+                else if (SquadDecision == SAINSquadDecision.Help)
+                {
+                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                    commandTrigger = EPhraseTrigger.Gogogo;
+                    commmandMask = ETagStatus.Aware;
+
+                    trigger = EPhraseTrigger.Going;
+                    mask = ETagStatus.Combat;
+                }
+                else if (CurrentDecision == SAINSoloDecision.HoldInCover)
+                {
+                    Player.HandsController.ShowGesture(EGesture.Stop);
                     commandTrigger = EPhraseTrigger.HoldPosition;
                     commmandMask = ETagStatus.Aware;
 
@@ -388,7 +417,7 @@ namespace SAIN.Classes
                 if (commandTrigger != EPhraseTrigger.PhraseNone)
                 {
                     Talk.Say(commandTrigger, commmandMask, true);
-                    AllMembersSay(trigger, mask, Random.Range(0.5f, 1.5f), 50f);
+                    AllMembersSay(trigger, mask, Random.Range(0.75f, 1.5f), 40f);
                     return true;
                 }
             }

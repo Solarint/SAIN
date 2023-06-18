@@ -20,7 +20,7 @@ namespace SAIN.Components
         }
 
         private float SpherecastRadius = 0.05f;
-        private LayerMask SightLayers => LayerMaskClass.HighPolyWithTerrainMask;
+        private LayerMask SightLayers => LayerMaskClass.HighPolyWithTerrainMaskAI;
         private int MinJobSize = 1;
         private List<Player> RegisteredPlayers => Singleton<GameWorld>.Instance.RegisteredPlayers;
 
@@ -90,6 +90,7 @@ namespace SAIN.Components
             for (int i = 0; i < botsWithEnemy.Count; i++)
             {
                 var bot = botsWithEnemy[i];
+                var Mask = SightLayers;
 
                 Player enemy = bot.Enemy.EnemyPlayer;
                 Vector3 head = HeadPos(bot.BotOwner.GetPlayer);
@@ -102,13 +103,18 @@ namespace SAIN.Components
                     Vector3 target = bodyParts[j];
                     Vector3 direction = target - head;
                     float max = bot.BotOwner.Settings.Current.CurrentVisibleDistance;
+                    float distance = direction.magnitude;
+                    if (distance < 8f)
+                    {
+                        Mask = LayerMaskClass.HighPolyWithTerrainMask;
+                    }
                     float rayDistance = Mathf.Clamp(direction.magnitude, 0f, max);
                     spherecastCommands[i + j] = new SpherecastCommand(
                         head,
                         SpherecastRadius,
                         direction.normalized,
                         rayDistance,
-                        SightLayers
+                        Mask
                     );
                 }
             }

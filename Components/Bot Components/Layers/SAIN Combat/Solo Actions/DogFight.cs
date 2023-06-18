@@ -9,9 +9,9 @@ using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
-    internal class DogfightAction : CustomLogic
+    internal class DogFight : CustomLogic
     {
-        public DogfightAction(BotOwner bot) : base(bot)
+        public DogFight(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();

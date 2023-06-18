@@ -50,7 +50,7 @@ namespace SAIN.Classes
 
             if (DecisionTimer < Time.time)
             {
-                DecisionTimer = Time.time + 0.05f;
+                DecisionTimer = Time.time + 0.15f;
 
                 if (UpdateEnemyTimer < Time.time)
                 {
@@ -146,7 +146,7 @@ namespace SAIN.Classes
                     Decision = SAINSoloDecision.UnstuckMoveToCover;
                     return true;
                 }
-                if (current == SAINSoloDecision.MoveToCover || current == SAINSoloDecision.UnstuckMoveToCover)
+                if (current == SAINSoloDecision.WalkToCover || current == SAINSoloDecision.UnstuckMoveToCover)
                 {
                     Decision = SAINSoloDecision.UnstuckSearch;
                     return true;

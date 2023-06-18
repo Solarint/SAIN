@@ -11,7 +11,7 @@ namespace SAIN.Components
 {
     public class LeanComponent : MonoBehaviour
     {
-        public List<SAINSoloDecision> DontLeanDecisions = new List<SAINSoloDecision> { SAINSoloDecision.Retreat, SAINSoloDecision.None, SAINSoloDecision.RunForCover, SAINSoloDecision.RunAway };
+        public List<SAINSoloDecision> DontLeanDecisions = new List<SAINSoloDecision> { SAINSoloDecision.Retreat, SAINSoloDecision.None, SAINSoloDecision.RunToCover, SAINSoloDecision.RunAway };
 
         private void Awake()
         {

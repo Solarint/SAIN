@@ -14,8 +14,10 @@ namespace SAIN.Classes
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             Inventory = (InventoryClass)AccessTools.Property(typeof(Player), "Inventory").GetValue(Player);
+            InventoryController = (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2416_0").GetValue(Player);
         }
 
+        public InventoryControllerClass InventoryController { get; private set; }
         protected ManualLogSource Logger;
 
         public InventoryClass Inventory { get; private set; }

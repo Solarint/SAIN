@@ -10,12 +10,16 @@ namespace SAIN.Classes
         public SteeringClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            EFTSteer = new EFTSteer(bot);
         }
+
+        private EFTSteer EFTSteer { get; set; }
 
         public void Update()
         {
             UpdateAimSway();
             UpdateSmoothLook();
+            UpdateSteerMode();
             if (UserSettings.DebugConfig.DebugLayers.Value)
             {
                 DebugGizmos.SingleObjects.Line(SAIN.HeadPosition, CurrentSteerPoint, Color.white, 0.05f, true, Time.deltaTime, true);
@@ -27,18 +31,18 @@ namespace SAIN.Classes
             switch (SteeringMode)
             {
                 case EBotSteering.ToCustomPoint:
-                    BotOwner.Steering.LookToPoint(SwaySteerPoint, 500f);
+                    EFTSteer.LookToPoint(CurrentSteerPoint, 250f);
                     break;
 
                 case EBotSteering.ToMovingDirection:
-                    Vector3 point = BotOwner.Mover.DirCurPoint + SAIN.HeadPosition;
-                    BotOwner.Steering.LookToPoint(point, 500f);
+                    EFTSteer.LookToMovingDirection();
                     break;
 
                 default:
-                    BotOwner.Steering.LookToPoint(SwaySteerPoint, 500f);
+                    EFTSteer.LookToPoint(CurrentSteerPoint, 250f);
                     break;
             }
+            EFTSteer.ManualFixedUpdate();
         }
 
         public EBotSteering SteeringMode { get; private set; }
@@ -68,11 +72,6 @@ namespace SAIN.Classes
 
         public bool SteerByPriority(bool lookRandomifFalse = true)
         {
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
-            {
-                return false;
-            }
-
             if (EnemyVisible())
             {
                 return true;
@@ -130,21 +129,24 @@ namespace SAIN.Classes
             float lerp = Time.deltaTime / divisor;
             Vector3 pos = Vector3.Lerp(CurrentSteerPoint, SwaySteerPoint, lerp);
             CurrentSteerPoint = pos;
-            BotOwner.Steering.LookToPoint(pos, 500f);
         }
 
-        public void LookToMovingDirection()
+        public void LookToMovingDirection(bool value = true)
         {
-            BotOwner.Steering.LookToMovingDirection();
-            Vector3 pos = BotOwner.Mover.DirCurPoint + SAIN.HeadPosition;
-            SwaySteerPoint = pos;
-            CurrentSteerPoint = pos;
-            RealSteerTarget = pos;
+            if (value)
+            {
+                SteeringMode = EBotSteering.ToMovingDirection;
+            }
+            else
+            {
+                SteeringMode = EBotSteering.ToCustomPoint;
+            }
         }
 
         public void LookToPoint(Vector3 point)
         {
             AimSway(point);
+            SteeringMode = EBotSteering.ToCustomPoint;
         }
 
         public void LookToDirection(Vector3 direction, bool flat)
@@ -180,7 +182,7 @@ namespace SAIN.Classes
             {
                 if (enemy.EnemyComponent == null)
                 {
-                    System.Console.WriteLine("Bot's Enemy is not null but their enemy component is null!");
+                    //System.Console.WriteLine("Bot's Enemy is not null but their enemy component is null!");
                 }
                 if (enemy.IsVisible || enemy.EnemyComponent?.VisibleByGroup == true)
                 {

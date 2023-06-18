@@ -180,7 +180,7 @@ namespace SAIN.Classes
 
         public bool StartCancelReload()
         {
-            if (!BotOwner.WeaponManager?.IsReady == true || BotOwner.WeaponManager.Reload?.BulletCount == 0)
+            if (!BotOwner.WeaponManager?.IsReady == true || !BotOwner.WeaponManager.HaveBullets)
             {
                 return false;
             }
@@ -231,7 +231,7 @@ namespace SAIN.Classes
             bool needToReload = false;
             if (CanReload)
             {
-                if (BotOwner.WeaponManager.Reload.BulletCount == 0)
+                if (!BotOwner.WeaponManager.HaveBullets)
                 {
                     needToReload = true;
                 }

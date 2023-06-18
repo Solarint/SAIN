@@ -88,6 +88,7 @@ namespace SAIN.Components
                         {
                             CoverPoints.Add(newPoint);
                             coverCount++;
+                            yield return null;
                         }
                         // Every 10 colliders checked, wait until the next frame before continuing.
                         if (frameWait == 10)
@@ -107,11 +108,6 @@ namespace SAIN.Components
 
                     if (coverCount > 0)
                     {
-                        var pointsArray = CoverPoints.ToArray();
-                        System.Array.Sort(pointsArray, CoverPointPathComparerer);
-                        CoverPoints.Clear();
-                        CoverPoints.AddRange(pointsArray);
-
                         if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
                         {
                             DebugLogTimer = Time.time + 1f;
@@ -211,7 +207,7 @@ namespace SAIN.Components
         {
             if (CheckPositionVsOtherBots(position))
             {
-                if ((position - TargetPosition).sqrMagnitude > MinDistance)
+                if ((position - TargetPosition).magnitude > MinDistance)
                 {
                     if (VisibilityCheck(position))
                     {
@@ -310,25 +306,44 @@ namespace SAIN.Components
 
         private bool RecheckPoints()
         {
+            CoverPoint PointToSave = null;
+            if (CoverPoints.Count > 0)
+            {
+                foreach (var point in CoverPoints)
+                {
+                    if (point != null && point.BotIsUsingThis)
+                    {
+                        point.BotIsUsingThis = false;
+                        if (CheckCollider(point.Collider, out var newPoint))
+                        {
+                            PointToSave = newPoint;
+                            PointToSave.BotIsUsingThis = true;
+                        }
+                        break;
+                    }
+                }
+            }
+            CoverPoints.Clear();
+            if (PointToSave != null)
+            {
+                CoverPoints.Add(PointToSave);
+            }
+            return false;
+
             List<CoverPoint> checkedPoints = new List<CoverPoint>();
             for (int i = 0; i < CoverPoints.Count; i++)
             {
                 var point = CoverPoints[i];
-                Vector3 coverPos = point.Collider.transform.position;
-                BotOwner Leader = SAIN.Squad.Leader;
-                if (Leader != null && !Leader.IsDead)
+                if (point.Spotted)
                 {
-                    float leadDist = (point.Position - Leader.Position).sqrMagnitude;
-                    if (leadDist > 1600f)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
+                Vector3 coverPos = point.Collider.transform.position;
 
                 float sqrMag = (point.Position - OriginPoint).sqrMagnitude;
-                if (sqrMag <= 2500 && CheckCollider(point.Collider, out var point2))
+                if (sqrMag <= 2500 && CheckCollider(point.Collider, out var newPoint))
                 {
-                    checkedPoints.Add(point2);
+                    checkedPoints.Add(newPoint);
                 }
             }
 
@@ -353,16 +368,6 @@ namespace SAIN.Components
             if (SAIN.Squad.SquadLocations == null || SAIN.Squad.SquadMembers == null || SAIN.Squad.SquadMembers.Count < 2)
             {
                 return true;
-            }
-
-            BotOwner Leader = SAIN.Squad.Leader;
-            if (Leader != null && !Leader.IsDead)
-            {
-                float leadDist = (position - Leader.Position).sqrMagnitude;
-                if (leadDist > 1600f)
-                {
-                    return false;
-                }
             }
 
             const float DistanceToBotCoverThresh = 1f;

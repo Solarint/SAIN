@@ -52,7 +52,7 @@ namespace SAIN.Layers
             {
                 SAIN.Mover.SetTargetPose(1f);
                 SAIN.Mover.SetTargetMoveSpeed(1f);
-                SAIN.Mover.GoToPoint(SquadLeadPos.Value, false, -1f);
+                SAIN.Mover.GoToPoint(SquadLeadPos.Value);
                 CheckShouldSprint(SquadLeadPos.Value);
                 BotOwner.DoorOpener.Update();
             }
