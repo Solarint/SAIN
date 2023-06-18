@@ -226,8 +226,8 @@ namespace SAIN.Components
             return false;
         }
         private static LayerMask NoBushMask => LayerMaskClass.HighPolyWithTerrainMaskAI;
-        public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider",
-        "timber", "spruce", "bush", "metal", "wood"};
+        public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch",
+        "timber", "spruce", "bush", "wood"};
 
 
         public Vector3? CurrentTargetPosition

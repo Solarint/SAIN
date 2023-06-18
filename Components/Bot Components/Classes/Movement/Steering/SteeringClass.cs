@@ -31,7 +31,7 @@ namespace SAIN.Classes
             switch (SteeringMode)
             {
                 case EBotSteering.ToCustomPoint:
-                    EFTSteer.LookToPoint(CurrentSteerPoint, 250f);
+                    EFTSteer.LookToPoint(CurrentSteerPoint, 300f);
                     break;
 
                 case EBotSteering.ToMovingDirection:
@@ -39,7 +39,7 @@ namespace SAIN.Classes
                     break;
 
                 default:
-                    EFTSteer.LookToPoint(CurrentSteerPoint, 250f);
+                    EFTSteer.LookToPoint(CurrentSteerPoint, 300f);
                     break;
             }
             EFTSteer.ManualFixedUpdate();
@@ -60,7 +60,7 @@ namespace SAIN.Classes
         {
             RealSteerTarget = point;
             Vector3 targetDirection = (point - SAIN.HeadPosition).normalized * 5f;
-            Vector3 random = Random.insideUnitSphere * 0.1f;
+            Vector3 random = Random.insideUnitSphere * 0.033f;
             Quaternion randomRotation = Quaternion.Euler(random.x, random.y, random.z);
             Vector3 randomDirection = randomRotation * targetDirection;
             SwaySteerPoint = randomDirection + SAIN.HeadPosition;
@@ -197,8 +197,7 @@ namespace SAIN.Classes
         {
             if (enemy != null)
             {
-                var pos = enemy.Person.MainParts.Values.PickRandom().Position;
-                LookToPoint(pos);
+                LookToPoint(enemy.EnemyChestPosition);
             }
         }
 

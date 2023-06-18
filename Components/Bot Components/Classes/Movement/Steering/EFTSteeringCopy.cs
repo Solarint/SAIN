@@ -49,7 +49,7 @@ namespace SAIN.Classes
 
         public void LookToPoint(Vector3 point)
         {
-            LookToPoint(point, BotOwner.Settings.FileSettings.Move.BASE_ROTATE_SPEED);
+            LookToPoint(point, 300f);
         }
 
         public void LookToPathDestPoint()
@@ -59,7 +59,7 @@ namespace SAIN.Classes
 
         public void LookToMovingDirection()
         {
-            LookToMovingDirection(BotOwner.Settings.FileSettings.Move.BASE_ROTATE_SPEED);
+            LookToMovingDirection(350f);
         }
 
         public void LookToPoint(Vector3 point, float rotateSpeed)

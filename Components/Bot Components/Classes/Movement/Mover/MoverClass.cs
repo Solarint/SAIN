@@ -109,14 +109,29 @@ namespace SAIN.Classes
 
         public void Update()
         {
-            Pose.Update();
-            UpdateTargetMoveSpeed();
+            if (!UpdateSprint())
+            {
+                Pose.Update();
+                UpdateTargetMoveSpeed();
+            }
+        }
 
+        private bool UpdateSprint()
+        {
             if (IsSprinting)
             {
                 SetTargetPose(1f);
                 SetTargetMoveSpeed(1f);
                 FastLean(0f);
+                SAIN.Steering.LookToMovingDirection();
+
+                CurrentState.EnableSprint(true);
+                return true;
+            }
+            else
+            {
+                CurrentState.EnableSprint(false);
+                return false;
             }
         }
 
@@ -156,31 +171,13 @@ namespace SAIN.Classes
 
         public void Sprint(bool value)
         {
-            if (value)
-            {
-                if (!IsSprinting)
-                {
-                    IsSprinting = true;
-                    SAIN.Steering.LookToMovingDirection();
-                    Pose.SetTargetPose(1f);
-                    SetTargetMoveSpeed(1f);
-                    ToggleSprint();
-                }
-            }
-            else
-            {
-                if (IsSprinting)
-                {
-                    IsSprinting = false;
-                    SAIN.Steering.SteerByPriority(false);
-                    ToggleSprint();
-                }
-            }
+            IsSprinting = value;
         }
 
         public void ToggleSprint()
         {
-            Player.ToggleSprint();
+            bool enable = !Player.Physical.Sprinting;
+            CurrentState.EnableSprint(enable, true);
         }
 
         public bool IsSprinting { get; private set; }

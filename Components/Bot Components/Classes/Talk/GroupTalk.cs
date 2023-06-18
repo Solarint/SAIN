@@ -100,6 +100,7 @@ namespace SAIN.Classes
                 BotOwner.BotsGroup.OnMemberRemove -= FriendlyDown;
                 BotOwner.BotsGroup.OnReportEnemy -= Contact;
                 BotOwner.DeadBodyWork.OnStartLookToBody -= LootStuff;
+                BotOwner.BotsGroup.OnEnemyRemove -= EnemyDown;
                 Subscribed = false;
             }
         }
