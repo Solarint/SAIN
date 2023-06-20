@@ -26,8 +26,9 @@ namespace SAIN.Classes
                     UpdateMembersTimer = Time.time + 0.25f;
 
                     UpdateMembers();
+                    UpdateVisibleMembers();
 
-                    if (Leader != null || Leader.IsDead)
+                    if (Leader != null || Leader?.IsDead == true)
                     {
                         if (LeaderDieTime == 0f)
                         {
@@ -35,14 +36,6 @@ namespace SAIN.Classes
                         }
                         if (TimeSinceLeaderDied > 30f)
                         {
-                            FindSquadLeader();
-                        }
-                    }
-                    if (SquadMembers != null)
-                    {
-                        if ((Leader == null || GroupSize != SquadMembers.Count) && TimeSinceLeaderDied == 0f)
-                        {
-                            GroupSize = SquadMembers.Count;
                             FindSquadLeader();
                         }
                     }
@@ -54,6 +47,19 @@ namespace SAIN.Classes
                 }
             }
         }
+        private void UpdateVisibleMembers()
+        {
+            VisibleMembers.Clear();
+            foreach (var member in SAIN.Squad.SquadMembers.Values)
+            {
+                if (member != null && SAIN.VisiblePlayers.Contains(member.Player))
+                {
+                    VisibleMembers.Add(member);
+                }
+            }
+        }
+
+        public List<SAINComponent> VisibleMembers { get; private set; } = new List<SAINComponent>();
 
         public float TimeSinceLeaderDied => LeaderDieTime == 0f ? 0f : Time.time - LeaderDieTime;
         public float LeaderDieTime { get; private set; } = 0f;
@@ -134,38 +140,28 @@ namespace SAIN.Classes
             var decisions = new List<SAINSoloDecision>();
             var squadDecisions = new List<SAINSquadDecision>();
 
-            MemberIsFallingBack = false;
-
             if (BotInGroup)
             {
                 var group = BotOwner.BotsGroup;
                 int count = group.MembersCount;
 
-                int i = 0;
-
-                while (i < count)
+                for (int i = 0; i < count; i++)
                 {
                     var member = group.Member(i);
                     if (member != null && member.HealthController.IsAlive)
                     {
-                        var component = member.GetComponent<SAINComponent>();
-
-                        if (component != null)
+                        if (SAINPlugin.BotController.GetBot(member.ProfileId, out var component))
                         {
                             dictionary.Add(member, component);
                             decisions.Add(component.CurrentDecision);
                             squadDecisions.Add(component.Decision.SquadDecision);
                             locations.Add(member.Position);
-
-                            if (component.CurrentDecision == SAINSoloDecision.Retreat)
-                            {
-                                MemberIsFallingBack = true;
-                            }
                         }
                     }
-                    i++;
                 }
             }
+
+            MemberIsFallingBack = decisions.Contains(SAINSoloDecision.Retreat) || decisions.Contains(SAINSoloDecision.RunToCover) || decisions.Contains(SAINSoloDecision.RunAway);
 
             SquadLocations = locations.ToArray();
             SquadSoloDecisions = decisions.ToArray();
@@ -174,7 +170,19 @@ namespace SAIN.Classes
             SquadPowerLevel = BotOwner.BotsGroup.GroupPower;
             SquadMembers = dictionary;
 
-            if (Leader == null)
+            if (Leader != null || Leader?.IsDead == true)
+            {
+                if (LeaderDieTime == 0f)
+                {
+                    LeaderDieTime = Time.time;
+                }
+                if (TimeSinceLeaderDied > 30f)
+                {
+                    FindSquadLeader();
+                }
+                return;
+            }
+            if ((Leader == null || GroupSize != SquadMembers.Count) && TimeSinceLeaderDied == 0f)
             {
                 GroupSize = SquadMembers.Count;
                 FindSquadLeader();

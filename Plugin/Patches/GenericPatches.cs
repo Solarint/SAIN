@@ -64,7 +64,7 @@ namespace SAIN.Patches.Generic
         }
     }
 
-    public class GetDefaultBotController : ModulePatch
+    public class GetBotController : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -74,8 +74,24 @@ namespace SAIN.Patches.Generic
         [PatchPrefix]
         public static void PatchPrefix(BotControllerClass __instance)
         {
-            var controller = Singleton<GameWorld>.Instance.GetComponent<SAINBotController>();
-            controller.DefaultController = __instance;
+            SAINPlugin.BotController.DefaultController = __instance;
+        }
+    }
+
+    public class GetBotSpawnerClass : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(BotSpawnerClass), "AddPlayer");
+        }
+
+        [PatchPostfix]
+        public static void PatchPostfix(BotSpawnerClass __instance)
+        {
+            if (SAINPlugin.BotController.BotSpawnerClass == null)
+            {
+                SAINPlugin.BotController.BotSpawnerClass = __instance;
+            }
         }
     }
 }

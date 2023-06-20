@@ -351,46 +351,19 @@ namespace SAIN.Components
                 allRaycastHits,
                 MinJobSize
             );
-            int visiblecount = 0;
+
             spherecastJob.Complete();
 
             for (int i = 0; i < sainBots.Count; i++)
             {
                 int startIndex = i * RegisteredPlayers.Count;
-                var visiblePlayers = sainBots[i].VisiblePlayers;
-                BotVisiblePlayers.Clear();
-                BotVisiblePlayers.AddRange(visiblePlayers);
-
-                for (int v = 0; v < visiblePlayers.Count; v++)
-                {
-                    var visPlayer = visiblePlayers[v];
-                    if (visPlayer == null || visPlayer.HealthController.IsAlive == false)
-                    {
-                        BotVisiblePlayers.RemoveAt(v);
-                    }
-                }
-
-                visiblePlayers.Clear();
-                visiblePlayers.AddRange(BotVisiblePlayers);
-                BotVisiblePlayers.Clear();
-
+                sainBots[i].VisiblePlayers.Clear();
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
                 {
                     currentIndex = startIndex + j;
-                    if (allRaycastHits[currentIndex].collider != null)
+                    if (allRaycastHits[currentIndex].collider == null && RegisteredPlayers[j] != null && RegisteredPlayers[j]?.HealthController?.IsAlive == true)
                     {
-                        if (visiblePlayers.Contains(RegisteredPlayers[j]))
-                        {
-                            visiblePlayers.Remove(RegisteredPlayers[j]);
-                        }
-                    }
-                    else
-                    {
-                        visiblecount++;
-                        if (!visiblePlayers.Contains(RegisteredPlayers[j]))
-                        {
-                            visiblePlayers.Add(RegisteredPlayers[j]);
-                        }
+                        sainBots[i].VisiblePlayers.Add(RegisteredPlayers[j]);
                     }
                 }
             }

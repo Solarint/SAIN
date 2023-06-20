@@ -173,38 +173,34 @@ namespace SAIN.Components
 
         private void UpdateEnemy()
         {
-            if (Enemies.Count > 0)
+            ClearEnemies();
+            AddEnemy();
+            foreach (var enemy in Enemies)
             {
-                ClearEnemies();
-            }
-            if (BotOwner.Memory.GoalEnemy != null)
-            {
-                AddEnemy();
-                Enemy?.Update();
-            }
-            else
-            {
-                Enemy = null;
+                enemy.Value?.Update();
             }
         }
 
         private void ClearEnemies()
         {
-            foreach (string id in Enemies.Keys)
+            if (Enemies.Count > 0)
             {
-                var enemy = Enemies[id];
-                if (enemy == null || !enemy.EnemyPlayer.HealthController.IsAlive)
+                foreach (string id in Enemies.Keys)
                 {
-                    EnemyIDsToRemove.Add(id);
+                    var enemy = Enemies[id];
+                    if (enemy == null || !enemy.EnemyPlayer.HealthController.IsAlive)
+                    {
+                        EnemyIDsToRemove.Add(id);
+                    }
                 }
-            }
 
-            foreach (string idToRemove in EnemyIDsToRemove)
-            {
-                Enemies.Remove(idToRemove);
-            }
+                foreach (string idToRemove in EnemyIDsToRemove)
+                {
+                    Enemies.Remove(idToRemove);
+                }
 
-            EnemyIDsToRemove.Clear();
+                EnemyIDsToRemove.Clear();
+            }
         }
 
         private readonly List<string> EnemyIDsToRemove = new List<string>();
@@ -212,6 +208,7 @@ namespace SAIN.Components
         private void AddEnemy()
         {
             string profileId;
+            Enemy = null;
             var goalEnemy = BotOwner.Memory.GoalEnemy;
             if (goalEnemy != null)
             {
@@ -245,7 +242,6 @@ namespace SAIN.Components
             float closestDist = Mathf.Infinity;
             float closestAnyDist = Mathf.Infinity;
             float closestVisibleDist = Mathf.Infinity;
-
             float enemyDist = Mathf.Infinity;
 
             if (Enemies.Count > 1)

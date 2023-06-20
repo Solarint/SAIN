@@ -194,7 +194,7 @@ namespace SAIN.Classes
                         {
                             CheckFriendliesTimer = Time.time + 10f;
 
-                            SAIN.Talk.Say(trigger, ETagStatus.Combat, true);
+                            SAIN.Talk.Say(trigger);
                             AllMembersSay(EPhraseTrigger.Roger, ETagStatus.Aware, Random.Range(0.5f, 1.5f), 60f);
                         }
                     }
@@ -253,7 +253,7 @@ namespace SAIN.Classes
             {
                 trigger = EPhraseTrigger.NeedHelp;
             }
-            else if (!RespondToAudio(out trigger, out var mask))
+            else if (!HearNoise(out trigger, out var mask))
             {
                 if (BotOwner.Memory.GoalEnemy != null)
                 {
@@ -272,7 +272,7 @@ namespace SAIN.Classes
             return false;
         }
 
-        private bool RespondToAudio(out EPhraseTrigger trigger, out ETagStatus mask)
+        private bool HearNoise(out EPhraseTrigger trigger, out ETagStatus mask)
         {
             trigger = EPhraseTrigger.PhraseNone;
             mask = ETagStatus.Aware;
@@ -336,10 +336,11 @@ namespace SAIN.Classes
                 var commmandMask = ETagStatus.Unaware;
                 var trigger = EPhraseTrigger.PhraseNone;
                 var mask = ETagStatus.Unaware;
+                var gesture = EGesture.None;
 
                 if (SquadDecisions.Contains(SAINSquadDecision.Suppress))
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
+                    gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.Suppress;
                     commmandMask = ETagStatus.Combat;
 
@@ -348,16 +349,16 @@ namespace SAIN.Classes
                 }
                 else if (SquadDecision == SAINSquadDecision.Search)
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
+                    gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.FollowMe;
                     commmandMask = ETagStatus.Aware;
 
                     trigger = EPhraseTrigger.Going;
                     mask = ETagStatus.Aware;
                 }
-                else if (SoloDecisions.Contains(SAINSoloDecision.RunToCover))
+                else if (SAIN.Squad.MemberIsFallingBack)
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.ComeToMe);
+                    gesture = EGesture.ComeToMe;
                     commandTrigger = EPhraseTrigger.GetBack;
                     commmandMask = ETagStatus.Combat;
 
@@ -366,7 +367,6 @@ namespace SAIN.Classes
                 }
                 else if (BotOwner.DoorOpener.Interacting && EFTMath.RandomBool(33f))
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.OpenDoor;
                     commmandMask = ETagStatus.Aware;
 
@@ -375,7 +375,7 @@ namespace SAIN.Classes
                 }
                 else if (SAIN.CurrentDecision == SAINSoloDecision.RunAway)
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
+                    gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.OnYourOwn;
                     commmandMask = ETagStatus.Aware;
 
@@ -384,7 +384,7 @@ namespace SAIN.Classes
                 }
                 else if (SAIN.Squad.SquadDecisions.Contains(SAINSquadDecision.Regroup))
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.ComeToMe);
+                    gesture = EGesture.ComeToMe;
                     commandTrigger = EPhraseTrigger.Regroup;
                     commmandMask = ETagStatus.Aware;
 
@@ -393,7 +393,7 @@ namespace SAIN.Classes
                 }
                 else if (SquadDecision == SAINSquadDecision.Help)
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
+                    gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.Gogogo;
                     commmandMask = ETagStatus.Aware;
 
@@ -402,7 +402,7 @@ namespace SAIN.Classes
                 }
                 else if (CurrentDecision == SAINSoloDecision.HoldInCover)
                 {
-                    BotPlayer.HandsController.ShowGesture(EGesture.Stop);
+                    gesture = EGesture.Stop;
                     commandTrigger = EPhraseTrigger.HoldPosition;
                     commmandMask = ETagStatus.Aware;
 
@@ -412,7 +412,11 @@ namespace SAIN.Classes
 
                 if (commandTrigger != EPhraseTrigger.PhraseNone)
                 {
-                    Talk.Say(commandTrigger, commmandMask, true);
+                    if (gesture != EGesture.None && SAIN.Squad.VisibleMembers.Count > 0)
+                    {
+                        BotPlayer.HandsController.ShowGesture(gesture);
+                    }
+                    Talk.Say(commandTrigger);
                     AllMembersSay(trigger, mask, Random.Range(0.75f, 1.5f), 40f);
                     return true;
                 }

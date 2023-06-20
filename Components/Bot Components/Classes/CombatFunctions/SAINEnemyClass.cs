@@ -42,7 +42,7 @@ namespace SAIN.Classes
             }
             else
             {
-                if (componentArray != null && count > 0)
+                if (componentArray != null)
                 {
                     foreach (var component in componentArray)
                     {
@@ -267,7 +267,7 @@ namespace SAIN.Classes
         {
             if (CheckPathTimer < Time.time)
             {
-                CheckPathTimer = Time.time + 0.25f;
+                CheckPathTimer = Time.time + 0.5f;
 
                 CalcPath(Person.Position);
             }
@@ -378,32 +378,19 @@ namespace SAIN.Classes
 
         private void UpdateVisibleMembers()
         {
-            var memberDict = new Dictionary<BotOwner, SAINComponent>(Members);
-            var visibleMembers = new Dictionary<BotOwner, SAINComponent>();
-            foreach (var member in memberDict)
+            VisibleMembers.Clear();
+            foreach (var member in SAIN.Squad.SquadMembers)
             {
-                if (member.Value == null || member.Value.IsDead) continue;
-                if (VisibleByMember(member.Value))
+                if (member.Value != null && SAIN.VisiblePlayers.Contains(member.Value.Player))
                 {
-                    if (!VisibleMembers.ContainsKey(member.Key))
-                    {
-                        visibleMembers.Add(member.Key, member.Value);
-                    }
-                }
-                else if (VisibleMembers.ContainsKey(member.Key))
-                {
-                    visibleMembers.Remove(member.Key);
+                    VisibleMembers.Add(member.Key, member.Value);
                 }
             }
-            VisibleMembers = visibleMembers;
         }
 
         public bool VisibleByMember(SAINComponent member)
         {
-            Vector3 start = SAIN.HeadPosition;
-            Vector3 end = member.HeadPosition;
-            Vector3 direction = end - start;
-            return !Physics.Raycast(start, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+            return SAIN.VisiblePlayers.Contains(member.Player);
         }
 
         public void Dispose()
@@ -451,6 +438,22 @@ namespace SAIN.Classes
             }
             return false;
         }
+        public bool CheckIfComponentIsForGroup(string botProfileId, string squadId)
+        {
+            foreach (var item in Owners)
+            {
+                if (item.Value == null) continue;
+                if (item.Value.SAINComponent.ProfileId == botProfileId)
+                {
+                    return true;
+                }
+                if (item.Value.SAINComponent.SquadId == squadId)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         private void Awake()
         {
@@ -483,7 +486,7 @@ namespace SAIN.Classes
             {
                 if (close && canHear && visible) break;
                 if (item.Value == null) continue;
-                if (item.Value.BotOwner.Memory.GoalEnemy?.Person?.GetPlayer != EnemyPlayer) continue;
+                if (item.Value.BotOwner.Memory.GoalEnemy?.Person?.GetPlayer.ProfileId != EnemyPlayer.ProfileId) continue;
 
                 if (!visible && item.Value.CanSeeEnemy)
                 {

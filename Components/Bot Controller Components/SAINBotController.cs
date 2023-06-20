@@ -1,25 +1,18 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using SAIN.Components;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.Collections;
-using Unity.Jobs;
 using System;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.VisionConfig;
 using SAIN.Helpers;
-using SAIN;
 using SAIN.Components.BotController;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SAIN.Components
 {
     public class SAINBotController : MonoBehaviour
     {
-        public Action<SAINSoundType, Player, float> AISoundPlayed;
+        public Action<SAINSoundType, Player, float> AISoundPlayed { get; private set; }
 
         public Dictionary<string, SAINComponent> SAINBots = new Dictionary<string, SAINComponent>();
         public LineOfSightManager LineOfSightManager { get; private set; } = new LineOfSightManager();
@@ -30,6 +23,7 @@ namespace SAIN.Components
         public BotControllerClass DefaultController { get; set; }
         public ManualLogSource Logger => LineOfSightManager.Logger;
         public BotExtractManager BotExtractManager { get; private set; } = new BotExtractManager();
+        public BotSpawnerClass BotSpawnerClass { get; set; }
 
         private TimeClass TimeClass { get; set; } = new TimeClass();
         private WeatherVisionClass WeatherClass { get; set; } = new WeatherVisionClass();
@@ -48,10 +42,10 @@ namespace SAIN.Components
             LineOfSightManager.Awake();
             CoverManager.Awake();
             PathManager.Awake();
-            AISoundPlayed += SoundPlayed;
 
             Singleton<GClass629>.Instance.OnGrenadeThrow += GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive += GrenadeExplosion;
+            AISoundPlayed += SoundPlayed;
         }
 
         private void Update()
@@ -66,6 +60,12 @@ namespace SAIN.Components
                 return;
             }
 
+            if (!Subscribed && BotSpawnerClass != null)
+            {
+                BotSpawnerClass.OnBotRemoved += BotDeath;
+                Subscribed = true;
+            }
+
             BotExtractManager.Update();
             UpdateMainPlayer();
             TimeClass.Update();
@@ -73,6 +73,86 @@ namespace SAIN.Components
             LineOfSightManager.Update();
             CoverManager.Update();
             PathManager.Update();
+            AddNavObstacles();
+            UpdateObstacles();
+        }
+
+        private bool Subscribed = false;
+
+        public void BotDeath(BotOwner bot)
+        {
+            if (bot.IsDead)
+            {
+                DeadBots.Add(bot.GetPlayer);
+            }
+        }
+
+        public List<Player> DeadBots { get; private set; } = new List<Player>();
+        public List<BotDeathObject> DeathObstacles { get; private set; } = new List<BotDeathObject>();
+        private readonly List<int> IndexToRemove = new List<int>();
+
+        public void AddNavObstacles()
+        {
+            if (DeadBots.Count > 0)
+            {
+                const float ObstacleRadius = 1.5f;
+
+                for (int i = 0; i < DeadBots.Count; i++)
+                {
+                    var bot = DeadBots[i];
+                    bool enableObstacle = true;
+                    Collider[] players = Physics.OverlapSphere(bot.Position, ObstacleRadius, LayerMaskClass.PlayerMask);
+                    foreach (var p in players)
+                    {
+                        if (p == null) continue;
+                        if (p.TryGetComponent<Player>(out var player))
+                        {
+                            if (player.IsAI && player.HealthController.IsAlive)
+                            {
+                                enableObstacle = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (enableObstacle)
+                    {
+                        var obstacle = new BotDeathObject(bot);
+                        obstacle.Activate(ObstacleRadius);
+                        DeathObstacles.Add(obstacle);
+                        IndexToRemove.Add(i);
+                    }
+                }
+
+                foreach (var index in IndexToRemove)
+                {
+                    DeadBots.RemoveAt(index);
+                }
+
+                IndexToRemove.Clear();
+            }
+        }
+
+        private void UpdateObstacles()
+        {
+            if (DeathObstacles.Count > 0)
+            {
+                for (int i = 0; i < DeathObstacles.Count; i++)
+                {
+                    var obstacle = DeathObstacles[i];
+                    if (obstacle.TimeSinceCreated > 30f)
+                    {
+                        obstacle.Dispose();
+                        IndexToRemove.Add(i);
+                    }
+                }
+
+                foreach (var index in IndexToRemove)
+                {
+                    DeathObstacles.RemoveAt(index);
+                }
+
+                IndexToRemove.Clear();
+            }
         }
 
         public void SoundPlayed(SAINSoundType soundType, Player player, float range)
@@ -218,28 +298,73 @@ namespace SAIN.Components
             AISoundPlayed -= SoundPlayed;
             Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
+            Singleton<BotSpawnerClass>.Instance.OnBotRemoved -= BotDeath;
 
+            foreach (var obstacle in DeathObstacles)
+            {
+                obstacle?.Dispose();
+            }
+
+            DeathObstacles.Clear();
             SAINBots.Clear();
-
             Destroy(this);
         }
 
-        public void AddBot(SAINComponent sain)
+        public void AddBot(BotOwner bot)
         {
-            string Id = sain.ProfileId;
-            if (!SAINBots.ContainsKey(Id))
+            string profileId = bot.ProfileId;
+            if (!SAINBots.ContainsKey(profileId))
             {
-                SAINBots.Add(Id, sain);
+                SAINBots.Add(profileId, bot.GetOrAddComponent<SAINComponent>());
             }
         }
 
-        public void RemoveBot(SAINComponent sain)
+        public bool GetBot(string profileId, out SAINComponent bot)
         {
-            string Id = sain.ProfileId;
-            if (SAINBots.ContainsKey(Id))
+            return SAINBots.TryGetValue(profileId, out bot);
+        }
+
+        public void RemoveBot(string profileId)
+        {
+            if (SAINBots.TryGetValue(profileId, out var component))
             {
-                SAINBots.Remove(Id);
+                SAINBots.Remove(profileId);
+                component?.Dispose();
             }
         }
+    }
+
+    public class BotDeathObject
+    {
+        public BotDeathObject(Player player)
+        {
+            Player = player;
+            NavMeshObstacle = player.gameObject.AddComponent<NavMeshObstacle>();
+            NavMeshObstacle.carving = false;
+            NavMeshObstacle.enabled = false;
+            Position = player.Position;
+            TimeCreated = Time.time;
+        }
+
+        public void Activate(float radius = 2f)
+        {
+            NavMeshObstacle.enabled = true;
+            NavMeshObstacle.carving = true;
+            NavMeshObstacle.radius = radius;
+        }
+
+        public void Dispose()
+        {
+            NavMeshObstacle.carving = false;
+            NavMeshObstacle.enabled = false;
+            GameObject.Destroy(NavMeshObstacle);
+        }
+
+        public NavMeshObstacle NavMeshObstacle { get; private set; }
+        public Player Player { get; private set; }
+        public Vector3 Position { get; private set; }
+        public float TimeCreated { get; private set; }
+        public float TimeSinceCreated => Time.time - TimeCreated;
+        public bool ObstacleActive => NavMeshObstacle.carving;
     }
 }

@@ -87,15 +87,15 @@ namespace SAIN.Layers
             }
             if (BotOwner.SuppressShoot.InitToPoints(list))
             {
-                //Logger.LogDebug("Init to Points List Success");
+                //Logger.LogDebug("Activate to Points List Success");
             }
             else if (BotOwner.SuppressShoot.InitToPoint(BotOwner.Memory.GoalEnemy.EnemyLastPositionReal))
             {
-                //Logger.LogDebug("Init to DangerPoint Success");
+                //Logger.LogDebug("Activate to DangerPoint Success");
             }
             else if (BotOwner.SuppressShoot.Init(BotOwner.Memory.GoalEnemy))
             {
-                //Logger.LogDebug("Init to GoalEnemy Success");
+                //Logger.LogDebug("Activate to GoalEnemy Success");
             }
             else
             {

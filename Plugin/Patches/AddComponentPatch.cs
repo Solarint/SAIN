@@ -5,6 +5,7 @@ using SAIN.Components;
 using System.Reflection;
 using SAIN.Helpers;
 using Comfort.Common;
+using System;
 
 namespace SAIN.Patches.Components
 {
@@ -23,8 +24,14 @@ namespace SAIN.Patches.Components
                 return;
             }
 
-            var component = __instance.GetOrAddComponent<SAINComponent>();
-            Singleton<GameWorld>.Instance.GetComponent<SAINBotController>()?.AddBot(component);
+            try
+            {
+                SAINPlugin.BotController.AddBot(__instance);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($" SAIN Add Component Error: {ex}");
+            }
         }
     }
 
@@ -48,11 +55,13 @@ namespace SAIN.Patches.Components
                 return;
             }
 
-            var component = __instance.GetComponent<SAINComponent>();
-            if (component != null)
+            try
             {
-                Singleton<GameWorld>.Instance.GetComponent<SAINBotController>()?.RemoveBot(component);
-                component?.Dispose();
+                SAINPlugin.BotController.RemoveBot(__instance.ProfileId);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($" SAIN Dispose Component Error: {ex}");
             }
         }
     }
