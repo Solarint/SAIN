@@ -222,6 +222,16 @@ namespace SAIN.Components
                 }
                 Enemy = Enemies[profileId];
             }
+            var lastEnemy = BotOwner.Memory.LastEnemy;
+            if (lastEnemy != null && Enemy == null)
+            {
+                profileId = lastEnemy.Person.ProfileId;
+                if (!Enemies.ContainsKey(profileId))
+                {
+                    Enemies.Add(profileId, new SAINEnemy(BotOwner, lastEnemy.Person, DifficultyModifier));
+                }
+                Enemy = Enemies[profileId];
+            }
         }
 
         private SAINEnemy PickClosestEnemy()

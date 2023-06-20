@@ -27,6 +27,7 @@ namespace SAIN.Classes
                 }
             }
 
+
             if (StartInvestigate())
             {
                 Decision = SAINSoloDecision.Investigate;

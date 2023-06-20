@@ -25,26 +25,23 @@ namespace SAIN.Layers
 
         public override void Start()
         {
-            Vector3 targetPosition;
-            if (BotOwner.Memory.GoalEnemy != null)
-            {
-                targetPosition = BotOwner.Memory.GoalEnemy.CurrPosition;
-            }
-            else if (BotOwner.Memory.GoalTarget?.GoalTarget?.Position != null)
-            {
-                targetPosition = BotOwner.Memory.GoalTarget.GoalTarget.Position;
-            }
-            else
-            {
-                targetPosition = BotOwner.Transform.position;
-            }
-
             Search = new SearchClass(BotOwner);
-            if (Search.GoToPoint(targetPosition) == NavMeshPathStatus.PathInvalid)
+            FindTarget();
+        }
+
+        private void FindTarget()
+        {
+            if (SAIN.CurrentTargetPosition != null)
             {
-                Logger.LogError($"Could not Start Search!");
+                if (Search.GoToPoint(SAIN.CurrentTargetPosition.Value) == NavMeshPathStatus.PathInvalid)
+                {
+                    TargetPosition = SAIN.CurrentTargetPosition.Value;
+                    Logger.LogError($"Could not Start Search!");
+                }
             }
         }
+
+        private Vector3? TargetPosition;
 
         public override void Stop()
         {
@@ -52,9 +49,25 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            CheckShouldSprint();
-            Search.Update(!SprintEnabled, SprintEnabled);
-            Steer(Search.ActiveDestination);
+            if (SAIN.Enemy != null)
+            {
+                Shoot.Update();
+            }
+            if ( TargetPosition != null )
+            {
+                if (SAIN.Enemy == null && (BotOwner.Position - TargetPosition.Value).sqrMagnitude < 2f)
+                {
+                    BotOwner.Memory.GoalTarget?.Clear();
+                    return;
+                }
+                CheckShouldSprint();
+                Search.Update(!SprintEnabled, SprintEnabled);
+                Steer(Search.ActiveDestination);
+            }
+            else
+            {
+                FindTarget();
+            }
         }
 
         private void CheckShouldSprint()
