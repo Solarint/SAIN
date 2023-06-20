@@ -18,7 +18,10 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             Init();
             WeaponInfo = new WeaponInfo(BotOwner);
+            PercentageRaidLeftBeforeExtract = UnityEngine.Random.Range(10f, 50f);
         }
+
+        public float PercentageRaidLeftBeforeExtract { get; private set; }
 
         private void Init()
         {
@@ -27,10 +30,6 @@ namespace SAIN.Classes
             IsScav = BotType == WildSpawnType.assault || BotType == WildSpawnType.cursedAssault || BotType == WildSpawnType.marksman;
             string botTypeString = BotType.ToString();
             IsPMC = botTypeString == "sptUsec" || botTypeString == "sptBear";
-            if (IsPMC)
-            {
-                Logger.LogInfo("Found PMC!");
-            }
 
             SetPersonality();
             DifficultyModifier = CalculateDifficulty(BotOwner);
@@ -44,6 +43,15 @@ namespace SAIN.Classes
                 GetTimeBeforeSearch();
             }
             WeaponInfo.ManualUpdate();
+
+            if (SAIN.Squad.BotInGroup && !SAIN.Squad.IAmLeader)
+            {
+                var Leader = SAIN.Squad.LeaderComponent;
+                if (Leader != null)
+                {
+                    PercentageRaidLeftBeforeExtract = Leader.Info.PercentageRaidLeftBeforeExtract;
+                }
+            }
         }
 
         private int GroupCount = 0;

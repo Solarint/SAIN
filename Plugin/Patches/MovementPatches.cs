@@ -101,7 +101,7 @@ namespace SAIN.Patches.Movement
         }
     }
 
-    public class StopMoveDisable : ModulePatch
+    public class StopMoveDisable1 : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -111,7 +111,80 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner __instance)
         {
-            return !BigBrainSAIN.IsBotUsingSAINLayer(__instance);
+            return false;
+        }
+    }
+
+    public class StopMoveDisable2 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("Stop", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotOwner __instance)
+        {
+            return false;
+        }
+    }
+
+    public class SprintPause : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("SprintPause", BindingFlags.Instance | BindingFlags.Public );
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotOwner __instance)
+        {
+            return false;
+        }
+    }
+
+    public class PlayerSprint : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(Player)?.GetMethod("EnableSprint", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(Player __instance)
+        {
+            Player player = __instance;
+            if (player.IsAI)
+            {
+                string Id = player.AIData.BotOwner.ProfileId;
+                var Bots = SAINPlugin.BotController.SAINBots;
+                if (Bots.ContainsKey(Id))
+                {
+                    if (Bots[Id].LayersActive)
+                    {
+                        if (!Environment.StackTrace.Contains("SAIN"))
+                        {
+                            Logger.LogWarning("WHY U TRY STOP SPRINT");
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+    }
+
+    public class MovePause : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetProperty("Mover")?.PropertyType?.GetMethod("MovementPause", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref BotOwner __instance)
+        {
+            return false;
         }
     }
 

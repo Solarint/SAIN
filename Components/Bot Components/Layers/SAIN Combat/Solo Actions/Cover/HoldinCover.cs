@@ -35,7 +35,7 @@ namespace SAIN.Layers
                     if (ResetSideStepTimer < Time.time)
                     {
                         ResetSideStepTimer = Time.time + 1.5f;
-                        SAIN.Lean.SideStep.SetSideStep(0f);
+                        //SAIN.Lean.SideStep.SetSideStep(0f);
                     }
                     else if (NewSideStepTimer < Time.time)
                     {
@@ -43,11 +43,11 @@ namespace SAIN.Layers
                         SideStepRight = !SideStepRight;
                         if (SideStepRight)
                         {
-                            SAIN.Lean.SideStep.SetSideStep(1f);
+                            //SAIN.Lean.SideStep.SetSideStep(1f);
                         }
                         else
                         {
-                            SAIN.Lean.SideStep.SetSideStep(-1f);
+                            //SAIN.Lean.SideStep.SetSideStep(-1f);
                         }
                     }
                 }
@@ -65,11 +65,11 @@ namespace SAIN.Layers
 
         public override void Start()
         {
+            SAIN.Mover.Sprint(false);
         }
 
         public override void Stop()
         {
-            SAIN.Lean.SideStep.SetSideStep(0f);
         }
     }
 }

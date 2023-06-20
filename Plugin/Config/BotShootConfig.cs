@@ -15,7 +15,7 @@ namespace SAIN.UserSettings
         {
             string shoot = "Bot Shoot Settings";
 
-            RateofFire = Config.Bind(shoot, "SemiAuto Rate of Fire Modifier", 1.25f,
+            RateofFire = Config.Bind(shoot, "SemiAuto Rate of Fire Modifier", 1.35f,
                 new ConfigDescription("Adjusts bot's base rate of fire value. Higher is faster overall rate of fire.",
                 new AcceptableValueRange<float>(0.01f, 5.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
@@ -25,7 +25,7 @@ namespace SAIN.UserSettings
                 new AcceptableValueRange<float>(0.1f, 3.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }));
 
-            ScatterMultiplier = Config.Bind(shoot, "Bot Recoil Scatter Multiplier", 1f,
+            ScatterMultiplier = Config.Bind(shoot, "Bot Recoil Scatter Multiplier", 1.5f,
                 new ConfigDescription("Increases or decreases scatter from recoil",
                 new AcceptableValueRange<float>(0.01f, 10.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
@@ -40,7 +40,7 @@ namespace SAIN.UserSettings
                 new AcceptableValueRange<float>(-1.0f, 5.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
 
-            LerpRecoil = Config.Bind(shoot, "Bot Recoil Recoil Reduction", 0.9f,
+            LerpRecoil = Config.Bind(shoot, "Bot Recoil Recoil Reduction", 0.925f,
                 new ConfigDescription("How much to reduce recoil per frame when not shooting",
                 new AcceptableValueRange<float>(0.1f, 0.99f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));

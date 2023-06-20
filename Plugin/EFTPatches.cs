@@ -17,6 +17,7 @@ namespace SAIN
 
         private static void GenericPatches()
         {
+            new Patches.BetterAudioPatch().Enable();
             new Patches.Generic.InitHelper().Enable();
             new Patches.Generic.GetDefaultBotController().Enable();
             new Patches.Generic.GrenadeThrownActionPatch().Enable();
@@ -38,13 +39,17 @@ namespace SAIN
 
         private static void MovementPatches()
         {
-            new Patches.Movement.SteerDisablePatch().Enable();
-            new Patches.Movement.StopMoveDisable().Enable();
+            //new Patches.Movement.PlayerSprint().Enable();
+            //new Patches.Movement.SprintPause().Enable();
+            //new Patches.Movement.MovePause().Enable();
+            //new Patches.Movement.SteerDisablePatch().Enable();
+            //new Patches.Movement.StopMoveDisable1().Enable();
+            //new Patches.Movement.StopMoveDisable2().Enable();
             new Patches.Movement.KickPatch().Enable();
-            new Patches.Movement.SprintDisable().Enable();
-            new Patches.Movement.BotRunDisable().Enable();
-            new Patches.Movement.TargetSpeedDisable1().Enable();
-            new Patches.Movement.TargetSpeedDisable2().Enable();
+            //new Patches.Movement.SprintDisable().Enable();
+            //new Patches.Movement.BotRunDisable().Enable();
+            //new Patches.Movement.TargetSpeedDisable1().Enable();
+            //new Patches.Movement.TargetSpeedDisable2().Enable();
             //new Patches.Movement.SetPoseDisable1().Enable();
             //new Patches.Movement.SetPoseDisable2().Enable();
             //new Patches.Movement.HoldOrCoverDisable1().Enable();

@@ -99,6 +99,78 @@ namespace SAIN.Classes
             return (BotOwner.Position - point).magnitude;
         }
 
+        private bool _enemyIsReloading;
+        private float _soundResetTimer;
+
+        public bool EnemyIsReloading
+        {
+            get
+            {
+                if (_soundResetTimer < Time.time)
+                {
+                    _enemyIsReloading = false;
+                }
+                return _enemyIsReloading;
+            }
+            set
+            {
+                if (value == true)
+                {
+                    _enemyIsReloading = true;
+                    _soundResetTimer = Time.time + 3f;
+                }
+            }
+        }
+
+        private bool _enemyHasGrenade;
+        private float _grenadeResetTimer;
+
+        public bool EnemyHasGrenadeOut
+        {
+            get
+            {
+                if (_grenadeResetTimer < Time.time)
+                {
+                    _enemyHasGrenade = false;
+                }
+                return _enemyHasGrenade;
+            }
+            set
+            {
+                if (value == true)
+                {
+                    _enemyHasGrenade = true;
+                    _grenadeResetTimer = Time.time + 3f;
+                }
+            }
+        }
+
+        private bool _enemyIsHeal;
+        private float _healResetTimer;
+
+        public bool EnemyIsHealing
+        {
+            get
+            {
+                if (_healResetTimer < Time.time)
+                {
+                    _enemyIsHeal = false;
+                }
+                return _enemyIsHeal;
+            }
+            set
+            {
+                if (value == true)
+                {
+                    _enemyIsHeal = true;
+                    _healResetTimer = Time.time + 4f;
+                }
+            }
+        }
+
+
+        private float SoundResetTimer = 0f;
+
         public float RealDistance { get; private set; }
         public float LastSeenDistance { get; private set; }
         public Vector3 PositionLastSeen { get; private set; }
@@ -133,6 +205,14 @@ namespace SAIN.Classes
         {
             UpdateVisible(false);
         }
+
+        public void UpdateCanShoot(bool value, float percentage)
+        {
+            PercentageEnemyCanShoot = percentage;
+            CanShoot = value;
+        }
+
+        public float PercentageEnemyCanShoot { get; private set; }
 
         private void UpdateVisible(bool inLineOfSight)
         {
@@ -187,7 +267,7 @@ namespace SAIN.Classes
         {
             if (CheckPathTimer < Time.time)
             {
-                CheckPathTimer = Time.time + 0.5f;
+                CheckPathTimer = Time.time + 0.25f;
 
                 CalcPath(Person.Position);
             }

@@ -6,7 +6,9 @@ namespace SAIN.Classes
 {
     public class EnemyDecisionClass : SAINBot
     {
-        public EnemyDecisionClass(BotOwner bot) : base(bot) { }
+        public EnemyDecisionClass(BotOwner bot) : base(bot) 
+        {
+        }
 
         protected ManualLogSource Logger => SAIN.Decision.Logger;
 
@@ -29,6 +31,10 @@ namespace SAIN.Classes
             else if (StartStandAndShoot())
             {
                 Decision = SAINSoloDecision.StandAndShoot;
+            }
+            else if (StartRushEnemy())
+            {
+                Decision = SAINSoloDecision.RushEnemy;
             }
             else if (StartSearch())
             {
@@ -53,7 +59,7 @@ namespace SAIN.Classes
             }
             else
             {
-                Decision = SAINSoloDecision.Shoot;
+                Decision = SAINSoloDecision.DogFight;
             }
 
             if (Decision != SAINSoloDecision.WalkToCover && Decision != SAINSoloDecision.RunToCover)
@@ -62,6 +68,30 @@ namespace SAIN.Classes
             }
 
             return true;
+        }
+
+        private bool StartRushEnemy()
+        {
+            var enemy = SAIN.Enemy;
+            if (enemy != null)
+            {
+                if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
+                {
+                    return true;
+                }
+            }
+            var Personality = SAIN.Info.BotPersonality;
+            if (Personality == BotPersonality.GigaChad || Personality == BotPersonality.Chad)
+            {
+                if (enemy != null && enemy.RealDistance < 30f)
+                {
+                    if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private bool StartShiftCover()

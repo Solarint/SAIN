@@ -6,17 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
 using Unity.Jobs;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.VisionConfig;
 using SAIN.Helpers;
 using SAIN;
 using SAIN.Components.BotController;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SAIN.Components
 {
     public class SAINBotController : MonoBehaviour
     {
+        public Action<SAINSoundType, Player, float> AISoundPlayed;
+
         public Dictionary<string, SAINComponent> SAINBots = new Dictionary<string, SAINComponent>();
         public LineOfSightManager LineOfSightManager { get; private set; } = new LineOfSightManager();
         public CoverManager CoverManager { get; private set; } = new CoverManager();
@@ -25,6 +29,7 @@ namespace SAIN.Components
         public static Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
         public BotControllerClass DefaultController { get; set; }
         public ManualLogSource Logger => LineOfSightManager.Logger;
+        public BotExtractManager BotExtractManager { get; private set; } = new BotExtractManager();
 
         private TimeClass TimeClass { get; set; } = new TimeClass();
         private WeatherVisionClass WeatherClass { get; set; } = new WeatherVisionClass();
@@ -43,6 +48,7 @@ namespace SAIN.Components
             LineOfSightManager.Awake();
             CoverManager.Awake();
             PathManager.Awake();
+            AISoundPlayed += SoundPlayed;
 
             Singleton<GClass629>.Instance.OnGrenadeThrow += GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive += GrenadeExplosion;
@@ -60,12 +66,51 @@ namespace SAIN.Components
                 return;
             }
 
+            BotExtractManager.Update();
             UpdateMainPlayer();
             TimeClass.Update();
             WeatherClass.Update();
             LineOfSightManager.Update();
             CoverManager.Update();
             PathManager.Update();
+        }
+
+        public void SoundPlayed(SAINSoundType soundType, Player player, float range)
+        {
+            if (SAINBots.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var bot in SAINBots.Values)
+            {
+                if (player.ProfileId == bot.Player.ProfileId)
+                {
+                    continue;
+                }
+                var Enemy = bot.Enemy;
+                if (Enemy != null && Enemy.Person.GetPlayer.ProfileId == player.ProfileId)
+                {
+                    if (Enemy.RealDistance <= range)
+                    {
+                        if (soundType == SAINSoundType.GrenadePin || soundType == SAINSoundType.GrenadeDraw)
+                        {
+                            Enemy.EnemyHasGrenadeOut = true;
+                            return;
+                        }
+                        if (soundType == SAINSoundType.Reload)
+                        {
+                            Enemy.EnemyIsReloading = true;
+                            return;
+                        }
+                        if (soundType == SAINSoundType.Heal)
+                        {
+                            Enemy.EnemyIsHealing = true;
+                            return;
+                        }
+                    }
+                }
+            }
         }
 
         private void UpdateMainPlayer()
@@ -170,6 +215,7 @@ namespace SAIN.Components
         {
             StopAllCoroutines();
 
+            AISoundPlayed -= SoundPlayed;
             Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
 

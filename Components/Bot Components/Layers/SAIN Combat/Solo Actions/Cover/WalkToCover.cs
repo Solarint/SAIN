@@ -21,37 +21,34 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (CoverDestination != null && CoverDestination.BotIsHere)
+            if (CoverDestination != null)
             {
-                EngageEnemy();
-                return;
+                if (!SAIN.Cover.CoverPoints.Contains(CoverDestination) || CoverDestination.Spotted)
+                {
+                    CoverDestination = null;
+                }
             }
 
             SAIN.Mover.SetTargetMoveSpeed(1f);
             SAIN.Mover.SetTargetPose(1f);
 
-            FindTargetCover();
-
             if (CoverDestination == null)
             {
-                EngageEnemy();
-                return;
+                if (FindTargetCover())
+                {
+                    if (SAIN.Mover.Prone.ShallProne(CoverDestination, true) || SAIN.Mover.Prone.IsProne)
+                    {
+                        SAIN.Mover.Prone.SetProne(true);
+                        SAIN.Mover.StopMove();
+                    }
+                    else
+                    {
+                        MoveTo(DestinationPosition);
+                    }
+                }
             }
 
-            if (CoverDestination != null)
-            {
-                if (SAIN.Mover.Prone.ShallProne(CoverDestination, true) || SAIN.Mover.Prone.IsProne)
-                {
-                    SAIN.Mover.Prone.SetProne(true);
-                    SAIN.Mover.StopMove();
-                }
-                else
-                {
-                    MoveTo(DestinationPosition);
-                }
-
-                EngageEnemy();
-            }
+            EngageEnemy();
         }
 
         private bool FindTargetCover()
@@ -61,17 +58,16 @@ namespace SAIN.Layers
             {
                 if (CanMoveTo(coverPoint, out Vector3 pointToGo))
                 {
+                    coverPoint.BotIsUsingThis = true;
+                    CoverDestination = coverPoint;
                     DestinationPosition = pointToGo;
                     return true;
                 }
                 else
                 {
                     coverPoint.Spotted = true;
+                    coverPoint.BotIsUsingThis = false;
                 }
-            }
-            if (CoverDestination != null)
-            {
-                CoverDestination.BotIsUsingThis = false;
             }
             return false;
         }
@@ -82,7 +78,6 @@ namespace SAIN.Layers
             SAIN.Mover.GoToPoint(position);
             SAIN.Mover.SetTargetMoveSpeed(1f);
             SAIN.Mover.SetTargetPose(1f);
-            BotOwner.DoorOpener.Update();
         }
 
         private bool CanMoveTo(CoverPoint coverPoint, out Vector3 pointToGo)
@@ -95,12 +90,11 @@ namespace SAIN.Layers
             return false;
         }
 
-        private CoverPoint CoverDestination => SAIN.Cover.ClosestPoint;
+        private CoverPoint CoverDestination;
         private Vector3 DestinationPosition;
 
         private void EngageEnemy()
         {
-            SAIN.Steering.LookToMovingDirection(false);
             if (!SAIN.Steering.SteerByPriority(false))
             {
                 if (SAIN.Enemy != null)
@@ -115,10 +109,12 @@ namespace SAIN.Layers
 
         public override void Start()
         {
+            SAIN.Mover.Sprint(false);
         }
 
         public override void Stop()
         {
+            CoverDestination = null;
         }
 
         private readonly SAINComponent SAIN;

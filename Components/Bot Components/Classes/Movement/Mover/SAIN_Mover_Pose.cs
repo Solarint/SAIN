@@ -14,9 +14,9 @@ using SAIN.Helpers;
 
 namespace SAIN.Classes.Mover
 {
-    public class PoseClass : SAINBot
+    public class SAIN_Mover_Pose : SAINBot
     {
-        public PoseClass(BotOwner owner) : base(owner)
+        public SAIN_Mover_Pose(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -24,7 +24,7 @@ namespace SAIN.Classes.Mover
         private void DebugFindOffset()
         {
             float lowWeapRootY = BotOwner.WeaponRoot.position.y - BotOwner.Position.y;
-            float playerPose = Player.PoseLevel;
+            float playerPose = BotPlayer.PoseLevel;
             if (playerPose == 0f)
             {
                 Logger.LogInfo($"WeaponRoot at 0 pose: [{lowWeapRootY}]");
@@ -50,8 +50,6 @@ namespace SAIN.Classes.Mover
             }
 
             FindObjectsInFront();
-
-            BotOwner.Mover.SetPose(TargetPose);
         }
 
         public bool SetPoseToCover()
@@ -61,27 +59,16 @@ namespace SAIN.Classes.Mover
 
         public void SetTargetPose(float num)
         {
-            TargetPose = num;
+            BotOwner.Mover.SetPose(num);
         }
 
         public bool SetTargetPose(float? num)
         {
-            bool set = num != null;
-            if (set)
+            if (num != null)
             {
-                TargetPose = num.Value;
+                BotOwner.Mover.SetPose(num.Value);
             }
-            return set;
-        }
-
-        public void StandUp()
-        {
-            TargetPose = 1f;
-        }
-
-        public void Crouch()
-        {
-            TargetPose = 0f;
+            return num != null;
         }
 
         public bool ObjectInFront => ObjectTargetPoseCover != null;
@@ -210,12 +197,6 @@ namespace SAIN.Classes.Mover
             const float min = 0.5f;
             const float add = max - min;
             return height - min;
-        }
-
-        public float TargetPose { get; private set; }
-
-        private void PoseChangeScatter(float obj)
-        {
         }
 
         private readonly ManualLogSource Logger;

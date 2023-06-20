@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using SAIN.Components;
 using EFT;
 using DrakiaXYZ.BigBrain.Brains;
+using BepInEx.Bootstrap;
 
 namespace SAIN
 {
@@ -19,6 +20,14 @@ namespace SAIN
             if (!TarkovVersion.CheckEftVersion(Logger, Info, Config))
             {
                 throw new Exception($"Invalid EFT Version");
+            }        
+            
+            // If BigBrain isn't loaded, we need to exit too. Normally this would be handled via
+            // the BepInDependency, but due to remapping between 3.5.7 and 3.5.8 we also have to/
+            // manually check for now
+            if (!Chainloader.PluginInfos.ContainsKey("xyz.drakia.bigbrain"))
+            {
+                throw new Exception("Missing BigBrain");
             }
 
             ConfigInit();

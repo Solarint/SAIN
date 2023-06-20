@@ -52,6 +52,7 @@ namespace SAIN.Layers
 
         public override void Start()
         {
+            SAIN.Mover.Sprint(false);
             StartTime = Time.time;
         }
 

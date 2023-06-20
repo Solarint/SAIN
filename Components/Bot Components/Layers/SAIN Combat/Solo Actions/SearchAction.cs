@@ -81,6 +81,7 @@ namespace SAIN.Layers
         {
             if (Search.PeekingCorner)
             {
+                SprintEnabled = false;
                 SAIN.Mover.SetTargetMoveSpeed(0.33f);
                 SAIN.Mover.SetTargetPose(0.8f);
             }
@@ -97,12 +98,11 @@ namespace SAIN.Layers
 
             if (SprintEnabled && !BotOwner.Memory.IsUnderFire)
             {
-                BotOwner.GetPlayer.EnableSprint(true);
-                SAIN.Steering.LookToMovingDirection();
+                SAIN.Mover.Sprint(true);
             }
             else
             {
-                BotOwner.GetPlayer.EnableSprint(false);
+                SAIN.Mover.Sprint(false);
                 float soundDistance = 999f;
                 if (SAIN.LastHeardSound != null)
                 {

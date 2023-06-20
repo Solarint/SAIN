@@ -13,17 +13,24 @@ using SAIN.Classes.Mover;
 
 namespace SAIN.Classes
 {
-    public class MoverClass : SAINBot
+    public class SAIN_Mover : SAINBot
     {
-        public MoverClass(BotOwner owner) : base(owner)
+        public SAIN_Mover(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            Prone = new ProneClass(owner);
-            Pose = new PoseClass(owner);
+
+            BlindFire = new SAIN_Mover_BlindFire(owner);
+            SideStep = new SAIN_Mover_SideStep(owner);
+            Lean = new SAIN_Mover_Lean(owner);
+            Prone = new SAIN_Mover_Prone(owner);
+            Pose = new SAIN_Mover_Pose(owner);
         }
 
-        public PoseClass Pose { get; private set; }
-        public ProneClass Prone { get; private set; }
+        public SAIN_Mover_BlindFire BlindFire { get; private set; }
+        public SAIN_Mover_SideStep SideStep { get; private set; }
+        public SAIN_Mover_Lean Lean { get; private set; }
+        public SAIN_Mover_Pose Pose { get; private set; }
+        public SAIN_Mover_Prone Prone { get; private set; }
 
         public bool GoToPoint(Vector3 point, float reachDist = -1f, bool crawl = false)
         {
@@ -47,6 +54,7 @@ namespace SAIN.Classes
             }
             return false;
         }
+
         public bool GoToPointWay(Vector3 point, float reachDist = -1f, bool crawl = false)
         {
             if (CurrentDecision == SAINSoloDecision.HoldInCover)
@@ -88,7 +96,7 @@ namespace SAIN.Classes
             return Way != null;
         }
 
-        public bool CanGoToPoint(Vector3 point, out Vector3 pointToGo)
+        public bool CanGoToPoint(Vector3 point, out Vector3 pointToGo, bool mustHaveCompletePath = false)
         {
             pointToGo = point;
             if (CurrentDecision == SAINSoloDecision.HoldInCover)
@@ -100,6 +108,10 @@ namespace SAIN.Classes
                 NavMeshPath Path = new NavMeshPath();
                 if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
                 {
+                    if (mustHaveCompletePath && Path.status != NavMeshPathStatus.PathComplete)
+                    {
+                        return false;
+                    }
                     pointToGo = navHit.position;
                     return true;
                 }
@@ -109,42 +121,19 @@ namespace SAIN.Classes
 
         public void Update()
         {
-            if (!UpdateSprint())
-            {
-                Pose.Update();
-                UpdateTargetMoveSpeed();
-            }
+            SetStamina();
+            Pose.Update();
+            SideStep.Update();
+            Prone.Update();
+            BlindFire.Update();
         }
 
-        private bool UpdateSprint()
+        private void SetStamina()
         {
-            if (IsSprinting)
+            var stamina = BotPlayer.Physical.Stamina;
+            if (SAIN.LayersActive && stamina.NormalValue < 0.33f)
             {
-                SetTargetPose(1f);
-                SetTargetMoveSpeed(1f);
-                FastLean(0f);
-                SAIN.Steering.LookToMovingDirection();
-
-                CurrentState.EnableSprint(true);
-                return true;
-            }
-            else
-            {
-                CurrentState.EnableSprint(false);
-                return false;
-            }
-        }
-
-        private void UpdateTargetMoveSpeed()
-        {
-            if (BotOwner.DoorOpener.NearDoor)
-            {
-                DestMoveSpeed = 0.5f;
-            }
-            float num = DestMoveSpeed - Player.Speed;
-            if (Math.Abs(num) >= 1E-45f)
-            {
-                Player.ChangeSpeed(num); 
+                BotPlayer.Physical.Stamina.UpdateStamina(stamina.TotalCapacity);
             }
         }
 
@@ -155,36 +144,32 @@ namespace SAIN.Classes
 
         public void SetTargetMoveSpeed(float speed)
         {
-            DestMoveSpeed = speed;
+            BotOwner.Mover.SetTargetMoveSpeed(speed);
         }
 
         public float DestMoveSpeed { get; private set; }
 
         public void StopMove()
         {
-            NavigationPoint = null;
+            SAIN.Steering.LookToMovingDirection(false);
             BotOwner.Mover.Stop();
-            Sprint(false);
+            if (IsSprinting)
+            {
+                Sprint(false);
+            }
         }
-
-        public bool CanSprint => Player.Physical.CanSprint;
 
         public void Sprint(bool value)
         {
-            IsSprinting = value;
+            BotOwner.Mover.Sprint(value);
+            SAIN.Steering.LookToMovingDirection(value);
+            if (value)
+            {
+                FastLean(0f);
+            }
         }
 
-        public void ToggleSprint()
-        {
-            bool enable = !Player.Physical.Sprinting;
-            CurrentState.EnableSprint(enable, true);
-        }
-
-        public bool IsSprinting { get; private set; }
-
-        public NavigationPointObject NavigationPoint { get; private set; }
-        public bool HasDestination => NavigationPoint != null;
-        public CoverPoint CoverDestination { get; private set; }
+        public bool IsSprinting => BotOwner.Mover.Sprinting;
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
         {
@@ -244,7 +229,10 @@ namespace SAIN.Classes
 
         public void SetBlindFire(int value)
         {
-            BotOwner.GetPlayer.MovementContext.SetBlindFire(value);
+            if (BotOwner.GetPlayer.MovementContext.BlindFire != value)
+            {
+                BotOwner.GetPlayer.MovementContext.SetBlindFire(value);
+            }
         }
 
         public void FastLean(LeanSetting value)
@@ -254,7 +242,10 @@ namespace SAIN.Classes
 
         public void FastLean(float value)
         {
-            Player.MovementContext.SetTilt(value);
+            if (BotPlayer.MovementContext.Tilt != value)
+            {
+                BotPlayer.MovementContext.SetTilt(value);
+            }
         }
 
         public void SlowLean(LeanSetting value)
@@ -274,7 +265,7 @@ namespace SAIN.Classes
 
         public void SlowLean(float value)
         {
-            Player.SlowLean(value);
+            BotPlayer.SlowLean(value);
         }
 
         private void UpdateLean()

@@ -1,7 +1,10 @@
 ﻿using BepInEx.Logging;
+using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
+using System;
+using UnityEngine;
 
 namespace SAIN.Layers
 {
@@ -9,14 +12,18 @@ namespace SAIN.Layers
     {
         public override string GetName()
         {
-            return "SAIN Extract";
+            return Name;
         }
+
+        public static string Name = "SAIN Extract";
 
         public SAINExtractLayer(BotOwner bot, int priority) : base(bot, priority)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
         }
+
+        private float PercentageToExtract => SAIN.Info.PercentageRaidLeftBeforeExtract;
 
         public override Action GetNextAction()
         {
@@ -25,16 +32,48 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            return Active;
-        }
+            if (SAIN.CanNotExfil == true || SAIN.Exfil == null)
+            {
+                return false;
+            }
 
-        private bool Active => CurrentDecision == SAINSoloDecision.None && !SAIN.HasGoalEnemy && !SAIN.HasGoalTarget && BotOwner.Memory.IsPeace;
+            if (!SAIN.Info.IsPMC && !SAIN.Info.IsScav)
+            {
+                return false;
+            }
+
+            float percentageLeft = BotController.BotExtractManager.PercentageRemaining;
+            if (percentageLeft <= PercentageToExtract)
+            {
+                if (SAIN.Enemy == null)
+                {
+                    return true;
+                }
+                else if (BotController.BotExtractManager.TimeRemaining < 120)
+                {
+                    return true;
+                }
+            }
+            if (SAIN.Dying && !BotOwner.Medecine.FirstAid.HaveSmth2Use)
+            {
+                if (SAIN.Enemy == null)
+                {
+                    return true;
+                }
+                else if (SAIN.Enemy.TimeSinceSeen > 30f)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public override bool IsCurrentActionEnding()
         {
-            return !Active;
+            return false;
         }
 
+        private SAINBotController BotController => SAINPlugin.BotController;
         public SAINSoloDecision LastDecision => SAIN.Decision.OldMainDecision;
         public SAINSoloDecision CurrentDecision => SAIN.CurrentDecision;
 

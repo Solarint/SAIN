@@ -15,7 +15,7 @@ namespace SAIN
 
         public BotOwner BotOwner { get; private set; }
         public SAINComponent SAIN { get; private set; }
-        public Player Player => BotOwner.GetPlayer;
+        public Player BotPlayer => BotOwner.GetPlayer;
         public Vector3 BotPosition => BotOwner.Position;
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
         public SAINBotController BotController => BotControllerHandler.BotController;

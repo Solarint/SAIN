@@ -66,7 +66,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\3.5.7\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
@@ -204,12 +204,17 @@
   <ItemGroup>
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\EFTBotGrenade.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\ThrowGrenadeClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\Mover\PoseClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\Mover\ProneClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\Steering\EFTSteeringCopy.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_Speed.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_SideStep.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_BlindFire.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_Pose.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_Prone.cs" />
+    <Compile Include="Components\Bot Components\Helpers\SAINSoundTypeHandler.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\RunToCover.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\ShiftCover.cs" />
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Push.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ThrowGrenade.cs" />
+    <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\ShootClass.cs" />
@@ -231,7 +236,7 @@
     <Compile Include="Components\Bot Components\Classes\Decision\Classes\SelfActionDecisionClass.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\FriendlyFireClass.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\JumpClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\Mover\MoverClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover.cs" />
     <Compile Include="Components\Bot Components\Classes\Cover\CoverPointClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Decision\DecisionClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Sense\HearingSensorClass.cs" />
@@ -291,7 +296,7 @@
     <Compile Include="Components\Bot Components\Classes\Core\InfoClass.cs" />
     <Compile Include="Components\Bot Components\SAINEnum.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\GrenadeTrackerComponent.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\Mover\LeanComponent.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_Lean.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\SearchAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\HoldinCover.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Squad Actions\SuppressAction.cs" />
@@ -301,7 +306,7 @@
     <Compile Include="Plugin\Config\CoverConfig.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSolo.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ShootAction.cs" />
-    <Compile Include="Components\Bot Components\Classes\Movement\Steering\SteeringClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\Movement\SteeringClass.cs" />
     <Compile Include="Plugin\Config\DebugConfigs.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\DogFight.cs" />
     <Compile Include="Components\Bot Components\Helpers\CornersHelper.cs" />
@@ -331,6 +336,13 @@
   </ProjectExtensions>
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\$(TargetName)-$(ConfigurationName).dll"
+
+if $(ConfigurationName) == Debug (
+    copy "$(TargetDir)$(TargetName).pdb" "C:\Games\spt 3.5.7\BepInEx\plugins\$(TargetName).pdb"
+) else (
+    del "C:\Games\spt 3.5.7\BepInEx\plugins\$(TargetName).pdb"
+)
+)
 
 </PostBuildEvent>
   </PropertyGroup>

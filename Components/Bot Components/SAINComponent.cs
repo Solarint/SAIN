@@ -27,6 +27,8 @@ namespace SAIN.Components
             ExitsToLocation.AddRange(exits);
         }
 
+        public bool CanNotExfil { get; set; }
+
         public string ProfileId => BotOwner.ProfileId;
         public string SquadId => Squad.SquadID;
         public Player Player => BotOwner.GetPlayer;
@@ -44,14 +46,13 @@ namespace SAIN.Components
             BotStuck = new BotUnstuckClass(bot);
             Hearing = new HearingSensorClass(bot);
             Talk = new BotTalkClass(bot);
-            Lean = bot.GetOrAddComponent<LeanComponent>();
             Decision = new DecisionClass(bot);
             Cover = new CoverClass(bot);
             FlashLight = bot.GetPlayer.gameObject.AddComponent<FlashLightComponent>();
             SelfActions = new SelfActionClass(bot);
             Steering = new SteeringClass(bot);
             Grenade = new BotGrenadeClass(bot);
-            Mover = new MoverClass(bot);
+            Mover = new SAIN_Mover(bot);
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
@@ -79,8 +80,11 @@ namespace SAIN.Components
                     BotOwner.AimingData?.LoseTarget();
                 }
 
+                UpdateExfiltration();
                 UpdateHealth();
                 UpdateEnemy();
+
+                BotOwner.DoorOpener.Update();
                 Equipment.Update();
                 Grenade.Update();
                 Mover.Update();
@@ -92,6 +96,35 @@ namespace SAIN.Components
                 Talk.Update();
                 SelfActions.Update();
                 Steering.Update();
+            }
+        }
+
+        private void UpdateExfiltration()
+        {
+            if (Info.IsPMC || Info.IsScav)
+            {
+                if (Exfil == null && !CanNotExfil)
+                {
+                    FindExfil();
+                }
+
+                var leader = Squad.LeaderComponent;
+                if (Squad.BotInGroup && leader != null && !Squad.IAmLeader)
+                {
+                    if (leader.Exfil != null)
+                    {
+                        Exfil = leader.Exfil;
+                        CanNotExfil = false;
+                    }
+                    else
+                    {
+                        if (Exfil != null)
+                        {
+                            leader.Exfil = Exfil;
+                            leader.CanNotExfil = false;
+                        }
+                    }
+                }
             }
         }
 
@@ -110,14 +143,14 @@ namespace SAIN.Components
             }
         }
 
-        public bool SAINLayersActive => BigBrainSAIN.IsBotUsingSAINLayer(BotOwner);
+        public bool LayersActive => BigBrainSAIN.IsBotUsingSAINLayer(BotOwner);
         public bool CheckActiveLayer
         {
             get
             {
                 if (RecheckTimer < Time.time)
                 {
-                    if (SAINLayersActive)
+                    if (LayersActive)
                     {
                         RecheckTimer = Time.time + 1f;
                         Active = true;
@@ -163,6 +196,70 @@ namespace SAIN.Components
             }
         }
 
+        private void FindExfil()
+        {
+            List<Vector3> validExfils = new List<Vector3>();
+            var exfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
+            if (Info.IsScav)
+            {
+                var scavPoints = exfilController.ScavExfiltrationPoints;
+                foreach (var ex in scavPoints)
+                {
+                    if (ex != null)
+                    {
+                        if (ex.enabled)
+                        {
+                            Collider collider = ex.GetComponent<Collider>();
+                            if (collider != null)
+                            {
+                                if (Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
+                                {
+                                    validExfils.Add(Destination);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var exfils = Singleton<GameWorld>.Instance.ExfiltrationController?.ExfiltrationPoints;
+                if (exfils != null)
+                {
+                    foreach (var ex in exfils)
+                    {
+                        if (ex != null)
+                        {
+                            if (ex.enabled)
+                            {
+                                Collider collider = ex.GetComponent<Collider>();
+                                if (collider != null)
+                                {
+                                    if (Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
+                                    {
+                                        validExfils.Add(Destination);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (validExfils.Count > 0)
+            {
+                CanNotExfil = false;
+                Exfil = validExfils.PickRandom();
+            }
+            else
+            {
+                CanNotExfil = true;
+                Exfil = null;
+            }
+        }
+
+        public Vector3? Exfil { get; set; }
+
         private void UpdateHealth()
         {
             if (UpdateHealthTimer < Time.time)
@@ -188,7 +285,6 @@ namespace SAIN.Components
 
             Cover?.Dispose();
             Hearing?.Dispose();
-            Lean?.Dispose();
             Cover?.CoverFinder?.Dispose();
             FlashLight?.Dispose();
 
@@ -207,7 +303,7 @@ namespace SAIN.Components
         {
             if (enemy != null && enemy.IsVisible)
             {
-                if (enemy.Player.IsYourPlayer)
+                if (enemy.BotPlayer.IsYourPlayer)
                 {
                     Vector3 direction = enemy.EnemyChestPosition - botHead;
                     if (Physics.Raycast(botHead, direction, out var hitInfo, direction.magnitude, NoBushMask))
@@ -269,7 +365,7 @@ namespace SAIN.Components
 
         public BotEquipmentClass Equipment { get; private set; }
 
-        public MoverClass Mover { get; private set; }
+        public SAIN_Mover Mover { get; private set; }
 
         public AILimitClass AILimit { get; private set; }
 
@@ -290,8 +386,6 @@ namespace SAIN.Components
         public SquadClass Squad { get; private set; }
 
         public SelfActionClass SelfActions { get; private set; }
-
-        public LeanComponent Lean { get; private set; }
 
         public BotGrenadeClass Grenade { get; private set; }
 

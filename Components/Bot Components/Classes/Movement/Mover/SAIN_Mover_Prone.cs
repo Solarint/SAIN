@@ -12,9 +12,9 @@ using HarmonyLib;
 
 namespace SAIN.Classes.Mover
 {
-    public class ProneClass : SAINBot
+    public class SAIN_Mover_Prone : SAINBot
     {
-        public ProneClass(BotOwner owner) : base(owner)
+        public SAIN_Mover_Prone(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             BotLayProperty = AccessTools.Property(typeof(BotOwner), "BotLay").PropertyType.GetProperty("IsLay");
@@ -39,7 +39,7 @@ namespace SAIN.Classes.Mover
             var status = point.CoverStatus;
             if (status == CoverStatus.FarFromCover || status == CoverStatus.None)
             {
-                if (Player.MovementContext.CanProne)
+                if (BotPlayer.MovementContext.CanProne)
                 {
                     var enemy = SAIN.Enemy;
                     if (enemy != null)
@@ -61,7 +61,7 @@ namespace SAIN.Classes.Mover
 
         public bool ShallProne(bool withShoot, float mindist = 30f)
         {
-            if (Player.MovementContext.CanProne)
+            if (BotPlayer.MovementContext.CanProne)
             {
                 var enemy = SAIN.Enemy;
                 if (enemy != null)
@@ -82,7 +82,7 @@ namespace SAIN.Classes.Mover
 
         public bool ShallProneHide(float mindist = 30f)
         {
-            if (Player.MovementContext.CanProne)
+            if (BotPlayer.MovementContext.CanProne)
             {
                 var enemy = SAIN.Enemy;
                 if (enemy != null)

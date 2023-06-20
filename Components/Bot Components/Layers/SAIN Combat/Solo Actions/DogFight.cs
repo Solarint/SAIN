@@ -27,7 +27,9 @@ namespace SAIN.Layers
                 return;
             }
 
-            SAIN.Steering.SteerByPriority(true);
+            SAIN.Mover.SetTargetPose(1f);
+            SAIN.Mover.SetTargetMoveSpeed(1f);
+            SAIN.Steering.SteerByPriority(false);
 
             if (SAIN.Enemy.IsVisible && BackUp(out var pos))
             {
@@ -42,7 +44,9 @@ namespace SAIN.Layers
             Vector3 a = -GClass782.NormalizeFastSelf(BotOwner.Memory.GoalEnemy.Direction);
             trgPos = Vector3.zero;
             float num = 0f;
-            if (NavMesh.SamplePosition(BotOwner.Position + a * 2f / 2f, out NavMeshHit navMeshHit, 1f, -1))
+            Vector3 random = Random.onUnitSphere * 1f;
+            random.y = 0f;
+            if (NavMesh.SamplePosition((BotOwner.Position + a * 2f / 2f) + random, out NavMeshHit navMeshHit, 1f, -1))
             {
                 trgPos = navMeshHit.position;
                 Vector3 a2 = trgPos - BotOwner.Position;
@@ -85,6 +89,7 @@ namespace SAIN.Layers
 
         public override void Start()
         {
+            SAIN.Mover.Sprint(false);
         }
 
         public override void Stop()

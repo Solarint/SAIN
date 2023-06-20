@@ -344,7 +344,7 @@ namespace SAIN.Classes
 
                 if (SquadDecisions.Contains(SAINSquadDecision.Suppress))
                 {
-                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.Suppress;
                     commmandMask = ETagStatus.Combat;
 
@@ -353,7 +353,7 @@ namespace SAIN.Classes
                 }
                 else if (SquadDecision == SAINSquadDecision.Search)
                 {
-                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.FollowMe;
                     commmandMask = ETagStatus.Aware;
 
@@ -362,7 +362,7 @@ namespace SAIN.Classes
                 }
                 else if (SoloDecisions.Contains(SAINSoloDecision.RunToCover))
                 {
-                    Player.HandsController.ShowGesture(EGesture.ComeToMe);
+                    BotPlayer.HandsController.ShowGesture(EGesture.ComeToMe);
                     commandTrigger = EPhraseTrigger.GetBack;
                     commmandMask = ETagStatus.Combat;
 
@@ -371,7 +371,7 @@ namespace SAIN.Classes
                 }
                 else if (BotOwner.DoorOpener.Interacting && EFTMath.RandomBool(33f))
                 {
-                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.OpenDoor;
                     commmandMask = ETagStatus.Aware;
 
@@ -380,7 +380,7 @@ namespace SAIN.Classes
                 }
                 else if (SAIN.CurrentDecision == SAINSoloDecision.RunAway)
                 {
-                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.OnYourOwn;
                     commmandMask = ETagStatus.Aware;
 
@@ -389,7 +389,7 @@ namespace SAIN.Classes
                 }
                 else if (SAIN.Squad.SquadDecisions.Contains(SAINSquadDecision.Regroup))
                 {
-                    Player.HandsController.ShowGesture(EGesture.ComeToMe);
+                    BotPlayer.HandsController.ShowGesture(EGesture.ComeToMe);
                     commandTrigger = EPhraseTrigger.Regroup;
                     commmandMask = ETagStatus.Aware;
 
@@ -398,7 +398,7 @@ namespace SAIN.Classes
                 }
                 else if (SquadDecision == SAINSquadDecision.Help)
                 {
-                    Player.HandsController.ShowGesture(EGesture.ThatDirection);
+                    BotPlayer.HandsController.ShowGesture(EGesture.ThatDirection);
                     commandTrigger = EPhraseTrigger.Gogogo;
                     commmandMask = ETagStatus.Aware;
 
@@ -407,7 +407,7 @@ namespace SAIN.Classes
                 }
                 else if (CurrentDecision == SAINSoloDecision.HoldInCover)
                 {
-                    Player.HandsController.ShowGesture(EGesture.Stop);
+                    BotPlayer.HandsController.ShowGesture(EGesture.Stop);
                     commandTrigger = EPhraseTrigger.HoldPosition;
                     commmandMask = ETagStatus.Aware;
 

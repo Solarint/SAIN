@@ -72,7 +72,7 @@ namespace SAIN.Classes
         {
             if (SAIN.Enemy == null) return false;
 
-            return SAIN.Decision.MainDecision == SAINSoloDecision.Retreat && !SAIN.Cover.BotIsAtCoverPoint && SAIN.Decision.TimeSinceChangeDecision < 3f && SAIN.BotHasStamina;
+            return SAIN.Decision.MainDecision == SAINSoloDecision.Retreat && !SAIN.Cover.BotIsAtCoverPoint && SAIN.Decision.TimeSinceChangeDecision < 3f;
         }
 
         private bool CheckContinueSelfAction(out SAINSelfDecision Decision)
@@ -180,7 +180,7 @@ namespace SAIN.Classes
 
         public bool StartCancelReload()
         {
-            if (!BotOwner.WeaponManager?.IsReady == true || !BotOwner.WeaponManager.HaveBullets)
+            if (!BotOwner.WeaponManager?.IsReady == true || !BotOwner.WeaponManager.HaveBullets || BotOwner.WeaponManager.CurrentWeapon.ReloadMode == EFT.InventoryLogic.Weapon.EReloadMode.ExternalMagazine)
             {
                 return false;
             }

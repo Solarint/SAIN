@@ -2,8 +2,10 @@
 using EFT;
 using HarmonyLib;
 using SAIN.Components;
+using SAIN.Components.Helpers;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Audio;
 
 namespace SAIN.Patches
 {
@@ -25,6 +27,26 @@ namespace SAIN.Patches
                 return false;
             }
             return true;
+        }
+    }
+
+    public class BetterAudioPatch : ModulePatch
+    {
+        private static FieldInfo _Player;
+        protected override MethodBase GetTargetMethod()
+        {
+            _Player = AccessTools.Field(typeof(BaseSoundPlayer), "Player");
+            return AccessTools.Method(typeof(BaseSoundPlayer), "SoundEventHandler");
+        }
+
+        [PatchPrefix]
+        public static void PatchPrefix(string soundName, BaseSoundPlayer __instance)
+        {
+            if (SAINPlugin.BotController == null)
+            {
+                return;
+            }
+            SAINSoundTypeHandler.AISoundPlayer(soundName, (Player)_Player.GetValue(__instance));
         }
     }
 }

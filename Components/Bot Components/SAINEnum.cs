@@ -17,6 +17,7 @@ namespace SAIN
         Investigate,
         ThrowGrenade,
         ShiftCover,
+        RushEnemy,
 
         UnstuckSearch,
         UnstuckMoveToCover,
@@ -69,88 +70,91 @@ namespace SAIN
 
     public enum BlindFireSetting
     {
-        None = 0,
-        Up = 1,
-        Right = -1,
+        None,
+        Up,
+        Right,
     }
 
     public enum BotPersonality
     {
-        Normal = 0,
-        Timmy = 1,
-        Coward = 2,
-        Rat = 3,
-        SweatLord = 4,
-        Chad = 5,
-        GigaChad = 6
+        Normal,
+        Timmy,
+        Coward,
+        Rat,
+        SweatLord,
+        Chad,
+        GigaChad
     }
 
     public enum BotAggression
     {
-        Low = 0,
-        Normal = 1,
-        High = 2,
-        VeryHigh = 3
+        Low,
+        Normal,
+        High,
+        VeryHigh
     }
 
     public enum GrenadeThrowDirection
     {
-        None = 0,
-        Over = 1,
-        Around = 2
+        None,
+        Over,
+        Around
     }
 
     public enum GrenadeThrowType
     {
-        None = 0,
-        Close = 1,
-        Mid = 2,
-        Far = 3
+        None,
+        Close,
+        Mid,
+        Far
     }
 
     public enum SAINSquadDecision
     {
-        None = 0,
-        Surround = 1,
-        Retreat = 2,
-        Suppress = 3,
-        BoundingAttack = 4,
-        BoundingRetreat = 5,
-        Regroup = 6,
-        SpreadOut = 7,
-        HoldPositions = 8,
-        Help = 9,
-        Search = 10,
+        None,
+        Surround,
+        Retreat,
+        Suppress,
+        BoundingAttack,
+        BoundingRetreat,
+        Regroup,
+        SpreadOut,
+        HoldPositions,
+        Help,
+        Search,
     }
 
     public enum SAINSoundType
     {
-        FootStep = 0,
-        Reload = 1,
-        Aim = 2,
-        GrenadePin = 3,
-        Injury = 4,
-        Jump = 5,
-        Door = 6,
-        DoorBreach = 7,
-        Gunshot = 8,
-        SuppressedGunShot = 9,
+        FootStep,
+        Reload,
+        Aim,
+        GrenadePin,
+        Injury,
+        Jump,
+        Door,
+        DoorBreach,
+        Gunshot,
+        SuppressedGunShot,
+        GrenadeDraw,
+        None,
+        Heal,
     }
 
     public enum SoundDistanceType
     {
-        CloseGun = 0,
-        CloseStep = 1,
-        FarGun = 2,
-        FarStep = 3,
+        CloseGun,
+        CloseStep,
+        FarGun,
+        FarStep,
     }
     public enum SAINEnemyPath
     {
-        VeryClose = 0,
-        Close = 1,
-        Mid = 2,
-        Far = 3,
-        VeryFar = 4,
-        NoEnemy = 5,
+        VeryClose,
+        Close,
+        Mid,
+        Far,
+        VeryFar,
+        NoEnemy,
     }
 }

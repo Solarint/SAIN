@@ -53,16 +53,19 @@ namespace SAIN.Classes
 
         private bool StartInvestigate()
         {
-            var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 100f, true);
-            if (sound != null)
+            if (Time.time - FoundTargetTimer > 10f)
             {
-                if (sound.IsDanger)
+                var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 200f, true);
+                if (sound != null)
                 {
-                    return true;
-                }
-                if (SAIN.Info.IsPMC)
-                {
-                    return true;
+                    if (sound.IsDanger)
+                    {
+                        return true;
+                    }
+                    if (SAIN.Info.IsPMC)
+                    {
+                        return true;
+                    }
                 }
             }
             return false;

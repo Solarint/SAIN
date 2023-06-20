@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.VisionConfig;
 using SAIN.Helpers;
+using SAIN.Classes;
 
 namespace SAIN.Components
 {
@@ -21,33 +22,26 @@ namespace SAIN.Components
 
         private float SpherecastRadius = 0.05f;
         private LayerMask SightLayers => LayerMaskClass.HighPolyWithTerrainMaskAI;
-        private int MinJobSize = 1;
+        private int MinJobSize = 5;
         private List<Player> RegisteredPlayers => Singleton<GameWorld>.Instance.RegisteredPlayers;
 
         private int Frames = 0;
 
         public void Update()
         {
-            var game = Singleton<IBotGame>.Instance;
-            if (game == null)
+            if (EnableVisionJobs.Value)
             {
-                return;
-            }
-            if (!EnableVisionJobs.Value)
-            {
-                return;
-            }
+                GlobalRaycastJob();
+                CheckEnemiesJobs();
 
-            GlobalRaycastJob();
-            EnemyRaycastJob();
+                Frames++;
+                if (Frames == CheckFrameCount.Value)
+                {
+                    Frames = 0;
 
-            Frames++;
-            if (Frames == CheckFrameCount.Value)
-            {
-                Frames = 0;
-
-                //GlobalRaycastJob();
-                //EnemyRaycastJob();
+                    //GlobalRaycastJob();
+                    //EnemyVisionJob();
+                }
             }
         }
 
@@ -66,56 +60,104 @@ namespace SAIN.Components
             return player.MainParts.Values.Select(item => item.Position).ToArray();
         }
 
-        private void EnemyRaycastJob()
+        private void CheckEnemiesJobs()
         {
-            List<SAINComponent> botsWithEnemy = new List<SAINComponent>();
-            foreach (var bot in BotController.SAINBots.Values)
+            if (BotController.SAINBots.Count > 0)
             {
-                if (bot.Enemy != null)
+                foreach (var bot in BotController.SAINBots)
                 {
-                    botsWithEnemy.Add(bot);
+                    if (bot.Value != null && bot.Value.Enemies.Count > 0)
+                    {
+                        BotsWithEnemies.Add(bot.Value);
+                        TotalEnemiesGlobal += bot.Value.Enemies.Count;
+                    }
                 }
+
+                if (BotsWithEnemies.Count > 0)
+                {
+                    EnemyCanShootJob();
+                    EnemyVisionJob();
+
+                    if (DebugVision.Value && DebugDrawTimer < Time.time)
+                    {
+                        DebugDrawTimer = Time.time + 0.5f;
+                        foreach (var bot in BotsWithEnemies)
+                        {
+                            var enemies = bot.Enemies;
+                            foreach (var enemy in enemies)
+                            {
+                                if (enemy.Value.InLineOfSight)
+                                {
+                                    DebugGizmos.SingleObjects.Line(bot.HeadPosition, enemy.Value.EnemyChestPosition, Color.blue, 0.05f, true, 0.5f, true);
+                                }
+                                if (enemy.Value.CanShoot)
+                                {
+                                    DebugGizmos.SingleObjects.Line(bot.WeaponRoot, enemy.Value.EnemyChestPosition, Color.red, 0.05f, true, 0.5f, true);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                BotsWithEnemies.Clear();
+                TotalEnemiesGlobal = 0;
             }
+        }
+
+        private float DebugDrawTimer { get; set; }
+
+        public List<SAINComponent> BotsWithEnemies = new List<SAINComponent>();
+        private int TotalEnemiesGlobal = 0;
+        public List<SAINEnemy> BotEnemiesList = new List<SAINEnemy>();
+
+        private void EnemyVisionJob()
+        {
+            const int PartCount = 6;
 
             NativeArray<SpherecastCommand> spherecastCommands = new NativeArray<SpherecastCommand>(
-                botsWithEnemy.Count * 6,
+                TotalEnemiesGlobal * PartCount,
                 Allocator.TempJob
             );
             NativeArray<RaycastHit> raycastHits = new NativeArray<RaycastHit>(
-                botsWithEnemy.Count * 6,
+                TotalEnemiesGlobal * PartCount,
                 Allocator.TempJob
             );
 
-            int BodyPartCount = 0;
-            for (int i = 0; i < botsWithEnemy.Count; i++)
+            for (int i = 0; i < BotsWithEnemies.Count; i++)
             {
-                var bot = botsWithEnemy[i];
-                var Mask = SightLayers;
+                var bot = BotsWithEnemies[i];
+                var mask = SightLayers;
+                float max = bot.BotOwner.Settings.Current.CurrentVisibleDistance;
+                Vector3 head = bot.BotOwner.LookSensor._headPoint;
 
-                Player enemy = bot.Enemy.EnemyPlayer;
-                Vector3 head = HeadPos(bot.BotOwner.GetPlayer);
+                BotEnemiesList.Clear();
+                BotEnemiesList.AddRange(bot.Enemies.Values.ToList());
 
-                var bodyParts = Parts(enemy);
-                BodyPartCount = bodyParts.Length;
-
-                for (int j = 0; j < BodyPartCount; j++)
+                for (int k = 0; k < BotEnemiesList.Count; k++)
                 {
-                    Vector3 target = bodyParts[j];
-                    Vector3 direction = target - head;
-                    float max = bot.BotOwner.Settings.Current.CurrentVisibleDistance;
-                    float distance = direction.magnitude;
-                    if (distance < 8f)
+                    SAINEnemy enemy = BotEnemiesList[k];
+                    Vector3[] bodyParts = Parts(enemy.EnemyPlayer);
+
+                    for (int j = 0; j < PartCount; j++)
                     {
-                        Mask = LayerMaskClass.HighPolyWithTerrainMask;
+                        Vector3 target = bodyParts[j];
+                        Vector3 direction = target - head;
+                        float distance = direction.magnitude;
+                        float rayDistance = Mathf.Clamp(distance, 0f, max);
+
+                        if (rayDistance < 8f)
+                        {
+                            mask = LayerMaskClass.HighPolyWithTerrainMask;
+                        }
+
+                        spherecastCommands[i + k + j] = new SpherecastCommand(
+                            head,
+                            SpherecastRadius,
+                            direction.normalized,
+                            rayDistance,
+                            mask
+                        );
                     }
-                    float rayDistance = Mathf.Clamp(direction.magnitude, 0f, max);
-                    spherecastCommands[i + j] = new SpherecastCommand(
-                        head,
-                        SpherecastRadius,
-                        direction.normalized,
-                        rayDistance,
-                        Mask
-                    );
                 }
             }
 
@@ -125,64 +167,141 @@ namespace SAIN.Components
                 MinJobSize
             );
 
-            int debugTotal = 0;
-            int debugVisible = 0;
-            int debugParts = 0;
-
             spherecastJob.Complete();
 
-            for (int i = 0; i < botsWithEnemy.Count; i++)
+            for (int i = 0; i < BotsWithEnemies.Count; i++)
             {
-                debugTotal++;
-                int partVisCount = 0;
                 bool visible = false;
-                var bot = botsWithEnemy[i];
-                int debugDrawPartCount = 0;
-                var bodyParts = bot.Enemy.EnemyPlayer.MainParts.Values.ToList();
-                for (int j = 0; j < BodyPartCount; j++)
+                var bot = BotsWithEnemies[i];
+
+                BotEnemiesList.AddRange(bot.Enemies.Values.ToList());
+                for (int k = 0; k < BotEnemiesList.Count; k++)
                 {
-                    debugParts++;
-                    if (raycastHits[j + i].collider == null)
+                    int partVisCount = 0;
+                    SAINEnemy enemy = BotEnemiesList[k];
+
+                    for (int j = 0; j < PartCount; j++)
                     {
-                        if (DebugVision.Value)
+                        if (raycastHits[i + k + j].collider == null)
                         {
-                            DebugGizmos.SingleObjects.Line(bot.HeadPosition, bodyParts[debugDrawPartCount].Position, Color.red, 0.01f, true, 0.25f, true);
+                            partVisCount++;
+                            visible = true;
                         }
-                        partVisCount++;
-                        visible = true;
                     }
-                    debugDrawPartCount++;
-                }
 
-                if (visible)
-                {
-                    debugVisible++;
-                    float percentage = (float)partVisCount / BodyPartCount * 100f;
-                    percentage = Mathf.Round(percentage);
-                    bot.Enemy?.OnGainSight(percentage);
-                    if (DebugVision.Value)
+                    if (visible)
                     {
-                        DebugGizmos.SingleObjects.Line(bot.HeadPosition, bot.Enemy.EnemyPlayer.MainParts[BodyPartType.body].Position, Color.red, 0.01f, true, 0.1f, true);
+                        float percentage = ((float)partVisCount / PartCount) * 100f;
+                        percentage = Mathf.Round(percentage);
+                        enemy.OnGainSight(percentage);
+                    }
+                    else
+                    {
+                        enemy.OnLoseSight();
                     }
                 }
-
-                if (!visible)
-                {
-                    bot.Enemy?.OnLoseSight();
-                }
-            }
-
-            if (DebugTimer < Time.time)
-            {
-                //DebugTimer = Time.time + 2f;
-                //Logger.LogInfo($"Raycast Job Enemy Complete [{spherecastCommands.Length}] raycasts finished for [{botsWithEnemy.Count}] bots with enemy. DebugCounts: Total:{debugTotal} Visible: {debugVisible} PartsChecked: {debugParts}");
+                BotEnemiesList.Clear();
             }
 
             spherecastCommands.Dispose();
             raycastHits.Dispose();
         }
 
-        private float DebugTimer = 0f;
+        private void EnemyCanShootJob()
+        {
+            const int PartCount = 6;
+
+            NativeArray<SpherecastCommand> spherecastCommands = new NativeArray<SpherecastCommand>(
+                TotalEnemiesGlobal * PartCount,
+                Allocator.TempJob
+            );
+            NativeArray<RaycastHit> raycastHits = new NativeArray<RaycastHit>(
+                TotalEnemiesGlobal * PartCount,
+                Allocator.TempJob
+            );
+
+            for (int i = 0; i < BotsWithEnemies.Count; i++)
+            {
+                var bot = BotsWithEnemies[i];
+                var mask = SightLayers;
+                float max = bot.BotOwner.WeaponManager.CurrentWeapon.Template.bEffDist * 1.5f;
+                Vector3 weapon = bot.BotOwner.WeaponRoot.position;
+
+                BotEnemiesList.AddRange(bot.Enemies.Values.ToList());
+
+                for (int k = 0; k < BotEnemiesList.Count; k++)
+                {
+                    SAINEnemy enemy = BotEnemiesList[k];
+                    Vector3[] bodyParts = Parts(enemy.EnemyPlayer);
+
+                    for (int j = 0; j < PartCount; j++)
+                    {
+                        Vector3 target = bodyParts[j];
+                        Vector3 direction = target - weapon;
+                        float distance = direction.magnitude;
+                        float rayDistance = Mathf.Clamp(distance, 0f, max);
+
+                        if (rayDistance < 8f)
+                        {
+                            mask = LayerMaskClass.HighPolyWithTerrainMask;
+                        }
+
+                        spherecastCommands[i + k + j] = new SpherecastCommand(
+                            weapon,
+                            SpherecastRadius,
+                            direction.normalized,
+                            rayDistance,
+                            mask
+                        );
+                    }
+                }
+                BotEnemiesList.Clear();
+            }
+
+            JobHandle spherecastJob = SpherecastCommand.ScheduleBatch(
+                spherecastCommands,
+                raycastHits,
+                MinJobSize
+            );
+
+            spherecastJob.Complete();
+
+            for (int i = 0; i < BotsWithEnemies.Count; i++)
+            {
+                bool canShoot = false;
+                var bot = BotsWithEnemies[i];
+
+                BotEnemiesList.AddRange(bot.Enemies.Values.ToList());
+                for (int k = 0; k < BotEnemiesList.Count; k++)
+                {
+                    int partsCanShoot = 0;
+                    SAINEnemy enemy = BotEnemiesList[k];
+                    for (int j = 0; j < PartCount; j++)
+                    {
+                        if (raycastHits[i + k + j].collider == null)
+                        {
+                            partsCanShoot++;
+                            canShoot = true;
+                        }
+                    }
+
+                    if (canShoot)
+                    {
+                        float percentage = ((float)partsCanShoot / PartCount) * 100f;
+                        percentage = Mathf.Round(percentage);
+                        enemy.UpdateCanShoot(true, percentage);
+                    }
+                    else
+                    {
+                        enemy.UpdateCanShoot(false, 0f);
+                    }
+                }
+                BotEnemiesList.Clear();
+            }
+
+            spherecastCommands.Dispose();
+            raycastHits.Dispose();
+        }
 
         private void GlobalRaycastJob()
         {
@@ -235,6 +354,20 @@ namespace SAIN.Components
             {
                 int startIndex = i * RegisteredPlayers.Count;
                 var visiblePlayers = list[i].VisiblePlayers;
+                BotVisiblePlayers.AddRange(visiblePlayers);
+
+                for (int v = 0; v < visiblePlayers.Count; v++)
+                {
+                    var visPlayer = visiblePlayers[v];
+                    if (visPlayer == null || visPlayer.HealthController.IsAlive == false)
+                    {
+                        BotVisiblePlayers.RemoveAt(v);
+                    }
+                }
+
+                visiblePlayers.Clear();
+                visiblePlayers.AddRange(BotVisiblePlayers);
+                BotVisiblePlayers.Clear();
 
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
                 {
@@ -257,13 +390,10 @@ namespace SAIN.Components
                 }
             }
 
-            if (DebugTimer < Time.time)
-            {
-                //Logger.LogInfo($"Raycast Job Complete [{allSpherecastCommands.Length}] raycasts finished. Found [{visiblecount}] visible players.");
-            }
-
             allSpherecastCommands.Dispose();
             allRaycastHits.Dispose();
         }
+
+        public List<Player> BotVisiblePlayers = new List<Player>();
     }
 }

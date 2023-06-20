@@ -14,8 +14,12 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsMindSettings __instance)
         {
+            __instance.SEC_TO_MORE_DIST_TO_RUN = 0f;
             __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
-            __instance.NO_RUN_AWAY_FOR_SAFE = true;
+            __instance.CHANCE_FUCK_YOU_ON_CONTACT_100 = 0f;
+            __instance.ATTACK_IMMEDIATLY_CHANCE_0_100 = 100f;
+            __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
+            __instance.NO_RUN_AWAY_FOR_SAFE = false;
             __instance.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
             __instance.CAN_USE_MEDS = true;
             __instance.CAN_USE_FOOD_DRINK = true;
@@ -87,7 +91,9 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsMoveSettings __instance)
         {
-            __instance.SEC_TO_CHANGE_TO_RUN = 9999f;
+            __instance.RUN_IF_GAOL_FAR_THEN = 0f;
+            __instance.CHANCE_TO_RUN_IF_NO_AMMO_0_100 = 100f;
+            __instance.SEC_TO_CHANGE_TO_RUN = 0f;
             __instance.RUN_TO_COVER_MIN = 9999f;
             __instance.BASE_ROTATE_SPEED = 250f;
             //__instance.FIRST_TURN_SPEED = 250f;

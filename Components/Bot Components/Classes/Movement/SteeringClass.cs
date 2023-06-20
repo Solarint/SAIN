@@ -10,19 +10,20 @@ namespace SAIN.Classes
         public SteeringClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            EFTSteer = new EFTSteer(bot);
         }
 
-        private EFTSteer EFTSteer { get; set; }
 
         public void Update()
         {
-            UpdateAimSway();
-            UpdateSmoothLook();
-            UpdateSteerMode();
-            if (UserSettings.DebugConfig.DebugLayers.Value)
+            if (SAIN.LayersActive)
             {
-                DebugGizmos.SingleObjects.Line(SAIN.HeadPosition, CurrentSteerPoint, Color.white, 0.05f, true, Time.deltaTime, true);
+                UpdateAimSway();
+                UpdateSmoothLook();
+                UpdateSteerMode();
+                if (UserSettings.DebugConfig.DebugLayers.Value)
+                {
+                    DebugGizmos.SingleObjects.Line(SAIN.HeadPosition, CurrentSteerPoint, Color.white, 0.05f, true, Time.deltaTime, true);
+                }
             }
         }
 
@@ -31,18 +32,22 @@ namespace SAIN.Classes
             switch (SteeringMode)
             {
                 case EBotSteering.ToCustomPoint:
-                    EFTSteer.LookToPoint(CurrentSteerPoint, 300f);
+                    BotOwner.Steering.LookToPoint(CurrentSteerPoint, 300f);
                     break;
 
                 case EBotSteering.ToMovingDirection:
-                    EFTSteer.LookToMovingDirection();
+                    if (BotOwner.ShootData?.Shooting == true)
+                    {
+                        BotOwner.Steering.LookToPoint(CurrentSteerPoint, 300f);
+                        break;
+                    }
+                    BotOwner.Steering.LookToMovingDirection();
                     break;
 
                 default:
-                    EFTSteer.LookToPoint(CurrentSteerPoint, 300f);
+                    BotOwner.Steering.LookToPoint(CurrentSteerPoint, 300f);
                     break;
             }
-            EFTSteer.ManualFixedUpdate();
         }
 
         public EBotSteering SteeringMode { get; private set; }
@@ -95,25 +100,65 @@ namespace SAIN.Classes
                 LookToEnemy(SAIN.Enemy);
                 return true;
             }
-            if (LookToCloseEnemyHear())
-            {
-                return true;
-            }
             var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 50f, 1f);
             if (sound != null)
             {
                 LookToHearPos(sound.Position);
                 return true;
             }
+            if (SAIN.Enemy?.TimeSinceSeen < 8f)
+            {
+                LookToEnemyLastSeenPos();
+                return true;
+            }
             else
             {
                 if (lookRandomifFalse)
                 {
-                    LookToRandomPosition();
+                    if (SAIN.ExitsToLocation != null && SAIN.ExitsToLocation.Count > 0)
+                    {
+                        LookToRoomExits();
+                    }
+                    else
+                    {
+                        LookToRandomPosition();
+                    }
                 }
                 return false;
             }
         }
+
+        public bool LookToEnemyLastSeenPos()
+        {
+            var enemy = SAIN.Enemy;
+            if (enemy != null)
+            {
+                if (!enemy.IsVisible)
+                {
+                    Vector3 pos = enemy.PositionLastSeen;
+                    pos += Vector3.up * 1f;
+                    LookToPoint(pos);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void LookToRoomExits()
+        {
+            if (RandomLookExitsTimer < Time.time)
+            {
+                RandomLookExitsTimer = Time.time + 3f;
+                var exits = SAIN.ExitsToLocation;
+                if (exits != null && exits.Count > 0)
+                {
+                    Vector3 corner = exits.PickRandom();
+                    corner += Vector3.up * 1f;
+                    LookToPoint(corner);
+                }
+            }
+        }
+        private float RandomLookExitsTimer;
 
         public Vector3 RealSteerTarget { get; private set; }
         public Vector3 CurrentSteerPoint { get; private set; }
@@ -201,12 +246,18 @@ namespace SAIN.Classes
             }
         }
 
+        public void LookToEnemy()
+        {
+            SAINEnemy enemy = SAIN.Enemy;
+            LookToEnemy(enemy);
+        }
+
         private bool LookToCloseEnemyHear()
         {
             SAINEnemy enemy = SAIN.Enemy;
             if (enemy != null)
             {
-                if (enemy.RealDistance < 30f && enemy.Player.MovementContext.ActualLinearSpeed > 0.33f)
+                if (enemy.RealDistance < 30f && enemy.Person.GetPlayer.MovementContext.ActualLinearSpeed > 0.33f)
                 {
                     LookToEnemy(enemy);
                     return true;

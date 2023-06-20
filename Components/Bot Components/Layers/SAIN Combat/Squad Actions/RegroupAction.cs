@@ -65,21 +65,22 @@ namespace SAIN.Layers
             float leadDist = (pos - BotOwner.Position).magnitude;
             float enemyDist = hasEnemy ? (SAIN.Enemy.Person.Position - BotOwner.Position).magnitude : 999f;
 
-            bool sprint = hasEnemy && leadDist > 30f && enemyLOS && enemyDist > 50f;
+            bool sprint = hasEnemy && leadDist > 30f && !enemyLOS && enemyDist > 50f;
 
-            if (SAIN.Steering.SteerByPriority())
+            if (SAIN.Steering.SteerByPriority(false))
             {
                 sprint = false;
             }
-            else if (sprint)
+
+            if (sprint)
             {
-                SAIN.Steering.LookToMovingDirection();
+                SAIN.Mover.Sprint(true);
             }
             else
             {
-                SAIN.Steering.LookToRandomPosition();
+                SAIN.Mover.Sprint(false); 
+                SAIN.Steering.SteerByPriority();
             }
-            SAIN.Mover.Sprint(sprint);
         }
 
         public override void Stop()

@@ -27,17 +27,20 @@ namespace SAIN.Layers
         {
             SAIN.Steering.SteerByPriority();
             Shoot.Update();
-            if (NewPoint != null)
+            if (NewPoint == null)
             {
-                if ((NewPoint.Position - BotOwner.Position).sqrMagnitude < 2f)
-                {
-                    SAIN.Decision.EnemyDecisions.ShiftCoverComplete = true;
-                }
-                else
+                if (FindPointToGo())
                 {
                     SAIN.Mover.GoToPoint(NewPoint.Position);
                     SAIN.Mover.SetTargetMoveSpeed(1f);
                     SAIN.Mover.SetTargetPose(1f);
+                }
+            }
+            else
+            {
+                if ((NewPoint.Position - BotOwner.Position).sqrMagnitude < 2f)
+                {
+                    SAIN.Decision.EnemyDecisions.ShiftCoverComplete = true;
                 }
             }
         }
@@ -47,7 +50,7 @@ namespace SAIN.Layers
 
         public ManualLogSource Logger;
 
-        private void FindPointToGo()
+        private bool FindPointToGo()
         {
             var cover = SAIN.Cover.CoverInUse;
             if (cover != null && cover.BotIsHere)
@@ -69,6 +72,7 @@ namespace SAIN.Layers
                                 SAIN.Mover.GoToPoint(NewPoint.Position);
                                 SAIN.Mover.SetTargetMoveSpeed(1f);
                                 SAIN.Mover.SetTargetPose(1f);
+                                return true;
                             }
                         }
                     }
@@ -82,11 +86,11 @@ namespace SAIN.Layers
             {
                 StartPosition = BotOwner.Position;
             }
+            return false;
         }
 
         public override void Start()
         {
-            FindPointToGo();
         }
 
         private Vector3? StartPosition;

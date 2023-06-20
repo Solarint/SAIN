@@ -311,7 +311,7 @@ namespace SAIN.Components
             {
                 foreach (var point in CoverPoints)
                 {
-                    if (point != null && point.BotIsUsingThis)
+                    if (point != null && point.BotIsUsingThis && !point.Spotted)
                     {
                         point.BotIsUsingThis = false;
                         if (CheckCollider(point.Collider, out var newPoint))
@@ -444,7 +444,7 @@ namespace SAIN.Components
             {
                 if (Colliders == null)
                 {
-                    Colliders = new Collider[ColliderArrayCount.Value];
+                    Colliders = new Collider[500];
                 }
                 LastCheckPos = OriginPoint;
                 GetNewColliders(out hits);
@@ -478,10 +478,10 @@ namespace SAIN.Components
             var origin = OriginPoint;
 
             const float widthAdd = 3f;
-            const float widthBase = 10f;
+            const float widthBase = 12f;
 
             const float heightAdd = 1f;
-            const float heightBase = 3f;
+            const float heightBase = 2f;
 
             float width = widthBase;
             float height = heightBase;
@@ -493,7 +493,7 @@ namespace SAIN.Components
                 hits = Physics.OverlapBoxNonAlloc(origin, box, Colliders, orientation, mask);
                 hits = FilterColliders(hits);
 
-                if (hits > 50)
+                if (hits > 100)
                 {
                     break;
                 }

@@ -25,7 +25,7 @@ namespace SAIN.Components.BotController
         {
             Vector3 center = Vector3.zero; // Center point
             float radius = 30.0f; // Radius of the circle
-            float angleIncrement = 360f / 8; // Angle between each direction
+            float angleIncrement = 360f / 8; // TiltNumber between each direction
 
             for (int i = 0; i < 8; i++)
             {
@@ -69,23 +69,56 @@ namespace SAIN.Components.BotController
                 NavMeshPath path = new NavMeshPath();
                 if (NavMesh.CalculatePath(botPosition, testPoint, -1, path) && path.corners.Length > 1)
                 {
-                    Vector3 exitPoint = path.corners[1];
                     bool AddPoint = true;
-                    if (exits.Count > 0)
+                    if (path.corners.Length < 3)
                     {
-                        foreach (Vector3 t in exits)
+                        Vector3 exitPoint = path.corners[1];
+                        if (exits.Count > 0)
                         {
-                            if ((t - exitPoint).sqrMagnitude < 4f)
+                            foreach (Vector3 t in exits)
                             {
-                                AddPoint = false;
+                                if ((t - exitPoint).sqrMagnitude < 4f)
+                                {
+                                    AddPoint = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (AddPoint)
+                        {
+                            exits.Add(exitPoint);
+                            DebugGizmos.SingleObjects.Line(botPosition + Vector3.up * 1f, exitPoint, Color.white, 0.06f, true, 1f, true);
+                        }
+                    }
+                    else
+                    {
+                        for (int j = 0; j < path.corners.Length - 1; j++)
+                        {
+                            Vector3 RayStart = botPosition + Vector3.up * 1f;
+                            Vector3 nextCorner = path.corners[j + 1];
+                            Vector3 direction = nextCorner - botPosition;
+                            if (Physics.Raycast(RayStart, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                            {
+                                Vector3 exitPoint = path.corners[j];
+                                if (exits.Count > 0)
+                                {
+                                    foreach (Vector3 t in exits)
+                                    {
+                                        if ((t - exitPoint).sqrMagnitude < 4f)
+                                        {
+                                            AddPoint = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (AddPoint)
+                                {
+                                    exits.Add(exitPoint);
+                                    DebugGizmos.SingleObjects.Line(botPosition + Vector3.up * 1f, exitPoint, Color.white, 0.06f, true, 1f, true);
+                                }
                                 break;
                             }
                         }
-                    }
-                    if (AddPoint)
-                    {
-                        exits.Add(exitPoint);
-                        DebugGizmos.SingleObjects.Line(botPosition, exitPoint, Color.white, 0.025f, true, 1f, true);
                     }
                 }
             }

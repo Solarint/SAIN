@@ -5,6 +5,7 @@ using SAIN.Classes;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SAIN.Layers
 {
@@ -21,42 +22,32 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (CoverDestination != null && CoverDestination.BotIsHere)
+            if (CoverDestination != null)
             {
-                EngageEnemy();
-                return;
+                if (!SAIN.Cover.CoverPoints.Contains(CoverDestination) || CoverDestination.Spotted)
+                {
+                    CoverDestination = null;
+                }
             }
 
             SAIN.Mover.SetTargetMoveSpeed(1f);
             SAIN.Mover.SetTargetPose(1f);
 
-            FindTargetCover();
-
+            if (CoverDestination == null)
+            {
+                if (FindTargetCover())
+                {
+                    if (SAIN.Mover.Prone.IsProne)
+                    {
+                        SAIN.Mover.Prone.SetProne(false);
+                    }
+                    SAIN.Mover.GoToPoint(CoverDestination.Position, 0.6f);
+                }
+            }
             if (CoverDestination == null)
             {
                 EngageEnemy();
-                return;
-            }
-            if (CoverDestination != null)
-            {
-                if (SAIN.Mover.Prone.IsProne)
-                {
-                    SAIN.Mover.Prone.SetProne(false);
-                }
-
-                MoveTo(DestinationPosition);
-
-                if (CheckDistanceToCover(DestinationPosition))
-                {
-                    SAIN.Steering.LookToMovingDirection(true);
-                    SAIN.Mover.Sprint(true);
-                }
-                else
-                {
-                    SAIN.Steering.LookToMovingDirection(false);
-                    SAIN.Mover.Sprint(false);
-                    EngageEnemy();
-                }
+                SAIN.Mover.Sprint(false);
             }
         }
 
@@ -67,49 +58,28 @@ namespace SAIN.Layers
             {
                 if (CanMoveTo(coverPoint, out Vector3 pointToGo))
                 {
+                    coverPoint.BotIsUsingThis = true;
                     CoverDestination = coverPoint;
-                    DestinationPosition = pointToGo;
                     return true;
                 }
                 else
                 {
+                    coverPoint.BotIsUsingThis = false;
                     coverPoint.Spotted = true;
                 }
-            }
-            if (CoverDestination != null)
-            {
-                CoverDestination.BotIsUsingThis = false;
-                CoverDestination = null;
             }
             return false;
         }
 
         private void MoveTo(Vector3 position)
         {
-            CoverDestination.BotIsUsingThis = true;
-            SAIN.Mover.GoToPoint(position);
-        }
-
-        private bool CheckDistanceToCover(Vector3 destPosition)
-        {
-            float sqrMag = (destPosition - SAIN.Position).sqrMagnitude;
-            if (sqrMag < 2f)
-            {
-                FarFromCover = false;
-            }
-            else if (sqrMag > 4f)
-            {
-                FarFromCover = true;
-            }
-            return FarFromCover;
+            SAIN.Mover.GoToPoint(position, 0.6f);
         }
 
         private bool CanMoveTo(CoverPoint coverPoint, out Vector3 pointToGo)
         {
             if (coverPoint != null && SAIN.Mover.CanGoToPoint(coverPoint.Position, out pointToGo))
             {
-                CoverDestination = coverPoint;
-                DestinationPosition = pointToGo;
                 return true;
             }
             pointToGo = Vector3.zero;
@@ -117,7 +87,6 @@ namespace SAIN.Layers
         }
 
         private CoverPoint CoverDestination;
-        private Vector3 DestinationPosition;
 
         private void EngageEnemy()
         {
@@ -139,6 +108,7 @@ namespace SAIN.Layers
 
         public override void Start()
         {
+            SAIN.Mover.Sprint(true);
             if (SAIN.Decision.SelfDecision == SAINSelfDecision.RunAwayGrenade)
             {
                 SAIN.Talk.Say(EPhraseTrigger.OnEnemyGrenade, ETagStatus.Combat);
@@ -147,10 +117,7 @@ namespace SAIN.Layers
 
         public override void Stop()
         {
-            if (Decision != SAINSoloDecision.Retreat && Decision != SAINSoloDecision.RunToCover)
-            {
-                SAIN.Mover.Sprint(false);
-            }
+            CoverDestination = null;
         }
 
         private readonly SAINComponent SAIN;

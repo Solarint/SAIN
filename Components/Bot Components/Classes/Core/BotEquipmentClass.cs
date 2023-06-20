@@ -13,8 +13,8 @@ namespace SAIN.Classes
         public BotEquipmentClass(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            Inventory = (InventoryClass)AccessTools.Property(typeof(Player), "Inventory").GetValue(Player);
-            InventoryController = (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2416_0").GetValue(Player);
+            Inventory = (InventoryClass)AccessTools.Property(typeof(Player), "Inventory").GetValue(BotPlayer);
+            InventoryController = (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2416_0").GetValue(BotPlayer);
         }
 
         public InventoryControllerClass InventoryController { get; private set; }

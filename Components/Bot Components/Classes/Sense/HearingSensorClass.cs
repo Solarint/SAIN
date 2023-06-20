@@ -51,23 +51,10 @@ namespace SAIN.Classes
                 if (CheckSoundHeardAfterModifiers(player, position, power, type, out float distance))
                 {
                     bool gunsound = type == AISoundType.gun || type == AISoundType.silencedGun;
-                    bool flag = false;
 
-                    if (!BotOwner.BotsGroup.IsEnemy(player))
+                    if (!BotOwner.BotsGroup.IsEnemy(player) && BotOwner.BotsGroup.Neutrals.ContainsKey(player))
                     {
-                        if (gunsound && BotOwner.BotsGroup.Neutrals.ContainsKey(player))
-                        {
-                            flag = true;
-                        }
-
-                        if (!flag && BotOwner.BotsGroup.Enemies.ContainsKey(player))
-                        {
-                            return;
-                        }
-                    }
-                    if (flag)
-                    {
-                        BotOwner.BotsGroup.LastSoundsController.AddNeutralSound(player, position);
+                        //BotOwner.BotsGroup.LastSoundsController.AddNeutralSound(player, position);
                         return;
                     }
 
@@ -108,7 +95,7 @@ namespace SAIN.Classes
                 {
                     range *= 0.66f;
                 }
-                var move = Player.MovementContext;
+                var move = BotPlayer.MovementContext;
                 if (move.IsSprintEnabled)
                 {
                     range *= 0.66f;

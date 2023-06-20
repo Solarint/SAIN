@@ -15,6 +15,7 @@ namespace SAIN.Patches
         {
             return typeof(BotOwner)?.GetProperty("ShootData")?.PropertyType?.GetMethod("Shoot");
         }
+
         [PatchPrefix]
         public static void PatchPrefix(ref BotOwner ___botOwner_0)
         {

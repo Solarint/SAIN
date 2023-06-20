@@ -52,23 +52,28 @@ namespace SAIN.Classes
                 {
                     continue;
                 }
-                if (SAIN.HasEnemy && member.HasEnemy)
+                var myEnemy = SAIN.Enemy;
+                if (myEnemy != null && member.HasEnemy)
                 {
-                    if (SAIN.Enemy.Person == member.Enemy.Person)
+                    if (myEnemy.Person == member.Enemy.Person)
                     {
-                        if (StartHelp(member))
-                        {
-                            Decision = SAINSquadDecision.Help;
-                            return true;
-                        }
-                        else if (StartSuppression(member))
+                        if (StartSuppression(member))
                         {
                             Decision = SAINSquadDecision.Suppress;
                             return true;
                         }
-                        else if (StartGroupSearch(member))
+                        if (myEnemy.IsVisible || myEnemy.TimeSinceSeen < 5f)
+                        {
+                            return false;
+                        }
+                        if (StartGroupSearch(member))
                         {
                             Decision = SAINSquadDecision.Search;
+                            return true;
+                        }
+                        if (StartHelp(member))
+                        {
+                            Decision = SAINSquadDecision.Help;
                             return true;
                         }
                     }
@@ -146,6 +151,9 @@ namespace SAIN.Classes
                 return false;
             }
 
+            float maxDist = 125f;
+            float minDist = 50f;
+
             var enemy = SAIN.Enemy;
             if (enemy != null)
             {
@@ -153,6 +161,8 @@ namespace SAIN.Classes
                 {
                     return false;
                 }
+                maxDist = 50f;
+                minDist = 15f;
             }
 
             var lead = squad.LeaderComponent;
@@ -177,11 +187,11 @@ namespace SAIN.Classes
                 }
                 if (SquadDecision == SAINSquadDecision.Regroup)
                 {
-                    return leadDistance > 15f;
+                    return leadDistance > minDist;
                 }
                 else
                 {
-                    return leadDistance > 50f;
+                    return leadDistance > maxDist;
                 }
             }
             return false;
