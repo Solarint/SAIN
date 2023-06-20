@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using EFT;
+using SAIN.Helpers;
 using UnityEngine;
 
 namespace SAIN.Classes.Mover
@@ -11,68 +12,121 @@ namespace SAIN.Classes.Mover
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
 
+        public void ResetBlindFire()
+        {
+            if (CurrentBlindFireSetting != 0)
+            {
+                BotOwner.GetPlayer.MovementContext.SetBlindFire(0);
+            }
+        }
+
+        private Vector3 WeaponPosOffset;
+
         public void Update()
         {
             SAINEnemy enemy = SAIN.Enemy;
-            if (enemy == null || BlindFireTimer > Time.time)
+            if (enemy == null || enemy.CanShoot || !enemy.Seen || enemy.TimeSinceSeen > 10f || !BotOwner.WeaponManager.IsReady || !BotOwner.WeaponManager.HaveBullets || SAIN.Mover.IsSprinting)
+            {
+                ResetBlindFire();
+                return;
+            }
+            if (BlindFireActive)
+            {
+                DebugGizmos.SingleObjects.Line(SAIN.WeaponRoot, BlindFireTargetPos, Color.magenta, 0.025f, true, 0.1f, true);
+            }
+            if (BlindFireTimer > Time.time)
             {
                 return;
             }
 
-            Vector3 targetPos = enemy.EnemyChestPosition;
-
-            int blindfire = 0;
-
-            if (!enemy.CanShoot)
+            if (CurrentBlindFireSetting == 0)
             {
-                if (CurrentBlindFireSetting == 0)
-                {
-                }
-                if (RayCastCheck(BotOwner.WeaponRoot.position, targetPos))
-                {
-                    Vector3 rayPoint = BotOwner.LookSensor._headPoint;
-                    rayPoint.y += 0.1f;
-
-                    if (!RayCastCheck(rayPoint, targetPos))
-                    {
-                        blindfire = 1;
-                    }
-                }
+                WeaponPosOffset = BotOwner.WeaponRoot.position - BotPosition;
             }
 
-            if (blindfire == 1 && BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.HaveBullets)
+            if (enemy.IsVisible)
             {
-                SetBlindFire(blindfire);
-                SAIN.Steering.LookToPoint(targetPos);
-                //BotOwner.ShootData.Shoot();
+                BlindFireTargetPos = enemy.EnemyChestPosition;
             }
             else
             {
-                SetBlindFire(0);
+                BlindFireTargetPos = enemy.PositionLastSeen + Vector3.up * 1f;
             }
 
-            if (CurrentBlindFireSetting == 0)
+            int blindfire = CheckOverHeadBlindFire(BlindFireTargetPos);
+
+            if (blindfire == 0)
             {
+                blindfire = CheckSideBlindFire(BlindFireTargetPos);
+            }
+
+            if (blindfire == 0)
+            {
+                ResetBlindFire();
+                BlindFireTimer = Time.time + 0.33f;
+            }
+            else
+            {
+                SetBlindFire(blindfire);
+                SAIN.Steering.LookToPoint(BlindFireTargetPos + Random.insideUnitSphere * 0.5f);
+                BotOwner.ShootData.Shoot();
+
+                BlindFireTimer = Time.time + 1f;
             }
         }
 
-        public int CurrentBlindFireSetting { get; private set; }
+        public Vector3 BlindFireTargetPos { get; private set; }
+        public bool BlindFireActive => CurrentBlindFireSetting != 0;
+        public int CurrentBlindFireSetting => BotPlayer.MovementContext.BlindFire;
         private float BlindFireTimer = 0f;
 
-        private bool RayCastCheck(Vector3 start, Vector3 targetPos)
+        private int CheckOverHeadBlindFire(Vector3 targetPos)
         {
-            Vector3 direction = targetPos - start;
-            float magnitude = (targetPos - start).magnitude;
-            return Physics.Raycast(start, direction, magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+            int blindfire = 0;
+            LayerMask mask = LayerMaskClass.HighPolyWithTerrainMask;
+
+            Vector3 rayShoot = WeaponPosOffset + BotPosition;
+            Vector3 direction = targetPos - rayShoot;
+            if (Physics.Raycast(rayShoot, direction, direction.magnitude, mask))
+            {
+                rayShoot = SAIN.HeadPosition + Vector3.up * 0.1f;
+                direction = targetPos - rayShoot;
+                if (!Physics.Raycast(rayShoot, direction, direction.magnitude, mask))
+                {
+                    blindfire = 1;
+                }
+            }
+            return blindfire;
+        }
+
+        private int CheckSideBlindFire(Vector3 targetPos)
+        {
+            int blindfire = 0;
+            LayerMask mask = LayerMaskClass.HighPolyWithTerrainMask;
+
+            Vector3 rayShoot = WeaponPosOffset + BotPosition;
+            Vector3 direction = targetPos - rayShoot;
+            if (Physics.Raycast(rayShoot, direction, direction.magnitude, mask))
+            {
+                Quaternion rotation = Quaternion.Euler(0f, 90f, 0f);
+                Vector3 SideShoot = rotation * direction.normalized * 0.2f;
+                rayShoot += SideShoot;
+                direction = targetPos - rayShoot;
+                if (!Physics.Raycast(rayShoot, direction, direction.magnitude, mask))
+                {
+                    blindfire = -1;
+                }
+            }
+            return blindfire;
         }
 
         public void SetBlindFire(int value)
         {
-            CurrentBlindFireSetting = value;
-            BotOwner.GetPlayer.MovementContext.SetBlindFire(value);
+            if (CurrentBlindFireSetting != value)
+            {
+                BotOwner.GetPlayer.MovementContext.SetBlindFire(value);
+            }
         }
-
-        private int GetBlindFire => BotOwner.GetPlayer.MovementContext.BlindFire;
 
         private readonly ManualLogSource Logger;
     }

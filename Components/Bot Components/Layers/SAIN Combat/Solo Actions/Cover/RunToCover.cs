@@ -22,7 +22,16 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (CoverDestination != null)
+            if (Decision == SAINSoloDecision.Retreat && SAIN.Cover.FallBackPoint != null)
+            {
+                CoverDestination = SAIN.Cover.FallBackPoint;
+                if (SAIN.Mover.Prone.IsProne)
+                {
+                    SAIN.Mover.Prone.SetProne(false);
+                }
+                SAIN.Mover.GoToPoint(CoverDestination.Position, 0.5f);
+            }
+            else if (CoverDestination != null)
             {
                 if (!SAIN.Cover.CoverPoints.Contains(CoverDestination) || CoverDestination.Spotted)
                 {
@@ -65,7 +74,6 @@ namespace SAIN.Layers
                 else
                 {
                     coverPoint.BotIsUsingThis = false;
-                    coverPoint.Spotted = true;
                 }
             }
             return false;

@@ -20,9 +20,9 @@ namespace SAIN.Components
         {
         }
 
-        private float SpherecastRadius = 0.05f;
+        private readonly float SpherecastRadius = 0.05f;
         private LayerMask SightLayers => LayerMaskClass.HighPolyWithTerrainMaskAI;
-        private int MinJobSize = 5;
+        private readonly int MinJobSize = 5;
         private List<Player> RegisteredPlayers => Singleton<GameWorld>.Instance.RegisteredPlayers;
 
         private int Frames = 0;
@@ -31,16 +31,12 @@ namespace SAIN.Components
         {
             if (EnableVisionJobs.Value)
             {
-                GlobalRaycastJob();
-                CheckEnemiesJobs();
-
                 Frames++;
                 if (Frames == CheckFrameCount.Value)
                 {
                     Frames = 0;
-
-                    //GlobalRaycastJob();
-                    //EnemyVisionJob();
+                    GlobalRaycastJob();
+                    CheckEnemiesJobs();
                 }
             }
         }

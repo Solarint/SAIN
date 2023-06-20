@@ -212,7 +212,7 @@ namespace SAIN.Classes
 
         private bool StartMoveToCover()
         {
-            bool start = !SAIN.Cover.BotIsAtCoverPoint && (SAIN.Cover.CurrentCoverPoint != null || SAIN.Cover.CurrentFallBackPoint != null);
+            bool start = !SAIN.Cover.BotIsAtCoverPoint && SAIN.Cover.CoverPoints.Count > 0;
 
             if (start)
             {
@@ -245,7 +245,7 @@ namespace SAIN.Classes
         private bool StartHoldInCover()
         {
             var cover = SAIN.Cover.CoverInUse;
-            if (cover != null && (cover.Position - BotOwner.Position).sqrMagnitude < 1.5f)
+            if (cover != null && !cover.Spotted && (cover.Position - BotOwner.Position).sqrMagnitude < 1.5f)
             {
                 return true;
             }

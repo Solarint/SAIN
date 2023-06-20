@@ -65,7 +65,6 @@ namespace SAIN.Layers
                 }
                 else
                 {
-                    coverPoint.Spotted = true;
                     coverPoint.BotIsUsingThis = false;
                 }
             }

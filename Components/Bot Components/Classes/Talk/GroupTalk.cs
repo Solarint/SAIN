@@ -81,17 +81,12 @@ namespace SAIN.Classes
                 return;
             }
 
-            var trigger = EPhraseTrigger.LootBody;
-            trigger |= EPhraseTrigger.LootContainer;
-            trigger |= EPhraseTrigger.LootGeneric;
-            trigger |= EPhraseTrigger.LootKey;
-            trigger |= EPhraseTrigger.LootMoney;
-            trigger |= EPhraseTrigger.LootNothing;
-            trigger |= EPhraseTrigger.LootWeapon;
-            trigger |= EPhraseTrigger.OnLoot;
+            var trigger = LootPhrases.PickRandom();
 
             SAIN.Talk.Say(trigger, null, true);
         }
+
+        private List<EPhraseTrigger> LootPhrases = new List<EPhraseTrigger> { EPhraseTrigger.LootBody, EPhraseTrigger.LootContainer, EPhraseTrigger.LootGeneric, EPhraseTrigger.LootKey, EPhraseTrigger.LootMoney, EPhraseTrigger.LootNothing, EPhraseTrigger.LootWeapon, EPhraseTrigger.OnLoot };
 
         public void Dispose()
         {

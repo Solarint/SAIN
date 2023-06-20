@@ -32,20 +32,20 @@ namespace SAIN.Classes
             switch (SteeringMode)
             {
                 case EBotSteering.ToCustomPoint:
-                    BotOwner.Steering.LookToPoint(CurrentSteerPoint, 300f);
+                    BotOwner.Steering.LookToPoint(CurrentSteerPoint, 500f);
                     break;
 
                 case EBotSteering.ToMovingDirection:
                     if (BotOwner.ShootData?.Shooting == true)
                     {
-                        BotOwner.Steering.LookToPoint(CurrentSteerPoint, 300f);
+                        BotOwner.Steering.LookToPoint(CurrentSteerPoint, 500f);
                         break;
                     }
-                    BotOwner.Steering.LookToMovingDirection();
+                    BotOwner.Steering.LookToMovingDirection(350f);
                     break;
 
                 default:
-                    BotOwner.Steering.LookToPoint(CurrentSteerPoint, 300f);
+                    BotOwner.Steering.LookToPoint(CurrentSteerPoint, 500f);
                     break;
             }
         }

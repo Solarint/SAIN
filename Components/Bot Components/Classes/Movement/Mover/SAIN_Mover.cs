@@ -122,7 +122,9 @@ namespace SAIN.Classes
         public void Update()
         {
             SetStamina();
+
             Pose.Update();
+            Lean.Update();
             SideStep.Update();
             Prone.Update();
             BlindFire.Update();
@@ -237,19 +239,6 @@ namespace SAIN.Classes
 
         public void FastLean(LeanSetting value)
         {
-
-        }
-
-        public void FastLean(float value)
-        {
-            if (BotPlayer.MovementContext.Tilt != value)
-            {
-                BotPlayer.MovementContext.SetTilt(value);
-            }
-        }
-
-        public void SlowLean(LeanSetting value)
-        {
             float num;
             switch (value)
             {
@@ -260,7 +249,15 @@ namespace SAIN.Classes
                 default:
                     num = 0f; break;
             }
-            SlowLean(num);
+            FastLean(num);
+        }
+
+        public void FastLean(float value)
+        {
+            if (BotPlayer.MovementContext.Tilt != value)
+            {
+                BotPlayer.MovementContext.SetTilt(value);
+            }
         }
 
         public void SlowLean(float value)

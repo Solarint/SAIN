@@ -5,6 +5,7 @@ using HarmonyLib;
 using SAIN.Classes;
 using SAIN.Helpers;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static SAIN.UserSettings.VisionConfig;
 
@@ -69,7 +70,7 @@ namespace SAIN.Components
                 {
                     foreach (var player in VisiblePlayers)
                     {
-                        DebugGizmos.SingleObjects.Line(HeadPosition, player.MainParts[BodyPartType.body].Position, Color.blue, 0.025f, true, 0.1f, true);
+                        DebugGizmos.SingleObjects.Line(HeadPosition, player.MainParts[BodyPartType.body].Position, Color.green, 0.025f, true, 0.1f, true);
                     }
                 }
 
@@ -172,28 +173,122 @@ namespace SAIN.Components
 
         private void UpdateEnemy()
         {
-            var goalEnemy = BotOwner.Memory.GoalEnemy;
-            if (goalEnemy != null)
+            if (Enemies.Count > 0)
             {
-                SAINEnemy sainEnemy;
-                string profile = goalEnemy.Person.ProfileId;
-                if (Enemies.ContainsKey(profile))
-                {
-                    sainEnemy = Enemies[profile];
-                }
-                else
-                {
-                    sainEnemy = new SAINEnemy(BotOwner, goalEnemy.Person, DifficultyModifier);
-                    Enemies.Add(profile, sainEnemy);
-                }
-                Enemy = sainEnemy;
+                ClearEnemies();
+            }
+            if (BotOwner.Memory.GoalEnemy != null)
+            {
+                AddEnemy();
                 Enemy?.Update();
             }
             else
             {
                 Enemy = null;
-                Enemies.Clear();
             }
+        }
+
+        private void ClearEnemies()
+        {
+            foreach (string id in Enemies.Keys)
+            {
+                var enemy = Enemies[id];
+                if (enemy == null || !enemy.EnemyPlayer.HealthController.IsAlive)
+                {
+                    EnemyIDsToRemove.Add(id);
+                }
+            }
+
+            foreach (string idToRemove in EnemyIDsToRemove)
+            {
+                Enemies.Remove(idToRemove);
+            }
+
+            EnemyIDsToRemove.Clear();
+        }
+
+        private readonly List<string> EnemyIDsToRemove = new List<string>();
+
+        private void AddEnemy()
+        {
+            string profileId;
+            var goalEnemy = BotOwner.Memory.GoalEnemy;
+            if (goalEnemy != null)
+            {
+                profileId = goalEnemy.Person.ProfileId;
+                if (!Enemies.ContainsKey(profileId))
+                {
+                    Enemies.Add(profileId, new SAINEnemy(BotOwner, goalEnemy.Person, DifficultyModifier));
+                }
+                Enemy = Enemies[profileId];
+            }
+        }
+
+        private SAINEnemy PickClosestEnemy()
+        {
+            SAINEnemy ChosenEnemy = null;
+
+            SAINEnemy closestLos = null;
+            SAINEnemy closestAny = null;
+            SAINEnemy closestVisible = null;
+
+            float closestDist = Mathf.Infinity;
+            float closestAnyDist = Mathf.Infinity;
+            float closestVisibleDist = Mathf.Infinity;
+
+            float enemyDist = Mathf.Infinity;
+
+            if (Enemies.Count > 1)
+            {
+                foreach (var enemy in Enemies.Values)
+                {
+                    if (enemy != null)
+                    {
+                        enemyDist = (enemy.Position - Position).sqrMagnitude;
+                        if (enemy.EnemyLookingAtMe && enemy.IsVisible)
+                        {
+                            if (enemyDist < closestVisibleDist)
+                            {
+                                closestVisibleDist = enemyDist;
+                                closestVisible = enemy;
+                            }
+                        }
+                        else if (enemy.InLineOfSight)
+                        {
+                            if (enemyDist < closestDist)
+                            {
+                                closestDist = enemyDist;
+                                closestLos = enemy;
+                            }
+                        }
+                        else
+                        {
+                            if (enemyDist < closestAnyDist)
+                            {
+                                closestAnyDist = enemyDist;
+                                closestAny = enemy;
+                            }
+                        }
+                    }
+                }
+                if (closestVisible != null)
+                {
+                    ChosenEnemy = closestVisible;
+                }
+                else if (closestLos != null)
+                {
+                    ChosenEnemy = closestLos;
+                }
+                else
+                {
+                    ChosenEnemy = closestAny;
+                }
+            }
+            else if (Enemies.Count == 1)
+            {
+                ChosenEnemy = Enemies.Values.PickRandom();
+            }
+            return ChosenEnemy;
         }
 
         private void FindExfil()

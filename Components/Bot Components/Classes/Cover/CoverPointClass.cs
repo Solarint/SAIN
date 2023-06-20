@@ -18,13 +18,16 @@ namespace SAIN.Classes
             Id = Guid.NewGuid().ToString();
         }
 
+        public int HitInCoverUnknownCount { get; set; }
+        public int HitInCoverCount { get; set; }
+
         public string Id { get; set; }
 
         public bool BotIsUsingThis { get; set; }
 
         public bool BotIsHere => BotIsUsingThis && Distance < 1f && !Spotted;
 
-        public bool Spotted { get; set; }
+        public bool Spotted => HitInCoverCount > 1 || HitInCoverUnknownCount > 0;
 
         public float CalcPathLength()
         {

@@ -187,18 +187,20 @@ namespace SAIN.Classes
                 return;
             }
 
-            var phrase = PhraseDictionary[type];
-
-            if (phrase.TimeLastSaid + phrase.TimeDelay * TalkDelayModifier.Value < Time.time)
+            if (PhraseDictionary.ContainsKey(type))
             {
-                var data = new BotTalkPackage(phrase, mask);
-
-                NormalBotTalk = CheckPriority(data, NormalBotTalk);
-
-                if (!TalkPriorityActive)
+                var phrase = PhraseDictionary[type];
+                if (phrase.TimeLastSaid + phrase.TimeDelay * TalkDelayModifier.Value < Time.time)
                 {
-                    TalkPriorityActive = true;
-                    TalkPriorityTimer = Time.time + 0.15f;
+                    var data = new BotTalkPackage(phrase, mask);
+
+                    NormalBotTalk = CheckPriority(data, NormalBotTalk);
+
+                    if (!TalkPriorityActive)
+                    {
+                        TalkPriorityActive = true;
+                        TalkPriorityTimer = Time.time + 0.15f;
+                    }
                 }
             }
         }

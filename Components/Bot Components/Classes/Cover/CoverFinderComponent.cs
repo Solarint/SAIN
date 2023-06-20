@@ -1,7 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using SAIN.Helpers;
 using SAIN.Classes;
+using SAIN.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,12 +40,12 @@ namespace SAIN.Components
             if (SAIN.Decision.CurrentSelfDecision == SAINSelfDecision.RunAwayGrenade)
             {
                 MinObstacleHeight = 1.5f;
-                MinDistance = 10f;
+                MinEnemyDist = 10f;
             }
             else
             {
                 MinObstacleHeight = CoverMinHeight.Value;
-                MinDistance = CoverMinEnemyDistance.Value;
+                MinEnemyDist = CoverMinEnemyDistance.Value;
             }
 
             if (TakeCoverCoroutine == null)
@@ -60,71 +60,79 @@ namespace SAIN.Components
             {
                 StopCoroutine(TakeCoverCoroutine);
                 TakeCoverCoroutine = null;
-                //CurrentCover = null;
-                //CurrentFallBackPoint = null;
+                CoverPoints.Clear();
+                FallBackPoint = null;
             }
         }
+
+        public CoverPoint FallBackPoint { get; private set; }
 
         private IEnumerator FindCover()
         {
             while (true)
             {
-                tooclose = 0;
-                baddist = 0;
-                visible = 0;
-                nopath = 0;
-                totalCount = 0;
+                UpdateSpotted();
+                ClearOldPoints();
+                GetColliders(out int hits);
 
-                if (!RecheckPoints())
+                int frameWait = 0;
+                int coverCount = CoverPoints.Count;
+                int totalChecked = 0;
+                bool foundFallback = false;
+
+                for (int i = 0; i < hits; i++)
                 {
-                    GetColliders(out int hits);
-                    int frameWait = 0;
-                    int coverCount = 0;
-                    int totalChecked = 0;
-
-                    for (int i = 0; i < hits; i++)
+                    totalChecked++;
+                    if (CheckCollider(Colliders[i], out var newPoint))
                     {
-                        if (CheckCollider(Colliders[i], out var newPoint))
+                        if (!foundFallback && Colliders[i].bounds.size.y >= 1.5f)
                         {
-                            CoverPoints.Add(newPoint);
+                            foundFallback = true;
+                            FallBackPoint = newPoint;
+                        }
+                        else if (coverCount < 5)
+                        {
                             coverCount++;
-                            yield return null;
-                        }
-                        // Every 10 colliders checked, wait until the next frame before continuing.
-                        if (frameWait == 10)
-                        {
-                            frameWait = 0;
-                            yield return null;
-                        }
-
-                        frameWait++;
-                        totalChecked++;
-
-                        if (coverCount >= 5)
-                        {
-                            break;
+                            CoverPoints.Add(newPoint);
                         }
                     }
 
-                    if (coverCount > 0)
+                    // Every 10 colliders checked, wait until the next frame before continuing.
+                    if (frameWait == 10)
                     {
-                        if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
-                        {
-                            DebugLogTimer = Time.time + 1f;
-                            Logger.LogInfo($"[{BotOwner.name}] - Found [{CoverPoints.Count}] CoverPoints: Stats: Too Close To Friendly: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Valid Colliders checked: [{totalCount}] Collider Array Size = [{hits}]");
-                        }
+                        frameWait = 0;
+                        yield return null;
                     }
-                    else
+                    frameWait++;
+
+                    if (coverCount >= 5 && foundFallback)
                     {
-                        if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
-                        {
-                            DebugLogTimer = Time.time + 1f;
-                            Logger.LogWarning($"[{BotOwner.name}] - No Cover Found! Oh no!: Stats: Too Close To Friendly: [{tooclose}] Too Close to Enemy: [{baddist}] Visible: [{visible}] No Path: [{nopath}] Valid Colliders checked: [{totalCount}] Collider Array Size = [{hits}]");
-                        }
+                        break;
                     }
                 }
 
-                yield return new WaitForSeconds(CoverUpdateFrequency.Value + SAIN.AILimit.TimeAdd);
+                if (foundFallback)
+                {
+                    CoverPoints.Add(FallBackPoint);
+                }
+
+                if (coverCount > 0)
+                {
+                    if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
+                    {
+                        DebugLogTimer = Time.time + 1f;
+                        Logger.LogInfo($"[{BotOwner.name}] - Found [{CoverPoints.Count}] CoverPoints. Colliders checked: [{totalChecked}] Collider Array Size = [{hits}]");
+                    }
+                }
+                else
+                {
+                    if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
+                    {
+                        DebugLogTimer = Time.time + 1f;
+                        Logger.LogWarning($"[{BotOwner.name}] - No Cover Found! Valid Colliders checked: [{totalChecked}] Collider Array Size = [{hits}]");
+                    }
+                }
+                yield return new WaitForSeconds(CoverUpdateFrequency.Value);
             }
         }
 
@@ -162,10 +170,6 @@ namespace SAIN.Components
                         newPoint = new CoverPoint(BotOwner, hit.position, collider);
                     }
                 }
-                else
-                {
-                    nopath++;
-                }
             }
 
             return newPoint != null;
@@ -200,32 +204,29 @@ namespace SAIN.Components
             return colliderDist < targetDist;
         }
 
-
-        private float MinDistance;
+        private float MinEnemyDist;
 
         private bool CheckPosition(Vector3 position)
         {
+            if (SpottedPoints.Count > 0)
+            {
+                foreach (var point in SpottedPoints)
+                {
+                    if (!point.IsValidAgain && point.TooClose(position))
+                    {
+                        return false;
+                    }
+                }
+            }
             if (CheckPositionVsOtherBots(position))
             {
-                if ((position - TargetPosition).magnitude > MinDistance)
+                if ((position - TargetPosition).magnitude > MinEnemyDist)
                 {
                     if (VisibilityCheck(position))
                     {
                         return true;
                     }
-                    else
-                    {
-                        visible++;
-                    }
                 }
-                else
-                {
-                    baddist++;
-                }
-            }
-            else
-            {
-                tooclose++;
             }
 
             return false;
@@ -296,30 +297,63 @@ namespace SAIN.Components
             return true;
         }
 
-        private int totalCount = 0;
-        private int baddist = 0;
-        private int tooclose = 0;
-        private int visible = 0;
-        private int nopath = 0;
-
         private float DebugLogTimer = 0f;
 
-        private bool RecheckPoints()
+        public List<SpottedCoverPoint> SpottedPoints { get; private set; } = new List<SpottedCoverPoint>();
+        private readonly List<SpottedCoverPoint> ReCheckList = new List<SpottedCoverPoint>();
+
+        private void UpdateSpotted()
+        {
+            if (SpottedPoints.Count > 0)
+            {
+                ReCheckList.AddRange(SpottedPoints);
+                for (int j = ReCheckList.Count - 1; j >= 0; j--)
+                {
+                    var spotted = ReCheckList[j];
+                    if (spotted != null)
+                    {
+                        if (spotted.IsValidAgain)
+                        {
+                            SpottedPoints.RemoveAt(j);
+                        }
+                    }
+                }
+                ReCheckList.Clear();
+            }
+        }
+
+        private void ClearOldPoints()
         {
             CoverPoint PointToSave = null;
             if (CoverPoints.Count > 0)
             {
-                foreach (var point in CoverPoints)
+                for (int i = 0; i < CoverPoints.Count; i++)
                 {
-                    if (point != null && point.BotIsUsingThis && !point.Spotted)
+                    var point = CoverPoints[i];
+                    if (point != null)
                     {
-                        point.BotIsUsingThis = false;
-                        if (CheckCollider(point.Collider, out var newPoint))
+                        if (point.Spotted)
                         {
-                            PointToSave = newPoint;
-                            PointToSave.BotIsUsingThis = true;
+                            SpottedPoints.Add(new SpottedCoverPoint(point.Position));
+                            continue;
                         }
-                        break;
+                        if (point.BotIsUsingThis)
+                        {
+                            if (CheckCollider(point.Collider, out var newPoint))
+                            {
+                                PointToSave = newPoint;
+                                PointToSave.BotIsUsingThis = true;
+                                PointToSave.HitInCoverCount = point.HitInCoverCount;
+                                if (PointToSave.Collider.bounds.size.y >= 1.5f)
+                                {
+                                    FallBackPoint = newPoint;
+                                }
+                                else
+                                {
+                                    FallBackPoint = null;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -328,39 +362,6 @@ namespace SAIN.Components
             {
                 CoverPoints.Add(PointToSave);
             }
-            return false;
-
-            List<CoverPoint> checkedPoints = new List<CoverPoint>();
-            for (int i = 0; i < CoverPoints.Count; i++)
-            {
-                var point = CoverPoints[i];
-                if (point.Spotted)
-                {
-                    continue;
-                }
-                Vector3 coverPos = point.Collider.transform.position;
-
-                float sqrMag = (point.Position - OriginPoint).sqrMagnitude;
-                if (sqrMag <= 2500 && CheckCollider(point.Collider, out var newPoint))
-                {
-                    checkedPoints.Add(newPoint);
-                }
-            }
-
-            CoverPoints.Clear();
-            if (checkedPoints.Count > 0)
-            {
-                if (checkedPoints.Count > 1)
-                {
-                    var pointsArray = checkedPoints.ToArray();
-                    System.Array.Sort(pointsArray, CoverPointPathComparerer);
-                    CoverPoints.AddRange(pointsArray);
-                    return true;
-                }
-                CoverPoints.AddRange(checkedPoints);
-                return true;
-            }
-            return false;
         }
 
         public bool CheckPositionVsOtherBots(Vector3 position)
@@ -383,9 +384,9 @@ namespace SAIN.Components
                             return false;
                         }
                     }
-                    if (member.Cover.CurrentFallBackPoint != null)
+                    if (member.Cover.FallBackPoint != null)
                     {
-                        if (Vector3.Distance(position, member.Cover.CurrentFallBackPoint.Position) < DistanceToBotCoverThresh)
+                        if (Vector3.Distance(position, member.Cover.FallBackPoint.Position) < DistanceToBotCoverThresh)
                         {
                             return false;
                         }
@@ -607,5 +608,27 @@ namespace SAIN.Components
         private Coroutine TakeCoverCoroutine;
         private Vector3 OriginPoint;
         public Vector3 TargetPosition { get; private set; }
+
+        public class SpottedCoverPoint
+        {
+            public SpottedCoverPoint(Vector3 position, float expireTime = 2f)
+            {
+                ExpireTime = expireTime;
+                Position = position;
+                TimeCreated = Time.time;
+            }
+
+            public bool TooClose(Vector3 newPos, float sqrdist = 3f)
+            {
+                return (Position - newPos).sqrMagnitude > sqrdist;
+            }
+
+            public Vector3 Position { get; private set; }
+            public float TimeCreated { get; private set; }
+            public float TimeSinceCreated => Time.time - TimeCreated;
+
+            private readonly float ExpireTime;
+            public bool IsValidAgain => TimeSinceCreated > ExpireTime;
+        }
     }
 }

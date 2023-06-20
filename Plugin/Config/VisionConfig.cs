@@ -20,7 +20,7 @@ namespace SAIN.UserSettings
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
 
-            CheckFrameCount = Config.Bind(debugmode, "CheckFrameCount", 5,
+            CheckFrameCount = Config.Bind(debugmode, "CheckFrameCount", 1,
                 new ConfigDescription("",
                 new AcceptableValueRange<int>(1, 30),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));

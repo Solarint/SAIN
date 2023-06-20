@@ -13,6 +13,29 @@ namespace SAIN.Classes.Mover
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
+        public void Update()
+        {
+            var enemy = SAIN.Enemy;
+            if (enemy == null || SAIN.Mover.IsSprinting || CurrentDecision == SAINSoloDecision.Retreat || CurrentDecision == SAINSoloDecision.RunAway || CurrentDecision == SAINSoloDecision.RunToCover)
+            {
+                ResetLean();
+                return;
+            }
+            if (LeanTimer < Time.time)
+            {
+                LeanTimer = Time.time + 0.5f;
+                FindLeanDirectionRayCast(enemy.Position);
+            }
+        }
+
+        private float LeanTimer = 0f;
+
+        public void ResetLean()
+        {
+            LeanDirection = LeanSetting.None;
+            SAIN.Mover.FastLean(0f);
+        }
+
         public void SetLean(float num)
         {
             SAIN.Mover.FastLean(num);
@@ -43,67 +66,61 @@ namespace SAIN.Classes.Mover
 
         private readonly ManualLogSource Logger;
 
-        public LeanSetting FindLeanDirectionRayCast(Vector3 targetPos)
+        public void FindLeanDirectionRayCast(Vector3 targetPos)
         {
-            if (RayTimer < Time.time)
+            DirectLineOfSight = CheckOffSetRay(targetPos, 0f, 0f, out var direct);
+
+            RightLos = CheckOffSetRay(targetPos, 90f, 0.66f, out var rightOffset);
+            if (!RightLos)
             {
-                RayTimer = Time.time + 0.25f;
+                RightLosPos = rightOffset;
 
-                DirectLineOfSight = CheckOffSetRay(targetPos, 0f, 0f, out var direct);
+                rightOffset.y = BotOwner.Position.y;
+                float halfDist1 = (rightOffset - BotOwner.Position).magnitude / 2f;
 
-                RightLos = CheckOffSetRay(targetPos, 90f, 0.66f, out var rightOffset);
-                if (!RightLos)
+                RightHalfLos = CheckOffSetRay(targetPos, 90f, halfDist1, out var rightHalfOffset);
+                if (!RightHalfLos)
                 {
-                    RightLosPos = rightOffset;
-
-                    rightOffset.y = BotOwner.Position.y;
-                    float halfDist1 = (rightOffset - BotOwner.Position).magnitude / 2f;
-
-                    RightHalfLos = CheckOffSetRay(targetPos, 90f, halfDist1, out var rightHalfOffset);
-                    if (!RightHalfLos)
-                    {
-                        RightHalfLosPos = rightHalfOffset;
-                    }
-                    else
-                    {
-                        RightHalfLosPos = null;
-                    }
+                    RightHalfLosPos = rightHalfOffset;
                 }
                 else
                 {
-                    RightLosPos = null;
                     RightHalfLosPos = null;
                 }
+            }
+            else
+            {
+                RightLosPos = null;
+                RightHalfLosPos = null;
+            }
 
-                LeftLos = CheckOffSetRay(targetPos, -90f, 0.66f, out var leftOffset);
-                if (!LeftLos)
+            LeftLos = CheckOffSetRay(targetPos, -90f, 0.66f, out var leftOffset);
+            if (!LeftLos)
+            {
+                LeftLosPos = leftOffset;
+
+                leftOffset.y = BotOwner.Position.y;
+                float halfDist2 = (leftOffset - BotOwner.Position).magnitude / 2f;
+
+                LeftHalfLos = CheckOffSetRay(targetPos, -90f, halfDist2, out var leftHalfOffset);
+
+                if (!LeftHalfLos)
                 {
-                    LeftLosPos = leftOffset;
-
-                    leftOffset.y = BotOwner.Position.y;
-                    float halfDist2 = (leftOffset - BotOwner.Position).magnitude / 2f;
-
-                    LeftHalfLos = CheckOffSetRay(targetPos, -90f, halfDist2, out var leftHalfOffset);
-
-                    if (!LeftHalfLos)
-                    {
-                        LeftHalfLosPos = leftHalfOffset;
-                    }
-                    else
-                    {
-                        LeftHalfLosPos = null;
-                    }
+                    LeftHalfLosPos = leftHalfOffset;
                 }
                 else
                 {
-                    LeftLosPos = null;
                     LeftHalfLosPos = null;
                 }
             }
-
+            else
+            {
+                LeftLosPos = null;
+                LeftHalfLosPos = null;
+            }
             var setting = GetSettingFromResults();
             LeanDirection = setting;
-            return setting;
+            SAIN.Mover.FastLean(setting);
         }
 
         private float RayTimer = 0f;

@@ -80,26 +80,7 @@ namespace SAIN.Layers
                 if (ExtractTimer < Time.time)
                 {
                     Logger.LogInfo($"{BotOwner.name} Extracted");
-                    var player = BotOwner.GetPlayer;
-                    BotOwner.BotsGroup.RemoveAlly(BotOwner);
-
-                    foreach (var registeredPlayer in Singleton<GameWorld>.Instance.RegisteredPlayers)
-                    {
-                        if (registeredPlayer != null && registeredPlayer.IsAI)
-                        {
-                            var group = registeredPlayer.AIData.BotOwner.BotsGroup;
-                            if (group.Enemies.ContainsKey(player))
-                            {
-                                group.RemoveEnemy(player);
-                            }
-                        }
-                    }
-
-                    BotOwner.Dispose();
-                    SAIN?.Dispose();
-                    player.Dispose();
-                    GameObject.Destroy(BotOwner);
-                    GameObject.Destroy(player);
+                    Singleton<IBotGame>.Instance.BotUnspawn(BotOwner);
                 }
                 return;
             }
@@ -107,7 +88,7 @@ namespace SAIN.Layers
             {
                 ExtractTimer = -1f;
                 SAIN.Mover.Sprint(true);
-                BotOwner.GoToPoint(point, false, -1, false, false, false);
+                SAIN.Mover.GoToPoint(point);
                 BotOwner.DoorOpener.Update();
             }
         }

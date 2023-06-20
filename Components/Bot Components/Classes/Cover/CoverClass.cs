@@ -21,7 +21,23 @@ namespace SAIN.Classes
             CoverPoint activePoint = CoverInUse;
             if (activePoint != null && activePoint.BotIsHere)
             {
-                activePoint.Spotted = true;
+                SAINEnemy enemy = SAIN.Enemy;
+                if (enemy != null && damage.Player != null && enemy.EnemyPlayer.ProfileId == damage.Player.ProfileId)
+                {
+                    activePoint.HitInCoverCount++;
+                    if (!enemy.IsVisible)
+                    {
+                        activePoint.HitInCoverCount += 2;
+                    }
+                    else
+                    {
+                        activePoint.HitInCoverCount += 1;
+                    }
+                }
+                else
+                {
+                    activePoint.HitInCoverUnknownCount++;
+                }
             }
         }
 
@@ -215,7 +231,7 @@ namespace SAIN.Classes
         public List<CoverPoint> CoverPoints => CoverFinder.CoverPoints;
         public CoverFinderComponent CoverFinder { get; private set; }
         public CoverPoint CurrentCoverPoint => ClosestPoint;
-        public CoverPoint CurrentFallBackPoint => ClosestPoint;
+        public CoverPoint FallBackPoint => CoverFinder.FallBackPoint;
 
         protected ManualLogSource Logger;
     }

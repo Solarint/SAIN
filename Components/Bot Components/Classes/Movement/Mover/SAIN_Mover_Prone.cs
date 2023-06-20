@@ -33,7 +33,6 @@ namespace SAIN.Classes.Mover
         {
         }
 
-
         public bool ShallProne(CoverPoint point, bool withShoot)
         {
             var status = point.CoverStatus;
