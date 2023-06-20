@@ -23,7 +23,7 @@ namespace SAIN.Layers
             SAIN = bot.GetComponent<SAINComponent>();
         }
 
-        private float PercentageToExtract => SAIN.Info.PercentageRaidLeftBeforeExtract;
+        private float PercentageToExtract => SAIN.Info.PercentageBeforeExtract;
 
         public override Action GetNextAction()
         {

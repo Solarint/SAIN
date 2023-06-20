@@ -31,13 +31,13 @@ namespace SAIN
         {
             CombineBigBrainLists();
 
-            //BrainManager.AddCustomLayer(typeof(SAINSquad), AllBots, 66);
-            //SAINLayers.Add(SAINSquad.Name);
+            BrainManager.AddCustomLayer(typeof(SAINSquad), AllBots, 24);
+            SAINLayers.Add(SAINSquad.Name);
 
-            //BrainManager.AddCustomLayer(typeof(SAINExtractLayer), AllBots, 65);
-            //SAINLayers.Add(SAINExtractLayer.Name);
+            BrainManager.AddCustomLayer(typeof(SAINExtractLayer), AllBots, 22);
+            SAINLayers.Add(SAINExtractLayer.Name);
 
-            BrainManager.AddCustomLayer(typeof(SAINSolo), AllBots, 64);
+            BrainManager.AddCustomLayer(typeof(SAINSolo), AllBots, 20);
             SAINLayers.Add(SAINSolo.Name);
 
             foreach (string layer in LayersToRemove)

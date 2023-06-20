@@ -107,7 +107,18 @@ namespace SAIN.Classes
             {
                 ChangeDecisionTime = Time.time;
             }
+            if (CurrentSelfDecision != OldSelfDecision)
+            {
+                ChangeSelfDecisionTime = Time.time;
+            }
+            if (CurrentSquadDecision != OldSquadDecision)
+            {
+                ChangeSquadDecisionTime = Time.time;
+            }
         }
+
+        public float ChangeSelfDecisionTime { get; private set; }
+        public float ChangeSquadDecisionTime { get; private set; }
 
         private bool CheckContinueRetreat()
         {

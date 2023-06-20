@@ -60,6 +60,10 @@ namespace SAIN.Components
         {
             if (BotController.SAINBots.Count > 0)
             {
+                TotalEnemiesGlobal = 0;
+                BotEnemiesList.Clear();
+                BotsWithEnemies.Clear();
+
                 foreach (var bot in BotController.SAINBots)
                 {
                     if (bot.Value != null && bot.Value.Enemies.Count > 0)
@@ -93,10 +97,11 @@ namespace SAIN.Components
                             }
                         }
                     }
-                }
 
-                BotsWithEnemies.Clear();
-                TotalEnemiesGlobal = 0;
+                    BotEnemiesList.Clear();
+                    BotsWithEnemies.Clear();
+                    TotalEnemiesGlobal = 0;
+                }
             }
         }
 
@@ -170,6 +175,7 @@ namespace SAIN.Components
                 bool visible = false;
                 var bot = BotsWithEnemies[i];
 
+                BotEnemiesList.Clear();
                 BotEnemiesList.AddRange(bot.Enemies.Values.ToList());
                 for (int k = 0; k < BotEnemiesList.Count; k++)
                 {
@@ -223,6 +229,7 @@ namespace SAIN.Components
                 float max = bot.BotOwner.WeaponManager.CurrentWeapon.Template.bEffDist * 1.5f;
                 Vector3 weapon = bot.BotOwner.WeaponRoot.position;
 
+                BotEnemiesList.Clear();
                 BotEnemiesList.AddRange(bot.Enemies.Values.ToList());
 
                 for (int k = 0; k < BotEnemiesList.Count; k++)
@@ -251,7 +258,6 @@ namespace SAIN.Components
                         );
                     }
                 }
-                BotEnemiesList.Clear();
             }
 
             JobHandle spherecastJob = SpherecastCommand.ScheduleBatch(
@@ -267,6 +273,7 @@ namespace SAIN.Components
                 bool canShoot = false;
                 var bot = BotsWithEnemies[i];
 
+                BotEnemiesList.Clear();
                 BotEnemiesList.AddRange(bot.Enemies.Values.ToList());
                 for (int k = 0; k < BotEnemiesList.Count; k++)
                 {
@@ -292,12 +299,14 @@ namespace SAIN.Components
                         enemy.UpdateCanShoot(false, 0f);
                     }
                 }
-                BotEnemiesList.Clear();
             }
 
             spherecastCommands.Dispose();
             raycastHits.Dispose();
+            BotEnemiesList.Clear();
         }
+
+        private List<SAINBot> GlobalVisionBotList = new List<SAINBot>();
 
         private void GlobalRaycastJob()
         {
@@ -311,12 +320,11 @@ namespace SAIN.Components
             );
 
             int currentIndex = 0;
+            var sainBots = BotController.SAINBots.Values.ToList();
 
-            var list = BotController.SAINBots.Values.ToList();
-
-            for (int i = 0; i < list.Count; i++)
+            for (int i = 0; i < sainBots.Count; i++)
             {
-                var bot = list[i];
+                var bot = sainBots[i];
                 Vector3 head = HeadPos(bot.BotOwner.GetPlayer);
 
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
@@ -346,10 +354,11 @@ namespace SAIN.Components
             int visiblecount = 0;
             spherecastJob.Complete();
 
-            for (int i = 0; i < list.Count; i++)
+            for (int i = 0; i < sainBots.Count; i++)
             {
                 int startIndex = i * RegisteredPlayers.Count;
-                var visiblePlayers = list[i].VisiblePlayers;
+                var visiblePlayers = sainBots[i].VisiblePlayers;
+                BotVisiblePlayers.Clear();
                 BotVisiblePlayers.AddRange(visiblePlayers);
 
                 for (int v = 0; v < visiblePlayers.Count; v++)

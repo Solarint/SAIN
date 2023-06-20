@@ -18,10 +18,10 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             Init();
             WeaponInfo = new WeaponInfo(BotOwner);
-            PercentageRaidLeftBeforeExtract = UnityEngine.Random.Range(10f, 50f);
+            PercentageBeforeExtract = UnityEngine.Random.Range(5f, 35f);
         }
 
-        public float PercentageRaidLeftBeforeExtract { get; private set; }
+        public float PercentageBeforeExtract { get; private set; }
 
         private void Init()
         {
@@ -49,7 +49,7 @@ namespace SAIN.Classes
                 var Leader = SAIN.Squad.LeaderComponent;
                 if (Leader != null)
                 {
-                    PercentageRaidLeftBeforeExtract = Leader.Info.PercentageRaidLeftBeforeExtract;
+                    PercentageBeforeExtract = Leader.Info.PercentageBeforeExtract;
                 }
             }
         }
