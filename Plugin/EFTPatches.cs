@@ -52,7 +52,6 @@ namespace SAIN
             new Patches.VisibleDistancePatch().Enable();
             new Patches.GainSightPatch().Enable();
             new Patches.CheckFlashlightPatch().Enable();
-            new Patches.DazzlePatch().Enable();
         }
 
         private static void HearingPatches()

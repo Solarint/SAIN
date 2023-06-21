@@ -33,10 +33,9 @@ namespace SAIN.Layers
         {
             if (SAIN.CurrentTargetPosition != null)
             {
-                if (Search.GoToPoint(SAIN.CurrentTargetPosition.Value) == NavMeshPathStatus.PathInvalid)
+                if (Search.GoToPoint(SAIN.CurrentTargetPosition.Value) != NavMeshPathStatus.PathInvalid)
                 {
                     TargetPosition = SAIN.CurrentTargetPosition.Value;
-                    Logger.LogError($"Could not Start Search!");
                 }
             }
         }
@@ -94,7 +93,6 @@ namespace SAIN.Layers
         {
             if (Search.PeekingCorner)
             {
-                SprintEnabled = false;
                 SAIN.Mover.SetTargetMoveSpeed(0.33f);
                 SAIN.Mover.SetTargetPose(0.8f);
             }
@@ -116,18 +114,8 @@ namespace SAIN.Layers
             else
             {
                 SAIN.Mover.Sprint(false);
-                float soundDistance = 999f;
-                if (SAIN.LastHeardSound != null)
+                if (SAIN.Steering.SteerByPriority(false))
                 {
-                    soundDistance = Vector3.Distance(SAIN.LastHeardSound.Position, BotOwner.Position);
-                }
-                if (BotOwner.Memory.IsUnderFire)
-                {
-                    SAIN.Steering.SteerByPriority();
-                }
-                else if (soundDistance < 30f && SAIN.LastHeardSound.TimeSinceHeard < 1f)
-                {
-                    SAIN.Steering.SteerByPriority();
                 }
                 else
                 {

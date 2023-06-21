@@ -216,7 +216,6 @@ namespace SAIN.Classes
 
         private void UpdateVisible(bool inLineOfSight)
         {
-            CanShoot = inLineOfSight;
             InLineOfSight = inLineOfSight;
 
             bool visible = GoalEnemy != null

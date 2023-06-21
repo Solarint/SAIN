@@ -3,7 +3,9 @@ using Comfort.Common;
 using EFT;
 using HarmonyLib;
 using SAIN.Classes;
+using SAIN.Classes.Sense;
 using SAIN.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -43,6 +45,7 @@ namespace SAIN.Components
             Equipment = new BotEquipmentClass(bot);
 
             Info = new BotInfoClass(bot);
+            Vision = new VisionClass(bot);
             AILimit = new AILimitClass(bot);
             BotStuck = new BotUnstuckClass(bot);
             Hearing = new HearingSensorClass(bot);
@@ -59,6 +62,8 @@ namespace SAIN.Components
 
         private float DebugPathTimer = 0f;
         public bool NoBushESPActive { get; private set; }
+        public SAINBotController BotController => SAINPlugin.BotController;
+
 
         private void Update()
         {
@@ -66,14 +71,6 @@ namespace SAIN.Components
 
             if (BotActive && !GameIsEnding)
             {
-                if (VisiblePlayers.Count > 0 && DebugVision.Value)
-                {
-                    foreach (var player in VisiblePlayers)
-                    {
-                        DebugGizmos.SingleObjects.Line(HeadPosition, player.MainParts[BodyPartType.body].Position, Color.green, 0.025f, true, 0.1f, true);
-                    }
-                }
-
                 NoBushESPActive = NoBushESP(Enemy, HeadPosition);
                 if (NoBushESPActive)
                 {
@@ -81,11 +78,14 @@ namespace SAIN.Components
                     BotOwner.AimingData?.LoseTarget();
                 }
 
+                DebugVisibleDraw();
+
                 UpdateExfiltration();
                 UpdateHealth();
                 UpdateEnemy();
 
                 BotOwner.DoorOpener.Update();
+                Vision.Update();
                 Equipment.Update();
                 Grenade.Update();
                 Mover.Update();
@@ -99,6 +99,53 @@ namespace SAIN.Components
                 Steering.Update();
             }
         }
+
+        private void DebugVisibleDraw()
+        {
+            if (VisiblePlayers.Count > 0 && DebugVision.Value && VisiblePlayerTimer < Time.time)
+            {
+                VisiblePlayerTimer = Time.time + 0.5f;
+                foreach (var player in VisiblePlayers)
+                {
+                    DebugGizmos.SingleObjects.Line(HeadPosition, player.MainParts[BodyPartType.body].Position, Color.green, 0.025f, true, 0.5f, true);
+                }
+            }
+            if (Squad.VisibleMembers != null && Squad.VisibleMembers.Count > 0 && DebugVision.Value && VisibleSquadTimer < Time.time)
+            {
+                VisibleSquadTimer = Time.time + 1f;
+                foreach (var player in Squad.VisibleMembers)
+                {
+                    DebugGizmos.SingleObjects.Line(HeadPosition, player.BodyPosition, Color.yellow, 0.025f, true, 1f, true);
+                }
+            }
+            if (Enemies.Count > 0 && DebugVision.Value && VisibleEnemyTimer < Time.time)
+            {
+                VisibleEnemyTimer = Time.time + 0.33f;
+                foreach (var enemy in Enemies.Values)
+                {
+                    if (enemy.CanShoot)
+                    {
+                        DebugGizmos.SingleObjects.Line(WeaponRoot, enemy.EnemyChestPosition, Color.red, 0.05f, true, 0.33f, true);
+                    }
+                    else
+                    {
+                        DebugGizmos.SingleObjects.Line(WeaponRoot, enemy.EnemyChestPosition, Color.red, 0.01f, true, 0.33f, true);
+                    }
+                    if (enemy.InLineOfSight)
+                    {
+                        DebugGizmos.SingleObjects.Line(HeadPosition, enemy.EnemyChestPosition, Color.blue, 0.05f, true, 0.33f, true);
+                    }
+                    else
+                    {
+                        DebugGizmos.SingleObjects.Line(HeadPosition, enemy.EnemyChestPosition, Color.blue, 0.01f, true, 0.33f, true);
+                    }
+                }
+            }
+        }
+
+        private float VisiblePlayerTimer;
+        private float VisibleSquadTimer;
+        private float VisibleEnemyTimer;
 
         private void UpdateExfiltration()
         {
@@ -394,7 +441,6 @@ namespace SAIN.Components
 
         public bool NoDecisions => CurrentDecision == SAINSoloDecision.None && Decision.SquadDecision == SAINSquadDecision.None && Decision.SelfDecision == SAINSelfDecision.None;
         public SAINSoloDecision CurrentDecision => Decision.MainDecision;
-        public float DistanceToMainPlayer => (SAINBotController.MainPlayerPosition - BotOwner.Position).magnitude;
         public Vector3 Position => BotOwner.Position;
         public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
@@ -464,6 +510,8 @@ namespace SAIN.Components
 
         public bool HasEnemyAndCanShoot => Enemy?.IsVisible == true;
 
+        public VisionClass Vision { get; private set; }
+
         public BotEquipmentClass Equipment { get; private set; }
 
         public SAIN_Mover Mover { get; private set; }
@@ -510,7 +558,7 @@ namespace SAIN.Components
 
         public BotOwner BotOwner { get; private set; }
 
-        private static Color RandomColor => new Color(Random.value, Random.value, Random.value);
+        private static Color RandomColor => new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 
         private ManualLogSource Logger;
     }

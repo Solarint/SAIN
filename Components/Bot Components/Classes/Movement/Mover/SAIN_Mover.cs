@@ -15,6 +15,8 @@ namespace SAIN.Classes
 {
     public class SAIN_Mover : SAINBot
     {
+        private PropertyInfo _Mover;
+        private PropertyInfo _IsSprinting;
         public SAIN_Mover(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
@@ -24,7 +26,29 @@ namespace SAIN.Classes
             Lean = new SAIN_Mover_Lean(owner);
             Prone = new SAIN_Mover_Prone(owner);
             Pose = new SAIN_Mover_Pose(owner);
+            NavAgentStuff();
+            _Mover = AccessTools.Property(typeof(BotOwner), "Mover");
+            _IsSprinting = AccessTools.Property(_Mover.PropertyType, "Sprinting");
         }
+
+        private void NavAgentStuff()
+        {
+            NavAgent = BotOwner.gameObject.GetComponent<NavMeshAgent>();
+        }
+
+        public void Update()
+        {
+            SetBotSprinting();
+            SetStamina();
+
+            Pose.Update();
+            Lean.Update();
+            SideStep.Update();
+            Prone.Update();
+            BlindFire.Update();
+        }
+
+        public NavMeshAgent NavAgent { get; private set; }
 
         public SAIN_Mover_BlindFire BlindFire { get; private set; }
         public SAIN_Mover_SideStep SideStep { get; private set; }
@@ -119,17 +143,6 @@ namespace SAIN.Classes
             return false;
         }
 
-        public void Update()
-        {
-            SetStamina();
-
-            Pose.Update();
-            Lean.Update();
-            SideStep.Update();
-            Prone.Update();
-            BlindFire.Update();
-        }
-
         private void SetStamina()
         {
             var stamina = BotPlayer.Physical.Stamina;
@@ -161,9 +174,16 @@ namespace SAIN.Classes
             }
         }
 
+        private void SetBotSprinting()
+        {
+            //_IsSprinting.SetValue(BotOwner.Mover, IsSprinting);
+        }
+
         public void Sprint(bool value)
         {
+            IsSprinting = value;
             BotOwner.Mover.Sprint(value);
+            //BotPlayer.EnableSprint(value);
             SAIN.Steering.LookToMovingDirection(value);
             if (value)
             {
@@ -171,7 +191,7 @@ namespace SAIN.Classes
             }
         }
 
-        public bool IsSprinting => BotOwner.Mover.Sprinting;
+        public bool IsSprinting { get; private set; }
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
         {

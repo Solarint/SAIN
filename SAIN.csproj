@@ -256,7 +256,7 @@
     <Compile Include="Components\Bot Components\Helpers\CoverPointHelpers.cs" />
     <Compile Include="Generic Helpers\DebugGizmos.cs" />
     <Compile Include="Generic Helpers\EFTMath.cs" />
-    <Compile Include="Components\Bot Components\Helpers\FlashlightHelpers.cs" />
+    <Compile Include="Components\Bot Components\Classes\Sense\FlashLightDazzle.cs" />
     <Compile Include="Generic Helpers\JsonUtility.cs" />
     <Compile Include="Components\Bot Components\Helpers\ShootHelpers.cs" />
     <Compile Include="Generic Helpers\VectorHelpers.cs" />

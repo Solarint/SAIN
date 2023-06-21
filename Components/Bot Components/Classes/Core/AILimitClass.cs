@@ -25,13 +25,13 @@ namespace SAIN.Classes
                 {
                     TimeAdd = 0f;
                 }
-                else if (SAIN.GoalTargetPos != null && (SAIN.GoalTargetPos.Value - SAINBotController.MainPlayerPosition).sqrMagnitude < 2500f)
+                else if (SAIN.GoalTargetPos != null && (SAIN.GoalTargetPos.Value - SAIN.BotController.MainPlayerPosition).sqrMagnitude < 2500f)
                 {
                     TimeAdd = 0f;
                 }
                 else
                 {
-                    float distanceToPlayer = SAIN.DistanceToMainPlayer;
+                    float distanceToPlayer = 1f;
                     if (distanceToPlayer > 500f)
                     {
                         TimeAdd = 3f;
