@@ -85,28 +85,45 @@ namespace SAIN.Classes
             {
                 if (SAIN.Equipment.HasEarPiece)
                 {
-                    range *= 1.5f;
+                    range *= 1.33f;
+                }
+                else
+                {
+                    range *= 0.9f;
                 }
                 if (SAIN.Equipment.HasHeavyHelmet)
                 {
                     range *= 0.66f;
                 }
-                if (BotOwner.GetPlayer.HealthStatus == ETagStatus.Dying)
+                if (SAIN.HealthStatus == ETagStatus.Dying)
                 {
-                    range *= 0.66f;
+                    range *= 0.55f;
                 }
                 var move = BotPlayer.MovementContext;
-                if (move.IsSprintEnabled)
+                float speed = move.ClampedSpeed / move.MaxSpeed;
+                if (BotPlayer.IsSprintEnabled && speed >= 0.9f)
                 {
                     range *= 0.66f;
                 }
-                else if (move.CharacterMovementSpeed > 0.5f)
+                else if (speed > 0.66f)
                 {
                     range *= 0.85f;
                 }
-                else if (move.CharacterMovementSpeed == 0f)
+                else if (speed <= 0.1f)
                 {
                     range *= 1.25f;
+                }
+
+                if (DebugSound.Value)
+                {
+                    Logger.LogDebug($" Sound modifier results before clamp: Original:[{power}] Modified:[{range}] Sprinting? [{BotPlayer.IsSprintEnabled}] MyMoveSpeed 0 to 1: [{speed}] Health: [{SAIN.HealthStatus}] Heavy Helmet? [{SAIN.Equipment.HasHeavyHelmet}] Headphones? [{SAIN.Equipment.HasEarPiece}]");
+                }
+
+                range = Mathf.Clamp(range, power / 3f, power * 1.33f);
+
+                if (DebugSound.Value)
+                {
+                    Logger.LogDebug($" Sound modifier results post clamp: Original: [{power}] Modified: [{range}] ");
                 }
 
                 return DoIHearSound(player, position, range, type, out distance, false);
@@ -392,12 +409,12 @@ namespace SAIN.Classes
                     if (hitCount == 0)
                     {
                         // If the hitCount is 0, set the occlusionmodifier to 0.8f multiplied by the environmentmodifier
-                        occlusionmodifier *= 0.8f * environmentmodifier;
+                        occlusionmodifier *= 0.75f * environmentmodifier;
                     }
                     else
                     {
                         // If the hitCount is not 0, set the occlusionmodifier to 0.95f multiplied by the environmentmodifier
-                        occlusionmodifier *= 0.95f * environmentmodifier;
+                        occlusionmodifier *= 0.9f * environmentmodifier;
                     }
 
                     // Increment the hitCount
