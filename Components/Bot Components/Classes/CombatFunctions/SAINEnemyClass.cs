@@ -22,7 +22,7 @@ namespace SAIN.Classes
         public SAINEnemy(BotOwner bot, IAIDetails person, float BotDifficultyMod) : base(bot)
         {
             Person = person;
-            EnemyPlayer = person.GetPlayer;
+            EnemyPlayer = person?.GetPlayer;
             BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
 
@@ -34,7 +34,11 @@ namespace SAIN.Classes
 
         private void FindEnemyComponent()
         {
-            var componentArray = EnemyPlayer.GetComponents<EnemyComponent>();
+            if (EnemyPlayer == null)
+            {
+                return;
+            }
+            var componentArray = EnemyPlayer?.GetComponents<EnemyComponent>();
             int? count = componentArray?.Count();
             if (componentArray == null || count == 0)
             {
@@ -415,7 +419,7 @@ namespace SAIN.Classes
         {
             if (!Owners.ContainsKey(botProfileID))
             {
-                System.Console.WriteLine($"{botProfileID} does not exist in owners list!");
+                //System.Console.WriteLine($"{botProfileID} does not exist in owners list!");
                 return null;
             }
             return Owners[botProfileID];

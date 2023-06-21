@@ -81,7 +81,7 @@ namespace SAIN.Components
 
         public void BotDeath(BotOwner bot)
         {
-            if (bot.IsDead)
+            if (bot != null && bot.IsDead)
             {
                 DeadBots.Add(bot.GetPlayer);
             }
@@ -100,6 +100,11 @@ namespace SAIN.Components
                 for (int i = 0; i < DeadBots.Count; i++)
                 {
                     var bot = DeadBots[i];
+                    if (bot == null || bot.GetPlayer == null)
+                    {
+                        IndexToRemove.Add(i);
+                        continue;
+                    }
                     bool enableObstacle = true;
                     Collider[] players = Physics.OverlapSphere(bot.Position, ObstacleRadius, LayerMaskClass.PlayerMask);
                     foreach (var p in players)
@@ -116,9 +121,12 @@ namespace SAIN.Components
                     }
                     if (enableObstacle)
                     {
-                        var obstacle = new BotDeathObject(bot);
-                        obstacle.Activate(ObstacleRadius);
-                        DeathObstacles.Add(obstacle);
+                        if (bot != null && bot.GetPlayer != null)
+                        {
+                            var obstacle = new BotDeathObject(bot);
+                            obstacle.Activate(ObstacleRadius);
+                            DeathObstacles.Add(obstacle);
+                        }
                         IndexToRemove.Add(i);
                     }
                 }
@@ -139,9 +147,9 @@ namespace SAIN.Components
                 for (int i = 0; i < DeathObstacles.Count; i++)
                 {
                     var obstacle = DeathObstacles[i];
-                    if (obstacle.TimeSinceCreated > 30f)
+                    if (obstacle?.TimeSinceCreated > 30f)
                     {
-                        obstacle.Dispose();
+                        obstacle?.Dispose();
                         IndexToRemove.Add(i);
                     }
                 }
@@ -348,16 +356,22 @@ namespace SAIN.Components
 
         public void Activate(float radius = 2f)
         {
-            NavMeshObstacle.enabled = true;
-            NavMeshObstacle.carving = true;
-            NavMeshObstacle.radius = radius;
+            if (NavMeshObstacle != null)
+            {
+                NavMeshObstacle.enabled = true;
+                NavMeshObstacle.carving = true;
+                NavMeshObstacle.radius = radius;
+            }
         }
 
         public void Dispose()
         {
-            NavMeshObstacle.carving = false;
-            NavMeshObstacle.enabled = false;
-            GameObject.Destroy(NavMeshObstacle);
+            if (NavMeshObstacle != null)
+            {
+                NavMeshObstacle.carving = false;
+                NavMeshObstacle.enabled = false;
+                GameObject.Destroy(NavMeshObstacle);
+            }
         }
 
         public NavMeshObstacle NavMeshObstacle { get; private set; }

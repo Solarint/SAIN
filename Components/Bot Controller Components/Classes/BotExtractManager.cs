@@ -11,7 +11,7 @@ namespace SAIN.Components.BotController
         {
             if (CheckExtractTimer < Time.time)
             {
-                CheckExtractTimer = Time.time + 5f;
+                CheckExtractTimer = Time.time + 30f;
                 CheckTimeRemaining();
                 Console.WriteLine($"Extra Time Remainging: {TimeRemaining} Percentage of raid left {PercentageRemaining}");
             }

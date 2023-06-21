@@ -2,6 +2,7 @@
 using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using HarmonyLib.Tools;
 using SAIN.Components;
 using System;
 using UnityEngine;
@@ -45,6 +46,11 @@ namespace SAIN.Layers
             float percentageLeft = BotController.BotExtractManager.PercentageRemaining;
             if (percentageLeft <= PercentageToExtract)
             {
+                if (!Logged)
+                {
+                    Logged = true;
+                    Logger.LogInfo($"[{BotOwner.name}] Is Moving to Extract with [{percentageLeft}] percent of the raid remaining.");
+                }
                 if (SAIN.Enemy == null)
                 {
                     return true;
@@ -56,6 +62,11 @@ namespace SAIN.Layers
             }
             if (SAIN.Dying && !BotOwner.Medecine.FirstAid.HaveSmth2Use)
             {
+                if (!Logged)
+                {
+                    Logged = true;
+                    Logger.LogInfo($"[{BotOwner.name}] Is Moving to Extract because of heavy injury and lack of healing items.");
+                }
                 if (SAIN.Enemy == null)
                 {
                     return true;
@@ -67,6 +78,8 @@ namespace SAIN.Layers
             }
             return false;
         }
+
+        private bool Logged = false;
 
         public override bool IsCurrentActionEnding()
         {

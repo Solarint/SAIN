@@ -235,7 +235,7 @@ namespace SAIN.Components
                 foreach (string id in Enemies.Keys)
                 {
                     var enemy = Enemies[id];
-                    if (enemy == null || !enemy.EnemyPlayer.HealthController.IsAlive)
+                    if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer?.HealthController?.IsAlive == false)
                     {
                         EnemyIDsToRemove.Add(id);
                     }
