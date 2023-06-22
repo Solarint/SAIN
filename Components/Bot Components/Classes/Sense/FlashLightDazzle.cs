@@ -18,6 +18,10 @@ namespace SAIN.Helpers
 
         public void CheckIfDazzleApplied(IAIDetails person)
         {
+            if (person.GetPlayer == null)
+            {
+                return;
+            }
             if (person.GetPlayer.TryGetComponent<FlashLightComponent>(out var flashlight))
             {
                 if (flashlight.WhiteLight)

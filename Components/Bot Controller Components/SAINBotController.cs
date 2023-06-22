@@ -72,10 +72,10 @@ namespace SAIN.Components
             TimeClass.Update();
             WeatherClass.Update();
             LineOfSightManager.Update();
-            CoverManager.Update();
-            PathManager.Update();
-            AddNavObstacles();
-            UpdateObstacles();
+            //CoverManager.Update();
+            //PathManager.Update();
+            //AddNavObstacles();
+            //UpdateObstacles();
         }
 
         private bool Subscribed = false;

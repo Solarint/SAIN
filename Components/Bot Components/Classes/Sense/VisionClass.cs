@@ -22,7 +22,7 @@ namespace SAIN.Classes.Sense
 
         public void Update()
         {
-            if (SAIN.Enemy != null && SAIN.Enemy.IsVisible)
+            if (SAIN.Enemy?.Person != null && SAIN.Enemy?.IsVisible == true)
             {
                 FlashLightDazzle.CheckIfDazzleApplied(SAIN.Enemy.Person);
             }

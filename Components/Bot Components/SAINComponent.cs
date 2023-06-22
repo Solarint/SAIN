@@ -380,26 +380,22 @@ namespace SAIN.Components
             var enemy = Enemy;
             if (enemy != null && enemy.IsVisible)
             {
-                if (enemy.EnemyPlayer.IsYourPlayer)
+                if (enemy.EnemyPlayer?.IsYourPlayer == true)
                 {
-                    Vector3 direction = enemy.EnemyChestPosition - HeadPosition;
-                    var hits = Physics.RaycastAll(HeadPosition, direction, direction.magnitude);
-                    if (hits.Length > 0)
+                    Vector3 direction = enemy.EnemyHeadPosition - HeadPosition;
+                    if (Physics.Raycast(HeadPosition, direction, out var hit, direction.magnitude, NoBushMask))
                     {
-                        foreach (var hit in hits)
+                        string ObjectName = hit.transform?.parent?.gameObject?.name;
+                        foreach (string exclusion in ExclusionList)
                         {
-                            string ObjectName = hit.transform.parent?.gameObject?.name;
-                            foreach (string exclusion in ExclusionList)
+                            if (ObjectName.ToLower().Contains(exclusion))
                             {
-                                if (ObjectName.ToLower().Contains(exclusion))
+                                if (DebugVision.Value)
                                 {
-                                    if (DebugVision.Value)
-                                    {
-                                        Logger.LogWarning("No Bush ESP ACTIVE");
-                                        DebugGizmos.SingleObjects.Line(hit.point, HeadPosition, Color.green, 0.1f, true, 0.25f, true);
-                                    }
-                                    return true;
+                                    Logger.LogWarning("No Bush ESP ACTIVE");
+                                    DebugGizmos.SingleObjects.Line(hit.point, HeadPosition, Color.green, 0.1f, true, 0.25f, true);
                                 }
+                                return true;
                             }
                         }
                     }
@@ -421,7 +417,12 @@ namespace SAIN.Components
                 {
                     return Enemy.Position;
                 }
-                if (Time.time - BotOwner.Memory.LastTimeHit < 120f && !BotOwner.Memory.IsPeace)
+                var Target = BotOwner.Memory.GoalTarget?.GoalTarget;
+                if (Target != null)
+                {
+                    return Target.Position;
+                }
+                if (Time.time - BotOwner.Memory.LastTimeHit < 20f && !BotOwner.Memory.IsPeace)
                 {
                     return BotOwner.Memory.LastHitPos;
                 }
@@ -429,11 +430,6 @@ namespace SAIN.Components
                 if (sound != null && !sound.IsCome)
                 {
                     return sound.Position;
-                }
-                var Target = BotOwner.Memory.GoalTarget?.GoalTarget;
-                if (Target != null)
-                {
-                    return Target.Position;
                 }
                 return null;
             }
