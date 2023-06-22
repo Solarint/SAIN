@@ -45,7 +45,7 @@ namespace SAIN.Layers
 
         private bool BackUp(out Vector3 trgPos)
         {
-            Vector3 a = -GClass782.NormalizeFastSelf(BotOwner.Memory.GoalEnemy.Direction);
+            Vector3 a = -GClass782.NormalizeFastSelf(SAIN.Enemy.Direction);
             trgPos = Vector3.zero;
             float num = 0f;
             Vector3 random = Random.onUnitSphere * 1f;

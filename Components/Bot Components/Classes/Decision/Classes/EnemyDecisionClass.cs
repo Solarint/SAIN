@@ -72,22 +72,18 @@ namespace SAIN.Classes
 
         private bool StartRushEnemy()
         {
-            var enemy = SAIN.Enemy;
-            if (enemy != null)
-            {
-                if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
-                {
-                    return true;
-                }
-            }
             var Personality = SAIN.Info.BotPersonality;
             if (Personality == BotPersonality.GigaChad || Personality == BotPersonality.Chad)
             {
-                if (enemy != null && enemy.RealDistance < 30f)
+                var enemy = SAIN.Enemy;
+                if (enemy != null && enemy.RealDistance < 20f)
                 {
-                    if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
+                    if (!SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.33f))
                     {
-                        return true;
+                        if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
+                        {
+                            return true;
+                        }
                     }
                 }
             }

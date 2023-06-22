@@ -86,17 +86,8 @@ namespace SAIN.Classes
         {
             get
             {
-                var points = CoverPoints;
-                if (points.Count == 1)
+                if (CoverPoints.Count > 0)
                 {
-                    return points.First();
-                }
-                if (points.Count > 0)
-                {
-                    var pointsArray = points.ToArray();
-                    System.Array.Sort(pointsArray, CoverFinder.CoverPointPathComparerer);
-                    CoverPoints.Clear();
-                    CoverPoints.AddRange(pointsArray);
                     return CoverPoints.First();
                 }
                 return null;
@@ -107,44 +98,11 @@ namespace SAIN.Classes
         {
             get
             {
-                if (CoverPoints.Count == 1)
+                if (CoverPoints.Count > 0)
                 {
-                    return CoverPoints.First();
-                }
-                if (CoverPoints.Count > 1)
-                {
-                    var points = CoverFinder.CoverPoints.ToArray();
-                    System.Array.Sort(points, CoverPointEnemyComparerer);
-                    return points.Last();
+                    return CoverPoints.Last();
                 }
                 return null;
-            }
-        }
-
-        private int CoverPointEnemyComparerer(CoverPoint A,  CoverPoint B)
-        {
-            if (A == null && B != null)
-            {
-                return 1;
-            }
-            else if (A != null && B == null)
-            {
-                return -1;
-            }
-            else if (A == null && B == null)
-            {
-                return 0;
-            }
-            else
-            {
-                if (SAIN.CurrentTargetPosition == null)
-                {
-                    return 0;
-                }
-                Vector3 enemy = SAIN.CurrentTargetPosition.Value;
-                float ADist = (enemy - A.Position).sqrMagnitude;
-                float BDist = (enemy - B.Position).sqrMagnitude;
-                return ADist.CompareTo(BDist);
             }
         }
 
@@ -183,11 +141,11 @@ namespace SAIN.Classes
                     CheckLimbTimer = Time.time + 0.1f;
                     bool cover = false;
                     var target = BotOwner.Memory.GoalEnemy.Person.WeaponRoot.position;
-                    if (CheckLimbForCover(BodyPartType.leftLeg, target, 5f) && CheckLimbForCover(BodyPartType.leftArm, target, 5f))
+                    if (CheckLimbForCover(BodyPartType.leftLeg, target, 4f) && CheckLimbForCover(BodyPartType.leftArm, target, 4f))
                     {
                         cover = true;
                     }
-                    else if (CheckLimbForCover(BodyPartType.rightLeg, target, 5f) && CheckLimbForCover(BodyPartType.rightArm, target, 5f))
+                    else if (CheckLimbForCover(BodyPartType.rightLeg, target, 4f) && CheckLimbForCover(BodyPartType.rightArm, target, 4f))
                     {
                         cover = true;
                     }

@@ -22,44 +22,20 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            Sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 50f, 10f);
-            if (SAIN.Enemy == null)
-            {
-                if (Sound != null)
-                {
-                    SAIN.Steering.SteerByPriority();
-                    MovePos = Sound.Position;
-                    SAIN.Mover.GoToPoint(MovePos);
-                }
-                else
-                {
-                    Sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 200f, false);
-                    SAIN.Steering.LookToRandomPosition();
-                }
-            }
-            else
-            {
-                SAIN.Steering.SteerByPriority();
-                Shoot.Update();
-                if (SAIN.CurrentTargetPosition != null)
-                {
-                    SAIN.Mover.GoToPoint(SAIN.                    CurrentTargetPosition.Value);
-                }
-            }
+            BotOwner.SearchData.UpdateByNode();
+            //SAIN.Steering.SteerByPriority();
+            Shoot.Update();
         }
 
         private Vector3 MovePos;
 
         private readonly SAINComponent SAIN;
-        public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
 
         public override void Start()
         {
         }
-
-        private GClass270 Sound;
 
         public override void Stop()
         {

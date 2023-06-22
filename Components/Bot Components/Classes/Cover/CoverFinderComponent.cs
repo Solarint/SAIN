@@ -27,7 +27,7 @@ namespace SAIN.Components
             {
                 if (CoverPoints.Count > 0)
                 {
-                    DebugGizmos.SingleObjects.Line(CoverPoints.PickRandom().Position, SAIN.HeadPosition, Color.yellow, 0.025f, true, 0.1f);
+                    DebugGizmos.SingleObjects.Line(CoverPoints.PickRandom().Position, SAIN.HeadPosition, Color.yellow, 0.035f, true, 0.1f);
                 }
             }
         }
@@ -75,48 +75,34 @@ namespace SAIN.Components
                 GetColliders(out int hits);
 
                 int frameWait = 0;
-                int coverCount = CoverPoints.Count;
                 int totalChecked = 0;
-                bool foundFallback = false;
 
                 for (int i = 0; i < hits; i++)
                 {
                     totalChecked++;
                     if (CheckCollider(Colliders[i], out var newPoint))
                     {
-                        if (!foundFallback && Colliders[i].bounds.size.y >= 1.5f)
-                        {
-                            foundFallback = true;
-                            FallBackPoint = newPoint;
-                        }
-                        else if (coverCount < 3)
-                        {
-                            coverCount++;
-                            CoverPoints.Add(newPoint);
-                        }
+                        CoverPoints.Add(newPoint);
                     }
 
                     // Every 10 colliders checked, wait until the next frame before continuing.
-                    if (frameWait == 5)
+                    if (frameWait == 10)
                     {
                         frameWait = 0;
-                        yield return endOfFrame;
+                        yield return null;
                     }
                     frameWait++;
 
-                    if (coverCount >= 5 && foundFallback)
+                    if (CoverPoints.Count > 4)
                     {
                         break;
                     }
                 }
 
-                if (foundFallback)
+                if (CoverPoints.Count > 0)
                 {
-                    CoverPoints.Add(FallBackPoint);
-                }
+                    FindFallback();
 
-                if (coverCount > 0)
-                {
                     if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
                     {
                         DebugLogTimer = Time.time + 1f;
@@ -131,7 +117,26 @@ namespace SAIN.Components
                         Logger.LogWarning($"[{BotOwner.name}] - No Cover Found! Valid Colliders checked: [{totalChecked}] Collider Array Size = [{hits}]");
                     }
                 }
-                yield return new WaitForSeconds(CoverUpdateFrequency.Value + 0.25f);
+                yield return new WaitForSeconds(CoverUpdateFrequency.Value);
+            }
+        }
+
+        private void FindFallback()
+        {
+            if (CoverPoints.Count > 0)
+            {
+                float highest = 0f;
+                int highestIndex = 0;
+                for (int i = 0; i < CoverPoints.Count; i++)
+                {
+                    float Y = CoverPoints[i].Collider.bounds.size.y;
+                    if (Y > highest)
+                    {
+                        highest = Y;
+                        highestIndex = i;
+                    }
+                }
+                FallBackPoint = CoverPoints[highestIndex];
             }
         }
 
@@ -140,7 +145,8 @@ namespace SAIN.Components
             const float ExtendLengthThresh = 1.5f;
 
             newPoint = null;
-            if (collider == null || collider.bounds.size.y < MinObstacleHeight || !ColliderDirection(collider))
+            //!ColliderDirection(collider)
+            if (collider == null || collider.bounds.size.y < MinObstacleHeight)
             {
                 return false;
             }
@@ -160,7 +166,7 @@ namespace SAIN.Components
             Vector3 farPoint = colliderPos + colliderDir;
 
             // the closest edge to that farPoint
-            if (NavMesh.SamplePosition(farPoint, out var hit, 1f, -1))
+            if (NavMesh.SamplePosition(farPoint, out var hit, 2f, -1))
             {
                 if (CheckPath(hit.position))
                 {
@@ -471,39 +477,16 @@ namespace SAIN.Components
 
         private void GetNewColliders(out int hits)
         {
-            ClearColliders();
-
             var mask = LayerMaskClass.HighPolyWithTerrainMask;
             var orientation = Quaternion.identity;
-            var origin = OriginPoint;
 
-            const float widthAdd = 3f;
-            const float widthBase = 12f;
+            const float width = 25f;
+            const float height = 3f;
 
-            const float heightAdd = 1f;
-            const float heightBase = 2f;
-
-            float width = widthBase;
-            float height = heightBase;
-            hits = 0;
-
-            for (int j = 0; j < 5; j++)
-            {
-                Vector3 box = new Vector3(width, height, width);
-                hits = Physics.OverlapBoxNonAlloc(origin, box, Colliders, orientation, mask);
-                hits = FilterColliders(hits);
-
-                if (hits > 100)
-                {
-                    break;
-                }
-                else
-                {
-                    ClearColliders();
-                    width += widthAdd;
-                    height += heightAdd;
-                }
-            }
+            Vector3 box = new Vector3(width, height, width);
+            ClearColliders();
+            hits = Physics.OverlapBoxNonAlloc(OriginPoint, box, Colliders, orientation, mask);
+            hits = FilterColliders(hits);
 
             System.Array.Sort(Colliders, ColliderArraySortComparer);
         }
@@ -530,26 +513,6 @@ namespace SAIN.Components
 
         private int LastHitCount = 0;
 
-        public int CoverPointPathComparerer(CoverPoint A, CoverPoint B)
-        {
-            if (A == null && B != null)
-            {
-                return 1;
-            }
-            else if (A != null && B == null)
-            {
-                return -1;
-            }
-            else if (A == null && B == null)
-            {
-                return 0;
-            }
-            else
-            {
-                return A.PathLengthAtCreation.CompareTo(B.PathLengthAtCreation);
-            }
-        }
-
         public int ColliderArraySortComparer(Collider A, Collider B)
         {
             if (A == null && B != null)
@@ -569,28 +532,6 @@ namespace SAIN.Components
                 float AMag = (OriginPoint - A.transform.position).sqrMagnitude;
                 float BMag = (OriginPoint - B.transform.position).sqrMagnitude;
                 return AMag.CompareTo(BMag);
-            }
-        }
-
-        public int ColliderArrayHeightSortComparer(Collider A, Collider B)
-        {
-            if (A == null && B != null)
-            {
-                return 1;
-            }
-            else if (A != null && B == null)
-            {
-                return -1;
-            }
-            else if (A == null && B == null)
-            {
-                return 0;
-            }
-            else
-            {
-                float absDiffA = Mathf.Abs(A.transform.position.y - OriginPoint.y);
-                float absDiffB = Mathf.Abs(B.transform.position.y - OriginPoint.y);
-                return absDiffA.CompareTo(absDiffB);
             }
         }
 

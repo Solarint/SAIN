@@ -13,6 +13,7 @@ namespace SAIN.Classes
 {
     public class SAINEnemy : SAINBot
     {
+        public Dictionary<BodyPartClass, GClass478> ActiveParts { get; private set; }
         public GClass475 GoalEnemy => BotOwner.Memory.GoalEnemy;
         public Player EnemyPlayer { get; private set; }
         public EnemyComponent EnemyComponent { get; private set; }
@@ -25,7 +26,8 @@ namespace SAIN.Classes
             EnemyPlayer = person.GetPlayer;
             BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-
+            ActiveParts = GoalEnemy.AllActiveParts;
+             
             if (SAIN.Squad.BotInGroup)
             {
                 FindEnemyComponent();
@@ -177,6 +179,7 @@ namespace SAIN.Classes
         public float RealDistance { get; private set; }
         public float LastSeenDistance { get; private set; }
         public Vector3 PositionLastSeen { get; private set; }
+        public float VisibleStartTime { get; private set; }
         public float TimeSinceSeen { get; private set; }
         public bool Seen { get; private set; }
         public float TimeFirstSeen { get; private set; }
@@ -216,30 +219,45 @@ namespace SAIN.Classes
         }
 
         public float PercentageEnemyCanShoot { get; private set; }
+        public Vector3 Direction => Position - BotPosition;
 
         private void UpdateVisible(bool inLineOfSight)
         {
             InLineOfSight = inLineOfSight;
-
-            bool visible = GoalEnemy != null
-                && BotOwner.LookSensor.IsPointInVisibleSector(GoalEnemy.CurrPosition)
-                && GoalEnemy.VisibleOnlyBySense == EEnemyPartVisibleType.visible
-                && inLineOfSight;
-
-            bool wasVisible = IsVisible;
-            IsVisible = visible;
-
             float realDistance = RealDistance;
             bool close = realDistance < 15f;
-
             var move = Person.GetPlayer.MovementContext;
             bool enemySprinting = move.IsSprintEnabled;
             float enemyMoveSpeed = move.ClampedSpeed / move.MaxSpeed;
 
-            bool canHear = (enemySprinting && realDistance < 35f) || close && enemyMoveSpeed > 0.25f;
+            bool canHear = (enemySprinting && realDistance < 25f) || close && enemyMoveSpeed > 0.35f;
+            bool visible = false;
+            if (canHear)
+            {
+                visible = true;
+            }
+            else if (inLineOfSight)
+            {
+                float angle = Vector3.Angle(Direction.normalized, BotOwner.LookDirection);
+                if (close && angle < 75)
+                {
+                    visible = true;
+                }
+                else if (GoalEnemy?.VisibleOnlyBySense == EEnemyPartVisibleType.visible)
+                {
+                    visible = true;
+                }
+            }
+
+            bool wasVisible = IsVisible;
+            IsVisible = visible;
 
             if (IsVisible)
             {
+                if (!wasVisible)
+                {
+                    VisibleStartTime = Time.time;
+                }
                 TimeSinceSeen = 0f;
                 if (!Seen)
                 {
@@ -249,6 +267,7 @@ namespace SAIN.Classes
             }
             if (!IsVisible)
             {
+                VisibleStartTime = -1f;
                 if (wasVisible)
                 {
                     TimeLastSeen = Time.time;
@@ -260,7 +279,6 @@ namespace SAIN.Classes
                 }
             }
 
-            EnemyClose = close;
             CanHearCloseVisible = canHear;
         }
 
