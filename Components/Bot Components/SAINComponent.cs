@@ -97,7 +97,8 @@ namespace SAIN.Components
             {
                 if (NoBushTimer < Time.time)
                 {
-                    NoBushESPActive = NoBushESP(Enemy, HeadPosition);
+                    NoBushTimer = Time.time + 0.25f;
+                    NoBushESPActive = NoBushESP();
                 }
                 if (NoBushESPActive)
                 {
@@ -374,14 +375,15 @@ namespace SAIN.Components
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
         public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
 
-        public bool NoBushESP(SAINEnemy enemy, Vector3 start)
+        public bool NoBushESP()
         {
+            var enemy = Enemy;
             if (enemy != null && enemy.IsVisible)
             {
                 if (enemy.EnemyPlayer.IsYourPlayer)
                 {
-                    Vector3 direction = enemy.EnemyChestPosition - start;
-                    var hits = Physics.RaycastAll(start, direction, direction.magnitude);
+                    Vector3 direction = enemy.EnemyChestPosition - HeadPosition;
+                    var hits = Physics.RaycastAll(HeadPosition, direction, direction.magnitude);
                     if (hits.Length > 0)
                     {
                         foreach (var hit in hits)

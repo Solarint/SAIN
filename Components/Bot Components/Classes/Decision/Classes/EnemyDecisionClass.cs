@@ -212,7 +212,7 @@ namespace SAIN.Classes
 
         private bool StartMoveToCover()
         {
-            bool start = !SAIN.Cover.BotIsAtCoverPoint && SAIN.Cover.CoverPoints.Count > 0;
+            bool start = !SAIN.Cover.BotIsAtCoverPoint;
 
             if (start)
             {

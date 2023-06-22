@@ -45,10 +45,26 @@ namespace SAIN.Classes
         {
             if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
-                CoverFinder.StopLooking();
+                ActivateCoverFinder(false);
                 return;
             }
-            if (SAIN.Enemy != null || BotOwner.Memory.GoalTarget.HaveMainTarget())
+            if (CurrentDecision == SAINSoloDecision.UnstuckMoveToCover || CurrentDecision == SAINSoloDecision.Retreat || CurrentDecision == SAINSoloDecision.RunToCover || CurrentDecision == SAINSoloDecision.WalkToCover)
+            {
+                ActivateCoverFinder(true);
+            }
+            else if (CurrentDecision == SAINSoloDecision.HoldInCover && CoverInUse?.Spotted == true)
+            {
+                ActivateCoverFinder(true);
+            }
+            else
+            {
+                ActivateCoverFinder(false);
+            }
+        }
+
+        private void ActivateCoverFinder(bool value)
+        {
+            if (value)
             {
                 if (GetPointToHideFrom(out var target))
                 {

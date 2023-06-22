@@ -36,7 +36,7 @@ namespace SAIN.Classes
 
                 if (CheckStuckTimer < Time.time)
                 {
-                    CheckStuckTimer = Time.time + 0.1f;
+                    CheckStuckTimer = Time.time + 0.25f;
                     bool stuck = BotStuckOnObject() || BotStuckOnPlayer();
                     if (!BotIsStuck && stuck)
                     {
@@ -47,7 +47,7 @@ namespace SAIN.Classes
 
                 if (BotIsStuck)
                 {
-                    if (DebugStuckTimer < Time.time)
+                    if (DebugStuckTimer < Time.time && TimeSinceStuck > 0.5f)
                     {
                         DebugStuckTimer = Time.time + 3f;
                         Logger.LogWarning($"[{BotOwner.name}] has been stuck for [{TimeSinceStuck}] seconds on [{StuckHit.transform.name}] object");
