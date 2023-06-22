@@ -38,9 +38,8 @@ namespace SAIN.Classes
             {
                 return;
             }
-            var componentArray = EnemyPlayer?.GetComponents<EnemyComponent>();
-            int? count = componentArray?.Count();
-            if (componentArray == null || count == 0)
+            var componentArray = EnemyPlayer.gameObject.GetComponents<EnemyComponent>();
+            if (componentArray == null || componentArray.Length == 0)
             {
                 AddNewComponent();
             }
@@ -50,14 +49,10 @@ namespace SAIN.Classes
                 {
                     foreach (var component in componentArray)
                     {
-                        if (component != null)
+                        if (component != null && component.SquadId == SAIN.SquadId)
                         {
-                            if (component.CheckIfComponentIsForGroup(SAIN))
-                            {
-                                EnemyComponent = component;
-                                component.AddOwner(SAIN);
-                                break;
-                            }
+                            EnemyComponent = component;
+                            break;
                         }
                     }
                 }
@@ -72,13 +67,17 @@ namespace SAIN.Classes
         {
             Logger.LogDebug($"New Enemy Component added for enemy: [{EnemyPlayer.name}] for SquadID: [{SAIN.SquadId}]");
             EnemyComponent = EnemyPlayer.gameObject.AddComponent<EnemyComponent>();
-            EnemyComponent.AddOwner(SAIN);
+            EnemyComponent.Init(EnemyPlayer, SAIN.SquadId, SAIN);
         }
 
         private readonly ManualLogSource Logger;
 
         public void Update()
         {
+            if (EnemyPlayer == null || !EnemyPlayer.HealthController.IsAlive)
+            {
+                return;
+            }
             UpdateDistance();
             UpdatePath();
         }
@@ -263,7 +262,6 @@ namespace SAIN.Classes
 
             EnemyClose = close;
             CanHearCloseVisible = canHear;
-            EnemyComponent?.UpdateVisible(SAIN.ProfileId, IsVisible, EnemyClose, CanHearCloseVisible);
         }
 
         public void UpdatePath()
@@ -278,9 +276,11 @@ namespace SAIN.Classes
 
         private void CalcPath(Vector3 pos)
         {
-            Path = new NavMeshPath();
-            NavMesh.CalculatePath(BotOwner.Transform.position, pos, -1, Path);
-            PathDistance = Path.CalculatePathLength();
+            Path.ClearCorners();
+            if (NavMesh.CalculatePath(BotOwner.Transform.position, pos, -1, Path))
+            {
+                PathDistance = Path.CalculatePathLength();
+            }
         }
 
         public SAINEnemyPath CheckPathDistance()
@@ -344,257 +344,87 @@ namespace SAIN.Classes
         public bool CanShoot { get; private set; }
     }
 
-    public class GroupMemberComponent : MonoBehaviour
-    {
-        public SAINComponent SAIN { get; private set; }
-        public Dictionary<BotOwner, SAINComponent> Members => SAIN.Squad.SquadMembers;
-        public Dictionary<BotOwner, SAINComponent> VisibleMembers { get; private set; } = new Dictionary<BotOwner, SAINComponent>();
-
-        public void Init(SAINComponent sain)
-        {
-            SAIN = sain;
-        }
-
-        private void Awake()
-        {
-
-        }
-
-        private void Update()
-        {
-            if (!SAIN.Squad.BotInGroup || SAIN.GameIsEnding || SAIN.IsDead)
-            {
-                Dispose();
-                return;
-            }
-            if (SAIN.BotActive)
-            {
-                if (CheckVisTimer < Time.time)
-                {
-                    CheckVisTimer = Time.time + 1f; 
-                    UpdateVisibleMembers();
-                }
-            }
-        }
-
-        private float CheckVisTimer = 0f;
-
-        private void UpdateVisibleMembers()
-        {
-            VisibleMembers.Clear();
-            foreach (var member in SAIN.Squad.SquadMembers)
-            {
-                if (member.Value != null && SAIN.VisiblePlayers.Contains(member.Value.Player))
-                {
-                    VisibleMembers.Add(member.Key, member.Value);
-                }
-            }
-        }
-
-        public bool VisibleByMember(SAINComponent member)
-        {
-            return SAIN.VisiblePlayers.Contains(member.Player);
-        }
-
-        public void Dispose()
-        {
-            StopAllCoroutines();
-            VisibleMembers?.Clear();
-            Destroy(this);
-        }
-    }
-
     public class EnemyComponent : MonoBehaviour
     {
-        public Dictionary<string, GroupOwner> Owners { get; private set; } = new Dictionary<string, GroupOwner>();
+        public string SquadId { get; private set; }
         public Player EnemyPlayer { get; private set; }
         public bool VisibleByGroup { get; private set; }
-        public bool HeardByGroup { get; private set; }
-        public bool CloseToGroupMember { get; private set; }
         public float EnemyPower { get; private set; }
         public ETagStatus EnemyHealthStatus { get; private set; }
-        public string OwnerSquadId { get; private set; } = "None";
-
-        public GroupOwner MyInfo(string botProfileID)
-        {
-            if (!Owners.ContainsKey(botProfileID))
-            {
-                //System.Console.WriteLine($"{botProfileID} does not exist in owners list!");
-                return null;
-            }
-            return Owners[botProfileID];
-        }
-
-        public bool CheckIfComponentIsForGroup(SAINComponent sainComponent)
-        {
-            foreach (var item in Owners)
-            {
-                if (item.Value == null) continue;
-                if (item.Value.SAINComponent.ProfileId == sainComponent.ProfileId)
-                {
-                    return true;
-                }
-                if (item.Value.SAINComponent.SquadId == sainComponent.SquadId)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public bool CheckIfComponentIsForGroup(string botProfileId, string squadId)
-        {
-            foreach (var item in Owners)
-            {
-                if (item.Value == null) continue;
-                if (item.Value.SAINComponent.ProfileId == botProfileId)
-                {
-                    return true;
-                }
-                if (item.Value.SAINComponent.SquadId == squadId)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        public SAINComponent CreatorBot { get; private set; }
+        public SAINComponent[] SquadMembers { get; private set; }
 
         private void Awake()
         {
-            EnemyPlayer = GetComponent<Player>();
-            EnemyPower = EnemyPlayer.AIData?.PowerOfEquipment ?? 50f;
+        }
+
+        public void Init(Player enemy, string squadId, SAINComponent creatorBot)
+        {
+            CreatorBot = creatorBot;
+            SquadMembers = creatorBot.Squad.SquadMembers?.Values?.ToArray();
+            EnemyPlayer = enemy;
+            SquadId = squadId;
+            EnemyPower = enemy.AIData?.PowerOfEquipment ?? 50f;
         }
 
         private void Update()
         {
-            if (EnemyPlayer == null || EnemyPlayer.HealthController?.IsAlive == false || Owners.Count == 0)
+            if (EnemyPlayer == null || EnemyPlayer.HealthController?.IsAlive == false)
             {
                 Dispose();
                 return;
             }
-            if (UpdateTimer < Time.time)
+            if (CreatorBot == null)
             {
-                UpdateTimer = Time.time + 0.5f; 
-                ClearDead();
-                CheckVisibleStatus();
-            }
-        }
-
-        private void CheckVisibleStatus()
-        {
-            bool visible = false;
-            bool canHear = false;
-            bool close = false;
-
-            foreach (var item in Owners)
-            {
-                if (close && canHear && visible) break;
-                if (item.Value == null) continue;
-                if (item.Value.BotOwner.Memory.GoalEnemy?.Person?.GetPlayer.ProfileId != EnemyPlayer.ProfileId) continue;
-
-                if (!visible && item.Value.CanSeeEnemy)
+                if (SquadMembers == null || SquadMembers.Length == 0)
                 {
-                    visible = true;
+                    Dispose();
+                    return;
                 }
-                if (!canHear && item.Value.CanHearEnemy)
+                else
                 {
-                    canHear = true;
-                }
-                if (!close && item.Value.CloseToEnemy)
-                {
-                    close = true;
+                    CreatorBot = SquadMembers.PickRandom();
+                    SquadMembers = CreatorBot.Squad.SquadMembers?.Values?.ToArray();
                 }
             }
 
-            VisibleByGroup = visible;
-            if (visible)
+            VisibleByGroup = false;
+            if (CreatorBot != null)
+            {
+                var enemy = CreatorBot.Enemy;
+                if (enemy?.IsVisible == true)
+                {
+                    VisibleByGroup = true;
+                }
+                else
+                {
+                    if (SquadMembers != null && SquadMembers.Length > 1)
+                    {
+                        foreach (var member in SquadMembers)
+                        {
+                            if (member == null || member.ProfileId == CreatorBot.ProfileId)
+                            {
+                                continue;
+                            }
+                            if (member.Enemy?.IsVisible == true)
+                            {
+                                VisibleByGroup = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (VisibleByGroup)
             {
                 EnemyHealthStatus = EnemyPlayer.HealthStatus;
             }
-            HeardByGroup = canHear;
-            CloseToGroupMember = close;
-        }
-
-        private void ClearDead()
-        {
-            var owners = new Dictionary<string, GroupOwner>(Owners);
-            foreach (var item in Owners)
-            {
-                if (item.Value == null || item.Value.BotIsDead)
-                {
-                    owners.Remove(item.Key);
-                }
-            }
-            Owners = owners;
-        }
-
-        private float UpdateTimer = 0f;
-
-        public bool AddOwner(SAINComponent sainComponent)
-        {
-            string botID = sainComponent.BotOwner.ProfileId;
-            if (!Owners.ContainsKey(botID))
-            {
-                if (OwnerSquadId == "None")
-                {
-                    OwnerSquadId = sainComponent.SquadId;
-                }
-                Owners.Add(botID, new GroupOwner(sainComponent));
-                return true;
-            }
-            return false;
-        }
-
-        public bool UpdateVisible(string botProfileID, bool visible, bool close, bool canHear)
-        {
-            var owner = MyInfo(botProfileID);
-            if (owner == null)
-            {
-                return false;
-            }
-
-            owner.CanSeeEnemy = visible;
-            owner.CloseToEnemy = close;
-            owner.CanHearEnemy = canHear;
-            return true;
         }
 
         public void Dispose()
         {
             StopAllCoroutines();
-            Owners?.Clear();
-            EnemyPlayer = null;
             Destroy(this);
-        }
-    }
-
-    public class GroupOwner
-    {
-        public SAINComponent SAINComponent { get; private set; }
-        public BotOwner BotOwner => SAINComponent.BotOwner;
-        public bool CloseToEnemy { get; set; }
-        public bool CanSeeEnemy { get; set; }
-        public bool CanHearEnemy { get; set; }
-        public bool BotIsDead => BotOwner.HealthController?.IsAlive == false;
-        public GroupOwner(SAINComponent SAIN)
-        {
-            SAINComponent = SAIN;
-        }
-    }
-
-    public class ReactionTimeChecker
-    {
-        public ReactionTimeChecker(float reactionTime)
-        {
-            ReactionTime = reactionTime;
-            startTime = Time.time;
-        }
-
-        private readonly float ReactionTime;
-        private readonly float startTime;
-
-        public bool Update()
-        {
-            return Time.time - startTime >= ReactionTime;
         }
     }
 }

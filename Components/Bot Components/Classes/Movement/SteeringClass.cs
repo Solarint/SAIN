@@ -225,10 +225,6 @@ namespace SAIN.Classes
             SAINEnemy enemy = SAIN.Enemy;
             if (enemy != null && enemy.InLineOfSight)
             {
-                if (enemy.EnemyComponent == null)
-                {
-                    //System.Console.WriteLine("Bot's Enemy is not null but their enemy component is null!");
-                }
                 if (enemy.IsVisible || enemy.EnemyComponent?.VisibleByGroup == true)
                 {
                     LookToEnemy(enemy);

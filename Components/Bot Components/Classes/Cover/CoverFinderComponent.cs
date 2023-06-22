@@ -90,7 +90,7 @@ namespace SAIN.Components
                             foundFallback = true;
                             FallBackPoint = newPoint;
                         }
-                        else if (coverCount < 5)
+                        else if (coverCount < 3)
                         {
                             coverCount++;
                             CoverPoints.Add(newPoint);
@@ -98,7 +98,7 @@ namespace SAIN.Components
                     }
 
                     // Every 10 colliders checked, wait until the next frame before continuing.
-                    if (frameWait == 10)
+                    if (frameWait == 5)
                     {
                         frameWait = 0;
                         yield return null;
@@ -132,7 +132,7 @@ namespace SAIN.Components
                         Logger.LogWarning($"[{BotOwner.name}] - No Cover Found! Valid Colliders checked: [{totalChecked}] Collider Array Size = [{hits}]");
                     }
                 }
-                yield return new WaitForSeconds(CoverUpdateFrequency.Value);
+                yield return new WaitForSeconds(CoverUpdateFrequency.Value + 0.25f);
             }
         }
 

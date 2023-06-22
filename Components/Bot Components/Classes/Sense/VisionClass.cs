@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SAIN.Classes.Sense
 {
@@ -21,15 +22,9 @@ namespace SAIN.Classes.Sense
 
         public void Update()
         {
-            if (SAIN.Enemies.Count > 0)
+            if (SAIN.Enemy != null && SAIN.Enemy.IsVisible)
             {
-                foreach (var enemy in SAIN.Enemies.Values)
-                {
-                    if (enemy != null && enemy.IsVisible)
-                    {
-                        FlashLightDazzle.CheckIfDazzleApplied(enemy.Person);
-                    }
-                }
+                FlashLightDazzle.CheckIfDazzleApplied(SAIN.Enemy.Person);
             }
         }
 

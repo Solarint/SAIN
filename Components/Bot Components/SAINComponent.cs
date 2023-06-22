@@ -205,13 +205,19 @@ namespace SAIN.Components
 
         private void UpdateEnemy()
         {
-            ClearEnemies();
+            if (ClearEnemyTimer < Time.time)
+            {
+                ClearEnemyTimer = Time.time + 1f;
+                ClearEnemies();
+            }
             AddEnemy();
             foreach (var enemy in Enemies)
             {
                 enemy.Value?.Update();
             }
         }
+
+        private float ClearEnemyTimer;
 
         private void ClearEnemies()
         {
@@ -239,27 +245,28 @@ namespace SAIN.Components
 
         private void AddEnemy()
         {
-            string profileId;
-            Enemy = null;
             var goalEnemy = BotOwner.Memory.GoalEnemy;
             if (goalEnemy != null)
             {
-                profileId = goalEnemy.Person.ProfileId;
-                if (!Enemies.ContainsKey(profileId))
+                string profileId = goalEnemy.Person.ProfileId;
+                if (Enemy != null && Enemy.Person.ProfileId == profileId)
                 {
-                    Enemies.Add(profileId, new SAINEnemy(BotOwner, goalEnemy.Person, DifficultyModifier));
+                    return;
                 }
-                Enemy = Enemies[profileId];
+
+                if (Enemies.ContainsKey(profileId))
+                {
+                    Enemy = Enemies[profileId];
+                }
+                else
+                {
+                    Enemy = new SAINEnemy(BotOwner, goalEnemy.Person, DifficultyModifier);
+                    Enemies.Add(profileId, Enemy);
+                }
             }
-            var lastEnemy = BotOwner.Memory.LastEnemy;
-            if (lastEnemy != null && Enemy == null)
+            else
             {
-                profileId = lastEnemy.Person.ProfileId;
-                if (!Enemies.ContainsKey(profileId))
-                {
-                    Enemies.Add(profileId, new SAINEnemy(BotOwner, lastEnemy.Person, DifficultyModifier));
-                }
-                Enemy = Enemies[profileId];
+                Enemy = null;
             }
         }
 

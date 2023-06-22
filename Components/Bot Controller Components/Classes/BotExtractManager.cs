@@ -173,8 +173,8 @@ namespace SAIN.Components.BotController
         }
 
         private float CheckExtractTimer = 0f;
-        public float TimeRemaining { get; private set; }
-        public float PercentageRemaining { get; private set; }
+        public float TimeRemaining { get; private set; } = 999f;
+        public float PercentageRemaining { get; private set; } = 100f;
 
         public void CheckTimeRemaining()
         {

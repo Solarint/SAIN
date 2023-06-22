@@ -30,10 +30,14 @@ namespace SAIN.Layers
             SAIN.Mover.SetTargetPose(1f);
             SAIN.Mover.SetTargetMoveSpeed(1f);
             SAIN.Steering.SteerByPriority(false);
-
-            if (SAIN.Enemy.IsVisible && BackUp(out var pos))
+            bool EnemyVisible = SAIN.Enemy.IsVisible;
+            if (EnemyVisible && BackUp(out var pos))
             {
                 BotOwner.GoToPoint(pos, false, -1, false, false, false);
+            }
+            else if (!EnemyVisible)
+            {
+                BotOwner.MoveToEnemyData.TryMoveToEnemy(SAIN.Enemy.Position);
             }
 
             Shoot.Update();

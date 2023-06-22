@@ -50,7 +50,7 @@ namespace SAIN.Classes
 
             if (DecisionTimer < Time.time)
             {
-                //DecisionTimer = Time.time + 0.1f;
+                DecisionTimer = Time.time + 0.1f;
 
                 if (UpdateEnemyTimer < Time.time)
                 {
