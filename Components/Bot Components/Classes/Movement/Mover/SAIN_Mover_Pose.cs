@@ -78,25 +78,11 @@ namespace SAIN.Classes.Mover
         {
             if (UpdateFindObjectTimer < Time.time)
             {
-                UpdateFindObjectTimer = Time.time + 0.5f;
+                UpdateFindObjectTimer = Time.time + 0.66f;
 
                 if (FindCrouchFromCover(out float pose1))
                 {
                     ObjectTargetPoseCover = pose1;
-                }
-                else
-                {
-                    ObjectTargetPoseCover = null;
-                }
-            }
-            else if (UpdateFindObjectInCoverTimer < Time.time && SAIN.Cover.CoverInUse != null)
-            {
-                UpdateFindObjectInCoverTimer = Time.time + 0.5f;
-                UpdateFindObjectTimer = Time.time + 0.5f;
-
-                if (FindCrouchFromCover(out float pose2))
-                {
-                    ObjectTargetPoseCover = pose2;
                 }
                 else
                 {
@@ -122,7 +108,7 @@ namespace SAIN.Classes.Mover
                     }
                     else
                     {
-                        targetPose = FindCrouchHeightRaycast(enemy.EnemyChestPosition);
+                        targetPose = FindCrouchHeightRaycast(enemy.EnemyChestPosition, 2f);
                     }
                 }
                 else
@@ -133,7 +119,7 @@ namespace SAIN.Classes.Mover
                     }
                     else
                     {
-                        targetPose = FindCrouchHeightRaycast(SAIN.CurrentTargetPosition.Value);
+                        targetPose = FindCrouchHeightRaycast(SAIN.CurrentTargetPosition.Value, 2f);
                     }
                 }
             }
@@ -148,7 +134,7 @@ namespace SAIN.Classes.Mover
         private float FindCrouchHeightRaycast(Vector3 target, float rayLength = 3f)
         {
             const float StartHeight = 1.5f;
-            const int max = 10;
+            const int max = 6;
             const float heightStep = 1f / max;
             LayerMask Mask = LayerMaskClass.HighPolyWithTerrainMask;
 

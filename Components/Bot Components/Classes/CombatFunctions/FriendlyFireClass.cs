@@ -41,7 +41,7 @@ namespace SAIN.Classes
                 {
                     return friendlyFire;
                 }
-                target = BotOwner.AimingData.RealTargetPoint;
+                target = BotOwner.AimingData.EndTargetPoint;
             }
             if (BotOwner.ShootData?.ChecFriendlyFire(BotOwner.WeaponRoot.position, target.Value) == true)
             {

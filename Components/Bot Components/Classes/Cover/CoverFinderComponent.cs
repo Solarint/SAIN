@@ -60,8 +60,6 @@ namespace SAIN.Components
             {
                 StopCoroutine(TakeCoverCoroutine);
                 TakeCoverCoroutine = null;
-                CoverPoints.Clear();
-                FallBackPoint = null;
             }
         }
 
@@ -69,6 +67,7 @@ namespace SAIN.Components
 
         private IEnumerator FindCover()
         {
+            var endOfFrame = new WaitForEndOfFrame();
             while (true)
             {
                 UpdateSpotted();
@@ -101,7 +100,7 @@ namespace SAIN.Components
                     if (frameWait == 5)
                     {
                         frameWait = 0;
-                        yield return null;
+                        yield return endOfFrame;
                     }
                     frameWait++;
 

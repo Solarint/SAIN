@@ -20,9 +20,9 @@ namespace SAIN.UserSettings
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
 
-            CheckFrameCount = Config.Bind(debugmode, "CheckFrameCount", 1,
+            CheckFrameCount = Config.Bind(debugmode, "CheckFrameCount", 5,
                 new ConfigDescription("",
-                new AcceptableValueRange<int>(1, 30),
+                new AcceptableValueRange<int>(5, 20),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
 
             NoGlobalFog = Config.Bind(debugmode, "Is Global Fog Disabled?", false,

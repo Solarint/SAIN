@@ -211,10 +211,7 @@ namespace SAIN.Components
                 ClearEnemies();
             }
             AddEnemy();
-            foreach (var enemy in Enemies)
-            {
-                enemy.Value?.Update();
-            }
+            Enemy?.Update();
         }
 
         private float ClearEnemyTimer;
@@ -381,7 +378,7 @@ namespace SAIN.Components
         {
             if (enemy != null && enemy.IsVisible)
             {
-                if (enemy.BotPlayer.IsYourPlayer)
+                if (enemy.EnemyPlayer.IsYourPlayer)
                 {
                     Vector3 direction = enemy.EnemyChestPosition - start;
                     var hits = Physics.RaycastAll(start, direction, direction.magnitude);

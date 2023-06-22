@@ -17,8 +17,8 @@ namespace SAIN.Classes
         {
             if (SAIN.LayersActive)
             {
-                UpdateAimSway();
-                UpdateSmoothLook();
+                //UpdateAimSway();
+                //UpdateSmoothLook();
                 UpdateSteerMode();
                 if (UserSettings.DebugConfig.DebugLayers.Value)
                 {
@@ -190,7 +190,8 @@ namespace SAIN.Classes
 
         public void LookToPoint(Vector3 point)
         {
-            AimSway(point);
+            CurrentSteerPoint = point;
+            //AimSway(point);
             SteeringMode = EBotSteering.ToCustomPoint;
         }
 

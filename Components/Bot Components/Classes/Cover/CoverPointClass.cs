@@ -14,7 +14,6 @@ namespace SAIN.Classes
             Collider = collider;
             TimeCreated = Time.time;
             ReCheckStatusTimer = Time.time;
-            PathLengthAtCreation = CalcPathLength();
             Id = Guid.NewGuid().ToString();
         }
 
@@ -61,7 +60,7 @@ namespace SAIN.Classes
 
                 CoverStatus status = CoverStatus.None;
 
-                PathDistance = CalcPathLength();
+                PathDistance = (BotOwner.Position - Position).sqrMagnitude;
 
                 if (PathDistance <= InCoverDist)
                 {
