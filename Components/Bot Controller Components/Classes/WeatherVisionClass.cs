@@ -53,7 +53,7 @@ namespace SAIN.Components.BotController
             float clouds = WeatherController.Instance.WeatherCurve.Cloudiness;
             float cloudsmod = CloudsModifier(clouds);
 
-            // Combines Modifiers
+            // Combines ModifiersClass
             float weathermodifier = 1f * fogmod * rainmod * cloudsmod;
 
             weathermodifier = Mathf.Clamp(weathermodifier, 0.2f, 1f);

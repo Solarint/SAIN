@@ -8,6 +8,7 @@ using System.Reflection;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
 using static SAIN.UserSettings.BotShootConfig;
+using static SAIN.UserSettings.DifficultyConfig;
 
 namespace SAIN.Patches
 {
@@ -23,13 +24,32 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(GClass544 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
+            float modifier = ScatterMultiplier.Value;
+            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
+            {
+                if (component.Info.IsPMC)
+                {
+                    modifier /= PMCDifficulty.Value;
+                }
+                else if (component.Info.IsScav)
+                {
+                    modifier /= ScavDifficulty.Value;
+                }
+                else
+                {
+                    modifier /= OtherDifficulty.Value;
+                }
+
+                modifier /= GlobalDifficulty.Value;
+            }
+
             __instance.EndTargetPoint = __instance.RealTargetPoint
                 + ___vector3_5
                 + ___float_13
 
                 * (___vector3_4
                 + (___botOwner_0.RecoilData.RecoilOffset
-                * ScatterMultiplier.Value));
+                * modifier));
 
             return false;
         }

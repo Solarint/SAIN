@@ -15,16 +15,16 @@ namespace SAIN.Components
         public Action<SAINSoundType, Player, float> AISoundPlayed { get; private set; }
 
         public Dictionary<string, SAINComponent> SAINBots = new Dictionary<string, SAINComponent>();
-        public LineOfSightManager LineOfSightManager { get; private set; } = new LineOfSightManager();
-        public CoverManager CoverManager { get; private set; } = new CoverManager();
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
         public IBotGame BotGame => Singleton<IBotGame>.Instance;
         public static Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
         public BotControllerClass DefaultController { get; set; }
         public ManualLogSource Logger => LineOfSightManager.Logger;
-        public BotExtractManager BotExtractManager { get; private set; } = new BotExtractManager();
         public BotSpawnerClass BotSpawnerClass { get; set; }
 
+        public CoverManager CoverManager { get; private set; } = new CoverManager();
+        public LineOfSightManager LineOfSightManager { get; private set; } = new LineOfSightManager();
+        public BotExtractManager BotExtractManager { get; private set; } = new BotExtractManager();
         private TimeClass TimeClass { get; set; } = new TimeClass();
         private WeatherVisionClass WeatherClass { get; set; } = new WeatherVisionClass();
 
@@ -32,9 +32,9 @@ namespace SAIN.Components
         public float TimeOfDayVisibility => TimeClass.TimeOfDayVisibility;
 
         public Vector3 MainPlayerPosition { get; private set; }
-
         private bool ComponentAdded { get; set; }
         private float UpdatePositionTimer { get; set; }
+
 
         private void Awake()
         {
@@ -42,6 +42,7 @@ namespace SAIN.Components
             LineOfSightManager.Awake();
             CoverManager.Awake();
             PathManager.Awake();
+            BotExtractManager.Awake();
 
             Singleton<GClass629>.Instance.OnGrenadeThrow += GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive += GrenadeExplosion;
@@ -62,7 +63,7 @@ namespace SAIN.Components
 
             if (!Subscribed && BotSpawnerClass != null)
             {
-                BotSpawnerClass.OnBotRemoved += BotDeath;
+                //BotSpawnerClass.OnBotRemoved += BotDeath;
                 Subscribed = true;
             }
 
@@ -81,7 +82,7 @@ namespace SAIN.Components
 
         public void BotDeath(BotOwner bot)
         {
-            if (bot != null && bot.IsDead)
+            if (bot?.GetPlayer != null && bot.IsDead)
             {
                 DeadBots.Add(bot.GetPlayer);
             }
@@ -89,6 +90,7 @@ namespace SAIN.Components
 
         public List<Player> DeadBots { get; private set; } = new List<Player>();
         public List<BotDeathObject> DeathObstacles { get; private set; } = new List<BotDeathObject>();
+
         private readonly List<int> IndexToRemove = new List<int>();
 
         public void AddNavObstacles()
@@ -165,7 +167,7 @@ namespace SAIN.Components
 
         public void SoundPlayed(SAINSoundType soundType, Player player, float range)
         {
-            if (SAINBots.Count == 0)
+            if (SAINBots.Count == 0 || player == null)
             {
                 return;
             }
@@ -306,7 +308,7 @@ namespace SAIN.Components
             AISoundPlayed -= SoundPlayed;
             Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
-            Singleton<BotSpawnerClass>.Instance.OnBotRemoved -= BotDeath;
+            //Singleton<BotSpawnerClass>.Instance.OnBotRemoved -= BotDeath;
 
             foreach (var obstacle in DeathObstacles)
             {

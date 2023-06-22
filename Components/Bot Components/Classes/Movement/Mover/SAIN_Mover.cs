@@ -120,14 +120,14 @@ namespace SAIN.Classes
             return Way != null;
         }
 
-        public bool CanGoToPoint(Vector3 point, out Vector3 pointToGo, bool mustHaveCompletePath = false)
+        public bool CanGoToPoint(Vector3 point, out Vector3 pointToGo, bool mustHaveCompletePath = false, float navSampleRange = 10f)
         {
             pointToGo = point;
             if (CurrentDecision == SAINSoloDecision.HoldInCover)
             {
                 return false;
             }
-            if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
+            if (NavMesh.SamplePosition(point, out var navHit, navSampleRange, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
                 if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)

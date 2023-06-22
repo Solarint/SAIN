@@ -25,7 +25,7 @@ namespace SAIN.Classes.CombatFunctions
 
             FriendlyFire.Update();
 
-            if (SAIN.Enemy.IsVisible && FriendlyFire.ClearShot && !SAIN.NoBushESPActive)
+            if (SAIN.Enemy.IsVisible && SAIN.Enemy.CanShoot && FriendlyFire.ClearShot && !SAIN.NoBushESPActive)
             {
                 if (ginterface5_0 == null)
                 {

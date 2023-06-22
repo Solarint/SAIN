@@ -220,7 +220,7 @@ namespace SAIN.Helpers
 
                 Rain = InverseScaling(Rain, rainMin, max);
 
-                // Combines Modifiers and returns
+                // Combines ModifiersClass and returns
                 RainModifier *= Rain;
             }
             return RainModifier;

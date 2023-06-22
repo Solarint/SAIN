@@ -16,6 +16,7 @@ namespace SAIN.Components
     public class SAINComponent : MonoBehaviour
     {
         public List<Player> VisiblePlayers = new List<Player>();
+
         private void Awake()
         {
             BotOwner = GetComponent<BotOwner>();
@@ -29,8 +30,6 @@ namespace SAIN.Components
             ExitsToLocation.Clear();
             ExitsToLocation.AddRange(exits);
         }
-
-        public bool CanNotExfil { get; set; }
 
         public string ProfileId => BotOwner.ProfileId;
         public string SquadId => Squad.SquadID;
@@ -71,16 +70,8 @@ namespace SAIN.Components
 
             if (BotActive && !GameIsEnding)
             {
-                NoBushESPActive = NoBushESP(Enemy, HeadPosition);
-                if (NoBushESPActive)
-                {
-                    BotOwner.ShootData?.EndShoot();
-                    BotOwner.AimingData?.LoseTarget();
-                }
-
+                UpdateNoBushESP();
                 DebugVisibleDraw();
-
-                UpdateExfiltration();
                 UpdateHealth();
                 UpdateEnemy();
 
@@ -99,6 +90,28 @@ namespace SAIN.Components
                 Steering.Update();
             }
         }
+
+        private void UpdateNoBushESP()
+        {
+            if (Enemy != null)
+            {
+                if (NoBushTimer < Time.time)
+                {
+                    NoBushESPActive = NoBushESP(Enemy, HeadPosition);
+                }
+                if (NoBushESPActive)
+                {
+                    BotOwner.ShootData?.EndShoot();
+                    BotOwner.AimingData?.LoseTarget();
+                }
+            }
+            else
+            {
+                NoBushESPActive = false;
+            }
+        }
+
+        private float NoBushTimer = 0f;
 
         private void DebugVisibleDraw()
         {
@@ -147,35 +160,6 @@ namespace SAIN.Components
         private float VisibleSquadTimer;
         private float VisibleEnemyTimer;
 
-        private void UpdateExfiltration()
-        {
-            if (Info.IsPMC || Info.IsScav)
-            {
-                if (Exfil == null && !CanNotExfil)
-                {
-                    FindExfil();
-                }
-
-                var leader = Squad.LeaderComponent;
-                if (Squad.BotInGroup && leader != null && !Squad.IAmLeader)
-                {
-                    if (leader.Exfil != null)
-                    {
-                        Exfil = leader.Exfil;
-                        CanNotExfil = false;
-                    }
-                    else
-                    {
-                        if (Exfil != null)
-                        {
-                            leader.Exfil = Exfil;
-                            leader.CanNotExfil = false;
-                        }
-                    }
-                }
-            }
-        }
-
         private void UpdatePatrolData()
         {
             if (CheckActiveLayer)
@@ -192,6 +176,7 @@ namespace SAIN.Components
         }
 
         public bool LayersActive => BigBrainSAIN.IsBotUsingSAINLayer(BotOwner);
+
         public bool CheckActiveLayer
         {
             get
@@ -344,69 +329,7 @@ namespace SAIN.Components
             return ChosenEnemy;
         }
 
-        private void FindExfil()
-        {
-            List<Vector3> validExfils = new List<Vector3>();
-            var exfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
-            if (Info.IsScav)
-            {
-                var scavPoints = exfilController.ScavExfiltrationPoints;
-                foreach (var ex in scavPoints)
-                {
-                    if (ex != null)
-                    {
-                        if (ex.enabled)
-                        {
-                            Collider collider = ex.GetComponent<Collider>();
-                            if (collider != null)
-                            {
-                                if (Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
-                                {
-                                    validExfils.Add(Destination);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var exfils = Singleton<GameWorld>.Instance.ExfiltrationController?.ExfiltrationPoints;
-                if (exfils != null)
-                {
-                    foreach (var ex in exfils)
-                    {
-                        if (ex != null)
-                        {
-                            if (ex.enabled)
-                            {
-                                Collider collider = ex.GetComponent<Collider>();
-                                if (collider != null)
-                                {
-                                    if (Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
-                                    {
-                                        validExfils.Add(Destination);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (validExfils.Count > 0)
-            {
-                CanNotExfil = false;
-                Exfil = validExfils.PickRandom();
-            }
-            else
-            {
-                CanNotExfil = true;
-                Exfil = null;
-            }
-        }
-
-        public Vector3? Exfil { get; set; }
+        public Vector3? ExfilPosition { get; set; }
 
         private void UpdateHealth()
         {
@@ -425,6 +348,7 @@ namespace SAIN.Components
         public bool HasEnemy => Enemy != null;
 
         public SAINEnemy Enemy { get; private set; }
+
         public Dictionary<string, SAINEnemy> Enemies { get; private set; } = new Dictionary<string, SAINEnemy>();
 
         public void Dispose()
@@ -446,21 +370,30 @@ namespace SAIN.Components
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
         public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
 
-        public static bool NoBushESP(SAINEnemy enemy, Vector3 botHead)
+        public bool NoBushESP(SAINEnemy enemy, Vector3 start)
         {
             if (enemy != null && enemy.IsVisible)
             {
                 if (enemy.BotPlayer.IsYourPlayer)
                 {
-                    Vector3 direction = enemy.EnemyChestPosition - botHead;
-                    if (Physics.Raycast(botHead, direction, out var hitInfo, direction.magnitude, NoBushMask))
+                    Vector3 direction = enemy.EnemyChestPosition - start;
+                    var hits = Physics.RaycastAll(start, direction, direction.magnitude);
+                    if (hits.Length > 0)
                     {
-                        string ObjectName = hitInfo.transform.parent?.gameObject?.name;
-                        foreach (string exclusion in ExclusionList)
+                        foreach (var hit in hits)
                         {
-                            if (ObjectName.ToLower().Contains(exclusion))
+                            string ObjectName = hit.transform.parent?.gameObject?.name;
+                            foreach (string exclusion in ExclusionList)
                             {
-                                return true;
+                                if (ObjectName.ToLower().Contains(exclusion))
+                                {
+                                    if (DebugVision.Value)
+                                    {
+                                        Logger.LogWarning("No Bush ESP ACTIVE");
+                                        DebugGizmos.SingleObjects.Line(hit.point, HeadPosition, Color.green, 0.1f, true, 0.25f, true);
+                                    }
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -468,9 +401,10 @@ namespace SAIN.Components
             }
             return false;
         }
+
         private static LayerMask NoBushMask => LayerMaskClass.HighPolyWithTerrainMaskAI;
         public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch",
-        "timber", "spruce", "bush", "wood"};
+        "timber", "spruce", "bush", "wood", "grass" };
 
 
         public Vector3? CurrentTargetPosition

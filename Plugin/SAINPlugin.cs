@@ -37,6 +37,7 @@ namespace SAIN
 
         private void ConfigInit()
         {
+            DifficultyConfig.Init(Config);
             TalkConfig.Init(Config);
             VisionConfig.Init(Config);
             DebugConfig.Init(Config);

@@ -33,7 +33,7 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            if (SAIN.CanNotExfil == true || SAIN.Exfil == null)
+            if (SAIN.ExfilPosition == null)
             {
                 return false;
             }

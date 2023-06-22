@@ -248,6 +248,7 @@
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
     <Compile Include="Components\Bot Components\Classes\Cover\CoverFinderComponent.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
+    <Compile Include="Plugin\Config\DifficultyConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />
     <Compile Include="Plugin\Config\BotShootConfig.cs" />
     <Compile Include="Plugin\Config\TalkConfig.cs" />

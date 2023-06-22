@@ -121,7 +121,7 @@ namespace SAIN.Classes
                 if (value == true)
                 {
                     _enemyIsReloading = true;
-                    _soundResetTimer = Time.time + 3f;
+                    _soundResetTimer = Time.time + 3f * Random.Range(0.75f, 1.5f);
                 }
             }
         }
@@ -144,7 +144,7 @@ namespace SAIN.Classes
                 if (value == true)
                 {
                     _enemyHasGrenade = true;
-                    _grenadeResetTimer = Time.time + 3f;
+                    _grenadeResetTimer = Time.time + 3f * Random.Range(0.75f, 1.5f);
                 }
             }
         }
@@ -167,7 +167,7 @@ namespace SAIN.Classes
                 if (value == true)
                 {
                     _enemyIsHeal = true;
-                    _healResetTimer = Time.time + 4f;
+                    _healResetTimer = Time.time + 4f * Random.Range(0.75f, 1.25f);
                 }
             }
         }
@@ -224,7 +224,7 @@ namespace SAIN.Classes
 
             bool visible = GoalEnemy != null
                 && BotOwner.LookSensor.IsPointInVisibleSector(GoalEnemy.CurrPosition)
-                && GoalEnemy.IsVisible == true
+                && GoalEnemy.VisibleOnlyBySense == EEnemyPartVisibleType.visible
                 && inLineOfSight;
 
             bool wasVisible = IsVisible;

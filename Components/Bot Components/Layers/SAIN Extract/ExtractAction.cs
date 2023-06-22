@@ -23,7 +23,7 @@ namespace SAIN.Layers
 
         private ShootClass Shoot;
 
-        private Vector3? Exfil => SAIN.Exfil;
+        private Vector3? Exfil => SAIN.ExfilPosition;
 
         private readonly SAINComponent SAIN;
 
