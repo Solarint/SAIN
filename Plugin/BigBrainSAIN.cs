@@ -13,7 +13,7 @@ namespace SAIN
     {
         public static bool IsBotUsingSAINLayer(BotOwner bot)
         {
-            if (bot.Brain.Agent != null)
+            if (bot?.Brain?.Agent != null)
             {
                 if (BrainManager.IsCustomLayerActive(bot))
                 {

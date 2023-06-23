@@ -36,7 +36,7 @@ namespace SAIN.Components
                 {
                     Frames = 0;
                     GlobalRaycastJob();
-                    CheckEnemiesJobs();
+                    //CheckEnemiesJobs();
                 }
             }
         }
@@ -244,12 +244,20 @@ namespace SAIN.Components
 
             for (int i = 0; i < sainBots.Count; i++)
             {
-                sainBots[i].VisiblePlayers.Clear();
+                var visPlayers = sainBots[i].VisiblePlayers;
+                var idList = sainBots[i].VisiblePlayerIds;
+                visPlayers.Clear();
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
                 {
-                    if (allRaycastHits[total].collider == null && RegisteredPlayers[j] != null && RegisteredPlayers[j]?.HealthController?.IsAlive == true)
+                    Player player = RegisteredPlayers[j];
+                    if (allRaycastHits[total].collider == null && player != null && player.HealthController.IsAlive)
                     {
-                        sainBots[i].VisiblePlayers.Add(RegisteredPlayers[j]);
+                        visPlayers.Add(player);
+                        string id = player.ProfileId;
+                        if (!idList.Contains(id))
+                        {
+                            idList.Add(id);
+                        }
                     }
                     total++;
                 }

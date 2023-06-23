@@ -15,7 +15,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            Shoot = new ShootClass(bot);
+            Shoot = new ShootClass(bot, SAIN);
         }
 
         private readonly ManualLogSource Logger;
@@ -117,7 +117,7 @@ namespace SAIN.Layers
         public override void Start()
         {
             SAIN.Mover.Sprint(true);
-            if (SAIN.Decision.SelfDecision == SAINSelfDecision.RunAwayGrenade)
+            if (SAIN.Decision.CurrentSelfDecision == SAINSelfDecision.RunAwayGrenade)
             {
                 SAIN.Talk.Say(EPhraseTrigger.OnEnemyGrenade, ETagStatus.Combat);
             }

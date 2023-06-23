@@ -25,7 +25,7 @@ namespace SAIN.Layers
             Action nextAction;
 
             var Decision = CurrentDecision;
-            var SelfDecision = SAIN.Decision.SelfDecision;
+            var SelfDecision = SAIN.Decision.CurrentSelfDecision;
             switch (Decision)
             {
                 case SAINSoloDecision.RushEnemy:

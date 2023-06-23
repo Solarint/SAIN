@@ -14,7 +14,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            Shoot = new ShootClass(bot);
+            Shoot = new ShootClass(bot, SAIN);
         }
 
         private ShootClass Shoot;
@@ -23,26 +23,16 @@ namespace SAIN.Layers
 
         public override void Start()
         {
-            BotOwner.PatrollingData.Pause();
         }
 
         public override void Stop()
         {
-            BotOwner.PatrollingData.Unpause();
         }
 
         public override void Update()
         {
-            //SAIN.Movement.DecideMovementSpeed();
-
             SAIN.Steering.SteerByPriority();
-
-            if (SAIN.HasEnemyAndCanShoot)
-            {
-                Shoot.Update();
-            }
-
-            SAIN.Mover.SetTargetPose(1f);
+            Shoot.Update();
         }
 
         public bool DebugMode => DebugLayers.Value;

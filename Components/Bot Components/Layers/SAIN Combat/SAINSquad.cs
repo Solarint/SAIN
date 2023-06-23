@@ -57,7 +57,7 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            bool Active = SAIN.Decision.SquadDecision != SAINSquadDecision.None;
+            bool Active = SAIN.Decision.CurrentSquadDecision != SAINSquadDecision.None;
             return Active;
         }
 
@@ -67,7 +67,7 @@ namespace SAIN.Layers
         }
 
         private SAINSquadDecision LastActionDecision = SAINSquadDecision.None;
-        public SAINSquadDecision SquadDecision => SAIN.Decision.SquadDecision;
+        public SAINSquadDecision SquadDecision => SAIN.Decision.CurrentSquadDecision;
 
         private readonly SAINComponent SAIN;
         protected ManualLogSource Logger;

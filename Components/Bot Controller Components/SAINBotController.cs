@@ -339,7 +339,7 @@ namespace SAIN.Components
             if (SAINBots.TryGetValue(profileId, out var component))
             {
                 SAINBots.Remove(profileId);
-                component?.Dispose();
+                component.Dispose();
             }
         }
     }

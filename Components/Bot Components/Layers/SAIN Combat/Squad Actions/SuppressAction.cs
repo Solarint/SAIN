@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            Shoot = new GClass112(bot);
+            Shoot = new ShootClass(bot, SAIN);
         }
 
         // Token: 0x060008C4 RID: 2244 RVA: 0x0002AE8C File Offset: 0x0002908C
@@ -22,7 +23,7 @@ namespace SAIN.Layers
             var enemy = SAIN.Enemy;
             if (enemy != null)
             {
-                if (enemy.IsVisible)
+                if (enemy.IsVisible && enemy.CanShoot)
                 {
                     BotOwner.StopMove();
                     Shoot.Update();
@@ -71,35 +72,15 @@ namespace SAIN.Layers
             return false;
         }
 
-        private readonly GClass112 Shoot;
+        private readonly ShootClass Shoot;
 
         private readonly SAINComponent SAIN;
 
         public override void Start()
         {
-            var list = new List<Vector3>();
-            foreach (var enemy in BotOwner.BotsGroup.Enemies.Keys)
+            if (SAIN.Enemy != null)
             {
-                if (enemy != null)
-                {
-                    list.Add(enemy.Position);
-                }
-            }
-            if (BotOwner.SuppressShoot.InitToPoints(list))
-            {
-                //Logger.LogDebug("Activate to Points List Success");
-            }
-            else if (BotOwner.SuppressShoot.InitToPoint(BotOwner.Memory.GoalEnemy.EnemyLastPositionReal))
-            {
-                //Logger.LogDebug("Activate to DangerPoint Success");
-            }
-            else if (BotOwner.SuppressShoot.Init(BotOwner.Memory.GoalEnemy))
-            {
-                //Logger.LogDebug("Activate to GoalEnemy Success");
-            }
-            else
-            {
-                Logger.LogError("Could Not Start Suppression");
+                BotOwner.SuppressShoot.InitToPoint(SAIN.Enemy.PositionLastSeen);
             }
         }
 

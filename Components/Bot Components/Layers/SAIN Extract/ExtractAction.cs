@@ -18,7 +18,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            Shoot = new ShootClass(bot);
+            Shoot = new ShootClass(bot, SAIN);
         }
 
         private ShootClass Shoot;
@@ -69,29 +69,39 @@ namespace SAIN.Layers
 
         private void GoTo(Vector3 point)
         {
-            if ((point - BotOwner.Position).sqrMagnitude < 6f)
+            if (CheckDistTimer < Time.time)
             {
-                if (ExtractTimer == -1f)
+                CheckDistTimer = Time.time + 1f;
+                if ((point - BotOwner.Position).sqrMagnitude < 6f)
                 {
-                    Logger.LogInfo($"{BotOwner.name} Starting Extract Timer");
-                    ExtractTimer = Time.time + 5f;
-                }
+                    if (ExtractTimer == -1f)
+                    {
+                        Logger.LogInfo($"{BotOwner.name} Starting Extract Timer");
+                        ExtractTimer = Time.time + 5f;
+                    }
 
-                if (ExtractTimer < Time.time)
-                {
-                    Logger.LogInfo($"{BotOwner.name} Extracted");
-                    Singleton<IBotGame>.Instance.BotUnspawn(BotOwner);
+                    if (ExtractTimer < Time.time)
+                    {
+                        Logger.LogInfo($"{BotOwner.name} Extracted");
+                        Singleton<IBotGame>.Instance.BotUnspawn(BotOwner);
+                    }
+                    return;
                 }
-                return;
-            }
-            else
-            {
-                ExtractTimer = -1f;
-                SAIN.Mover.Sprint(true);
-                SAIN.Mover.GoToPoint(point);
-                BotOwner.DoorOpener.Update();
+                else
+                {
+                    if (ReCalcPathTimer < Time.time)
+                    {
+                        ExtractTimer = -1f;
+                        ReCalcPathTimer = Time.time + 4f;
+                        SAIN.Mover.Sprint(true);
+                        SAIN.Mover.GoToPoint(point);
+                    }
+                }
             }
         }
+
+        private float CheckDistTimer = 0f;
+        private float ReCalcPathTimer = 0f;
         private float ExtractTimer = -1f;
         private ManualLogSource Logger;
     }

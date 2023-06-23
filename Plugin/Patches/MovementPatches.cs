@@ -23,7 +23,12 @@ namespace SAIN.Patches.Movement
         [PatchPrefix]
         public static void PatchPrefix(ref BotOwner ___botOwner_0, Door door, ref EInteractionType Etype)
         {
-            if (___botOwner_0.Memory.GoalEnemy == null)
+            if (!SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var bot))
+            {
+                return;
+            }
+
+            if (bot.Enemy == null)
             {
                 if (Etype == EInteractionType.Breach)
                 {
@@ -35,7 +40,7 @@ namespace SAIN.Patches.Movement
 
             if (Etype == EInteractionType.Open || Etype == EInteractionType.Breach)
             {
-                bool enemyClose = Vector3.Distance(___botOwner_0.Position, ___botOwner_0.Memory.GoalEnemy.CurrPosition) < 30f;
+                bool enemyClose = Vector3.Distance(bot.Position, bot.Enemy.Position) < 30f;
 
                 if (enemyClose || ___botOwner_0.Memory.IsUnderFire)
                 {

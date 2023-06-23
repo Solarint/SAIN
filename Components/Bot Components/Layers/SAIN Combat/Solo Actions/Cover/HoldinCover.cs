@@ -16,7 +16,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
-            Shoot = new ShootClass(bot);
+            Shoot = new ShootClass(bot, SAIN);
         }
 
         private ShootClass Shoot;

@@ -25,14 +25,13 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            return Active;
+            return false;
         }
 
-        private bool Active => CurrentDecision == SAINSoloDecision.None && !SAIN.HasGoalEnemy && !SAIN.HasGoalTarget && BotOwner.Memory.IsPeace;
 
         public override bool IsCurrentActionEnding()
         {
-            return !Active;
+            return false;
         }
 
         public SAINSoloDecision LastDecision => SAIN.Decision.OldMainDecision;

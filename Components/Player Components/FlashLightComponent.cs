@@ -20,9 +20,7 @@ namespace SAIN.Components
         private void Awake()
         {
             Player = GetComponent<Player>();
-
             Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(FlashLightComponent));
-
             _lightDetection = new LightDetectionClass();
         }
 
@@ -49,19 +47,25 @@ namespace SAIN.Components
                 return;
             }
 
-            if (WhiteLight)
+            if (FrameCount >= 3)
             {
-                if (Player.IsAI)
+                FrameCount = 0;
+                if (WhiteLight)
                 {
-                    _lightDetection.DetectAndInvestigateFlashlight(Player);
-                }
-
-                if (Player.IsYourPlayer)
-                {
-                    _lightDetection.CreateDetectionPoints(Player);
+                    if (Player.IsAI)
+                    {
+                        _lightDetection.DetectAndInvestigateFlashlight(Player);
+                    }
+                    if (Player.IsYourPlayer)
+                    {
+                        _lightDetection.CreateDetectionPoints(Player);
+                    }
                 }
             }
+            FrameCount++;
         }
+
+        private float FrameCount = 0;
 
         public void Dispose()
         {
