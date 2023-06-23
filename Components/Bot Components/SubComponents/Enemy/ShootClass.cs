@@ -1,6 +1,5 @@
 ﻿using EFT;
 using SAIN.Components;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SAIN.Classes.CombatFunctions
@@ -11,8 +10,10 @@ namespace SAIN.Classes.CombatFunctions
         {
             SAIN = sain;
             FriendlyFire = new FriendlyFireClass(owner);
+            BotShoot = new GClass182(owner);
         }
 
+        private readonly GClass182 BotShoot;
         private BotOwner BotOwner => botOwner_0;
 
         private SAINComponent SAIN;
@@ -42,7 +43,7 @@ namespace SAIN.Classes.CombatFunctions
                     if (AimingData.IsReady)
                     {
                         ReadyToShoot();
-                        Shoot();
+                        BotShoot.Update();
                     }
                 }
             }
@@ -54,15 +55,6 @@ namespace SAIN.Classes.CombatFunctions
 
         protected virtual void ReadyToShoot()
         {
-        }
-
-        private void Shoot()
-        {
-            if (!BotOwner.WeaponManager.HaveBullets)
-            {
-                return;
-            }
-            BotOwner.ShootData.Shoot();
         }
 
         protected virtual Vector3? GetTarget()
