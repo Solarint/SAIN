@@ -92,13 +92,22 @@ namespace SAIN.Classes
                 LookToEnemy(SAIN.Enemy);
                 return true;
             }
-            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 50f, 1f);
+            if (BotOwner.DangerPointsData.HaveDangePoints && BotOwner.DangerPointsData.place != null)
+            {
+                LookToPoint(BotOwner.DangerPointsData.place.Position);
+                return true;
+            }
+            if (LookToEnemyLastSeenClose())
+            {
+                return true;
+            }
+            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 25f, 1f);
             if (sound != null)
             {
                 LookToHearPos(sound.Position);
                 return true;
             }
-            if (SAIN.Enemy?.TimeSinceSeen < 8f)
+            if (SAIN.Enemy?.TimeSinceSeen < 12f)
             {
                 LookToEnemyLastSeenPos();
                 return true;
@@ -130,6 +139,20 @@ namespace SAIN.Classes
                     Vector3 pos = enemy.PositionLastSeen;
                     pos += Vector3.up * 1f;
                     LookToPoint(pos);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool LookToEnemyLastSeenClose()
+        {
+            var enemy = SAIN.Enemy;
+            if (enemy != null)
+            {
+                if (enemy.Seen && (enemy.Position - enemy.PositionLastSeen).sqrMagnitude < 10f)
+                {
+                    LookToPoint(enemy.Position);
                     return true;
                 }
             }

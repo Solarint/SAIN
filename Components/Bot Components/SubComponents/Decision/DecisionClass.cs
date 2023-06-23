@@ -57,7 +57,7 @@ namespace SAIN.Classes
 
             if (DecisionTimer < Time.time)
             {
-                DecisionTimer = Time.time + 0.1f;
+                DecisionTimer = Time.time + 0.066f;
 
                 if (UpdateEnemyTimer < Time.time)
                 {
@@ -67,6 +67,11 @@ namespace SAIN.Classes
 
                 GetDecision();
             }
+        }
+
+        public void ResetDecisions()
+        {
+            UpdateDecisionProperties(SAINSoloDecision.None, SAINSquadDecision.None, SAINSelfDecision.None);
         }
 
         private void GetDecision()

@@ -25,6 +25,8 @@ namespace SAIN.Classes.CombatFunctions
                 return;
             }
 
+            FriendlyFire.Update();
+
             if (SAIN.Enemy.IsVisible && SAIN.Enemy.CanShoot)
             {
                 if (AimingData == null)
@@ -32,15 +34,13 @@ namespace SAIN.Classes.CombatFunctions
                     AimingData = BotOwner.AimingData;
                 }
 
-                FriendlyFire.Update();
-
                 Vector3? pointToShoot = GetPointToShoot();
                 if (pointToShoot != null)
                 {
+                    BotOwner.BotLight.TurnOn();
                     Target = pointToShoot.Value;
-                    if (AimingData.IsReady && FriendlyFire.ClearShot)
+                    if (AimingData.IsReady)
                     {
-                        BotOwner.BotLight.TurnOn();
                         ReadyToShoot();
                         Shoot();
                     }
@@ -67,10 +67,10 @@ namespace SAIN.Classes.CombatFunctions
 
         protected virtual Vector3? GetTarget()
         {
-            var enemy = SAIN.Enemy;
+            var enemy = BotOwner.Memory.GoalEnemy;
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
-                Vector3 value = enemy.ChestPart.PartPosition + Random.insideUnitSphere * 0.15f;
+                Vector3 value = enemy.GetPartToShoot();
                 return new Vector3?(value);
             }
             Vector3? result = null;

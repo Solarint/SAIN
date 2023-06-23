@@ -75,13 +75,53 @@ namespace SAIN.Classes
             return SAIN.Decision.MainDecision == SAINSoloDecision.Retreat && !SAIN.Cover.BotIsAtCoverPoint && SAIN.Decision.TimeSinceChangeDecision < 3f;
         }
 
+        private void TryFixBusyHands()
+        {
+            var selector = BotOwner.WeaponManager?.Selector;
+            if (selector == null)
+            {
+                return;
+            }
+            if (selector.TakePrevWeapon())
+            {
+                return;
+            }
+            if (selector.TryChangeToMain())
+            {
+                return;
+            }
+            if (selector.TryChangeWeapon(true))
+            {
+                return;
+            }
+            if (selector.CanChangeToSecondWeapons)
+            {
+                selector.ChangeToSecond();
+                return;
+            }
+        }
+
         private bool CheckContinueSelfAction(out SAINSelfDecision Decision)
         {
+            float timesinceChange = Time.time - SAIN.Decision.ChangeSelfDecisionTime;
+            if (timesinceChange > 5f)
+            {
+                Decision = SAINSelfDecision.None;
+                if (CurrentSelfAction != SAINSelfDecision.Surgery)
+                {
+                    TryFixBusyHands();
+                    return false;
+                }
+                else if (timesinceChange > 30f)
+                {
+                    TryFixBusyHands();
+                    return false;
+                }
+            }
             bool continueAction = UsingMeds || ContinueReload || ContinueRunGrenade;
             Decision = continueAction ? CurrentSelfAction : SAINSelfDecision.None;
             return continueAction;
         }
-
         private bool ContinueRunGrenade => CurrentSelfAction == SAINSelfDecision.RunAwayGrenade && SAIN.Grenade.GrenadeDangerPoint != null;
         public bool UsingMeds => BotOwner.Medecine.Using;
         private bool ContinueReload => BotOwner.WeaponManager.Reload?.Reloading == true && !StartCancelReload();

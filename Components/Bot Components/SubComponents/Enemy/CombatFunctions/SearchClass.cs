@@ -45,6 +45,14 @@ namespace SAIN.Classes
                 ReachDistance = reachDist;
             }
 
+            if (!SAIN.BotStuck.BotIsMoving && SAIN.BotStuck.TimeSpentNotMoving > 3f)
+            {
+                DirectMove = true;
+                MoveToNextPoint(TargetPosition.Value);
+                ActiveDestination = TargetPosition.Value;
+                return;
+            }
+
             if (MoveDirect(shallSprint))
             {
                 return;

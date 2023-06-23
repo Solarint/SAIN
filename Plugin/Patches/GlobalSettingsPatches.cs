@@ -14,6 +14,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsMindSettings __instance)
         {
+            __instance.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 240f;
             __instance.SEC_TO_MORE_DIST_TO_RUN = 0f;
             __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
             __instance.CHANCE_FUCK_YOU_ON_CONTACT_100 = 0f;
@@ -58,10 +59,11 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalShootData __instance)
         {
-            __instance.MAX_DIST_COEF = 1.75f;
+            __instance.SHOOT_IMMEDIATELY_DIST = 50f;
+            __instance.MAX_DIST_COEF = 1.5f;
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
-            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.5f;
-            __instance.BASE_AUTOMATIC_TIME = 0.5f;
+            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.25f;
+            __instance.BASE_AUTOMATIC_TIME = 0.33f;
             __instance.RECOIL_DELTA_PRESS = 0f;
         }
     }
@@ -98,7 +100,7 @@ namespace SAIN.Patches
             __instance.BASE_ROTATE_SPEED = 250f;
             //__instance.FIRST_TURN_SPEED = 250f;
             //__instance.FIRST_TURN_BIG_SPEED = 250f;
-            __instance.TURN_SPEED_ON_SPRINT = 250f;
+            __instance.TURN_SPEED_ON_SPRINT = 320f;
         }
     }
 
@@ -117,8 +119,8 @@ namespace SAIN.Patches
             __instance.CAN_SHOOT_TO_HEAD = false;
             __instance.ARMOR_CLASS_COEF = 6f;
             __instance.SHOTGUN_POWER = 60f;
-            __instance.RIFLE_POWER = 50f;
-            __instance.PISTOL_POWER = 30f;
+            __instance.RIFLE_POWER = 80f;
+            __instance.PISTOL_POWER = 10f;
             __instance.SMG_POWER = 100f;
             __instance.SNIPE_POWER = 20f;
         }
@@ -150,30 +152,30 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalLookData __instance)
         {
-            //__instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 1000f;
+            __instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 1000f;
 
             __instance.NIGHT_VISION_ON = 75f;
             __instance.NIGHT_VISION_OFF = 125f;
             __instance.NIGHT_VISION_DIST = 125f;
             __instance.VISIBLE_ANG_NIGHTVISION = 90f;
 
-            //__instance.LOOK_THROUGH_PERIOD_BY_HIT = 0f;
+            __instance.LOOK_THROUGH_PERIOD_BY_HIT = 0f;
 
             __instance.LightOnVisionDistance = 40f;
             __instance.VISIBLE_ANG_LIGHT = 30f;
             __instance.VISIBLE_DISNACE_WITH_LIGHT = 50f;
 
-            __instance.GOAL_TO_FULL_DISSAPEAR = 0.25f;
-            __instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;
+            __instance.GOAL_TO_FULL_DISSAPEAR = 0.1f;
+            __instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.05f;
             __instance.GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.0001f;
 
-            //__instance.MAX_VISION_GRASS_METERS = 1f;
-            //__instance.MAX_VISION_GRASS_METERS_OPT = 1f;
-            //__instance.MAX_VISION_GRASS_METERS_FLARE = 4f;
-            //__instance.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
+            __instance.MAX_VISION_GRASS_METERS = 1f;
+            __instance.MAX_VISION_GRASS_METERS_OPT = 1f;
+            __instance.MAX_VISION_GRASS_METERS_FLARE = 4f;
+            __instance.MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
 
-            //__instance.NO_GREEN_DIST = 3f;
-            //__instance.NO_GRASS_DIST = 3f;
+            __instance.NO_GREEN_DIST = 3f;
+            __instance.NO_GRASS_DIST = 3f;
         }
     }
 }

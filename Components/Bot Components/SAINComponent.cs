@@ -194,7 +194,7 @@ namespace SAIN.Components
                 {
                     return BotOwner.Memory.LastHitPos;
                 }
-                var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 500f, true);
+                var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 200f, true);
                 if (sound != null && !sound.IsCome)
                 {
                     return sound.Position;

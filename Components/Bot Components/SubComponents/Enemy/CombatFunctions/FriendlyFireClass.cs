@@ -37,13 +37,17 @@ namespace SAIN.Classes
             }
             if (target == null)
             {
+                target = SAIN.Enemy?.EnemyChestPosition;
+            }
+            if (target == null)
+            {
                 if (BotOwner.AimingData == null)
                 {
                     return friendlyFire;
                 }
                 target = BotOwner.AimingData.EndTargetPoint;
             }
-            if (BotOwner.ShootData?.ChecFriendlyFire(BotOwner.WeaponRoot.position, target.Value) == true)
+            if (target != null && BotOwner.ShootData?.ChecFriendlyFire(BotOwner.WeaponRoot.position, target.Value) == true)
             {
                 friendlyFire = FriendlyFireStatus.FriendlyBlock;
             }
@@ -56,10 +60,7 @@ namespace SAIN.Classes
 
         public void StopShooting()
         {
-            if (BotOwner.ShootData.Shooting == true)
-            {
-                BotOwner.ShootData?.EndShoot();
-            }
+            BotOwner.ShootData?.EndShoot();
             BotOwner.AimingData?.LoseTarget();
         }
 

@@ -14,7 +14,7 @@ namespace SAIN.Classes
 
         public bool GetDecision(out SAINSoloDecision Decision)
         {
-            if (SAIN.Enemy == null || !SAIN.Enemy.Seen)
+            if (SAIN.Enemy == null)
             {
                 Decision = SAINSoloDecision.None;
                 return false;
@@ -73,12 +73,12 @@ namespace SAIN.Classes
         private bool StartRushEnemy()
         {
             var Personality = SAIN.Info.BotPersonality;
-            if (Personality == BotPersonality.GigaChad || Personality == BotPersonality.Chad)
+            if (SAIN.Info.IsPMC)
             {
                 var enemy = SAIN.Enemy;
-                if (enemy != null && enemy.RealDistance < 20f)
+                if (enemy != null && enemy.PathDistance < 25f)
                 {
-                    if (!SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.33f))
+                    if (!SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.4f) && SAIN.HealthStatus != ETagStatus.Dying)
                     {
                         if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
                         {

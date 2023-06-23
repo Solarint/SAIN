@@ -48,15 +48,13 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (SAIN.Enemy != null)
-            {
-                Shoot.Update();
-            }
+            Shoot.Update();
+
             if ( TargetPosition != null )
             {
                 if (SAIN.Enemy == null && (BotOwner.Position - TargetPosition.Value).sqrMagnitude < 2f)
                 {
-                    BotOwner.Memory.GoalTarget?.Clear();
+                    SAIN.Decision.ResetDecisions();
                     return;
                 }
                 CheckShouldSprint();
@@ -73,14 +71,13 @@ namespace SAIN.Layers
         {
             if (Search.PeekingCorner)
             {
-                SprintEnabled = false;
                 return;
             }
 
             var pers = SAIN.Info.BotPersonality;
             if (RandomSprintTimer < Time.time && (pers == BotPersonality.GigaChad || pers == BotPersonality.Chad))
             {
-                RandomSprintTimer = Time.time + 3f * Random.Range(0.33f, 2f);
+                RandomSprintTimer = Time.time + 3f * Random.Range(0.5f, 2f);
                 float chance = pers == BotPersonality.GigaChad ? 40f : 20f;
                 SprintEnabled = EFTMath.RandomBool(chance);
             }

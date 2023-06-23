@@ -29,6 +29,9 @@ namespace SAIN.Classes
 
         private ManualLogSource Logger;
 
+        public float TimeSpentNotMoving => Time.time - TimeStartNotMoving;
+        public float TimeStartNotMoving { get; private set; }
+
         private void Update()
         {
             if (BotOwner == null || SAIN == null) return;
@@ -36,9 +39,19 @@ namespace SAIN.Classes
             {
                 if (CheckMoveTimer < Time.time)
                 {
+                    bool botWasMoving = BotIsMoving;
                     CheckMoveTimer = Time.time + 0.33f;
                     BotIsMoving = (LastPos - BotOwner.Position).sqrMagnitude > 0.01f;
                     LastPos = BotOwner.Position;
+
+                    if (botWasMoving && !BotIsMoving)
+                    {
+                        TimeStartNotMoving = Time.time;
+                    }
+                    else if (BotIsMoving)
+                    {
+                        TimeStartNotMoving = 0f;
+                    }
                 }
 
                 if (CheckStuckTimer < Time.time)

@@ -14,9 +14,11 @@ namespace SAIN.Classes
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
+
         public SAINEnemy Enemy { get; private set; }
 
         private SAINComponent SAIN;
+
         private BotOwner BotOwner => SAIN.BotOwner;
 
         private void Update()
@@ -40,6 +42,7 @@ namespace SAIN.Classes
             //        }
             //    }
             //}
+
             var goalEnemy = BotOwner.Memory.GoalEnemy;
             if (goalEnemy != null)
             {
@@ -51,7 +54,19 @@ namespace SAIN.Classes
             }
             else
             {
-                Enemy = null;
+                goalEnemy = BotOwner.Memory.LastEnemy;
+                if (goalEnemy != null)
+                {
+                    string id = goalEnemy.Person.ProfileId;
+                    if (Enemy == null || Enemy.Person.ProfileId != id)
+                    {
+                        Enemy = new SAINEnemy(BotOwner, goalEnemy.Person, 1f);
+                    }
+                }
+                else
+                {
+                    Enemy = null;
+                }
             }
             Enemy?.Update();
         }

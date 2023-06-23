@@ -29,7 +29,7 @@ namespace SAIN.Classes
                 if (NoBushTimer < Time.time)
                 {
                     NoBushTimer = Time.time + 0.25f;
-                    NoBushESPActive = NoBushESPCheck();
+                    //NoBushESPActive = NoBushESPCheck();
                 }
                 if (NoBushESPActive)
                 {
@@ -43,7 +43,7 @@ namespace SAIN.Classes
             }
         }
 
-        public bool NoBushESPActive { get; private set; }
+        public bool NoBushESPActive { get; private set; } = false;
 
         private float NoBushTimer = 0f;
 
@@ -55,7 +55,7 @@ namespace SAIN.Classes
                 if (player.IsYourPlayer)
                 {
                     Vector3 direction = player.MainParts[BodyPartType.head].Position - SAIN.HeadPosition;
-                    if (Physics.Raycast(SAIN.HeadPosition, direction, out var hit, direction.magnitude, NoBushMask))
+                    if (Physics.Raycast(SAIN.HeadPosition, direction.normalized, out var hit, direction.magnitude, NoBushMask))
                     {
                         if (hit.transform?.parent?.gameObject == null)
                         {
