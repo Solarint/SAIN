@@ -82,6 +82,6 @@ namespace SAIN
         public static List<string> AllNormalBots = new List<string>();
 
         public static List<string> SAINLayers { get; private set; } = new List<string>();
-        public static List<string> LayersToRemove = new List<string> { "Help", "AdvAssaultTarget", "Hit", "Pmc", "AssaultHaveEnemy" };
+        public static List<string> LayersToRemove = new List<string> { "Help", "AdvAssaultTarget", "Hit", "Pmc", "AssaultHaveEnemy", "Request" };
     }
 }

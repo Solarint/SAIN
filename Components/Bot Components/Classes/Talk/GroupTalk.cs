@@ -567,7 +567,7 @@ namespace SAIN.Classes
         {
             if (SAIN.Enemy != null && BotOwner.Memory.GoalEnemy != null)
             {
-                if (SAIN.Enemy.GoalEnemy.TimeLastSeenReal > 30f && RatTimer < Time.time)
+                if (SAIN.Enemy.TimeSinceSeen > 30f && RatTimer < Time.time)
                 {
                     RatTimer = Time.time + 60f * Random.Range(0.75f, 1.25f);
 

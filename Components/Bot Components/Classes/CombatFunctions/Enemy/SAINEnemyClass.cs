@@ -13,8 +13,9 @@ namespace SAIN.Classes
 {
     public class SAINEnemy : SAINBot
     {
-        public Dictionary<BodyPartClass, GClass478> ActiveParts { get; private set; }
-        public GClass475 GoalEnemy => BotOwner.Memory.GoalEnemy;
+        public EnemyBodyPart[] BodyParts { get; private set; } = new EnemyBodyPart[6];
+        public EnemyBodyPart ChestPart { get; private set; }
+        public EnemyBodyPart HeadPart { get; private set; }
         public Player EnemyPlayer { get; private set; }
         public EnemyComponent EnemyComponent { get; private set; }
 
@@ -26,13 +27,35 @@ namespace SAIN.Classes
             EnemyPlayer = person.GetPlayer;
             BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            ActiveParts = GoalEnemy.AllActiveParts;
+
+            BifacialTransform bottransform = bot.Transform;
+            BodyPartType type;
+            EnemyBodyPart part;
+            for (int i = 0; i < PartTypes.Count; i++)
+            {
+                type = PartTypes[i];
+                part = new EnemyBodyPart(bottransform, person, type);
+
+                if (type == BodyPartType.head)
+                {
+                    HeadPart = part;
+                }
+                if (type == BodyPartType.body)
+                {
+                    ChestPart = part;
+                }
+
+                BodyParts[i] = part;
+            }
              
             if (SAIN.Squad.BotInGroup)
             {
                 FindEnemyComponent();
             }
         }
+
+        public readonly List<BodyPartType> PartTypes = new List<BodyPartType> { BodyPartType.leftLeg, BodyPartType.rightLeg, BodyPartType.body, BodyPartType.leftArm, BodyPartType.rightArm, BodyPartType.head };
+
 
         private void FindEnemyComponent()
         {
@@ -82,6 +105,27 @@ namespace SAIN.Classes
             }
             UpdateDistance();
             UpdatePath();
+
+            bool visible = false;
+            bool canshoot = false;
+            foreach (var part in BodyParts)
+            {
+                if (part.Visible)
+                {
+                    visible = true;
+                }
+                if (part.CanShoot)
+                {
+                    canshoot = true;
+                }
+                if (canshoot && visible)
+                {
+                    break;
+                }
+            }
+
+            UpdateVisible(visible);
+            UpdateCanShoot(canshoot);
         }
 
         private void UpdateDistance()
@@ -189,36 +233,11 @@ namespace SAIN.Classes
         
         private float DistanceTimer = 0f;
 
-        public void OnGainSight(float percentage)
+        public void UpdateCanShoot(bool value)
         {
-            if (percentage > 50f)
-            {
-                UpdateVisible(true);
-                return;
-            }
-            if (IsVisible)
-            {
-                UpdateVisible(true);
-            }
-            else
-            {
-                bool random = EFTMath.RandomBool(25);
-                UpdateVisible(random);
-            }
-        }
-
-        public void OnLoseSight()
-        {
-            UpdateVisible(false);
-        }
-
-        public void UpdateCanShoot(bool value, float percentage)
-        {
-            PercentageEnemyCanShoot = percentage;
             CanShoot = value;
         }
 
-        public float PercentageEnemyCanShoot { get; private set; }
         public Vector3 Direction => Position - BotPosition;
 
         private void UpdateVisible(bool inLineOfSight)
@@ -243,7 +262,7 @@ namespace SAIN.Classes
                 {
                     visible = true;
                 }
-                else if (GoalEnemy?.VisibleOnlyBySense == EEnemyPartVisibleType.visible)
+                else if (BotOwner.LookSensor.IsPointInVisibleSector(Person.Position))
                 {
                     visible = true;
                 }

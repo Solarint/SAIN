@@ -202,8 +202,10 @@
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Enemy\EnemyBodyPart.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\EFTBotGrenade.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\ThrowGrenadeClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Enemy\SAINEnemy_Vision.cs" />
     <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_Speed.cs" />
     <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_SideStep.cs" />
     <Compile Include="Components\Bot Components\Classes\Movement\Mover\SAIN_Mover_BlindFire.cs" />
@@ -217,7 +219,7 @@
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
-    <Compile Include="Components\Bot Components\Classes\CombatFunctions\ShootClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Enemy\ShootClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Core\BotEquipmentClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\WeatherVisionClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\TimeClass.cs" />
@@ -293,7 +295,7 @@
     <Compile Include="Components\Bot Components\Classes\Talk\EnemyTalkObject.cs" />
     <Compile Include="Components\Bot Components\Classes\Talk\GroupTalk.cs" />
     <Compile Include="Components\Bot Components\Classes\Core\BotSquadClass.cs" />
-    <Compile Include="Components\Bot Components\Classes\CombatFunctions\SAINEnemyClass.cs" />
+    <Compile Include="Components\Bot Components\Classes\CombatFunctions\Enemy\SAINEnemyClass.cs" />
     <Compile Include="Components\Bot Components\Classes\Core\InfoClass.cs" />
     <Compile Include="Components\Bot Components\SAINEnum.cs" />
     <Compile Include="Components\Bot Components\Classes\CombatFunctions\Grenade\GrenadeTrackerComponent.cs" />

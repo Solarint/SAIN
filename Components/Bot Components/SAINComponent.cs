@@ -21,6 +21,20 @@ namespace SAIN.Components
         {
             BotOwner = GetComponent<BotOwner>();
             Init(BotOwner);
+            BotOwner.BotsGroup.OnReportEnemy += ReportEnemy;
+        }
+
+        public void ReportEnemy(IAIDetails person, Vector3 enemyPos, Vector3 weaponRootLast, EEnemyPartVisibleType isVisibleOnlyBySense)
+        {
+            if (person != null)
+            {
+                string id = person.ProfileId;
+                if (!Enemies.ContainsKey(id))
+                {
+                    //SAINEnemy person = new SAINEnemy(BotOwner, person, 1f);
+                    //Enemies.Add(id, person);
+                }
+            }
         }
 
         public List<Vector3> ExitsToLocation { get; private set; } = new List<Vector3>();
@@ -59,7 +73,6 @@ namespace SAIN.Components
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        private float DebugPathTimer = 0f;
         public bool NoBushESPActive { get; private set; }
         public SAINBotController BotController => SAINPlugin.BotController;
 
@@ -211,7 +224,21 @@ namespace SAIN.Components
                 ClearEnemyTimer = Time.time + 1f;
                 ClearEnemies();
             }
-            AddEnemy();
+
+            if (BotOwner.BotsGroup.Enemies.Count > 0)
+            {
+                foreach (var person in BotOwner.BotsGroup.Enemies.Keys)
+                {
+                    string id = person.ProfileId;
+                    if (!Enemies.ContainsKey(id))
+                    {
+                        SAINEnemy sainEnemy = new SAINEnemy(BotOwner, person, 1f);
+                        Enemies.Add(id, sainEnemy);
+                    }
+                }
+            }
+
+            Enemy = PickClosestEnemy();
             Enemy?.Update();
         }
 
@@ -241,33 +268,6 @@ namespace SAIN.Components
 
         private readonly List<string> EnemyIDsToRemove = new List<string>();
 
-        private void AddEnemy()
-        {
-            var goalEnemy = BotOwner.Memory.GoalEnemy;
-            if (goalEnemy != null)
-            {
-                string profileId = goalEnemy.Person.ProfileId;
-                if (Enemy != null && Enemy.Person.ProfileId == profileId)
-                {
-                    return;
-                }
-
-                if (Enemies.ContainsKey(profileId))
-                {
-                    Enemy = Enemies[profileId];
-                }
-                else
-                {
-                    Enemy = new SAINEnemy(BotOwner, goalEnemy.Person, DifficultyModifier);
-                    Enemies.Add(profileId, Enemy);
-                }
-            }
-            else
-            {
-                Enemy = null;
-            }
-        }
-
         private SAINEnemy PickClosestEnemy()
         {
             SAINEnemy ChosenEnemy = null;
@@ -279,7 +279,7 @@ namespace SAIN.Components
             float closestDist = Mathf.Infinity;
             float closestAnyDist = Mathf.Infinity;
             float closestVisibleDist = Mathf.Infinity;
-            float enemyDist = Mathf.Infinity;
+            float enemyDist;
 
             if (Enemies.Count > 1)
             {
@@ -359,6 +359,8 @@ namespace SAIN.Components
         public void Dispose()
         {
             StopAllCoroutines();
+
+            BotOwner.BotsGroup.OnReportEnemy -= ReportEnemy;
 
             Cover?.Dispose();
             Hearing?.Dispose();

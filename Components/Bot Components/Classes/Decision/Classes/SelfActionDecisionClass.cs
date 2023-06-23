@@ -189,7 +189,7 @@ namespace SAIN.Classes
             {
                 var enemy = SAIN.Enemy;
                 var pathStatus = enemy.CheckPathDistance();
-                bool SeenRecent = Time.time - enemy.GoalEnemy.PersonalLastShootTime < 3f;
+                bool SeenRecent = Time.time - enemy.TimeSinceSeen > 3f;
 
                 if (SeenRecent && Vector3.Distance(BotOwner.Position, enemy.Person.Position) < 8f)
                 {
