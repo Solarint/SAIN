@@ -201,7 +201,7 @@ namespace SAIN.Components
                     return Enemy.Position;
                 }
                 var Target = BotOwner.Memory.GoalTarget?.GoalTarget;
-                if (Target != null)
+                if (Target?.Position != null)
                 {
                     if ((Target.Position - BotOwner.Position).sqrMagnitude < 1f)
                     {
