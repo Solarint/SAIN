@@ -219,6 +219,7 @@
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\ShiftCover.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Push.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ThrowGrenade.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\HeardSoundsComponent.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
@@ -234,7 +235,7 @@
     <Compile Include="Components\Bot Controller Components\Classes\PathManager.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\LineOfSightManager.cs" />
     <Compile Include="Components\Bot Components\Old\AILimitClass.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\BotUnstuckClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\SAINBotUnstuck.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Decision\Classes\EnemyDecisionClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Decision\Classes\TargetDecisionClass.cs" />
@@ -252,6 +253,7 @@
     <Compile Include="Components\Bot Components\SubComponents\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinderComponent.cs" />
+    <Compile Include="Plugin\Config\ExtractConfig.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DifficultyConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />

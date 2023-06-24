@@ -86,6 +86,11 @@ namespace SAIN.Classes
 
         private void TryFixBusyHands()
         {
+            if (BusyHandsTimer > Time.time)
+            {
+                return;
+            }
+            BusyHandsTimer = Time.time + 1f;
             var selector = BotOwner.WeaponManager?.Selector;
             if (selector == null)
             {
@@ -109,6 +114,8 @@ namespace SAIN.Classes
                 return;
             }
         }
+
+        private float BusyHandsTimer;
 
         private bool CheckContinueSelfAction(out SAINSelfDecision Decision)
         {
@@ -193,7 +200,7 @@ namespace SAIN.Classes
                 else
                 {
                     var pathStatus = EnemyDistance;
-                    bool SeenRecent = enemy.TimeSinceSeen < 3f;
+                    bool SeenRecent = enemy.TimeSinceSeen < 4f;
                     var status = SAIN;
                     if (status.Injured)
                     {
@@ -204,23 +211,23 @@ namespace SAIN.Classes
                     }
                     else if (status.BadlyInjured)
                     {
-                        if (!enemy.InLineOfSight && pathStatus != SAINEnemyPath.VeryClose)
+                        if (!enemy.InLineOfSight && pathStatus != SAINEnemyPath.VeryClose && enemy.TimeSinceSeen < 2f)
                         {
                             useFirstAid = true;
                         }
 
-                        if (enemy.InLineOfSight && (pathStatus == SAINEnemyPath.Far || pathStatus == SAINEnemyPath.VeryFar))
+                        if (pathStatus == SAINEnemyPath.VeryFar)
                         {
                             useFirstAid = true;
                         }
                     }
                     else if (status.Dying)
                     {
-                        if (!enemy.InLineOfSight)
+                        if (!enemy.InLineOfSight && enemy.TimeSinceSeen < 1f)
                         {
                             useFirstAid = true;
                         }
-                        if (pathStatus != SAINEnemyPath.VeryClose && pathStatus != SAINEnemyPath.Close)
+                        if (pathStatus == SAINEnemyPath.VeryFar || pathStatus == SAINEnemyPath.Far)
                         {
                             useFirstAid = true;
                         }
@@ -249,7 +256,7 @@ namespace SAIN.Classes
                     return true;
                 }
 
-                if (!CheckLowAmmo() && enemy.IsVisible)
+                if (!CheckLowAmmo(0.15f) && enemy.IsVisible)
                 {
                     return true;
                 }

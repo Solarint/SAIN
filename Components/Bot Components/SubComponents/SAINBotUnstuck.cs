@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class BotUnstuckClass : MonoBehaviour
+    public class SAINBotUnstuck : MonoBehaviour
     {
         private SAINComponent SAIN;
         private BotOwner BotOwner => SAIN.BotOwner;
@@ -67,10 +67,10 @@ namespace SAIN.Classes
 
                 if (BotIsStuck)
                 {
-                    if (DebugStuckTimer < Time.time && TimeSinceStuck > 0.5f)
+                    if (DebugStuckTimer < Time.time && TimeSinceStuck > 1f)
                     {
                         DebugStuckTimer = Time.time + 3f;
-                        Logger.LogWarning($"[{BotOwner.name}] has been stuck for [{TimeSinceStuck}] seconds on [{StuckHit.transform.name}] object");
+                        Logger.LogWarning($"[{BotOwner.name}] has been stuck for [{TimeSinceStuck}] seconds on [{StuckHit.transform.name}] object at [{StuckHit.transform.position}] with Current Decision as [{SAIN.CurrentDecision}]");
                     }
                     if (JumpTimer < Time.time && TimeSinceStuck > 1f)
                     {

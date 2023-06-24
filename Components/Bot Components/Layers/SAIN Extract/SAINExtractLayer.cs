@@ -1,11 +1,8 @@
 ﻿using BepInEx.Logging;
-using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
-using HarmonyLib.Tools;
 using SAIN.Components;
-using System;
-using UnityEngine;
+using static SAIN.UserSettings.ExtractConfig;
 
 namespace SAIN.Layers
 {
@@ -33,7 +30,7 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            if (SAIN.ExfilPosition == null)
+            if (SAIN.ExfilPosition == null || !EnableExtracts.Value)
             {
                 return false;
             }

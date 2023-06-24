@@ -32,6 +32,8 @@ namespace SAIN.Classes
 
         private readonly List<ArmorComponent> HelmetArmorComponents = new List<ArmorComponent>();
 
+        public float InventorySpaceFilled { get; private set; }
+
         private void Update()
         {
             if (BotOwner == null || SAIN == null) return;

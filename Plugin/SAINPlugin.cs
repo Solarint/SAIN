@@ -40,6 +40,7 @@ namespace SAIN
 
         private void ConfigInit()
         {
+            ExtractConfig.Init(Config);
             DifficultyConfig.Init(Config);
             TalkConfig.Init(Config);
             VisionConfig.Init(Config);

@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEngine;
 using static SAIN.UserSettings.TalkConfig;
 using static SAIN.UserSettings.DebugConfig;
+using static SAIN.UserSettings.ExtractConfig;
 using SAIN.Components;
 
 namespace SAIN.Classes
@@ -37,7 +38,7 @@ namespace SAIN.Classes
 
             SetPersonality();
             DifficultyModifier = CalculateDifficulty(BotOwner);
-            PercentageBeforeExtract = UnityEngine.Random.Range(5f, 35f);
+            PercentageBeforeExtract = UnityEngine.Random.Range(MinPercentage.Value, MaxPercentage.Value);
         }
 
         private void Update()

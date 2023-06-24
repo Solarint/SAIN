@@ -40,7 +40,7 @@ namespace SAIN.Components
             Equipment = bot.GetOrAddComponent<BotEquipmentClass>();
 
             Info = bot.GetOrAddComponent<BotInfoClass>();
-            BotStuck = bot.GetOrAddComponent<BotUnstuckClass>();
+            BotStuck = bot.GetOrAddComponent<SAINBotUnstuck>();
             Hearing = bot.GetOrAddComponent<HearingSensorClass>();
             Talk = bot.GetOrAddComponent<BotTalkClass>();
             Decision = bot.GetOrAddComponent<DecisionClass>();
@@ -52,6 +52,7 @@ namespace SAIN.Components
             Mover = bot.GetOrAddComponent<SAIN_Mover>();
             NoBushESP = bot.GetOrAddComponent<NoBushESP>();
             EnemyController = bot.GetOrAddComponent<EnemyController>();
+            Sounds = bot.GetOrAddComponent<SoundsController>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
@@ -170,6 +171,7 @@ namespace SAIN.Components
             Destroy(Cover);
             Destroy(Hearing);
             Destroy(FlashLight);
+            Destroy(Sounds);
 
             Destroy(this);
         }
@@ -226,11 +228,12 @@ namespace SAIN.Components
         public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
         public Vector3 UnderFireFromPosition { get; set; }
 
+        public SoundsController Sounds { get; private set; }
         public VisionClass Vision { get; private set; }
         public BotEquipmentClass Equipment { get; private set; }
         public SAIN_Mover Mover { get; private set; }
         public AILimitClass AILimit { get; private set; }
-        public BotUnstuckClass BotStuck { get; private set; }
+        public SAINBotUnstuck BotStuck { get; private set; }
         public FlashLightComponent FlashLight { get; private set; }
         public HearingSensorClass Hearing { get; private set; }
         public BotTalkClass Talk { get; private set; }

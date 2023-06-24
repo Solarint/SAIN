@@ -63,7 +63,7 @@ namespace SAIN.Patches
             __instance.MAX_DIST_COEF = 1.75f;
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
             __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.25f;
-            __instance.BASE_AUTOMATIC_TIME = 0.5f;
+            __instance.BASE_AUTOMATIC_TIME = 0.25f;
             __instance.RECOIL_DELTA_PRESS = 0f;
         }
     }
@@ -93,13 +93,13 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsMoveSettings __instance)
         {
-            __instance.RUN_IF_GAOL_FAR_THEN = 2f;
-            //__instance.CHANCE_TO_RUN_IF_NO_AMMO_0_100 = 100f;
-            __instance.SEC_TO_CHANGE_TO_RUN = 0.5f;
-            __instance.RUN_TO_COVER_MIN = 2f;
-            __instance.BASE_ROTATE_SPEED = 250f;
-            //__instance.FIRST_TURN_SPEED = 250f;
-            //__instance.FIRST_TURN_BIG_SPEED = 250f;
+            __instance.RUN_IF_GAOL_FAR_THEN = 0f;
+            __instance.CHANCE_TO_RUN_IF_NO_AMMO_0_100 = 100f;
+            __instance.SEC_TO_CHANGE_TO_RUN = 0f;
+            __instance.RUN_TO_COVER_MIN = 0f;
+            __instance.BASE_ROTATE_SPEED = 275f;
+            __instance.FIRST_TURN_SPEED = 275f;
+            __instance.FIRST_TURN_BIG_SPEED = 275f;
             __instance.TURN_SPEED_ON_SPRINT = 320f;
         }
     }
@@ -114,6 +114,12 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(GClass559 __instance)
         {
+            __instance.CARE_ENEMY_ONLY_TIME = 120f;
+            __instance.ENEMY_TO_BE_CURRENT = 20f;
+            __instance.DELAY_BEFORE_ENEMY = 0f;
+            //__instance.SCAV_GROUPS_TOGETHER = false;
+            __instance.DIST_NOT_TO_GROUP = 50f;
+            __instance.DIST_NOT_TO_GROUP_SQR = 50f * 50f;
             //__instance.BOT_MOVE_CAST_ONLYVERTICAL = false;
             __instance.MIN_DIST_TO_STOP_RUN = 0f;
             __instance.CAN_SHOOT_TO_HEAD = false;

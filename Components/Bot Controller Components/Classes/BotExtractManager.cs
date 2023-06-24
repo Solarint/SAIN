@@ -16,6 +16,7 @@ namespace SAIN.Components.BotController
         }
 
         public ExfiltrationControllerClass ExfilController { get; private set; }
+        public float TotalRaidTime { get; private set; }
 
         public void Update()
         {
@@ -30,7 +31,7 @@ namespace SAIN.Components.BotController
                 if (DebugCheckExfilTimer < Time.time)
                 {
                     DebugCheckExfilTimer = Time.time + 30f;
-                    Console.WriteLine($"Extra Time Remainging: {TimeRemaining} Percentage of raid left {PercentageRemaining}. Valid Scav Exfils: [{ValidScavExfils.Count}] Valid All Exfils: [{ValidExfils.Count}]");
+                    Console.WriteLine($"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. Total Raid Seconds: [{TotalRaidTime}] Found: [{ValidScavExfils.Count}] ScavExfils and [{ValidExfils.Count}] PMC Exfils to be used.");
                 }
             }
             if (AllScavExfils == null)
@@ -63,6 +64,10 @@ namespace SAIN.Components.BotController
                 {
                     if (bot.Value.CannotExfil)
                     {
+                        if (bot.Value.Squad.LeaderComponent?.ExfilPosition != null)
+                        {
+                            bot.Value.ExfilPosition = bot.Value.Squad.LeaderComponent?.ExfilPosition;
+                        }
                         continue;
                     }
                     if (bot.Value.ExfilPosition == null)
@@ -196,9 +201,9 @@ namespace SAIN.Components.BotController
                 var StartTime = GameTime.StartDateTime.Value;
                 var EscapeTime = GameTime.EscapeDateTime.Value;
                 var Span = EscapeTime - StartTime;
-                float TotalSeconds = (float)Span.TotalSeconds;
+                TotalRaidTime = (float)Span.TotalSeconds;
                 TimeRemaining = EscapeTimeSeconds(GameTime);
-                float ratio = TimeRemaining / TotalSeconds;
+                float ratio = TimeRemaining / TotalRaidTime;
                 PercentageRemaining = Mathf.Round(ratio * 100f);
             }
         }
