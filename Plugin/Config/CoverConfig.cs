@@ -23,9 +23,9 @@ namespace SAIN.UserSettings
                 new AcceptableValueRange<float>(0f, 20f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 4 }));
 
-            CoverUpdateFrequency = Config.Bind(cover, "Update Frequency", 0.25f,
+            CoverUpdateFrequency = Config.Bind(cover, "Update Frequency", 0.33f,
                 new ConfigDescription("Dont touch unless you know what you are doing",
-                new AcceptableValueRange<float>(0.05f, 1f),
+                new AcceptableValueRange<float>(0.25f, 1f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
 
             DebugCoverFinder = Config.Bind(cover, "Debug CoverFinder", false,

@@ -142,7 +142,7 @@ namespace SAIN.Classes
         private bool StartDogFightAction()
         {
             var pathStatus = SAIN.Enemy.CheckPathDistance();
-            return pathStatus == SAINEnemyPath.VeryClose && SAIN.Enemy.IsVisible;
+            return (pathStatus == SAINEnemyPath.VeryClose && SAIN.Enemy.IsVisible) || SAIN.Cover.CoverInUse?.Spotted == true;
         }
 
         private bool StartThrowNade()
@@ -241,7 +241,7 @@ namespace SAIN.Classes
         private bool StartHoldInCover()
         {
             var cover = SAIN.Cover.CoverInUse;
-            if (cover != null && !cover.Spotted && (cover.Position - BotOwner.Position).sqrMagnitude < 1.5f)
+            if (cover != null && !cover.Spotted && (cover.Position - BotOwner.Position).sqrMagnitude < 1f)
             {
                 return true;
             }

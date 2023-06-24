@@ -86,7 +86,7 @@ namespace SAIN.Components
                     }
 
                     // Every 10 colliders checked, wait until the next frame before continuing.
-                    if (frameWait == 10)
+                    if (frameWait == 5)
                     {
                         frameWait = 0;
                         yield return null;

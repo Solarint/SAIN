@@ -24,7 +24,7 @@ namespace SAIN.Classes
 
         public bool BotIsUsingThis { get; set; }
 
-        public bool BotIsHere => BotIsUsingThis && Distance < 1f && !Spotted;
+        public bool BotIsHere => BotIsUsingThis && Distance < 0.5f && !Spotted;
 
         public bool Spotted => HitInCoverCount > 1 || HitInCoverUnknownCount > 0;
 

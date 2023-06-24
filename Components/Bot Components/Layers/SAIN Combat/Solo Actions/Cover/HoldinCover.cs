@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Classes;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using SAIN.Layers;
@@ -20,9 +21,16 @@ namespace SAIN.Layers
         }
 
         private ShootClass Shoot;
+        private bool Stopped;
 
         public override void Update()
         {
+            if (!Stopped && !CoverInUse.Spotted && (CoverInUse.Position - BotOwner.Position).sqrMagnitude < 0.33f)
+            {
+                SAIN.Mover.StopMove();
+                Stopped = true;
+            }
+
             SAIN.Steering.SteerByPriority();
             Shoot.Update();
             SAIN.Cover.DuckInCover();
@@ -63,8 +71,11 @@ namespace SAIN.Layers
 
         public ManualLogSource Logger;
 
+        private CoverPoint CoverInUse;
+
         public override void Start()
         {
+            CoverInUse = SAIN.Cover.CoverInUse;
             SAIN.Mover.Sprint(false);
         }
 
