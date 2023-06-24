@@ -31,9 +31,9 @@ namespace SAIN.Layers
 
         private void FindTarget()
         {
-            if (SAIN.CurrentTargetPosition != null)
+            if (SAIN?.CurrentTargetPosition != null)
             {
-                if (Search.GoToPoint(SAIN.CurrentTargetPosition.Value) != NavMeshPathStatus.PathInvalid)
+                if (Search?.GoToPoint(SAIN.CurrentTargetPosition.Value) != NavMeshPathStatus.PathInvalid)
                 {
                     TargetPosition = SAIN.CurrentTargetPosition.Value;
                 }
@@ -44,6 +44,7 @@ namespace SAIN.Layers
 
         public override void Stop()
         {
+            TargetPosition = null;
         }
 
         public override void Update()
@@ -59,7 +60,14 @@ namespace SAIN.Layers
                 }
                 CheckShouldSprint();
                 Search.Update(!SprintEnabled, SprintEnabled);
-                Steer(Search.ActiveDestination);
+                if (Search?.ActiveDestination != null)
+                {
+                    Steer(Search.ActiveDestination);
+                }
+                else
+                {
+                    SAIN.Steering.SteerByPriority();
+                }
             }
             else
             {
