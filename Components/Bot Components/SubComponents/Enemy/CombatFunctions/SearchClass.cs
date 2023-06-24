@@ -252,7 +252,7 @@ namespace SAIN.Classes
                 return Path.status;
             }
 
-            Logger.LogError($"Couldn't Find NavMesh at Point {point}");
+            //Logger.LogError($"Couldn't Find NavMesh at Point {point}");
             return NavMeshPathStatus.PathInvalid;
         }
 

@@ -15,7 +15,7 @@ namespace SAIN.UserSettings
         {
             string shoot = "Bot Shoot Settings";
 
-            RateofFire = Config.Bind(shoot, "SemiAuto Rate of Fire Modifier", 1.35f,
+            RateofFire = Config.Bind(shoot, "SemiAuto Rate of Fire Modifier", 1.45f,
                 new ConfigDescription("Adjusts bot's base rate of fire value. Higher is faster overall rate of fire.",
                 new AcceptableValueRange<float>(0.01f, 5.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
