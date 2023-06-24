@@ -144,11 +144,6 @@ namespace SAIN.Classes
 
             if (wasHeard)
             {
-                if (person != null)
-                {
-                    LastHeardSound = new LastHeardSound(person, pos, type, power);
-                }
-
                 float dispersion = (type == AISoundType.gun) ? shooterDistance / 50f : shooterDistance / 20f;
 
                 float num2 = EFTMath.Random(-dispersion, dispersion);
@@ -189,7 +184,7 @@ namespace SAIN.Classes
                     }
                 }
 
-                if (!BotOwner.Memory.GoalTarget.HavePlaceTarget() && SAIN.Enemy == null)
+                if (!BotOwner.Memory.GoalTarget.HavePlaceTarget() && BotOwner.Memory.GoalEnemy == null)
                 {
                     BotOwner.BotsGroup.CalcGoalForBot(BotOwner);
                     return;
@@ -203,8 +198,6 @@ namespace SAIN.Classes
                 if (firedAtMe && soundclose)
                 {
                     var estimate = GetEstimatedPoint(pos);
-
-                    LastHeardSound = new LastHeardSound(person, estimate, type, power);
 
                     SAIN.UnderFireFromPosition = estimate;
 

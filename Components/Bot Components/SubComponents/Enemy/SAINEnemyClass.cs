@@ -25,25 +25,27 @@ namespace SAIN.Classes
             BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
 
-            BifacialTransform bottransform = bot.Transform;
-            BodyPartType type;
-            EnemyBodyPart part;
-            for (int i = 0; i < PartTypes.Count; i++)
-            {
-                type = PartTypes[i];
-                part = new EnemyBodyPart(bottransform, person, type);
+            Logger.LogInfo($"New Enemy [{person.GetPlayer.name}] for {BotOwner.name}");
 
-                if (type == BodyPartType.head)
-                {
-                    HeadPart = part;
-                }
-                if (type == BodyPartType.body)
-                {
-                    ChestPart = part;
-                }
-
-                BodyParts[i] = part;
-            }
+            //BifacialTransform bottransform = bot.Transform;
+            //BodyPartType type;
+            //EnemyBodyPart part;
+            //for (int i = 0; i < PartTypes.Count; i++)
+            //{
+            //    type = PartTypes[i];
+            //    part = new EnemyBodyPart(bottransform, person, type);
+            //
+            //    if (type == BodyPartType.head)
+            //    {
+            //        HeadPart = part;
+            //    }
+            //    if (type == BodyPartType.body)
+            //    {
+            //        ChestPart = part;
+            //    }
+            //
+            //    BodyParts[i] = part;
+            //}
         }
 
         public readonly List<BodyPartType> PartTypes = new List<BodyPartType> { BodyPartType.leftLeg, BodyPartType.rightLeg, BodyPartType.body, BodyPartType.leftArm, BodyPartType.rightArm, BodyPartType.head };
@@ -52,10 +54,6 @@ namespace SAIN.Classes
 
         public void Update()
         {
-            if (EnemyPlayer == null || !EnemyPlayer.HealthController.IsAlive)
-            {
-                return;
-            }
             UpdateDistance();
             UpdatePath();
 
@@ -76,13 +74,21 @@ namespace SAIN.Classes
             //        break;
             //    }
             //}
+            InLineOfSight = false;
             if (CheckLosTimer < Time.time)
             {
                 CheckLosTimer = Time.time + 0.1f;
-                InLineOfSight = !Physics.Raycast(SAIN.HeadPosition, Direction, Direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+                foreach (var part in BotOwner.MainParts.Values)
+                {
+                    Vector3 direction = part.Position - SAIN.HeadPosition;
+                    if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                    {
+                        InLineOfSight = true; break;
+                    }
+                }
             }
             var goalenemy = BotOwner.Memory.GoalEnemy;
-            if (goalenemy?.IsVisible == true)
+            if (goalenemy?.IsVisible == true && InLineOfSight)
             {
                 visible = true;
             }
@@ -183,9 +189,6 @@ namespace SAIN.Classes
             }
         }
 
-
-        private float SoundResetTimer = 0f;
-
         public float RealDistance { get; private set; }
         public float LastSeenDistance { get; private set; }
         public Vector3 PositionLastSeen { get; private set; }
@@ -209,31 +212,6 @@ namespace SAIN.Classes
 
         private void UpdateVisible(bool inLineOfSight)
         {
-            float realDistance = RealDistance;
-            bool close = realDistance < 15f;
-            var move = Person.GetPlayer.MovementContext;
-            bool enemySprinting = move.IsSprintEnabled;
-            float enemyMoveSpeed = move.ClampedSpeed / move.MaxSpeed;
-
-            bool canHear = (enemySprinting && realDistance < 25f) || close && enemyMoveSpeed > 0.35f;
-            bool visible = false;
-            if (canHear)
-            {
-                visible = true;
-            }
-            else if (inLineOfSight)
-            {
-                float angle = Vector3.Angle(Direction.normalized, BotOwner.LookDirection);
-                if (close && angle < 75)
-                {
-                    visible = true;
-                }
-                if (BotOwner.LookSensor.IsPointInVisibleSector(Person.Position))
-                {
-                    visible = true;
-                }
-            }
-
             bool wasVisible = IsVisible;
             IsVisible = inLineOfSight;
 
@@ -263,8 +241,6 @@ namespace SAIN.Classes
                     TimeSinceSeen = Time.time - TimeLastSeen;
                 }
             }
-
-            CanHearCloseVisible = canHear;
 
             if (IsVisible != wasVisible)
             {

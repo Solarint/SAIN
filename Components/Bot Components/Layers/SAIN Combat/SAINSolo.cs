@@ -100,9 +100,6 @@ namespace SAIN.Layers
             return Active;
         }
 
-        private GClass430 Patrol => BotOwner.PatrollingData;
-        private PatrolStatus PatrolStatus => Patrol.Status;
-
         public override bool IsCurrentActionEnding()
         {
             return CurrentDecision != LastActionDecision;

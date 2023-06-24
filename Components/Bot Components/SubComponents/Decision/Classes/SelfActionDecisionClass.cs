@@ -103,19 +103,22 @@ namespace SAIN.Classes
 
         private bool CheckContinueSelfAction(out SAINSelfDecision Decision)
         {
-            float timesinceChange = Time.time - SAIN.Decision.ChangeSelfDecisionTime;
-            if (timesinceChange > 5f)
+            if (CurrentSelfAction != SAINSelfDecision.None)
             {
-                Decision = SAINSelfDecision.None;
-                if (CurrentSelfAction != SAINSelfDecision.Surgery)
+                float timesinceChange = Time.time - SAIN.Decision.ChangeSelfDecisionTime;
+                if (timesinceChange > 5f)
                 {
-                    TryFixBusyHands();
-                    return false;
-                }
-                else if (timesinceChange > 30f)
-                {
-                    TryFixBusyHands();
-                    return false;
+                    Decision = SAINSelfDecision.None;
+                    if (CurrentSelfAction != SAINSelfDecision.Surgery)
+                    {
+                        TryFixBusyHands();
+                        return false;
+                    }
+                    else if (timesinceChange > 30f)
+                    {
+                        TryFixBusyHands();
+                        return false;
+                    }
                 }
             }
             bool continueAction = UsingMeds || ContinueReload || ContinueRunGrenade;

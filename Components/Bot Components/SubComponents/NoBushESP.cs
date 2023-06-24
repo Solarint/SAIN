@@ -33,8 +33,8 @@ namespace SAIN.Classes
                 }
                 if (NoBushESPActive)
                 {
-                    BotOwner.ShootData?.EndShoot();
-                    BotOwner.AimingData?.LoseTarget();
+                    //BotOwner.ShootData?.EndShoot();
+                    //BotOwner.AimingData?.LoseTarget();
                 }
             }
             else

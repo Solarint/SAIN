@@ -3,6 +3,7 @@ using Comfort.Common;
 using EFT;
 using SAIN.Classes;
 using SAIN.Classes.Sense;
+using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -63,8 +64,22 @@ namespace SAIN.Components
         {
             UpdatePatrolData();
 
+            if (Enemy != null)
+            {
+                if (Enemy.IsVisible)
+                {
+                    DebugGizmos.SingleObjects.Line(HeadPosition, Enemy.Position + Vector3.up * 0.8f, Color.green, 0.05f, true, 0.1f, true);
+                }
+                if (Enemy.CanShoot)
+                {
+                    DebugGizmos.SingleObjects.Line(WeaponRoot, Enemy.Position + Vector3.up * 1.3f, Color.red, 0.05f, true, 0.1f, true);
+                }
+            }
+
             if (BotActive && !GameIsEnding)
             {
+                Enemy?.Update();
+
                 UpdateHealth();
 
                 BotOwner.DoorOpener.Update();

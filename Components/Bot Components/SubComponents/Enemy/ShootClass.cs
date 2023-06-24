@@ -20,15 +20,10 @@ namespace SAIN.Classes.CombatFunctions
 
         public override void Update()
         {
-            if (BotOwner == null || SAIN == null) return;
-            if (SAIN.Enemy == null)
-            {
-                return;
-            }
-
             FriendlyFire.Update();
 
-            if (SAIN.Enemy.IsVisible && SAIN.Enemy.CanShoot)
+            var enemy = BotOwner.Memory.GoalEnemy;
+            if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
                 if (AimingData == null)
                 {
@@ -38,7 +33,7 @@ namespace SAIN.Classes.CombatFunctions
                 Vector3? pointToShoot = GetPointToShoot();
                 if (pointToShoot != null)
                 {
-                    BotOwner.BotLight.TurnOn();
+                    BotOwner.BotLight?.TurnOn(true);
                     Target = pointToShoot.Value;
                     if (AimingData.IsReady)
                     {
@@ -49,7 +44,7 @@ namespace SAIN.Classes.CombatFunctions
             }
             else
             {
-                BotOwner.BotLight.TurnOff();
+                BotOwner.BotLight?.TurnOff(true, true);
             }
         }
 
@@ -62,7 +57,15 @@ namespace SAIN.Classes.CombatFunctions
             var enemy = BotOwner.Memory.GoalEnemy;
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
-                Vector3 value = enemy.GetPartToShoot();
+                Vector3 value;
+                if (enemy.Distance < botOwner_0.Settings.FileSettings.Aiming.DIST_TO_SHOOT_TO_CENTER)
+                {
+                    value = enemy.GetCenterPart();
+                }
+                else
+                {
+                    value = enemy.GetPartToShoot();
+                }
                 return new Vector3?(value);
             }
             Vector3? result = null;

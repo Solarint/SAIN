@@ -47,10 +47,14 @@ namespace SAIN.Classes
 
             if (!SAIN.BotStuck.BotIsMoving && SAIN.BotStuck.TimeSpentNotMoving > 3f)
             {
-                DirectMove = true;
-                MoveToNextPoint(TargetPosition.Value);
-                ActiveDestination = TargetPosition.Value;
-                return;
+                TargetPosition = SAIN.CurrentTargetPosition;
+                if (TargetPosition != null)
+                {
+                    DirectMove = true;
+                    MoveToNextPoint(TargetPosition.Value);
+                    ActiveDestination = TargetPosition.Value;
+                    return;
+                }
             }
 
             if (MoveDirect(shallSprint))

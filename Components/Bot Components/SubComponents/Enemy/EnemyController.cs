@@ -68,7 +68,6 @@ namespace SAIN.Classes
                     Enemy = null;
                 }
             }
-            Enemy?.Update();
         }
 
 
