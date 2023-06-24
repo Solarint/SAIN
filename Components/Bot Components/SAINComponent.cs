@@ -200,12 +200,12 @@ namespace SAIN.Components
                 {
                     return Enemy.Position;
                 }
-                var Target = BotOwner.Memory.GoalTarget?.GoalTarget;
-                if (Target?.Position != null)
+                var Target = BotOwner.Memory.GoalTarget;
+                if (Target != null && Target?.Position != null)
                 {
-                    if ((Target.Position - BotOwner.Position).sqrMagnitude < 1f)
+                    if ((Target.Position.Value - BotOwner.Position).sqrMagnitude < 1f)
                     {
-                        BotOwner.Memory.GoalTarget.Clear();
+                        Target.Clear();
                     }
                     else
                     {
@@ -217,7 +217,7 @@ namespace SAIN.Components
                 {
                     if ((sound.Position - BotOwner.Position).sqrMagnitude < 2f)
                     {
-                        BotOwner.BotsGroup.PlaceChecked(sound);
+                        sound.IsCome = true;
                     }
                     else
                     {
