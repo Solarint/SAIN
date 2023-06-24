@@ -35,7 +35,7 @@ namespace SAIN.Classes.CombatFunctions
                 {
                     BotOwner.BotLight?.TurnOn(true);
                     Target = pointToShoot.Value;
-                    if (AimingData.IsReady)
+                    if (AimingData.IsReady && !SAIN.NoBushESPActive && FriendlyFire.ClearShot)
                     {
                         ReadyToShoot();
                         BotShoot.Update();
@@ -55,10 +55,10 @@ namespace SAIN.Classes.CombatFunctions
         protected virtual Vector3? GetTarget()
         {
             var enemy = BotOwner.Memory.GoalEnemy;
-            if (enemy != null && enemy.CanShoot && enemy.IsVisible)
+            if (enemy != null)
             {
                 Vector3 value;
-                if (enemy.Distance < botOwner_0.Settings.FileSettings.Aiming.DIST_TO_SHOOT_TO_CENTER)
+                if (enemy.Distance < 3f)
                 {
                     value = enemy.GetCenterPart();
                 }

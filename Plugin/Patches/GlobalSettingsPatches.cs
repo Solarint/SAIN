@@ -40,9 +40,9 @@ namespace SAIN.Patches
         public static void PatchPostfix(BotGlobalAimingSettings __instance)
         {
             __instance.SHPERE_FRIENDY_FIRE_SIZE = 0.15f;
-            __instance.RECALC_MUST_TIME = 1;
-            __instance.RECALC_MUST_TIME_MIN = 1;
-            __instance.RECALC_MUST_TIME_MAX = 2;
+            //__instance.RECALC_MUST_TIME = 1;
+            //__instance.RECALC_MUST_TIME_MIN = 1;
+            //__instance.RECALC_MUST_TIME_MAX = 2;
             __instance.BASE_HIT_AFFECTION_DELAY_SEC = 0.5f;
             __instance.BASE_HIT_AFFECTION_MIN_ANG = 3f;
             __instance.BASE_HIT_AFFECTION_MAX_ANG = 5f;
@@ -63,8 +63,8 @@ namespace SAIN.Patches
             __instance.MAX_DIST_COEF = 1.75f;
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
             __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.25f;
-            __instance.BASE_AUTOMATIC_TIME = 0.25f;
-            __instance.RECOIL_DELTA_PRESS = 0f;
+            __instance.BASE_AUTOMATIC_TIME = 0.5f;
+            __instance.RECOIL_DELTA_PRESS = 0.0f;
         }
     }
 
@@ -98,8 +98,8 @@ namespace SAIN.Patches
             __instance.SEC_TO_CHANGE_TO_RUN = 0f;
             __instance.RUN_TO_COVER_MIN = 0f;
             __instance.BASE_ROTATE_SPEED = 275f;
-            __instance.FIRST_TURN_SPEED = 275f;
-            __instance.FIRST_TURN_BIG_SPEED = 275f;
+            //__instance.FIRST_TURN_SPEED = 275f;
+            //__instance.FIRST_TURN_BIG_SPEED = 275f;
             __instance.TURN_SPEED_ON_SPRINT = 320f;
         }
     }
@@ -168,8 +168,8 @@ namespace SAIN.Patches
             //__instance.LOOK_THROUGH_PERIOD_BY_HIT = 0f;
 
             __instance.LightOnVisionDistance = 40f;
-            //__instance.VISIBLE_ANG_LIGHT = 30f;
-            //__instance.VISIBLE_DISNACE_WITH_LIGHT = 50f;
+            __instance.VISIBLE_ANG_LIGHT = 30f;
+            __instance.VISIBLE_DISNACE_WITH_LIGHT = 50f;
 
             //__instance.GOAL_TO_FULL_DISSAPEAR = 0.25f;
             //__instance.GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;

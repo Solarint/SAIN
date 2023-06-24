@@ -77,7 +77,7 @@ namespace SAIN.Classes
             InLineOfSight = false;
             if (CheckLosTimer < Time.time)
             {
-                CheckLosTimer = Time.time + 0.1f;
+                CheckLosTimer = Time.time + 0.075f;
                 foreach (var part in BotOwner.MainParts.Values)
                 {
                     Vector3 direction = part.Position - SAIN.HeadPosition;
@@ -193,7 +193,7 @@ namespace SAIN.Classes
         public float LastSeenDistance { get; private set; }
         public Vector3 PositionLastSeen { get; private set; }
         public float VisibleStartTime { get; private set; }
-        public float TimeSinceSeen { get; private set; }
+        public float TimeSinceSeen => Seen ? Time.time - TimeLastSeen : -1f;
         public bool Seen { get; private set; }
         public float TimeFirstSeen { get; private set; }
         public float TimeLastSeen { get; private set; }
@@ -221,7 +221,6 @@ namespace SAIN.Classes
                 {
                     VisibleStartTime = Time.time;
                 }
-                TimeSinceSeen = 0f;
                 if (!Seen)
                 {
                     TimeFirstSeen = Time.time;
@@ -235,10 +234,6 @@ namespace SAIN.Classes
                 {
                     TimeLastSeen = Time.time;
                     PositionLastSeen = Person.Position;
-                }
-                if (Seen)
-                {
-                    TimeSinceSeen = Time.time - TimeLastSeen;
                 }
             }
 

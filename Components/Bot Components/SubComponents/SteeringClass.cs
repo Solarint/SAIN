@@ -68,16 +68,12 @@ namespace SAIN.Classes
                 LookToUnderFirePos();
                 return true;
             }
-            if (SAIN.Enemy?.TimeSinceSeen < 2f)
+            if (SAIN.Enemy?.TimeSinceSeen < 2f && SAIN.Enemy.Seen)
             {
                 LookToEnemy(SAIN.Enemy);
                 return true;
             }
-            if (LookToEnemyLastSeenClose())
-            {
-                return true;
-            }
-            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 25f, 1f);
+            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 30f, 1f);
             if (sound != null)
             {
                 LookToHearPos(sound.Position);
@@ -88,7 +84,7 @@ namespace SAIN.Classes
                 LookToPoint(BotOwner.DangerPointsData.place.Position);
                 return true;
             }
-            if (SAIN.Enemy?.TimeSinceSeen < 12f)
+            if (SAIN.Enemy?.TimeSinceSeen < 12f && SAIN.Enemy.Seen)
             {
                 LookToEnemyLastSeenPos();
                 return true;
@@ -201,16 +197,7 @@ namespace SAIN.Classes
         {
             if (SAIN.Enemy?.IsVisible == true && SAIN.Enemy?.CanShoot == true)
             {
-                if (BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.HaveBullets)
-                {
-                    var aim = BotOwner.AimingData;
-                    if (aim != null)
-                    {
-                        Vector3 pos = aim.EndTargetPoint;
-                        LookToPoint(pos);
-                        return true;
-                    }
-                }
+                return true;
             }
             return false;
         }
@@ -230,7 +217,7 @@ namespace SAIN.Classes
         {
             if (enemy != null)
             {
-                LookToPoint(enemy.EnemyChestPosition);
+                LookToPoint(enemy.Position + Vector3.up * 0.85f);
             }
         }
 
@@ -325,6 +312,10 @@ namespace SAIN.Classes
                         return;
                     }
                     if (LookToEnemyLastSeenPos())
+                    {
+                        return;
+                    }
+                    if (LookToEnemyLastSeenClose())
                     {
                         return;
                     }
