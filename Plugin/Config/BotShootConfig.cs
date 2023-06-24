@@ -8,6 +8,7 @@ namespace SAIN.UserSettings
         public static ConfigEntry<float> MaxScatter { get; private set; }
         public static ConfigEntry<float> AddRecoil { get; private set; }
         public static ConfigEntry<float> LerpRecoil { get; private set; }
+
         public static ConfigEntry<float> BurstLengthModifier { get; private set; }
         public static ConfigEntry<float> RateofFire { get; private set; }
 
