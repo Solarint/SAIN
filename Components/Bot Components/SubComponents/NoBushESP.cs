@@ -29,12 +29,12 @@ namespace SAIN.Classes
                 if (NoBushTimer < Time.time)
                 {
                     NoBushTimer = Time.time + 0.25f;
-                    //NoBushESPActive = NoBushESPCheck();
+                    NoBushESPActive = NoBushESPCheck();
                 }
                 if (NoBushESPActive)
                 {
-                    //BotOwner.ShootData?.EndShoot();
-                    //BotOwner.AimingData?.LoseTarget();
+                    BotOwner.ShootData?.EndShoot();
+                    BotOwner.AimingData?.LoseTarget();
                 }
             }
             else
@@ -49,6 +49,10 @@ namespace SAIN.Classes
 
         public bool NoBushESPCheck()
         {
+            if (!UserSettings.VisionConfig.NoBushESPToggle.Value)
+            {
+                return false;
+            }
             if (Enemy != null && Enemy.Person?.GetPlayer != null && Enemy.IsVisible)
             {
                 Player player = Enemy.Person.GetPlayer;

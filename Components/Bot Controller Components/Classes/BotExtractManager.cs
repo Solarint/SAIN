@@ -19,6 +19,10 @@ namespace SAIN.Components.BotController
 
         public void Update()
         {
+            if (SAINPlugin.ExtractingDisabled)
+            {
+                return;
+            }
             if (CheckExtractTimer < Time.time)
             {
                 CheckExtractTimer = Time.time + 5f;
@@ -57,6 +61,10 @@ namespace SAIN.Components.BotController
             {
                 foreach (var bot in BotController.SAINBots)
                 {
+                    if (bot.Value.CannotExfil)
+                    {
+                        continue;
+                    }
                     if (bot.Value.ExfilPosition == null)
                     {
                         FindExfils(bot.Value);
@@ -68,6 +76,10 @@ namespace SAIN.Components.BotController
                         {
                             AssignExfil(bot.Value);
                         }
+                    }
+                    if (bot.Value.ExfilPosition == null)
+                    {
+                        bot.Value.CannotExfil = true;
                     }
                 }
                 return ValidExfils.Count > 0 || ValidScavExfils.Count > 0;

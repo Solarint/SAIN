@@ -29,15 +29,12 @@ namespace SAIN.Components
 
         public void Update()
         {
-            if (EnableVisionJobs.Value)
+            Frames++;
+            if (Frames == CheckFrameCount.Value)
             {
-                Frames++;
-                if (Frames == CheckFrameCount.Value)
-                {
-                    Frames = 0;
-                    GlobalRaycastJob();
-                    //CheckEnemiesJobs();
-                }
+                Frames = 0;
+                GlobalRaycastJob();
+                //CheckEnemiesJobs();
             }
         }
 

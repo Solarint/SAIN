@@ -126,6 +126,7 @@ namespace SAIN.Components
         private float DebugPatrolTimer = 0f;
 
         public Vector3? ExfilPosition { get; set; }
+        public bool CannotExfil { get; set; }
 
         private void UpdateHealth()
         {
