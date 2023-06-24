@@ -195,7 +195,7 @@ namespace SAIN.Classes
             var SqrMagnitude = (point - BotOwner.Position).sqrMagnitude;
             if (SqrMagnitude <= 0.5f)
             {
-                Logger.LogInfo($"Search Destination is too close. SqrMagnitude: [{SqrMagnitude}]");
+                //Logger.LogInfo($"Search Destination is too close. SqrMagnitude: [{SqrMagnitude}]");
                 return NavMeshPathStatus.PathInvalid;
             }
 

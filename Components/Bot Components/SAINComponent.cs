@@ -203,16 +203,30 @@ namespace SAIN.Components
                 var Target = BotOwner.Memory.GoalTarget?.GoalTarget;
                 if (Target != null)
                 {
-                    return Target.Position;
-                }
-                if (Time.time - BotOwner.Memory.LastTimeHit < 20f && !BotOwner.Memory.IsPeace)
-                {
-                    return BotOwner.Memory.LastHitPos;
+                    if ((Target.Position - BotOwner.Position).sqrMagnitude < 1f)
+                    {
+                        BotOwner.Memory.GoalTarget.Clear();
+                    }
+                    else
+                    {
+                        return Target.Position;
+                    }
                 }
                 var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 200f, true);
                 if (sound != null && !sound.IsCome)
                 {
-                    return sound.Position;
+                    if ((sound.Position - BotOwner.Position).sqrMagnitude < 2f)
+                    {
+                        BotOwner.BotsGroup.PlaceChecked(sound);
+                    }
+                    else
+                    {
+                        return Target.Position;
+                    }
+                }
+                if (Time.time - BotOwner.Memory.LastTimeHit < 20f && !BotOwner.Memory.IsPeace)
+                {
+                    return BotOwner.Memory.LastHitPos;
                 }
                 return null;
             }

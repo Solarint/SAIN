@@ -32,26 +32,35 @@ namespace SAIN.Classes
                 {
                     Decision = SAINSelfDecision.RunAwayGrenade;
                 }
-                else if (StartUseStims())
-                {
-                    Decision = SAINSelfDecision.Stims;
-                }
                 else if (StartBotReload())
                 {
                     Decision = SAINSelfDecision.Reload;
                 }
-                else if (StartSurgery())
+                else
                 {
-                    Decision = SAINSelfDecision.Surgery;
-                }
-                else if (StartFirstAid())
-                {
-                    Decision = SAINSelfDecision.FirstAid;
+                    if (LastHealCheckTime < Time.time && !SAIN.Healthy)
+                    {
+                        LastHealCheckTime = Time.time + 1f;
+                        if (StartUseStims())
+                        {
+                            Decision = SAINSelfDecision.Stims;
+                        }
+                        else if (StartSurgery())
+                        {
+                            Decision = SAINSelfDecision.Surgery;
+                        }
+                        else if (StartFirstAid())
+                        {
+                            Decision = SAINSelfDecision.FirstAid;
+                        }
+                    }
                 }
             }
 
             return Decision != SAINSelfDecision.None;
         }
+
+        private float LastHealCheckTime;
 
         private bool StartRunGrenade()
         {
@@ -125,6 +134,7 @@ namespace SAIN.Classes
             Decision = continueAction ? CurrentSelfAction : SAINSelfDecision.None;
             return continueAction;
         }
+
         private bool ContinueRunGrenade => CurrentSelfAction == SAINSelfDecision.RunAwayGrenade && SAIN.Grenade.GrenadeDangerPoint != null;
         public bool UsingMeds => BotOwner.Medecine.Using;
         private bool ContinueReload => BotOwner.WeaponManager.Reload?.Reloading == true && !StartCancelReload();

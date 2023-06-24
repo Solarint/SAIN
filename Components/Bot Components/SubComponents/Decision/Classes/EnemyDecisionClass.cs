@@ -24,10 +24,6 @@ namespace SAIN.Classes
             {
                 Decision = SAINSoloDecision.DogFight;
             }
-            else if (StartThrowNade())
-            {
-                Decision = SAINSoloDecision.ThrowGrenade;
-            }
             else if (StartStandAndShoot())
             {
                 Decision = SAINSoloDecision.StandAndShoot;
@@ -56,6 +52,10 @@ namespace SAIN.Classes
                 {
                     Decision = SAINSoloDecision.RunToCover;
                 }
+            }
+            else if (StartThrowNade())
+            {
+                Decision = SAINSoloDecision.ThrowGrenade;
             }
             else
             {
