@@ -19,6 +19,7 @@ namespace SAIN.Components
         {
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            Path = new NavMeshPath();
         }
 
         private void Update()
@@ -249,7 +250,7 @@ namespace SAIN.Components
             return false;
         }
 
-        private readonly NavMeshPath Path = new NavMeshPath();
+        private NavMeshPath Path;
 
         private bool PathToEnemy(NavMeshPath path)
         {
