@@ -10,7 +10,7 @@ using BepInEx.Bootstrap;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN AI Beta 2", "2.0")]
+    [BepInPlugin("me.sol.sain", "SAIN Beta 2", "2.0")]
     [BepInDependency("xyz.drakia.bigbrain", "0.1.3")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
