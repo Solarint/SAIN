@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SAIN.Classes.CombatFunctions
 {
-    public class ShootClass : GClass104
+    public class ShootClass : BaseNodeClass
     {
         public ShootClass(BotOwner owner, SAINComponent sain) : base(owner)
         {

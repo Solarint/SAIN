@@ -72,6 +72,14 @@
     <ErrorReport>prompt</ErrorReport>
     <Optimize>true</Optimize>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '3.5.8|x86'">
+    <OutputPath>bin\x86\3.5.8\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\BepInEx\core\0Harmony.dll</HintPath>
@@ -107,12 +115,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\DissonanceVoip.dll</HintPath>
     </Reference>
-    <Reference Include="DrakiaXYZ-BigBrain-0.13rc">
-      <HintPath>..\..\BepInEx\plugins\DrakiaXYZ-BigBrain-0.13rc.dll</HintPath>
-    </Reference>
-    <Reference Include="ItemComponent.Types, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\EscapeFromTarkov_Data\Managed\ItemComponent.Types.dll</HintPath>
+    <Reference Include="DrakiaXYZ-BigBrain">
+      <HintPath>..\..\BepInEx\plugins\DrakiaXYZ-BigBrain.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -276,8 +280,6 @@
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSquad.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\ExtractAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\SAINExtractLayer.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Roaming\RoamingAction.cs" />
-    <Compile Include="Components\Bot Components\Layers\SAIN Roaming\SAINRoamingLayer.cs" />
     <Compile Include="Plugin\EFTPatches.cs" />
     <Compile Include="Plugin\Patches\Audio\HearSensorActivatePatch.cs" />
     <Compile Include="Plugin\Patches\FlashLight\CheckFlashlightPatch.cs" />

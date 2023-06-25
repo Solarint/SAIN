@@ -5,14 +5,14 @@ using System;
 using System.Collections.Generic;
 using SAIN.Components;
 using EFT;
-using DrakiaXYZ.BigBrain.Brains;
 using BepInEx.Bootstrap;
 using Comfort.Common;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN Beta 2", "2.0")]
-    [BepInDependency("xyz.drakia.bigbrain", "0.1.3")]
+    [BepInPlugin("me.sol.sain", "SAIN Beta 3", "2.0")]
+    [BepInDependency("xyz.drakia.bigbrain", "0.1.4")]
+    [BepInDependency("com.spt-aki.core", "3.5.8")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
     {
