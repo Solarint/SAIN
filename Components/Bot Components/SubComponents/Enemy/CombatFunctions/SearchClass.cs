@@ -84,7 +84,7 @@ namespace SAIN.Classes
                 if (!DirectMove && TargetPosition != null)
                 {
                     DirectMove = true;
-                    MoveToNextPoint(TargetPosition.Value);
+                    BotOwner.BotRun.Run(TargetPosition.Value, false);
                     ActiveDestination = TargetPosition.Value;
                 }
                 return true;

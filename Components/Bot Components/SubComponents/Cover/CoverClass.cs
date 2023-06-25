@@ -58,7 +58,7 @@ namespace SAIN.Classes
             {
                 ActivateCoverFinder(true);
             }
-            else if (CurrentDecision == SAINSoloDecision.HoldInCover && CoverInUse?.Spotted == true)
+            else if (CurrentDecision == SAINSoloDecision.HoldInCover && (CoverInUse == null || CoverInUse.Spotted == true || Time.time - CoverInUse.TimeCreated > 5f))
             {
                 ActivateCoverFinder(true);
             }

@@ -21,11 +21,6 @@ namespace SAIN.Classes
 
         public bool GetDecision(out SAINSelfDecision Decision)
         {
-            if (CheckContinueRetreat())
-            {
-                Decision = CurrentSelfAction;
-                return true;
-            }
             if (!CheckContinueSelfAction(out Decision))
             {
                 if (StartRunGrenade())
@@ -75,13 +70,6 @@ namespace SAIN.Classes
                 }
             }
             return false;
-        }
-
-        private bool CheckContinueRetreat()
-        {
-            if (SAIN.Enemy == null) return false;
-
-            return SAIN.Decision.MainDecision == SAINSoloDecision.Retreat && !SAIN.Cover.BotIsAtCoverPoint && SAIN.Decision.TimeSinceChangeDecision < 3f;
         }
 
         private void TryFixBusyHands()
@@ -155,7 +143,7 @@ namespace SAIN.Classes
         }
         public bool CanUseFirstAid => BotOwner.Medecine.FirstAid.ShallStartUse();
         public bool CanUseSurgery => BotOwner.Medecine.SurgicalKit.ShallStartUse();
-        public bool CanReload => BotOwner.WeaponManager.IsReady && BotOwner.WeaponManager.Reload.CanReload(false) && !StartCancelReload();
+        public bool CanReload => BotOwner.WeaponManager.IsReady && !BotOwner.WeaponManager.HaveBullets;
 
         private bool StartUseStims()
         {
@@ -278,7 +266,7 @@ namespace SAIN.Classes
             bool needToReload = false;
             if (CanReload)
             {
-                if (!BotOwner.WeaponManager.HaveBullets)
+                if (BotOwner.WeaponManager.Reload.BulletCount == 0)
                 {
                     needToReload = true;
                 }

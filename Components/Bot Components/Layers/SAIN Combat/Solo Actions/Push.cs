@@ -30,6 +30,15 @@ namespace SAIN.Layers
             SAIN.Mover.SetTargetPose(1f);
             SAIN.Mover.SetTargetMoveSpeed(1f);
 
+            Shoot.Update();
+
+            if (SAIN.Enemy.InLineOfSight)
+            {
+                SAIN.Mover.Sprint(false);
+                SAIN.Steering.SteerByPriority();
+                return;
+            }
+
             Vector3[] EnemyPath = SAIN.Enemy.Path.corners;
             Vector3 EnemyPos = SAIN.Enemy.Position;
             if (NewDestTimer < Time.time)
@@ -74,16 +83,9 @@ namespace SAIN.Layers
                     }
                 }
                 */
-                SAIN.Mover.GoToPoint(Destination);
+                BotOwner.BotRun.Run(Destination, false);
             }
 
-            if (SAIN.Enemy.InLineOfSight)
-            {
-                SAIN.Mover.Sprint(false);
-                SAIN.Steering.LookToEnemy();
-            }
-
-            Shoot.Update();
         }
 
         private float NewDestTimer = 0f;

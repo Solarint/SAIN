@@ -80,7 +80,11 @@ namespace SAIN.Classes
             var squadDecision = SAINSquadDecision.None;
             var selfDecision = SAINSelfDecision.None;
 
-            if (SelfActionDecisions.GetDecision(out selfDecision))
+            if (CheckContinueRetreat())
+            {
+                return;
+            }
+            else if (SelfActionDecisions.GetDecision(out selfDecision))
             {
             }
             else if (CheckStuckDecision(out soloDecision))
@@ -134,9 +138,20 @@ namespace SAIN.Classes
 
         private bool CheckContinueRetreat()
         {
-            if (SAIN.Enemy == null) return false;
-
-            return MainDecision == SAINSoloDecision.Retreat && !SAIN.Cover.BotIsAtCoverPoint && TimeSinceChangeDecision < 3f && SAIN.BotHasStamina;
+            float timeChangeDec = SAIN.Decision.TimeSinceChangeDecision;
+            bool Running = MainDecision == SAINSoloDecision.Retreat || MainDecision == SAINSoloDecision.RunToCover;
+            if (Running && !SAIN.BotStuck.BotIsMoving && SAIN.BotStuck.TimeSpentNotMoving > 1f && timeChangeDec > 0.5f)
+            {
+                return false;
+            }
+            CoverPoint pointInUse = SAIN.Cover.CoverInUse;
+            if (pointInUse != null && pointInUse.BotIsHere)
+            {
+                return false;
+            }
+            bool CheckTime = timeChangeDec < 5f;
+            bool Moving = BotOwner.Mover.RealDestPoint != Vector3.one && BotOwner.Mover.DirDestination.magnitude > 2f;
+            return Running && Moving && CheckTime;
         }
 
         private bool CheckStuckDecision(out SAINSoloDecision Decision)

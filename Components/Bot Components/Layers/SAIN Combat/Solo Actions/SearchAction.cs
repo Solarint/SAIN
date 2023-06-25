@@ -112,11 +112,7 @@ namespace SAIN.Layers
                 SAIN.Mover.SetTargetPose(0.9f);
             }
 
-            if (SprintEnabled && !BotOwner.Memory.IsUnderFire)
-            {
-                SAIN.Mover.Sprint(true);
-            }
-            else
+            if (!SprintEnabled || BotOwner.Memory.IsUnderFire)
             {
                 SAIN.Mover.Sprint(false);
                 if (SAIN.Steering.SteerByPriority(false))

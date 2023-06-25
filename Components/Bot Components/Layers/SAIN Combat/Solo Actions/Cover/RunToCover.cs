@@ -22,43 +22,29 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (Decision == SAINSoloDecision.Retreat && SAIN.Cover.FallBackPoint != null)
-            {
-                CoverDestination = SAIN.Cover.FallBackPoint;
-                if (SAIN.Mover.Prone.IsProne)
-                {
-                    SAIN.Mover.Prone.SetProne(false);
-                }
-                SAIN.Mover.GoToPoint(CoverDestination.Position, 0.5f);
-            }
-            else if (CoverDestination != null)
-            {
-                if (!SAIN.Cover.CoverPoints.Contains(CoverDestination) || CoverDestination.Spotted)
-                {
-                    CoverDestination = null;
-                }
-            }
-
             SAIN.Mover.SetTargetMoveSpeed(1f);
             SAIN.Mover.SetTargetPose(1f);
 
-            if (CoverDestination == null)
+            if (CoverDestination == null || RecalcTimer < Time.time)
             {
-                if (FindTargetCover())
+                RecalcTimer = Time.time + 4f;
+                if (Decision == SAINSoloDecision.Retreat && SAIN.Cover.FallBackPoint != null)
                 {
-                    if (SAIN.Mover.Prone.IsProne)
-                    {
-                        SAIN.Mover.Prone.SetProne(false);
-                    }
-                    SAIN.Mover.GoToPoint(CoverDestination.Position, 0.6f);
+                    CoverDestination = SAIN.Cover.FallBackPoint;
+                    BotOwner.BotRun.Run(CoverDestination.Position, false);
+                }
+                else if (FindTargetCover())
+                {
+                    BotOwner.BotRun.Run(CoverDestination.Position, false);
                 }
             }
             if (CoverDestination == null)
             {
                 EngageEnemy();
-                SAIN.Mover.Sprint(false);
             }
         }
+
+        private float RecalcTimer;
 
         private bool FindTargetCover()
         {
@@ -79,11 +65,6 @@ namespace SAIN.Layers
             return false;
         }
 
-        private void MoveTo(Vector3 position)
-        {
-            SAIN.Mover.GoToPoint(position, 0.6f);
-        }
-
         private bool CanMoveTo(CoverPoint coverPoint, out Vector3 pointToGo)
         {
             if (coverPoint != null && SAIN.Mover.CanGoToPoint(coverPoint.Position, out pointToGo))
@@ -98,13 +79,7 @@ namespace SAIN.Layers
 
         private void EngageEnemy()
         {
-            if (!SAIN.Steering.SteerByPriority(false))
-            {
-                if (SAIN.Enemy != null)
-                {
-                    SAIN.Steering.LookToEnemy(SAIN.Enemy);
-                }
-            }
+            SAIN.Steering.SteerByPriority();
             Shoot.Update();
         }
 
@@ -116,7 +91,6 @@ namespace SAIN.Layers
 
         public override void Start()
         {
-            SAIN.Mover.Sprint(true);
             if (SAIN.Decision.CurrentSelfDecision == SAINSelfDecision.RunAwayGrenade)
             {
                 SAIN.Talk.Say(EPhraseTrigger.OnEnemyGrenade, ETagStatus.Combat);
