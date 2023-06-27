@@ -274,6 +274,10 @@ namespace SAIN.Components
 
         private void GrenadeThrown(Grenade grenade, Vector3 position, Vector3 force, float mass)
         {
+            if (grenade == null)
+            {
+                return;
+            }
             var danger = VectorHelpers.DangerPoint(position, force, mass);
             foreach (var bot in SAINBots.Values)
             {

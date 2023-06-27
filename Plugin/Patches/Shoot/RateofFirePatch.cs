@@ -1,16 +1,55 @@
 ﻿using Aki.Reflection.Patching;
+using Aki.Reflection.Utils;
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components;
 using System.Linq;
+using System;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Helpers.Shoot;
-using static SAIN.UserSettings.BotShootConfig;
+using static SAIN.UserSettings.ShootConfig;
+using static SAIN.UserSettings.DifficultyConfig;
 
 namespace SAIN.Patches
 {
+    public class AimTimePatch : ModulePatch
+    {
+        private static Type _aimingDataType;
+        private static MethodInfo _aimingDataMethod7;
+
+        protected override MethodBase GetTargetMethod()
+        {
+            //return AccessTools.Method(typeof(GClass544), "method_7"); 
+            _aimingDataType = PatchConstants.EftTypes.Single(x => x.GetProperty("LastSpreadCount") != null && x.GetProperty("LastAimTime") != null);
+            _aimingDataMethod7 = AccessTools.Method(_aimingDataType, "method_7");
+            return _aimingDataMethod7;
+        }
+
+        [PatchPostfix]
+        public static void PatchPostfix(ref BotOwner ___botOwner_0, float dist, ref float __result)
+        {
+            if (!FasterCQBReactions.Value)
+            {
+                return;
+            }
+            if (dist <= 30)
+            {
+                float min = 0.075f;
+                if (___botOwner_0.IsRole(WildSpawnType.assault))
+                {
+                    min = 0.15f;
+                }
+                float scale = dist / 30f;
+                scale = Mathf.Clamp(scale, min, 1f);
+                float newResult = __result * scale;
+                //Logger.LogWarning($"New Aim Time: [{newResult}] Old Aim Time: [{__result}] Distance: [{dist}]");
+                __result = newResult;
+            }
+        }
+    }
+
     public class FullAutoPatch : ModulePatch
     {
         private static PropertyInfo _ShootData;

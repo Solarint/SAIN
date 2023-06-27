@@ -6,19 +6,26 @@ using SAIN.Components;
 using SAIN.Helpers;
 using System.Reflection;
 using UnityEngine;
+using System;
+using Aki.Reflection.Utils;
+using System.Linq;
 using static SAIN.UserSettings.DebugConfig;
-using static SAIN.UserSettings.BotShootConfig;
+using static SAIN.UserSettings.ShootConfig;
 using static SAIN.UserSettings.DifficultyConfig;
 
 namespace SAIN.Patches
 {
     public class AimOffsetPatch : ModulePatch
     {
+        private static Type _aimingDataType;
+        private static MethodInfo _aimingDataMethod13;
 
         protected override MethodBase GetTargetMethod()
         {
-            // Note: Can't find this based on the property type of AimingData? Is this because of it being an interface?
-            return AccessTools.Method(typeof(GClass544), "method_13");
+            //return AccessTools.Method(typeof(GClass544), "method_7"); 
+            _aimingDataType = PatchConstants.EftTypes.Single(x => x.GetProperty("LastSpreadCount") != null && x.GetProperty("LastAimTime") != null);
+            _aimingDataMethod13 = AccessTools.Method(_aimingDataType, "method_13");
+            return _aimingDataMethod13;
         }
 
         [PatchPrefix]
@@ -39,9 +46,8 @@ namespace SAIN.Patches
                 {
                     modifier /= OtherDifficulty.Value;
                 }
-
-                modifier /= GlobalDifficulty.Value;
             }
+            modifier /= GlobalDifficulty.Value;
 
             __instance.EndTargetPoint = __instance.RealTargetPoint
                 + ___vector3_5

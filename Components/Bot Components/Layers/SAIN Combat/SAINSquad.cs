@@ -2,6 +2,8 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
+using System.Text;
+using UnityEngine;
 
 namespace SAIN.Layers
 {
@@ -68,8 +70,24 @@ namespace SAIN.Layers
 
         private SAINSquadDecision LastActionDecision = SAINSquadDecision.None;
         public SAINSquadDecision SquadDecision => SAIN.Decision.CurrentSquadDecision;
-
         private readonly SAINComponent SAIN;
         protected ManualLogSource Logger;
+
+        public override void BuildDebugText(StringBuilder stringBuilder)
+        {
+            stringBuilder.AppendLine($"SAIN Info:");
+            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Power of Equipment", $"{SAIN.Info.PowerLevel}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Time Before Start Search", $"{SAIN.Info.TimeBeforeSearch}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Hold Ground Time", $"{SAIN.Info.HoldGroundDelay}", Color.white, Color.yellow, true);
+            if (SAIN.Enemy != null)
+            {
+                stringBuilder.AppendLine($"SAIN Enemy Info:");
+                stringBuilder.AppendLabeledValue("Enemy", $"{SAIN.Enemy.EnemyPlayer.name}", Color.red, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Seen?", $"{SAIN.Enemy.Seen}", Color.red, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Time Since Seen", $"{SAIN.Enemy.TimeSinceSeen}", Color.red, Color.yellow, true);
+            }
+        }
     }
 }

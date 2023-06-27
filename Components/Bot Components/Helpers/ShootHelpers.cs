@@ -2,7 +2,7 @@
 using EFT.InventoryLogic;
 using SAIN.Components;
 using UnityEngine;
-using static SAIN.UserSettings.BotShootConfig;
+using static SAIN.UserSettings.ShootConfig;
 
 namespace SAIN.Helpers
 {

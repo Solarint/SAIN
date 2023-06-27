@@ -24,6 +24,7 @@ namespace SAIN.Classes
             EnemyPlayer = person.GetPlayer;
             BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            TimeEnemyCreated = Time.time;
 
             //Logger.LogInfo($"New Enemy [{person.GetPlayer.name}] for {BotOwner.name}");
 
@@ -47,6 +48,9 @@ namespace SAIN.Classes
             //    BodyParts[i] = part;
             //}
         }
+
+        public float TimeEnemyCreated { get; private set; }
+        public float TimeSinceEnemyCreated => Time.time - TimeEnemyCreated;
 
         public readonly List<BodyPartType> PartTypes = new List<BodyPartType> { BodyPartType.leftLeg, BodyPartType.rightLeg, BodyPartType.body, BodyPartType.leftArm, BodyPartType.rightArm, BodyPartType.head };
 
@@ -74,11 +78,11 @@ namespace SAIN.Classes
             //        break;
             //    }
             //}
-            InLineOfSight = false;
             if (CheckLosTimer < Time.time)
             {
                 CheckLosTimer = Time.time + 0.075f;
-                foreach (var part in BotOwner.MainParts.Values)
+                InLineOfSight = false;
+                foreach (var part in EnemyPlayer.MainParts.Values)
                 {
                     Vector3 direction = part.Position - SAIN.HeadPosition;
                     if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
@@ -210,7 +214,7 @@ namespace SAIN.Classes
         public Vector3 Direction => Position - BotPosition;
         private float CheckLosTimer;
 
-        private void UpdateVisible(bool inLineOfSight)
+        public void UpdateVisible(bool inLineOfSight)
         {
             bool wasVisible = IsVisible;
             IsVisible = inLineOfSight;

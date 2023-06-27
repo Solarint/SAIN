@@ -46,7 +46,7 @@ namespace SAIN
             VisionConfig.Init(Config);
             DebugConfig.Init(Config);
             CoverConfig.Init(Config);
-            BotShootConfig.Init(Config);
+            ShootConfig.Init(Config);
             SoundConfig.Init(Config);
             DazzleConfig.Init(Config);
         }

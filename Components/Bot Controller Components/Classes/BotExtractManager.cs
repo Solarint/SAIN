@@ -42,9 +42,10 @@ namespace SAIN.Components.BotController
             {
                 AllExfils = ExfilController?.ExfiltrationPoints;
             }
-            if (CheckExfilTimer < Time.time && FindExfilsForBots())
+            if (CheckExfilTimer < Time.time)
             {
                 CheckExfilTimer = Time.time + 3f;
+                FindExfilsForBots();
             }
         }
 
@@ -62,6 +63,10 @@ namespace SAIN.Components.BotController
             {
                 foreach (var bot in BotController.SAINBots)
                 {
+                    if (bot.Value == null)
+                    {
+                        continue;
+                    }
                     if (bot.Value.CannotExfil)
                     {
                         if (bot.Value.Squad.LeaderComponent?.ExfilPosition != null)
@@ -94,6 +99,10 @@ namespace SAIN.Components.BotController
 
         private void FindExfils(SAINComponent bot)
         {
+            if (bot == null)
+            {
+                return;
+            }
             if (bot.Info.IsScav && AllScavExfils != null)
             {
                 foreach (var ex in AllScavExfils)

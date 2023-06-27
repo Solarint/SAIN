@@ -2,7 +2,7 @@
 
 namespace SAIN.UserSettings
 {
-    internal class BotShootConfig
+    internal class ShootConfig
     {
         public static ConfigEntry<float> ScatterMultiplier { get; private set; }
         public static ConfigEntry<float> MaxScatter { get; private set; }
@@ -25,8 +25,8 @@ namespace SAIN.UserSettings
                 new AcceptableValueRange<float>(0.1f, 3.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }));
 
-            ScatterMultiplier = Config.Bind(shoot, "Bot Recoil Scatter Multiplier", 1.5f,
-                new ConfigDescription("Increases or decreases scatter from recoil",
+            ScatterMultiplier = Config.Bind(shoot, "Bot Recoil Scatter Multiplier", 1.25f,
+                new ConfigDescription("Increases or decreases scatter from recoil. Higher value equals more recoil for bots.",
                 new AcceptableValueRange<float>(0.01f, 10.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
 
@@ -35,7 +35,7 @@ namespace SAIN.UserSettings
                 new AcceptableValueRange<float>(0.5f, 10.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
 
-            AddRecoil = Config.Bind(shoot, "Bot Recoil Add Recoil Scatter", 0.35f,
+            AddRecoil = Config.Bind(shoot, "Bot Recoil Add Recoil Scatter", 0.325f,
                 new ConfigDescription("Adds or subtracts from the recoil felt per shot",
                 new AcceptableValueRange<float>(-1.0f, 5.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));

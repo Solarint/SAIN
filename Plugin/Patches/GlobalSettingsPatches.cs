@@ -15,7 +15,7 @@ namespace SAIN.Patches
         public static void PatchPostfix(BotGlobalsMindSettings __instance)
         {
             __instance.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 240f;
-            __instance.SEC_TO_MORE_DIST_TO_RUN = 1f;
+            __instance.SEC_TO_MORE_DIST_TO_RUN = 0f;
             __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
             __instance.CHANCE_FUCK_YOU_ON_CONTACT_100 = 0f;
             //__instance.ATTACK_IMMEDIATLY_CHANCE_0_100 = 100f;

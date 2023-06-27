@@ -7,8 +7,7 @@ namespace SAIN.Classes
     public class TargetDecisionClass : SAINBot
     {
         public TargetDecisionClass(BotOwner bot) : base(bot) { }
-
-        public float FoundTargetTimer;
+        public float FoundTargetTimer { get; private set; }
 
         public bool GetDecision(out SAINSoloDecision Decision)
         {
@@ -40,13 +39,13 @@ namespace SAIN.Classes
             {
                 Decision = SAINSoloDecision.Search;
             }
-            else if (SAIN.Cover.CoverInUse == null)
+            else if (SAIN.Decision.EnemyDecisions.StartHoldInCover())
             {
-                Decision = SAINSoloDecision.WalkToCover;
+                Decision = SAINSoloDecision.HoldInCover;
             }
             else
             {
-                Decision = SAINSoloDecision.HoldInCover;
+                Decision = SAINSoloDecision.WalkToCover;
             }
 
             return Decision != SAINSoloDecision.None;

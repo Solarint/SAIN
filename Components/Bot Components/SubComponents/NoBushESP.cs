@@ -58,7 +58,7 @@ namespace SAIN.Classes
                 Player player = Enemy.Person.GetPlayer;
                 if (player.IsYourPlayer)
                 {
-                    Vector3 direction = player.MainParts[BodyPartType.head].Position - SAIN.HeadPosition;
+                    Vector3 direction = player.MainParts[BodyPartType.body].Position - SAIN.HeadPosition;
                     if (Physics.Raycast(SAIN.HeadPosition, direction.normalized, out var hit, direction.magnitude, NoBushMask))
                     {
                         if (hit.transform?.parent?.gameObject == null)

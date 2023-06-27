@@ -26,8 +26,8 @@ namespace SAIN.Classes
             if (BotOwner == null || SAIN == null) return;
             if (ClearEnemyTimer < Time.time)
             {
-                //ClearEnemyTimer = Time.time + 1f;
-                //ClearEnemies();
+                ClearEnemyTimer = Time.time + 1f;
+                ClearEnemies();
             }
 
             //if (BotOwner.BotsGroup.Enemies.Count > 0)
@@ -44,29 +44,46 @@ namespace SAIN.Classes
             //}
 
             var goalEnemy = BotOwner.Memory.GoalEnemy;
-            if (goalEnemy != null)
+            if (goalEnemy?.Person != null)
             {
-                string id = goalEnemy.Person.ProfileId;
-                if (Enemy == null || Enemy.Person.ProfileId != id)
-                {
-                    Enemy = new SAINEnemy(BotOwner, goalEnemy.Person, 1f);
-                }
+                AddEnemy(goalEnemy.Person);
             }
             else
             {
                 goalEnemy = BotOwner.Memory.LastEnemy;
-                if (goalEnemy != null)
+                if (goalEnemy?.Person != null)
                 {
-                    string id = goalEnemy.Person.ProfileId;
-                    if (Enemy == null || Enemy.Person.ProfileId != id)
-                    {
-                        Enemy = new SAINEnemy(BotOwner, goalEnemy.Person, 1f);
-                    }
+                    AddEnemy(goalEnemy.Person);
                 }
                 else
                 {
                     Enemy = null;
                 }
+            }
+        }
+
+        public void AddEnemy(IAIDetails person)
+        {
+            string id = person.ProfileId;
+            
+            // Check if the dictionary contains a previous SAINEnemy
+            if (Enemies.ContainsKey(id))
+            {
+                // if we are moving to a new enemy, mark the old enemy as not visible
+                if (Enemy?.Person != null)
+                {
+                    if (Enemy.Person.ProfileId != id)
+                    {
+                        Enemy.UpdateCanShoot(false);
+                        Enemy.UpdateVisible(false);
+                    }
+                }
+                Enemy = Enemies[id];
+            }
+            else
+            {
+                Enemy = new SAINEnemy(BotOwner, person, 1f);
+                Enemies.Add(id, Enemy);
             }
         }
 

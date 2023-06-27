@@ -98,8 +98,8 @@ namespace SAIN.Layers
         {
             if (Search.PeekingCorner)
             {
-                SAIN.Mover.SetTargetMoveSpeed(0.33f);
-                SAIN.Mover.SetTargetPose(0.8f);
+                SAIN.Mover.SetTargetMoveSpeed(0.25f);
+                SAIN.Mover.SetTargetPose(0.75f);
             }
             else if (SprintEnabled)
             {
@@ -108,8 +108,8 @@ namespace SAIN.Layers
             }
             else
             {
-                SAIN.Mover.SetTargetMoveSpeed(0.75f);
-                SAIN.Mover.SetTargetPose(0.9f);
+                SAIN.Mover.SetTargetMoveSpeed(0.66f);
+                SAIN.Mover.SetTargetPose(0.85f);
             }
 
             if (!SprintEnabled || BotOwner.Memory.IsUnderFire)

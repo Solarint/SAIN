@@ -27,6 +27,7 @@ namespace SAIN
 
         private static void ShootPatches()
         {
+            new Patches.AimTimePatch().Enable();
             new Patches.AimOffsetPatch().Enable();
             new Patches.RecoilPatch().Enable();
             new Patches.LoseRecoilPatch().Enable();

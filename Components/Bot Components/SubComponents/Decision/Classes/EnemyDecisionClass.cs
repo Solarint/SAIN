@@ -99,16 +99,27 @@ namespace SAIN.Classes
 
             if (CurrentDecision == SAINSoloDecision.HoldInCover)
             {
-                if (SAIN.Decision.TimeSinceChangeDecision > 3f)
+                if (SAIN.Decision.TimeSinceChangeDecision > 3f && TimeForNewShift < Time.time)
                 {
                     var enemy = SAIN.Enemy;
-                    if (enemy != null && enemy.Seen && !enemy.IsVisible && enemy.TimeSinceSeen > 5f)
+                    if (enemy != null)
                     {
-                        ShiftResetTimer = Time.time + 5f;
-                        return true;
+                        if (enemy.Seen && !enemy.IsVisible && enemy.TimeSinceSeen > 5f)
+                        {
+                            TimeForNewShift = Time.time + 10f;
+                            ShiftResetTimer = Time.time + 5f;
+                            return true;
+                        }
+                        if (!enemy.Seen && enemy.TimeSinceEnemyCreated > 8f)
+                        {
+                            TimeForNewShift = Time.time + 10f;
+                            ShiftResetTimer = Time.time + 5f;
+                            return true;
+                        }
                     }
                     if (enemy == null && SAIN.Decision.TimeSinceChangeDecision > 6f)
                     {
+                        TimeForNewShift = Time.time + 10f;
                         ShiftResetTimer = Time.time + 5f;
                         return true;
                     }
@@ -135,6 +146,8 @@ namespace SAIN.Classes
             }
             return false;
         }
+
+        private float TimeForNewShift;
 
         private float ShiftResetTimer;
         public bool ShiftCoverComplete { get; set; }
@@ -230,15 +243,20 @@ namespace SAIN.Classes
             {
                 return false;
             }
-
-            if (SAIN.Enemy?.TimeSinceSeen >= SAIN.Info.TimeBeforeSearch)
+            if (SAIN.Enemy?.TimeSinceSeen >= TimeBeforeSearch)
+            {
+                return true;
+            }
+            if (!SAIN.Enemy.Seen && SAIN.Enemy.TimeSinceEnemyCreated >= TimeBeforeSearch)
             {
                 return true;
             }
             return false;
         }
 
-        private bool StartHoldInCover()
+        private float TimeBeforeSearch => SAIN.Info.TimeBeforeSearch;
+
+        public bool StartHoldInCover()
         {
             var cover = SAIN.Cover.CoverInUse;
             if (cover != null && !cover.Spotted && (cover.Position - BotOwner.Position).sqrMagnitude < 1f)
