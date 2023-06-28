@@ -18,6 +18,7 @@ namespace SAIN
         ThrowGrenade,
         ShiftCover,
         RushEnemy,
+        MoveToEngage,
 
         UnstuckSearch,
         UnstuckMoveToCover,

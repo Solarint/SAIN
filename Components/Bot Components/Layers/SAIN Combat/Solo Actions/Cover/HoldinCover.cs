@@ -5,6 +5,7 @@ using SAIN.Classes;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using SAIN.Layers;
+using System.Text;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;
@@ -81,6 +82,26 @@ namespace SAIN.Layers
 
         public override void Stop()
         {
+        }
+
+        public override void BuildDebugText(StringBuilder stringBuilder)
+        {
+            stringBuilder.AppendLine($"SAIN Info:");
+            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
+            CoverPoint cover = SAIN.Cover.CoverInUse;
+            if (cover != null)
+            {
+                stringBuilder.AppendLine($"SAIN Cover Info:");
+                stringBuilder.AppendLabeledValue("Cover Position", $"{cover.Position}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Distance", $"{cover.Distance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Spotted?", $"{cover.Spotted}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.PathDistance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover ID", $"{cover.Id}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Status", $"{cover.CoverStatus}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{cover.HitInCoverCount}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover HitInCoverUnknownCount", $"{cover.HitInCoverUnknownCount}", Color.white, Color.yellow, true);
+            }
         }
     }
 }

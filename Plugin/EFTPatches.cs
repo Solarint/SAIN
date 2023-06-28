@@ -75,12 +75,13 @@ namespace SAIN
 
         private static void GlobalSettingsPatches()
         {
+            new Patches.BotGlobalCore1().Enable();
             new Patches.BotGlobalLookPatch().Enable();
             new Patches.BotGlobalShootPatch().Enable();
             new Patches.BotGlobalGrenadePatch().Enable();
             new Patches.BotGlobalMindPatch().Enable();
             new Patches.BotGlobalMovePatch().Enable();
-            new Patches.BotGlobalCorePatch().Enable();
+            new Patches.BotGlobalCore2Patch().Enable();
             new Patches.BotGlobalAimPatch().Enable();
             new Patches.BotGlobalScatterPatch().Enable();
         }

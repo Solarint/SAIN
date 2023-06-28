@@ -247,6 +247,8 @@ namespace SAIN.Classes
             }
         }
 
+        public Vector3? LastCornerToEnemy { get; private set; }
+
         public float LastChangeVisionTime { get; private set; }
 
         public void UpdatePath()
@@ -265,8 +267,22 @@ namespace SAIN.Classes
             if (NavMesh.CalculatePath(BotOwner.Transform.position, pos, -1, Path))
             {
                 PathDistance = Path.CalculatePathLength();
+                if (Path.corners.Length > 2)
+                {
+                    LastCornerToEnemy = Path.corners[Path.corners.Length - 2];
+                    Vector3 cornerRay = LastCornerToEnemy.Value;
+                    cornerRay += Vector3.up * 1f;
+                    Vector3 direction = cornerRay - SAIN.HeadPosition;
+                    CanSeeLastCornerToEnemy = !Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+                }
+                else
+                {
+                    LastCornerToEnemy = null;
+                }
             }
         }
+
+        public bool CanSeeLastCornerToEnemy { get; private set; }
 
         public SAINEnemyPath CheckPathDistance()
         {

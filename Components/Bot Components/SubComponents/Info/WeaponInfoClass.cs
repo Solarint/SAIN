@@ -86,6 +86,51 @@ namespace SAIN.Classes
                 return perMeter;
             }
         }
+
+        public float EffectiveWeaponDistance
+        {
+            get
+            {
+                float PreferedDist;
+                switch (WeaponClass)
+                {
+                    case "assaultCarbine":
+                    case "assaultRifle":
+                    case "machinegun":
+                        PreferedDist = 100f;
+                        break;
+
+                    case "smg":
+                        PreferedDist = 40f;
+                        break;
+
+                    case "pistol":
+                        PreferedDist = 30f;
+                        break;
+
+                    case "marksmanRifle":
+                        PreferedDist = 150f;
+                        break;
+
+                    case "sniperRifle":
+                        PreferedDist = 200f;
+                        break;
+
+                    case "shotgun":
+                        PreferedDist = 30f;
+                        break;
+                    case "grenadeLauncher":
+                    case "specialWeapon":
+                        PreferedDist = 100f;
+                        break;
+
+                    default:
+                        PreferedDist = 120f;
+                        break;
+                }
+                return PreferedDist;
+            }
+        }
     }
 
     public class ModifierClass : SAINBot

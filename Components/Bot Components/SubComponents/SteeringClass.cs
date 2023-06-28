@@ -280,9 +280,9 @@ namespace SAIN.Classes
             {
                 RandomLookTimer = Time.time + 2f * Random.Range(0.66f, 1.33f);
                 Vector3 pointToLook = Vector3.zero;
-                LookRandom = !LookRandom;
                 if (LookRandom)
                 {
+                    LookRandom = false;
                     var Mask = LayerMaskClass.HighPolyWithTerrainMask;
                     var Start = SAIN.HeadPosition;
                     float pointDistance = 0f;
@@ -307,6 +307,7 @@ namespace SAIN.Classes
                 }
                 else
                 {
+                    LookRandom = true;
                     if (LookToPathToEnemy())
                     {
                         return;

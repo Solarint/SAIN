@@ -23,7 +23,7 @@ namespace SAIN.Classes
         private void OnBeingHit(DamageInfo damage, EBodyPart part, float unused)
         {
             CoverPoint activePoint = CoverInUse;
-            if (activePoint != null && activePoint.BotIsHere)
+            if (activePoint != null && activePoint.CoverStatus == CoverStatus.InCover)
             {
                 SAINEnemy enemy = SAIN.Enemy;
                 if (enemy != null && damage.Player != null && enemy.EnemyPlayer.ProfileId == damage.Player.ProfileId)
@@ -31,11 +31,7 @@ namespace SAIN.Classes
                     activePoint.HitInCoverCount++;
                     if (!enemy.IsVisible)
                     {
-                        activePoint.HitInCoverCount += 2;
-                    }
-                    else
-                    {
-                        activePoint.HitInCoverCount += 1;
+                        activePoint.HitInCoverCount++;
                     }
                 }
                 else
@@ -94,7 +90,7 @@ namespace SAIN.Classes
             {
                 if (CoverPoints.Count > 0)
                 {
-                    return CoverPoints.First();
+                    return CoverPoints[0];
                 }
                 return null;
             }
@@ -106,7 +102,7 @@ namespace SAIN.Classes
             {
                 if (CoverPoints.Count > 0)
                 {
-                    return CoverPoints.Last();
+                    return CoverPoints[CoverPoints.Count - 1];
                 }
                 return null;
             }

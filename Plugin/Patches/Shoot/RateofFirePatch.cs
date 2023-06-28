@@ -11,6 +11,7 @@ using UnityEngine;
 using static SAIN.Helpers.Shoot;
 using static SAIN.UserSettings.ShootConfig;
 using static SAIN.UserSettings.DifficultyConfig;
+using SAIN.Classes;
 
 namespace SAIN.Patches
 {
@@ -82,6 +83,62 @@ namespace SAIN.Patches
             }
 
             return true;
+        }
+    }
+
+    public class PrefShootDistPatch : ModulePatch
+    {
+        private static PropertyInfo _LookSensor;
+
+        protected override MethodBase GetTargetMethod()
+        {
+            _LookSensor = AccessTools.Property(typeof(BotOwner), "LookSensor");
+            return AccessTools.Method(_LookSensor.PropertyType, "Init");
+        }
+
+        [PatchPrefix]
+        public static void PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_2)
+        {
+            Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
+            string WeaponClass = weapon.Template.weapClass;
+            float PreferedDist;
+            switch (WeaponClass)
+            {
+                case "assaultCarbine":
+                case "assaultRifle":
+                case "machinegun":
+                    PreferedDist = 100f;
+                    break;
+
+                case "smg":
+                    PreferedDist = 50f;
+                    break;
+
+                case "pistol":
+                    PreferedDist = 30f;
+                    break;
+
+                case "marksmanRifle":
+                    PreferedDist = 150f;
+                    break;
+
+                case "sniperRifle":
+                    PreferedDist = 200f;
+                    break;
+
+                case "shotgun":
+                    PreferedDist = 40f;
+                    break;
+                case "grenadeLauncher":
+                case "specialWeapon":
+                    PreferedDist = 100f;
+                    break;
+
+                default:
+                    PreferedDist = 120f;
+                    break;
+            }
+            ___float_2 = PreferedDist;
         }
     }
 

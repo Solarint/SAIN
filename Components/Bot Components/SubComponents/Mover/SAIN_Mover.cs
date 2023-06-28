@@ -126,9 +126,9 @@ namespace SAIN.Classes
         private void SetStamina()
         {
             var stamina = BotOwner.GetPlayer.Physical.Stamina;
-            if (SAIN.LayersActive && stamina.NormalValue < 0.33f)
+            if (SAIN.LayersActive && stamina.NormalValue < 0.05f)
             {
-                BotOwner.GetPlayer.Physical.Stamina.UpdateStamina(stamina.TotalCapacity);
+                BotOwner.GetPlayer.Physical.Stamina.UpdateStamina(stamina.TotalCapacity / 8f);
             }
         }
 

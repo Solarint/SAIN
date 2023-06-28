@@ -195,7 +195,7 @@ namespace SAIN.Classes
                             CheckFriendliesTimer = Time.time + 10f;
 
                             SAIN.Talk.Say(trigger);
-                            AllMembersSay(EPhraseTrigger.Roger, ETagStatus.Aware, Random.Range(0.5f, 1.5f), 60f);
+                            AllMembersSay(EPhraseTrigger.Roger, ETagStatus.Aware, Random.Range(0.5f, 1.5f), 40f);
                         }
                     }
                 }
@@ -409,12 +409,15 @@ namespace SAIN.Classes
 
                 if (commandTrigger != EPhraseTrigger.PhraseNone)
                 {
-                    if (gesture != EGesture.None && SAIN.Squad.VisibleMembers.Count > 0)
+                    if (gesture != EGesture.None && SAIN.Squad.VisibleMembers.Count > 0 && SAIN.Enemy?.IsVisible == false)
                     {
                         BotPlayer.HandsController.ShowGesture(gesture);
                     }
-                    Talk.Say(commandTrigger);
-                    AllMembersSay(trigger, mask, Random.Range(0.75f, 1.5f), 40f);
+                    if (SAIN.Squad.VisibleMembers.Count / (float)SAIN.Squad.SquadMembers.Count < 0.5f)
+                    {
+                        Talk.Say(commandTrigger);
+                        AllMembersSay(trigger, mask, Random.Range(0.75f, 1.5f), 35f);
+                    }
                     return true;
                 }
             }

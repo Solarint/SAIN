@@ -52,7 +52,7 @@ namespace SAIN.Components
                 Vector3 grenadePos = Grenade.transform.position;
                 Vector3 headPos = BotOwner.LookSensor._headPoint;
                 Vector3 grenadeDir = grenadePos - headPos;
-                if (Vector3.Dot(grenadeDir.normalized, BotOwner.LookDirection.normalized) > 0f && NadeVisible(grenadePos, headPos))
+                if (Vector3.Dot(grenadeDir.normalized, BotOwner.LookDirection.normalized) > -0.25f && NadeVisible(grenadePos, headPos))
                 {
                     SpotGrenade();
                 }
@@ -70,6 +70,7 @@ namespace SAIN.Components
         {
             GrenadeSpotted = true;
             TimeSeen = Time.time;
+            CanReact = true;
         }
 
         public Grenade Grenade { get; private set; }

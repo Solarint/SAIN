@@ -30,6 +30,10 @@ namespace SAIN.Layers
             var SelfDecision = SAIN.Decision.CurrentSelfDecision;
             switch (Decision)
             {
+                case SAINSoloDecision.MoveToEngage:
+                    nextAction = new Action(typeof(MoveToEngage), $"{Decision}");
+                    break;
+
                 case SAINSoloDecision.RushEnemy:
                     nextAction = new Action(typeof(RushEnemy), $"{Decision}");
                     break;

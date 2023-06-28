@@ -281,7 +281,7 @@ namespace SAIN.Components
             var danger = VectorHelpers.DangerPoint(position, force, mass);
             foreach (var bot in SAINBots.Values)
             {
-                if (!bot.IsDead && bot.BotOwner.BotState == EBotState.Active)
+                if (!bot.IsDead)
                 {
                     var player = grenade.Player;
                     bool sendInfo = false;
@@ -289,7 +289,7 @@ namespace SAIN.Components
                     {
                         sendInfo = true;
                     }
-                    else if ((danger - bot.Position).sqrMagnitude < 22500f) // 150 meters min distance
+                    else if ((danger - bot.Position).sqrMagnitude < 150f * 150f) // 150 meters min distance
                     {
                         sendInfo = true;
                     }

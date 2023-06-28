@@ -74,7 +74,7 @@ namespace SAIN.Classes
                 {
                     status = CoverStatus.MidRangeToCover;
                 }
-                else if (PathDistance <= FarCoverDist)
+                else
                 {
                     status = CoverStatus.FarFromCover;
                 }
@@ -94,6 +94,5 @@ namespace SAIN.Classes
         private const float InCoverDist = 0.75f;
         private const float CloseCoverDist = 10f;
         private const float MidCoverDist = 25f;
-        private const float FarCoverDist = 50f;
     }
 }

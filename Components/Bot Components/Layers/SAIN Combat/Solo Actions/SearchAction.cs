@@ -115,11 +115,12 @@ namespace SAIN.Layers
             if (!SprintEnabled || BotOwner.Memory.IsUnderFire)
             {
                 SAIN.Mover.Sprint(false);
-                if (SAIN.Steering.SteerByPriority(false))
+                if (SAIN.Steering.SteerByPriority())
                 {
                 }
                 else
                 {
+                    return;
                     pos.y += 1f;
                     if (!SeenSearchPoint && !Physics.Raycast(SAIN.HeadPosition, pos - SAIN.HeadPosition, (pos - SAIN.HeadPosition).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                     {

@@ -207,6 +207,7 @@
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
     <Compile Include="Components\Bot Components\SubComponents\NoBushESP.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyBodyPart.cs" />

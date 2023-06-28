@@ -49,6 +49,24 @@ namespace SAIN.Patches
         }
     }
 
+    public class BotGlobalCore1 : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Constructor(typeof(GClass554));
+        }
+
+        [PatchPostfix]
+        public static void PatchPostfix(GClass554 __instance)
+        {
+            __instance.PistolFireDistancePref = 40f;
+            __instance.ShotgunFireDistancePref = 40f;
+            __instance.RifleFireDistancePref = 150f;
+            __instance.CanGrenade = true;
+            __instance.CanRun = true;
+        }
+    }
+
     public class BotGlobalShootPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
@@ -97,14 +115,14 @@ namespace SAIN.Patches
             __instance.CHANCE_TO_RUN_IF_NO_AMMO_0_100 = 100f;
             __instance.SEC_TO_CHANGE_TO_RUN = 0f;
             __instance.RUN_TO_COVER_MIN = 0f;
-            __instance.BASE_ROTATE_SPEED = 275f;
-            //__instance.FIRST_TURN_SPEED = 275f;
-            //__instance.FIRST_TURN_BIG_SPEED = 275f;
-            __instance.TURN_SPEED_ON_SPRINT = 320f;
+            __instance.BASE_ROTATE_SPEED = 265f;
+            __instance.FIRST_TURN_SPEED = 275f;
+            __instance.FIRST_TURN_BIG_SPEED = 300f;
+            //__instance.TURN_SPEED_ON_SPRINT = 320f;
         }
     }
 
-    public class BotGlobalCorePatch : ModulePatch
+    public class BotGlobalCore2Patch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -115,8 +133,8 @@ namespace SAIN.Patches
         public static void PatchPostfix(GClass559 __instance)
         {
             __instance.CARE_ENEMY_ONLY_TIME = 120f;
-            __instance.ENEMY_TO_BE_CURRENT = 20f;
-            __instance.DELAY_BEFORE_ENEMY = 0f;
+            //__instance.ENEMY_TO_BE_CURRENT = 20f;
+            //__instance.DELAY_BEFORE_ENEMY = 0f;
             //__instance.SCAV_GROUPS_TOGETHER = false;
             __instance.DIST_NOT_TO_GROUP = 50f;
             __instance.DIST_NOT_TO_GROUP_SQR = 50f * 50f;

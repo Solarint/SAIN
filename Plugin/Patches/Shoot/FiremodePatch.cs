@@ -41,7 +41,7 @@ namespace SAIN.Patches
                     {
                         weapon.FireMode.SetFireMode(EFireMode.fullauto);
                     }
-                    else if (weapon.WeapFireType.Contains(EFireMode.burst) && weapon.SelectedFireMode != EFireMode.burst)
+                    else if (weapon.WeapFireType.Contains(EFireMode.burst) && weapon.SelectedFireMode != EFireMode.burst && weapon.SelectedFireMode != EFireMode.fullauto)
                     {
                         weapon.FireMode.SetFireMode(EFireMode.burst);
                     }

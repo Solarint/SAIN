@@ -70,8 +70,23 @@ namespace SAIN.Classes
 
                 if (allTalkDelay < Time.time && TalkPack != null)
                 {
-                    SendSayCommand(TalkPack);
                     allTalkDelay = Time.time + GlobalTalkLimit.Value;
+                    if (TalkPack.phraseInfo.Phrase == EPhraseTrigger.Roger || TalkPack.phraseInfo.Phrase == EPhraseTrigger.Negative)
+                    {
+                        if (SAIN.Squad.VisibleMembers != null && SAIN.Squad.LeaderComponent != null && SAIN.Squad.VisibleMembers.Contains(SAIN.Squad.LeaderComponent) && SAIN.Enemy?.IsVisible == false)
+                        {
+                            if (TalkPack.phraseInfo.Phrase == EPhraseTrigger.Roger)
+                            {
+                                BotOwner.GetPlayer.HandsController.ShowGesture(EGesture.Good);
+                            }
+                            else
+                            {
+                                BotOwner.GetPlayer.HandsController.ShowGesture(EGesture.Bad);
+                            }
+                            return;
+                        }
+                    }
+                    SendSayCommand(TalkPack);
                 }
             }
         }
@@ -286,7 +301,7 @@ namespace SAIN.Classes
             Phrases.Add(new PhraseInfo(EPhraseTrigger.StartHeal, 18, 75f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtLight, 19, 60f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnWeaponReload, 20, 10f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnOutOfAmmo, 21, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnOutOfAmmo, 21, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtMedium, 22, 60f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.HurtHeavy, 23, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LegBroken, 24, 30f));
@@ -300,30 +315,30 @@ namespace SAIN.Classes
             Phrases.Add(new PhraseInfo(EPhraseTrigger.RightFlank, 32, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.NeedWeapon, 33, 15f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.WeaponBroken, 34, 15f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnGrenade, 35, 1f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyGrenade, 36, 1f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnGrenade, 35, 10f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.OnEnemyGrenade, 36, 10f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Stop, 37, 1f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnBeingHurt, 38, 1f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnAgony, 39, 1f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnDeath, 40, 1f));
 
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Regroup, 10, 90f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Regroup, 10, 80f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnSix, 15, 10f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.InTheFront, 15, 20f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.FollowMe, 15, 45f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.HoldPosition, 6, 60f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Suppress, 20, 15f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Roger, 10, 15f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Negative, 10, 15f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Roger, 10, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Negative, 10, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.PhraseNone, 1, 1f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.Attention, 25, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.OnYourOwn, 25, 15f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.Repeat, 25, 15f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.CoverMe, 25, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.Repeat, 25, 30f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.CoverMe, 25, 45f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.NoisePhrase, 5, 120f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.UnderFire, 34, 5f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.MumblePhrase, 10, 35f));
-            Phrases.Add(new PhraseInfo(EPhraseTrigger.GetBack, 10, 40f));
+            Phrases.Add(new PhraseInfo(EPhraseTrigger.GetBack, 10, 45f));
 
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LootBody, 5, 30f));
             Phrases.Add(new PhraseInfo(EPhraseTrigger.LootContainer, 5, 30f));

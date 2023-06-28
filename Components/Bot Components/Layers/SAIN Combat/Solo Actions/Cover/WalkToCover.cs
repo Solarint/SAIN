@@ -4,6 +4,7 @@ using EFT;
 using SAIN.Classes;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
+using System.Text;
 using UnityEngine;
 
 namespace SAIN.Layers
@@ -43,13 +44,21 @@ namespace SAIN.Layers
                     }
                     else
                     {
+                        RecalcPathTimer = Time.time + 2f;
                         MoveTo(DestinationPosition);
                     }
                 }
             }
+            if (CoverDestination != null && RecalcPathTimer < Time.time)
+            {
+                RecalcPathTimer = Time.time + 2f;
+                MoveTo(DestinationPosition);
+            }
 
             EngageEnemy();
         }
+
+        private float RecalcPathTimer = 0f;
 
         private bool FindTargetCover()
         {
@@ -94,14 +103,25 @@ namespace SAIN.Layers
 
         private void EngageEnemy()
         {
-            if (!SAIN.Steering.SteerByPriority(false))
+            if (SAIN.Enemy?.IsVisible == false && SAIN.Enemy.Seen && SAIN.Enemy.TimeSinceSeen < 5f && SAIN.Enemy.LastCornerToEnemy != null && SAIN.Enemy.CanSeeLastCornerToEnemy)
             {
+                Vector3 corner = SAIN.Enemy.LastCornerToEnemy.Value;
+                corner += Vector3.up * 1f;
+                SAIN.Steering.LookToPoint(corner);
+                if (BotOwner.WeaponManager.HaveBullets)
+                {
+                    BotOwner.ShootData.Shoot();
+                }
+            }
+            else
+            {
+                SAIN.Steering.SteerByPriority(false);
                 if (SAIN.Enemy != null)
                 {
                     SAIN.Steering.LookToEnemy(SAIN.Enemy);
                 }
+                Shoot.Update();
             }
-            Shoot.Update();
         }
 
         private readonly ShootClass Shoot;
@@ -114,6 +134,25 @@ namespace SAIN.Layers
         public override void Stop()
         {
             CoverDestination = null;
+        }
+        public override void BuildDebugText(StringBuilder stringBuilder)
+        {
+            stringBuilder.AppendLine($"SAIN Info:");
+            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
+            CoverPoint cover = SAIN.Cover.CoverInUse;
+            if (cover != null)
+            {
+                stringBuilder.AppendLine($"SAIN Cover Info:");
+                stringBuilder.AppendLabeledValue("Cover Position", $"{cover.Position}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Distance", $"{cover.Distance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Spotted?", $"{cover.Spotted}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.PathDistance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover ID", $"{cover.Id}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Status", $"{cover.CoverStatus}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{cover.HitInCoverCount}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover HitInCoverUnknownCount", $"{cover.HitInCoverUnknownCount}", Color.white, Color.yellow, true);
+            }
         }
 
         private readonly SAINComponent SAIN;

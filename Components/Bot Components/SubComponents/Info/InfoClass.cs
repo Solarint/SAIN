@@ -67,7 +67,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (BotOwner.Settings.FileSettings.Mind.CAN_TALK && TalkGlobal.Value)
+                if (TalkGlobal.Value)
                 {
                     if (IAmBoss)
                     {
@@ -84,6 +84,10 @@ namespace SAIN.Classes
                     if (IsPMC)
                     {
                         return PMCTalk.Value;
+                    }
+                    if (BotOwner.Settings.FileSettings.Mind.CAN_TALK)
+                    {
+                        return true;
                     }
                 }
                 return false;
@@ -155,27 +159,27 @@ namespace SAIN.Classes
                 switch (BotPersonality)
                 {
                     case BotPersonality.GigaChad:
-                        searchTime = 1f;
+                        searchTime = 1.5f;
                         break;
 
                     case BotPersonality.Chad:
-                        searchTime = 3f;
+                        searchTime = 5f;
                         break;
 
                     case BotPersonality.Timmy:
-                        searchTime = 50f;
+                        searchTime = 60f;
                         break;
 
                     case BotPersonality.Rat:
-                        searchTime = 90f;
+                        searchTime = 240f;
                         break;
 
                     case BotPersonality.Coward:
-                        searchTime = 30f;
+                        searchTime = 40f;
                         break;
 
                     default:
-                        searchTime = 10f;
+                        searchTime = 24f;
                         break;
                 }
             }
@@ -287,7 +291,11 @@ namespace SAIN.Classes
         {
             get
             {
-                if (PowerLevel > 90f && IsPMC && EFTMath.RandomBool(50))
+                if (PowerLevel > 85f && IsPMC && EFTMath.RandomBool(65))
+                {
+                    return true;
+                }
+                if (EFTMath.RandomBool(8))
                 {
                     return true;
                 }
@@ -299,7 +307,11 @@ namespace SAIN.Classes
         {
             get
             {
-                if (PowerLevel > 120f && IsPMC && EFTMath.RandomBool(60))
+                if (PowerLevel > 110f && IsPMC && EFTMath.RandomBool(75))
+                {
+                    return true;
+                }
+                if (EFTMath.RandomBool(8))
                 {
                     return true;
                 }
@@ -311,7 +323,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (BotOwner.Profile.Info.Level <= 10 && PowerLevel < 30f)
+                if (BotOwner.Profile.Info.Level <= 10 && PowerLevel < 25f)
                 {
                     return true;
                 }
@@ -323,7 +335,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (BotOwner.Profile.Info.Level < 50 && EFTMath.RandomBool())
+                if (BotOwner.Profile.Info.Level < 40 && EFTMath.RandomBool(40))
                 {
                     return true;
                 }
