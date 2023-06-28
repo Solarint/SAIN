@@ -208,6 +208,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\ColliderFinder.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverAnalyzer.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\SpottedCoverPoint.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\FrameWait.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
     <Compile Include="Components\Bot Components\SubComponents\NoBushESP.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyBodyPart.cs" />
@@ -248,7 +252,7 @@
     <Compile Include="Components\Bot Components\SubComponents\Enemy\CombatFunctions\FriendlyFireClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\CombatFunctions\JumpClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Mover\SAIN_Mover.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverPointClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverPointClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Decision\DecisionClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Sense\HearingSensorClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Sense\LastHeardSoundClass.cs" />
@@ -257,7 +261,7 @@
     <Compile Include="Components\Bot Components\SubComponents\Decision\Classes\SquadDecisionClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinderComponent.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverFinderComponent.cs" />
     <Compile Include="Plugin\Config\ExtractConfig.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DifficultyConfig.cs" />

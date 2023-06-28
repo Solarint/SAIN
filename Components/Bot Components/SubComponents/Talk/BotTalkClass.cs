@@ -168,9 +168,22 @@ namespace SAIN.Classes
             {
                 etagStatus = ETagStatus.Solo;
             }
-            if (SAIN.Enemy != null)
+
+            if (BotOwner.Memory.IsUnderFire)
             {
                 etagStatus |= ETagStatus.Combat;
+            }
+            else if (SAIN.Enemy != null)
+            {
+                if (SAIN.Enemy.Seen && SAIN.Enemy.TimeSinceSeen < 10f)
+                {
+                    etagStatus |= ETagStatus.Combat;
+                }
+                else
+                {
+                    etagStatus |= ETagStatus.Aware;
+                }
+
                 switch (SAIN.Enemy.Person.Side)
                 {
                     case EPlayerSide.Usec:
@@ -194,10 +207,12 @@ namespace SAIN.Classes
             {
                 etagStatus |= ETagStatus.Unaware;
             }
+
             if (additionaMask != null)
             {
                 etagStatus |= additionaMask.Value;
             }
+
             return etagStatus;
         }
 
