@@ -9,7 +9,6 @@ using UnityEngine;
 using System;
 using Aki.Reflection.Utils;
 using System.Linq;
-using static SAIN.UserSettings.DebugConfig;
 using static SAIN.UserSettings.ShootConfig;
 using static SAIN.UserSettings.DifficultyConfig;
 
@@ -18,19 +17,17 @@ namespace SAIN.Patches
     public class AimOffsetPatch : ModulePatch
     {
         private static Type _aimingDataType;
-        private static MethodInfo _aimingDataMethod13;
 
         protected override MethodBase GetTargetMethod()
         {
-            //return AccessTools.Method(typeof(GClass544), "method_7"); 
             _aimingDataType = PatchConstants.EftTypes.Single(x => x.GetProperty("LastSpreadCount") != null && x.GetProperty("LastAimTime") != null);
-            _aimingDataMethod13 = AccessTools.Method(_aimingDataType, "method_13");
-            return _aimingDataMethod13;
+            return AccessTools.Method(_aimingDataType, "method_13");
         }
 
         [PatchPrefix]
         public static bool PatchPrefix(GClass544 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
+            // Recoil Scatter Modifiers.
             float modifier = ScatterMultiplier.Value;
             if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
@@ -49,7 +46,8 @@ namespace SAIN.Patches
             }
             modifier /= GlobalDifficulty.Value;
 
-            __instance.EndTargetPoint = __instance.RealTargetPoint
+            // Applies aiming offset, recoil offset, and scatter offsets
+            Vector3 finalTarget = __instance.RealTargetPoint
                 + ___vector3_5
                 + ___float_13
 
@@ -57,6 +55,22 @@ namespace SAIN.Patches
                 + (___botOwner_0.RecoilData.RecoilOffset
                 * modifier));
 
+            if (HeadShotProtection.Value)
+            {
+                // Get the head position of a bot's current enemy if it exists
+                Vector3? headPos = ___botOwner_0.Memory.GoalEnemy?.Person?.MainParts[BodyPartType.head].Position;
+                if (headPos != null)
+                {
+                    // Check the distance to the bot's aiming target, and see if its really close or on the player's head
+                    float dist = (headPos.Value - finalTarget).sqrMagnitude;
+                    if (dist < 0.1f * 0.1f)
+                    {
+                        // Shift the aim target up if it was going to be a headshot
+                        finalTarget += Vector3.up * 0.2f;
+                    }
+                }
+            }
+            __instance.EndTargetPoint = finalTarget;
             return false;
         }
     }

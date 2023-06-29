@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Classes;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using UnityEngine;
@@ -23,25 +24,34 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (SAIN.Enemy == null)
+            SAINEnemy enemy = SAIN.Enemy;
+            if (enemy == null)
             {
                 return;
             }
 
             SAIN.Mover.SetTargetPose(1f);
             SAIN.Mover.SetTargetMoveSpeed(1f);
-            Vector3 lastSeenPos = SAIN.Enemy.PositionLastSeen;
-            float distance = SAIN.Enemy.RealDistance;
-            bool enemyLookAtMe = SAIN.Enemy.EnemyLookingAtMe;
-            float EffDist = SAIN.Info.WeaponInfo.EffectiveWeaponDistance;
 
-            if (enemyLookAtMe || distance <= EffDist)
+            if (CheckShoot(enemy))
             {
                 Shoot.Update();
                 return;
             }
 
-            if (distance > 40f && !BotOwner.Memory.IsUnderFire && !enemyLookAtMe)
+            if (SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
+            {
+                SAIN.SelfActions.TryReload();
+            }
+
+            Vector3 lastSeenPos = enemy.PositionLastSeen;
+            if ((BotOwner.Position - lastSeenPos).sqrMagnitude < 2f)
+            {
+                lastSeenPos = enemy.Position;
+            }
+
+            float distance = enemy.RealDistance;
+            if (distance > 40f && !BotOwner.Memory.IsUnderFire)
             {
                 if (RecalcPathTimer < Time.time)
                 {
@@ -64,6 +74,26 @@ namespace SAIN.Layers
                     SAIN.Steering.LookToPoint(lastSeenPos + Vector3.up * 1f);
                 }
             }
+        }
+
+        private bool CheckShoot(SAINEnemy enemy)
+        {
+            float distance = enemy.RealDistance;
+            bool enemyLookAtMe = enemy.EnemyLookingAtMe;
+            float EffDist = SAIN.Info.WeaponInfo.EffectiveWeaponDistance;
+
+            if (enemy.IsVisible)
+            {
+                if (enemyLookAtMe)
+                {
+                    return true;
+                }
+                if (distance <= EffDist && enemy.CanShoot)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
 

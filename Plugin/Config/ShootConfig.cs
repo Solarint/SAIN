@@ -10,10 +10,16 @@ namespace SAIN.UserSettings
         public static ConfigEntry<float> LerpRecoil { get; private set; }
         public static ConfigEntry<float> BurstLengthModifier { get; private set; }
         public static ConfigEntry<float> RateofFire { get; private set; }
+        public static ConfigEntry<bool> HeadShotProtection { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
             string shoot = "Bot Shoot Settings";
+
+            HeadShotProtection = Config.Bind(shoot, "Extra Headshot Protection", true,
+                new ConfigDescription("Adds extra protection from bots aiming to the players head, accidently or otherwise",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 55 }));
 
             RateofFire = Config.Bind(shoot, "SemiAuto Rate of Fire Modifier", 1.45f,
                 new ConfigDescription("Adjusts bot's base rate of fire value. Higher is faster overall rate of fire.",

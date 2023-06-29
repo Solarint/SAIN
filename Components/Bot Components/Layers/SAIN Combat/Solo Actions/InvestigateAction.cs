@@ -22,9 +22,16 @@ namespace SAIN.Layers
 
         public override void Update()
         {
+            if (SAIN.Enemy?.IsVisible == false && SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
+            {
+                SAIN.SelfActions.TryReload();
+            }
+
             SAIN.Mover.SetTargetMoveSpeed(0.7f);
             SAIN.Mover.SetTargetPose(1f);
+
             Shoot.Update();
+
             if (SearchPoint == null)
             {
                 SAIN.Decision.ResetDecisions();

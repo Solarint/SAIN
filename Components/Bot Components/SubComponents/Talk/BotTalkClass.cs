@@ -3,8 +3,6 @@ using EFT;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 using static SAIN.UserSettings.TalkConfig;
 
 namespace SAIN.Classes
@@ -31,11 +29,6 @@ namespace SAIN.Classes
             {
                 ETagStatus mask = SetETagMask(additionalMask);
                 CheckPhrase(type, mask);
-                if (BotOwner.BotsGroup.GroupTalk.CanSay(BotOwner, type) || type == EPhraseTrigger.OnAgony || type == EPhraseTrigger.OnBeingHurt || type == EPhraseTrigger.OnDeath)
-                {
-                    //ETagStatus mask = SetETagMask(additionalMask);
-                    //CheckPhrase(type, mask);
-                }
             }
         }
 

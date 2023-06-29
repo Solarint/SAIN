@@ -2,7 +2,6 @@ using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
 using SAIN.Components;
-using System.Drawing;
 using UnityEngine;
 using static SAIN.UserSettings.TalkConfig;
 

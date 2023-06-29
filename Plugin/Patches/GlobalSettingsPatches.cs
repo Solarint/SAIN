@@ -39,6 +39,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalAimingSettings __instance)
         {
+            __instance.AIMING_TYPE = 4;
             __instance.SHPERE_FRIENDY_FIRE_SIZE = 0.15f;
             //__instance.RECALC_MUST_TIME = 1;
             //__instance.RECALC_MUST_TIME_MIN = 1;

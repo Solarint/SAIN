@@ -44,14 +44,14 @@ namespace SAIN.Classes
             //}
 
             var goalEnemy = BotOwner.Memory.GoalEnemy;
-            if (goalEnemy?.Person != null)
+            if (goalEnemy?.Person != null && goalEnemy.Person.HealthController.IsAlive)
             {
                 AddEnemy(goalEnemy.Person);
             }
             else
             {
                 goalEnemy = BotOwner.Memory.LastEnemy;
-                if (goalEnemy?.Person != null)
+                if (goalEnemy?.Person != null && goalEnemy.Person.HealthController.IsAlive)
                 {
                     AddEnemy(goalEnemy.Person);
                 }

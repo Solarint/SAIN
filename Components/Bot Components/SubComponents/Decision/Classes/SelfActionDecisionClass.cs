@@ -21,6 +21,13 @@ namespace SAIN.Classes
 
         public bool GetDecision(out SAINSelfDecision Decision)
         {
+            if ( SAIN.Enemy == null && !BotOwner.Medecine.Using && CheckLowAmmo(0.75f) )
+            {
+                SAIN.SelfActions.TryReload();
+                Decision = SAINSelfDecision.None;
+                return false;
+            }
+
             if (!CheckContinueSelfAction(out Decision))
             {
                 if (StartRunGrenade())

@@ -24,7 +24,7 @@ namespace SAIN.Components
         public CoverAnalyzer CoverAnalyzer { get; private set; }
         public ColliderFinder ColliderFinder { get; private set; }
 
-        private Collider[] Colliders;
+        private Collider[] Colliders = new Collider[200];
 
         private void Update()
         {
@@ -250,22 +250,17 @@ namespace SAIN.Components
 
         private void GetColliders(out int hits)
         {
-            const float CheckDistThresh = 100f;
-            const float ColliderSortDistThresh = 25f;
+            const float CheckDistThresh = 10f * 10f;
+            const float ColliderSortDistThresh = 3f * 3f;
 
             float distance = (LastCheckPos - OriginPoint).sqrMagnitude;
-            if (Colliders == null || distance > CheckDistThresh)
+            if (distance > CheckDistThresh)
             {
-                if (Colliders == null)
-                {
-                    Colliders = new Collider[200];
-                }
                 LastCheckPos = OriginPoint;
                 ColliderFinder.GetNewColliders(out hits, OriginPoint, TargetPosition, Colliders);
                 LastHitCount = hits;
-                return;
             }
-            else if (distance > ColliderSortDistThresh)
+            if (distance > ColliderSortDistThresh)
             {
                 ColliderFinder.SortArrayBotDist(Colliders);
             }
@@ -273,7 +268,7 @@ namespace SAIN.Components
             hits = LastHitCount;
         }
 
-        private Vector3 LastCheckPos;
+        private Vector3 LastCheckPos = Vector3.zero + Vector3.down * 100f;
         private int LastHitCount = 0;
 
         public void OnDestroy()

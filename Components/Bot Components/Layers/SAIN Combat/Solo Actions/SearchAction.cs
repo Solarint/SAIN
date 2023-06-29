@@ -51,6 +51,11 @@ namespace SAIN.Layers
         {
             Shoot.Update();
 
+            if (SAIN.Enemy?.IsVisible == false && SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
+            {
+                SAIN.SelfActions.TryReload();
+            }
+
             if ( TargetPosition != null )
             {
                 if (SAIN.Enemy == null && (BotOwner.Position - TargetPosition.Value).sqrMagnitude < 2f)
