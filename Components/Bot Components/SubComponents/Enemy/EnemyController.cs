@@ -30,19 +30,6 @@ namespace SAIN.Classes
                 ClearEnemies();
             }
 
-            //if (BotOwner.BotsGroup.Enemies.Count > 0)
-            //{
-            //    foreach (var person in BotOwner.BotsGroup.Enemies.Keys)
-            //    {
-            //        string id = person.ProfileId;
-            //        if (!Enemies.ContainsKey(id))
-            //        {
-            //            SAINEnemy sainEnemy = new SAINEnemy(BotOwner, person, 1f);
-            //            Enemies.Add(id, sainEnemy);
-            //        }
-            //    }
-            //}
-
             var goalEnemy = BotOwner.Memory.GoalEnemy;
             if (goalEnemy?.Person != null && goalEnemy.Person.HealthController.IsAlive)
             {
