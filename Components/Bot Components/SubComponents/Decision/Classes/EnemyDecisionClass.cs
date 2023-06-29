@@ -39,7 +39,10 @@ namespace SAIN.Classes
             }
             else if (StartSearch(enemy))
             {
-                SAIN.Info.GetTimeBeforeSearch();
+                if (CurrentDecision != SAINSoloDecision.Search)
+                {
+                    SAIN.Info.GetTimeBeforeSearch();
+                }
                 Decision = SAINSoloDecision.Search;
             }
             else if (StartShiftCover(enemy))
