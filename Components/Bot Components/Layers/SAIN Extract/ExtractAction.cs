@@ -13,12 +13,10 @@ namespace SAIN.Layers
 {
     internal class ExtractAction : CustomLogic
     {
-        private PropertyInfo _BotLeaveProp;
         private MethodInfo _BotUnspawn;
         public ExtractAction(BotOwner bot) : base(bot)
         {
-            _BotLeaveProp = AccessTools.Property(typeof(BotOwner), "LeaveData");
-            _BotUnspawn = AccessTools.Method(_BotLeaveProp.PropertyType, "method_1");
+            _BotUnspawn = AccessTools.Method(bot.LeaveData.GetType(), "method_1");
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
             Shoot = new ShootClass(bot, SAIN);
@@ -131,7 +129,7 @@ namespace SAIN.Layers
             if (ExtractTimer < Time.time)
             {
                 Logger.LogInfo($"{BotOwner.name} Extracted at {point} at {System.DateTime.UtcNow}");
-                _BotUnspawn.Invoke(BotOwner, null);
+                _BotUnspawn.Invoke(BotOwner.LeaveData, null);
             }
         }
 

@@ -19,32 +19,6 @@ namespace SAIN.Components
         {
             BotOwner = GetComponent<BotOwner>();
             AddComponents(BotOwner);
-            BotOwner.LeaveData.OnLeave += BotUnspawn;
-            BotOwner.GetPlayer.OnPlayerDeadOrUnspawn += BotKilled;
-        }
-
-        private void BotUnspawn(BotOwner bot)
-        {
-            if (BotOwner.ProfileId == bot.ProfileId)
-            {
-                SAINPlugin.BotController.RemoveBot(ProfileId);
-            }
-            else
-            {
-                Logger.LogError("Cant Unspawn BotUnspawn");
-            }
-        }
-
-        private void BotKilled(Player player)
-        {
-            if (BotOwner.ProfileId == player.AIData?.BotOwner?.ProfileId)
-            {
-                SAINPlugin.BotController.RemoveBot(ProfileId);
-            }
-            else
-            {
-                Logger.LogError("Cant Unspawn BotKilled");
-            }
         }
 
         public List<Vector3> ExitsToLocation { get; private set; } = new List<Vector3>();
@@ -177,9 +151,6 @@ namespace SAIN.Components
 
         public void Dispose()
         {
-            BotOwner.LeaveData.OnLeave -= BotUnspawn;
-            BotOwner.GetPlayer.OnPlayerDeadOrUnspawn -= BotKilled;
-
             StopAllCoroutines();
 
             Destroy(Squad);
@@ -197,9 +168,6 @@ namespace SAIN.Components
             Destroy(Mover);
             Destroy(NoBushESP);
             Destroy(EnemyController);
-            Destroy(Cover);
-            Destroy(Hearing);
-            Destroy(FlashLight);
             Destroy(Sounds);
 
             Destroy(this);

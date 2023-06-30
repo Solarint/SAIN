@@ -13,6 +13,35 @@ namespace SAIN.Components.BotController
         public BotSpawnController() { }
 
         public Dictionary<string, SAINComponent> SAINBotDictionary = new Dictionary<string, SAINComponent>();
+        private BotSpawnerClass BotSpawnerClass => BotController?.BotSpawnerClass;
+
+        public void Update()
+        {
+            if (BotSpawnerClass != null)
+            {
+                if (Subscribed)
+                {
+                    var status = BotController.BotGame.Status;
+                    if (status == GameStatus.Stopping || status == GameStatus.Stopped || status == GameStatus.SoftStopping)
+                    {
+                        BotSpawnerClass.OnBotRemoved -= RemoveBot;
+                        BotSpawnerClass.OnBotCreated -= AddBot;
+                        Subscribed = false;
+                        GameEnding = true;
+                    }
+                }
+
+                if (!Subscribed && !GameEnding)
+                {
+                    BotSpawnerClass.OnBotRemoved += RemoveBot;
+                    BotSpawnerClass.OnBotCreated += AddBot;
+                    Subscribed = true;
+                }
+            }
+        }
+
+        private bool GameEnding = false;
+        private bool Subscribed = false;
 
         public void AddBot(BotOwner bot)
         {
@@ -48,26 +77,21 @@ namespace SAIN.Components.BotController
             {
                 if (bot != null)
                 {
-                    RemoveFromDictionary(bot.ProfileId);
+                    SAINBotDictionary.Remove(bot.ProfileId);
+                    if (bot.TryGetComponent<SAINComponent>(out var component))
+                    {
+                        component.BotOwner.LeaveData.OnLeave -= RemoveBot;
+                        component.Dispose();
+                    }
                 }
                 else
                 {
-                    Logger.LogError("Bot is null, cannot remove it from dictionary!");
+                    Logger.LogError("Bot is null, cannot dispose!");
                 }
             }
             catch (Exception ex)
             {
                 Logger.LogError($"Dispose Component Error: {ex}");
-            }
-        }
-
-        private void RemoveFromDictionary(string profileId)
-        {
-            if (SAINBotDictionary.TryGetValue(profileId, out var component))
-            {
-                component.BotOwner.LeaveData.OnLeave -= RemoveBot;
-                component?.Dispose();
-                SAINBotDictionary.Remove(profileId);
             }
         }
     }

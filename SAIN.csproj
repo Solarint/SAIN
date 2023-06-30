@@ -239,7 +239,7 @@
     <Compile Include="Components\Bot Controller Components\Classes\TimeClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Sense\VisionClass.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\InvestigateAction.cs" />
-    <Compile Include="Components\Bot Controller Components\Classes\BotControllerAbstract.cs" />
+    <Compile Include="Components\Bot Controller Components\BotControllerAbstract.cs" />
     <Compile Include="Components\Bot Controller Components\SAINBotController.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\DecisionManager.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\PathManager.cs" />

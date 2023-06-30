@@ -1,16 +1,12 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using SAIN.Components;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using UnityEngine.AI;
 using static SAIN.UserSettings.VisionConfig;
-using SAIN.Helpers;
-using SAIN.Classes;
 
 namespace SAIN.Components
 {
@@ -30,11 +26,13 @@ namespace SAIN.Components
         public void Update()
         {
             Frames++;
-            if (Frames == CheckFrameCount.Value)
+            if (Frames >= CheckFrameCount.Value)
             {
                 Frames = 0;
-                GlobalRaycastJob();
-                //CheckEnemiesJobs();
+                if (Bots != null && Bots.Count > 0)
+                {
+                    GlobalRaycastJob();
+                }
             }
         }
 
@@ -55,9 +53,9 @@ namespace SAIN.Components
 
         private void CheckEnemiesJobs()
         {
-            if (BotController.Bots.Count > 0)
+            if (Bots.Count > 0)
             {
-                foreach (var bot in BotController.Bots.Values)
+                foreach (var bot in Bots.Values)
                 {
                     if (bot?.Enemy != null)
                     {
@@ -194,7 +192,7 @@ namespace SAIN.Components
 
         private void GlobalRaycastJob()
         {
-            var sainBots = BotController.Bots.Values.ToList();
+            var sainBots = Bots.Values.ToList();
             int total = sainBots.Count * RegisteredPlayers.Count;
 
             NativeArray<SpherecastCommand> allSpherecastCommands = new NativeArray<SpherecastCommand>(

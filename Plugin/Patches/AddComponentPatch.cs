@@ -26,7 +26,7 @@ namespace SAIN.Patches.Components
 
             try
             {
-                SAINPlugin.BotController.AddBot(__instance);
+                //SAINPlugin.BotController.AddBot(__instance);
             }
             catch (Exception ex)
             {
@@ -57,7 +57,7 @@ namespace SAIN.Patches.Components
 
             try
             {
-                SAINPlugin.BotController.RemoveBot(__instance.ProfileId);
+                //SAINPlugin.BotController.RemoveBot(__instance.ProfileId);
             }
             catch (Exception ex)
             {

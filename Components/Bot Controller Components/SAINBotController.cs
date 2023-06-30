@@ -17,9 +17,9 @@ namespace SAIN.Components
         public Action<SAINSoundType, Player, float> AISoundPlayed { get; private set; }
 
         public Dictionary<string, SAINComponent> Bots = new Dictionary<string, SAINComponent>();
-        public GameWorld GameWorldInstance => Singleton<GameWorld>.Instance;
+        public GameWorld GameWorld => Singleton<GameWorld>.Instance;
         public IBotGame BotGame => Singleton<IBotGame>.Instance;
-        public static Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
+        public Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
         public BotControllerClass DefaultController { get; set; }
         public ManualLogSource Logger => LineOfSightManager.Logger;
         public BotSpawnerClass BotSpawnerClass { get; set; }
@@ -57,9 +57,8 @@ namespace SAIN.Components
 
         private void Update()
         {
-            if (GameWorldInstance == null)
+            if (GameWorld == null)
             {
-                Dispose();
                 return;
             }
             if (BotGame == null)
@@ -67,13 +66,7 @@ namespace SAIN.Components
                 return;
             }
 
-            if (!Subscribed && BotSpawnerClass != null)
-            {
-                BotSpawnerClass.OnBotRemoved += BotSpawnController.RemoveBot;
-                BotSpawnerClass.OnBotCreated += BotSpawnController.AddBot;
-                Subscribed = true;
-            }
-
+            BotSpawnController.Update();
             BotExtractManager.Update();
             UpdateMainPlayer();
             TimeClass.Update();
@@ -275,7 +268,7 @@ namespace SAIN.Components
             }
             if (!isSmoke)
             {
-                Singleton<GClass629>.Instance.PlaySound(player, explosionPosition, 300f, AISoundType.gun);
+                Singleton<GClass629>.Instance.PlaySound(player, explosionPosition, 200f, AISoundType.gun);
             }
         }
 
@@ -321,12 +314,6 @@ namespace SAIN.Components
             AISoundPlayed -= SoundPlayed;
             Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
-
-            if (BotSpawnerClass != null)
-            {
-                BotSpawnerClass.OnBotRemoved -= BotSpawnController.RemoveBot;
-                BotSpawnerClass.OnBotCreated -= BotSpawnController.AddBot;
-            }
 
             foreach (var obstacle in DeathObstacles)
             {

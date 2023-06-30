@@ -26,6 +26,11 @@ namespace SAIN.Layers
 
         public override void Update()
         {
+            if (CoverInUse == null)
+            {
+                return;
+            }
+
             if (!Stopped && !CoverInUse.Spotted && (CoverInUse.Position - BotOwner.Position).sqrMagnitude < 0.33f)
             {
                 SAIN.Mover.StopMove();
@@ -77,7 +82,7 @@ namespace SAIN.Layers
         public override void Start()
         {
             CoverInUse = SAIN.Cover.CoverInUse;
-            SAIN.Mover.Sprint(false);
+            //SAIN.Mover.Sprint(false);
         }
 
         public override void Stop()
@@ -89,7 +94,7 @@ namespace SAIN.Layers
             stringBuilder.AppendLine($"SAIN Info:");
             stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
-            CoverPoint cover = SAIN.Cover.CoverInUse;
+            CoverPoint cover = CoverInUse;
             if (cover != null)
             {
                 stringBuilder.AppendLine($"SAIN Cover Info:");

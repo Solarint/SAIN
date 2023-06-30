@@ -21,7 +21,7 @@ namespace SAIN
 
         public ManualLogSource Logger { get; private set; }
         public SAINBotController BotController { get; private set; }
-        public Dictionary<string, SAINComponent> SAINBots2 => BotController?.Bots;
+        public Dictionary<string, SAINComponent> Bots => BotController?.BotSpawnController?.SAINBotDictionary;
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
     }
 }

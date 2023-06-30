@@ -44,7 +44,7 @@ namespace SAIN
 
         private static void ComponentPatches()
         {
-            new Patches.Components.AddComponentPatch().Enable();
+            //new Patches.Components.AddComponentPatch().Enable();
             //new Patches.Components.DisposeComponentPatch().Enable();
         }
 

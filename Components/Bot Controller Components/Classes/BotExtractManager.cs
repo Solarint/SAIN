@@ -10,10 +10,7 @@ namespace SAIN.Components.BotController
 {
     public class BotExtractManager : SAINControl
     {
-        public BotExtractManager()
-        {
-            ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
-        }
+        public BotExtractManager() { }
 
         public ExfiltrationControllerClass ExfilController { get; private set; }
         public float TotalRaidTime { get; private set; }
@@ -24,29 +21,44 @@ namespace SAIN.Components.BotController
             {
                 return;
             }
-            if (CheckExtractTimer < Time.time)
+            if (GetExfilControl())
             {
-                CheckExtractTimer = Time.time + 5f;
-                CheckTimeRemaining();
-                if (DebugCheckExfilTimer < Time.time)
+                if (CheckExtractTimer < Time.time)
                 {
-                    DebugCheckExfilTimer = Time.time + 30f;
-                    Console.WriteLine($"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. Total Raid Seconds: [{TotalRaidTime}] Found: [{ValidScavExfils.Count}] ScavExfils and [{ValidExfils.Count}] PMC Exfils to be used.");
+                    CheckExtractTimer = Time.time + 10f;
+                    CheckTimeRemaining();
+                    if (DebugCheckExfilTimer < Time.time)
+                    {
+                        DebugCheckExfilTimer = Time.time + 30f;
+                        Console.WriteLine($"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. Total Raid Seconds: [{TotalRaidTime}] Found: [{ValidScavExfils.Count}] ScavExfils and [{ValidExfils.Count}] PMC Exfils to be used.");
+                    }
+                }
+                if (CheckExfilTimer < Time.time)
+                {
+                    CheckExfilTimer = Time.time + 3f;
+                    FindExfilsForBots();
                 }
             }
-            if (AllScavExfils == null)
+        }
+
+        private bool GetExfilControl()
+        {
+            if (ExfilController == null)
             {
-                AllScavExfils = ExfilController?.ScavExfiltrationPoints;
+                ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
             }
-            if (AllExfils == null)
+            else
             {
-                AllExfils = ExfilController?.ExfiltrationPoints;
+                if (AllScavExfils == null)
+                {
+                    AllScavExfils = ExfilController.ScavExfiltrationPoints;
+                }
+                if (AllExfils == null)
+                {
+                    AllExfils = ExfilController.ExfiltrationPoints;
+                }
             }
-            if (CheckExfilTimer < Time.time)
-            {
-                CheckExfilTimer = Time.time + 3f;
-                FindExfilsForBots();
-            }
+            return ExfilController != null;
         }
 
         private float DebugCheckExfilTimer = 0f;
@@ -59,9 +71,9 @@ namespace SAIN.Components.BotController
 
         private bool FindExfilsForBots()
         {
-            if (BotController?.Bots.Count > 0)
+            if (Bots?.Count > 0)
             {
-                foreach (var bot in BotController.Bots)
+                foreach (var bot in Bots)
                 {
                     if (bot.Value == null)
                     {
