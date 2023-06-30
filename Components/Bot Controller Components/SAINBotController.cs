@@ -321,7 +321,12 @@ namespace SAIN.Components
             AISoundPlayed -= SoundPlayed;
             Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
-            //Singleton<BotSpawnerClass>.Instance.OnBotRemoved -= BotDeath;
+
+            if (BotSpawnerClass != null)
+            {
+                BotSpawnerClass.OnBotRemoved -= BotSpawnController.RemoveBot;
+                BotSpawnerClass.OnBotCreated -= BotSpawnController.AddBot;
+            }
 
             foreach (var obstacle in DeathObstacles)
             {
