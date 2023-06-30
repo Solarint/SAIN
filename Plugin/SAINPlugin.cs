@@ -7,6 +7,9 @@ using SAIN.Components;
 using EFT;
 using BepInEx.Bootstrap;
 using Comfort.Common;
+using BepInEx.Configuration;
+using EFT.UI;
+using UnityEngine;
 
 namespace SAIN
 {
@@ -16,6 +19,7 @@ namespace SAIN
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
     {
+        public static readonly Difficulty.Editor DifficultySettings = new Difficulty.Editor();
         private void Awake()
         {
             if (!TarkovVersion.CheckEftVersion(Logger, Info, Config))
@@ -32,11 +36,23 @@ namespace SAIN
             }
 
             ConfigInit();
+            EditorInit();
             EFTPatches.Init();
             BigBrainSAIN.Init();
         }
 
         public static bool ExtractingDisabled { get; private set; }
+
+        private void EditorInit()
+        {
+            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(Difficulty.Editor.OpenPanel));
+
+            Difficulty.Editor.TogglePanel = Config.Bind(
+                "Difficulty Editor",
+                "SAIN Bot Difficulty Editor",
+                new KeyboardShortcut(KeyCode.Home),
+                "The keyboard shortcut that toggles editor");
+        }
 
         private void ConfigInit()
         {
@@ -53,6 +69,7 @@ namespace SAIN
 
         private void Update()
         {
+            DifficultySettings.Update();
             BotControllerHandler.Update();
             if (Singleton<GameWorld>.Instance != null)
             {
@@ -66,6 +83,11 @@ namespace SAIN
                     }
                 }
             }
+        }
+
+        private void OnGUI()
+        {
+            DifficultySettings.OnGUI();
         }
 
         private bool WayPointsChecked = false;

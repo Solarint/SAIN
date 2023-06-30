@@ -276,7 +276,7 @@ namespace SAIN.Components
             StopAllCoroutines();
         }
 
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
         private SAINComponent SAIN;
         protected ManualLogSource Logger;
         private float MinObstacleHeight;

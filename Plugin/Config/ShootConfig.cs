@@ -4,7 +4,6 @@ namespace SAIN.UserSettings
 {
     internal class ShootConfig
     {
-        public static ConfigEntry<float> ScatterMultiplier { get; private set; }
         public static ConfigEntry<float> MaxScatter { get; private set; }
         public static ConfigEntry<float> AddRecoil { get; private set; }
         public static ConfigEntry<float> LerpRecoil { get; private set; }
@@ -31,11 +30,6 @@ namespace SAIN.UserSettings
                 new AcceptableValueRange<float>(0.1f, 3.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 7 }));
 
-            ScatterMultiplier = Config.Bind(shoot, "Bot Recoil Scatter Multiplier", 1.25f,
-                new ConfigDescription("Increases or decreases scatter from recoil. Higher value equals more recoil for bots.",
-                new AcceptableValueRange<float>(0.01f, 10.0f),
-                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
-
             MaxScatter = Config.Bind(shoot, "Bot Recoil Max Scatter", 2f,
                 new ConfigDescription("Upper Limit for how far from a target the recoil scatter can go",
                 new AcceptableValueRange<float>(0.5f, 10.0f),
@@ -43,11 +37,11 @@ namespace SAIN.UserSettings
 
             AddRecoil = Config.Bind(shoot, "Bot Recoil Add Recoil Scatter", 0.325f,
                 new ConfigDescription("Adds or subtracts from the recoil felt per shot",
-                new AcceptableValueRange<float>(-1.0f, 5.0f),
+                new AcceptableValueRange<float>(-1.0f, 2.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
 
             LerpRecoil = Config.Bind(shoot, "Bot Recoil Recoil Reduction", 0.925f,
-                new ConfigDescription("How much to reduce recoil per frame when not shooting",
+                new ConfigDescription("How much to compensate recoil per frame",
                 new AcceptableValueRange<float>(0.1f, 0.99f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
         }

@@ -28,23 +28,23 @@ namespace SAIN.Patches
         public static bool PatchPrefix(GClass544 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
             // Recoil Scatter Modifiers.
-            float modifier = ScatterMultiplier.Value;
+            float modifier = 1f;
             if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
                 if (component.Info.IsPMC)
                 {
-                    modifier /= PMCDifficulty.Value;
+                    modifier *= PMCRecoil.Value;
                 }
                 else if (component.Info.IsScav)
                 {
-                    modifier /= ScavDifficulty.Value;
+                    modifier *= ScavRecoil.Value;
                 }
                 else
                 {
-                    modifier /= OtherDifficulty.Value;
+                    modifier *= OtherRecoil.Value;
                 }
             }
-            modifier /= GlobalDifficulty.Value;
+            modifier *= BotRecoilGlobal.Value;
 
             // Applies aiming offset, recoil offset, and scatter offsets
             Vector3 finalTarget = __instance.RealTargetPoint

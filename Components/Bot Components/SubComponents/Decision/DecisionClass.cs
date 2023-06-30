@@ -13,7 +13,7 @@ namespace SAIN.Classes
     public class DecisionClass : MonoBehaviour
     {
         private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Awake()
         {

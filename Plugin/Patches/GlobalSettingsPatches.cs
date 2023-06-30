@@ -177,6 +177,8 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalLookData __instance)
         {
+            __instance.FULL_SECTOR_VIEW = false;
+
             __instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 1000f;
 
             __instance.NIGHT_VISION_ON = 75f;

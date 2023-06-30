@@ -4,10 +4,13 @@ namespace SAIN.UserSettings
 {
     internal class DifficultyConfig
     {
-        public static ConfigEntry<float> GlobalDifficulty { get; private set; }
-        public static ConfigEntry<float> PMCDifficulty { get; private set; }
-        public static ConfigEntry<float> ScavDifficulty { get; private set; }
-        public static ConfigEntry<float> OtherDifficulty { get; private set; }
+        public static ConfigEntry<float> BotRecoilGlobal { get; private set; }
+        public static ConfigEntry<float> PMCRecoil { get; private set; }
+        public static ConfigEntry<float> ScavRecoil { get; private set; }
+        public static ConfigEntry<float> OtherRecoil { get; private set; }
+
+        public static ConfigEntry<float> BaseAccuracy { get; private set; }
+
         public static ConfigEntry<bool> FasterCQBReactions { get; private set; }
         public static ConfigEntry<bool> AllChads { get; private set; }
         public static ConfigEntry<bool> AllGigaChads { get; private set; }
@@ -22,26 +25,30 @@ namespace SAIN.UserSettings
                 null,
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 10 }));
 
-            GlobalDifficulty = Config.Bind(shoot, "Global Difficulty", 1.0f,
-                new ConfigDescription("Affects all bots. Only modifies Recoil/scatter. Higher Number equals harder bots",
-                new AcceptableValueRange<float>(0.5f, 2.0f),
+            BaseAccuracy = Config.Bind(shoot, "Base Accuracy Modifier", 1.0f,
+                new ConfigDescription("Affects all bots. Modifies base accuracy for aiming. Higher Number equals easier and less accurate bots",
+                new AcceptableValueRange<float>(0.5f, 1.5f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 5 }));
 
-            PMCDifficulty = Config.Bind(shoot, "PMC Difficulty", 1.0f,
-                new ConfigDescription("Only modifies Recoil/scatter. Higher Number equals harder bots",
-                new AcceptableValueRange<float>(0.5f, 2.0f),
+            BotRecoilGlobal = Config.Bind(shoot, "Bot Global Recoil Multiplier", 1.0f,
+                new ConfigDescription("Affects all bots. Only modifies Recoil/scatter. Higher Number equals easier and less accurate bots",
+                new AcceptableValueRange<float>(0.5f, 3.0f),
+                new ConfigurationManagerAttributes { IsAdvanced = false, Order = 5 }));
+
+            PMCRecoil = Config.Bind(shoot, "PMC Recoil Multiplier", 1.0f,
+                new ConfigDescription("Only modifies Recoil/scatter. Higher Number equals easier and less accurate bots",
+                new AcceptableValueRange<float>(0.5f, 3.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 4 }));
 
-            ScavDifficulty = Config.Bind(shoot, "Scav Difficulty", 1.0f,
-                new ConfigDescription("Only modifies Recoil/scatter. Higher Number equals harder bots",
-                new AcceptableValueRange<float>(0.5f, 2.0f),
+            ScavRecoil = Config.Bind(shoot, "Scav Recoil Multiplier", 1.0f,
+                new ConfigDescription("Only modifies Recoil/scatter. Higher Number equals easier and less accurate bots",
+                new AcceptableValueRange<float>(0.5f, 3.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 3 }));
 
-            OtherDifficulty = Config.Bind(shoot, "Other Difficulty", 1.0f,
-                new ConfigDescription("Everything except scavs and pmcs. Only modifies Recoil/scatter. Higher Number equals harder bots",
-                new AcceptableValueRange<float>(0.5f, 2.0f),
+            OtherRecoil = Config.Bind(shoot, "Other Bots Recoil Multiplier", 1.0f,
+                new ConfigDescription("Everything except scavs and pmcs. Only modifies Recoil/scatter. Higher Number equals easier and less accurate bots",
+                new AcceptableValueRange<float>(0.5f, 3.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
-
 
             AllGigaChads = Config.Bind(shoot, "All Bots are GigaChads", false,
                 new ConfigDescription("WARNING not recommended to actually play with this. Bots will be too predictable. For the memes",

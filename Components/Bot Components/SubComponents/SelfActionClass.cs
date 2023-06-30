@@ -10,7 +10,7 @@ namespace SAIN.Classes
     public class SelfActionClass : MonoBehaviour
     {
         private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Awake()
         {
@@ -113,14 +113,12 @@ namespace SAIN.Classes
                 reloadClass.Reload();
                 return;
             }
-            if (SAIN.Decision.TimeSinceChangeDecision > 3f && reloadClass.NoAmmoForReloadCached)
-            {
-                //BotOwner.WeaponManager.Reload.TryFillMagazines();
-                //return;
-            }
             if (reloadClass.NoAmmoForReloadCached)
             {
-                BotOwner.WeaponManager.Selector.TryChangeWeapon(true);
+                if (!BotOwner.WeaponManager.Selector.TryChangeWeapon(true))
+                {
+                    BotOwner.WeaponManager.Reload.TryFillMagazines();
+                }
             }
         }
 

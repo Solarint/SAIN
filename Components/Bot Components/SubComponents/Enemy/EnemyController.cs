@@ -19,7 +19,7 @@ namespace SAIN.Classes
 
         private SAINComponent SAIN;
 
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Update()
         {

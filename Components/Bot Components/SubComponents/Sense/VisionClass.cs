@@ -2,20 +2,14 @@
 using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SAIN.Classes.Sense
 {
     public class VisionClass : MonoBehaviour
     {
         private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Awake()
         {

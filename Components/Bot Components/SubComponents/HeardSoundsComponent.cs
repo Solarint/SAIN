@@ -13,7 +13,7 @@ namespace SAIN.Classes
     public class SoundsController : MonoBehaviour
     {
         private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Awake()
         {

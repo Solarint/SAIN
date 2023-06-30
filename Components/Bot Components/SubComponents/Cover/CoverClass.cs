@@ -10,7 +10,7 @@ namespace SAIN.Classes
     public class CoverClass : MonoBehaviour
     {
         private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Awake()
         {

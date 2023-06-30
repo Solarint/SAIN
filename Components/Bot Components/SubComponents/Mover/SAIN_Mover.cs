@@ -17,7 +17,7 @@ namespace SAIN.Classes
     public class SAIN_Mover : MonoBehaviour
     {
         private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Awake()
         {

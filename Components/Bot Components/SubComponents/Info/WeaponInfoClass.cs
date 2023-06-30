@@ -1,6 +1,7 @@
 using BepInEx.Logging;
 using EFT;
 using EFT.InventoryLogic;
+using System.Reflection;
 using UnityEngine;
 using static SAIN.UserSettings.DifficultyConfig;
 
@@ -8,15 +9,22 @@ namespace SAIN.Classes
 {
     public class WeaponInfo : SAINBot
     {
+        private static FieldInfo XZCoef;
         public WeaponInfo(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             Modifiers = new ModifierClass(bot);
+            DefaultAccuracy = BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF;
         }
+
+        private float DefaultAccuracy = -1f;
 
         public void ManualUpdate()
         {
             if (BotOwner == null || SAIN == null) return;
+
+            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * BaseAccuracy.Value;
+
             if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true && BotOwner.WeaponManager.CurrentWeapon?.Template != LastCheckedWeapon)
             {
                 LastCheckedWeapon = CurrentWeapon.Template;
@@ -474,18 +482,18 @@ namespace SAIN.Classes
             float modifier = 1f;
             if (SAIN.Info.IsPMC)
             {
-                modifier /= PMCDifficulty.Value;
+                modifier /= PMCRecoil.Value;
             }
             else if (SAIN.Info.IsScav)
             {
-                modifier /= ScavDifficulty.Value;
+                modifier /= ScavRecoil.Value;
             }
             else
             {
-                modifier /= OtherDifficulty.Value;
+                modifier /= OtherRecoil.Value;
             }
 
-            modifier /= GlobalDifficulty.Value;
+            modifier /= BotRecoilGlobal.Value;
             return modifier;
         }
     }

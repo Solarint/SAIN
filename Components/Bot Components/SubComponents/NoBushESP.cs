@@ -10,7 +10,7 @@ namespace SAIN.Classes
     public class NoBushESP : MonoBehaviour
     {
         private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN.BotOwner;
+        private BotOwner BotOwner => SAIN?.BotOwner;
         private SAINEnemy Enemy => SAIN.Enemy;
 
         private void Awake()

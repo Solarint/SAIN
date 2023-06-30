@@ -263,6 +263,7 @@
     <Compile Include="Components\Bot Components\SubComponents\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverFinderComponent.cs" />
+    <Compile Include="Plugin\Config\Editor.cs" />
     <Compile Include="Plugin\Config\ExtractConfig.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DifficultyConfig.cs" />
@@ -289,7 +290,7 @@
     <Compile Include="Plugin\EFTPatches.cs" />
     <Compile Include="Plugin\Patches\Audio\HearSensorActivatePatch.cs" />
     <Compile Include="Plugin\Patches\FlashLight\CheckFlashlightPatch.cs" />
-    <Compile Include="Plugin\Patches\FlashLight\DazzlePatch.cs" />
+    <Compile Include="Plugin\Patches\FlashLight\VisionSpeedPatch.cs" />
     <Compile Include="Plugin\Patches\MovementPatches.cs" />
     <Compile Include="Plugin\Patches\Shoot\FiremodePatch.cs" />
     <Compile Include="Plugin\Patches\Audio\InitiateShotPatch.cs" />

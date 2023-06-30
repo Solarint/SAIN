@@ -6,8 +6,6 @@ namespace SAIN
         public static void Init()
         {
             GenericPatches();
-            MovementPatches();
-            ComponentPatches();
             HearingPatches();
             TalkPatches();
             VisionPatches();
@@ -17,6 +15,7 @@ namespace SAIN
 
         private static void GenericPatches()
         {
+            new Patches.Movement.KickPatch().Enable();
             new Patches.BetterAudioPatch().Enable();
             new Patches.Generic.InitHelper().Enable();
             new Patches.Generic.GetBotController().Enable();
@@ -37,20 +36,9 @@ namespace SAIN
             new Patches.FiremodePatch().Enable();
         }
 
-        private static void MovementPatches()
-        {
-            new Patches.Movement.KickPatch().Enable();
-        }
-
-        private static void ComponentPatches()
-        {
-            //new Patches.Components.AddComponentPatch().Enable();
-            //new Patches.Components.DisposeComponentPatch().Enable();
-        }
-
         private static void VisionPatches()
         {
-            //new Patches.LookDisablePatch1().Enable();
+            new Patches.VisionSpeedPatch().Enable();
             //new Patches.LookDisablePatch2().Enable();
             new Patches.VisibleDistancePatch().Enable();
             //new Patches.GainSightPatch().Enable();
@@ -76,12 +64,12 @@ namespace SAIN
         private static void GlobalSettingsPatches()
         {
             new Patches.BotGlobalCore1().Enable();
+            new Patches.BotGlobalCore2Patch().Enable();
             new Patches.BotGlobalLookPatch().Enable();
             new Patches.BotGlobalShootPatch().Enable();
             new Patches.BotGlobalGrenadePatch().Enable();
             new Patches.BotGlobalMindPatch().Enable();
             new Patches.BotGlobalMovePatch().Enable();
-            new Patches.BotGlobalCore2Patch().Enable();
             new Patches.BotGlobalAimPatch().Enable();
             new Patches.BotGlobalScatterPatch().Enable();
         }
