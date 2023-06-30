@@ -9,6 +9,9 @@ namespace SAIN.UserSettings
         public static ConfigEntry<float> ScavDifficulty { get; private set; }
         public static ConfigEntry<float> OtherDifficulty { get; private set; }
         public static ConfigEntry<bool> FasterCQBReactions { get; private set; }
+        public static ConfigEntry<bool> AllChads { get; private set; }
+        public static ConfigEntry<bool> AllGigaChads { get; private set; }
+        public static ConfigEntry<bool> AllRats { get; private set; }
 
         public static void Init(ConfigFile Config)
         {
@@ -38,6 +41,22 @@ namespace SAIN.UserSettings
                 new ConfigDescription("Everything except scavs and pmcs. Only modifies Recoil/scatter. Higher Number equals harder bots",
                 new AcceptableValueRange<float>(0.5f, 2.0f),
                 new ConfigurationManagerAttributes { IsAdvanced = false, Order = 2 }));
+
+
+            AllGigaChads = Config.Bind(shoot, "All Bots are GigaChads", false,
+                new ConfigDescription("WARNING not recommended to actually play with this. Bots will be too predictable. For the memes",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = false, Order = -10 }));
+
+            AllChads = Config.Bind(shoot, "All Bots are Chads", false,
+                new ConfigDescription("WARNING not recommended to actually play with this. Bots will be too predictable. For the memes",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = false, Order = -11 }));
+
+            AllRats = Config.Bind(shoot, "All Bots are Rats", false,
+                new ConfigDescription("WARNING not recommended to actually play with this. Bots will be too predictable. For the memes",
+                null,
+                new ConfigurationManagerAttributes { IsAdvanced = false, Order = -12 }));
         }
     }
 }

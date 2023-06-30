@@ -19,9 +19,15 @@ namespace SAIN.Components.BotController
         {
             if (BotSpawnerClass != null)
             {
+                if (!Subscribed && !GameEnding)
+                {
+                    BotSpawnerClass.OnBotRemoved += RemoveBot;
+                    BotSpawnerClass.OnBotCreated += AddBot;
+                    Subscribed = true;
+                }
                 if (Subscribed)
                 {
-                    var status = BotController.BotGame.Status;
+                    var status = BotController?.BotGame?.Status;
                     if (status == GameStatus.Stopping || status == GameStatus.Stopped || status == GameStatus.SoftStopping)
                     {
                         BotSpawnerClass.OnBotRemoved -= RemoveBot;
@@ -29,13 +35,6 @@ namespace SAIN.Components.BotController
                         Subscribed = false;
                         GameEnding = true;
                     }
-                }
-
-                if (!Subscribed && !GameEnding)
-                {
-                    BotSpawnerClass.OnBotRemoved += RemoveBot;
-                    BotSpawnerClass.OnBotCreated += AddBot;
-                    Subscribed = true;
                 }
             }
         }

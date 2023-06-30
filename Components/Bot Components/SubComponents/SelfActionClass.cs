@@ -113,6 +113,11 @@ namespace SAIN.Classes
                 reloadClass.Reload();
                 return;
             }
+            if (SAIN.Decision.TimeSinceChangeDecision > 3f && reloadClass.NoAmmoForReloadCached)
+            {
+                //BotOwner.WeaponManager.Reload.TryFillMagazines();
+                //return;
+            }
             if (reloadClass.NoAmmoForReloadCached)
             {
                 BotOwner.WeaponManager.Selector.TryChangeWeapon(true);

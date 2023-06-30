@@ -7,6 +7,7 @@ using UnityEngine;
 using static SAIN.UserSettings.TalkConfig;
 using static SAIN.UserSettings.DebugConfig;
 using static SAIN.UserSettings.ExtractConfig;
+using static SAIN.UserSettings.DifficultyConfig;
 using SAIN.Components;
 
 namespace SAIN.Classes
@@ -39,7 +40,10 @@ namespace SAIN.Classes
             SetPersonality();
             DifficultyModifier = CalculateDifficulty(BotOwner);
             PercentageBeforeExtract = UnityEngine.Random.Range(MinPercentage.Value, MaxPercentage.Value);
+            LastPower = PowerLevel;
         }
+
+        private float LastPower;
 
         private void Update()
         {
@@ -49,6 +53,14 @@ namespace SAIN.Classes
                 GroupCount = BotOwner.BotsGroup.MembersCount;
                 GetTimeBeforeSearch();
             }
+
+            if (LastPower != PowerLevel)
+            {
+                LastPower = PowerLevel;
+                SetPersonality();
+                GetTimeBeforeSearch();
+            }
+
             WeaponInfo.ManualUpdate();
 
             if (SAIN.Squad.BotInGroup && !SAIN.Squad.IAmLeader)
@@ -112,7 +124,7 @@ namespace SAIN.Classes
             {
                 if (SAIN.Info.BotPersonality == BotPersonality.Rat || SAIN.Info.BotPersonality == BotPersonality.Coward || SAIN.Info.BotPersonality == BotPersonality.Timmy)
                 {
-                    return 0f;
+                    return 0.25f;
                 }
 
                 if (StandAndShootRandomTimer < Time.time)
@@ -185,6 +197,11 @@ namespace SAIN.Classes
             }
 
             searchTime *= UnityEngine.Random.Range(1f - SearchRandomize, 1f + SearchRandomize);
+            searchTime = Mathf.Round(searchTime * 10f) / 10f;
+            if (searchTime < 0.25f)
+            {
+                searchTime = 0.25f;
+            }
 
             if (DebugBotInfo.Value)
             {
@@ -261,7 +278,19 @@ namespace SAIN.Classes
 
         public void SetPersonality()
         {
-            if (CanBeTimmy)
+            if (AllGigaChads.Value)
+            {
+                BotPersonality = BotPersonality.GigaChad;
+            }
+            else if (AllChads.Value)
+            {
+                BotPersonality = BotPersonality.Chad;
+            }
+            else if (AllRats.Value)
+            {
+                BotPersonality = BotPersonality.Rat;
+            }
+            else if (CanBeTimmy)
             {
                 BotPersonality = BotPersonality.Timmy;
             }
@@ -295,7 +324,7 @@ namespace SAIN.Classes
                 {
                     return true;
                 }
-                if (EFTMath.RandomBool(8))
+                if (EFTMath.RandomBool(3))
                 {
                     return true;
                 }
@@ -311,7 +340,7 @@ namespace SAIN.Classes
                 {
                     return true;
                 }
-                if (EFTMath.RandomBool(8))
+                if (EFTMath.RandomBool(3))
                 {
                     return true;
                 }

@@ -65,6 +65,15 @@ namespace SAIN.Components
         {
             UpdatePatrolData();
 
+            if (BotActive)
+            {
+                ToggleComponents(true);
+            }
+            else
+            {
+                ToggleComponents(false);
+            }
+
             if (BotActive && !GameIsEnding)
             {
                 Enemy?.Update();
@@ -85,7 +94,7 @@ namespace SAIN.Components
 
         private void UpdatePatrolData()
         {
-            if (CheckActiveLayer)
+            if (LayersActive)
             {
                 BotOwner.PatrollingData.Pause();
             }
@@ -98,17 +107,17 @@ namespace SAIN.Components
             }
         }
 
-        public bool LayersActive => BigBrainSAIN.IsBotUsingSAINLayer(BotOwner);
+        private bool SAINActive => BigBrainSAIN.IsBotUsingSAINLayer(BotOwner);
 
-        public bool CheckActiveLayer
+        public bool LayersActive
         {
             get
             {
                 if (RecheckTimer < Time.time)
                 {
-                    if (LayersActive)
+                    if (SAINActive)
                     {
-                        RecheckTimer = Time.time + 1f;
+                        RecheckTimer = Time.time + 0.5f;
                         Active = true;
                     }
                     else
@@ -123,8 +132,6 @@ namespace SAIN.Components
 
         private bool Active;
         private float RecheckTimer = 0f;
-        private bool PatrolPaused { get; set; }
-        private float DebugPatrolTimer = 0f;
 
         public Vector3? ExfilPosition { get; set; }
         public bool CannotExfil { get; set; }
@@ -171,6 +178,30 @@ namespace SAIN.Components
             Destroy(Sounds);
 
             Destroy(this);
+        }
+
+        private void ToggleComponents(bool value)
+        {
+            if (Info.enabled != value)
+            {
+                Info.enabled = value;
+                Squad.enabled = value;
+                Equipment.enabled = value;
+                BotStuck.enabled = value;
+                Hearing.enabled = value;
+                Talk.enabled = value;
+                Decision.enabled = value;
+                Cover.enabled = value;
+                Cover.CoverFinder.enabled = value;
+                FlashLight.enabled = value;
+                SelfActions.enabled = value;
+                Steering.enabled = value;
+                Grenade.enabled = value;
+                Mover.enabled = value;
+                NoBushESP.enabled = value;
+                EnemyController.enabled = value;
+                Sounds.enabled = value;
+            }
         }
 
         public SAINSoloDecision CurrentDecision => Decision.MainDecision;
@@ -243,7 +274,7 @@ namespace SAIN.Components
         public SteeringClass Steering { get; private set; }
 
         public bool IsDead => BotOwner?.IsDead == true;
-        public bool BotActive => BotOwner.BotState == EBotState.Active && !IsDead && BotOwner?.GetPlayer?.enabled == true;
+        public bool BotActive => BotOwner.BotState == EBotState.Active && !IsDead && BotOwner?.enabled == true && BotOwner?.GetPlayer?.enabled == true;
         public bool GameIsEnding => GameHasEnded || Singleton<IBotGame>.Instance?.Status == GameStatus.Stopping;
         public bool GameHasEnded => Singleton<IBotGame>.Instance == null;
 

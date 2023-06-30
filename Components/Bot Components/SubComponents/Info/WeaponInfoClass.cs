@@ -19,7 +19,6 @@ namespace SAIN.Classes
             if (BotOwner == null || SAIN == null) return;
             if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true && BotOwner.WeaponManager.CurrentWeapon?.Template != LastCheckedWeapon)
             {
-                BotOwner.AIData.CalcPower();
                 LastCheckedWeapon = CurrentWeapon.Template;
                 FinalModifier = Modifiers.FinalModifier;
             }
