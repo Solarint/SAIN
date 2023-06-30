@@ -43,7 +43,7 @@ namespace SAIN.Components.BotController
 
         private void FindExitForNextBot()
         {
-            var Bots = BotController.SAINBots;
+            var Bots = BotController.Bots;
             int count = Bots.Count;
             int max = count - 1;
             if (SAINCompCount > max)
@@ -53,7 +53,7 @@ namespace SAIN.Components.BotController
             if (count > 0)
             {
                 int i = SAINCompCount;
-                var component = BotController.SAINBots.ElementAt(i).Value;
+                var component = BotController.Bots.ElementAt(i).Value;
                 Vector3[] exits = FindExits(component.Position);
                 component.UpdateExitsToLoc(exits);
                 SAINCompCount++;

@@ -40,7 +40,7 @@ namespace SAIN.Patches.Generic
             Vector3 danger = VectorHelpers.DangerPoint(position, force, mass);
             foreach (BotOwner bot in __instance.Bots.BotOwners)
             {
-                if (SAINPlugin.BotController.SAINBots.ContainsKey(bot.ProfileId))
+                if (SAINPlugin.BotController.Bots.ContainsKey(bot.ProfileId))
                 {
                     continue;
                 }

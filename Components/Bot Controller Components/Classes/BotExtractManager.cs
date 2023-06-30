@@ -59,9 +59,9 @@ namespace SAIN.Components.BotController
 
         private bool FindExfilsForBots()
         {
-            if (BotController?.SAINBots.Count > 0)
+            if (BotController?.Bots.Count > 0)
             {
-                foreach (var bot in BotController.SAINBots)
+                foreach (var bot in BotController.Bots)
                 {
                     if (bot.Value == null)
                     {

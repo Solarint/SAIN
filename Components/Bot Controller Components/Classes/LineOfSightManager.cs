@@ -55,9 +55,9 @@ namespace SAIN.Components
 
         private void CheckEnemiesJobs()
         {
-            if (BotController.SAINBots.Count > 0)
+            if (BotController.Bots.Count > 0)
             {
-                foreach (var bot in BotController.SAINBots.Values)
+                foreach (var bot in BotController.Bots.Values)
                 {
                     if (bot?.Enemy != null)
                     {
@@ -194,7 +194,7 @@ namespace SAIN.Components
 
         private void GlobalRaycastJob()
         {
-            var sainBots = BotController.SAINBots.Values.ToList();
+            var sainBots = BotController.Bots.Values.ToList();
             int total = sainBots.Count * RegisteredPlayers.Count;
 
             NativeArray<SpherecastCommand> allSpherecastCommands = new NativeArray<SpherecastCommand>(

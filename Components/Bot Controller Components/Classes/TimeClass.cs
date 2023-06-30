@@ -22,9 +22,9 @@ namespace SAIN.Components.BotController
 
         private float Visibilty()
         {
-            if (BotController.SAINBots.Count > 0)
+            if (BotController.Bots.Count > 0)
             {
-                DateTime time = BotController.SAINBots.PickRandom().Value.BotOwner.GameDateTime.Calculate();
+                DateTime time = BotController.Bots.PickRandom().Value.BotOwner.GameDateTime.Calculate();
                 float minutes = time.Minute / 59f;
                 float timeofday = time.Hour + minutes;
 

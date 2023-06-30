@@ -162,7 +162,7 @@ namespace SAIN.Patches.Movement
             if (player.IsAI)
             {
                 string Id = player.AIData.BotOwner.ProfileId;
-                var Bots = SAINPlugin.BotController.SAINBots;
+                var Bots = SAINPlugin.BotController.Bots;
                 if (Bots.ContainsKey(Id))
                 {
                     if (Bots[Id].LayersActive)

@@ -21,7 +21,7 @@ namespace SAIN.Components.Helpers
             {
                 Logger = BepInEx.Logging.Logger.CreateLogSource("SAIN: Sound Manager");
             }
-            if (BotController == null || BotController.SAINBots.Count == 0)
+            if (BotController == null || BotController.Bots.Count == 0)
             {
                 return;
             }

@@ -22,7 +22,7 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref IAIDetails player, ref Vector3 position, ref float power, ref AISoundType type)
         {
-            if (SAINPlugin.BotController.SAINBots.ContainsKey(___botOwner_0.ProfileId))
+            if (SAINPlugin.BotController.Bots.ContainsKey(___botOwner_0.ProfileId))
             {
                 return false;
             }

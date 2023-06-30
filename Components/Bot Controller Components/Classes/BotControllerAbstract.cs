@@ -2,6 +2,7 @@
 using Comfort.Common;
 using EFT;
 using SAIN.Components;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SAIN
@@ -19,8 +20,8 @@ namespace SAIN
         }
 
         public ManualLogSource Logger { get; private set; }
-        public LineOfSightManager LineOfSightManager => BotController.LineOfSightManager;
         public SAINBotController BotController { get; private set; }
+        public Dictionary<string, SAINComponent> SAINBots2 => BotController?.Bots;
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
     }
 }

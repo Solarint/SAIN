@@ -230,6 +230,7 @@
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ThrowGrenade.cs" />
     <Compile Include="Components\Bot Components\SubComponents\HeardSoundsComponent.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
+    <Compile Include="Components\Bot Controller Components\Classes\BotSpawnController.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\ShootClass.cs" />

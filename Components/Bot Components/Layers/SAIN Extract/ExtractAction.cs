@@ -2,20 +2,23 @@
 using Comfort.Common;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
-using EFT.Interactive;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using System.Reflection;
 using UnityEngine;
+using HarmonyLib;
+using System.Drawing;
 
 namespace SAIN.Layers
 {
     internal class ExtractAction : CustomLogic
     {
+        private PropertyInfo _BotLeaveProp;
+        private MethodInfo _BotUnspawn;
         public ExtractAction(BotOwner bot) : base(bot)
         {
+            _BotLeaveProp = AccessTools.Property(typeof(BotOwner), "LeaveData");
+            _BotUnspawn = AccessTools.Method(_BotLeaveProp.PropertyType, "method_1");
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
             Shoot = new ShootClass(bot, SAIN);
@@ -39,67 +42,100 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAIN.Mover.SetTargetMoveSpeed(1f);
-            SAIN.Mover.SetTargetPose(1f);
             float stamina = BotOwner.GetPlayer.Physical.Stamina.NormalValue;
-            if (stamina > 0.5f)
+            if (SAIN.Enemy != null && SAIN.Enemy.Seen && (SAIN.Enemy.PathDistance < 50f || SAIN.Enemy.IsVisible))
             {
-                if (SAIN.Enemy != null && SAIN.Enemy.RealDistance < 50f)
-                {
-                    SAIN.Mover.Sprint(false);
-                    SAIN.Steering.SteerByPriority();
-                    Shoot.Update();
-                }
-                else
-                {
-                    SAIN.Mover.Sprint(true);
-                }
+                NoSprint = true;
+                SAIN.Steering.SteerByPriority();
+                Shoot.Update();
+            }
+            else if (stamina > 0.5f)
+            {
+                NoSprint = false;
+            }
+            else if (stamina < 0.1f)
+            {
+                NoSprint = true;
+            }
+
+            Vector3 point = Exfil.Value;
+            float distance = (point - BotOwner.Position).sqrMagnitude;
+
+            if (distance < 1f)
+            {
+                SAIN.Mover.SetTargetPose(0f);
+                NoSprint = true;
             }
             else
             {
-                if (stamina < 0.1f || (SAIN.Enemy != null && SAIN.Enemy.RealDistance < 100f))
-                {
-                    SAIN.Mover.Sprint(false);
-                    SAIN.Steering.SteerByPriority();
-                    Shoot.Update();
-                }
+                SAIN.Mover.SetTargetPose(1f);
+                SAIN.Mover.SetTargetMoveSpeed(1f);
             }
-            GoTo(Exfil.Value);
-        }
 
-        private void GoTo(Vector3 point)
-        {
-            if (CheckDistTimer < Time.time)
+            if (ExtractStarted)
             {
-                CheckDistTimer = Time.time + 1f;
-                if ((point - BotOwner.Position).sqrMagnitude < 6f)
-                {
-                    if (ExtractTimer == -1f)
-                    {
-                        Logger.LogInfo($"{BotOwner.name} Starting Extract Timer");
-                        ExtractTimer = Time.time + 5f;
-                    }
+                StartExtract(point);
+            }
+            else
+            {
+                MoveToExtract(distance, point);
+            }
 
-                    if (ExtractTimer < Time.time)
-                    {
-                        Logger.LogInfo($"{BotOwner.name} Extracted");
-                        Singleton<IBotGame>.Instance.BotUnspawn(BotOwner);
-                    }
-                    return;
-                }
-                else
+            if (NoSprint)
+            {
+                SAIN.Mover.Sprint(false);
+                SAIN.Steering.SteerByPriority();
+            }
+        }
+
+        private bool NoSprint;
+
+        private void MoveToExtract(float distance, Vector3 point)
+        {
+            if (distance > 12f)
+            {
+                ExtractStarted = false;
+            }
+            if (distance < 6f)
+            {
+                ExtractStarted = true;
+            }
+
+            if (!ExtractStarted)
+            {
+                if (ReCalcPathTimer < Time.time)
                 {
-                    if (ReCalcPathTimer < Time.time)
+                    ExtractTimer = -1f;
+                    ReCalcPathTimer = Time.time + 4f;
+                    if (NoSprint)
                     {
-                        ExtractTimer = -1f;
-                        ReCalcPathTimer = Time.time + 4f;
-                        SAIN.Mover.Sprint(true);
-                        SAIN.Mover.GoToPoint(point);
+                        BotOwner.Mover.GoToPoint(point, true, 0.5f, false, false);
+                    }
+                    else
+                    {
+                        BotOwner.BotRun.Run(point, false);
                     }
                 }
             }
         }
 
+        private void StartExtract(Vector3 point)
+        {
+            if (ExtractTimer == -1f)
+            {
+                float timer = 5f * Random.Range(0.75f, 1.5f);
+                Logger.LogInfo($"{BotOwner.name} Starting Extract Timer of {timer}");
+                ExtractTimer = Time.time + timer;
+            }
+
+            if (ExtractTimer < Time.time)
+            {
+                Logger.LogInfo($"{BotOwner.name} Extracted at {point} at {System.DateTime.UtcNow}");
+                _BotUnspawn.Invoke(BotOwner, null);
+            }
+        }
+
+        private bool ExtractStarted = false;
         private float CheckDistTimer = 0f;
         private float ReCalcPathTimer = 0f;
         private float ExtractTimer = -1f;

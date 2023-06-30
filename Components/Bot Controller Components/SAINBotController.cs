@@ -7,6 +7,8 @@ using UnityEngine;
 using UnityEngine.AI;
 using SAIN.Helpers;
 using SAIN.Components.BotController;
+using UnityEngine.UIElements;
+using UnityEngine.Profiling;
 
 namespace SAIN.Components
 {
@@ -14,8 +16,8 @@ namespace SAIN.Components
     {
         public Action<SAINSoundType, Player, float> AISoundPlayed { get; private set; }
 
-        public Dictionary<string, SAINComponent> SAINBots = new Dictionary<string, SAINComponent>();
-        public GameWorld GameWorld => Singleton<GameWorld>.Instance;
+        public Dictionary<string, SAINComponent> Bots = new Dictionary<string, SAINComponent>();
+        public GameWorld GameWorldInstance => Singleton<GameWorld>.Instance;
         public IBotGame BotGame => Singleton<IBotGame>.Instance;
         public static Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
         public BotControllerClass DefaultController { get; set; }
@@ -27,6 +29,7 @@ namespace SAIN.Components
         public BotExtractManager BotExtractManager { get; private set; } = new BotExtractManager();
         private TimeClass TimeClass { get; set; } = new TimeClass();
         private WeatherVisionClass WeatherClass { get; set; } = new WeatherVisionClass();
+        public BotSpawnController BotSpawnController { get; private set; } = new BotSpawnController();
 
         public float WeatherVisibility => WeatherClass.WeatherVisibility;
         public float TimeOfDayVisibility => TimeClass.TimeOfDayVisibility;
@@ -38,6 +41,9 @@ namespace SAIN.Components
 
         private void Awake()
         {
+            GameWorld.OnDispose += Dispose;
+
+            BotSpawnController.Awake();
             TimeClass.Awake();
             LineOfSightManager.Awake();
             CoverManager.Awake();
@@ -51,7 +57,7 @@ namespace SAIN.Components
 
         private void Update()
         {
-            if (GameWorld == null)
+            if (GameWorldInstance == null)
             {
                 Dispose();
                 return;
@@ -63,7 +69,8 @@ namespace SAIN.Components
 
             if (!Subscribed && BotSpawnerClass != null)
             {
-                //BotSpawnerClass.OnBotRemoved += BotDeath;
+                BotSpawnerClass.OnBotRemoved += BotSpawnController.RemoveBot;
+                BotSpawnerClass.OnBotCreated += BotSpawnController.AddBot;
                 Subscribed = true;
             }
 
@@ -167,12 +174,12 @@ namespace SAIN.Components
 
         public void SoundPlayed(SAINSoundType soundType, Player player, float range)
         {
-            if (SAINBots.Count == 0 || player == null)
+            if (Bots.Count == 0 || player == null)
             {
                 return;
             }
 
-            foreach (var bot in SAINBots.Values)
+            foreach (var bot in Bots.Values)
             {
                 if (player.ProfileId == bot.Player.ProfileId)
                 {
@@ -279,7 +286,7 @@ namespace SAIN.Components
                 return;
             }
             var danger = VectorHelpers.DangerPoint(position, force, mass);
-            foreach (var bot in SAINBots.Values)
+            foreach (var bot in Bots.Values)
             {
                 if (!bot.IsDead)
                 {
@@ -309,6 +316,8 @@ namespace SAIN.Components
         {
             StopAllCoroutines();
 
+            GameWorld.OnDispose -= Dispose;
+
             AISoundPlayed -= SoundPlayed;
             Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
@@ -320,31 +329,13 @@ namespace SAIN.Components
             }
 
             DeathObstacles.Clear();
-            SAINBots.Clear();
+            Bots.Clear();
             Destroy(this);
-        }
-
-        public void AddBot(BotOwner bot)
-        {
-            string profileId = bot.ProfileId;
-            if (!SAINBots.ContainsKey(profileId))
-            {
-                SAINBots.Add(profileId, bot.GetOrAddComponent<SAINComponent>());
-            }
         }
 
         public bool GetBot(string profileId, out SAINComponent bot)
         {
-            return SAINBots.TryGetValue(profileId, out bot);
-        }
-
-        public void RemoveBot(string profileId)
-        {
-            if (SAINBots.TryGetValue(profileId, out var component))
-            {
-                SAINBots.Remove(profileId);
-                component.Dispose();
-            }
+            return Bots.TryGetValue(profileId, out bot);
         }
     }
 
