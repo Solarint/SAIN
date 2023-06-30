@@ -1,16 +1,13 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
-using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN.Components;
-using SAIN.Helpers;
+using SAIN.Classes;
 using System.Reflection;
 using UnityEngine;
 using System;
 using Aki.Reflection.Utils;
 using System.Linq;
 using static SAIN.UserSettings.ShootConfig;
-using static SAIN.UserSettings.DifficultyConfig;
 
 namespace SAIN.Patches
 {
@@ -27,33 +24,13 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(GClass544 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
-            // Recoil Scatter Modifiers.
-            float modifier = 1f;
-            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
-            {
-                if (component.Info.IsPMC)
-                {
-                    modifier *= PMCRecoil.Value;
-                }
-                else if (component.Info.IsScav)
-                {
-                    modifier *= ScavRecoil.Value;
-                }
-                else
-                {
-                    modifier *= OtherRecoil.Value;
-                }
-            }
-            modifier *= BotRecoilGlobal.Value;
-
             // Applies aiming offset, recoil offset, and scatter offsets
             Vector3 finalTarget = __instance.RealTargetPoint
                 + ___vector3_5
                 + ___float_13
 
                 * (___vector3_4
-                + (___botOwner_0.RecoilData.RecoilOffset
-                * modifier));
+                + ___botOwner_0.RecoilData.RecoilOffset);
 
             if (HeadShotProtection.Value)
             {
@@ -88,31 +65,21 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(ref Vector3 ___vector3_0, ref BotOwner ___botOwner_0, ref float ___float_0)
         {
-            float modifier = 1f;
-            var stats = ___botOwner_0.GetComponent<SAINComponent>()?.Info?.WeaponInfo;
-            if (stats != null)
+            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
-                modifier = stats.FinalModifier;
-            }
-
-            Vector3 recoilVector;
-            if (___float_0 < Time.time)
-            {
-                Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
-
-                if (weapon.SelectedFireMode == Weapon.EFireMode.fullauto || weapon.SelectedFireMode == Weapon.EFireMode.burst)
+                Recoil recoil = component?.Info?.WeaponInfo?.Recoil;
+                if (recoil == null)
                 {
-                    ___float_0 = Time.time + Shoot.FullAutoTimePerShot(weapon.Template.bFirerate) * 0.8f;
+                    return true;
                 }
-                else
+                if (___float_0 < Time.time)
                 {
-                    ___float_0 = Time.time + (1f / (weapon.Template.SingleFireRate / 60f)) * 0.8f;
+                    ___float_0 = recoil.RecoilTimeWait;
+                    ___vector3_0 = recoil.CalculateRecoil(___vector3_0);
                 }
-
-                recoilVector = Shoot.Recoil(___vector3_0, weapon.Template.RecoilForceBack, weapon.Template.RecoilForceUp, modifier, ___botOwner_0.AimingData.LastDist2Target);
-                ___vector3_0 = recoilVector;
+                return false;
             }
-            return false;
+            return true;
         }
     }
 
@@ -129,21 +96,21 @@ namespace SAIN.Patches
         [PatchPrefix]
         public static bool PatchPrefix(ref Vector3 ___vector3_0, ref BotOwner ___botOwner_0, ref float ___float_1)
         {
-            // Repurposing float_1 as a recoil reset timer
-            if (___float_1 < Time.time)
+            if (!SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
-                Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
-                if (weapon.SelectedFireMode == Weapon.EFireMode.fullauto || weapon.SelectedFireMode == Weapon.EFireMode.burst)
+                var recoil = component?.Info?.WeaponInfo?.Recoil;
+                if (recoil == null)
                 {
-                    ___float_1 = Time.time + (Shoot.FullAutoTimePerShot(weapon.Template.bFirerate) / 3f);
+                    return true;
                 }
-                else
+                // Repurposing float_1 as a recoil reset timer
+                if (___float_1 < Time.time)
                 {
-                    ___float_1 = Time.time + ((1f / (weapon.Template.SingleFireRate / 60f)) / 3f);
+                    ___vector3_0 = recoil.CalculateDecay(___vector3_0, out ___float_1);
                 }
-                ___vector3_0 = Vector3.Lerp(Vector3.zero, ___vector3_0, LerpRecoil.Value);
+                return false;
             }
-            return false;
+            return true;
         }
     }
 

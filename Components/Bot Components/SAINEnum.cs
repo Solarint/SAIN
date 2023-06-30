@@ -76,7 +76,7 @@ namespace SAIN
         Right,
     }
 
-    public enum BotPersonality
+    public enum SAINPersonality
     {
         Normal,
         Timmy,

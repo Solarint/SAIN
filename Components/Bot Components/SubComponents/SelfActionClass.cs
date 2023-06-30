@@ -26,7 +26,7 @@ namespace SAIN.Classes
 
         private void Update()
         {
-            if (BotOwner == null || SAIN == null) return;
+            if (SAIN == null) return;
             if (!UsingMeds)
             {
                 if (WasUsingMeds)
@@ -103,24 +103,35 @@ namespace SAIN.Classes
         public void TryReload()
         {
             var reloadClass = BotOwner.WeaponManager.Reload;
+            bool canreload = reloadClass.CanReload(false);
+            if (!canreload && reloadClass.NoAmmoForReloadCached)
+            {
+                BotOwner.WeaponManager.Selector.TryChangeWeapon(true);
+                return;
+            }
             if (reloadClass.Reloading)
             {
                 reloadClass.CheckReloadLongTime();
+                if (TimeReloading < 0)
+                {
+                    TimeReloading = Time.time;
+                }
+                if (TimeReloading + 5f < Time.time)
+                {
+                    BotCancelReload();
+                }
                 return;
             }
-            if (reloadClass.CanReload(false))
+            else
+            {
+                TimeReloading = -1f;
+            }
+            if (canreload)
             {
                 reloadClass.Reload();
-                return;
-            }
-            if (reloadClass.NoAmmoForReloadCached)
-            {
-                if (!BotOwner.WeaponManager.Selector.TryChangeWeapon(true))
-                {
-                    BotOwner.WeaponManager.Reload.TryFillMagazines();
-                }
             }
         }
+        private float TimeReloading;
 
         public void BotCancelReload()
         {

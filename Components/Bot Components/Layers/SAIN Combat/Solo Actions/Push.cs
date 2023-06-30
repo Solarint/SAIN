@@ -4,8 +4,6 @@ using EFT;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using UnityEngine;
-using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
@@ -19,6 +17,7 @@ namespace SAIN.Layers
         }
 
         private readonly ShootClass Shoot;
+        private float TryJumpTimer;
 
         public override void Update()
         {
@@ -30,12 +29,26 @@ namespace SAIN.Layers
             SAIN.Mover.SetTargetPose(1f);
             SAIN.Mover.SetTargetMoveSpeed(1f);
 
-            Shoot.Update();
-
             if (SAIN.Enemy.InLineOfSight)
             {
+                Shoot.Update();
+                if (SAIN.Info.Personality == SAINPersonality.GigaChad)
+                {
+                    if (TryJumpTimer < Time.time)
+                    {
+                        TryJumpTimer = Time.time + 10f;
+                        SAIN.Mover.TryJump();
+                    }
+                }
                 SAIN.Mover.Sprint(false);
-                SAIN.Steering.SteerByPriority();
+                if (SAIN.Enemy.IsVisible && SAIN.Enemy.CanShoot)
+                {
+                    SAIN.Steering.SteerByPriority();
+                }
+                else
+                {
+                    SAIN.Steering.LookToEnemy(SAIN.Enemy);
+                }
                 return;
             }
 
@@ -46,7 +59,7 @@ namespace SAIN.Layers
                 NewDestTimer = Time.time + 1f;
                 Vector3 Destination = EnemyPos;
                 /*
-                if (SAIN.Info.BotPersonality == BotPersonality.GigaChad)
+                if (SAIN.Info.Personality == Personality.GigaChad)
                 {
                     if (EnemyPath.Length > 2)
                     {
@@ -86,6 +99,20 @@ namespace SAIN.Layers
                 BotOwner.BotRun.Run(Destination, false);
             }
 
+            if (SAIN.Info.Personality == SAINPersonality.GigaChad && TryJumpTimer < Time.time)
+            {
+                var corner = SAIN.Enemy?.LastCornerToEnemy;
+                if (corner != null)
+                {
+                    float distance = (corner.Value - BotOwner.Position).magnitude;
+                    if (distance < 0.5f)
+                    {
+                        TryJumpTimer = Time.time + 3f;
+                        SAIN.Mover.TryJump();
+                    }
+                }
+            }
+
         }
 
         private float NewDestTimer = 0f;
@@ -97,7 +124,6 @@ namespace SAIN.Layers
 
         public override void Start()
         {
-            SAIN.Mover.Sprint(true);
         }
 
         public override void Stop()

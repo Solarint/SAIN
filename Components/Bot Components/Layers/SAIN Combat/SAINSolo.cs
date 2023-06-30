@@ -120,7 +120,7 @@ namespace SAIN.Layers
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
             stringBuilder.AppendLine($"SAIN Info:");
-            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.Personality}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Power of Equipment", $"{SAIN.Info.PowerLevel}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Time Before Start Search", $"{SAIN.Info.TimeBeforeSearch}", Color.white, Color.yellow, true);

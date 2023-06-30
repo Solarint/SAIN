@@ -7,93 +7,43 @@ using static SAIN.UserSettings.DifficultyConfig;
 
 namespace SAIN.Classes
 {
-    public class WeaponInfo : SAINBot
+    public class WeaponInfo : SAINWeapon
     {
-        private static FieldInfo XZCoef;
         public WeaponInfo(BotOwner bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             Modifiers = new ModifierClass(bot);
             DefaultAccuracy = BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF;
+            Recoil = new Recoil(bot);
+            Firerate = new Firerate(bot);
+            Firemode = new Firemode(bot);
         }
 
-        private float DefaultAccuracy = -1f;
+        private readonly float DefaultAccuracy;
 
         public void ManualUpdate()
         {
-            if (BotOwner == null || SAIN == null) return;
-
             BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * BaseAccuracy.Value;
 
-            if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true && BotOwner.WeaponManager.CurrentWeapon?.Template != LastCheckedWeapon)
+            if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true)
             {
-                LastCheckedWeapon = CurrentWeapon.Template;
-                FinalModifier = Modifiers.FinalModifier;
+                Firemode.CheckSwap();
+                if (BotOwner.WeaponManager.CurrentWeapon?.Template != LastCheckedWeapon)
+                {
+                    LastCheckedWeapon = CurrentWeapon.Template;
+                    FinalModifier = Modifiers.FinalModifier;
+                }
             }
         }
 
+        public Recoil Recoil { get; private set; }
+        public Firerate Firerate { get; private set; }
+        public Firemode Firemode { get; private set; }
+
         public float FinalModifier { get; private set; }
-
-        public string WeaponClass => CurrentWeapon.Template.weapClass;
-
-        public string AmmoCaliber => CurrentWeapon.CurrentAmmoTemplate.Caliber;
-
-        public Weapon CurrentWeapon => BotOwner.WeaponManager.CurrentWeapon;
-
-        private readonly ManualLogSource Logger;
 
         private WeaponTemplate LastCheckedWeapon;
 
         public ModifierClass Modifiers { get; private set; }
-
-        public float PerMeter
-        {
-            get
-            {
-                float perMeter;
-                // Higher is faster firerate // Selects a the time for 1 second of wait time for every x meters
-                switch (WeaponClass)
-                {
-                    case "assaultCarbine":
-                    case "assaultRifle":
-                    case "machinegun":
-                        perMeter = 120f;
-                        break;
-
-                    case "smg":
-                        perMeter = 130f;
-                        break;
-
-                    case "pistol":
-                        perMeter = 90f;
-                        break;
-
-                    case "marksmanRifle":
-                        perMeter = 90f;
-                        break;
-
-                    case "sniperRifle":
-                        perMeter = 70f;
-                        // VSS and VAL Exception
-                        if (AmmoCaliber == "9x39")
-                        {
-                            perMeter = 120f;
-                        }
-                        break;
-
-                    case "shotgun":
-                    case "grenadeLauncher":
-                    case "specialWeapon":
-                        perMeter = 70f;
-                        break;
-
-                    default:
-                        perMeter = 120f;
-                        break;
-                }
-                return perMeter;
-            }
-        }
 
         public float EffectiveWeaponDistance
         {
@@ -136,16 +86,18 @@ namespace SAIN.Classes
                         PreferedDist = 120f;
                         break;
                 }
+                if (AmmoCaliber == "9x39")
+                {
+                    PreferedDist = 75f;
+                }
                 return PreferedDist;
             }
         }
     }
 
-    public class ModifierClass : SAINBot
+    public class ModifierClass : SAINWeapon
     {
-        public ModifierClass(BotOwner bot) : base(bot) 
-        {
-        }
+        public ModifierClass(BotOwner bot) : base(bot) { }
 
         private const float WeaponClassScaling = 0.3f;
         private const float RecoilScaling = 0.2f;
@@ -160,7 +112,7 @@ namespace SAIN.Classes
         {
             get
             {
-                float modifier = Ammo(AmmoCaliber);
+                float modifier = Ammo();
                 return Scaling(modifier, 0f, 1f, 1 - AmmoTypeScaling, 1 + AmmoTypeScaling);
             }
         }
@@ -168,7 +120,7 @@ namespace SAIN.Classes
         {
             get
             {
-                float modifier = BotType(Role);
+                float modifier = BotType();
                 return Scaling(modifier, 0f, 1f, 1 - BotRoleScaling, 1 + BotRoleScaling);
             }
         }
@@ -176,7 +128,7 @@ namespace SAIN.Classes
         {
             get
             {
-                float modifier = WeaponClass(WeaponClassString, AmmoCaliber);
+                float modifier = WeaponClassMod();
                 return Scaling(modifier, 0f, 1f, 1 - WeaponClassScaling, 1 + WeaponClassScaling);
             }
         }
@@ -184,16 +136,18 @@ namespace SAIN.Classes
         {
             get
             {
-                float modifier = Ergo(CurrentWeapon.ErgonomicsTotal);
-                return Scaling(modifier, 0f, 1f, 1 - ErgoScaling, 1 + ErgoScaling);
+                float ergoModifier = 1f - CurrentWeapon.ErgonomicsTotal / 100f;
+                ergoModifier = Mathf.Clamp(ergoModifier, 0.01f, 1f);
+                return Scaling(ergoModifier, 0f, 1f, 1 - ErgoScaling, 1 + ErgoScaling);
             }
         }
         public float RecoilModifier
         {
             get
             {
-                float modifier = Recoil(CurrentWeapon.RecoilBase, CurrentWeapon.RecoilTotal, CurrentWeapon.CurrentAmmoTemplate.ammoRec);
-                return Scaling(modifier, 0f, 1f, 1 - RecoilScaling, 1 + RecoilScaling);
+                float ammoRecoil = CurrentWeapon.CurrentAmmoTemplate.ammoRec / 200f;
+                float recoilmodifier = (CurrentWeapon.RecoilTotal / CurrentWeapon.RecoilBase) + ammoRecoil;
+                return Scaling(recoilmodifier, 0f, 1f, 1 - RecoilScaling, 1 + RecoilScaling);
             }
         }
 
@@ -205,21 +159,16 @@ namespace SAIN.Classes
             }
         }
 
-        public Weapon CurrentWeapon => BotOwner.WeaponManager.CurrentWeapon;
-        public string WeaponClassString => CurrentWeapon.Template.weapClass;
-        public string AmmoCaliber => CurrentWeapon.CurrentAmmoTemplate.Caliber;
-        public WildSpawnType Role => BotOwner.Profile.Info.Settings.Role;
-
         public static float Scaling(float value, float inputMin, float inputMax, float outputMin, float outputMax)
         {
             return outputMin + (outputMax - outputMin) * ((value - inputMin) / (inputMax - inputMin));
         }
 
-        public float Ammo(string ammocaliber)
+        public float Ammo()
         {
             float ammomodifier;
             // Sets Modifier based on Ammo Type. Scaled between 0 - 1. Lower is better.
-            switch (ammocaliber)
+            switch (AmmoCaliber)
             {
                 // Pistol Rounds
                 case "9x18PM":
@@ -332,7 +281,7 @@ namespace SAIN.Classes
             return ammomodifier;
         }
 
-        public float BotType(WildSpawnType bottype)
+        public float BotType()
         {
             float botTypeModifier;
             if (SAIN.Info.IsPMC)
@@ -341,7 +290,7 @@ namespace SAIN.Classes
             }
             else
             {
-                switch (bottype)
+                switch (Role)
                 {
                     case WildSpawnType.assault:
                         botTypeModifier = 1.0f;
@@ -398,34 +347,11 @@ namespace SAIN.Classes
             return botTypeModifier;
         }
 
-        public float Ergo(float ergoTotal)
-        {
-            // Low Ergo results in a higher modifier, with 1 modifier being worst
-            float ergoModifier = 1f - ergoTotal / 100f;
-
-            // Makes sure the modifier doesn't come out to 0
-            ergoModifier = Mathf.Clamp(ergoModifier, 0.01f, 1f);
-
-            // Final Output
-            return ergoModifier;
-        }
-
-        public float Recoil(float recoilBase, float recoilTotal, float ammoRec)
-        {
-            // Adds Recoil Stat from ammo type currently used.
-            float ammoRecoil = ammoRec / 200f;
-
-            // Raw Recoil Modifier
-            float recoilmodifier = (recoilTotal / recoilBase) + ammoRecoil;
-
-            return recoilmodifier;
-        }
-
-        public float WeaponClass(string weaponclass, string ammocaliber)
+        public float WeaponClassMod()
         {
             // Weapon Class ModifiersClass. Scaled Between 0 and 1. Lower is Better
             float classmodifier;
-            switch (weaponclass)
+            switch (WeaponClass)
             {
                 case "assaultRifle":
                     classmodifier = 0.25f;
@@ -454,7 +380,7 @@ namespace SAIN.Classes
                 case "sniperRifle":
                     classmodifier = 0.75f;
                     // VSS and VAL Exception
-                    if (ammocaliber == "9x39") classmodifier = 0.3f;
+                    if (AmmoCaliber == "9x39") classmodifier = 0.3f;
                     break;
 
                 case "shotgun":
@@ -496,5 +422,23 @@ namespace SAIN.Classes
             modifier /= BotRecoilGlobal.Value;
             return modifier;
         }
+    }
+
+    public abstract class SAINWeapon : SAINBot
+    {
+        public SAINWeapon(BotOwner owner) : base(owner)
+        {
+            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+        }
+
+        public readonly ManualLogSource Logger;
+
+        public WeaponInfo WeaponInfo => SAIN.Info.WeaponInfo;
+
+        public string WeaponClass => CurrentWeapon.Template.weapClass;
+
+        public string AmmoCaliber => CurrentWeapon.CurrentAmmoTemplate.Caliber;
+
+        public Weapon CurrentWeapon => BotOwner.WeaponManager.CurrentWeapon;
     }
 }

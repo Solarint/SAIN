@@ -33,7 +33,6 @@ namespace SAIN
             new Patches.EndRecoilPatch().Enable();
             new Patches.FullAutoPatch().Enable();
             new Patches.SemiAutoPatch().Enable();
-            new Patches.FiremodePatch().Enable();
         }
 
         private static void VisionPatches()

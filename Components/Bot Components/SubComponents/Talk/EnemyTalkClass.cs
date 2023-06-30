@@ -19,8 +19,8 @@ namespace SAIN.Classes
 
         private void Init()
         {
-            var type = SAIN.Info.BotPersonality;
-            if (type == BotPersonality.Chad || type == BotPersonality.GigaChad)
+            var type = SAIN.Info.Personality;
+            if (type == SAINPersonality.Chad || type == SAINPersonality.GigaChad)
             {
                 TauntDist = 50f;
                 TauntFreq = 8f;
@@ -46,20 +46,22 @@ namespace SAIN.Classes
 
         public void Update()
         {
+            if (SAIN == null) return;
+
             if (TauntFreq == 0f)
             {
                 Init();
             }
 
-            if (SAIN.Enemy != null)
+            if (SAIN?.Enemy != null)
             {
                 if (BegForLife())
                 {
                     return;
                 }
 
-                var pers = SAIN.Info.BotPersonality;
-                if (pers == BotPersonality.Coward || pers == BotPersonality.Timmy || pers == BotPersonality.Rat)
+                var pers = SAIN.Info.Personality;
+                if (pers == SAINPersonality.Coward || pers == SAINPersonality.Timmy || pers == SAINPersonality.Rat)
                 {
                     return;
                 }
@@ -91,8 +93,8 @@ namespace SAIN.Classes
         {
             if (SAIN.Enemy != null && !SAIN.Squad.BotInGroup)
             {
-                var personality = SAIN.Info.BotPersonality;
-                if (personality == BotPersonality.GigaChad || personality == BotPersonality.Chad)
+                var personality = SAIN.Info.Personality;
+                if (personality == SAINPersonality.GigaChad || personality == SAINPersonality.Chad)
                 {
                     if (FakeTimer < Time.time)
                     {
@@ -127,8 +129,8 @@ namespace SAIN.Classes
                 float timeAdd = random ? 8f : 2f;
                 BegTimer = Time.time + timeAdd;
 
-                var personality = SAIN.Info.BotPersonality;
-                if (personality == BotPersonality.Timmy || personality == BotPersonality.Coward)
+                var personality = SAIN.Info.Personality;
+                if (personality == SAINPersonality.Timmy || personality == SAINPersonality.Coward)
                 {
                     var health = SAIN.HealthStatus;
                     if (health != ETagStatus.Healthy)
@@ -176,7 +178,7 @@ namespace SAIN.Classes
             bool tauntEnemy = false;
 
             var sainEnemy = SAIN.Enemy;
-            var type = SAIN.Info.BotPersonality;
+            var type = SAIN.Info.Personality;
 
             float distanceToEnemy = Vector3.Distance(sainEnemy.Position, BotPos);
 
@@ -188,12 +190,12 @@ namespace SAIN.Classes
                     {
                         tauntEnemy = true;
                     }
-                    if (type == BotPersonality.Chad)
+                    if (type == SAINPersonality.Chad)
                     {
                         tauntEnemy = true;
                     }
                 }
-                if (type == BotPersonality.GigaChad)
+                if (type == SAINPersonality.GigaChad)
                 {
                     tauntEnemy = true;
                 }

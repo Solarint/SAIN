@@ -6,7 +6,6 @@ using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SAIN.Layers
 {
@@ -26,7 +25,7 @@ namespace SAIN.Layers
             SAIN.Mover.SetTargetMoveSpeed(1f);
             SAIN.Mover.SetTargetPose(1f);
 
-            if (CoverDestination == null || RecalcTimer < Time.time)
+            if (RecalcTimer < Time.time)
             {
                 RecalcTimer = Time.time + 2f;
                 if (Decision == SAINSoloDecision.Retreat && SAIN.Cover.FallBackPoint != null)
@@ -37,6 +36,10 @@ namespace SAIN.Layers
                 else if (FindTargetCover())
                 {
                     BotOwner.BotRun.Run(CoverDestination.Position, false);
+                }
+                else
+                {
+                    RecalcTimer = Time.time + 0.5f;
                 }
             }
             if (CoverDestination == null)
@@ -106,7 +109,7 @@ namespace SAIN.Layers
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
             stringBuilder.AppendLine($"SAIN Info:");
-            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.Personality}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
             CoverPoint cover = SAIN.Cover.CoverInUse;
             if (cover != null)

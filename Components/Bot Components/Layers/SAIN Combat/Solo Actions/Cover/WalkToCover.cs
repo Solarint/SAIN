@@ -100,6 +100,7 @@ namespace SAIN.Layers
 
         private CoverPoint CoverDestination;
         private Vector3 DestinationPosition;
+        private float SuppressTimer;
 
         private void EngageEnemy()
         {
@@ -108,8 +109,9 @@ namespace SAIN.Layers
                 Vector3 corner = SAIN.Enemy.LastCornerToEnemy.Value;
                 corner += Vector3.up * 1f;
                 SAIN.Steering.LookToPoint(corner);
-                if (BotOwner.WeaponManager.HaveBullets)
+                if (SuppressTimer < Time.time && BotOwner.WeaponManager.HaveBullets)
                 {
+                    SuppressTimer = Time.time + 0.5f * Random.Range(0.66f, 1.25f);
                     BotOwner.ShootData.Shoot();
                 }
             }
@@ -138,7 +140,7 @@ namespace SAIN.Layers
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
             stringBuilder.AppendLine($"SAIN Info:");
-            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.Personality}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
             CoverPoint cover = SAIN.Cover.CoverInUse;
             if (cover != null)

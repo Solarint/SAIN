@@ -207,12 +207,16 @@
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Bot Components\Helpers\MathHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\ColliderFinder.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverAnalyzer.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\SpottedCoverPoint.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\FrameWait.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\Weapon\Firerate.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\Weapon\Firemode.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\Weapon\Recoil.cs" />
     <Compile Include="Components\Bot Components\SubComponents\NoBushESP.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyBodyPart.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Grenade\EFTBotGrenade.cs" />
@@ -292,7 +296,6 @@
     <Compile Include="Plugin\Patches\FlashLight\CheckFlashlightPatch.cs" />
     <Compile Include="Plugin\Patches\FlashLight\VisionSpeedPatch.cs" />
     <Compile Include="Plugin\Patches\MovementPatches.cs" />
-    <Compile Include="Plugin\Patches\Shoot\FiremodePatch.cs" />
     <Compile Include="Plugin\Patches\Audio\InitiateShotPatch.cs" />
     <Compile Include="Plugin\Patches\Shoot\RateofFirePatch.cs" />
     <Compile Include="Plugin\Patches\Shoot\RecoilPatch.cs" />
@@ -302,7 +305,7 @@
     <Compile Include="Plugin\Patches\VisibilityPatch.cs" />
     <Compile Include="Components\Player Components\FlashLightComponent.cs" />
     <Compile Include="Components\Bot Components\SubComponents\SelfActionClass.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\WeaponInfoClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\Weapon\WeaponInfoClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Sense\LightDetectionClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Talk\BotTalkClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Talk\EnemyTalkClass.cs" />

@@ -47,36 +47,69 @@ namespace SAIN.Layers
             TargetPosition = null;
         }
 
+        private float CheckMagTimer;
+        private float CheckChamberTimer;
+        private float NextCheckTimer;
+        private float ReloadTimer;
+
         public override void Update()
         {
             Shoot.Update();
-
-            if (SAIN.Enemy?.IsVisible == false && SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
-            {
-                SAIN.SelfActions.TryReload();
-            }
+            CheckWeapon();
 
             if ( TargetPosition != null )
             {
-                if (SAIN.Enemy == null && (BotOwner.Position - TargetPosition.Value).sqrMagnitude < 2f)
-                {
-                    SAIN.Decision.ResetDecisions();
-                    return;
-                }
-                CheckShouldSprint();
-                Search.Update(!SprintEnabled, SprintEnabled);
-                if (Search?.ActiveDestination != null)
-                {
-                    Steer(Search.ActiveDestination);
-                }
-                else
-                {
-                    SAIN.Steering.SteerByPriority();
-                }
+                MoveToEnemy();
             }
             else
             {
                 FindTarget();
+            }
+        }
+
+        private void CheckWeapon()
+        {
+            if (SAIN.Enemy != null)
+            {
+                if ((SAIN.Enemy.Seen && SAIN.Enemy.TimeSinceSeen > 10f) || (!SAIN.Enemy.Seen && SAIN.Enemy.TimeSinceEnemyCreated > 10f))
+                {
+                    if (ReloadTimer < Time.time && SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
+                    {
+                        ReloadTimer = Time.time + 10f;
+                        SAIN.SelfActions.TryReload();
+                    }
+                    else if (CheckMagTimer < Time.time && NextCheckTimer < Time.time)
+                    {
+                        NextCheckTimer = Time.time + 3f;
+                        CheckMagTimer = Time.time + 240f * Random.Range(0.5f, 1.5f);
+                        BotOwner.GetPlayer.HandsController.FirearmsAnimator.CheckAmmo();
+                    }
+                    else if (CheckChamberTimer < Time.time && NextCheckTimer < Time.time)
+                    {
+                        NextCheckTimer = Time.time + 3f;
+                        CheckChamberTimer = Time.time + 240f * Random.Range(0.5f, 1.5f);
+                        BotOwner.GetPlayer.HandsController.FirearmsAnimator.CheckChamber();
+                    }
+                }
+            }
+        }
+
+        private void MoveToEnemy()
+        {
+            if (SAIN.Enemy == null && (BotOwner.Position - TargetPosition.Value).sqrMagnitude < 2f)
+            {
+                SAIN.Decision.ResetDecisions();
+                return;
+            }
+            CheckShouldSprint();
+            Search.Update(!SprintEnabled, SprintEnabled);
+            if (Search?.ActiveDestination != null)
+            {
+                Steer(Search.ActiveDestination);
+            }
+            else
+            {
+                SAIN.Steering.SteerByPriority();
             }
         }
 
@@ -87,11 +120,11 @@ namespace SAIN.Layers
                 return;
             }
 
-            var pers = SAIN.Info.BotPersonality;
-            if (RandomSprintTimer < Time.time && (pers == BotPersonality.GigaChad || pers == BotPersonality.Chad))
+            var pers = SAIN.Info.Personality;
+            if (RandomSprintTimer < Time.time && (pers == SAINPersonality.GigaChad || pers == SAINPersonality.Chad))
             {
                 RandomSprintTimer = Time.time + 3f * Random.Range(0.5f, 2f);
-                float chance = pers == BotPersonality.GigaChad ? 40f : 20f;
+                float chance = pers == SAINPersonality.GigaChad ? 40f : 20f;
                 SprintEnabled = EFTMath.RandomBool(chance);
             }
         }
@@ -120,8 +153,9 @@ namespace SAIN.Layers
             if (!SprintEnabled || BotOwner.Memory.IsUnderFire)
             {
                 SAIN.Mover.Sprint(false);
-                if (SAIN.Steering.SteerByPriority())
+                if (!SAIN.Steering.SteerByPriority(false))
                 {
+                    SAIN.Steering.LookToMovingDirection();
                 }
                 else
                 {

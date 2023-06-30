@@ -67,15 +67,15 @@ namespace SAIN.Patches
             Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
 
             // Config Toggle Check, Null aim data check, and Make sure the weapon can actually full auto (probably not necessary)
-            if (___botOwner_0.AimingData == null || (!weapon.WeapFireType.Contains(Weapon.EFireMode.fullauto) && !weapon.WeapFireType.Contains(Weapon.EFireMode.burst)))
+            if (___botOwner_0.AimingData == null)
             {
                 return true;
             }
 
-            if (weapon.SelectedFireMode != Weapon.EFireMode.single)
+            if (weapon.SelectedFireMode == Weapon.EFireMode.fullauto || weapon.SelectedFireMode == Weapon.EFireMode.burst)
             {
                 float distance = ___botOwner_0.AimingData.LastDist2Target;
-                float scaledDistance = FullAutoLength(___botOwner_0, distance);
+                float scaledDistance = FullAutoBurstLength(___botOwner_0, distance);
 
                 ___float_0 = scaledDistance * BurstLengthModifier.Value + Time.time;
 
@@ -86,59 +86,19 @@ namespace SAIN.Patches
         }
     }
 
-    public class PrefShootDistPatch : ModulePatch
+    public class UpdateFireArmPatch : ModulePatch
     {
-        private static PropertyInfo _LookSensor;
-
         protected override MethodBase GetTargetMethod()
         {
-            _LookSensor = AccessTools.Property(typeof(BotOwner), "LookSensor");
-            return AccessTools.Method(_LookSensor.PropertyType, "Init");
+            return AccessTools.Method(typeof(GClass363), "UpdateFirearmsController");
         }
 
-        [PatchPrefix]
-        public static void PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_2)
+        [PatchPostfix]
+        public static void PatchPostfix(ref BotOwner ___botOwner_0)
         {
-            Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
-            string WeaponClass = weapon.Template.weapClass;
-            float PreferedDist;
-            switch (WeaponClass)
+            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
-                case "assaultCarbine":
-                case "assaultRifle":
-                case "machinegun":
-                    PreferedDist = 100f;
-                    break;
-
-                case "smg":
-                    PreferedDist = 50f;
-                    break;
-
-                case "pistol":
-                    PreferedDist = 30f;
-                    break;
-
-                case "marksmanRifle":
-                    PreferedDist = 150f;
-                    break;
-
-                case "sniperRifle":
-                    PreferedDist = 200f;
-                    break;
-
-                case "shotgun":
-                    PreferedDist = 40f;
-                    break;
-                case "grenadeLauncher":
-                case "specialWeapon":
-                    PreferedDist = 100f;
-                    break;
-
-                default:
-                    PreferedDist = 120f;
-                    break;
             }
-            ___float_2 = PreferedDist;
         }
     }
 
@@ -149,36 +109,13 @@ namespace SAIN.Patches
             return AccessTools.Method(typeof(GClass363), "method_1");
         }
 
-        [PatchPrefix]
-        public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float __result)
+        [PatchPostfix]
+        public static void PatchPostfix(ref BotOwner ___botOwner_0, ref float __result)
         {
-            BotOwner bot = ___botOwner_0;
-
-            // Config Toggle and Disables mod for sniper scavs
-            if (bot.IsRole(WildSpawnType.marksman))
+            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
-                return true;
+                __result = component.Info.WeaponInfo.Firerate.SemiAutoROF();
             }
-
-            var component = bot.gameObject.GetComponent<SAINComponent>();
-            if (component == null)
-            {
-                return true;
-            }
-
-            float EnemyDistance = (bot.AimingData.RealTargetPoint - bot.WeaponRoot.position).magnitude;
-
-            var weaponInfo = component.Info.WeaponInfo;
-
-            float permeter = weaponInfo.PerMeter / weaponInfo.FinalModifier;
-
-            var firemode = ___botOwner_0.WeaponManager.CurrentWeapon.SelectedFireMode;
-
-            float finalTime = SemiAutoROF(EnemyDistance, permeter, firemode);
-
-            __result = finalTime;
-
-            return false;
         }
     }
 }

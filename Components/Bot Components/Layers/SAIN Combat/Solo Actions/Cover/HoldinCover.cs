@@ -92,7 +92,7 @@ namespace SAIN.Layers
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
             stringBuilder.AppendLine($"SAIN Info:");
-            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.BotPersonality}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.Personality}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
             CoverPoint cover = CoverInUse;
             if (cover != null)

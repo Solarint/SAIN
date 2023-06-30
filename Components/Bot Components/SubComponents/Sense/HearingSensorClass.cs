@@ -240,7 +240,7 @@ namespace SAIN.Classes
 
         public static Vector3 GetProjectionPoint(Vector3 p, Vector3 p1, Vector3 p2)
         {
-            //Calculate the difference between the z-coordinates of points p1 and p2
+            //CalculateRecoil the difference between the z-coordinates of points p1 and p2
             float num = p1.z - p2.z;
 
             //If the difference is 0, return a vector with the x-coordinate of point p and the y and z-coordinates of point p1
@@ -249,7 +249,7 @@ namespace SAIN.Classes
                 return new Vector3(p.x, p1.y, p1.z);
             }
 
-            //Calculate the difference between the x-coordinates of points p1 and p2
+            //CalculateRecoil the difference between the x-coordinates of points p1 and p2
             float num2 = p2.x - p1.x;
 
             //If the difference is 0, return a vector with the x-coordinate of point p1 and the y and z-coordinates of point p
@@ -258,7 +258,7 @@ namespace SAIN.Classes
                 return new Vector3(p1.x, p1.y, p.z);
             }
 
-            //Calculate the values of num3, num4, and num5
+            //CalculateRecoil the values of num3, num4, and num5
             float num3 = p1.x * p2.z - p2.x * p1.z;
             float num4 = num2 * p.x - num * p.z;
             float num5 = -(num2 * num3 + num * num4) / (num2 * num2 + num * num);
@@ -286,10 +286,10 @@ namespace SAIN.Classes
 
             float num = farhearing - closehearing;
 
-            //Calculate the difference between the distance and close hearing
+            //CalculateRecoil the difference between the distance and close hearing
             float num2 = d - closehearing;
 
-            //Calculate the ratio of the difference between the distance and close hearing to the difference between the far hearing and close hearing
+            //CalculateRecoil the ratio of the difference between the distance and close hearing to the difference between the far hearing and close hearing
             float num3 = 1f - num2 / num;
 
             return EFTMath.Random(0f, 1f) < num3;

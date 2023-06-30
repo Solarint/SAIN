@@ -122,7 +122,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (SAIN.Info.BotPersonality == BotPersonality.Rat || SAIN.Info.BotPersonality == BotPersonality.Coward || SAIN.Info.BotPersonality == BotPersonality.Timmy)
+                if (SAIN.Info.Personality == SAINPersonality.Rat || SAIN.Info.Personality == SAINPersonality.Coward || SAIN.Info.Personality == SAINPersonality.Timmy)
                 {
                     return 0.25f;
                 }
@@ -131,11 +131,11 @@ namespace SAIN.Classes
                 {
                     StandAndShootRandomTimer = Time.time + 1f;
 
-                    if (SAIN.Info.BotPersonality == BotPersonality.GigaChad)
+                    if (SAIN.Info.Personality == SAINPersonality.GigaChad)
                     {
                         ShootDelay = 2f * UnityEngine.Random.Range(0.25f, 2f);
                     }
-                    else if (SAIN.Info.BotPersonality == BotPersonality.Chad)
+                    else if (SAIN.Info.Personality == SAINPersonality.Chad)
                     {
                         ShootDelay = 1.5f * UnityEngine.Random.Range(0.5f, 2f);
                     }
@@ -168,25 +168,25 @@ namespace SAIN.Classes
             }
             else
             {
-                switch (BotPersonality)
+                switch (Personality)
                 {
-                    case BotPersonality.GigaChad:
+                    case SAINPersonality.GigaChad:
                         searchTime = 1.5f;
                         break;
 
-                    case BotPersonality.Chad:
+                    case SAINPersonality.Chad:
                         searchTime = 5f;
                         break;
 
-                    case BotPersonality.Timmy:
+                    case SAINPersonality.Timmy:
                         searchTime = 60f;
                         break;
 
-                    case BotPersonality.Rat:
+                    case SAINPersonality.Rat:
                         searchTime = 240f;
                         break;
 
-                    case BotPersonality.Coward:
+                    case SAINPersonality.Coward:
                         searchTime = 40f;
                         break;
 
@@ -205,7 +205,7 @@ namespace SAIN.Classes
 
             if (DebugBotInfo.Value)
             {
-                Logger.LogDebug($"Search Time = [{searchTime}] because: IsBoss? [{IAmBoss}] IsFollower? [{IsFollower}] Personality [{BotPersonality}] SquadLead? [{group.IAmLeader}] Squad Members: [{group.SquadMembers.Count}]");
+                Logger.LogDebug($"Search Time = [{searchTime}] because: IsBoss? [{IAmBoss}] IsFollower? [{IsFollower}] Personality [{Personality}] SquadLead? [{group.IAmLeader}] Squad Members: [{group.SquadMembers.Count}]");
             }
 
             TimeBeforeSearch = searchTime;
@@ -280,39 +280,39 @@ namespace SAIN.Classes
         {
             if (AllGigaChads.Value)
             {
-                BotPersonality = BotPersonality.GigaChad;
+                Personality = SAINPersonality.GigaChad;
             }
             else if (AllChads.Value)
             {
-                BotPersonality = BotPersonality.Chad;
+                Personality = SAINPersonality.Chad;
             }
             else if (AllRats.Value)
             {
-                BotPersonality = BotPersonality.Rat;
+                Personality = SAINPersonality.Rat;
             }
             else if (CanBeTimmy)
             {
-                BotPersonality = BotPersonality.Timmy;
+                Personality = SAINPersonality.Timmy;
             }
             else if (CanBeGigaChad)
             {
-                BotPersonality = BotPersonality.GigaChad;
+                Personality = SAINPersonality.GigaChad;
             }
             else if (CanBeChad)
             {
-                BotPersonality = BotPersonality.Chad;
+                Personality = SAINPersonality.Chad;
             }
             else if (CanBeRat)
             {
-                BotPersonality = BotPersonality.Rat;
+                Personality = SAINPersonality.Rat;
             }
             else if (EFTMath.RandomBool())
             {
-                BotPersonality = BotPersonality.Coward;
+                Personality = SAINPersonality.Coward;
             }
             else
             {
-                BotPersonality = BotPersonality.Normal;
+                Personality = SAINPersonality.Normal;
             }
         }
 
@@ -378,7 +378,7 @@ namespace SAIN.Classes
 
         public float DifficultyModifier { get; private set; }
 
-        public BotPersonality BotPersonality { get; private set; }
+        public SAINPersonality Personality { get; private set; }
 
         public float PowerLevel => BotOwner.AIData.PowerOfEquipment;
 

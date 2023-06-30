@@ -18,7 +18,6 @@ namespace SAIN.Patches
             __instance.SEC_TO_MORE_DIST_TO_RUN = 0f;
             __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
             __instance.CHANCE_FUCK_YOU_ON_CONTACT_100 = 0f;
-            //__instance.ATTACK_IMMEDIATLY_CHANCE_0_100 = 100f;
             __instance.DIST_TO_STOP_RUN_ENEMY = 0f;
             __instance.NO_RUN_AWAY_FOR_SAFE = true;
             __instance.SURGE_KIT_ONLY_SAFE_CONTAINER = false;
@@ -60,11 +59,10 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(GClass554 __instance)
         {
-            __instance.PistolFireDistancePref = 40f;
-            __instance.ShotgunFireDistancePref = 40f;
-            __instance.RifleFireDistancePref = 150f;
             __instance.CanGrenade = true;
             __instance.CanRun = true;
+            __instance.GainSightCoef *= 1.1f;
+            __instance.VisibleAngle = 160f;
         }
     }
 
@@ -78,10 +76,9 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalShootData __instance)
         {
-            //__instance.SHOOT_IMMEDIATELY_DIST = 50f;
-            //__instance.MAX_DIST_COEF = 1.75f;
+            __instance.CAN_STOP_SHOOT_CAUSE_ANIMATOR = true;
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
-            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.25f;
+            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.0f;
             __instance.BASE_AUTOMATIC_TIME = 0.5f;
             __instance.RECOIL_DELTA_PRESS = 0.0f;
         }
@@ -96,9 +93,9 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalsScatteringSettings __instance)
         {
-            //__instance.MinScatter = 0.15f;
-            // __instance.WorkingScatter = 0.25f;
-            //__instance.MaxScatter = 0.33f;
+            __instance.MinScatter *= 0.9f;
+            __instance.WorkingScatter *= 0.9f;
+            __instance.MaxScatter *= 0.9f;
         }
     }
 
@@ -139,15 +136,14 @@ namespace SAIN.Patches
             //__instance.SCAV_GROUPS_TOGETHER = false;
             __instance.DIST_NOT_TO_GROUP = 50f;
             __instance.DIST_NOT_TO_GROUP_SQR = 50f * 50f;
-            //__instance.BOT_MOVE_CAST_ONLYVERTICAL = false;
             __instance.MIN_DIST_TO_STOP_RUN = 0f;
             __instance.CAN_SHOOT_TO_HEAD = false;
-            __instance.ARMOR_CLASS_COEF = 6f;
-            __instance.SHOTGUN_POWER = 60f;
-            __instance.RIFLE_POWER = 80f;
-            __instance.PISTOL_POWER = 10f;
-            __instance.SMG_POWER = 100f;
-            __instance.SNIPE_POWER = 20f;
+            __instance.ARMOR_CLASS_COEF = 7f;
+            __instance.SHOTGUN_POWER = 40f;
+            __instance.RIFLE_POWER = 50f;
+            __instance.PISTOL_POWER = 20f;
+            __instance.SMG_POWER = 60f;
+            __instance.SNIPE_POWER = 5f;
         }
     }
 
@@ -179,7 +175,7 @@ namespace SAIN.Patches
         {
             __instance.FULL_SECTOR_VIEW = false;
 
-            __instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 1000f;
+            __instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 500f;
 
             __instance.NIGHT_VISION_ON = 75f;
             __instance.NIGHT_VISION_OFF = 125f;

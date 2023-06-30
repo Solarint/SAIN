@@ -82,6 +82,15 @@ namespace SAIN
                         Console.WriteLine("SAIN: Waypoints Is Not Installed, Bot Extracts Disabled!");
                     }
                 }
+                if (!RealismChecked)
+                {
+                    RealismChecked = true;
+                    RealismModLoaded = Chainloader.PluginInfos.ContainsKey("RealismMod");
+                    if (RealismModLoaded)
+                    {
+                        Console.WriteLine("SAIN: Realism Mod Detected, auto-adjusting recoil for bots.");
+                    }
+                }
             }
         }
 
@@ -89,6 +98,9 @@ namespace SAIN
         {
             DifficultySettings.OnGUI();
         }
+
+        private bool RealismChecked = false;
+        public static bool RealismModLoaded = false;
 
         private bool WayPointsChecked = false;
         public static List<string> SAINLayers => BigBrainSAIN.SAINLayers;

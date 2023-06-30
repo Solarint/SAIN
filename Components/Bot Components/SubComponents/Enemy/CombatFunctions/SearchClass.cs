@@ -239,7 +239,7 @@ namespace SAIN.Classes
                                 {
                                     if (SampleNav(endPeekPos, out var endResult))
                                     {
-                                        // Calculate the signed angle between the corners, value will be negative if its to the left of the startPeekPos.
+                                        // CalculateRecoil the signed angle between the corners, value will be negative if its to the left of the startPeekPos.
                                         float signAngle = GetSignedAngle(dirToBlind, dirToDanger);
                                         SearchMovePoint = new MoveDangerPoint(startResult, endResult, dangerPoint, blindCorner, signAngle);
                                         break;
@@ -372,7 +372,7 @@ namespace SAIN.Classes
 
         private float GetSignedAngle(Vector3 dirCenter, Vector3 dirOther, Vector3? axis = null)
         {
-            // Calculate the signed angle between the corners, value will be negative if its to the left of the startPeekPos.
+            // CalculateRecoil the signed angle between the corners, value will be negative if its to the left of the startPeekPos.
             Vector3 angleAxis = axis ?? Vector3.up;
             return Vector3.SignedAngle(dirCenter, dirOther, angleAxis);
         }

@@ -92,6 +92,26 @@ namespace SAIN.Components
             }
         }
 
+        public float DistanceToAimTarget
+        {
+            get
+            {
+                if (BotOwner.AimingData != null)
+                {
+                    return (BotOwner.AimingData.RealTargetPoint - Position).magnitude;
+                }
+                else if (Enemy != null)
+                {
+                    return Enemy.RealDistance;
+                }
+                else if (BotOwner.Memory.GoalEnemy != null)
+                {
+                    return BotOwner.Memory.GoalEnemy.Distance;
+                }
+                return 10f;
+            }
+        }
+
         private void UpdatePatrolData()
         {
             if (LayersActive)
