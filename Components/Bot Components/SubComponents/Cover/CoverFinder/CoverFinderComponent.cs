@@ -1,11 +1,11 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Classes;
+using SAIN.Components.CoverFinder;
 using SAIN.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using SAIN.Components.CoverFinder;
 using static SAIN.UserSettings.CoverConfig;
 
 namespace SAIN.Components
@@ -164,7 +164,7 @@ namespace SAIN.Components
 
         private void FindFallback()
         {
-            if (CoverPoints.Count > 0)
+            if (CoverPoints.Count > 0 && FallBackPoint == null)
             {
                 float highest = 0f;
                 int highestIndex = 0;
@@ -191,15 +191,12 @@ namespace SAIN.Components
             if (SpottedPoints.Count > 0)
             {
                 ReCheckList.AddRange(SpottedPoints);
-                for (int j = ReCheckList.Count - 1; j >= 0; j--)
+                for (int j = SpottedPoints.Count - 1; j >= 0; j--)
                 {
-                    var spotted = ReCheckList[j];
-                    if (spotted != null)
+                    var spotted = SpottedPoints[j];
+                    if (spotted != null && spotted.IsValidAgain)
                     {
-                        if (spotted.IsValidAgain)
-                        {
-                            SpottedPoints.RemoveAt(j);
-                        }
+                        SpottedPoints.RemoveAt(j);
                     }
                 }
                 ReCheckList.Clear();
@@ -209,35 +206,15 @@ namespace SAIN.Components
         private void ClearOldPoints()
         {
             CoverPoint PointToSave = null;
+
             if (CoverPoints.Count > 0)
             {
                 for (int i = 0; i < CoverPoints.Count; i++)
                 {
-                    var point = CoverPoints[i];
-                    if (point != null)
+                    var coverPoint = CoverPoints[i];
+                    if (coverPoint != null && Recheck(coverPoint))
                     {
-                        if (point.Spotted)
-                        {
-                            SpottedPoints.Add(new SpottedCoverPoint(point.Position));
-                            continue;
-                        }
-                        if (point.BotIsUsingThis)
-                        {
-                            if (CoverAnalyzer.CheckCollider(point.Collider, out var newPoint, MinObstacleHeight, OriginPoint, TargetPosition, MinEnemyDist))
-                            {
-                                PointToSave = newPoint;
-                                PointToSave.BotIsUsingThis = true;
-                                PointToSave.HitInCoverCount = point.HitInCoverCount;
-                                if (PointToSave.Collider.bounds.size.y >= 1.5f)
-                                {
-                                    FallBackPoint = newPoint;
-                                }
-                                else
-                                {
-                                    FallBackPoint = null;
-                                }
-                            }
-                        }
+                        PointToSave = coverPoint;
                     }
                 }
             }
@@ -246,6 +223,34 @@ namespace SAIN.Components
             {
                 CoverPoints.Add(PointToSave);
             }
+        }
+
+        private bool Recheck(CoverPoint coverPoint)
+        {
+            if (!PointIsSpotted(coverPoint) && coverPoint.BotIsUsingThis && CheckPoint(coverPoint, out var newPoint))
+            {
+                coverPoint.Position = newPoint.Position;
+                return true;
+            }
+            return false;
+        }
+
+        private bool PointIsSpotted(CoverPoint point)
+        {
+            if (point == null)
+            {
+                return true;
+            }
+            if (point.Spotted)
+            {
+                SpottedPoints.Add(new SpottedCoverPoint(point.Position));
+            }
+            return point.Spotted;
+        }
+
+        private bool CheckPoint(CoverPoint point, out CoverPoint newPoint)
+        {
+            return CoverAnalyzer.CheckCollider(point.Collider, out newPoint, MinObstacleHeight, OriginPoint, TargetPosition, MinEnemyDist);
         }
 
         private void GetColliders(out int hits)

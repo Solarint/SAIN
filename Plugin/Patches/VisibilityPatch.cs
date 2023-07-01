@@ -64,7 +64,7 @@ namespace SAIN.Patches
                         currentVisionDistance = defaultvision;
                         MaxVision = 30f;
                     }
-                    // Unlocked Vision distance.
+                    // Unlocked Vision Distance.
                     else
                     {
                         currentVisionDistance = VisionConfig.AbsoluteMaxVisionDistance.Value * visdistcoef;
@@ -80,10 +80,10 @@ namespace SAIN.Patches
                     weatherMod = Mathf.Clamp(weatherMod, 0.5f, 1f);
                 }
 
-                // Sets a minimum cap based on weather conditions to avoid bots having too low of a vision distance while at peace in bad weather
+                // Sets a minimum cap based on weather conditions to avoid bots having too low of a vision Distance while at peace in bad weather
                 float currentVisionDistanceCapped = Mathf.Clamp(currentVisionDistance * weatherMod, 80f, MaxVision);
 
-                // Applies SeenTime Modifier to the final vision distance results
+                // Applies SeenTime Modifier to the final vision Distance results
                 float finalVisionDistance = currentVisionDistanceCapped * timeMod;
 
                 _clearVisibleDistProperty.SetValue(__instance, finalVisionDistance);

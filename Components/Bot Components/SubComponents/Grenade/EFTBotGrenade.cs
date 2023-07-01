@@ -416,9 +416,6 @@ namespace SAIN.Classes
             BotOwner.WeaponManager.Selector.TakePrevWeapon();
         }
 
-        [CompilerGenerated]
-        private GClass513 gclass513_0;
-
         public Vector3 LastThrowDirection;
         public float MaxThrowForce = 20f;
         private GrenadeClass SavedGrenade;
@@ -447,8 +444,6 @@ namespace SAIN.Classes
             }
 
             public static readonly EFTBotGrenade.Class138 class138_0 = new EFTBotGrenade.Class138();
-            public static Func<Item, bool> func_0;
-            public static Func<Item, bool> func_1;
         }
     }
 }

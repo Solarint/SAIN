@@ -17,10 +17,6 @@ namespace SAIN.Components.BotController
 
         public void Update()
         {
-            if (SAINPlugin.ExtractingDisabled)
-            {
-                return;
-            }
             if (GetExfilControl())
             {
                 if (CheckExtractTimer < Time.time)
@@ -75,7 +71,7 @@ namespace SAIN.Components.BotController
             {
                 foreach (var bot in Bots)
                 {
-                    if (bot.Value == null)
+                    if (bot.Value == null || (!bot.Value.Info.IsPMC && !bot.Value.Info.IsScav))
                     {
                         continue;
                     }

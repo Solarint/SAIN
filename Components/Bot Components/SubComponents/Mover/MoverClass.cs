@@ -10,34 +10,48 @@ using BepInEx.Logging;
 using System.Reflection;
 using HarmonyLib;
 using SAIN.Classes.Mover;
+using SAIN.Components;
 
 namespace SAIN.Classes
 {
-    public class SAIN_Mover_Speed : SAINBot
+    public class MoverClass : MonoBehaviour
     {
-        public SAIN_Mover_Speed(BotOwner owner) : base(owner)
+        private SAINComponent SAIN;
+        private BotOwner BotOwner => SAIN?.BotOwner;
+
+        private void Awake()
         {
+            SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
 
-            BlindFire = new SAIN_Mover_BlindFire(owner);
-            SideStep = new SAIN_Mover_SideStep(owner);
-            Lean = new SAIN_Mover_Lean(owner);
-            Prone = new SAIN_Mover_Prone(owner);
-            Pose = new SAIN_Mover_Pose(owner);
+            BlindFire = new BlindFireClass(BotOwner);
+            SideStep = new SideStepClass(BotOwner);
+            Lean = new LeanClass(BotOwner);
+            Prone = new ProneClass(BotOwner);
+            Pose = new PoseClass(BotOwner);
         }
 
-        public SAIN_Mover_BlindFire BlindFire { get; private set; }
-        public SAIN_Mover_SideStep SideStep { get; private set; }
-        public SAIN_Mover_Lean Lean { get; private set; }
-        public SAIN_Mover_Pose Pose { get; private set; }
-        public SAIN_Mover_Prone Prone { get; private set; }
+        private void Update()
+        {
+            if (BotOwner == null) return;
+
+            SetStamina();
+
+            Pose.Update();
+            Lean.Update();
+            SideStep.Update();
+            Prone.Update();
+            BlindFire.Update();
+        }
+
+        public BlindFireClass BlindFire { get; private set; }
+        public SideStepClass SideStep { get; private set; }
+        public LeanClass Lean { get; private set; }
+        public PoseClass Pose { get; private set; }
+        public ProneClass Prone { get; private set; }
 
         public bool GoToPoint(Vector3 point, float reachDist = -1f, bool crawl = false)
         {
-            if (CurrentDecision == SAINSoloDecision.HoldInCover)
-            {
-                return false;
-            }
             if (CanGoToPoint(point, out Vector3 pointToGo))
             {
                 if (reachDist < 0f)
@@ -57,10 +71,6 @@ namespace SAIN.Classes
 
         public bool GoToPointWay(Vector3 point, float reachDist = -1f, bool crawl = false)
         {
-            if (CurrentDecision == SAINSoloDecision.HoldInCover)
-            {
-                return false;
-            }
             if (CanGoToPoint(point, out Vector3[] Way))
             {
                 if (reachDist < 0f)
@@ -81,10 +91,6 @@ namespace SAIN.Classes
         public bool CanGoToPoint(Vector3 point, out Vector3[] Way)
         {
             Way = null;
-            if (CurrentDecision == SAINSoloDecision.HoldInCover)
-            {
-                return false;
-            }
             if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
@@ -96,14 +102,10 @@ namespace SAIN.Classes
             return Way != null;
         }
 
-        public bool CanGoToPoint(Vector3 point, out Vector3 pointToGo, bool mustHaveCompletePath = false)
+        public bool CanGoToPoint(Vector3 point, out Vector3 pointToGo, bool mustHaveCompletePath = false, float navSampleRange = 10f)
         {
             pointToGo = point;
-            if (CurrentDecision == SAINSoloDecision.HoldInCover)
-            {
-                return false;
-            }
-            if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
+            if (NavMesh.SamplePosition(point, out var navHit, navSampleRange, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
                 if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
@@ -119,23 +121,13 @@ namespace SAIN.Classes
             return false;
         }
 
-        public void Update()
+        private void SetStamina()
         {
-            if (SAIN.LayersActive)
+            var stamina = BotOwner.GetPlayer.Physical.Stamina;
+            if (SAIN.LayersActive && stamina.NormalValue < 0.1f)
             {
-                Pose.Update();
-                UpdateTargetMoveSpeed();
-                var stamina = BotPlayer.Physical.Stamina;
-                if (stamina.NormalValue < 0.33f)
-                {
-                    BotPlayer.Physical.Stamina.UpdateStamina(stamina.TotalCapacity);
-                }
+                BotOwner.GetPlayer.Physical.Stamina.UpdateStamina(stamina.TotalCapacity / 8f);
             }
-        }
-
-        private void UpdateTargetMoveSpeed()
-        {
-            BotOwner.SetTargetMoveSpeed(1f);
         }
 
         public void SetTargetPose(float pose)
@@ -152,13 +144,16 @@ namespace SAIN.Classes
 
         public void StopMove()
         {
-            NavigationPoint = null;
             BotOwner.Mover.Stop();
-            Sprint(false);
+            if (IsSprinting)
+            {
+                Sprint(false);
+            }
         }
 
         public void Sprint(bool value)
         {
+            IsSprinting = value;
             BotOwner.Mover.Sprint(value);
             if (value)
             {
@@ -168,10 +163,6 @@ namespace SAIN.Classes
         }
 
         public bool IsSprinting { get; private set; }
-
-        public NavigationPointObject NavigationPoint { get; private set; }
-        public bool HasDestination => NavigationPoint != null;
-        public CoverPoint CoverDestination { get; private set; }
 
         public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
         {
@@ -200,21 +191,6 @@ namespace SAIN.Classes
             return Physics.Raycast(BotOwner.Position, direction, out rayHit, checkDist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
-        public Vector3 MidPointLerp(Vector3 target)
-        {
-            return Vector3.Lerp(BotOwner.Position, target, 0.5f);
-        }
-
-        public bool BotIsAtPoint(Vector3 point, float reachDist = 1f)
-        {
-            return SqrMagToPoint(point) < reachDist;
-        }
-
-        public float SqrMagToPoint(Vector3 point)
-        {
-            return (point - BotOwner.Position).sqrMagnitude;
-        }
-
         public void TryJump()
         {
             if (JumpTimer < Time.time && CanJump)
@@ -239,19 +215,6 @@ namespace SAIN.Classes
 
         public void FastLean(LeanSetting value)
         {
-
-        }
-
-        public void FastLean(float value)
-        {
-            if (BotPlayer.MovementContext.Tilt != value)
-            {
-                BotPlayer.MovementContext.SetTilt(value);
-            }
-        }
-
-        public void SlowLean(LeanSetting value)
-        {
             float num;
             switch (value)
             {
@@ -262,25 +225,22 @@ namespace SAIN.Classes
                 default:
                     num = 0f; break;
             }
-            SlowLean(num);
+            FastLean(num);
         }
 
-        public void SlowLean(float value)
+        public void FastLean(float value)
         {
-            BotPlayer.SlowLean(value);
+            if (BotOwner.GetPlayer.MovementContext.Tilt != value)
+            {
+                BotOwner.GetPlayer.MovementContext.SetTilt(value);
+            }
         }
 
-        private void UpdateLean()
-        {
-        }
-
-        private float TargetLeanNumber = 0f;
-        public float CurrentLeanNumber { get; private set; }
         public MovementState CurrentState => BotOwner.GetPlayer.MovementContext.CurrentState;
         public bool CanJump => BotOwner.GetPlayer.MovementContext.CanJump;
 
         private float JumpTimer = 0f;
 
-        private readonly ManualLogSource Logger;
+        private ManualLogSource Logger;
     }
 }

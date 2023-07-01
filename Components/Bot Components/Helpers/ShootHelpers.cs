@@ -1,8 +1,7 @@
 ﻿using EFT;
-using EFT.InventoryLogic;
 using SAIN.Components;
 using UnityEngine;
-using static SAIN.UserSettings.ShootConfig;
+using static SAIN.UserSettings.EditorSettings;
 
 namespace SAIN.Helpers
 {
@@ -19,7 +18,7 @@ namespace SAIN.Helpers
 
             float modifier = component.Info.WeaponInfo.FinalModifier;
 
-            float k = 0.08f * modifier; // How fast for the burst length to falloff with distance
+            float k = 0.08f * modifier; // How fast for the burst length to falloff with Distance
             float scaledDistance = InverseScaleWithLogisticFunction(distance, k, 20f);
 
             scaledDistance = Mathf.Clamp(scaledDistance, 0.001f, 1f);
@@ -33,7 +32,7 @@ namespace SAIN.Helpers
                 scaledDistance = 1f;
             }
 
-            return scaledDistance * BurstLengthModifier.Value;
+            return scaledDistance * BurstMulti.Value;
         }
 
         public static float FullAutoTimePerShot(int bFirerate)

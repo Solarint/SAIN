@@ -54,7 +54,7 @@ namespace SAIN.Components
                 {
                     if (CheckPosition(hit.position))
                     {
-                        newPoint = new CoverPoint(BotOwner, hit.position, collider);
+                        newPoint = new CoverPoint(SAIN, hit.position, collider);
                     }
                 }
             }

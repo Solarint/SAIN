@@ -1,8 +1,10 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
+using SAIN.UserSettings;
 using System.Reflection;
 using UnityEngine;
+using static SAIN.UserSettings.EditorSettings;
 
 namespace SAIN.Patches
 {
@@ -11,17 +13,33 @@ namespace SAIN.Patches
         public static float VisionSpeed(float dist)
         {
             float result = 1f;
-            if (dist >= Difficulty.CloseFarThresh)
+            if (dist >= CloseFarThresh.Value)
             {
-                result *= Difficulty.FarVisionSpeed;
+                result *= FarVisionSpeed.Value;
             }
             else
             {
-                result *= Difficulty.CloseVisionSpeed;
+                result *= CloseVisionSpeed.Value;
             }
-            result *= Difficulty.VisionSpeed;
+            result *= EditorSettings.VisionSpeed.Value;
 
             return result;
+        }
+    }
+    //IsEnemyLookingAtMe
+
+    public class NoAIESPPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(BotOwner)?.GetMethod("IsEnemyLookingAtMe", BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(IAIDetails) }, null);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref bool __result)
+        {
+            __result = false;
+            return false;
         }
     }
 

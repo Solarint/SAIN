@@ -49,7 +49,7 @@ namespace SAIN.Layers
                     if (ResetSideStepTimer < Time.time)
                     {
                         ResetSideStepTimer = Time.time + 1.5f;
-                        //SAIN.Lean.SideStep.SetSideStep(0f);
+                        //SAIN.Lean.SideStepClass.SetSideStep(0f);
                     }
                     else if (NewSideStepTimer < Time.time)
                     {
@@ -57,11 +57,11 @@ namespace SAIN.Layers
                         SideStepRight = !SideStepRight;
                         if (SideStepRight)
                         {
-                            //SAIN.Lean.SideStep.SetSideStep(1f);
+                            //SAIN.Lean.SideStepClass.SetSideStep(1f);
                         }
                         else
                         {
-                            //SAIN.Lean.SideStep.SetSideStep(-1f);
+                            //SAIN.Lean.SideStepClass.SetSideStep(-1f);
                         }
                     }
                 }
@@ -101,7 +101,7 @@ namespace SAIN.Layers
                 stringBuilder.AppendLabeledValue("Cover Position", $"{cover.Position}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Distance", $"{cover.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Spotted?", $"{cover.Spotted}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.PathDistance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover ID", $"{cover.Id}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Status", $"{cover.CoverStatus}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{cover.HitInCoverCount}", Color.white, Color.yellow, true);

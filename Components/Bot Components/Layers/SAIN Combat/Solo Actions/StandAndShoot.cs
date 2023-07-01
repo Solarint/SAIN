@@ -32,7 +32,7 @@ namespace SAIN.Layers
 
             Shoot.Update();
 
-            if (SAIN.Cover.BotIsAtCoverPoint)
+            if (SAIN.Cover.BotIsAtCoverPoint())
             {
                 return;
             }

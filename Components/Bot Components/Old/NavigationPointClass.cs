@@ -321,7 +321,6 @@ namespace SAIN.Classes
         }
 
         private readonly ManualLogSource Logger;
-        private float CheckMoveTimer = 0f;
     }
 
     public class PathPoint

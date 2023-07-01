@@ -4,9 +4,7 @@ using SAIN.UserSettings;
 using System;
 using System.Collections.Generic;
 using SAIN.Components;
-using EFT;
 using BepInEx.Bootstrap;
-using Comfort.Common;
 using BepInEx.Configuration;
 using EFT.UI;
 using UnityEngine;
@@ -15,11 +13,12 @@ namespace SAIN
 {
     [BepInPlugin("me.sol.sain", "SAIN Beta 3", "2.0")]
     [BepInDependency("xyz.drakia.bigbrain", "0.1.4")]
+    [BepInDependency("xyz.drakia.waypoints", "1.1.2")]
     [BepInDependency("com.spt-aki.core", "3.5.8")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
     {
-        public static readonly Difficulty.Editor DifficultySettings = new Difficulty.Editor();
+        public static Difficulty.Editor DifficultySettings;
         private void Awake()
         {
             if (!TarkovVersion.CheckEftVersion(Logger, Info, Config))
@@ -39,30 +38,29 @@ namespace SAIN
             EditorInit();
             EFTPatches.Init();
             BigBrainSAIN.Init();
+            DifficultySettings = new Difficulty.Editor();
+            ModsCheckTimer = Time.time + 5f;
         }
-
-        public static bool ExtractingDisabled { get; private set; }
 
         private void EditorInit()
         {
             ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(Difficulty.Editor.OpenPanel));
 
             Difficulty.Editor.TogglePanel = Config.Bind(
-                "Difficulty Editor",
-                "SAIN Bot Difficulty Editor",
+                "SAIN Settings Editor",
+                "",
                 new KeyboardShortcut(KeyCode.Home),
                 "The keyboard shortcut that toggles editor");
         }
 
         private void ConfigInit()
         {
+            EditorSettings.Init(Config);
             ExtractConfig.Init(Config);
-            DifficultyConfig.Init(Config);
             TalkConfig.Init(Config);
             VisionConfig.Init(Config);
             DebugConfig.Init(Config);
             CoverConfig.Init(Config);
-            ShootConfig.Init(Config);
             SoundConfig.Init(Config);
             DazzleConfig.Init(Config);
         }
@@ -71,25 +69,20 @@ namespace SAIN
         {
             DifficultySettings.Update();
             BotControllerHandler.Update();
-            if (Singleton<GameWorld>.Instance != null)
+
+            if (!ModsChecked && ModsCheckTimer < Time.time)
             {
-                if (!WayPointsChecked)
+                ModsChecked = true;
+
+                RealismLoaded = Chainloader.PluginInfos.ContainsKey("RealismMod");
+                if (RealismLoaded)
                 {
-                    WayPointsChecked = true;
-                    ExtractingDisabled = !Chainloader.PluginInfos.ContainsKey("xyz.drakia.waypoints");
-                    if (ExtractingDisabled)
-                    {
-                        Console.WriteLine("SAIN: Waypoints Is Not Installed, Bot Extracts Disabled!");
-                    }
+                    Logger.LogInfo("SAIN: Realism Mod Detected, Auto-Adjusting Recoil for Bots...");
                 }
-                if (!RealismChecked)
+                LootingBotsLoaded = Chainloader.PluginInfos.ContainsKey("me.skwizzy.lootingbots");
+                if (LootingBotsLoaded)
                 {
-                    RealismChecked = true;
-                    RealismModLoaded = Chainloader.PluginInfos.ContainsKey("RealismMod");
-                    if (RealismModLoaded)
-                    {
-                        Console.WriteLine("SAIN: Realism Mod Detected, auto-adjusting recoil for bots.");
-                    }
+                    Logger.LogInfo("SAIN: Looting Bots Detected.");
                 }
             }
         }
@@ -99,10 +92,12 @@ namespace SAIN
             DifficultySettings.OnGUI();
         }
 
-        private bool RealismChecked = false;
-        public static bool RealismModLoaded = false;
+        private float ModsCheckTimer;
 
-        private bool WayPointsChecked = false;
+        private bool ModsChecked = false;
+        public static bool RealismLoaded { get; private set; } = false;
+        public static bool LootingBotsLoaded { get; private set; } = false;
+
         public static List<string> SAINLayers => BigBrainSAIN.SAINLayers;
         public static SAINBotController BotController => BotControllerHandler.BotController;
     }

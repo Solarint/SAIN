@@ -37,10 +37,9 @@ namespace SAIN
 
         private static void VisionPatches()
         {
+            new Patches.NoAIESPPatch().Enable();
             new Patches.VisionSpeedPatch().Enable();
-            //new Patches.LookDisablePatch2().Enable();
             new Patches.VisibleDistancePatch().Enable();
-            //new Patches.GainSightPatch().Enable();
             new Patches.CheckFlashlightPatch().Enable();
         }
 

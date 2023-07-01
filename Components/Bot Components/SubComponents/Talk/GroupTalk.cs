@@ -330,81 +330,53 @@ namespace SAIN.Classes
             {
                 CommandSayTimer = Time.time + 5f;
                 var commandTrigger = EPhraseTrigger.PhraseNone;
-                var commmandMask = ETagStatus.Unaware;
                 var trigger = EPhraseTrigger.PhraseNone;
-                var mask = ETagStatus.Unaware;
                 var gesture = EGesture.None;
 
                 if (SquadDecisions.Contains(SAINSquadDecision.Suppress))
                 {
-                    gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.Suppress;
-                    commmandMask = ETagStatus.Combat;
-
                     trigger = EPhraseTrigger.Roger;
-                    mask = ETagStatus.Aware;
                 }
                 else if (SquadDecision == SAINSquadDecision.Search)
                 {
                     gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.FollowMe;
-                    commmandMask = ETagStatus.Aware;
-
                     trigger = EPhraseTrigger.Going;
-                    mask = ETagStatus.Aware;
                 }
                 else if (SAIN.Squad.MemberIsFallingBack)
                 {
                     gesture = EGesture.ComeToMe;
                     commandTrigger = EPhraseTrigger.GetBack;
-                    commmandMask = ETagStatus.Combat;
-
                     trigger = EPhraseTrigger.PhraseNone;
-                    mask = ETagStatus.Combat;
                 }
                 else if (BotOwner.DoorOpener.Interacting && EFTMath.RandomBool(33f))
                 {
                     commandTrigger = EPhraseTrigger.OpenDoor;
-                    commmandMask = ETagStatus.Aware;
-
                     trigger = EPhraseTrigger.Roger;
-                    mask = ETagStatus.Aware;
                 }
                 else if (SAIN.CurrentDecision == SAINSoloDecision.RunAway)
                 {
-                    gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.OnYourOwn;
-                    commmandMask = ETagStatus.Aware;
-
                     trigger = EFTMath.RandomBool() ? EPhraseTrigger.Repeat : EPhraseTrigger.Stop;
-                    mask = ETagStatus.Aware;
                 }
                 else if (SAIN.Squad.SquadDecisions.Contains(SAINSquadDecision.Regroup))
                 {
                     gesture = EGesture.ComeToMe;
                     commandTrigger = EPhraseTrigger.Regroup;
-                    commmandMask = ETagStatus.Aware;
-
                     trigger = EPhraseTrigger.Roger;
-                    mask = ETagStatus.Aware;
                 }
                 else if (SquadDecision == SAINSquadDecision.Help)
                 {
                     gesture = EGesture.ThatDirection;
                     commandTrigger = EPhraseTrigger.Gogogo;
-                    commmandMask = ETagStatus.Aware;
-
                     trigger = EPhraseTrigger.Going;
-                    mask = ETagStatus.Combat;
                 }
                 else if (CurrentDecision == SAINSoloDecision.HoldInCover)
                 {
                     gesture = EGesture.Stop;
                     commandTrigger = EPhraseTrigger.HoldPosition;
-                    commmandMask = ETagStatus.Aware;
-
                     trigger = EPhraseTrigger.Roger;
-                    mask = ETagStatus.Aware;
                 }
 
                 if (commandTrigger != EPhraseTrigger.PhraseNone)
@@ -416,7 +388,7 @@ namespace SAIN.Classes
                     if (SAIN.Squad.VisibleMembers.Count / (float)SAIN.Squad.SquadMembers.Count < 0.5f)
                     {
                         Talk.Say(commandTrigger);
-                        AllMembersSay(trigger, mask, Random.Range(0.75f, 1.5f), 35f);
+                        AllMembersSay(trigger, ETagStatus.Aware, Random.Range(0.75f, 1.5f), 35f);
                     }
                     return true;
                 }

@@ -3,15 +3,12 @@ using Aki.Reflection.Utils;
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN.Components;
 using System.Linq;
 using System;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Helpers.Shoot;
-using static SAIN.UserSettings.ShootConfig;
-using static SAIN.UserSettings.DifficultyConfig;
-using SAIN.Classes;
+using static SAIN.UserSettings.EditorSettings;
 
 namespace SAIN.Patches
 {
@@ -77,7 +74,7 @@ namespace SAIN.Patches
                 float distance = ___botOwner_0.AimingData.LastDist2Target;
                 float scaledDistance = FullAutoBurstLength(___botOwner_0, distance);
 
-                ___float_0 = scaledDistance * BurstLengthModifier.Value + Time.time;
+                ___float_0 = scaledDistance * BurstMulti.Value + Time.time;
 
                 return false;
             }

@@ -32,7 +32,7 @@ namespace SAIN.Layers
 
             ExecuteThrow();
 
-            if (SAIN.Cover.BotIsAtCoverPoint)
+            if (SAIN.Cover.BotIsAtCoverPoint())
             {
                 return;
             }

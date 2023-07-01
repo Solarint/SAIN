@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BepInEx.Logging;
+﻿using BepInEx.Logging;
 using EFT;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
@@ -14,14 +9,12 @@ namespace SAIN.Classes
     {
         public SelfActionDecisionClass(BotOwner bot) : base(bot) { }
 
-        protected ManualLogSource Logger => SAIN.Decision.Logger;
-        private bool DebugBotDecision => DebugBotDecisions.Value;
         public SAINSelfDecision CurrentSelfAction => SAIN.Decision.CurrentSelfDecision;
         private SAINEnemyPath EnemyDistance => SAIN.Decision.EnemyDistance;
 
         public bool GetDecision(out SAINSelfDecision Decision)
         {
-            if ( SAIN.Enemy == null && !BotOwner.Medecine.Using && CheckLowAmmo(0.75f) )
+            if ( SAIN.Enemy == null && !BotOwner.Medecine.Using && LowOnAmmo(0.75f) )
             {
                 SAIN.SelfActions.TryReload();
                 Decision = SAINSelfDecision.None;
@@ -91,15 +84,15 @@ namespace SAIN.Classes
             {
                 return;
             }
+            if (selector.TryChangeWeapon(true))
+            {
+                return;
+            }
             if (selector.TakePrevWeapon())
             {
                 return;
             }
             if (selector.TryChangeToMain())
-            {
-                return;
-            }
-            if (selector.TryChangeWeapon(true))
             {
                 return;
             }
@@ -116,7 +109,7 @@ namespace SAIN.Classes
         {
             if (CurrentSelfAction != SAINSelfDecision.None)
             {
-                float timesinceChange = Time.time - SAIN.Decision.ChangeSelfDecisionTime;
+                float timesinceChange = Time.time - SAIN.Decision.ChangeDecisionTime;
                 if (timesinceChange > 5f)
                 {
                     Decision = SAINSelfDecision.None;
@@ -235,7 +228,7 @@ namespace SAIN.Classes
 
         public bool StartCancelReload()
         {
-            if (!BotOwner.WeaponManager?.IsReady == true || !BotOwner.WeaponManager.HaveBullets || BotOwner.WeaponManager.CurrentWeapon.ReloadMode == EFT.InventoryLogic.Weapon.EReloadMode.ExternalMagazine)
+            if (!BotOwner.WeaponManager?.IsReady == true || BotOwner.WeaponManager.Reload.BulletCount == 0 || BotOwner.WeaponManager.CurrentWeapon.ReloadMode == EFT.InventoryLogic.Weapon.EReloadMode.ExternalMagazine)
             {
                 return false;
             }
@@ -251,7 +244,7 @@ namespace SAIN.Classes
                     return true;
                 }
 
-                if (!CheckLowAmmo(0.15f) && enemy.IsVisible)
+                if (!LowOnAmmo(0.15f) && enemy.IsVisible)
                 {
                     return true;
                 }
@@ -277,7 +270,7 @@ namespace SAIN.Classes
                 {
                     needToReload = true;
                 }
-                else if (CheckLowAmmo())
+                else if (LowOnAmmo())
                 {
                     var enemy = SAIN.Enemy;
                     if (enemy == null)
@@ -290,11 +283,6 @@ namespace SAIN.Classes
                     }
                     else if (EnemyDistance != SAINEnemyPath.VeryClose && !enemy.IsVisible)
                     {
-                        if (DebugBotDecision)
-                        {
-                            Logger.LogDebug($"I'm low on ammo, and I can't see my enemy and he isn't close, so I should reload.");
-                        }
-
                         needToReload = true;
                     }
                 }
@@ -329,7 +317,7 @@ namespace SAIN.Classes
             return useSurgery;
         }
 
-        public bool CheckLowAmmo(float ratio = 0.3f)
+        public bool LowOnAmmo(float ratio = 0.3f)
         {
             int currentAmmo = BotOwner.WeaponManager.Reload.BulletCount;
             int maxAmmo = BotOwner.WeaponManager.Reload.MaxBulletCount;
@@ -338,6 +326,7 @@ namespace SAIN.Classes
             {
 
             }
+
             return AmmoRatio < ratio;
         }
 

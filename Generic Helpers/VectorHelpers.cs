@@ -351,7 +351,7 @@ namespace SAIN.Helpers
         /// Checks if a given Vector3 is on the NavMesh.
         /// </summary>
         /// <param name="v">The Vector3 to check.</param>
-        /// <param name="dist">The distance to check.</param>
+        /// <param name="dist">The Distance to check.</param>
         /// <returns>True if the Vector3 is on the NavMesh, false otherwise.</returns>
         public static bool IsOnNavMesh(Vector3 v, float dist = 0.04f)
         {
@@ -410,11 +410,11 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Tests a given direction from a given position for a given distance.
+        /// Tests a given direction from a given position for a given Distance.
         /// </summary>
         /// <param name="headPos">The position to start the test from.</param>
         /// <param name="dir">The direction to test.</param>
-        /// <param name="dist">The distance to test.</param>
+        /// <param name="dist">The Distance to test.</param>
         /// <returns>True if the test was successful, false otherwise.</returns>
         public static bool TestDir(Vector3 headPos, Vector3 dir, float dist)
         {
@@ -422,11 +422,11 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Tests a given direction from a given position for a given distance and returns a boolean indicating if the direction is clear and a Vector3 of the point of impact if it is not.
+        /// Tests a given direction from a given position for a given Distance and returns a boolean indicating if the direction is clear and a Vector3 of the point of impact if it is not.
         /// </summary>
         /// <param name="headPos">The starting position of the test.</param>
         /// <param name="dir">The direction of the test.</param>
-        /// <param name="dist">The distance of the test.</param>
+        /// <param name="dist">The Distance of the test.</param>
         /// <param name="outPos">The point of impact if the direction is not clear.</param>
         /// <returns>A boolean indicating if the direction is clear.</returns>
         public static bool TestDir(Vector3 headPos, Vector3 dir, float dist, out Vector3? outPos)
@@ -475,11 +475,11 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Calculates the squared distance between two Vector3 objects.
+        /// Calculates the squared Distance between two Vector3 objects.
         /// </summary>
         /// <param name="a">The first Vector3 object.</param>
         /// <param name="b">The second Vector3 object.</param>
-        /// <returns>The squared distance between two Vector3 objects.</returns>
+        /// <returns>The squared Distance between two Vector3 objects.</returns>
         public static float SqrDistance(this Vector3 a, Vector3 b)
         {
             Vector3 vector = new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);

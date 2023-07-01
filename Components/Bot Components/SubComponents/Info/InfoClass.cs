@@ -1,64 +1,70 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using SAIN.Helpers;
 using System;
 using System.Linq;
 using UnityEngine;
 using static SAIN.UserSettings.TalkConfig;
-using static SAIN.UserSettings.DebugConfig;
 using static SAIN.UserSettings.ExtractConfig;
-using static SAIN.UserSettings.DifficultyConfig;
-using SAIN.Components;
 
 namespace SAIN.Classes
 {
-    public class BotInfoClass : MonoBehaviour
+    public class SAINBotInfo : SAINBot
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public SAINBotInfo(BotOwner botOwner) : base(botOwner)
         {
-            SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            Init();
+
+            FindBotType();
+            PersonalityClass = new PersonalityClass(BotOwner);
+            CalcHoldGroundDelay();
+            CalcTimeBeforeSearch();
+
             WeaponInfo = new WeaponInfo(BotOwner);
-        }
 
-        public float TimeBeforeSearch { get; private set; } = 0f;
-
-        public float PercentageBeforeExtract { get; private set; }
-
-        private void Init()
-        {
-            IAmBoss = CheckIsBoss(BotType);
-            IsFollower = CheckIsFollower(BotType);
-            IsScav = BotType == WildSpawnType.assault || BotType == WildSpawnType.cursedAssault || BotType == WildSpawnType.marksman;
-            string botTypeString = BotType.ToString();
-            IsPMC = botTypeString == "sptUsec" || botTypeString == "sptBear";
-
-            SetPersonality();
-            DifficultyModifier = CalculateDifficulty(BotOwner);
             PercentageBeforeExtract = UnityEngine.Random.Range(MinPercentage.Value, MaxPercentage.Value);
             LastPower = PowerLevel;
         }
 
+        public float TimeBeforeSearch { get; private set; } = 0f;
+        public float PercentageBeforeExtract { get; private set; }
+
+        private void FindBotType()
+        {
+            if (CheckIsBoss(BotType))
+            {
+                IAmBoss = true;
+            }
+            else if (CheckIsFollower(BotType))
+            {
+                IsFollower = true;
+            }
+            else if (BotType == WildSpawnType.assault || BotType == WildSpawnType.cursedAssault || BotType == WildSpawnType.marksman)
+            {
+                IsScav = true;
+            }
+            else if (BotType.ToString() == "sptUsec" || BotType.ToString() == "sptBear")
+            {
+                IsPMC = true;
+            }
+        }
+
         private float LastPower;
 
-        private void Update()
+        public void Update()
         {
-            if (BotOwner == null || SAIN == null) return;
+            if (SAIN == null) return;
+
             if (TimeBeforeSearch == 0f || BotOwner.BotsGroup.MembersCount != GroupCount)
             {
                 GroupCount = BotOwner.BotsGroup.MembersCount;
-                GetTimeBeforeSearch();
+                CalcTimeBeforeSearch();
             }
 
             if (LastPower != PowerLevel)
             {
                 LastPower = PowerLevel;
-                SetPersonality();
-                GetTimeBeforeSearch();
+                PersonalityClass.Update();
+                CalcTimeBeforeSearch();
             }
 
             WeaponInfo.ManualUpdate();
@@ -106,63 +112,37 @@ namespace SAIN.Classes
             }
         }
 
-        private float CalculateDifficulty(BotOwner bot)
+        public float HoldGroundDelay { get; private set; }
+
+        public float CalcHoldGroundDelay()
         {
-            var settings = bot.Profile.Info.Settings;
-
-            if (settings != null)
+            if (Personality == SAINPersonality.Rat || Personality == SAINPersonality.Coward || Personality == SAINPersonality.Timmy)
             {
-                return GetDifficultyMod(settings.Role, settings.BotDifficulty, IAmBoss, IsFollower);
+                HoldGroundDelay = 0.25f;
             }
-
-            return 1f;
+            else if (Personality == SAINPersonality.GigaChad)
+            {
+                HoldGroundDelay = 2f * UnityEngine.Random.Range(0.25f, 2f);
+            }
+            else if (Personality == SAINPersonality.Chad)
+            {
+                HoldGroundDelay = 1.5f * UnityEngine.Random.Range(0.5f, 2f);
+            }
+            else
+            {
+                HoldGroundDelay = 1f * UnityEngine.Random.Range(0.66f, 1.5f);
+            }
+            return HoldGroundDelay;
         }
 
-        public float HoldGroundDelay
+        public void CalcTimeBeforeSearch()
         {
-            get
-            {
-                if (SAIN.Info.Personality == SAINPersonality.Rat || SAIN.Info.Personality == SAINPersonality.Coward || SAIN.Info.Personality == SAINPersonality.Timmy)
-                {
-                    return 0.25f;
-                }
-
-                if (StandAndShootRandomTimer < Time.time)
-                {
-                    StandAndShootRandomTimer = Time.time + 1f;
-
-                    if (SAIN.Info.Personality == SAINPersonality.GigaChad)
-                    {
-                        ShootDelay = 2f * UnityEngine.Random.Range(0.25f, 2f);
-                    }
-                    else if (SAIN.Info.Personality == SAINPersonality.Chad)
-                    {
-                        ShootDelay = 1.5f * UnityEngine.Random.Range(0.5f, 2f);
-                    }
-                    else
-                    {
-                        ShootDelay = 1f * UnityEngine.Random.Range(0.66f, 1.5f);
-                    }
-                }
-
-                return ShootDelay;
-            }
-        }
-
-        private float StandAndShootRandomTimer = 0f;
-        private float ShootDelay = 0f;
-
-        public void GetTimeBeforeSearch()
-        {
-            var group = SAIN.Squad;
-
             float searchTime;
-
-            if (IsFollower && group.BotInGroup)
+            if (IsFollower && SAIN.Squad.BotInGroup)
             {
                 searchTime = 3f;
             }
-            else if (IAmBoss && group.BotInGroup)
+            else if (IAmBoss && SAIN.Squad.BotInGroup)
             {
                 searchTime = 20f;
             }
@@ -187,7 +167,7 @@ namespace SAIN.Classes
                         break;
 
                     case SAINPersonality.Coward:
-                        searchTime = 40f;
+                        searchTime = 60f;
                         break;
 
                     default:
@@ -203,194 +183,78 @@ namespace SAIN.Classes
                 searchTime = 0.25f;
             }
 
-            if (DebugBotInfo.Value)
-            {
-                Logger.LogDebug($"Search Time = [{searchTime}] because: IsBoss? [{IAmBoss}] IsFollower? [{IsFollower}] Personality [{Personality}] SquadLead? [{group.IAmLeader}] Squad Members: [{group.SquadMembers.Count}]");
-            }
-
             TimeBeforeSearch = searchTime;
         }
 
         private const float SearchRandomize = 0.33f;
 
-        private static float GetDifficultyMod(WildSpawnType bottype, BotDifficulty difficulty, bool isBoss, bool isFollower)
+        public float DifficultyModifier
         {
-            float modifier = 1f;
-            if (isBoss)
+            get
             {
-                modifier = 0.85f;
-            }
-            else if (isFollower)
-            {
-                modifier = 0.95f;
-            }
-            else
-            {
-                switch (bottype)
+                float modifier;
+                if (IAmBoss)
                 {
-                    case WildSpawnType.assault:
+                    modifier = 0.85f;
+                }
+                else if (IsFollower)
+                {
+                    modifier = 0.95f;
+                }
+                else if (IsPMC)
+                {
+                    modifier = 0.75f;
+                }
+                else if (IsScav)
+                {
+                    modifier = 1.25f;
+                }
+                else
+                {
+                    modifier = 1.1f;
+                }
+
+                switch (BotDifficulty)
+                {
+                    case BotDifficulty.easy:
                         modifier *= 1.25f;
                         break;
 
-                    case WildSpawnType.pmcBot:
-                        modifier *= 1.1f;
+                    case BotDifficulty.normal:
+                        modifier *= 1.0f;
                         break;
 
-                    case WildSpawnType.cursedAssault:
-                        modifier *= 1.35f;
+                    case BotDifficulty.hard:
+                        modifier *= 0.85f;
                         break;
 
-                    case WildSpawnType.exUsec:
-                        modifier *= 1.1f;
+                    case BotDifficulty.impossible:
+                        modifier *= 0.75f;
                         break;
 
                     default:
-                        modifier *= 0.75f;
+                        modifier *= 1f;
                         break;
                 }
-            }
 
-            switch (difficulty)
-            {
-                case BotDifficulty.easy:
-                    modifier *= 1.25f;
-                    break;
-
-                case BotDifficulty.normal:
-                    modifier *= 1.0f;
-                    break;
-
-                case BotDifficulty.hard:
-                    modifier *= 0.85f;
-                    break;
-
-                case BotDifficulty.impossible:
-                    modifier *= 0.75f;
-                    break;
-
-                default:
-                    modifier *= 1f;
-                    break;
-            }
-
-            return modifier;
-        }
-
-        public void SetPersonality()
-        {
-            if (AllGigaChads.Value)
-            {
-                Personality = SAINPersonality.GigaChad;
-            }
-            else if (AllChads.Value)
-            {
-                Personality = SAINPersonality.Chad;
-            }
-            else if (AllRats.Value)
-            {
-                Personality = SAINPersonality.Rat;
-            }
-            else if (CanBeTimmy)
-            {
-                Personality = SAINPersonality.Timmy;
-            }
-            else if (CanBeGigaChad)
-            {
-                Personality = SAINPersonality.GigaChad;
-            }
-            else if (CanBeChad)
-            {
-                Personality = SAINPersonality.Chad;
-            }
-            else if (CanBeRat)
-            {
-                Personality = SAINPersonality.Rat;
-            }
-            else if (EFTMath.RandomBool())
-            {
-                Personality = SAINPersonality.Coward;
-            }
-            else
-            {
-                Personality = SAINPersonality.Normal;
+                return modifier;
             }
         }
 
-        private bool CanBeChad
-        {
-            get
-            {
-                if (PowerLevel > 85f && IsPMC && EFTMath.RandomBool(65))
-                {
-                    return true;
-                }
-                if (EFTMath.RandomBool(3))
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
+        public BotDifficulty BotDifficulty => BotOwner.Profile.Info.Settings.BotDifficulty;
 
-        private bool CanBeGigaChad
-        {
-            get
-            {
-                if (PowerLevel > 110f && IsPMC && EFTMath.RandomBool(75))
-                {
-                    return true;
-                }
-                if (EFTMath.RandomBool(3))
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        private bool CanBeTimmy
-        {
-            get
-            {
-                if (BotOwner.Profile.Info.Level <= 10 && PowerLevel < 25f)
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        private bool CanBeRat
-        {
-            get
-            {
-                if (BotOwner.Profile.Info.Level < 40 && EFTMath.RandomBool(40))
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        public bool IsScav { get; private set; }
-
+        public PersonalityClass PersonalityClass { get; private set; }
         public WeaponInfo WeaponInfo { get; private set; }
 
-        public float DifficultyModifier { get; private set; }
-
-        public SAINPersonality Personality { get; private set; }
-
+        public SAINPersonality Personality => PersonalityClass.Personality;
         public float PowerLevel => BotOwner.AIData.PowerOfEquipment;
-
         public WildSpawnType BotType => BotOwner.Profile.Info.Settings.Role;
-
         public EPlayerSide Faction => BotOwner.Profile.Side;
 
-        public bool IAmBoss { get; private set; }
-
-        public bool IsFollower { get; private set; }
-
-        public bool IsPMC { get; private set; }
+        public bool IAmBoss { get; private set; } = false;
+        public bool IsFollower { get; private set; } = false;
+        public bool IsScav { get; private set; } = false;
+        public bool IsPMC { get; private set; } = false;
 
         public static bool CheckIsBoss(WildSpawnType bottype)
         {

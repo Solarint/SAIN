@@ -14,9 +14,9 @@ using SAIN.Helpers;
 
 namespace SAIN.Classes.Mover
 {
-    public class SAIN_Mover_Pose : SAINBot
+    public class PoseClass : SAINBot
     {
-        public SAIN_Mover_Pose(BotOwner owner) : base(owner)
+        public PoseClass(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -179,9 +179,7 @@ namespace SAIN.Classes.Mover
 
         private float FindCrouchHeight(float height)
         {
-            const float max = 1.5f;
             const float min = 0.5f;
-            const float add = max - min;
             return height - min;
         }
 

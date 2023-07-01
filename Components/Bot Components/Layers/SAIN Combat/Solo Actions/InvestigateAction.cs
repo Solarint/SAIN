@@ -22,7 +22,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            if (SAIN.Enemy?.IsVisible == false && SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
+            if (SAIN.Enemy?.IsVisible == false && SAIN.Decision.SelfActionDecisions.LowOnAmmo(0.66f))
             {
                 SAIN.SelfActions.TryReload();
             }
@@ -60,7 +60,6 @@ namespace SAIN.Layers
         }
 
         private float RecalcPathtimer = 0f;
-        private Vector3 MovePos;
 
         private readonly SAINComponent SAIN;
 

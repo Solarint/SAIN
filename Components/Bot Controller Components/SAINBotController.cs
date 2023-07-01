@@ -16,7 +16,7 @@ namespace SAIN.Components
     {
         public Action<SAINSoundType, Player, float> AISoundPlayed { get; private set; }
 
-        public Dictionary<string, SAINComponent> Bots = new Dictionary<string, SAINComponent>();
+        public Dictionary<string, SAINComponent> Bots => BotSpawnController.Bots;
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
         public IBotGame BotGame => Singleton<IBotGame>.Instance;
         public Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
@@ -77,8 +77,6 @@ namespace SAIN.Components
             //AddNavObstacles();
             //UpdateObstacles();
         }
-
-        private bool Subscribed = false;
 
         public void BotDeath(BotOwner bot)
         {
@@ -281,20 +279,9 @@ namespace SAIN.Components
             var danger = VectorHelpers.DangerPoint(position, force, mass);
             foreach (var bot in Bots.Values)
             {
-                if (!bot.IsDead)
+                if (bot?.IsDead == false && bot.BotOwner.BotsGroup.IsEnemy(grenade.Player))
                 {
-                    var player = grenade.Player;
-                    bool sendInfo = false;
-                    if (player != null && bot.Enemy != null && bot.Enemy.EnemyPlayer.ProfileId == player.ProfileId)
-                    {
-                        sendInfo = true;
-                    }
-                    else if ((danger - bot.Position).sqrMagnitude < 150f * 150f) // 150 meters min distance
-                    {
-                        sendInfo = true;
-                    }
-
-                    if (sendInfo)
+                    if ((danger - bot.Position).sqrMagnitude < 200f * 200f)
                     {
                         bot.Grenade.EnemyGrenadeThrown(grenade, danger);
                     }

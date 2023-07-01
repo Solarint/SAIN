@@ -273,7 +273,7 @@ namespace SAIN.Classes
             float closehearing = 10f;
             float farhearing = 50f;
 
-            //Check if the distance is less than or equal to the close hearing
+            //Check if the Distance is less than or equal to the close hearing
             if (d <= closehearing)
             {
                 return true;
@@ -286,10 +286,10 @@ namespace SAIN.Classes
 
             float num = farhearing - closehearing;
 
-            //CalculateRecoil the difference between the distance and close hearing
+            //CalculateRecoil the difference between the Distance and close hearing
             float num2 = d - closehearing;
 
-            //CalculateRecoil the ratio of the difference between the distance and close hearing to the difference between the far hearing and close hearing
+            //CalculateRecoil the ratio of the difference between the Distance and close hearing to the difference between the far hearing and close hearing
             float num3 = 1f - num2 / num;
 
             return EFTMath.Random(0f, 1f) < num3;
@@ -299,7 +299,7 @@ namespace SAIN.Classes
         {
             distance = (BotOwner.Transform.position - position).magnitude;
 
-            // Is sound within hearing distance at all?
+            // Is sound within hearing Distance at all?
             if (distance < power)
             {
                 if (!withOcclusionCheck)

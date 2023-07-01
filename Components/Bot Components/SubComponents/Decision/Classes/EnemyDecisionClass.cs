@@ -6,11 +6,7 @@ namespace SAIN.Classes
 {
     public class EnemyDecisionClass : SAINBot
     {
-        public EnemyDecisionClass(BotOwner bot) : base(bot) 
-        {
-        }
-
-        protected ManualLogSource Logger => SAIN.Decision.Logger;
+        public EnemyDecisionClass(BotOwner bot) : base(bot) { }
 
         public bool GetDecision(out SAINSoloDecision Decision)
         {
@@ -31,6 +27,10 @@ namespace SAIN.Classes
             }
             else if (StartStandAndShoot(enemy))
             {
+                if (CurrentDecision != SAINSoloDecision.StandAndShoot)
+                {
+                    SAIN.Info.CalcHoldGroundDelay();
+                }
                 Decision = SAINSoloDecision.StandAndShoot;
             }
             else if (StartRushEnemy(enemy))
@@ -41,7 +41,7 @@ namespace SAIN.Classes
             {
                 if (CurrentDecision != SAINSoloDecision.Search)
                 {
-                    SAIN.Info.GetTimeBeforeSearch();
+                    SAIN.Info.CalcTimeBeforeSearch();
                 }
                 Decision = SAINSoloDecision.Search;
             }
@@ -81,11 +81,11 @@ namespace SAIN.Classes
 
         private bool StartRushEnemy(SAINEnemy enemy)
         {
-            if (SAIN.Info.IsPMC)
+            if (SAIN.Info.Personality == SAINPersonality.Chad || SAIN.Info.Personality == SAINPersonality.GigaChad)
             {
-                if (enemy != null && enemy.PathDistance < 25f)
+                if (enemy != null && enemy.PathDistance < 30f)
                 {
-                    if (!SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.4f) && SAIN.HealthStatus != ETagStatus.Dying)
+                    if (!SAIN.Decision.SelfActionDecisions.LowOnAmmo(0.5f) && SAIN.HealthStatus != ETagStatus.Dying && BotOwner.CanSprintPlayer)
                     {
                         if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
                         {
@@ -227,24 +227,16 @@ namespace SAIN.Classes
             return CurrentDecision == SAINSoloDecision.ThrowGrenade && SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData?.ThrowComplete == false;
         }
 
-        private bool HideFromFlankShot()
-        {
-            if (BotOwner.Memory.IsUnderFire)
-            {
-            }
-            return false;
-        }
-
         private bool StartRunForCover()
         {
-            return StartRunCoverTimer < Time.time && SAIN.BotHasStamina && BotOwner.CanSprintPlayer;
+            return StartRunCoverTimer < Time.time && BotOwner.CanSprintPlayer;
         }
 
         private bool StartMoveToCover()
         {
-            bool start = !SAIN.Cover.BotIsAtCoverPoint;
+            bool inCover = SAIN.Cover.BotIsAtCoverPoint();
 
-            if (start)
+            if (!inCover)
             {
                 if (CurrentDecision != SAINSoloDecision.WalkToCover && CurrentDecision != SAINSoloDecision.RunToCover)
                 {
@@ -264,7 +256,7 @@ namespace SAIN.Classes
             {
                 return false;
             }
-            if (enemy.TimeSinceSeen >= TimeBeforeSearch)
+            if (enemy.Seen && enemy.TimeSinceSeen >= TimeBeforeSearch)
             {
                 return true;
             }

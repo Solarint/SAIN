@@ -40,10 +40,7 @@ namespace SAIN
             BrainManager.AddCustomLayer(typeof(SAINSolo), AllBots, 20);
             SAINLayers.Add(SAINSolo.Name);
 
-            foreach (string layer in LayersToRemove)
-            {
-                BrainManager.RemoveLayer(layer, new List<string>(AllBots));
-            }
+            BrainManager.RemoveLayers(LayersToRemove, new List<string>(AllBots));
         }
 
         private static void CombineBigBrainLists()
@@ -73,7 +70,7 @@ namespace SAIN
         public static List<string> Scavs = new List<string> { "Assault", "CursAssault" };
         public static List<string> GoonsFollowers = new List<string> { "BigPipe", "BirdEye" };
         public static List<string> TagillaKilla = new List<string> { "Tagilla", "Killa" };
-        public static List<string> NormalBosses = new List<string> { "BossBully", "BossSanitar", "Tagilla", "BossGluhar", "Killa", "BossKojaniy", "SectantPriest" };
+        public static List<string> NormalBosses = new List<string> { "BossBully", "BossSanitar", "Tagilla", "BossGluhar", "BossKojaniy", "SectantPriest" };
         public static List<string> NormalFollowers = new List<string> { "FollowerBully", "FollowerSanitar", "TagillaFollower", "FollowerGluharAssault", "FollowerGluharProtect", "FollowerGluharScout" };
 
         public static List<string> AllBots = new List<string>();

@@ -133,7 +133,7 @@ namespace SAIN.Patches
             __instance.CARE_ENEMY_ONLY_TIME = 120f;
             //__instance.ENEMY_TO_BE_CURRENT = 20f;
             //__instance.DELAY_BEFORE_ENEMY = 0f;
-            //__instance.SCAV_GROUPS_TOGETHER = false;
+            __instance.SCAV_GROUPS_TOGETHER = false;
             __instance.DIST_NOT_TO_GROUP = 50f;
             __instance.DIST_NOT_TO_GROUP_SQR = 50f * 50f;
             __instance.MIN_DIST_TO_STOP_RUN = 0f;
@@ -173,6 +173,7 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(BotGlobalLookData __instance)
         {
+            __instance.CAN_USE_LIGHT = true;
             __instance.FULL_SECTOR_VIEW = false;
 
             __instance.MAX_DIST_CLAMP_TO_SEEN_SPEED = 500f;

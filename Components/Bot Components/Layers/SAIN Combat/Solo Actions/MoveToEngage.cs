@@ -39,7 +39,7 @@ namespace SAIN.Layers
                 return;
             }
 
-            if (SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
+            if (SAIN.Decision.SelfActionDecisions.LowOnAmmo(0.66f))
             {
                 SAIN.SelfActions.TryReload();
             }

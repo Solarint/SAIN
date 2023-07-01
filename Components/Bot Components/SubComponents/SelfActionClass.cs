@@ -33,33 +33,26 @@ namespace SAIN.Classes
                 {
                     BotOwner.Medecine.RefreshCurMeds();
                 }
-                if (SAIN.Decision.SelfActionDecisions.StartCancelReload())
+                switch (SelfDecision)
                 {
-                    BotCancelReload();
-                }
-                else
-                {
-                    switch (SelfDecision)
-                    {
-                        case SAINSelfDecision.Reload:
-                            TryReload();
-                            break;
+                    case SAINSelfDecision.Reload:
+                        TryReload();
+                        break;
 
-                        case SAINSelfDecision.Surgery:
-                            DoSurgery();
-                            break;
+                    case SAINSelfDecision.Surgery:
+                        DoSurgery();
+                        break;
 
-                        case SAINSelfDecision.FirstAid:
-                            DoFirstAid();
-                            break;
+                    case SAINSelfDecision.FirstAid:
+                        DoFirstAid();
+                        break;
 
-                        case SAINSelfDecision.Stims:
-                            DoStims();
-                            break;
+                    case SAINSelfDecision.Stims:
+                        DoStims();
+                        break;
 
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
                 WasUsingMeds = UsingMeds;
             }
@@ -102,36 +95,13 @@ namespace SAIN.Classes
 
         public void TryReload()
         {
-            var reloadClass = BotOwner.WeaponManager.Reload;
-            bool canreload = reloadClass.CanReload(false);
-            if (!canreload && reloadClass.NoAmmoForReloadCached)
+            BotOwner.WeaponManager.Reload.TryReload();
+            if (BotOwner.WeaponManager.Reload.NoAmmoForReloadCached)
             {
-                BotOwner.WeaponManager.Selector.TryChangeWeapon(true);
-                return;
-            }
-            if (reloadClass.Reloading)
-            {
-                reloadClass.CheckReloadLongTime();
-                if (TimeReloading < 0)
-                {
-                    TimeReloading = Time.time;
-                }
-                if (TimeReloading + 5f < Time.time)
-                {
-                    BotCancelReload();
-                }
-                return;
-            }
-            else
-            {
-                TimeReloading = -1f;
-            }
-            if (canreload)
-            {
-                reloadClass.Reload();
+                //System.Console.WriteLine("NoAmmoForReloadCached");
+                BotOwner.WeaponManager.Reload.TryFillMagazines();
             }
         }
-        private float TimeReloading;
 
         public void BotCancelReload()
         {

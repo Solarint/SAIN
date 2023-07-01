@@ -12,9 +12,9 @@ using HarmonyLib;
 
 namespace SAIN.Classes.Mover
 {
-    public class SAIN_Mover_Prone : SAINBot
+    public class ProneClass : SAINBot
     {
-        public SAIN_Mover_Prone(BotOwner owner) : base(owner)
+        public ProneClass(BotOwner owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             BotLayProperty = AccessTools.Property(typeof(BotOwner), "BotLay").PropertyType.GetProperty("IsLay");

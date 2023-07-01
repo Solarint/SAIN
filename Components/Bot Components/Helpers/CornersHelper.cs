@@ -97,7 +97,7 @@ namespace SAIN.Helpers
             /// </summary>
             /// <param name="navMeshCorners">The original array of Vector3 RawCorners.</param>
             /// <param name="averagedcorners">The averaged array of Vector3 RawCorners.</param>
-            /// <param name="minlength">The minimum distance between RawCorners.</param>
+            /// <param name="minlength">The minimum Distance between RawCorners.</param>
             /// <returns>The averaged array of Vector3 RawCorners.</returns>
             private static Vector3[] LerpTrim(Vector3[] navMeshCorners, float minlength)
             {

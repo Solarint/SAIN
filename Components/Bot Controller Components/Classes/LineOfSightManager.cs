@@ -2,19 +2,15 @@ using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using static SAIN.UserSettings.VisionConfig;
 
 namespace SAIN.Components
 {
     public class LineOfSightManager : SAINControl
     {
-        public LineOfSightManager()
-        {
-        }
+        public LineOfSightManager() { }
 
         private readonly float SpherecastRadius = 0.025f;
         private LayerMask SightLayers => LayerMaskClass.HighPolyWithTerrainMaskAI;
@@ -26,12 +22,22 @@ namespace SAIN.Components
         public void Update()
         {
             Frames++;
-            if (Frames >= CheckFrameCount.Value)
+            if (Frames >= 10)
             {
                 Frames = 0;
                 if (Bots != null && Bots.Count > 0)
                 {
+                    foreach (var bot in Bots)
+                    {
+                        if (bot.Value != null)
+                        {
+                            TempBotList.Add(bot.Value);
+                        }
+                    }
+
                     GlobalRaycastJob();
+
+                    TempBotList.Clear();
                 }
             }
         }
@@ -44,11 +50,6 @@ namespace SAIN.Components
         private Vector3 BodyPos(Player player)
         {
             return player.MainParts[BodyPartType.body].Position;
-        }
-
-        private Vector3[] Parts(Player player)
-        {
-            return player.MainParts.Values.Select(item => item.Position).ToArray();
         }
 
         private void CheckEnemiesJobs()
@@ -190,10 +191,11 @@ namespace SAIN.Components
 
         private float DebugTimer;
 
+        private readonly List<SAINComponent> TempBotList = new List<SAINComponent>();
+
         private void GlobalRaycastJob()
         {
-            var sainBots = Bots.Values.ToList();
-            int total = sainBots.Count * RegisteredPlayers.Count;
+            int total = TempBotList.Count * RegisteredPlayers.Count;
 
             NativeArray<SpherecastCommand> allSpherecastCommands = new NativeArray<SpherecastCommand>(
                 total,
@@ -205,9 +207,9 @@ namespace SAIN.Components
             );
 
             total = 0;
-            for (int i = 0; i < sainBots.Count; i++)
+            for (int i = 0; i < TempBotList.Count; i++)
             {
-                var bot = sainBots[i];
+                var bot = TempBotList[i];
                 Vector3 head = HeadPos(bot.BotOwner.GetPlayer);
 
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
@@ -237,10 +239,10 @@ namespace SAIN.Components
             spherecastJob.Complete();
             total = 0;
 
-            for (int i = 0; i < sainBots.Count; i++)
+            for (int i = 0; i < TempBotList.Count; i++)
             {
-                var visPlayers = sainBots[i].VisiblePlayers;
-                var idList = sainBots[i].VisiblePlayerIds;
+                var visPlayers = TempBotList[i].VisiblePlayers;
+                var idList = TempBotList[i].VisiblePlayerIds;
                 visPlayers.Clear();
                 for (int j = 0; j < RegisteredPlayers.Count; j++)
                 {

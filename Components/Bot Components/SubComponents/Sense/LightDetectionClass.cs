@@ -146,7 +146,7 @@ namespace SAIN.Components
         /// <param name="playerPos">The position of the player.</param>
         /// <param name="flashPos">The position of the flashlight point.</param>
         /// <param name="botPos">The position of the bot.</param>
-        /// <param name="dispersion">What the distance to enemy is divided by to produce dispersion. Higher is more accurate</param>
+        /// <param name="dispersion">What the Distance to enemy is divided by to produce dispersion. Higher is more accurate</param>
         /// <returns>The estimated search position.</returns>
         private Vector3 EstimateSearchPosition(Vector3 playerPos, Vector3 flashPos, Vector3 botPos, float dispersion)
         {

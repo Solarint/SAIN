@@ -33,7 +33,7 @@ namespace SAIN.Components.CoverFinder
         }
 
         /// <summary>
-        /// Sorts an array of Colliders based on their distance from bot's position. 
+        /// Sorts an array of Colliders based on their Distance from bot's position. 
         /// </summary>
         /// <param name="array">The array of Colliders to be sorted.</param>
         public void SortArrayBotDist(Collider[] array)
@@ -42,7 +42,7 @@ namespace SAIN.Components.CoverFinder
         }
 
         /// <summary>
-        /// Sorts an array of Colliders based on their distance to the enemy.
+        /// Sorts an array of Colliders based on their Distance to the enemy.
         /// </summary>
         /// <param name="array">The array of Colliders to be sorted.</param>
         public void SortArrayEnemyDist(Collider[] array)

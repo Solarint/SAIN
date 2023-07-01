@@ -118,7 +118,7 @@ namespace SAIN.Layers
                 stringBuilder.AppendLabeledValue("Cover Position", $"{NewPoint.Position}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Distance", $"{NewPoint.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Spotted?", $"{NewPoint.Spotted}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Path Length", $"{NewPoint.PathDistance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Path Length", $"{NewPoint.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover ID", $"{NewPoint.Id}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Status", $"{NewPoint.CoverStatus}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{NewPoint.HitInCoverCount}", Color.white, Color.yellow, true);

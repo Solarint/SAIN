@@ -264,7 +264,7 @@ namespace SAIN.Classes
                         continue;
                     }
 
-                    // Check the distance between the bots to see if they can hear them
+                    // Check the Distance between the bots to see if they can hear them
                     if (Vector3.Distance(player.Position, BotOwner.Position) < ResponseDist)
                     {
                         if (BotOwner.BotsGroup.Enemies.ContainsKey(player))

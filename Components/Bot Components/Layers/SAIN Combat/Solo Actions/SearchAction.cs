@@ -14,7 +14,6 @@ namespace SAIN.Layers
     {
         public SearchAction(BotOwner bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
             Shoot = new ShootClass(bot, SAIN);
         }
@@ -73,7 +72,7 @@ namespace SAIN.Layers
             {
                 if ((SAIN.Enemy.Seen && SAIN.Enemy.TimeSinceSeen > 10f) || (!SAIN.Enemy.Seen && SAIN.Enemy.TimeSinceEnemyCreated > 10f))
                 {
-                    if (ReloadTimer < Time.time && SAIN.Decision.SelfActionDecisions.CheckLowAmmo(0.66f))
+                    if (ReloadTimer < Time.time && SAIN.Decision.SelfActionDecisions.LowOnAmmo(0.5f))
                     {
                         ReloadTimer = Time.time + 10f;
                         SAIN.SelfActions.TryReload();
@@ -157,31 +156,10 @@ namespace SAIN.Layers
                 {
                     SAIN.Steering.LookToMovingDirection();
                 }
-                else
-                {
-                    return;
-                    pos.y += 1f;
-                    if (!SeenSearchPoint && !Physics.Raycast(SAIN.HeadPosition, pos - SAIN.HeadPosition, (pos - SAIN.HeadPosition).magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                    {
-                        SeenSearchPoint = true;
-                    }
-
-                    if (SeenSearchPoint)
-                    {
-                        SAIN.Steering.SteerByPriority();
-                    }
-                    else
-                    {
-                        SAIN.Steering.LookToPoint(pos);
-                    }
-                }
             }
         }
 
-        private bool SeenSearchPoint = false;
-
-        private SAINComponent SAIN;
+        private readonly SAINComponent SAIN;
         public NavMeshPath Path = new NavMeshPath();
-        private readonly ManualLogSource Logger;
     }
 }

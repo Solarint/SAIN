@@ -12,15 +12,18 @@ namespace SAIN.Classes
         private SAINComponent SAIN;
         private BotOwner BotOwner => SAIN?.BotOwner;
 
+        private Player Player;
+
         private void Awake()
         {
             SAIN = GetComponent<SAINComponent>();
+            Player = SAIN.Player;
             CoverFinder = BotOwner.GetOrAddComponent<CoverFinderComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            SAIN.Player.BeingHitAction += OnBeingHit;
+            Player.HealthController.ApplyDamageEvent += OnBeingHit;
         }
 
-        private void OnBeingHit(DamageInfo damage, EBodyPart part, float unused)
+        private void OnBeingHit(EBodyPart part, float unused,DamageInfo damage)
         {
             CoverPoint activePoint = CoverInUse;
             if (activePoint != null && activePoint.CoverStatus == CoverStatus.InCover)
@@ -43,13 +46,13 @@ namespace SAIN.Classes
 
         private void Update()
         {
-            if (BotOwner == null || SAIN == null) return;
-            var CurrentDecision = SAIN.CurrentDecision;
-            if (!SAIN.BotActive || SAIN.GameIsEnding)
+            if (SAIN == null || !SAIN.BotActive || SAIN.GameIsEnding)
             {
                 ActivateCoverFinder(false);
                 return;
             }
+
+            var CurrentDecision = SAIN.CurrentDecision;
             if (CurrentDecision == SAINSoloDecision.UnstuckMoveToCover || CurrentDecision == SAINSoloDecision.Retreat || CurrentDecision == SAINSoloDecision.RunToCover || CurrentDecision == SAINSoloDecision.WalkToCover)
             {
                 ActivateCoverFinder(true);
@@ -66,22 +69,19 @@ namespace SAIN.Classes
 
         private void ActivateCoverFinder(bool value)
         {
-            if (value)
+            if (value && GetPointToHideFrom(out var target))
             {
-                if (GetPointToHideFrom(out var target))
-                {
-                    CoverFinder.LookForCover(target.Value, BotOwner.Position);
-                }
+                CoverFinder?.LookForCover(target.Value, BotOwner.Position);
             }
-            else
+            if (!value)
             {
-                CoverFinder.StopLooking();
+                CoverFinder?.StopLooking();
             }
         }
 
         public void OnDestroy()
         {
-            SAIN.Player.BeingHitAction -= OnBeingHit;
+            Player.HealthController.ApplyDamageEvent -= OnBeingHit;
         }
 
         public CoverPoint ClosestPoint
@@ -172,13 +172,21 @@ namespace SAIN.Classes
             return Physics.Raycast(position, direction, dist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
-        public bool BotIsAtCoverPoint
+        public bool BotIsAtCoverPoint(out CoverPoint coverPoint)
         {
-            get
-            {
-                var point = CoverInUse;
-                return point != null && point.BotIsHere;
-            }
+            coverPoint = CoverInUse;
+            return BotIsAtCoverPoint(coverPoint);
+        }
+
+        public bool BotIsAtCoverPoint(CoverPoint coverPoint)
+        {
+            return coverPoint != null && coverPoint.BotIsHere;
+        }
+
+        public bool BotIsAtCoverPoint()
+        {
+            var coverPoint = CoverInUse;
+            return BotIsAtCoverPoint(coverPoint);
         }
 
         public bool BotIsMovingToPoint

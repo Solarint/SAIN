@@ -134,9 +134,8 @@ namespace SAIN.Layers
         }
 
         private bool ExtractStarted = false;
-        private float CheckDistTimer = 0f;
         private float ReCalcPathTimer = 0f;
         private float ExtractTimer = -1f;
-        private ManualLogSource Logger;
+        private readonly ManualLogSource Logger;
     }
 }

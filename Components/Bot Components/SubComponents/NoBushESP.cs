@@ -4,6 +4,7 @@ using EFT;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
+using static SAIN.UserSettings.EditorSettings;
 
 namespace SAIN.Classes
 {
@@ -11,7 +12,6 @@ namespace SAIN.Classes
     {
         private SAINComponent SAIN;
         private BotOwner BotOwner => SAIN?.BotOwner;
-        private SAINEnemy Enemy => SAIN.Enemy;
 
         private void Awake()
         {
@@ -23,18 +23,23 @@ namespace SAIN.Classes
 
         private void Update()
         {
-            if (BotOwner == null || SAIN == null) return;
-            if (Enemy != null)
+            if (SAIN == null) return;
+            var enemy = BotOwner.Memory.GoalEnemy;
+            if (enemy != null && enemy?.Person?.GetPlayer?.IsYourPlayer == true)
             {
                 if (NoBushTimer < Time.time)
                 {
-                    NoBushTimer = Time.time + 0.25f;
+                    NoBushTimer = Time.time + 0.1f;
                     NoBushESPActive = NoBushESPCheck();
                 }
                 if (NoBushESPActive)
                 {
-                    BotOwner.ShootData?.EndShoot();
                     BotOwner.AimingData?.LoseTarget();
+                    if (!SAIN.LayersActive)
+                    {
+                        BotOwner.ShootData.EndShoot();
+                        enemy.SetCanShoot(false);
+                    }
                 }
             }
             else
@@ -49,16 +54,17 @@ namespace SAIN.Classes
 
         public bool NoBushESPCheck()
         {
-            if (!UserSettings.VisionConfig.NoBushESPToggle.Value)
+            if (!NoBushESPToggle.Value)
             {
                 return false;
             }
-            if (Enemy != null && Enemy.Person?.GetPlayer != null && Enemy.IsVisible)
+            var enemy = BotOwner.Memory.GoalEnemy;
+            if (enemy != null && enemy?.IsVisible == true)
             {
-                Player player = Enemy.Person.GetPlayer;
-                if (player.IsYourPlayer)
+                Player player = enemy?.Person?.GetPlayer;
+                if (player?.IsYourPlayer == true)
                 {
-                    Vector3 direction = player.MainParts[BodyPartType.body].Position - SAIN.HeadPosition;
+                    Vector3 direction = player.MainParts[BodyPartType.head].Position - SAIN.HeadPosition;
                     if (Physics.Raycast(SAIN.HeadPosition, direction.normalized, out var hit, direction.magnitude, NoBushMask))
                     {
                         if (hit.transform?.parent?.gameObject == null)
@@ -80,7 +86,7 @@ namespace SAIN.Classes
         }
 
         private static LayerMask NoBushMask => LayerMaskClass.HighPolyWithTerrainMaskAI;
-        public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "pine", "plant", "birch",
-        "timber", "spruce", "bush", "grass" };
+        public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider",
+        "timber", "spruce", "bush", "metal", "wood", "grass" };
     }
 }

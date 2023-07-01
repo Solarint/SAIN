@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace SAIN.Classes.Mover
 {
-    public class SAIN_Mover_SideStep : SAINBot
+    public class SideStepClass : SAINBot
     {
         public SideStepSetting SideStepSetting { get; private set; }
 
-        public SAIN_Mover_SideStep(BotOwner bot) : base(bot)
+        public SideStepClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }

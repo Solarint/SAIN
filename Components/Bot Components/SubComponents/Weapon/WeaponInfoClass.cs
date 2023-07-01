@@ -1,9 +1,8 @@
 using BepInEx.Logging;
 using EFT;
 using EFT.InventoryLogic;
-using System.Reflection;
 using UnityEngine;
-using static SAIN.UserSettings.DifficultyConfig;
+using static SAIN.UserSettings.EditorSettings;
 
 namespace SAIN.Classes
 {
@@ -22,7 +21,7 @@ namespace SAIN.Classes
 
         public void ManualUpdate()
         {
-            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * BaseAccuracy.Value;
+            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * AccuracyMulti.Value;
 
             if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true)
             {
@@ -38,13 +37,10 @@ namespace SAIN.Classes
         public Recoil Recoil { get; private set; }
         public Firerate Firerate { get; private set; }
         public Firemode Firemode { get; private set; }
-
         public float FinalModifier { get; private set; }
 
         private WeaponTemplate LastCheckedWeapon;
-
         public ModifierClass Modifiers { get; private set; }
-
         public float EffectiveWeaponDistance
         {
             get
@@ -155,7 +151,8 @@ namespace SAIN.Classes
         {
             get
             {
-                return Difficulty();
+                float modifier = Difficulty();
+                return Scaling(modifier, 0f, 1f, 1 - DifficultyScaling, 1 + DifficultyScaling);
             }
         }
 
@@ -404,23 +401,7 @@ namespace SAIN.Classes
 
         public float Difficulty()
         {
-            return 1f;
-            float modifier = 1f;
-            if (SAIN.Info.IsPMC)
-            {
-                modifier /= PMCRecoil.Value;
-            }
-            else if (SAIN.Info.IsScav)
-            {
-                modifier /= ScavRecoil.Value;
-            }
-            else
-            {
-                modifier /= OtherRecoil.Value;
-            }
-
-            modifier /= BotRecoilGlobal.Value;
-            return modifier;
+            return SAIN.Info.DifficultyModifier;
         }
     }
 

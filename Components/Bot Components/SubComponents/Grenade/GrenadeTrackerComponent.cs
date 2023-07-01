@@ -17,11 +17,10 @@ namespace SAIN.Components
         {
             DangerPoint = dangerPoint;
             Grenade = grenade;
-            ReactionTime = reactionTime;
 
             if (EnemyGrenadeHeard())
             {
-                SpotGrenade();
+                GrenadeSpotted = true;
             }
         }
 
@@ -29,8 +28,6 @@ namespace SAIN.Components
         {
             BotOwner = GetComponent<BotOwner>();
         }
-
-        private int FrameCount = 0; 
 
         private bool EnemyGrenadeHeard()
         {
@@ -46,40 +43,33 @@ namespace SAIN.Components
                 return;
             }
 
-            if (!GrenadeSpotted && FrameCount == 5)
+            if (!GrenadeSpotted)
             {
-                FrameCount = 0;
+                if ((Grenade.transform.position - BotOwner.Position).sqrMagnitude < 10f * 10f)
+                {
+                    GrenadeSpotted = true;
+                    return;
+                }
+
                 Vector3 grenadePos = Grenade.transform.position;
                 Vector3 headPos = BotOwner.LookSensor._headPoint;
                 Vector3 grenadeDir = grenadePos - headPos;
-                if (Vector3.Dot(grenadeDir.normalized, BotOwner.LookDirection.normalized) > -0.25f && NadeVisible(grenadePos, headPos))
+                if (!Physics.Raycast(headPos, grenadeDir, grenadeDir.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
-                    SpotGrenade();
+                    GrenadeSpotted = true;
                 }
             }
-
-            if (GrenadeSpotted && !CanReact && TimeSeen + ReactionTime < Time.time)
-            {
-                CanReact = true;
-            }
-
-            FrameCount++;
         }
 
         private void SpotGrenade()
         {
             GrenadeSpotted = true;
-            TimeSeen = Time.time;
-            CanReact = true;
         }
 
         public Grenade Grenade { get; private set; }
         public Vector3 DangerPoint { get; private set; }
         public bool GrenadeSpotted { get; private set; }
         public bool CanReact { get; private set; }
-
-        private float TimeSeen = 0f;
-        private float ReactionTime = 0f;
 
         private bool NadeVisible(Vector3 grenadeDirection, Vector3 headPosition)
         {

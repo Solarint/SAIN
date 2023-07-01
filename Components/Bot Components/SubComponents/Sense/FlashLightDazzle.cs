@@ -113,12 +113,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Logs debug information about the BotOwner's settings and the current dazzle, gainsight, and distance values.
+        /// Logs debug information about the BotOwner's settings and the current dazzle, gainsight, and Distance values.
         /// </summary>
         /// <param name="BotOwner">The BotOwner owner.</param>
         /// <param name="dazzlemod">The dazzle intensity.</param>
         /// <param name="gainsightmod">The gainsight modifier.</param>
-        /// <param name="distance">The distance.</param>
+        /// <param name="distance">The Distance.</param>
         private void DebugLogs(float dazzlemod, float gainsightmod, float distance)
         {
             if (DebugFlash.Value)
@@ -221,9 +221,9 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Calculates the gain sight modifier based on the distance to the enemy.
+        /// Calculates the gain sight modifier based on the Distance to the enemy.
         /// </summary>
-        /// <param name="enemyDist">The distance to the enemy.</param>
+        /// <param name="enemyDist">The Distance to the enemy.</param>
         /// <returns>The gain sight modifier.</returns>
         private float GetGainSightModifier(float enemyDist)
         {

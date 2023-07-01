@@ -171,7 +171,7 @@ namespace SAIN.Classes
                 Vector3 directionToCorner = SearchMovePoint.Corner - BotOwner.Position;
                 float signAngle = GetSignedAngle(directionToCorner, directionToDanger);
                 var lean = SearchMovePoint.GetDirectionToLean(signAngle);
-                SetLean(lean);
+                SAIN.Mover.FastLean(lean);
             }
         }
 
@@ -334,21 +334,6 @@ namespace SAIN.Classes
                 result = start + direction;
                 return false;
             }
-        }
-
-        private void SetLean(LeanSetting leanSetting)
-        {
-            float num;
-            switch (leanSetting)
-            {
-                case LeanSetting.Left:
-                    num = -1f; break;
-                case LeanSetting.Right:
-                    num = 1f; break;
-                default:
-                    num = 0f; break;
-            }
-            SAIN.Mover.SlowLean(num);
         }
 
         public bool BotIsAtPoint(Vector3 point, float reachDist = 1f, bool Sqr = true)

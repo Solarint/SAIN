@@ -39,7 +39,7 @@ namespace SAIN.Classes
             {
                 if (CurrentDecision != SAINSoloDecision.Search)
                 {
-                    SAIN.Info.GetTimeBeforeSearch();
+                    SAIN.Info.CalcTimeBeforeSearch();
                 }
                 Decision = SAINSoloDecision.Search;
             }

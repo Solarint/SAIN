@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace SAIN.Classes.Mover
 {
-    public class SAIN_Mover_Lean : SAINBot
+    public class LeanClass : SAINBot
     {
         public LeanSetting LeanDirection { get; private set; }
 
-        public SAIN_Mover_Lean(BotOwner bot) : base(bot)
+        public LeanClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -122,8 +122,6 @@ namespace SAIN.Classes.Mover
             LeanDirection = setting;
             SAIN.Mover.FastLean(setting);
         }
-
-        private float RayTimer = 0f;
 
         public LeanSetting GetSettingFromResults()
         {

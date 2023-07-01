@@ -9,20 +9,17 @@ namespace SAIN.Classes.CombatFunctions
         public ShootClass(BotOwner owner, SAINComponent sain) : base(owner)
         {
             SAIN = sain;
-            FriendlyFire = new FriendlyFireClass(owner);
             BotShoot = new GClass182(owner);
         }
 
         private readonly GClass182 BotShoot;
         private BotOwner BotOwner => botOwner_0;
 
-        private SAINComponent SAIN;
+        private readonly SAINComponent SAIN;
 
         public override void Update()
         {
-            FriendlyFire.Update();
-
-            var enemy = BotOwner.Memory.GoalEnemy;
+            var enemy = SAIN.Enemy;
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
                 if (AimingData == null)
@@ -33,7 +30,10 @@ namespace SAIN.Classes.CombatFunctions
                 Vector3? pointToShoot = GetPointToShoot();
                 if (pointToShoot != null)
                 {
-                    BotOwner.BotLight?.TurnOn(true);
+                    if (enemy.RealDistance < 30f)
+                    {
+                        BotOwner.BotLight?.TurnOn(true);
+                    }
                     Target = pointToShoot.Value;
                     if (AimingData.IsReady && !SAIN.NoBushESPActive && FriendlyFire.ClearShot)
                     {
@@ -44,7 +44,7 @@ namespace SAIN.Classes.CombatFunctions
             }
             else
             {
-                BotOwner.BotLight?.TurnOff(true, true);
+                BotOwner.BotLight?.TurnOff(false, false);
             }
         }
 
@@ -92,6 +92,6 @@ namespace SAIN.Classes.CombatFunctions
         protected Vector3 Target;
         private GInterface5 AimingData;
 
-        public FriendlyFireClass FriendlyFire { get; private set; }
+        public FriendlyFireClass FriendlyFire => SAIN.FriendlyFireClass;
     }
 }

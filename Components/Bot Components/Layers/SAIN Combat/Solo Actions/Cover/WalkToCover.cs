@@ -112,7 +112,7 @@ namespace SAIN.Layers
                 if (SuppressTimer < Time.time && BotOwner.WeaponManager.HaveBullets)
                 {
                     SuppressTimer = Time.time + 0.5f * Random.Range(0.66f, 1.25f);
-                    BotOwner.ShootData.Shoot();
+                    SAIN.Shoot(false);
                 }
             }
             else
@@ -149,7 +149,7 @@ namespace SAIN.Layers
                 stringBuilder.AppendLabeledValue("Cover Position", $"{cover.Position}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Distance", $"{cover.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Spotted?", $"{cover.Spotted}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.PathDistance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover ID", $"{cover.Id}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Status", $"{cover.CoverStatus}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{cover.HitInCoverCount}", Color.white, Color.yellow, true);

@@ -2,12 +2,9 @@
 using EFT.InventoryLogic;
 using SAIN.Components;
 using System;
-using System.ComponentModel;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
-using static SAIN.Helpers.DebugGizmos;
-using static SAIN.UserSettings.ShootConfig;
+using static SAIN.UserSettings.EditorSettings;
 
 namespace SAIN.Classes
 {
@@ -43,46 +40,9 @@ namespace SAIN.Classes
             }
 
             // Final Result which is randomized +- 15%
-            float finalTime = final * Random.Range(0.85f, 1.15f) / RateofFire.Value;
+            float finalTime = final * Random.Range(0.85f, 1.15f) / FireratMulti.Value;
 
             return finalTime;
-        }
-
-        public float FullAutoBurstLength(BotOwner BotOwner, float distance)
-        {
-            var component = BotOwner.GetComponent<SAINComponent>();
-
-            if (component == null)
-            {
-                return 0.001f;
-            }
-
-            float modifier = component.Info.WeaponInfo.FinalModifier;
-
-            float k = 0.08f * modifier; // How fast for the burst length to falloff with distance
-            float scaledDistance = MathHelpers.InverseScaleWithLogisticFunction(distance, k, 20f);
-
-            scaledDistance = Mathf.Clamp(scaledDistance, 0.001f, 1f);
-
-            if (distance > 80f)
-            {
-                scaledDistance = 0.001f;
-            }
-            else if (distance < 8f)
-            {
-                scaledDistance = 1f;
-            }
-
-            return scaledDistance * BurstLengthModifier.Value;
-        }
-
-        public float FullAutoTimePerShot(int bFirerate)
-        {
-            float roundspersecond = bFirerate / 60;
-
-            float secondsPerShot = 1f / roundspersecond;
-
-            return secondsPerShot;
         }
 
         public float PerMeter

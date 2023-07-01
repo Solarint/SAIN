@@ -1,4 +1,5 @@
 ﻿using EFT;
+using SAIN.Components;
 using System;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,9 +8,9 @@ namespace SAIN.Classes
 {
     public class CoverPoint
     {
-        public CoverPoint(BotOwner bot, Vector3 point, Collider collider)
+        public CoverPoint(SAINComponent sain, Vector3 point, Collider collider)
         {
-            BotOwner = bot;
+            SAIN = sain;
             Position = point;
             Collider = collider;
             TimeCreated = Time.time;
@@ -17,6 +18,7 @@ namespace SAIN.Classes
             Id = Guid.NewGuid().ToString();
         }
 
+        private readonly SAINComponent SAIN;
         public int HitInCoverUnknownCount { get; set; }
         public int HitInCoverCount { get; set; }
 
@@ -24,9 +26,44 @@ namespace SAIN.Classes
 
         public bool BotIsUsingThis { get; set; }
 
-        public bool BotIsHere => BotIsUsingThis && Distance < 0.5f && !Spotted;
+        public bool BotIsHere => CoverStatus == CoverStatus.InCover;
 
-        public bool Spotted => HitInCoverCount > 1 || HitInCoverUnknownCount > 0;
+        public bool Spotted
+        {
+            get
+            {
+                if (HitInCoverCount > 1 || HitInCoverUnknownCount > 0)
+                {
+                    return true;
+                }
+                if (BotIsUsingThis && PointIsVisible())
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public bool PointIsVisible()
+        {
+            if (VisTimer < Time.time)
+            {
+                VisTimer = Time.time + 0.5f;
+                PointVis = false;
+                if (SAIN.Enemy != null)
+                {
+                    Vector3 coverPos = Position;
+                    coverPos += Vector3.up * 0.3f;
+                    Vector3 start = SAIN.Enemy.EnemyHeadPosition;
+                    Vector3 direction = coverPos - start;
+                    PointVis = !Physics.Raycast(start, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask);
+                }
+            }
+            return PointVis;
+        }
+
+        private bool PointVis;
+        private float VisTimer;
 
         public float CalcPathLength()
         {
@@ -40,8 +77,6 @@ namespace SAIN.Classes
                 return Mathf.Infinity;
             }
         }
-
-        public float PathDistance { get; private set; }
 
         public float PathLengthAtCreation { get; private set; }
 
@@ -57,20 +92,18 @@ namespace SAIN.Classes
                     return OldStatus;
                 }
                 ReCheckStatusTimer = 0f;
+                float distance = Distance;
 
-                CoverStatus status = CoverStatus.None;
-
-                PathDistance = (BotOwner.Position - Position).sqrMagnitude;
-
-                if (PathDistance <= InCoverDist)
+                CoverStatus status;
+                if (distance <= InCoverDist)
                 {
                     status = CoverStatus.InCover;
                 }
-                else if (PathDistance <= CloseCoverDist)
+                else if (distance <= CloseCoverDist)
                 {
                     status = CoverStatus.CloseToCover;
                 }
-                else if (PathDistance <= MidCoverDist)
+                else if (distance <= MidCoverDist)
                 {
                     status = CoverStatus.MidRangeToCover;
                 }
@@ -86,7 +119,7 @@ namespace SAIN.Classes
         private CoverStatus OldStatus;
         private float ReCheckStatusTimer;
 
-        public BotOwner BotOwner { get; private set; }
+        public BotOwner BotOwner => SAIN.BotOwner;
         public Collider Collider { get; private set; }
         public Vector3 Position { get; set; }
         public float TimeCreated { get; private set; }

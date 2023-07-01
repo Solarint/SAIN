@@ -2,8 +2,7 @@
 using EFT.InventoryLogic;
 using SAIN.Helpers;
 using UnityEngine;
-using static SAIN.UserSettings.ShootConfig;
-using static SAIN.UserSettings.DifficultyConfig;
+using static SAIN.UserSettings.EditorSettings;
 
 namespace SAIN.Classes
 {
@@ -15,8 +14,8 @@ namespace SAIN.Classes
         {
             float distance = SAIN.DistanceToAimTarget;
 
-            // Reduces scatter recoil at very close range. Clamps distance between 3 and 20 then scale to 0.25 to 1.
-            // So if a target is 3m or less distance, their recoil scaling will be 25% its original value
+            // Reduces scatter recoil at very close range. Clamps Distance between 3 and 20 then scale to 0.25 to 1.
+            // So if a target is 3m or less Distance, their recoil scaling will be 25% its original value
             distance = Mathf.Clamp(distance, 3f, 20f);
             distance /= 20f;
             distance = distance * 0.75f + 0.25f;
@@ -49,7 +48,7 @@ namespace SAIN.Classes
             {
                 rate = Time.time + (SemiAutoTimePerShot / 3f);
             }
-            return Vector3.Lerp(Vector3.zero, oldVector, LerpRecoil.Value);
+            return Vector3.Lerp(Vector3.zero, oldVector, RecoilDecay.Value);
         }
 
         public float RecoilTimeWait
@@ -58,11 +57,11 @@ namespace SAIN.Classes
             {
                 if (CurrentWeapon.SelectedFireMode == Weapon.EFireMode.fullauto || CurrentWeapon.SelectedFireMode == Weapon.EFireMode.burst)
                 {
-                    return Time.time + Shoot.FullAutoTimePerShot(CurrentWeapon.Template.bFirerate) * 0.8f;
+                    return Time.time + FullAutoTimePerShot * 0.8f;
                 }
                 else
                 {
-                    return Time.time + (1f / (CurrentWeapon.Template.SingleFireRate / 60f)) * 0.8f;
+                    return Time.time + SemiAutoTimePerShot * 0.8f;
                 }
             }
         }
@@ -113,7 +112,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (!SAINPlugin.RealismModLoaded)
+                if (!SAINPlugin.RealismLoaded)
                 {
                     return 250f;
                 }

@@ -5,9 +5,9 @@ using UnityEngine;
 
 namespace SAIN.Classes.Mover
 {
-    public class SAIN_Mover_BlindFire : SAINBot
+    public class BlindFireClass : SAINBot
     {
-        public SAIN_Mover_BlindFire(BotOwner bot) : base(bot)
+        public BlindFireClass(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
@@ -65,11 +65,11 @@ namespace SAIN.Classes.Mover
                 ResetBlindFire();
                 BlindFireTimer = Time.time + 0.33f;
             }
-            else
+            else if (!SAIN.NoBushESPActive && SAIN.FriendlyFireClass.ClearShot)
             {
                 SetBlindFire(blindfire);
-                SAIN.Steering.LookToPoint(BlindFireTargetPos + Random.insideUnitSphere * 0.5f);
-                BotOwner.ShootData.Shoot();
+                SAIN.Steering.LookToPoint(BlindFireTargetPos + Random.insideUnitSphere * 1f);
+                SAIN.Shoot(false);
 
                 BlindFireTimer = Time.time + 1f;
             }

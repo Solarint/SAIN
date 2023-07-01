@@ -27,22 +27,17 @@ namespace SAIN.Layers
 
             if (RecalcTimer < Time.time)
             {
-                RecalcTimer = Time.time + 2f;
-                if (Decision == SAINSoloDecision.Retreat && SAIN.Cover.FallBackPoint != null)
+                if (FindTargetCover())
                 {
-                    CoverDestination = SAIN.Cover.FallBackPoint;
-                    BotOwner.BotRun.Run(CoverDestination.Position, false);
-                }
-                else if (FindTargetCover())
-                {
-                    BotOwner.BotRun.Run(CoverDestination.Position, false);
+                    RecalcTimer = Time.time + 2f;
+                    BotOwner.BotRun.Run(CoverDestination.Position, false, 0.6f);
                 }
                 else
                 {
                     RecalcTimer = Time.time + 0.5f;
                 }
             }
-            if (CoverDestination == null)
+            if (CoverDestination == null || CoverDestination.BotIsHere)
             {
                 EngageEnemy();
             }
@@ -52,31 +47,37 @@ namespace SAIN.Layers
 
         private bool FindTargetCover()
         {
-            var coverPoint = SAIN.Cover.ClosestPoint;
+            if (CoverDestination != null)
+            {
+                CoverDestination.BotIsUsingThis = false;
+                CoverDestination = null;
+            }
+
+            CoverPoint coverPoint = SelectPoint();
             if (coverPoint != null && !coverPoint.Spotted)
             {
-                if (CanMoveTo(coverPoint, out Vector3 pointToGo))
+                if (SAIN.Mover.CanGoToPoint(coverPoint.Position, out Vector3 pointToGo))
                 {
+                    coverPoint.Position = pointToGo;
                     coverPoint.BotIsUsingThis = true;
                     CoverDestination = coverPoint;
                     return true;
-                }
-                else
-                {
-                    coverPoint.BotIsUsingThis = false;
                 }
             }
             return false;
         }
 
-        private bool CanMoveTo(CoverPoint coverPoint, out Vector3 pointToGo)
+        private CoverPoint SelectPoint()
         {
-            if (coverPoint != null && SAIN.Mover.CanGoToPoint(coverPoint.Position, out pointToGo))
+            CoverPoint fallback = SAIN.Cover.FallBackPoint;
+            if (SAIN.CurrentDecision == SAINSoloDecision.Retreat && fallback != null)
             {
-                return true;
+                return fallback;
             }
-            pointToGo = Vector3.zero;
-            return false;
+            else
+            {
+                return SAIN.Cover.ClosestPoint;
+            }
         }
 
         private CoverPoint CoverDestination;
@@ -88,10 +89,6 @@ namespace SAIN.Layers
         }
 
         private readonly ShootClass Shoot;
-
-        private SAINSoloDecision Decision => SAIN.CurrentDecision;
-
-        private bool FarFromCover;
 
         public override void Start()
         {
@@ -118,7 +115,7 @@ namespace SAIN.Layers
                 stringBuilder.AppendLabeledValue("Cover Position", $"{cover.Position}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Distance", $"{cover.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Spotted?", $"{cover.Spotted}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.PathDistance}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.Distance}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover ID", $"{cover.Id}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover Status", $"{cover.CoverStatus}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{cover.HitInCoverCount}", Color.white, Color.yellow, true);

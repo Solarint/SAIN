@@ -3,10 +3,8 @@ using Comfort.Common;
 using EFT;
 using SAIN.Classes;
 using SAIN.Classes.Sense;
-using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SAIN.Components
 {
@@ -39,7 +37,7 @@ namespace SAIN.Components
             Squad = bot.GetOrAddComponent<SquadClass>();
             Equipment = bot.GetOrAddComponent<BotEquipmentClass>();
 
-            Info = bot.GetOrAddComponent<BotInfoClass>();
+            Info = new SAINBotInfo(bot);
             BotStuck = bot.GetOrAddComponent<SAINBotUnstuck>();
             Hearing = bot.GetOrAddComponent<HearingSensorClass>();
             Talk = bot.GetOrAddComponent<BotTalkClass>();
@@ -49,10 +47,11 @@ namespace SAIN.Components
             SelfActions = bot.GetOrAddComponent<SelfActionClass>();
             Steering = bot.GetOrAddComponent<SteeringClass>();
             Grenade = bot.GetOrAddComponent<BotGrenadeClass>();
-            Mover = bot.GetOrAddComponent<SAIN_Mover>();
+            Mover = bot.GetOrAddComponent<MoverClass>();
             NoBushESP = bot.GetOrAddComponent<NoBushESP>();
             EnemyController = bot.GetOrAddComponent<EnemyController>();
             Sounds = bot.GetOrAddComponent<SoundsController>();
+            FriendlyFireClass = new FriendlyFireClass(bot);
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
@@ -76,6 +75,10 @@ namespace SAIN.Components
 
             if (BotActive && !GameIsEnding)
             {
+                Info.Update();
+
+                FriendlyFireClass.Update();
+
                 Enemy?.Update();
 
                 UpdateHealth();
@@ -96,11 +99,7 @@ namespace SAIN.Components
         {
             get
             {
-                if (BotOwner.AimingData != null)
-                {
-                    return (BotOwner.AimingData.RealTargetPoint - Position).magnitude;
-                }
-                else if (Enemy != null)
+                if (Enemy != null)
                 {
                     return Enemy.RealDistance;
                 }
@@ -124,6 +123,27 @@ namespace SAIN.Components
                 {
                     BotOwner.PatrollingData.Unpause();
                 }
+            }
+        }
+
+        public void Shoot(bool noBush = true, bool checkFF = true)
+        {
+            bool startShoot = true;
+            if (noBush && NoBushESPActive)
+            {
+                startShoot = false;
+            }
+            if (checkFF && !FriendlyFireClass.ClearShot)
+            {
+                startShoot = false;
+            }
+            if (startShoot)
+            {
+                BotOwner.ShootData.Shoot();
+            }
+            else
+            {
+                BotOwner.ShootData.EndShoot();
             }
         }
 
@@ -166,15 +186,10 @@ namespace SAIN.Components
         }
 
         public FriendlyFireStatus FriendlyFireStatus { get; private set; }
-
         private float UpdateHealthTimer = 0f;
-        public float DifficultyModifier => Info.DifficultyModifier;
 
         public bool HasEnemy => Enemy != null;
-
         public SAINEnemy Enemy => EnemyController.Enemy;
-
-        public Dictionary<string, SAINEnemy> Enemies => EnemyController.Enemies;
 
         public void Dispose()
         {
@@ -182,7 +197,6 @@ namespace SAIN.Components
 
             Destroy(Squad);
             Destroy(Equipment);
-            Destroy(Info);
             Destroy(BotStuck);
             Destroy(Hearing);
             Destroy(Talk);
@@ -202,9 +216,8 @@ namespace SAIN.Components
 
         private void ToggleComponents(bool value)
         {
-            if (Info.enabled != value)
+            if (Squad.enabled != value)
             {
-                Info.enabled = value;
                 Squad.enabled = value;
                 Equipment.enabled = value;
                 BotStuck.enabled = value;
@@ -271,23 +284,20 @@ namespace SAIN.Components
             }
         }
 
-        public bool HasGoalTarget => BotOwner.Memory.GoalTarget?.GoalTarget != null;
-        public Vector3? GoalTargetPos => BotOwner.Memory.GoalTarget?.GoalTarget?.Position;
-        public bool BotHasStamina => BotOwner.GetPlayer.Physical.Stamina.NormalValue > 0f;
         public Vector3 UnderFireFromPosition { get; set; }
 
+        public FriendlyFireClass FriendlyFireClass { get; private set; }
         public SoundsController Sounds { get; private set; }
         public VisionClass Vision { get; private set; }
         public BotEquipmentClass Equipment { get; private set; }
-        public SAIN_Mover Mover { get; private set; }
-        public AILimitClass AILimit { get; private set; }
+        public MoverClass Mover { get; private set; }
         public SAINBotUnstuck BotStuck { get; private set; }
         public FlashLightComponent FlashLight { get; private set; }
         public HearingSensorClass Hearing { get; private set; }
         public BotTalkClass Talk { get; private set; }
         public DecisionClass Decision { get; private set; }
         public CoverClass Cover { get; private set; }
-        public BotInfoClass Info { get; private set; }
+        public SAINBotInfo Info { get; private set; }
         public SquadClass Squad { get; private set; }
         public SelfActionClass SelfActions { get; private set; }
         public BotGrenadeClass Grenade { get; private set; }

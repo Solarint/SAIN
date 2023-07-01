@@ -36,7 +36,7 @@ namespace SAIN.Classes
 
         private void Update()
         {
-            if (BotOwner == null || SAIN == null) return;
+            if (SAIN == null) return;
             if (UpdateEquipmentTimer < Time.time)
             {
                 UpdateEquipmentTimer = Time.time + 30f;

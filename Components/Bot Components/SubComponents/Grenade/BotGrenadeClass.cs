@@ -1,15 +1,7 @@
 ﻿using EFT;
-using EFT.InventoryLogic;
 using SAIN.Components;
-using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using Comfort.Common;
-using HarmonyLib;
-using UnityEngine.UIElements;
 
 namespace SAIN.Classes
 {
@@ -31,21 +23,13 @@ namespace SAIN.Classes
             if (BotOwner == null || SAIN == null) return;
             if (ActiveGrenades.Count > 0)
             {
-                List<GrenadeTracker> grenades = new List<GrenadeTracker>();
-                foreach (var grenade in ActiveGrenades)
+                for (int i = ActiveGrenades.Count - 1; i >= 0; i--)
                 {
-                    if (grenade != null)
+                    var tracker = ActiveGrenades[i];
+                    if (tracker == null || tracker.Grenade == null)
                     {
-                        grenades.Add(grenade);
+                        ActiveGrenades.RemoveAt(i);
                     }
-                }
-                ActiveGrenades.Clear();
-                if (grenades.Count > 0)
-                {
-                    var array = grenades.ToArray();
-                    grenades.Clear();
-                    System.Array.Sort(array, GrenadePositionComparerer);
-                    ActiveGrenades.AddRange(array);
                 }
             }
         }
@@ -58,9 +42,9 @@ namespace SAIN.Classes
                 {
                     foreach (var tracker in ActiveGrenades)
                     {
-                        if (tracker?.Grenade != null && tracker.CanReact)
+                        if (tracker?.Grenade?.transform != null && tracker?.GrenadeSpotted == true)
                         {
-                            return tracker.DangerPoint;
+                            return tracker.Grenade.transform.position;
                         }
                     }
                 }
