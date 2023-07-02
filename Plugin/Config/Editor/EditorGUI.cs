@@ -6,15 +6,11 @@ using EFT.UI;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
-namespace SAIN
+namespace SAIN.Editor
 {
-    public class Difficulty
-    {
-        public static float SpeedResult { get; private set; } = 100f;
-
-        public class Editor
+        public class EditorGUI
         {
             internal static ConfigEntry<KeyboardShortcut> TogglePanel;
 
@@ -82,13 +78,31 @@ namespace SAIN
                 }
             }
 
+            private void ApplyStyle()
+            {
+                GUI.skin.window.normal.background = Texture2D.blackTexture;
+                GUI.skin.window.normal.textColor = Color.white;
+                var slider = GUI.skin.horizontalSlider;
+                var thumb = GUI.skin.horizontalSliderThumb;
+                slider.normal.background = null;
+                slider.fixedHeight = 20f;
+                slider.alignment = TextAnchor.MiddleCenter;
+                thumb.fixedHeight = 20f;
+                thumb.alignment = TextAnchor.MiddleCenter;
+                GUI.color = Color.white;
+            }
+
             public void OnGUI()
             {
                 if (guiStatus)
                 {
-                    windowRect = GUI.Window(0, windowRect, WindowFunction, "SAIN AI Settings Editor");
+                    ApplyStyle();
+                    MainWindowRect = GUI.Window(0, MainWindowRect, MainWindow, "SAIN AI Settings Editor"); 
+                    BuilderUtil.OnGUI();
                 }
             }
+
+            public static Color DarkGray = new Color(0.2f, 0.2f, 0.2f, 1f);
 
             private int SelectedTab = 0;
             private const int GeneralTab = 0;
@@ -97,12 +111,14 @@ namespace SAIN
             private const int PersonalityTab = 3;
             private const int AdvancedTab = 4;
 
-            private static Rect windowRect = new Rect(50, 50, 600, 650);
-            private void WindowFunction(int TWCWindowID)
-            {
-                GUI.DragWindow(new Rect(0, 0, 600, 20));
+            private static Rect MainWindowRect = new Rect(50, 50, 600, 650);
 
-                GUILayout.BeginArea(new Rect(0, 20, 600, 30));
+            private void MainWindow(int TWCWindowID)
+            {
+                //GUI.DrawTexture(new Rect(0, 20, MainWindowRect.width, MainWindowRect.height - 20), Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, DarkGray, 0, 0);
+
+                GUI.DragWindow(new Rect(0, 0, 600, 20));
+                GUILayout.BeginArea(new Rect(0, 20, 580, 30));
                 GUILayout.BeginVertical();
 
                 SelectedTab = GUILayout.Toolbar(SelectedTab, new string[] { "General", "Vision", "Shoot", "Personalties", "Advanced" });
@@ -125,7 +141,25 @@ namespace SAIN
                     GUILayout.BeginArea(new Rect(25, 55, 550, 500));
                     GUILayout.BeginVertical();
 
-                    VisionMenu();
+                    GUILayout.Box("Vision Speed Multipliers");
+                    GUILayout.Box("1.5 = 1.5x faster vision speed. Result will vary between bot types.");
+
+                    BuilderUtil.DrawSlider("Base Speed", VisionSpeed, 0.25f, 3f, 100f, "The Base vision speed multiplier. Bots will see this much faster, or slower, at any range.");
+                    BuilderUtil.DrawSlider("Close Speed", CloseVisionSpeed, 0.25f, 3f, 100f, "Vision speed multiplier at close range. Bots will see this much faster, or slower, at close range.");
+                    BuilderUtil.DrawSlider("Far Speed", FarVisionSpeed, 0.25f, 3f, 100f, "Vision speed multiplier at Far range. Bots will see this much faster, or slower, at Far range.");
+                    BuilderUtil.DrawSlider("Close/Far Threshold", CloseFarThresh, 10f, 150f, 1f, "The Distance that defines what is Close Or Far for the above options.");
+
+                    GUILayout.Box("Vision Speed Test");
+                    BuilderUtil.DrawSlider("Test Distance", TestDistance, 0f, 500f);
+                    float result = Patches.Math.VisionSpeed(TestDistance.Value);
+                    GUILayout.Box($"How much faster or slower bot vision will be. In Meters.");
+                    GUILayout.Box("Test Result Final Vision Speed Multiplier = " + result + " at " + TestDistance + " meters away from the player");
+
+                    if (GUILayout.Button("Reset Vision to Default"))
+                    {
+                        MenuClickSound();
+                        ResetVision();
+                    }
 
                     GUILayout.EndVertical();
                     GUILayout.EndArea();
@@ -175,42 +209,69 @@ namespace SAIN
                 GUILayout.EndArea();
             }
 
+
             private void GeneralMenu()
             {
                 GUILayout.Box("General Settings");
 
-                GUILayout.Box("No Bush ESP Enabled = " + NoBushESPToggle.Value);
+                GUILayout.BeginHorizontal();
+                NoBushESPToggle.Value = Button("No Bush ESP", NoBushESPToggle.Value);
+                HeadShotProtection.Value = Button("HeadShot Protection", HeadShotProtection.Value);
+                FasterCQBReactions.Value = Button("Faster CQB Reactions", FasterCQBReactions.Value);
+                GUILayout.EndHorizontal();
 
-                if (GUILayout.Button("No Bush ESP"))
-                {
-                    MenuClickSound();
-                    NoBushESPToggle.Value = !NoBushESPToggle.Value;
-                }
-
-                GUILayout.Box("HeadShot Protection Enabled = " + HeadShotProtection.Value);
-
-                if (GUILayout.Button("HeadShot Protection"))
-                {
-                    MenuClickSound();
-                    HeadShotProtection.Value = !HeadShotProtection.Value;
-                }
-
-                GUILayout.Box("Faster CQB Reactions Enabled = " + FasterCQBReactions.Value);
-
-                if (GUILayout.Button("FasterCQBReactions"))
-                {
-                    MenuClickSound();
-                    FasterCQBReactions.Value = !FasterCQBReactions.Value;
-                }
-
-                GUILayout.Box("Looting Bots Mod Detected = " + SAINPlugin.LootingBotsLoaded);
-                GUILayout.Box("Realism Mod Detected = " + SAINPlugin.RealismLoaded);
+                GUILayout.Box("Mod Detection");
+                GUILayout.BeginHorizontal();
+                SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
+                SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
+                GUILayout.EndHorizontal();
 
                 if (GUILayout.Button("Reset General to Default"))
                 {
                     MenuClickSound();
                     ResetGeneral();
                 }
+            }
+
+            private void SingleTextBool(string text, bool value)
+            {
+                Color old = GUI.backgroundColor;
+                if (value)
+                {
+                    GUI.backgroundColor = Color.green;
+                }
+                else
+                {
+                    GUI.backgroundColor = Color.red;
+                }
+                string status = value ? ": Detected" : ": Not Detected";
+                GUILayout.Box(text + status);
+                GUI.backgroundColor = old;
+            }
+
+            private bool Button(string name, bool value)
+            {
+                Color old = GUI.backgroundColor;
+                if (value)
+                {
+                    GUI.backgroundColor = Color.green;
+                }
+                else
+                {
+                    GUI.backgroundColor = Color.red;
+                }
+                if (GUILayout.Button($"{name} : {Toggle(value)}"))
+                {
+                    MenuClickSound();
+                    value = !value;
+                }
+                GUI.backgroundColor = old;
+                return value;
+            }
+
+            private string Toggle(bool value)
+            {
+                return value ? "On" : "Off";
             }
 
             private void ResetGeneral()
@@ -220,40 +281,9 @@ namespace SAIN
                 FasterCQBReactions.Value = true;
             }
 
-            private void VisionMenu()
-            {
-                GUILayout.Box("Vision Speed Multipliers");
-                GUILayout.Box("1.5 = 1.5x faster vision speed. Result will vary between bot types.");
-
-                GUILayout.Box("Base: " + VisionSpeed.Value);
-                VisionSpeed.Value = GUILayout.HorizontalSlider(VisionSpeed.Value, 0.25f, 3f);
-                VisionSpeed.Value = Mathf.Round(VisionSpeed.Value * 10f) / 10f;
-
-                GUILayout.Box("Close: " + CloseVisionSpeed.Value);
-                CloseVisionSpeed.Value = GUILayout.HorizontalSlider(CloseVisionSpeed.Value, 0.25f, 3f);
-                CloseVisionSpeed.Value = Mathf.Round(CloseVisionSpeed.Value * 10f) / 10f;
-
-                GUILayout.Box("Far: " + FarVisionSpeed.Value);
-                FarVisionSpeed.Value = GUILayout.HorizontalSlider(FarVisionSpeed.Value, 0.25f, 3f);
-                FarVisionSpeed.Value = Mathf.Round(FarVisionSpeed.Value * 10f) / 10f;
-
-                GUILayout.Box("Close/Far Threshold: " + CloseFarThresh.Value);
-                CloseFarThresh.Value = GUILayout.HorizontalSlider(CloseFarThresh.Value, 10f, 150f);
-                CloseFarThresh.Value = Mathf.Round(CloseFarThresh.Value);
-
-                GUILayout.Box("Vision Speed Test");
-                SpeedResult = GUILayout.HorizontalSlider(SpeedResult, 0f, 300f);
-                SpeedResult = Mathf.Round(SpeedResult);
-                float result = Patches.Math.VisionSpeed(SpeedResult);
-                GUILayout.Box($"How much faster or slower bot vision will be. In Meters.");
-                GUILayout.Box("Test Result Final Vision Speed Multiplier = " + result + " at " + SpeedResult + " meters away from the player");
-
-                if (GUILayout.Button("Reset Vision to Default"))
-                {
-                    MenuClickSound();
-                    ResetVision();
-                }
-            }
+            public static GUIStyle TextStyle;
+            public static GUIStyle TextRightAlign;
+            public static GUIStyle TextLeftAlign;
 
             private void ResetVision()
             {
@@ -261,42 +291,22 @@ namespace SAIN
                 CloseVisionSpeed.Value = 1f;
                 FarVisionSpeed.Value = 1f;
                 CloseFarThresh.Value = 50f;
-                SpeedResult = 100f;
+                TestDistance.Value = 50f;
             }
 
             private void ShootMenu()
             {
                 GUILayout.Box("Bot Shoot Settings");
-
-                GUILayout.Box("Semiauto Firerate Multiplier: " + FireratMulti.Value);
-                FireratMulti.Value = GUILayout.HorizontalSlider(FireratMulti.Value, 0.25f, 3f);
-                FireratMulti.Value = Mathf.Round(FireratMulti.Value * 10f) / 10f;
-
-                GUILayout.Box("Fullauto Burst Multiplier: " + BurstMulti.Value);
-                BurstMulti.Value = GUILayout.HorizontalSlider(BurstMulti.Value, 0.25f, 3f);
-                BurstMulti.Value = Mathf.Round(BurstMulti.Value * 10f) / 10f;
-
-                GUILayout.Box("Bot Accuracy Multiplier: " + AccuracyMulti.Value);
-                AccuracyMulti.Value = GUILayout.HorizontalSlider(AccuracyMulti.Value, 0.25f, 3f);
-                AccuracyMulti.Value = Mathf.Round(AccuracyMulti.Value * 100f) / 100f;
+                BuilderUtil.DrawSlider("Semiauto Firerate Multiplier", FireratMulti, 0.25f, 3f, 10f);
+                BuilderUtil.DrawSlider("Fullauto Burst Multiplier", BurstMulti, 0.25f, 3f, 10f);
+                BuilderUtil.DrawSlider("Bot Accuracy Multiplier", AccuracyMulti, 0.25f, 3f, 10f);
+                BuilderUtil.DrawSlider("Semiauto Firerate Multiplier", FireratMulti, 0.25f, 3f, 100f);
 
                 GUILayout.Box("Bot Recoil Settings. 1.5 = 1.5x more recoil and scatter per shot");
-
-                GUILayout.Box("All Bots: " + BotRecoilGlobal.Value);
-                BotRecoilGlobal.Value = GUILayout.HorizontalSlider(BotRecoilGlobal.Value, 0.25f, 3f);
-                BotRecoilGlobal.Value = Mathf.Round(BotRecoilGlobal.Value * 10f) / 10f;
-
-                GUILayout.Box("PMCs: " + PMCRecoil.Value);
-                PMCRecoil.Value = GUILayout.HorizontalSlider(PMCRecoil.Value, 0.25f, 3f);
-                PMCRecoil.Value = Mathf.Round(PMCRecoil.Value * 10f) / 10f;
-
-                GUILayout.Box("Scav: " + ScavRecoil.Value);
-                ScavRecoil.Value = GUILayout.HorizontalSlider(ScavRecoil.Value, 0.25f, 3f);
-                ScavRecoil.Value = Mathf.Round(ScavRecoil.Value * 10f) / 10f;
-
-                GUILayout.Box("Other Bots: " + OtherRecoil.Value);
-                OtherRecoil.Value = GUILayout.HorizontalSlider(OtherRecoil.Value, 0.25f, 3f);
-                OtherRecoil.Value = Mathf.Round(OtherRecoil.Value);
+                BuilderUtil.DrawSlider("All Bots", BotRecoilGlobal, 0.25f, 3f, 10f);
+                BuilderUtil.DrawSlider("PMCs", PMCRecoil, 0.25f, 3f, 10f);
+                BuilderUtil.DrawSlider("Scavs", ScavRecoil, 0.25f, 3f, 10f);
+                BuilderUtil.DrawSlider("Other Bots", OtherRecoil, 0.25f, 3f, 10f);
 
                 if (GUILayout.Button("Reset Shoot to Default"))
                 {
@@ -352,6 +362,7 @@ namespace SAIN
                     AllRats.Value = !AllRats.Value;
                 }
 
+                BuilderUtil.DrawSlider("Random Any Bot GigaChad Chance", RandomGigaChadChance, 0.25f, 3f, 10f);
                 float chance = RandomGigaChadChance.Value;
                 GUILayout.Box("Random GigaChad Chance: " + chance);
                 GUILayout.Box("Does Not Affect Gear or Level Based Personality Selection");
@@ -423,6 +434,10 @@ namespace SAIN
                     Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.PlayerIsDead);
                     Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.QuestFailed);
                 }
+                if (GUILayout.Button("Edit Editor GUI"))
+                {
+                    BuilderUtil.OpenEditWindow = true;
+                }
             }
 
             private void ResetAdvanced()
@@ -466,5 +481,4 @@ namespace SAIN
                 setCursorMethod.Invoke(null, new object[] { type });
             }
         }
-    }
 }

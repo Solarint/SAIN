@@ -4,6 +4,7 @@ using SAIN.UserSettings;
 using System;
 using System.Collections.Generic;
 using SAIN.Components;
+using SAIN.Editor;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using EFT.UI;
@@ -11,14 +12,14 @@ using UnityEngine;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN Beta 3", "2.0")]
+    [BepInPlugin("me.sol.sain", "SAIN Beta", "3.4")]
     [BepInDependency("xyz.drakia.bigbrain", "0.1.4")]
     [BepInDependency("xyz.drakia.waypoints", "1.1.2")]
     [BepInDependency("com.spt-aki.core", "3.5.8")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
     {
-        public static Difficulty.Editor DifficultySettings;
+        public static EditorGUI EditorGUI;
         private void Awake()
         {
             if (!TarkovVersion.CheckEftVersion(Logger, Info, Config))
@@ -38,15 +39,15 @@ namespace SAIN
             EditorInit();
             EFTPatches.Init();
             BigBrainSAIN.Init();
-            DifficultySettings = new Difficulty.Editor();
+            EditorGUI = new EditorGUI();
             ModsCheckTimer = Time.time + 5f;
         }
 
         private void EditorInit()
         {
-            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(Difficulty.Editor.OpenPanel));
+            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(EditorGUI.OpenPanel));
 
-            Difficulty.Editor.TogglePanel = Config.Bind(
+            EditorGUI.TogglePanel = Config.Bind(
                 "SAIN Settings Editor",
                 "",
                 new KeyboardShortcut(KeyCode.Home),
@@ -67,7 +68,7 @@ namespace SAIN
 
         private void Update()
         {
-            DifficultySettings.Update();
+            EditorGUI.Update();
             BotControllerHandler.Update();
 
             if (!ModsChecked && ModsCheckTimer < Time.time)
@@ -89,7 +90,7 @@ namespace SAIN
 
         private void OnGUI()
         {
-            DifficultySettings.OnGUI();
+            EditorGUI.OnGUI();
         }
 
         private float ModsCheckTimer;

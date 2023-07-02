@@ -2,7 +2,7 @@ using BepInEx.Logging;
 using EFT;
 using EFT.InventoryLogic;
 using UnityEngine;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {

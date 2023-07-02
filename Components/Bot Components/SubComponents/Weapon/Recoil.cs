@@ -2,7 +2,7 @@
 using EFT.InventoryLogic;
 using SAIN.Helpers;
 using UnityEngine;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {

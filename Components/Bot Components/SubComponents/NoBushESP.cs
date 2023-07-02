@@ -4,7 +4,7 @@ using EFT;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {

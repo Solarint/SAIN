@@ -4,7 +4,7 @@ using SAIN.Components;
 using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {

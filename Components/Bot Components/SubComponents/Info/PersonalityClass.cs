@@ -7,7 +7,7 @@ using UnityEngine;
 using static SAIN.UserSettings.TalkConfig;
 using static SAIN.UserSettings.DebugConfig;
 using static SAIN.UserSettings.ExtractConfig;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 using SAIN.Components;
 
 namespace SAIN.Classes

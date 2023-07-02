@@ -4,7 +4,7 @@ using HarmonyLib;
 using SAIN.UserSettings;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Patches
 {

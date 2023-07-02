@@ -8,7 +8,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Helpers.Shoot;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Patches
 {

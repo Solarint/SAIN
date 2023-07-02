@@ -7,7 +7,7 @@ using UnityEngine;
 using System;
 using Aki.Reflection.Utils;
 using System.Linq;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 using SAIN.Helpers;
 
 namespace SAIN.Patches

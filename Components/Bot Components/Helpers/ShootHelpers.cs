@@ -1,7 +1,7 @@
 ﻿using EFT;
 using SAIN.Components;
 using UnityEngine;
-using static SAIN.UserSettings.EditorSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Helpers
 {
