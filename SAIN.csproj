@@ -162,6 +162,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
@@ -235,6 +239,9 @@
     <Compile Include="Components\Bot Components\SubComponents\HeardSoundsComponent.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotSpawnController.cs" />
+    <Compile Include="Editor\Util\Buttons.cs" />
+    <Compile Include="Editor\Util\CursorSettings.cs" />
+    <Compile Include="Editor\Util\Sounds.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\ShootClass.cs" />
@@ -266,9 +273,15 @@
     <Compile Include="Components\Bot Components\SubComponents\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverFinderComponent.cs" />
-    <Compile Include="Plugin\Config\Editor\EditorSettings.cs" />
-    <Compile Include="Plugin\Config\Editor\Editor.cs" />
-    <Compile Include="Plugin\Config\Editor\BuilderUtil.cs" />
+    <Compile Include="Editor\Util\AssignConfig.cs" />
+    <Compile Include="Editor\EditorSettings.cs" />
+    <Compile Include="Editor\EditorGUI.cs" />
+    <Compile Include="Editor\Util\BuilderUtil.cs" />
+    <Compile Include="Editor\Util\RectLayout.cs" />
+    <Compile Include="Editor\Util\Styles.cs" />
+    <Compile Include="Editor\Util\ToolTips.cs" />
+    <Compile Include="Editor\Util\UITextures.cs" />
+    <Compile Include="Plugin\Config\ConfigAbstract.cs" />
     <Compile Include="Plugin\Config\ExtractConfig.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />

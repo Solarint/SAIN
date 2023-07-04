@@ -34,29 +34,18 @@ namespace SAIN
             {
                 throw new Exception("Missing BigBrain");
             }
-
+            UITextures.LoadTextures();
             ConfigInit();
-            EditorInit();
             EFTPatches.Init();
             BigBrainSAIN.Init();
             EditorGUI = new EditorGUI();
             ModsCheckTimer = Time.time + 5f;
         }
 
-        private void EditorInit()
-        {
-            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(EditorGUI.OpenPanel));
-
-            EditorGUI.TogglePanel = Config.Bind(
-                "SAIN Settings Editor",
-                "",
-                new KeyboardShortcut(KeyCode.Home),
-                "The keyboard shortcut that toggles editor");
-        }
-
         private void ConfigInit()
         {
-            EditorSettings.Init(Config);
+            SAINConfig = Config;
+            EditorSettings.Init();
             ExtractConfig.Init(Config);
             TalkConfig.Init(Config);
             VisionConfig.Init(Config);
@@ -65,6 +54,8 @@ namespace SAIN
             SoundConfig.Init(Config);
             DazzleConfig.Init(Config);
         }
+
+        public static ConfigFile SAINConfig { get; private set; }
 
         private void Update()
         {

@@ -10,7 +10,7 @@ namespace SAIN.Patches
 {
     public class Math
     {
-        public static float VisionSpeed(float dist)
+        public static float CalcVisSpeed(float dist)
         {
             float result = 1f;
             if (dist >= CloseFarThresh.Value)
@@ -21,7 +21,7 @@ namespace SAIN.Patches
             {
                 result *= CloseVisionSpeed.Value;
             }
-            result *= EditorSettings.VisionSpeed.Value;
+            result *= VisionSpeed.Value;
 
             return result;
         }
@@ -56,7 +56,7 @@ namespace SAIN.Patches
         public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result)
         {
             float dist = (BotTransform.position - enemy.position).magnitude;
-            __result *= Math.VisionSpeed(dist);
+            __result *= Math.CalcVisSpeed(dist);
         }
     }
 }

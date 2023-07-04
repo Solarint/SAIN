@@ -26,7 +26,7 @@ namespace SAIN.Classes
             float horizRecoil = (1f * weaponhorizrecoil + AddRecoil.Value) * distance;
             float vertRecoil = (1f * weaponvertrecoil + AddRecoil.Value) * distance;
 
-            float maxrecoil = MaxScatter.Value * distance;
+            float maxrecoil = MaxRecoil.Value * distance;
 
             float randomHorizRecoil = Random.Range(-horizRecoil, horizRecoil);
             float randomvertRecoil = Random.Range(-vertRecoil, vertRecoil);
