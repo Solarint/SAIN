@@ -286,6 +286,7 @@
     <Compile Include="Editor\Util\ToolTips.cs" />
     <Compile Include="Editor\Util\UITextures.cs" />
     <Compile Include="Plugin\Config\ConfigAbstract.cs" />
+    <Compile Include="Plugin\DifficultyPresetManager.cs" />
     <Compile Include="Plugin\DifficultyPreset.cs" />
     <Compile Include="Plugin\Config\ExtractConfig.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />

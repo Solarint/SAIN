@@ -31,6 +31,23 @@ namespace SAIN.Helpers
             path += ".json";
             return path;
         }
+        public static string BotPresetPath(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
+        {
+            string path = GetPluginPath("SAIN");
+            path = Path.Combine(path, "DifficultyPresets");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            path = Path.Combine(path, keypair.Key.ToString());
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            path = Path.Combine(path, keypair.Value.ToString());
+            path += ".json";
+            return path;
+        }
 
         public static class SaveToJson
         {
@@ -38,7 +55,7 @@ namespace SAIN.Helpers
 
             public static void DifficultyPreset(SAINBotPreset preset)
             {
-                string path = BotPresetPath(preset.BotType, preset.Difficulty);
+                string path = BotPresetPath(preset.KeyPair.Key, preset.KeyPair.Value);
                 string json = JsonConvert.SerializeObject(preset);
                 File.WriteAllText(path, json);
             }
@@ -92,6 +109,22 @@ namespace SAIN.Helpers
 
         public static class LoadFromJson
         {
+            public static SAINBotPreset DifficultyPreset(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
+            {
+                string path = BotPresetPath(keypair.Key, keypair.Value);
+
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    var preset = JsonConvert.DeserializeObject<SAINBotPreset>(json); // Deserialize to SAINBotPreset
+                    return preset;
+                }
+                else
+                {
+                    Logger.LogWarning($"File {path} does not exist");
+                    return null;
+                }
+            }
             public static SAINBotPreset DifficultyPreset(WildSpawnType type, BotDifficulty difficulty)
             {
                 string path = BotPresetPath(type, difficulty);

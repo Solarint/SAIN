@@ -9,146 +9,12 @@ using System.Reflection;
 
 namespace SAIN
 {
-    public class SAINBotPresetManager
-    {
-        public static string[] WildSpawnTypes { get; private set; }
-        public static string[] Difficulties { get; private set; }
-
-        public static Action<WildSpawnType, BotDifficulty, SAINBotPreset> PresetUpdated { get; set; }
-
-        public static void Init()
-        {
-            CreateJsons();
-            AssignProperties();
-        }
-
-        public static void SavePreset(SAINBotPreset preset)
-        {
-            UpdatePreset(preset);
-        }
-
-        public static void ClonePresetList(List<SAINBotPreset> presets, SAINBotPreset clone)
-        {
-            for (int i = 0; i < presets.Count; i++)
-            {
-                presets[i].Copy(clone);
-                UpdatePreset(presets[i]);
-            }
-        }
-
-        public static SAINBotPreset LoadPreset(WildSpawnType spawnType, BotDifficulty botDifficulty)
-        {
-            var Pair = GetKeyPair(spawnType, botDifficulty);
-            if (Presets.ContainsKey(Pair))
-            {
-                return Presets[Pair];
-            }
-            return null;
-        }
-
-        public static void CreateJsons()
-        {
-            List<string> types = new List<string>();
-            List<string> difficulties = new List<string>();
-            foreach (WildSpawnType type in Enum.GetValues(typeof(WildSpawnType)))
-            {
-                if (type.ToString().ToLower().Contains("test"))
-                {
-                    continue;
-                }
-                types.Add(type.ToString());
-                foreach (BotDifficulty diff in Enum.GetValues(typeof(BotDifficulty)))
-                {
-                    TypeDiffs.Add(new KeyValuePair<WildSpawnType, BotDifficulty>(type, diff));
-                    string diffstring = diff.ToString();
-                    if (!difficulties.Contains(diffstring))
-                    {
-                        difficulties.Add(diffstring);
-                    }
-                }
-            }
-
-            WildSpawnTypes = types.ToArray();
-            Difficulties = difficulties.ToArray();
-            types.Clear();
-            difficulties.Clear();
-
-            foreach (var pair in TypeDiffs)
-            {
-                SAINBotPreset preset = JsonUtility.LoadFromJson.DifficultyPreset(pair.Key, pair.Value);
-                if (preset == null)
-                {
-                    preset = new SAINBotPreset(pair.Key, pair.Value);
-                }
-                Presets.Add(pair, preset);
-            }
-            foreach (var preset in Presets)
-            {
-                JsonUtility.SaveToJson.DifficultyPreset(preset.Value);
-            }
-        }
-
-        public static void UpdatePreset(SAINBotPreset preset)
-        {
-            var Pair = GetKeyPair(preset.BotType, preset.Difficulty);
-            if (Presets.ContainsKey(Pair))
-            {
-                Presets[Pair].Copy(preset);
-                JsonUtility.SaveToJson.DifficultyPreset(preset);
-                if (SAINPlugin.BotController != null && SAINPlugin.BotController.Bots.Count > 0)
-                {
-                    PresetUpdated(Pair.Key, Pair.Value, preset);
-                }
-            }
-        }
-
-        public static KeyValuePair<WildSpawnType, BotDifficulty> GetKeyPair(WildSpawnType spawnType, BotDifficulty botDifficulty)
-        {
-            return GetNullableKeyPair(spawnType, botDifficulty).Value;
-        }
-
-        private static KeyValuePair<WildSpawnType, BotDifficulty>? GetNullableKeyPair(WildSpawnType spawnType, BotDifficulty botDifficulty)
-        {
-            foreach (var pair in TypeDiffs)
-            {
-                if (pair.Key == spawnType && pair.Value == botDifficulty)
-                {
-                    return pair;
-                }
-            }
-            return null;
-        }
-
-        private static void AssignProperties()
-        {
-            if (Properties == null)
-            {
-                var list = new List<PropertyInfo>();
-                PropertyInfo[] properties = typeof(SAINBotPreset).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-                foreach (PropertyInfo property in properties)
-                {
-                    Type propertyType = property.PropertyType;
-                    if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(SAINProperty<>))
-                    {
-                        list.Add(property);
-                    }
-                }
-                Properties = list.ToArray();
-            }
-        }
-
-        public static PropertyInfo[] Properties { get; private set; }
-
-        private static readonly List<KeyValuePair<WildSpawnType, BotDifficulty>> TypeDiffs = new List<KeyValuePair<WildSpawnType, BotDifficulty>>();
-        public static readonly Dictionary<KeyValuePair<WildSpawnType, BotDifficulty>, SAINBotPreset> Presets = new Dictionary<KeyValuePair<WildSpawnType, BotDifficulty>, SAINBotPreset>();
-    }
     public class SAINBotPreset
     {
-        public SAINBotPreset(WildSpawnType spawnType, BotDifficulty botDifficulty) 
+        [JsonConstructor]
+        public SAINBotPreset(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
         {
-            BotType = spawnType;
-            Difficulty = botDifficulty;
+            KeyPair = keypair;
             Init();
         }
 
@@ -314,33 +180,16 @@ namespace SAIN
             MinPercentage = new SAINProperty<float>(name, def, min, max, desc, round);
         }
 
-        public void Copy(SAINBotPreset preset)
-        {
-            foreach (PropertyInfo property in GetProperties())
-            {
-                var newProp = property.GetValue(preset);
-                if (newProp is SAINProperty<dynamic> dynProp)
-                {
-                    CopyValue(dynProp, property);
-                }
-            }
-        }
-
-        private void CopyValue<T>(SAINProperty<T> newProp, PropertyInfo property)
-        {
-            var oldProp = property.GetValue(this) as SAINProperty<T>;
-            oldProp.Value = newProp.Value;
-        }
-
         public PropertyInfo[] GetProperties()
         {
             return SAINBotPresetManager.Properties;
         }
 
         [JsonProperty]
-        public WildSpawnType BotType { get; private set; }
-        [JsonProperty]
-        public BotDifficulty Difficulty { get; private set; }
+        public KeyValuePair<WildSpawnType, BotDifficulty> KeyPair { get; private set; }
+
+        public WildSpawnType BotType => KeyPair.Key;
+        public BotDifficulty Difficulty => KeyPair.Value;
 
         [JsonProperty]
         public SAINProperty<float> AudibleRangeMultiplier { get; set; }
