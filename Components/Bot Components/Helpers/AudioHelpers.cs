@@ -2,8 +2,6 @@
 using EFT;
 using EFT.InventoryLogic;
 using EFT.Weather;
-using System;
-using System.Collections;
 using UnityEngine;
 using static SAIN.UserSettings.SoundConfig;
 
@@ -11,19 +9,11 @@ namespace SAIN.Helpers
 {
     public class GunshotRange
     {
-        /// <summary>
-        /// Plays a shoot sound for a given player, range, subsonic status, and sound type.
-        /// </summary>
-        /// <param name="player">The player to play the sound for.</param>
-        /// <param name="range">The range of the sound.</param>
-        /// <param name="subsonic">Whether the sound is subsonic.</param>
-        /// <param name="soundType">The type of sound to play.</param>
-        public IEnumerator OnMakingShotCoroutine(IWeapon weapon, Player player, BulletClass ammo)
+        public static void OnMakingShot(IWeapon weapon, Player player, BulletClass ammo)
         {
             if (player?.AIData != null)
             {
                 Player.FirearmController firearmController = player.HandsController as Player.FirearmController;
-                string name = player.Profile.Nickname;
                 string caliber = weapon.WeaponTemplate.ammoCaliber;
 
                 float range = AudibleRange(caliber);
@@ -36,29 +26,13 @@ namespace SAIN.Helpers
                 else soundType = AISoundType.gun;
 
                 PlayShootSound(player, range, subsonic, soundType);
-
-                if (DebugSound.Value)
-                {
-                    bool suppressed;
-                    if (soundType == AISoundType.silencedGun)
-                    {
-                        suppressed = true;
-                        if (subsonic) range *= SubsonicModifier.Value;
-                        else range *= SuppressorModifier.Value;
-                    }
-                    else suppressed = false;
-
-                    Console.WriteLine($"SAIN Sound For [{name}]: Audible Range: [{range}] because [AmmoCaliber [{caliber}] | Suppressed? [{suppressed}] and is Subsonic? [{subsonic}]]");
-                }
-
-                yield return null;
             }
         }
 
         /// <summary>
         /// Plays a shoot sound for the given player, range, subsonic and sound type, applying modifiers if necessary.
         /// </summary>
-        private void PlayShootSound(Player player, float range, bool subsonic, AISoundType soundtype)
+        private static void PlayShootSound(Player player, float range, bool subsonic, AISoundType soundtype)
         {
             // Decides if Suppressor modifier should be applied + subsonic
             float supmod = 1f;
@@ -95,7 +69,7 @@ namespace SAIN.Helpers
         /// </summary>
         /// <param name="ammocaliber">The ammunition caliber.</param>
         /// <returns>The audible range of the given ammunition caliber.</returns>
-        private float AudibleRange(string ammocaliber)
+        private static float AudibleRange(string ammocaliber)
         {
             float range;
             switch (ammocaliber)
@@ -192,7 +166,7 @@ namespace SAIN.Helpers
         /// </summary>
         /// <param name="velocity">The velocity to check.</param>
         /// <returns>True if the velocity is subsonic, false otherwise.</returns>
-        private bool IsSubsonic(float velocity)
+        private static bool IsSubsonic(float velocity)
         {
             if (velocity < 343.2f) return true;
             else return false;

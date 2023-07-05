@@ -6,7 +6,6 @@ namespace SAIN.UserSettings
     {
         public static ConfigEntry<float> SuppressorModifier { get; private set; }
         public static ConfigEntry<float> SubsonicModifier { get; private set; }
-        public static ConfigEntry<bool> RaycastOcclusion { get; private set; }
 
         public static ConfigEntry<bool> DebugSound { get; private set; }
         public static ConfigEntry<bool> DebugSolarintSound { get; private set; }
@@ -25,12 +24,6 @@ namespace SAIN.UserSettings
                 new ConfigDescription("Modifier for how much less audible suppressed shots are when the round is sub-sonic",
                 new AcceptableValueRange<float>(0.1f, 0.99f),
                 new ConfigurationManagerAttributes { IsAdvanced = true, Order = 2 }));
-
-            RaycastOcclusion = Config.Bind(audio, "Raycast Sound Occlusion", true,
-                new ConfigDescription("",
-                null,
-                new ConfigurationManagerAttributes { IsAdvanced = true, Order = 1 }));
-
 
             DebugSound = Config.Bind(audio,
                 "Gunshot Audible Distance Logs",

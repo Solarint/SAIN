@@ -16,6 +16,28 @@ namespace SAIN.Editor
 {
     public class EditorGUI
     {
+        public EditorGUI()
+        {
+            int i;
+            for (i = 0; i < PresetEditor.BotTypeOptions.Length; i++)
+            {
+                if (PresetEditor.BotTypeOptions[i] == "assault")
+                {
+                    break;
+                }
+            }
+            PresetEditor.SelectedType = i;
+
+            for (i = 0; i < PresetEditor.BotDifficultyOptions.Length; i++)
+            {
+                if (PresetEditor.BotDifficultyOptions[i] == "normal")
+                {
+                    break;
+                }
+            }
+            PresetEditor.SelectedDifficulty = i;
+        }
+
         internal static ConfigEntry<KeyboardShortcut> TogglePanel;
 
         private static GameObject input;
@@ -50,12 +72,9 @@ namespace SAIN.Editor
 
         private bool CloseEditor;
 
-        public bool EscKey => Input.GetKeyDown(KeyCode.Escape);
-        public bool ToggleKey => Input.GetKeyDown(TogglePanel.Value.MainKey);
-
         public void Update()
         {
-            if (EscKey || ToggleKey || CloseEditor)
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(TogglePanel.Value.MainKey) || CloseEditor)
             {
                 SelectedTab = 0;
                 CloseEditor = false;
@@ -93,7 +112,6 @@ namespace SAIN.Editor
                 InitStyles();
                 DrawShadow();
                 MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", WindowStyle);
-                BuilderUtil.OnGUI();
             }
         }
 
@@ -165,6 +183,8 @@ namespace SAIN.Editor
                     SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
                     GUILayout.EndHorizontal();
                 }
+
+                PresetEditor.PresetSelectionMenu();
 
                 GUILayout.EndVertical(); GUILayout.EndArea();
             }
@@ -401,11 +421,6 @@ namespace SAIN.Editor
                     Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.QuestFailed);
                 }
                 GUILayout.EndHorizontal();
-
-                if (GUILayout.Button("Edit Editor GUI"))
-                {
-                    BuilderUtil.OpenEditWindow = true;
-                }
 
                 GUILayout.EndVertical(); GUILayout.EndArea();
             }

@@ -17,6 +17,7 @@ namespace SAIN.Components.BotController
             }
         }
 
+        public DateTime GameDateTime { get; private set; }
         public float TimeOfDayVisibility { get; private set; }
         private float VisibilityTimer = 0f;
 
@@ -24,9 +25,9 @@ namespace SAIN.Components.BotController
         {
             if (BotController.Bots.Count > 0)
             {
-                DateTime time = BotController.Bots.PickRandom().Value.BotOwner.GameDateTime.Calculate();
-                float minutes = time.Minute / 59f;
-                float timeofday = time.Hour + minutes;
+                GameDateTime = BotController.Bots.PickRandom().Value.BotOwner.GameDateTime.Calculate();
+                float minutes = GameDateTime.Minute / 59f;
+                float timeofday = GameDateTime.Hour + minutes;
 
                 float timemodifier = 1f;
                 // SeenTime Check

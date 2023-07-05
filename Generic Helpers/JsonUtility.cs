@@ -6,14 +6,43 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+using SAIN.Plugin.Config;
+using static CC_Vintage;
+using static HBAO_Core;
 
 namespace SAIN.Helpers
 {
     public static class JsonUtility
     {
+        public static string BotPresetPath(WildSpawnType type, BotDifficulty difficulty)
+        {
+            string path = GetPluginPath("SAIN");
+            path = Path.Combine(path, "DifficultyPresets");
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            path = Path.Combine(path, type.ToString());
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            path = Path.Combine(path, difficulty.ToString());
+            path += ".json";
+            return path;
+        }
+
         public static class SaveToJson
         {
             private static int count = 1;
+
+            public static void DifficultyPreset(SAINBotPreset preset)
+            {
+                string path = BotPresetPath(preset.BotType, preset.Difficulty);
+                string json = JsonConvert.SerializeObject(preset);
+                File.WriteAllText(path, json);
+            }
+
             public static void List<T>(List<T> inputList, string inputFolder, string inputName, bool useMapName, bool overwrite = true)
             {
                 if (useMapName && Singleton<GameWorld>.Instance?.MainPlayer?.Location == null)
@@ -63,6 +92,23 @@ namespace SAIN.Helpers
 
         public static class LoadFromJson
         {
+            public static SAINBotPreset DifficultyPreset(WildSpawnType type, BotDifficulty difficulty)
+            {
+                string path = BotPresetPath(type, difficulty);
+
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path); 
+                    var preset = JsonConvert.DeserializeObject<SAINBotPreset>(json); // Deserialize to SAINBotPreset
+                    return preset;
+                }
+                else
+                {
+                    Logger.LogWarning($"File {path} does not exist");
+                    return null;
+                }
+            }
+
             public static bool GetSingle<T>(out List<T> outputList, string inputFolder, string inputName, bool forMap)
             {
                 outputList = null;

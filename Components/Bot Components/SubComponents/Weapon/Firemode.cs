@@ -7,9 +7,9 @@ using static EFT.InventoryLogic.Weapon;
 
 namespace SAIN.Classes
 {
-    public class Firemode : SAINWeapon
+    public class Firemode : SAINWeaponInfoAbstract
     {
-        public Firemode(BotOwner owner) : base(owner) { }
+        public Firemode(BotOwner owner, SAINBotInfo info) : base(owner, info) { }
 
         private const float SemiAutoSwapDist = 40f;
         private const float FullAutoSwapDist = 30f;

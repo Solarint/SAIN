@@ -33,6 +33,7 @@ namespace SAIN.Components
 
         public float WeatherVisibility => WeatherClass.WeatherVisibility;
         public float TimeOfDayVisibility => TimeClass.TimeOfDayVisibility;
+        public DateTime GameDateTime => TimeClass.GameDateTime;
 
         public Vector3 MainPlayerPosition { get; private set; }
         private bool ComponentAdded { get; set; }

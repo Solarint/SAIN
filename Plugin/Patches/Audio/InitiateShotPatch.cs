@@ -13,12 +13,11 @@ namespace SAIN.Patches
         {
             return AccessTools.Method(typeof(Player.FirearmController), "InitiateShot");
         }
-        [PatchPrefix]
-        public static void PatchPrefix(Player.FirearmController __instance, IWeapon weapon, BulletClass ammo)
+        [PatchPostfix]
+        public static void PatchPostfix(Player.FirearmController __instance, IWeapon weapon, BulletClass ammo)
         {
             Player playerInstance = AccessTools.FieldRefAccess<Player.FirearmController, Player>(__instance, "_player");
-            GunshotRange playsound = new GunshotRange();
-            playerInstance.StartCoroutine(playsound.OnMakingShotCoroutine(weapon, playerInstance, ammo));
+            GunshotRange.OnMakingShot(weapon, playerInstance, ammo);
         }
     }
 }

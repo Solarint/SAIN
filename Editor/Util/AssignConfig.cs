@@ -80,5 +80,21 @@ namespace SAIN.Editor
                 boolEntry.Value = (bool)boolEntry.DefaultValue;
             }
         }
+
+        public static void DefaultValue<T>(SAINProperty<T> entry)
+        {
+            if (entry is SAINProperty<float> floatEntry)
+            {
+                floatEntry.Value = (float)floatEntry.DefaultVal;
+            }
+            if (entry is SAINProperty<int> intEntry)
+            {
+                intEntry.Value = (int)intEntry.DefaultVal;
+            }
+            if (entry is SAINProperty<bool> boolEntry)
+            {
+                boolEntry.Value = (bool)boolEntry.DefaultVal;
+            }
+        }
     }
 }

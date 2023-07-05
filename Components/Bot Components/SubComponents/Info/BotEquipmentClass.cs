@@ -28,7 +28,7 @@ namespace SAIN.Classes
 
         public InventoryClass Inventory { get; private set; }
         public Weapon CurrentWeapon => BotOwner.WeaponManager.CurrentWeapon;
-        public Weapon SecondaryWeapon => BotOwner.WeaponManager.SecondWeaponInfo.weapon;
+        public Weapon SecondaryWeapon => BotOwner.WeaponManager.SecondWeaponInfo?.weapon;
 
         private readonly List<ArmorComponent> HelmetArmorComponents = new List<ArmorComponent>();
 

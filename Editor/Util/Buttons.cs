@@ -49,7 +49,26 @@ namespace SAIN.Editor
             return entry.Value;
         }
 
+        public static bool Button(SAINProperty<bool> entry)
+        {
+            InfoBox(entry.Description);
+            CreateNameLabel(entry.Name);
+            GUILayout.FlexibleSpace();
+            entry.Value = Button(entry.Value, 420f);
+            GUILayout.FlexibleSpace();
+            ResetButton(entry);
+            return entry.Value;
+        }
+
         public static void ResetButton<T>(ConfigEntry<T> entry)
+        {
+            if (GUILayout.Button("Reset", GUILayout.MaxWidth(50f)))
+            {
+                MenuClickSound();
+                DefaultValue(entry);
+            }
+        }
+        public static void ResetButton<T>(SAINProperty<T> entry)
         {
             if (GUILayout.Button("Reset", GUILayout.MaxWidth(50f)))
             {

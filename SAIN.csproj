@@ -219,7 +219,10 @@
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\SpottedCoverPoint.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\FrameWait.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\Abstract\InfoClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\PersonalityClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\Abstract\BotPresetClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\Abstract\SAINInfoAbstract.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firerate.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firemode.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Recoil.cs" />
@@ -241,6 +244,7 @@
     <Compile Include="Components\Bot Controller Components\Classes\BotSpawnController.cs" />
     <Compile Include="Editor\Util\Buttons.cs" />
     <Compile Include="Editor\Util\CursorSettings.cs" />
+    <Compile Include="Editor\Util\PresetEditor.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
@@ -282,6 +286,7 @@
     <Compile Include="Editor\Util\ToolTips.cs" />
     <Compile Include="Editor\Util\UITextures.cs" />
     <Compile Include="Plugin\Config\ConfigAbstract.cs" />
+    <Compile Include="Plugin\DifficultyPreset.cs" />
     <Compile Include="Plugin\Config\ExtractConfig.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />
@@ -305,7 +310,7 @@
     <Compile Include="Plugin\EFTPatches.cs" />
     <Compile Include="Plugin\Patches\Audio\HearSensorActivatePatch.cs" />
     <Compile Include="Plugin\Patches\FlashLight\CheckFlashlightPatch.cs" />
-    <Compile Include="Plugin\Patches\FlashLight\VisionSpeedPatch.cs" />
+    <Compile Include="Plugin\Patches\VisionSpeedPatch.cs" />
     <Compile Include="Plugin\Patches\MovementPatches.cs" />
     <Compile Include="Plugin\Patches\Audio\InitiateShotPatch.cs" />
     <Compile Include="Plugin\Patches\Shoot\RateofFirePatch.cs" />
@@ -313,7 +318,6 @@
     <Compile Include="Plugin\Patches\Audio\StepSoundPatch.cs" />
     <Compile Include="Plugin\Patches\Audio\TalkPatch.cs" />
     <Compile Include="Plugin\Patches\Audio\TryPlayShootSoundPatch.cs" />
-    <Compile Include="Plugin\Patches\VisibilityPatch.cs" />
     <Compile Include="Components\Player Components\FlashLightComponent.cs" />
     <Compile Include="Components\Bot Components\SubComponents\SelfActionClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\WeaponInfoClass.cs" />
@@ -324,7 +328,7 @@
     <Compile Include="Components\Bot Components\SubComponents\Talk\GroupTalk.cs" />
     <Compile Include="Components\Bot Components\SubComponents\BotSquadClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\SAINEnemyClass.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\InfoClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\SAINBotInfo.cs" />
     <Compile Include="Components\Bot Components\SAINEnum.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Grenade\GrenadeTrackerComponent.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Mover\LeanClass.cs" />

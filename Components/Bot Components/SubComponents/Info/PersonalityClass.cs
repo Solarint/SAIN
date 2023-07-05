@@ -1,20 +1,12 @@
-﻿using BepInEx.Logging;
-using EFT;
+﻿using EFT;
 using SAIN.Helpers;
-using System;
-using System.Linq;
-using UnityEngine;
-using static SAIN.UserSettings.TalkConfig;
-using static SAIN.UserSettings.DebugConfig;
-using static SAIN.UserSettings.ExtractConfig;
 using static SAIN.Editor.EditorSettings;
-using SAIN.Components;
 
 namespace SAIN.Classes
 {
-    public class PersonalityClass : SAINBot
+    public class PersonalityClass : SAINInfoAbstract
     {
-        public PersonalityClass(BotOwner owner) : base(owner) 
+        public PersonalityClass(BotOwner owner, SAINBotInfo info) : base(owner, info) 
         {
             SetPersonality();
         }
@@ -60,7 +52,7 @@ namespace SAIN.Classes
                 {
                     return true;
                 }
-                if (Info.PowerLevel > 110f && Info.IsPMC && EFTMath.RandomBool(75))
+                if (PowerLevel > 110f && IsPMC && EFTMath.RandomBool(75))
                 {
                     return true;
                 }
@@ -72,8 +64,6 @@ namespace SAIN.Classes
             }
         }
 
-        private SAINBotInfo Info => SAIN.Info;
-
         private bool CanBeChad
         {
             get
@@ -82,7 +72,7 @@ namespace SAIN.Classes
                 {
                     return true;
                 }
-                if (Info.PowerLevel > 85f && Info.IsPMC && EFTMath.RandomBool(65))
+                if (PowerLevel > 85f && IsPMC && EFTMath.RandomBool(65))
                 {
                     return true;
                 }
@@ -98,7 +88,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (BotOwner.Profile.Info.Level <= 10 && Info.PowerLevel < 25f)
+                if (BotOwner.Profile.Info.Level <= 10 && PowerLevel < 25f)
                 {
                     return true;
                 }
@@ -114,7 +104,7 @@ namespace SAIN.Classes
                 {
                     return true;
                 }
-                if (BotOwner.Profile.Info.Level < 40 && EFTMath.RandomBool(RandomRatChance.Value))
+                if (PowerLevel < 40 && EFTMath.RandomBool(RandomRatChance.Value))
                 {
                     return true;
                 }

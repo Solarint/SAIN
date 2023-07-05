@@ -6,15 +6,15 @@ using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {
-    public class WeaponInfo : SAINWeapon
+    public class WeaponInfo : SAINWeaponInfoAbstract
     {
-        public WeaponInfo(BotOwner bot) : base(bot)
+        public WeaponInfo(BotOwner bot, SAINBotInfo info) : base(bot, info)
         {
-            Modifiers = new ModifierClass(bot);
+            Modifiers = new ModifierClass(bot, info);
             DefaultAccuracy = BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF;
-            Recoil = new Recoil(bot);
-            Firerate = new Firerate(bot);
-            Firemode = new Firemode(bot);
+            Recoil = new Recoil(bot, info);
+            Firerate = new Firerate(bot, info);
+            Firemode = new Firemode(bot, info);
         }
 
         private readonly float DefaultAccuracy;
@@ -91,9 +91,9 @@ namespace SAIN.Classes
         }
     }
 
-    public class ModifierClass : SAINWeapon
+    public class ModifierClass : SAINWeaponInfoAbstract
     {
-        public ModifierClass(BotOwner bot) : base(bot) { }
+        public ModifierClass(BotOwner bot, SAINBotInfo info) : base(bot, info) { }
 
         private const float WeaponClassScaling = 0.3f;
         private const float RecoilScaling = 0.2f;
@@ -102,7 +102,7 @@ namespace SAIN.Classes
         private const float BotRoleScaling = 0.3f;
         private const float DifficultyScaling = 0.5f;
 
-        public float FinalModifier => WeaponClassModifier * RecoilModifier * ErgoModifier * AmmoTypeModifier * BotRoleModifier * DifficultyModifier;
+        public float FinalModifier => WeaponClassModifier * RecoilModifier * ErgoModifier * AmmoTypeModifier * BotRoleModifier * CalcDifficultyModifier;
 
         public float AmmoTypeModifier
         {
@@ -116,7 +116,7 @@ namespace SAIN.Classes
         {
             get
             {
-                float modifier = BotType();
+                float modifier = GetBotTypeModifier();
                 return Scaling(modifier, 0f, 1f, 1 - BotRoleScaling, 1 + BotRoleScaling);
             }
         }
@@ -147,7 +147,7 @@ namespace SAIN.Classes
             }
         }
 
-        public float DifficultyModifier
+        public float CalcDifficultyModifier
         {
             get
             {
@@ -278,7 +278,7 @@ namespace SAIN.Classes
             return ammomodifier;
         }
 
-        public float BotType()
+        public float GetBotTypeModifier()
         {
             float botTypeModifier;
             if (SAIN.Info.IsPMC)
@@ -405,16 +405,13 @@ namespace SAIN.Classes
         }
     }
 
-    public abstract class SAINWeapon : SAINBot
+    public abstract class SAINWeaponInfoAbstract : SAINInfoAbstract
     {
-        public SAINWeapon(BotOwner owner) : base(owner)
+        public SAINWeaponInfoAbstract(BotOwner owner, SAINBotInfo info) : base(owner, info)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        public readonly ManualLogSource Logger;
-
-        public WeaponInfo WeaponInfo => SAIN.Info.WeaponInfo;
+        public WeaponInfo WeaponInfo => SAINInfo.WeaponInfo;
 
         public string WeaponClass => CurrentWeapon.Template.weapClass;
 

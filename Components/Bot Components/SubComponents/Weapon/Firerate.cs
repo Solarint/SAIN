@@ -8,9 +8,9 @@ using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {
-    public class Firerate : SAINWeapon
+    public class Firerate : SAINWeaponInfoAbstract
     {
-        public Firerate(BotOwner owner) : base(owner) { }
+        public Firerate(BotOwner owner, SAINBotInfo info) : base(owner, info) { }
 
         public void Update()
         {

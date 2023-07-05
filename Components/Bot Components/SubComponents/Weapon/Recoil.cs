@@ -6,9 +6,9 @@ using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {
-    public class Recoil : SAINWeapon
+    public class Recoil : SAINWeaponInfoAbstract
     {
-        public Recoil(BotOwner owner) : base(owner) { }
+        public Recoil(BotOwner owner, SAINBotInfo info) : base(owner, info) { }
 
         public Vector3 CalculateRecoil(Vector3 targetpoint)
         {

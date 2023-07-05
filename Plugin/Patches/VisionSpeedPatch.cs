@@ -1,15 +1,33 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
+using SAIN.UserSettings;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using SAIN.Helpers;
-using SAIN.UserSettings;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Patches
 {
+    public class Math
+    {
+        public static float CalcVisSpeed(float dist)
+        {
+            float result = 1f;
+            if (dist >= CloseFarThresh.Value)
+            {
+                result *= FarVisionSpeed.Value;
+            }
+            else
+            {
+                result *= CloseVisionSpeed.Value;
+            }
+            result *= VisionSpeed.Value;
+
+            return result;
+        }
+    }
+
     public class VisibleDistancePatch : ModulePatch
     {
         private static float DebugTimer = 0f;
@@ -40,15 +58,13 @@ namespace SAIN.Patches
                 // Checks to make sure a date and time is present
                 if (___botOwner_0.GameDateTime != null)
                 {
-                    DateTime dateTime = ___botOwner_0.GameDateTime.Calculate();
-
-                    timeMod = Modifiers.Time.Visibilty(dateTime);
-
+                    DateTime dateTime = SAINPlugin.BotController.GameDateTime;
+                    timeMod = SAINPlugin.BotController.TimeOfDayVisibility;
                     // Set the value of the "HourServer" property to the hour from the DateTime object
                     _HourServerProperty.SetValue(__instance, (int)((short)dateTime.Hour));
                 }
 
-                float weatherMod = Modifiers.Weather.Visibility();
+                float weatherMod = SAINPlugin.BotController.WeatherVisibility;
 
                 float visdistcoef = ___botOwner_0.Settings.Current._visibleDistCoef;
                 float defaultvision = ___botOwner_0.Settings.Current.CurrentVisibleDistance;
@@ -56,7 +72,7 @@ namespace SAIN.Patches
                 float MaxVision;
                 float currentVisionDistance;
                 // User Toggle for if Global Fog is disabled
-                if (VisionConfig.NoGlobalFog.Value)
+                if (VisionConfig.OverrideVisionDist.Value)
                 {
                     // Uses default settings with a max vision cap for safety if a bot is flashed.
                     if (___botOwner_0.FlashGrenade.IsFlashed)
@@ -98,34 +114,47 @@ namespace SAIN.Patches
                 }
 
                 // Original Logic. Update Frequency - once a minute
-                ___float_3 = Time.time + (float)(___botOwner_0.FlashGrenade.IsFlashed ? 3 : 60);
+                ___float_3 = Time.time + (float)(___botOwner_0.FlashGrenade.IsFlashed ? 3 : 10);
             }
             return false;
         }
     }
 
-    public class GainSightPatch : ModulePatch
+    public class NoAIESPPatch : ModulePatch
     {
-        //static float Timer = 0f;
-        private static PropertyInfo _GoalEnemy;
-
         protected override MethodBase GetTargetMethod()
         {
-            _GoalEnemy = AccessTools.Property(typeof(BotMemoryClass), "GoalEnemy");
-            Type goalEnemyType = _GoalEnemy.PropertyType;
-            return AccessTools.Method(goalEnemyType, "method_7");
+            return typeof(BotOwner)?.GetMethod("IsEnemyLookingAtMe", BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(IAIDetails) }, null);
+        }
+
+        [PatchPrefix]
+        public static bool PatchPrefix(ref bool __result)
+        {
+            __result = false;
+            return false;
+        }
+    }
+
+    public class VisionSpeedPatch : ModulePatch
+    {
+        private static PropertyInfo _GoalEnemyProp;
+        protected override MethodBase GetTargetMethod()
+        {
+            _GoalEnemyProp = AccessTools.Property(typeof(BotMemoryClass), "GoalEnemy");
+            return AccessTools.Method(_GoalEnemyProp.PropertyType, "method_7");
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(ref float __result)
+        public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result)
         {
-            float weatherModifier = Modifiers.Weather.Visibility();
-
-            float inverseMod = Mathf.Sqrt(2f - weatherModifier);
-
-            float finalModifier = __result * inverseMod;
-
-            __result = finalModifier;
+            float dist = (BotTransform.position - enemy.position).magnitude;
+            float weatherModifier = SAINPlugin.BotController.WeatherVisibility;
+            float inverseWeatherModifier = Mathf.Sqrt(2f - weatherModifier);
+            __result *= Math.CalcVisSpeed(dist);
+            if (dist > 20f)
+            {
+                __result *= inverseWeatherModifier;
+            }
         }
     }
 }

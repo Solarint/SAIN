@@ -4,6 +4,7 @@ using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
 using static SAIN.UserSettings.TalkConfig;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {
@@ -220,7 +221,7 @@ namespace SAIN.Classes
             if (PhraseDictionary.ContainsKey(type))
             {
                 var phrase = PhraseDictionary[type];
-                if (phrase.TimeLastSaid + phrase.TimeDelay * TalkDelayModifier.Value < Time.time)
+                if (phrase.TimeLastSaid + phrase.TimeDelay * TalkGlobalFreq.Value < Time.time)
                 {
                     var data = new BotTalkPackage(phrase, mask);
 

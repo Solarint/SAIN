@@ -3,7 +3,7 @@ using Comfort.Common;
 using EFT;
 using SAIN.Components;
 using UnityEngine;
-using static SAIN.UserSettings.TalkConfig;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {

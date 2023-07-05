@@ -34,6 +34,8 @@ namespace SAIN
             {
                 throw new Exception("Missing BigBrain");
             }
+
+            SAINBotPresetManager.Init();
             UITextures.LoadTextures();
             ConfigInit();
             EFTPatches.Init();

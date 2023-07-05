@@ -38,6 +38,8 @@ namespace SAIN.Components
             Equipment = bot.GetOrAddComponent<BotEquipmentClass>();
 
             Info = new SAINBotInfo(bot);
+            Info.Init();
+
             BotStuck = bot.GetOrAddComponent<SAINBotUnstuck>();
             Hearing = bot.GetOrAddComponent<HearingSensorClass>();
             Talk = bot.GetOrAddComponent<BotTalkClass>();
@@ -195,6 +197,7 @@ namespace SAIN.Components
         {
             StopAllCoroutines();
 
+            Info.Dispose();
             Destroy(Squad);
             Destroy(Equipment);
             Destroy(BotStuck);
@@ -285,6 +288,7 @@ namespace SAIN.Components
         }
 
         public Vector3 UnderFireFromPosition { get; set; }
+
 
         public FriendlyFireClass FriendlyFireClass { get; private set; }
         public SoundsController Sounds { get; private set; }
