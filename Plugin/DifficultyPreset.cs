@@ -4,7 +4,6 @@ using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using static Mono.Security.X509.X520;
 
 namespace SAIN
 {
@@ -23,7 +22,25 @@ namespace SAIN
 
         public static void SavePreset(SAINBotPreset preset)
         {
-            JsonUtility.SaveToJson.DifficultyPreset(preset);
+            UpdatePreset(preset);
+        }
+
+        public static void SavePreset(List<SAINBotPreset> presets)
+        {
+            SAINBotPreset clone = presets[0];
+            for (int i = 0; i < presets.Count; i++)
+            {
+                if (presets[i] == null)
+                {
+                    Console.WriteLine($"Preset {i} == null!");
+                    continue;
+                }
+                if (i > 0)
+                {
+                    presets[i].Copy(clone);
+                }
+                UpdatePreset(presets[i]);
+            }
         }
 
         public static SAINBotPreset LoadPreset(WildSpawnType spawnType, BotDifficulty botDifficulty)
@@ -72,11 +89,6 @@ namespace SAIN
                 }
                 Presets.Add(pair, preset);
             }
-            SavePresets();
-        }
-
-        public static void SavePresets()
-        {
             foreach (var preset in Presets)
             {
                 JsonUtility.SaveToJson.DifficultyPreset(preset.Value);
@@ -92,9 +104,19 @@ namespace SAIN
             var Pair = GetKeyPair(preset.BotType, preset.Difficulty);
             if (Presets.ContainsKey(Pair))
             {
-                Presets[Pair].Copy(preset);
+                if (Presets[Pair] == null)
+                {
+                    Presets[Pair] = preset;
+                }
+                else
+                {
+                    Presets[Pair].Copy(preset);
+                }
                 JsonUtility.SaveToJson.DifficultyPreset(preset);
-                PresetUpdated(Pair.Key, Pair.Value, preset);
+                if (SAINPlugin.BotController != null && SAINPlugin.BotController.Bots.Count > 0)
+                {
+                    PresetUpdated(Pair.Key, Pair.Value, preset);
+                }
             }
         }
 

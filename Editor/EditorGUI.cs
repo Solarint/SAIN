@@ -74,7 +74,7 @@ namespace SAIN.Editor
 
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(TogglePanel.Value.MainKey) || CloseEditor)
+            if ((Input.GetKeyDown(KeyCode.Escape) && guiStatus) || Input.GetKeyDown(TogglePanel.Value.MainKey) || CloseEditor)
             {
                 SelectedTab = 0;
                 CloseEditor = false;
@@ -82,6 +82,7 @@ namespace SAIN.Editor
                 if (input == null)
                 {
                     input = GameObject.Find("___Input");
+                    return;
                 }
 
                 guiStatus = !guiStatus;
@@ -184,7 +185,10 @@ namespace SAIN.Editor
                     GUILayout.EndHorizontal();
                 }
 
-                PresetEditor.PresetSelectionMenu();
+                if (ExpandPresetEditor = BuilderUtil.ExpandableMenu("Bot Preset Editor", ExpandPresetEditor, "Edit Values for particular bot types and difficulty settings"))
+                {
+                    PresetEditor.PresetSelectionMenu();
+                }
 
                 GUILayout.EndVertical(); GUILayout.EndArea();
             }
@@ -440,6 +444,7 @@ namespace SAIN.Editor
         private static bool ExpandTalkOther;
         private static bool ExpandTalkSquad;
 
+        private static bool ExpandPresetEditor = false;
         private static bool ExpandGeneral = false;
         private static bool ExpandVisionSpeed = false;
         private static bool ExpandShoot = false;

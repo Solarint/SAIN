@@ -36,11 +36,15 @@ namespace SAIN
             }
 
             SAINBotPresetManager.Init();
-            UITextures.LoadTextures();
+            PresetEditor.Init();
+
             ConfigInit();
             EFTPatches.Init();
             BigBrainSAIN.Init();
+
+            UITextures.LoadTextures();
             EditorGUI = new EditorGUI();
+
             ModsCheckTimer = Time.time + 5f;
         }
 
