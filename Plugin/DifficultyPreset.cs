@@ -1,5 +1,7 @@
-﻿using EFT;
+﻿using BepInEx.Configuration;
+using EFT;
 using Newtonsoft.Json;
+using SAIN.Editor;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
@@ -25,20 +27,11 @@ namespace SAIN
             UpdatePreset(preset);
         }
 
-        public static void SavePreset(List<SAINBotPreset> presets)
+        public static void ClonePresetList(List<SAINBotPreset> presets, SAINBotPreset clone)
         {
-            SAINBotPreset clone = presets[0];
             for (int i = 0; i < presets.Count; i++)
             {
-                if (presets[i] == null)
-                {
-                    Console.WriteLine($"Preset {i} == null!");
-                    continue;
-                }
-                if (i > 0)
-                {
-                    presets[i].Copy(clone);
-                }
+                presets[i].Copy(clone);
                 UpdatePreset(presets[i]);
             }
         }
@@ -97,21 +90,10 @@ namespace SAIN
 
         public static void UpdatePreset(SAINBotPreset preset)
         {
-            if (preset == null)
-            {
-                return;
-            }
             var Pair = GetKeyPair(preset.BotType, preset.Difficulty);
             if (Presets.ContainsKey(Pair))
             {
-                if (Presets[Pair] == null)
-                {
-                    Presets[Pair] = preset;
-                }
-                else
-                {
-                    Presets[Pair].Copy(preset);
-                }
+                Presets[Pair].Copy(preset);
                 JsonUtility.SaveToJson.DifficultyPreset(preset);
                 if (SAINPlugin.BotController != null && SAINPlugin.BotController.Bots.Count > 0)
                 {
@@ -172,24 +154,182 @@ namespace SAIN
 
         private void Init()
         {
-            VisibleDistance = new SAINProperty<float>(nameof(VisibleDistance), 150f, 45f, 500f, "The Maximum Vision Distance for this bot", 1f);
-            VisibleAngle = new SAINProperty<float>(nameof(VisibleAngle), 160f, 45f, 180f, "The Maximum Vision Cone for a bot", 1f);
-            VisionSpeedModifier = new SAINProperty<float>(nameof(VisionSpeedModifier), 1f, 0.25f, 5f, "Modifies the vision speed for this bot", 100f);
-            TalkFrequency = new SAINProperty<float>(nameof(TalkFrequency), 1f, 0.5f, 5f, "Multiplies the time between phrases said for this bot", 100f);
+            string name;
+            string desc;
+            float def;
+            float min;
+            float max;
+            float round;
 
-            CanTalk = new SAINProperty<bool>(nameof(CanTalk), "Sets whether this bot can talk or not", true);
-            FasterCQBReactions = new SAINProperty<bool>(nameof(FasterCQBReactions), "Sets whether this bot reacts faster at close ranges", true);
-            CanUseGrenades = new SAINProperty<bool>(nameof(CanUseGrenades), "Can This Bot Use Grenades at all?", true);
+            name = "Visible Distance";
+            desc = "The Maximum Vision Distance for this bot";
+            def = 150f;
+            min = 50f;
+            max = 500f;
+            round = 1f;
+            VisibleDistance = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Visible Angle";
+            desc = "The Maximum Vision Cone for a bot";
+            def = 160f;
+            min = 45;
+            max = 180f;
+            round = 1f;
+            VisibleAngle = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Base Vision Speed Multiplier";
+            desc = "The Base vision speed multiplier. Bots will see this much faster, or slower, at any range.";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            VisionSpeedModifier = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Talk Frequency";
+            desc = "Multiplies how often this bot can say voicelines.";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            TalkFrequency = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Can Talk";
+            desc = "Sets whether this bot can talk or not";
+            CanTalk = new SAINProperty<bool>(name, desc, true);
+
+            name = "Taunts";
+            desc = "Enables bots yelling nasty words at you.";
+            BotTaunts = new SAINProperty<bool>(name, desc, true);
+
+            name = "Faster CQB Reactions";
+            desc = "Sets whether this bot reacts faster at close ranges";
+            FasterCQBReactions = new SAINProperty<bool>(name, desc, true);
+
+            name = "Can Use Grenades";
+            desc = "Can This Bot Use Grenades at all?";
+            CanUseGrenades = new SAINProperty<bool>(name, desc, true);
+
+            name = "Close Speed";
+            desc = "Vision speed multiplier at close range. Bots will see this much faster, or slower, at close range.";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            CloseVisionSpeed = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Far Speed";
+            desc = "Vision speed multiplier at Far range. Bots will see this much faster, or slower, at Far range.";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            FarVisionSpeed = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Close/Far Threshold";
+            desc = "The Distance that defines what is Close Or Far for the above options.";
+            def = 50f;
+            min = 5f;
+            max = 100f;
+            round = 1f;
+            CloseFarThresh = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Audible Range Multiplier";
+            desc = "Modifies the distance that this bot can hear sounds.";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            AudibleRangeMultiplier = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Accuracy Multiplier";
+            desc = "Modifies a bot's base accuracy. Higher = less accurate. 1.5 = 1.5x higher accuracy spread";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            AccuracyMulti = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Recoil Scatter Multiplier";
+            desc = "Modifies a bot's recoil impulse from a shot. Higher = less accurate. 1.5 = 1.5x more recoil and scatter per shot";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            RecoilMultiplier = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Burst Length Multiplier";
+            desc = "Modifies how long bots shoot a burst during full auto fire. Higher = longer full auto time. 1.5 = 1.5x longer bursts";
+            def = 1.25f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            BurstMulti = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Semiauto Firerate Multiplier";
+            desc = "Modifies the time a bot waits between semiauto fire. Higher = faster firerate. 1.5 = 1.5x more shots per second";
+            def = 1.35f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            FireratMulti = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Squad Talk";
+            desc = "Enables bots talking to each other in a squad";
+            SquadTalk = new SAINProperty<bool>(name, desc, true);
+
+            name = "Squad Talk Multiplier";
+            desc = "Multiplies the time between squad voice communication";
+            def = 1f;
+            min = 0.1f;
+            max = 5f;
+            round = 100f;
+            SquadMemberTalkFreq = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Squad Leader Talk Multiplier";
+            desc = "Multiplies the time between squad Leader commands and callouts";
+            def = 1f;
+            min = 0.1f;
+            max = 5f;
+            round = 100f;
+            SquadLeadTalkFreq = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Extracts";
+            desc = "Can This Bot Use Extracts?";
+            EnableExtracts = new SAINProperty<bool>(name, desc, true);
+
+            name = "Extract Max Percentage";
+            desc = "The shortest possible time before this bot can decide to move to extract. Based on total raid timer and time remaining. 60 min total raid time with 6 minutes remaining would be 10 percent";
+            def = 35f;
+            min = 1f;
+            max = 99f;
+            round = 1f;
+            MaxPercentage = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Extract Min Percentage";
+            desc = "The longest possible time before this bot can decide to move to extract. Based on total raid timer and time remaining. 60 min total raid time with 6 minutes remaining would be 10 percent";
+            def = 5f;
+            min = 1f;
+            max = 99f;
+            round = 1f;
+            MinPercentage = new SAINProperty<float>(name, def, min, max, desc, round);
         }
 
         public void Copy(SAINBotPreset preset)
         {
-            VisibleAngle.Value = preset.VisibleAngle.Value;
-            VisibleDistance.Value = preset.VisibleDistance.Value;
-            CanTalk.Value = preset.CanTalk.Value;
-            TalkFrequency.Value = preset.TalkFrequency.Value;
-            VisionSpeedModifier.Value = preset.VisionSpeedModifier.Value;
-            FasterCQBReactions.Value = preset.FasterCQBReactions.Value;
+            foreach (PropertyInfo property in GetProperties())
+            {
+                var newProp = property.GetValue(preset);
+                if (newProp is SAINProperty<dynamic> dynProp)
+                {
+                    CopyValue(dynProp, property);
+                }
+            }
+        }
+
+        private void CopyValue<T>(SAINProperty<T> newProp, PropertyInfo property)
+        {
+            var oldProp = property.GetValue(this) as SAINProperty<T>;
+            oldProp.Value = newProp.Value;
         }
 
         public PropertyInfo[] GetProperties()
@@ -203,15 +343,50 @@ namespace SAIN
         public BotDifficulty Difficulty { get; private set; }
 
         [JsonProperty]
+        public SAINProperty<float> AudibleRangeMultiplier { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> AccuracyMulti { get; set; }
+
+        [JsonProperty]
+        public SAINProperty<float> CloseVisionSpeed { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> FarVisionSpeed { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> CloseFarThresh { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> RecoilMultiplier { get; set; }
+
+        [JsonProperty]
+        public SAINProperty<float> BurstMulti { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> FireratMulti { get; set; }
+
+        [JsonProperty]
+        public SAINProperty<float> TalkFrequency { get; set; }
+        [JsonProperty]
+        public SAINProperty<bool> CanTalk { get; set; }
+        [JsonProperty]
+        public SAINProperty<bool> BotTaunts { get; set; }
+        [JsonProperty]
+        public SAINProperty<bool> SquadTalk { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> SquadMemberTalkFreq { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> SquadLeadTalkFreq { get; set; }
+
+        [JsonProperty]
+        public SAINProperty<float> MaxPercentage { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> MinPercentage { get; set; }
+        [JsonProperty]
+        public SAINProperty<bool> EnableExtracts { get; set; }
+
+        [JsonProperty]
         public SAINProperty<float> VisibleDistance { get; set; }
         [JsonProperty]
         public SAINProperty<float> VisibleAngle { get; set; }
         [JsonProperty]
         public SAINProperty<float> VisionSpeedModifier { get; set; }
-        [JsonProperty]
-        public SAINProperty<float> TalkFrequency { get; set; }
-        [JsonProperty]
-        public SAINProperty<bool> CanTalk { get; set; }
         [JsonProperty]
         public SAINProperty<bool> FasterCQBReactions { get; set; }
         [JsonProperty]

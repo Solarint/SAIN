@@ -43,7 +43,7 @@ namespace SAIN.Editor
             InfoBox(description);
             CreateNameLabel(name);
             GUILayout.FlexibleSpace();
-            entry.Value = Button(entry.Value, 420f);
+            entry.Value = Button(null, entry.Value, null, 420f);
             GUILayout.FlexibleSpace();
             ResetButton(entry);
             return entry.Value;
@@ -54,7 +54,7 @@ namespace SAIN.Editor
             InfoBox(entry.Description);
             CreateNameLabel(entry.Name);
             GUILayout.FlexibleSpace();
-            entry.Value = Button(entry.Value, 420f);
+            entry.Value = Button(null, entry.Value, null, 420f);
             GUILayout.FlexibleSpace();
             ResetButton(entry);
             return entry.Value;
@@ -77,17 +77,70 @@ namespace SAIN.Editor
             }
         }
 
-        public static bool Button(bool value, float width)
+        public static bool Button(string name = null, bool? value = null, float? height = null, float? width = null)
         {
             Color old = GUI.backgroundColor;
-            SetBackground(value);
-            if (GUILayout.Button(Toggle(value), GUILayout.Width(width)))
+            if (value != null)
             {
-                MenuClickSound();
-                value = !value;
+                SetBackground(value.Value);
             }
-            GUI.backgroundColor = old;
-            return value;
+
+            bool button;
+            if (height != null && width != null)
+            {
+                if (name != null)
+                {
+                    button = GUILayout.Button(name, GUILayout.Height(height.Value), GUILayout.Width(width.Value));
+                }
+                else
+                {
+                    button = GUILayout.Button(Toggle(value.Value), GUILayout.Height(height.Value), GUILayout.Width(width.Value));
+                }
+            }
+            else if (height != null)
+            {
+                if (name != null)
+                {
+                    button = GUILayout.Button(name, GUILayout.Height(height.Value));
+                }
+                else
+                {
+                    button = GUILayout.Button(Toggle(value.Value), GUILayout.Height(height.Value));
+                }
+            }
+            else if (width != null)
+            {
+                if (name != null)
+                {
+                    button = GUILayout.Button(name, GUILayout.Width(width.Value));
+                }
+                else
+                {
+                    button = GUILayout.Button(Toggle(value.Value), GUILayout.Width(width.Value));
+                }
+            }
+            else
+            {
+                if (name != null)
+                {
+                    button = GUILayout.Button(name);
+                }
+                else
+                {
+                    button = GUILayout.Button(Toggle(value.Value));
+                }
+            }
+            if (value != null)
+            {
+                if (button)
+                {
+                    MenuClickSound();
+                    value = !value.Value;
+                }
+                GUI.backgroundColor = old;
+                return value.Value;
+            }
+            return button;
         }
 
         public static int Button(string name, int value, int target, float width = 300f)

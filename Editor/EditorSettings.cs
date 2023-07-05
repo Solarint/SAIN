@@ -80,9 +80,6 @@ namespace SAIN.Editor
         public static ConfigEntry<float> AudioRangeLargeCal { get; set; }
         public static ConfigEntry<float> AudioRangeShotgun { get; set; }
 
-
-        public static ConfigEntry<float> PMCVisibleDistance { get; set; }
-
         public static void Init()
         {
             EditorParameters.Init();

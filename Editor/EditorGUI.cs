@@ -187,7 +187,10 @@ namespace SAIN.Editor
 
                 if (ExpandPresetEditor = BuilderUtil.ExpandableMenu("Bot Preset Editor", ExpandPresetEditor, "Edit Values for particular bot types and difficulty settings"))
                 {
+                    Color old = GUI.backgroundColor;
+                    GUI.backgroundColor = Color.gray;
                     PresetEditor.PresetSelectionMenu();
+                    GUI.backgroundColor = old;
                 }
 
                 GUILayout.EndVertical(); GUILayout.EndArea();

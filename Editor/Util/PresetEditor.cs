@@ -1,6 +1,7 @@
 ﻿using EFT;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms.VisualStyles;
 using UnityEngine;
@@ -16,7 +17,11 @@ namespace SAIN.Editor
             foreach(var type in BotTypeOptions)
             {
                 string check = type.ToLower();
-                if (check.Contains("boss"))
+                if (check.Contains("bigpipe") || check.Contains("birdeye") || check.Contains("knight"))
+                {
+                    Goons.Add(type);
+                }
+                else if (check.Contains("boss"))
                 {
                     Bosses.Add(type);
                 }
@@ -24,9 +29,17 @@ namespace SAIN.Editor
                 {
                     Followers.Add(type);
                 }
-                if (check.Contains("bigpipe") || check.Contains("birdeye") || check.Contains("knight"))
+                else if (check.Contains("sptusec") || check.Contains("sptbear"))
                 {
-                    Goons.Add(type);
+                    PMCs.Add(type);
+                }
+                else if (check.Contains("assault"))
+                {
+                    Scavs.Add(type);
+                }
+                else
+                {
+                    Other.Add(type);
                 }
             }
         }
@@ -39,15 +52,14 @@ namespace SAIN.Editor
         public static int SelectedType = 0;
         public static int SelectedDifficulty = 0;
 
-        private static SAINBotPreset PresetInEdit;
-
         private static readonly List<SAINBotPreset> BotPresetList = new List<SAINBotPreset>();
 
-        private static readonly List<string> PMCs = new List<string> { "sptUsec", "sptBear" };
-        private static readonly List<string> Scavs = new List<string> { "assault", "cursedAssault" };
+        private static readonly List<string> PMCs = new List<string>();
+        private static readonly List<string> Scavs = new List<string>();
         private static readonly List<string> Followers = new List<string>();
         private static readonly List<string> Bosses = new List<string>();
         private static readonly List<string> Goons = new List<string>();
+        private static readonly List<string> Other = new List<string>();
 
         private static Vector2 SelectScrollPos = Vector2.zero;
         private static Vector2 PresetScrollPos = Vector2.zero;
@@ -55,23 +67,21 @@ namespace SAIN.Editor
         {
             GUILayout.BeginVertical();
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Select Single Bot Preset", GUILayout.Height(35f)))
+            if (SelectSingleOpen = Buttons.Button("Select Single Bot Preset", SelectSingleOpen, 35f))
             {
-                SelectSingleOpen = !SelectSingleOpen;
                 SelectGroupOpen = false;
             }
-            if (GUILayout.Button("Select Bot Preset Group", GUILayout.Height(35f)))
+            if (SelectGroupOpen = Buttons.Button("Select Bot Preset Group", SelectGroupOpen, 35f))
             {
                 SelectSingleOpen = false;
-                SelectGroupOpen = !SelectGroupOpen;
             }
-            if (GUILayout.Button("Load Preset", GUILayout.Height(35f), GUILayout.Width(200f)))
+            if (Buttons.Button("Load Preset", null, 35f, 200f))
             {
-                GetPresetsList(SelectGroupOpen, LoadAllDifficulties);
+                GetPresetsList();
                 SelectSingleOpen = false;
                 SelectGroupOpen = false;
             }
-            if (GUILayout.Button("X", GUILayout.Height(35f), GUILayout.Width(35f)))
+            if (Buttons.Button("X", null, 35f, 35f))
             {
                 SelectSingleOpen = false;
                 SelectGroupOpen = false;
@@ -96,21 +106,23 @@ namespace SAIN.Editor
             {
                 GUILayout.Space(5);
 
-                GUILayout.Box("Bot Type:");
+                LoadAllTypes = LabelAndAll("Bot Type", LoadAllTypes);
+                if (!LoadAllTypes)
+                {
+                    float dropdownHeight = DropDownHeight(BotTypeOptions.Length, 8);
+                    SelectScrollPos = GUILayout.BeginScrollView(SelectScrollPos, GUILayout.Height(dropdownHeight));
 
-                float dropdownHeight = DropDownHeight(BotTypeOptions.Length, 8);
-                SelectScrollPos = GUILayout.BeginScrollView(SelectScrollPos, GUILayout.Height(dropdownHeight));
+                    SelectedType = GUILayout.SelectionGrid(SelectedType, BotTypeOptions, 2);
 
-                SelectedType = GUILayout.SelectionGrid(SelectedType, BotTypeOptions, 2);
-
-                GUILayout.EndScrollView();
+                    GUILayout.EndScrollView();
+                }
 
                 GetDifficulty(false);
             }
         }
 
         private static int GroupSelection = 0;
-        private static readonly string[] GroupSelectionArray = { "Scavs", "PMCs", "Goons", "Bosses", "Followers" };
+        private static readonly string[] GroupSelectionArray = { "Scavs", "PMCs", "Goons", "Bosses", "Followers", "Other" };
 
         private static List<string> GetGroup(int i)
         {
@@ -134,6 +146,10 @@ namespace SAIN.Editor
             {
                 return Followers;
             }
+            if (i == 5)
+            {
+                return Other;
+            }
             return null;
         }
 
@@ -143,18 +159,37 @@ namespace SAIN.Editor
             {
                 GUILayout.Space(5);
 
-                GUILayout.Box("Preset Groups:");
+                LoadAllTypes = LabelAndAll("Preset Groups", LoadAllTypes);
+                if (!LoadAllTypes)
+                {
+                    float dropdownHeight = DropDownHeight(GroupSelectionArray.Length, 4);
+                    SelectScrollPos = GUILayout.BeginScrollView(SelectScrollPos, GUILayout.Height(dropdownHeight));
 
-                float dropdownHeight = DropDownHeight(GroupSelectionArray.Length, 4);
-                SelectScrollPos = GUILayout.BeginScrollView(SelectScrollPos, GUILayout.Height(dropdownHeight));
+                    GroupSelection = GUILayout.SelectionGrid(GroupSelection, GroupSelectionArray, 2);
 
-                GroupSelection = GUILayout.SelectionGrid(GroupSelection, GroupSelectionArray, 2);
-
-                GUILayout.EndScrollView();
+                    GUILayout.EndScrollView();
+                }
 
                 GetDifficulty(true);
             }
         }
+
+        private static bool LabelAndAll(string labelName, bool value)
+        {
+            GUILayout.BeginHorizontal();
+
+            labelName += ": ";
+            GUILayout.Box(labelName);
+
+            string name = "All: " + value.ToString();
+            value = Buttons.Button(name, value);
+
+            GUILayout.EndHorizontal();
+
+            return value;
+        }
+
+        private static bool LoadAllTypes = false;
 
         private static float DropDownHeight(int optionsLength, int optionsShown, float buttonHeight = 20f)
         {
@@ -163,28 +198,45 @@ namespace SAIN.Editor
 
         private static void GetDifficulty(bool group)
         {
-            GUILayout.Space(5);
             GUILayout.BeginHorizontal();
-            GUILayout.Box("Difficulty:");
-            if (GUILayout.Button("All: " + LoadAllDifficulties.ToString(), GUILayout.Width(100f)))
-            {
-                LoadAllDifficulties = !LoadAllDifficulties;
-            }
+
+            GUILayout.Space(5);
+
+            LoadAllDifficulties = LabelAndAll("Difficulty", LoadAllDifficulties);
 
             GUILayout.EndHorizontal();
-            SelectedDifficulty = GUILayout.SelectionGrid(SelectedDifficulty, BotDifficultyOptions, 2);
+
+            if (!LoadAllDifficulties)
+            {
+                SelectedDifficulty = GUILayout.SelectionGrid(SelectedDifficulty, BotDifficultyOptions, 2);
+            }
+
             GUILayout.Space(5);
-            string baseText = group ? GroupSelectionArray[GroupSelection] : BotTypeOptions[SelectedType];
-            string addText = LoadAllDifficulties ? "All" : BotDifficultyOptions[SelectedDifficulty];
-            GUILayout.Label("Selected = [" + baseText + "] Difficulty: [" + addText + "]");
         }
 
         private static bool LoadAllDifficulties = false;
 
         private static void PresetEditWindow()
         {
+            if (BotPresetList.Count == 0)
+            {
+                GUILayout.Label("No Presets Loaded");
+                return;
+            }
             if (BotPresetList.Count > 0)
             {
+                string baseText;
+                if (LoadAllTypes)
+                {
+                    baseText = "All Bots!";
+                }
+                else
+                {
+                    baseText = GroupLoaded ? GroupSelectionArray[GroupSelection] : BotTypeOptions[SelectedType];
+                }
+                string addText = LoadAllDifficulties ? "All" : BotDifficultyOptions[SelectedDifficulty];
+                GUILayout.Label("Selected = [" + baseText + "] Difficulty: [" + addText + "]");
+
                 SAINBotPreset preset = BotPresetList[0];
                 GUILayout.BeginVertical();
 
@@ -193,13 +245,15 @@ namespace SAIN.Editor
                 //GUILayout.Box("Editing: " + PresetInEdit.BotType.ToString() + " " + PresetInEdit.Difficulty.ToString(), GUILayout.Height(35f));
                 if (GUILayout.Button("Save", GUILayout.Height(35f), GUILayout.Width(200f)))
                 {
-                    SAINBotPresetManager.SavePreset(BotPresetList);
+                    SAINBotPresetManager.ClonePresetList(BotPresetList, preset);
                     BotPresetList.Clear();
                 }
-                if (GUILayout.Button("X", GUILayout.Height(35f), GUILayout.Width(35f)))
+                if (GUILayout.Button("Discard", GUILayout.Height(35f)))
                 {
                     BotPresetList.Clear();
                 }
+
+                GUILayout.FlexibleSpace();
 
                 GUILayout.EndHorizontal();
 
@@ -221,29 +275,35 @@ namespace SAIN.Editor
                 if (propertyType == typeof(SAINProperty<float>))
                 {
                     var floatProperty = (SAINProperty<float>)property.GetValue(preset);
-                    CreatePropertySlider(floatProperty);
+                    float value = CreatePropertySlider(floatProperty);
                 }
                 else if (propertyType == typeof(SAINProperty<int>))
                 {
                     var intProperty = (SAINProperty<int>)property.GetValue(preset);
-                    CreatePropertySlider(intProperty);
+                    int value = CreatePropertySlider(intProperty);
                 }
                 else if (propertyType == typeof(SAINProperty<bool>))
                 {
                     var boolProperty = (SAINProperty<bool>)property.GetValue(preset);
-                    BuilderUtil.CreateButtonOption(boolProperty);
+                    bool value = BuilderUtil.CreateButtonOption(boolProperty);
                 }
             }
         }
 
-        private static void CreatePropertySlider(SAINProperty<float> property)
+        private static void ApplyValueToList<T>(List<SAINBotPreset> presets, SAINProperty<T> property)
         {
-            BuilderUtil.HorizSlider(property);
+
         }
 
-        private static void CreatePropertySlider(SAINProperty<int> property)
+        private static float CreatePropertySlider(SAINProperty<float> property)
         {
-            BuilderUtil.HorizSlider(property.Name, property.Value, property.Min, property.Max, 1f, property.Description);
+            return BuilderUtil.HorizSlider(property);
+        }
+
+        private static int CreatePropertySlider(SAINProperty<int> property)
+        {
+            float value = BuilderUtil.HorizSlider(property.Name, property.Value, property.Min, property.Max, 1f, property.Description);
+            return Mathf.RoundToInt(value);
         }
 
         private static SAINBotPreset LoadSelectedPreset()
@@ -253,12 +313,33 @@ namespace SAIN.Editor
             return SAINBotPresetManager.LoadPreset(convertedType, convertedDiff);
         }
 
-        private static List<SAINBotPreset> GetPresetsList(bool group, bool allDiff)
+        private static void GetPresetsList()
         {
             BotPresetList.Clear();
-            if (!group)
+            if (!SelectGroupOpen && !SelectGroupOpen)
             {
-                if (!allDiff)
+                return;
+            }
+
+            string difficulty = null;
+            if (!LoadAllDifficulties)
+            {
+                difficulty = BotDifficultyOptions[SelectedDifficulty];
+            }
+
+            if (LoadAllTypes)
+            {
+                LoadGroupPresets(BotTypeOptions, difficulty);
+            }
+            else if (SelectGroupOpen)
+            {
+                GroupLoaded = true;
+                LoadGroupPresets(GetGroup(GroupSelection), difficulty);
+            }
+            else if (SelectSingleOpen)
+            {
+                GroupLoaded = false;
+                if (!LoadAllDifficulties)
                 {
                     BotPresetList.Add(LoadSelectedPreset());
                 }
@@ -267,18 +348,9 @@ namespace SAIN.Editor
                     LoadAllDiffPresets(BotTypeOptions[SelectedType]);
                 }
             }
-            else
-            {
-                var list = GetGroup(GroupSelection);
-                string difficulty = null;
-                if (!allDiff)
-                {
-                    difficulty = BotDifficultyOptions[SelectedDifficulty];
-                }
-                LoadGroupPresets(list, difficulty);
-            }
-            return BotPresetList;
         }
+
+        private static bool GroupLoaded = false;
 
         private static SAINBotPreset LoadSinglePreset(string type, string diff)
         {
@@ -305,43 +377,51 @@ namespace SAIN.Editor
             return (BotDifficulty)Enum.Parse(typeof(BotDifficulty), diff);
         }
 
-        private static List<SAINBotPreset> LoadAllDiffPresets(string type)
+        private static void LoadAllDiffPresets(string type)
         {
-            BotPresetList.Clear();
             WildSpawnType typeEnum = GetType(type);
             foreach (var difficulty in BotDifficultyOptions)
             {
                 var preset = LoadSinglePreset(typeEnum, difficulty);
                 BotPresetList.Add(preset);
             }
-            return BotPresetList;
         }
 
-        private static List<SAINBotPreset> LoadGroupPresets(List<string> group, string diff = null)
+        private static void LoadGroupPresets(List<string> group, string diff = null)
         {
-            BotPresetList.Clear();
-            WildSpawnType typeEnum;
-            BotDifficulty diffEnum;
-            SAINBotPreset preset;
             foreach (string groupItem in group)
             {
-                if (diff != null)
+                AddPresetToList(groupItem, diff);
+            }
+        }
+
+        private static void LoadGroupPresets(string[] group, string diff = null)
+        {
+            foreach (string groupItem in group)
+            {
+                AddPresetToList(groupItem, diff);
+            }
+        }
+
+        private static void AddPresetToList(string type, string diff = null)
+        {
+            WildSpawnType typeEnum = GetType(type);
+            BotDifficulty diffEnum;
+            SAINBotPreset preset;
+            if (diff != null)
+            {
+                diffEnum = GetDiff(diff);
+                preset = SAINBotPresetManager.LoadPreset(typeEnum, diffEnum);
+                BotPresetList.Add(preset);
+            }
+            else
+            {
+                foreach (var difficulty in BotDifficultyOptions)
                 {
-                    typeEnum = GetType(groupItem);
-                    diffEnum = GetDiff(diff);
-                    preset = SAINBotPresetManager.LoadPreset(typeEnum, diffEnum);
+                    preset = LoadSinglePreset(typeEnum, difficulty);
                     BotPresetList.Add(preset);
                 }
-                else
-                {
-                    foreach (var difficulty in BotDifficultyOptions)
-                    {
-                        preset = LoadSinglePreset(groupItem, difficulty);
-                        BotPresetList.Add(preset);
-                    }
-                }
             }
-            return BotPresetList;
         }
     }
 }

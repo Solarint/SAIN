@@ -117,7 +117,7 @@ namespace SAIN.Editor
             TextStyle, GUILayout.Width(SliderLabelWidth.Value));
         }
 
-        public static void HorizSlider(SAINProperty<float> entry)
+        public static float HorizSlider(SAINProperty<float> entry)
         {
             GUILayout.BeginHorizontal();
 
@@ -142,7 +142,9 @@ namespace SAIN.Editor
             GUILayout.FlexibleSpace();
             Buttons.ResetButton(entry);
             GUILayout.EndHorizontal();
+            return entry.Value;
         }
+
         public static float HorizSlider(string name, float value, float min, float max, float rounding = 1f, string description = null)
         {
             GUILayout.BeginHorizontal();
