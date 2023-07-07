@@ -63,7 +63,7 @@ namespace SAIN.Patches
         {
             Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
 
-            // Config Toggle Check, Null aim data check, and Make sure the weapon can actually full auto (probably not necessary)
+            // Config ToggleOnOff Check, Null aim data check, and Make sure the weapon can actually full auto (probably not necessary)
             if (___botOwner_0.AimingData == null)
             {
                 return true;

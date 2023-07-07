@@ -5,21 +5,14 @@ using static SAIN.Editor.ConfigValues;
 using static SAIN.Editor.Styles;
 using static SAIN.Editor.ToolTips;
 using static SAIN.Editor.BuilderUtil;
+using Colors = SAIN.Editor.Util.Colors;
 using BepInEx.Configuration;
-using SAIN.Plugin.Config;
 
 namespace SAIN.Editor
 {
     internal class Buttons
     {
-        public static void SingleTextBool(string text, bool value)
-        {
-            Color old = GUI.backgroundColor;
-            SetBackground(value);
-            string status = value ? ": Detected" : ": Not Detected";
-            GUILayout.Box(text + status);
-            GUI.backgroundColor = old;
-        }
+        public const float Height = 25f;
 
         private static void SetBackground(bool value, Color? on = null, Color? off = null)
         {
@@ -27,42 +20,41 @@ namespace SAIN.Editor
             GUI.backgroundColor = color.Value;
         }
 
+        private const float InfoWidth = 25f;
+
         public static void InfoBox(string description)
         {
-            if (description == null)
-            {
-                GUILayout.Space(30);
-                return;
-            }
-            GUILayout.Box("?", TextStyle, GUILayout.Width(20));
+            GUILayout.Box("?", Height(Height), Width(InfoWidth));
             CheckMouse(description);
         }
 
-        public static bool Button(ConfigEntry<bool> entry, string name, string description = null)
+        public static bool ButtonConfigEntry(ConfigEntry<bool> entry, string name, string description = null)
         {
             InfoBox(description);
-            CreateNameLabel(name);
-            GUILayout.FlexibleSpace();
-            entry.Value = Button(null, entry.Value, null, 420f);
-            GUILayout.FlexibleSpace();
+            GUILayout.Box(name, GUILayout.Height(Height));
+            GUILayout.Space(25);
+            entry.Value = Button(null, entry.Value, Height);
+            GUILayout.Space(25);
             ResetButton(entry);
             return entry.Value;
         }
 
-        public static bool Button(SAINProperty<bool> entry)
+        public static bool ButtonProperty(SAINProperty<bool> entry)
         {
             InfoBox(entry.Description);
-            CreateNameLabel(entry.Name);
-            GUILayout.FlexibleSpace();
-            entry.Value = Button(null, entry.Value, null, 420f);
-            GUILayout.FlexibleSpace();
+            GUILayout.Box(entry.Name, GUILayout.Height(Height));
+            GUILayout.Space(25);
+            entry.Value = Button(null, entry.Value, Height);
+            GUILayout.Space(25);
             ResetButton(entry);
             return entry.Value;
         }
+
+        private const float ResetWidth = 60f;
 
         public static void ResetButton<T>(ConfigEntry<T> entry)
         {
-            if (GUILayout.Button("Reset", GUILayout.MaxWidth(50f)))
+            if (GUILayout.Button("Reset", GUILayout.Width(ResetWidth), GUILayout.Height(Height)))
             {
                 MenuClickSound();
                 DefaultValue(entry);
@@ -70,7 +62,7 @@ namespace SAIN.Editor
         }
         public static void ResetButton<T>(SAINProperty<T> entry)
         {
-            if (GUILayout.Button("Reset", GUILayout.MaxWidth(50f)))
+            if (GUILayout.Button("Reset", GUILayout.Width(ResetWidth), GUILayout.Height(Height)))
             {
                 MenuClickSound();
                 DefaultValue(entry);
@@ -79,57 +71,31 @@ namespace SAIN.Editor
 
         public static bool Button(string name = null, bool? value = null, float? height = null, float? width = null)
         {
-            Color old = GUI.backgroundColor;
-            if (value != null)
+            Texture2D old = GUI.skin.button.normal.background;
+            if (value == true)
             {
-                SetBackground(value.Value);
+                GUI.skin.button.normal.background = Colors.TextureDarkRed;
             }
+            name = name ?? ToggleOnOff(value.Value);
 
             bool button;
             if (height != null && width != null)
             {
-                if (name != null)
-                {
-                    button = GUILayout.Button(name, GUILayout.Height(height.Value), GUILayout.Width(width.Value));
-                }
-                else
-                {
-                    button = GUILayout.Button(Toggle(value.Value), GUILayout.Height(height.Value), GUILayout.Width(width.Value));
-                }
+                button = GUILayout.Button(name, Height(height), Width(width));
             }
             else if (height != null)
             {
-                if (name != null)
-                {
-                    button = GUILayout.Button(name, GUILayout.Height(height.Value));
-                }
-                else
-                {
-                    button = GUILayout.Button(Toggle(value.Value), GUILayout.Height(height.Value));
-                }
+                button = GUILayout.Button(name, Height(height));
             }
             else if (width != null)
             {
-                if (name != null)
-                {
-                    button = GUILayout.Button(name, GUILayout.Width(width.Value));
-                }
-                else
-                {
-                    button = GUILayout.Button(Toggle(value.Value), GUILayout.Width(width.Value));
-                }
+                button = GUILayout.Button(name, Width(width));
             }
             else
             {
-                if (name != null)
-                {
-                    button = GUILayout.Button(name);
-                }
-                else
-                {
-                    button = GUILayout.Button(Toggle(value.Value));
-                }
+                button = GUILayout.Button(name);
             }
+            GUI.skin.button.normal.background = old;
             if (value != null)
             {
                 if (button)
@@ -137,28 +103,38 @@ namespace SAIN.Editor
                     MenuClickSound();
                     value = !value.Value;
                 }
-                GUI.backgroundColor = old;
                 return value.Value;
             }
             return button;
         }
 
-        public static int Button(string name, int value, int target, float width = 300f)
+        public static string ToggleOnOff(bool value)
+        {
+            return Toggle(value, "On", "Off");
+        }
+        public static string ToggleSelected(bool value)
+        {
+            return Toggle(value, "Selected", " ");
+        }
+        public static string ToggleEnabledDisabled(bool value)
+        {
+            return Toggle(value, "Enabled", "Disabled");
+        }
+        public static string ToggleTrueFalse(bool value)
+        {
+            return Toggle(value, "True", "False");
+        }
+        public static string Toggle(bool value, string on, string off)
+        {
+            return value ? on : off;
+        }
+        public static void SingleTextBool(string text, bool value)
         {
             Color old = GUI.backgroundColor;
-            SetBackground(target == value);
-            if (GUILayout.Button(name, GUILayout.Width(width)))
-            {
-                MenuClickSound();
-                value = target;
-            }
+            SetBackground(value);
+            string status = value ? ": Detected" : ": Not Detected";
+            GUILayout.Box(text + status);
             GUI.backgroundColor = old;
-            return value;
-        }
-
-        public static string Toggle(bool value)
-        {
-            return value ? "On" : "Off";
         }
     }
 }

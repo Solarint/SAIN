@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using static SAIN.Editor.Styles;
 
 namespace SAIN.Editor
@@ -10,31 +11,55 @@ namespace SAIN.Editor
             if (text == null) return;
 
             var rect = GUILayoutUtility.GetLastRect();
-            if (rect.Contains(Event.current.mousePosition) && Event.current.type == EventType.Repaint)
+            Vector2 mousePos = Event.current.mousePosition;
+            if (rect.Contains(mousePos) && Event.current.type == EventType.Repaint)
             {
                 ToolTipContent = Create(text);
                 Vector2 tooltipSize = TooltipStyle.CalcSize(ToolTipContent);
-                ToolTip = new Rect(rect.x + rect.width + 20, rect.y + rect.height + 50, tooltipSize.x, tooltipSize.y);
+                //ToolTip = new Rect(rect.x + rect.width + 20, rect.y + rect.height + 50, tooltipSize.x, tooltipSize.y);
+                ToolTip = new Rect(mousePos.x + 20, mousePos.y + 50, tooltipSize.x, tooltipSize.y);
             }
         }
 
-        public static Rect? ToolTip;
-        public static Vector2? NearestRect;
+        public static void CheckMouseTable(List<string> options)
+        {
+            var rect = GUILayoutUtility.GetLastRect();
+            Vector2 mousePos = Event.current.mousePosition;
+            if (rect.Contains(mousePos) && Event.current.type == EventType.Repaint)
+            {
+                OpenToolTip = true;
+                ToolTipContent = StringList(options);
+            }
+            else
+            {
+                OpenToolTip = false;
+            }
+        }
+
+        private static bool OpenToolTip = false;
+
+        public static Rect ToolTip;
         public static GUIContent ToolTipContent;
 
         public static void DrawToolTip()
         {
-            if (ToolTipContent != null)
+            if (OpenToolTip)
             {
-                GUI.DrawTexture(ToolTip.Value, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, Color.black, 0, 0);
-                GUI.Box(ToolTip.Value, ToolTipContent, TooltipStyle);
+                Vector2 mousePos = Event.current.mousePosition;
+                Vector2 tooltipSize = TooltipStyle.CalcSize(ToolTipContent);
+                ToolTip = new Rect(mousePos.x + 20, mousePos.y + 50, tooltipSize.x, tooltipSize.y);
+                ToolTip = GUI.Window(1, ToolTip, ToolTipFunc, "");
             }
         }
 
-        public static GUIContent Create(string text)
+        public static void ToolTipFunc(int i)
         {
-            const int lineMaxWidth = 350; // Maximum width for each line
+            GUI.DrawTexture(ToolTip, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, Color.black, 0, 0);
+            GUI.Box(ToolTip, ToolTipContent, TooltipStyle);
+        }
 
+        public static GUIContent Create(string text, int lineMaxWidth = 350)
+        {
             GUIContent wrappedContent = new GUIContent();
 
             string[] words = text.Split(' ');
@@ -61,6 +86,28 @@ namespace SAIN.Editor
 
             wrappedContent.text += lineText.TrimEnd();
             return wrappedContent;
+        }
+
+        public static GUIContent StringList(string[] text)
+        {
+            string result = "";
+            foreach (string word in text)
+            {
+                result += word;
+                result += ", ";
+            }
+            return Create(result);
+        }
+
+        public static GUIContent StringList(List<string> text)
+        {
+            string result = "";
+            foreach (string word in text)
+            {
+                result += word;
+                result += ", ";
+            }
+            return Create(result);
         }
     }
 }

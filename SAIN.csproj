@@ -242,10 +242,16 @@
     <Compile Include="Components\Bot Components\SubComponents\HeardSoundsComponent.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotSpawnController.cs" />
+    <Compile Include="Editor\EditorCustomization.cs" />
+    <Compile Include="Editor\GUISections\FontEditMenu.cs" />
     <Compile Include="Editor\Util\Buttons.cs" />
+    <Compile Include="Editor\Util\Colors.cs" />
     <Compile Include="Editor\Util\CursorSettings.cs" />
-    <Compile Include="Editor\Util\PresetEditor.cs" />
+    <Compile Include="Editor\GUISections\PresetEditor.cs" />
+    <Compile Include="Editor\Util\Fonts.cs" />
+    <Compile Include="Editor\Util\InputField.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
+    <Compile Include="Editor\GUISections\Toolbar.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\ShootClass.cs" />

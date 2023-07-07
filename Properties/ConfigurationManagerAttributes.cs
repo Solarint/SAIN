@@ -33,7 +33,7 @@ internal sealed class ConfigurationManagerAttributes
     public bool? ShowRangeAsPercent;
 
     /// <summary>
-    /// Custom setting editor (OnGUI code that replaces the default editor provided by ConfigurationManager).
+    /// Custom setting editor (PropertySelection code that replaces the default editor provided by ConfigurationManager).
     /// See below for a deeper explanation. Using a custom drawer will cause many of the other fields to do nothing.
     /// </summary>
     public System.Action<BepInEx.Configuration.ConfigEntryBase> CustomDrawer;
@@ -61,12 +61,12 @@ internal sealed class ConfigurationManagerAttributes
     ///         // It's best to check Input.anyKeyDown and set isEditing to false immediately if it's true,
     ///         // so that the input doesn't have a chance to propagate to the game itself.
     /// 
-    ///         if (GUILayout.Button("Stop"))
+    ///         if (GUILayout.ButtonConfigEntry("Stop"))
     ///             isEditing = false;
     ///     }
     ///     else
     ///     {
-    ///         if (GUILayout.Button("Start"))
+    ///         if (GUILayout.ButtonConfigEntry("Start"))
     ///             isEditing = true;
     ///     }
     /// 

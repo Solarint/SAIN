@@ -1,10 +1,8 @@
-﻿using BepInEx.Configuration;
-using EFT;
-using Newtonsoft.Json;
-using SAIN.Editor;
+﻿using EFT;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
+//using System.Linq;
 using System.Reflection;
 
 namespace SAIN
@@ -12,7 +10,9 @@ namespace SAIN
     public class SAINBotPresetManager
     {
         public static string[] WildSpawnTypes { get; private set; }
-        public static string[] Difficulties { get; private set; }
+        public static string[] ConvertedWildSpawnTypes { get; private set; }
+
+        public static string[] Difficulties = { "easy", "normal", "hard", "impossible" };
         public static string[] PropertyNames { get; private set; }
 
         public static Action<WildSpawnType, BotDifficulty, SAINBotPreset> PresetUpdated { get; set; }
@@ -85,30 +85,17 @@ namespace SAIN
 
         public static void CreateJsons()
         {
-            List<string> types = new List<string>();
-            List<string> difficulties = new List<string>();
-            foreach (WildSpawnType type in Enum.GetValues(typeof(WildSpawnType)))
+            List<string> strings = new List<string>();
+            foreach (WildSpawnType type in GetTypeEnums())
             {
-                if (type.ToString().ToLower().Contains("test"))
-                {
-                    continue;
-                }
-                types.Add(type.ToString());
+                strings.Add(type.ToString());
                 foreach (BotDifficulty diff in Enum.GetValues(typeof(BotDifficulty)))
                 {
                     TypeDiffs.Add(new KeyValuePair<WildSpawnType, BotDifficulty>(type, diff));
-                    string diffstring = diff.ToString();
-                    if (!difficulties.Contains(diffstring))
-                    {
-                        difficulties.Add(diffstring);
-                    }
                 }
             }
 
-            WildSpawnTypes = types.ToArray();
-            Difficulties = difficulties.ToArray();
-            types.Clear();
-            difficulties.Clear();
+            CreateWildSpawnTypeArray(strings);
 
             foreach (var pair in TypeDiffs)
             {
@@ -120,6 +107,107 @@ namespace SAIN
                 JsonUtility.SaveToJson.DifficultyPreset(preset.Value);
             }
         }
+
+        private static WildSpawnType[] GetTypeEnums()
+        {
+            List<WildSpawnType> types = new List<WildSpawnType>();
+            foreach (WildSpawnType type in Enum.GetValues(typeof(WildSpawnType)))
+            {
+                if (!TypeExclusions.Contains(type))
+                {
+                    types.Add(type);
+                }
+            }
+            return types.ToArray();
+        }
+
+        private static void CreateWildSpawnTypeArray(List<string> types)
+        {
+            WildSpawnTypes = types.ToArray();
+            Array.Sort(WildSpawnTypes);
+
+            List<string> list = new List<string>(WildSpawnTypes);
+
+            foreach (var kvp in TypeIndexes)
+            {
+                int currentIndex = list.IndexOf(kvp.Key);
+                MoveEntryToIndex(list, currentIndex, kvp.Value);
+            }
+
+            WildSpawnTypes = list.ToArray();
+            ConvertedWildSpawnTypes = ConvertNames(WildSpawnTypes, false);
+        }
+
+        private static void MoveEntryToIndex(List<string> list, int currentIndex, int desiredIndex)
+        {
+            string entry = list[currentIndex];
+            list.RemoveAt(currentIndex);
+            list.Insert(desiredIndex, entry);
+        }
+
+        public static string[] ConvertNames(string[] array, bool revert)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = GetConvertedName(array[i], revert);
+            }
+
+            return array;
+        }
+
+        public static string GetConvertedName(string name, bool getConvertedName)
+        {
+            if (getConvertedName)
+            {
+                foreach (var kvp in NameConversions)
+                {
+                    if (kvp.Value == name)
+                    {
+                        name = kvp.Key;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (NameConversions.ContainsKey(name))
+                {
+                    name = NameConversions[name];
+                }
+            }
+            return name;
+        }
+
+        private static readonly List<WildSpawnType> TypeExclusions = new List<WildSpawnType>
+        {
+            WildSpawnType.test,
+            WildSpawnType.bossTest,
+            WildSpawnType.followerTest,
+            WildSpawnType.gifter,
+            WildSpawnType.assaultGroup
+        };
+
+        private static readonly Dictionary<string, int> TypeIndexes = new Dictionary<string, int>
+            {
+                { "assault", 1 },
+                { "sptUsec", 2 },
+                { "sptBear", 3 }
+            };
+
+        public static readonly Dictionary<string, string> NameConversions = new Dictionary<string, string>
+            {
+                { "assault", "Scav" },
+                { "bossKnight", "Goons Knight" },
+                { "followerBigPipe", "Goons BigPipe" },
+                { "followerBirdEye", "Goons BirdEye" },
+                { "sptUsec", "PMC Usec" },
+                { "sptBear", "PMC Bear" },
+                { "exUsec", "Rogue" },
+                { "pmcBot", "Raider" },
+                { "sectantPriest", "Cultist Priest" },
+                { "sectantWarrior", "Cultist" },
+                { "arenaFighterEvent", "Bloodhound" }
+            };
 
         public static void UpdatePreset(SAINBotPreset preset)
         {

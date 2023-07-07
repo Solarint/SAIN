@@ -1,13 +1,13 @@
+using Aki.Common.Utils;
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
 using Newtonsoft.Json;
+using SAIN.Editor;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using SAIN.Plugin.Config;
-using static CC_Vintage;
 using static HBAO_Core;
 
 namespace SAIN.Helpers
@@ -60,6 +60,19 @@ namespace SAIN.Helpers
                 File.WriteAllText(path, json);
             }
 
+            public static void EditorSettings(EditorCustomization custom)
+            {
+                string path = GetPluginPath("SAIN");
+                path = Path.Combine(path, "editor");
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                path += ".json";
+                string json = JsonConvert.SerializeObject(custom);
+                File.WriteAllText(path, json);
+            }
+
             public static void List<T>(List<T> inputList, string inputFolder, string inputName, bool useMapName, bool overwrite = true)
             {
                 if (useMapName && Singleton<GameWorld>.Instance?.MainPlayer?.Location == null)
@@ -109,6 +122,22 @@ namespace SAIN.Helpers
 
         public static class LoadFromJson
         {
+            public static EditorCustomization EditorSettings()
+            {
+                string path = GetPluginPath("SAIN");
+                path = Path.Combine(path, "editor");
+                path += ".json";
+                if (File.Exists(path))
+                {
+                    string json = File.ReadAllText(path);
+                    return JsonConvert.DeserializeObject<EditorCustomization>(json);
+                }
+                else
+                {
+                    return new EditorCustomization();
+                }
+            }
+
             public static SAINBotPreset DifficultyPreset(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
             {
                 string path = BotPresetPath(keypair.Key, keypair.Value);

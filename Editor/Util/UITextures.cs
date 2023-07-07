@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System.IO;
-using static SAIN.Editor.BuilderUtil;
-using static SAIN.Editor.EditorGUI;
 using static SAIN.Editor.EditorParameters;
 using static SAIN.Editor.Styles;
 using static SAIN.Editor.RectLayout;
@@ -27,38 +24,6 @@ namespace SAIN.Editor
                 var recolored = RecolorTexture(rotated, -0.05f, -0.15f, -0.15f);
                 Backgrounds[i] = recolored;
             }
-        }
-
-        public static void DrawShadow()
-        {
-            GUI.DrawTexture(FollowMainWindow(-6, 6), Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, Color.black, 0, 0);
-        }
-
-        public static void DrawWindowBackground(int i)
-        {
-            if (i >= Backgrounds.Length)
-            {
-                i -= Backgrounds.Length;
-            }
-            if (i < 0)
-            {
-                i = 0;
-            }
-            if (i > Backgrounds.Length)
-            {
-                i = Backgrounds.Length - 1;
-            }
-            GUI.DrawTexture(new Rect(0, 0, MainWindow.width, MainWindow.height), Backgrounds[i], ScaleMode.ScaleAndCrop);
-        }
-
-        public static Rect FollowMainWindow(int Xoffset = 0, int Yoffset = 0)
-        {
-            return FollowRectPos(MainWindow, Xoffset, Yoffset, MainWindow.height, MainWindow.width);
-        }
-
-        public static Rect FollowRectPos(Rect Rect2Follow, int Xoffset, int Yoffset, float height, float width)
-        {
-            return new Rect(Rect2Follow.x + Xoffset, Rect2Follow.y + Yoffset, width, height);
         }
 
         private static Texture2D RotateTexture(Texture2D originalTexture)
@@ -165,16 +130,16 @@ namespace SAIN.Editor
 
         public static Rect DrawSliderBackGrounds(float progress)
         {
-            Rect sliderRect = GUILayoutUtility.GetRect(GUIContent.none, SliderStyle, GUILayout.Width(SliderWidth.Value));
-            float lineHeight = 5f; // Adjust the line height as desired
-            float filledY = sliderRect.y + (sliderRect.height - lineHeight * 2f) * 0.5f;
-            float sliderY = sliderRect.y + (sliderRect.height - lineHeight) * 0.5f;
-            Rect Filled = new Rect(sliderRect.x, filledY, sliderRect.width * progress, lineHeight * 2f);
-            Rect Background = new Rect(sliderRect.x, sliderY, sliderRect.width, lineHeight);
+            Rect lastRect = GUILayoutUtility.GetLastRect();
+            float lineHeight = 5f;
+            float filledY = lastRect.y + (lastRect.height - lineHeight * 2f) * 0.5f;
+            float sliderY = lastRect.y + (lastRect.height - lineHeight) * 0.5f;
+            Rect Filled = new Rect(lastRect.x, filledY, lastRect.width * progress, lineHeight * 2f);
+            Rect Background = new Rect(lastRect.x, sliderY, lastRect.width, lineHeight);
 
             GUI.DrawTexture(Background, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, Color.white, 0, 0);
             GUI.DrawTexture(Filled, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(1f, 0.25f, 0.25f), 0, 0);
-            return sliderRect;
+            return lastRect;
         }
     }
 }

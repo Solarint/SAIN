@@ -7,7 +7,6 @@ using SAIN.Components;
 using SAIN.Editor;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
-using EFT.UI;
 using UnityEngine;
 
 namespace SAIN
@@ -34,7 +33,6 @@ namespace SAIN
             {
                 throw new Exception("Missing BigBrain");
             }
-
             SAINBotPresetManager.Init();
             PresetEditor.Init();
 

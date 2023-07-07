@@ -71,7 +71,7 @@ namespace SAIN.Patches
 
                 float MaxVision;
                 float currentVisionDistance;
-                // User Toggle for if Global Fog is disabled
+                // User ToggleOnOff for if Global Fog is disabled
                 if (VisionConfig.OverrideVisionDist.Value)
                 {
                     // Uses default settings with a max vision cap for safety if a bot is flashed.

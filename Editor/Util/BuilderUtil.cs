@@ -11,44 +11,33 @@ namespace SAIN.Editor
 {
     internal class BuilderUtil
     {
-        public static bool ExpandableMenu(string name, bool value, string description = null, float indent = 0)
+        private static GUILayoutOption Height => GUILayout.Height(25f);
+        private static GUILayoutOption ExpandWidth => GUILayout.Width(150f);
+        private static GUILayoutOption MinMaxWidth => GUILayout.Width(SliderMinMaxWidth.Value);
+        private static GUILayoutOption SlWidth => GUILayout.Width(SliderWidth.Value);
+        private static GUILayoutOption ResultWidth => GUILayout.Width(SliderResultWidth.Value);
+        private static GUILayoutOption LabeltWidth => GUILayout.Width(SliderLabelWidth.Value);
+
+        public static bool ExpandableMenu(string name, bool value, string description = null, float indent = 0f)
         {
-            GUILayout.Space(5);
-
-            GUILayout.BeginHorizontal();
-            if (indent != 0)
-            {
-                GUILayout.Space(indent);
-            }
-            Color oldBackgroundColor = GUI.backgroundColor;
-
             // Create a Rect for the background
-            Rect backgroundRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.ExpandWidth(true), GUILayout.Height(1));
-
-            // Draw the solid color background
-            Color backgroundcolor = Color.gray; // Set the desired background color
-            GUI.backgroundColor = backgroundcolor;
-            backgroundRect.height = 30;
-            GUI.Box(backgroundRect, GUIContent.none);
-            GUILayout.EndHorizontal();
+            Rect backgroundRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(RectLayout.MainWindow.width), GUILayout.Height(25));
+            GUI.DrawTexture(backgroundRect, Util.Colors.TextureDarkBlue);
 
             GUILayout.BeginHorizontal();
-            if (indent != 0)
+            if (indent != 0f)
             {
                 GUILayout.Space(indent);
             }
-            GUILayout.Space(15);
             Buttons.InfoBox(description);
-            GUILayout.Label(name, GUILayout.Width(150));
-            GUILayout.Space(25);
-            if (GUILayout.Button(ExpandCollapse(value), GUILayout.Width(75)))
+            GUILayout.Label(name, Height, ExpandWidth);
+            if (GUILayout.Button(ExpandCollapse(value), Height, ExpandWidth))
             {
                 value = !value;
             }
+            GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
-            GUI.backgroundColor = oldBackgroundColor; 
-            GUILayout.Space(5);
             return value;
         }
 
@@ -57,13 +46,11 @@ namespace SAIN.Editor
             return value ? "[Collapse]" : "[Expand]";
         }
 
-        public static Rect EditWindow = new Rect(50, 50, 600, 300);
-
         public static bool CreateButtonOption(ConfigEntry<bool> entry, string name, string description = null)
         {
             bool value = false;
             GUILayout.BeginHorizontal();
-            if (Buttons.Button(entry, name))
+            if (Buttons.ButtonConfigEntry(entry, name))
             {
                 value = true;
             }
@@ -75,7 +62,7 @@ namespace SAIN.Editor
         {
             bool value = false;
             GUILayout.BeginHorizontal();
-            if (Buttons.Button(entry))
+            if (Buttons.ButtonProperty(entry))
             {
                 value = true;
             }
@@ -87,59 +74,41 @@ namespace SAIN.Editor
         {
             GUILayout.BeginHorizontal();
 
-            TextStyle.alignment = TextAnchor.MiddleCenter;
-
             Buttons.InfoBox(description);
-            CreateNameLabel(name);
-            var defaultStyle = TextStyle.fontStyle;
-            TextStyle.fontStyle = FontStyle.Normal;
-            GUILayout.FlexibleSpace();
-            GUILayout.Box(min.ToString(), BlankBoxBG, GUILayout.Width(SliderMinMaxWidth.Value));
+            GUILayout.Box(name, LabeltWidth, Height);
+            GUILayout.Box(min.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Min");
 
             float result = CreateSlider(entry, min, max, rounding, assignConfig);
 
-            GUILayout.Box(max.ToString(), BlankBoxBG, GUILayout.Width(SliderMinMaxWidth.Value));
+            GUILayout.Box(max.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Max");
 
-            TextStyle.fontStyle = defaultStyle;
-
-            GUILayout.Box(entry.Value.ToString(), TextStyle, GUILayout.Width(SliderResultWidth.Value));
+            GUILayout.Box(entry.Value.ToString(), ResultWidth, Height);
             GUILayout.FlexibleSpace();
             Buttons.ResetButton(entry);
             GUILayout.EndHorizontal();
             return result;
         }
 
-        public static void CreateNameLabel(string name)
-        {
-            GUILayout.Box(name,
-            TextStyle, GUILayout.Width(SliderLabelWidth.Value));
-        }
-
         public static float HorizSlider(SAINProperty<float> entry)
         {
             GUILayout.BeginHorizontal();
 
-            TextStyle.alignment = TextAnchor.MiddleCenter;
-
             Buttons.InfoBox(entry.Description);
-            CreateNameLabel(entry.Name);
-            var defaultStyle = TextStyle.fontStyle;
-            TextStyle.fontStyle = FontStyle.Normal;
+            GUILayout.Box(entry.Name, LabeltWidth, Height);
+
             GUILayout.FlexibleSpace();
-            GUILayout.Box(entry.Min.ToString(), BlankBoxBG, GUILayout.Width(SliderMinMaxWidth.Value));
+
+            GUILayout.Box(entry.Min.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Min");
 
             entry.Value = CreateSlider(entry.Value, entry.Min, entry.Max, entry.Rounding);
 
-            GUILayout.Box(entry.Max.ToString(), BlankBoxBG, GUILayout.Width(SliderMinMaxWidth.Value));
+            GUILayout.Box(entry.Max.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Max");
 
-            TextStyle.fontStyle = defaultStyle;
-
-            GUILayout.Box(entry.Value.ToString(), TextStyle, GUILayout.Width(SliderResultWidth.Value));
-            GUILayout.FlexibleSpace();
+            GUILayout.Box(entry.Value.ToString(), ResultWidth, Height);
             Buttons.ResetButton(entry);
             GUILayout.EndHorizontal();
             return entry.Value;
@@ -149,25 +118,18 @@ namespace SAIN.Editor
         {
             GUILayout.BeginHorizontal();
 
-            TextStyle.alignment = TextAnchor.MiddleCenter;
-
             Buttons.InfoBox(description);
-            CreateNameLabel(name);
+            GUILayout.Box(name, LabeltWidth, Height);
 
-            var defaultStyle = TextStyle.fontStyle;
-            TextStyle.fontStyle = FontStyle.Normal;
-
-            GUILayout.Box(min.ToString(), TextStyle);
+            GUILayout.Box(min.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Min");
 
             float result = CreateSlider(value, min, max, rounding);
 
-            GUILayout.Box(max.ToString(), TextStyle);
+            GUILayout.Box(max.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Max");
 
-            TextStyle.fontStyle = defaultStyle;
-
-            GUILayout.Box(value.ToString(), TextStyle, GUILayout.Width(SliderResultWidth.Value));
+            GUILayout.Box(value.ToString(), ResultWidth, Height);
 
             GUILayout.EndHorizontal();
             return result;
@@ -188,9 +150,10 @@ namespace SAIN.Editor
 
         private static float CreateSlider(float value, float min, float max, float rounding = 1f)
         {
-            float progress = (value - min) / (max - min); // Calculate the progress from 0 to 1
-            var sliderRect = DrawSliderBackGrounds(progress);
-            value = GUI.HorizontalSlider(sliderRect, value, min, max, SliderStyle, ThumbStyle);
+            float progress = (value - min) / (max - min);
+            value = GUILayout.HorizontalSlider(value, min, max, SlWidth, Height);
+            DrawSliderBackGrounds(progress);
+
             value = Mathf.Round(value * rounding) / rounding;
             return value;
         }
