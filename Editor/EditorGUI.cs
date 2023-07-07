@@ -150,11 +150,11 @@ namespace SAIN.Editor
                 {
                     name = "No Bush ESP";
                     description = "Adds extra vision check for bots to help prevent bots seeing or shooting through foliage.";
-                    BuilderUtil.CreateButtonOption(NoBushESPToggle, name, description);
+                    BuilderUtil.CreateButtonOption(NoBushESPToggle);
 
                     name = "HeadShot Protection";
                     description = "Experimental, will kick bot's aiming target if it ends up on the player's head.";
-                    BuilderUtil.CreateButtonOption(HeadShotProtection, name, description);
+                    BuilderUtil.CreateButtonOption(HeadShotProtection);
 
                     GUILayout.Box("Mod Detection");
                     GUILayout.BeginHorizontal();
@@ -171,17 +171,17 @@ namespace SAIN.Editor
                 GUILayout.Box("For The Memes. Recommended not to use these during normal gameplay!");
                 GUILayout.Box("Bots will be more predictable and exploitable.");
 
-                if (BuilderUtil.CreateButtonOption(AllGigaChads, "All GigaChads"))
+                if (BuilderUtil.CreateButtonOption(AllGigaChads))
                 {
                     AllChads.Value = false;
                     AllRats.Value = false;
                 }
-                if (BuilderUtil.CreateButtonOption(AllChads, "All Chads"))
+                if (BuilderUtil.CreateButtonOption(AllChads))
                 {
                     AllGigaChads.Value = false;
                     AllRats.Value = false;
                 }
-                if (BuilderUtil.CreateButtonOption(AllRats, "All Rats"))
+                if (BuilderUtil.CreateButtonOption(AllRats))
                 {
                     AllGigaChads.Value = false;
                     AllChads.Value = false;
@@ -190,31 +190,38 @@ namespace SAIN.Editor
                 description = "The Chance that any random bot will get assigned this personality, regardless of Gear and Level";
 
                 name = "Random GigaChad Chance";
-                BuilderUtil.HorizSlider(name, RandomGigaChadChance, 0f, 100f, 1, description);
+                BuilderUtil.HorizSlider(RandomGigaChadChance, 1);
 
                 name = "Random Chad Chance";
-                BuilderUtil.HorizSlider(name, RandomChadChance, 0f, 100f, 1, description);
+                BuilderUtil.HorizSlider(RandomChadChance, 1);
 
                 name = "Random Rat Chance";
-                BuilderUtil.HorizSlider(name, RandomRatChance, 0f, 100f, 1, description);
+                BuilderUtil.HorizSlider(RandomRatChance, 1);
 
                 name = "Random Coward Chance";
-                BuilderUtil.HorizSlider(name, RandomCowardChance, 0f, 100f, 1, description);
+                BuilderUtil.HorizSlider(RandomCowardChance, 1);
             }
             if (IsTabSelected(Hearing))
             {
                 description = "Audible Gun Range is multiplied by this number when using a suppressor";
-                BuilderUtil.HorizSlider("Suppressor Modifier", SuppressorModifier, 0.1f, 0.75f, 100f, description);
+                BuilderUtil.HorizSlider(SuppressorModifier, 100f);
+                //BuilderUtil.HorizSlider("Suppressor Modifier", SuppressorModifier, 0.1f, 0.75f, 100f, description);
 
                 description = "Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo";
-                BuilderUtil.HorizSlider("Subsonic Ammo Modifier", SubsonicModifier, 0.1f, 0.75f, 100f, description);
+                BuilderUtil.HorizSlider(SubsonicModifier, 100f);
+                //BuilderUtil.HorizSlider("Subsonic Ammo Modifier", SubsonicModifier, 0.1f, 0.75f, 100f, description);
 
                 description = "How far bots can hear specific ammo calibers. In Meters";
-                BuilderUtil.HorizSlider("Pistol Caliber", AudioRangePistol, 75f, 500f, 1f, description);
-                BuilderUtil.HorizSlider("556 or 545 Caliber", AudioRangeRifle, 75f, 500f, 1f, description);
-                BuilderUtil.HorizSlider("762 Caliber", AudioRangeMidRifle, 75f, 500f, 1f, description);
-                BuilderUtil.HorizSlider("Large Caliber", AudioRangeLargeCal, 75f, 500f, 1f, description);
-                BuilderUtil.HorizSlider("Shotguns", AudioRangeShotgun, 75f, 500f, 1f, description);
+                BuilderUtil.HorizSlider(AudioRangePistol, 1f);
+                //BuilderUtil.HorizSlider("Pistol Caliber", AudioRangePistol, 75f, 500f, 1f, description);
+                BuilderUtil.HorizSlider(AudioRangeRifle, 1f);
+                //BuilderUtil.HorizSlider("556 or 545 Caliber", AudioRangeRifle, 75f, 500f, 1f, description);
+                BuilderUtil.HorizSlider(AudioRangeMidRifle, 1f);
+                //BuilderUtil.HorizSlider("762 Caliber", AudioRangeMidRifle, 75f, 500f, 1f, description);
+                BuilderUtil.HorizSlider(AudioRangeLargeCal, 1f);
+                //BuilderUtil.HorizSlider("Large Caliber", AudioRangeLargeCal, 75f, 500f, 1f, description);
+                BuilderUtil.HorizSlider(AudioRangeShotgun, 1f);
+                //BuilderUtil.HorizSlider("Shotguns", AudioRangeShotgun, 75f, 500f, 1f, description);
             }
             if (IsTabSelected(Advanced))
             {
@@ -222,15 +229,15 @@ namespace SAIN.Editor
 
                 name = "Max Recoil";
                 description = "The Max Recoil that can be applied from a single gunshot.";
-                BuilderUtil.HorizSlider(name, MaxRecoil, 0.5f, 10f, 100f, description);
+                BuilderUtil.HorizSlider(MaxRecoil, 100f);
 
                 name = "Add Recoil";
                 description = "Linearly Adds or Subtracts Recoil from each gunshot";
-                BuilderUtil.HorizSlider(name, AddRecoil, -1f, 1f, 100f, description);
+                BuilderUtil.HorizSlider(AddRecoil, 100f);
 
                 name = "Recoil Decay";
                 description = "How much to Decay recoil per frame. 0.9 = 10 percent recoil decay per frame";
-                BuilderUtil.HorizSlider(name, RecoilDecay, 0.5f, 0.99f, 1000f, description);
+                BuilderUtil.HorizSlider(RecoilDecay, 1000f);
 
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Font"))

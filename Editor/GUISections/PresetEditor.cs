@@ -242,20 +242,33 @@ namespace SAIN.Editor
             }
         }
 
-        private static string DifficultyTable(string selected)
+        private static readonly List<string> SelectedDifficulties = new List<string>();
+
+        private static void DifficultyTable()
         {
             GUILayout.BeginHorizontal();
             string name;
             for (int i = 0; i < BotDifficultyOptions.Length; i++)
             {
                 name = BotDifficultyOptions[i];
-                if (Buttons.Button(name, name == selected, 30f))
+                bool selected = SelectedDifficulties.Contains(name);
+                if (GUILayout.Toggle(selected, name, GUILayout.Height(25), GUILayout.Width(RectLayout.MainWindow.width / 4f)))
                 {
-                    selected = name;
+                    // The button was pressed, update the selection state
+                    if (!selected)
+                    {
+                        SelectedDifficulties.Add(name);
+                    }
+                }
+                else
+                {
+                    if (selected)
+                    {
+                        SelectedDifficulties.Remove(name);
+                    }
                 }
             }
             GUILayout.EndHorizontal();
-            return selected;
         }
 
         private static List<string> SelectListButton(List<string> option, List<string> list, string name = null, string description = null, float height = 30f, float width = 185f)
@@ -320,7 +333,19 @@ namespace SAIN.Editor
                 //GUILayout.Box("Editing: " + PresetInEdit.BotType.ToString() + " " + PresetInEdit.Difficulty.ToString(), GUILayout.Height(35f));
                 if (GUILayout.Button("Save", GUILayout.Height(35f), GUILayout.Width(200f)))
                 {
-                    SAINBotPresetManager.ClonePresetList(BotPresetList, preset);
+                    if (!LoadAllDifficulties)
+                    {
+                        var enumDiff = SAINBotPresetManager.GetDiff(SelectedDifficulty);
+                        SAINBotPresetManager.ClonePresetList(BotPresetList, preset, enumDiff);
+                    }
+                    else
+                    {
+                        foreach (var diff in BotDifficultyOptions)
+                        {
+                            var enumDiff = SAINBotPresetManager.GetDiff(diff);
+                            SAINBotPresetManager.ClonePresetList(BotPresetList, preset, enumDiff);
+                        }
+                    }
                     BotPresetList.Clear();
                 }
                 if (GUILayout.Button("Discard", GUILayout.Height(35f)))
@@ -401,18 +426,12 @@ namespace SAIN.Editor
             if (propertyType == typeof(SAINProperty<float>))
             {
                 var floatProperty = (SAINProperty<float>)property.GetValue(preset);
-                BuilderUtil.HorizSlider(floatProperty);
-            }
-            else if (propertyType == typeof(SAINProperty<int>))
-            {
-                var intProperty = (SAINProperty<int>)property.GetValue(preset);
-                float value = BuilderUtil.HorizSlider(intProperty.Name, intProperty.Value, intProperty.Min, intProperty.Max, 1f, intProperty.Description);
-                intProperty.Value = Mathf.RoundToInt(value);
+                BuilderUtil.HorizSlider(floatProperty, preset.Difficulty);
             }
             else if (propertyType == typeof(SAINProperty<bool>))
             {
                 var boolProperty = (SAINProperty<bool>)property.GetValue(preset);
-                BuilderUtil.CreateButtonOption(boolProperty);
+                BuilderUtil.CreateButtonOption(boolProperty, preset.Difficulty);
             }
         }
 

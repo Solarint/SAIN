@@ -2,6 +2,7 @@
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
+
 //using System.Linq;
 using System.Reflection;
 
@@ -28,11 +29,11 @@ namespace SAIN
             UpdatePreset(preset);
         }
 
-        public static void ClonePresetList(List<SAINBotPreset> presets, SAINBotPreset clone)
+        public static void ClonePresetList(List<SAINBotPreset> presets, SAINBotPreset clone, BotDifficulty difficulty)
         {
             for (int i = 0; i < presets.Count; i++)
             {
-                presets[i] = CopyAllProperties(presets[i], clone);
+                presets[i] = CopyAllProperties(presets[i], clone, difficulty);
                 UpdatePreset(presets[i]);
             }
         }
@@ -189,24 +190,91 @@ namespace SAIN
 
         private static readonly Dictionary<string, int> TypeIndexes = new Dictionary<string, int>
             {
-                { "assault", 1 },
-                { "sptUsec", 2 },
-                { "sptBear", 3 }
+                { "assault", 0 },
+                { "sptUsec", 1 },
+                { "sptBear", 2 }
             };
+
+
+        //   WildSpawnType                                      // DisplayName             // Section       // Description
+        public static BotType[] BotTypes =
+        {
+            new BotType( WildSpawnType.assault,                 "Scav",                     "Scavs" ,       "Scavs!" ),
+            new BotType( WildSpawnType.marksman,                "Scav Sniper",              "Scavs" ,       "The Scav Snipers that spawn on rooftops on certain maps" ),
+            new BotType( WildSpawnType.cursedAssault,           "Tagged and Cursed Scav",   "Scavs" ,       "The type a scav is assigned when the player is marked as Tagged and Cursed" ),
+
+            new BotType( WildSpawnType.bossKnight,              "Knight",                   "Goons" ,       "Goons leader. Close proximity to the goons has been noted to cause smashed keyboards" ),
+            new BotType( WildSpawnType.followerBigPipe,         "BigPipe" ,                 "Goons" ,       "Goons follower. Close proximity to the goons has been noted to cause smashed keyboards\"" ),
+            new BotType( WildSpawnType.followerBirdEye,         "BirdEye",                  "Goons" ,       "Goons follower. Close proximity to the goons has been noted to cause smashed keyboards\"" ),
+
+            new BotType( "sptUsec",                             "PMC Usec",                 "PMCs" ,        "A PMC of the Usec Faction" ),
+            new BotType( "sptBear",                             "PMC Bear",                 "PMCs" ,        "A PMC of the Bear Faction" ),
+
+            new BotType( WildSpawnType.exUsec,                  "Rogue",                    "Other" ,       "Ex Usec Personel on Lighthouse usually found around the water treatment plant" ),
+            new BotType( WildSpawnType.pmcBot,                  "Raider",                   "Other" ,       "Heavily armed scavs typically found on reserve and Labs by default" ),
+            new BotType( WildSpawnType.arenaFighterEvent,       "Bloodhound",               "Other" ,       "From the Live Event, nearly identical to raiders except with different voicelines and better gear. Found in" ),
+
+            new BotType( WildSpawnType.sectantPriest,           "Cultist Priest",           "Other" ,       "Found on Customs, Woods, Factory, Shoreline at night" ),
+            new BotType( WildSpawnType.sectantWarrior,          "Cultist",                  "Other" ,       "Found on Customs, Woods, Factory, Shoreline at night" ),
+
+            new BotType( WildSpawnType.bossKilla,               "Killa",                    "Bosses" ,      "He shoot. Found on Interchange and Streets" ),
+
+            new BotType( WildSpawnType.bossBully,               "Rashala",                  "Bosses" ,      "Customs Boss" ),
+            new BotType( WildSpawnType.followerBully,           "Rashala Guard",            "Followers" ,   "Customs Boss Follower" ),
+
+            new BotType( WildSpawnType.bossKojaniy,             "Shturman",                 "Bosses" ,      "Woods Boss" ),
+            new BotType( WildSpawnType.followerKojaniy,         "Shturman Guard",           "Followers" ,   "Woods Boss Follower" ),
+
+            new BotType( WildSpawnType.bossTagilla,             "Tagilla",                  "Bosses" ,      "He Smash" ),
+            new BotType( WildSpawnType.followerTagilla,         "Tagilla Guard",            "Followers" ,   "They Smash Too?" ),
+
+            new BotType( WildSpawnType.bossSanitar,             "Sanitar",                  "Bosses" ,      "Shoreline Boss" ),
+            new BotType( WildSpawnType.followerSanitar,         "Sanitar Guard",            "Followers" ,   "Shoreline Boss Follower" ),
+
+            new BotType( WildSpawnType.bossGluhar,              "Gluhar",                   "Bosses" ,      "Reserve Boss. Also can be found on Streets." ),
+            new BotType( WildSpawnType.followerGluharSnipe,     "Gluhar Guard Snipe",       "Followers" ,   "Reserve Boss Follower" ),
+            new BotType( WildSpawnType.followerGluharScout,     "Gluhar Guard Scout",       "Followers" ,   "Reserve Boss Follower" ),
+            new BotType( WildSpawnType.followerGluharSecurity,  "Gluhar Guard Security",    "Followers" ,   "Reserve Boss Follower" ),
+            new BotType( WildSpawnType.followerGluharAssault,   "Gluhar Guard Assault",     "Followers" ,   "Reserve Boss Follower" ),
+
+            new BotType( WildSpawnType.bossZryachiy,            "Zryachiy",                 "Bosses" ,      "Lighthouse Island Sniper Boss" ),
+            new BotType( WildSpawnType.followerZryachiy,        "Zryachiy Guard",           "Followers" ,   "Lighthouse Island Sniper Boss Follower" )
+        };
 
         public static readonly Dictionary<string, string> NameConversions = new Dictionary<string, string>
             {
                 { "assault", "Scav" },
-                { "bossKnight", "Goons Knight" },
-                { "followerBigPipe", "Goons BigPipe" },
-                { "followerBirdEye", "Goons BirdEye" },
+                { "marksman", "Scav Sniper" },
+                { "cursedAssault", "Tagged and Cursed Scav" },
+
+                { "bossKnight", "Knight" },
+                { "followerBigPipe", "BigPipe" },
+                { "followerBirdEye", "BirdEye" },
+
                 { "sptUsec", "PMC Usec" },
                 { "sptBear", "PMC Bear" },
                 { "exUsec", "Rogue" },
                 { "pmcBot", "Raider" },
                 { "sectantPriest", "Cultist Priest" },
                 { "sectantWarrior", "Cultist" },
-                { "arenaFighterEvent", "Bloodhound" }
+                { "arenaFighterEvent", "Bloodhound" },
+                { "bossBully", "Rashala" },
+                { "followerBully", "Rashala Guard" },
+                { "bossKojaniy", "Shturman" },
+                { "followerKojaniy", "Shturman Guard" },
+
+                { "bossTagilla", "Tagilla" },
+                { "followerTagilla", "Tagilla Guard" },
+                { "followerSanitar", "Sanitar Guard" },
+                { "bossSanitar", "Sanitar" },
+                { "followerGluharSnipe", "Gluhar Guard Snipe" },
+                { "followerGluharScout", "Gluhar Guard Scout" },
+                { "followerGluharSecurity", "Gluhar Guard Security" },
+                { "followerGluharAssault", "Gluhar Guard Assault" },
+                { "bossGluhar", "Gluhar" },
+                { "bossKilla", "Killa" },
+                { "bossZryachiy", "Zryachiy" },
+                { "followerZryachiy", "Zryachiy Guard" }
             };
 
         public static void UpdatePreset(SAINBotPreset preset)
@@ -245,64 +313,96 @@ namespace SAIN
             }
         }
 
-        public static SAINBotPreset CopyAllProperties(SAINBotPreset target, SAINBotPreset source)
+        public static SAINBotPreset CopyAllProperties(SAINBotPreset target, SAINBotPreset source, BotDifficulty difficulty)
         {
             foreach (PropertyInfo property in Properties)
             {
-                Copy(target, source, property);
+                Copy(target, source, property, difficulty);
             }
             return target;
         }
 
-        public static SAINBotPreset Copy(SAINBotPreset target, SAINBotPreset source, PropertyInfo property)
+        public static SAINBotPreset Copy(SAINBotPreset target, SAINBotPreset source, PropertyInfo property, BotDifficulty difficulty)
         {
             var targetProp = property.GetValue(target);
             var sourceProp = property.GetValue(source);
-            Copy(targetProp, sourceProp);
+            Copy(targetProp, sourceProp, difficulty);
             return target;
         }
 
-        public static void Copy(object targetProp, object sourceProp)
+        public static void Copy(object targetProp, object sourceProp, BotDifficulty difficulty)
         {
             if (targetProp is SAINProperty<float> targetFloat && sourceProp is SAINProperty<float> sourceFloat)
             {
-                targetFloat.Value = sourceFloat.Value;
+                targetFloat.SetValue(difficulty, sourceFloat.GetValue(difficulty));
             }
             if (targetProp is SAINProperty<int> targetInt && sourceProp is SAINProperty<int> sourceInt)
             {
-                targetInt.Value = sourceInt.Value;
+                targetInt.SetValue(difficulty, sourceInt.GetValue(difficulty));
             }
             if (targetProp is SAINProperty<bool> targetBool && sourceProp is SAINProperty<bool> sourceBool)
             {
-                targetBool.Value = sourceBool.Value;
+                targetBool.SetValue(difficulty, sourceBool.GetValue(difficulty));
             }
         }
 
-        public static void UpdatePropertyValue<T>(List<SAINBotPreset> presets, PropertyInfo property, T value)
+        public static void UpdatePropertyValue<T>(List<SAINBotPreset> presets, PropertyInfo property, T value, BotDifficulty difficulty)
         {
             for (int i = 0; i < presets.Count; i++)
             {
-                UpdatePropertyValue(presets[i], property, value);
+                UpdatePropertyValue(presets[i], property, value, difficulty);
             }
         }
 
-        public static void UpdatePropertyValue<T>(SAINBotPreset preset, PropertyInfo property, T value)
+        public static void UpdatePropertyValue<T>(SAINBotPreset preset, PropertyInfo property, T value, BotDifficulty difficulty)
         {
             var targetProp = property.GetValue(preset);
             if (targetProp is SAINProperty<T> prop)
             {
-                UpdatePropertyValue(prop, value);
+                UpdatePropertyValue(prop, value, difficulty);
             }
         }
 
-        public static void UpdatePropertyValue<T>(SAINProperty<T> property, T value)
+        public static void UpdatePropertyValue<T>(SAINProperty<T> property, T value, BotDifficulty difficulty)
         {
-            property.Value = value;
+            property.SetValue(difficulty, value);
         }
 
         public static PropertyInfo[] Properties { get; private set; }
 
         private static readonly List<KeyValuePair<WildSpawnType, BotDifficulty>> TypeDiffs = new List<KeyValuePair<WildSpawnType, BotDifficulty>>();
         public static readonly Dictionary<KeyValuePair<WildSpawnType, BotDifficulty>, SAINBotPreset> Presets = new Dictionary<KeyValuePair<WildSpawnType, BotDifficulty>, SAINBotPreset>();
+    }
+
+    public sealed class BotType
+    {
+        public BotType(WildSpawnType type, string name, string section, string description)
+        {
+            OriginalName = type.ToString();
+            Name = name;
+            Description = description;
+            Section = section;
+            WildSpawnType = type;
+        }
+
+        public BotType(string originalName, string name, string section, string description)
+        {
+            OriginalName = originalName;
+            Name = name;
+            Description = description;
+            Section = section;
+            WildSpawnType = SAINBotPresetManager.GetType(originalName);
+        }
+
+        public SAINBotPreset Preset { get; set; }
+
+        public PropertyInfo[] PresetProperties => SAINBotPresetManager.Properties;
+
+        public string OriginalName { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public string Section { get; private set; }
+
+        public WildSpawnType WildSpawnType { get; private set; }
     }
 }

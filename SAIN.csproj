@@ -295,7 +295,7 @@
     <Compile Include="Editor\Util\AssignConfig.cs" />
     <Compile Include="Editor\EditorSettings.cs" />
     <Compile Include="Editor\EditorGUI.cs" />
-    <Compile Include="Editor\Util\BuilderUtil.cs" />
+    <Compile Include="Editor\Component\Util\BuilderUtil.cs" />
     <Compile Include="Editor\Util\RectLayout.cs" />
     <Compile Include="Editor\Util\Styles.cs" />
     <Compile Include="Editor\Util\ToolTips.cs" />

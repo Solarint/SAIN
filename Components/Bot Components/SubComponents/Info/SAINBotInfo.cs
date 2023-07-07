@@ -81,7 +81,7 @@ namespace SAIN.Classes
 
         private int GroupCount = 0;
 
-        public bool CanBotTalk => TalkGlobal.Value && BotPresetClass?.DifficultyPreset?.CanTalk.Value == true;
+        public bool CanBotTalk => TalkGlobal.Value && BotPresetClass?.DifficultyPreset?.CanTalk.GetValue(BotDifficulty) == true;
 
         public float HoldGroundDelay { get; private set; }
 

@@ -31,9 +31,9 @@ namespace SAIN.Classes
         public void UpdateSettings()
         {
             var core = BotOwner.Settings.FileSettings.Core;
-            core.VisibleDistance = DifficultyPreset.VisibleDistance.Value;
-            core.VisibleAngle = DifficultyPreset.VisibleAngle.Value;
-            core.CanGrenade = DifficultyPreset.CanUseGrenades.Value;
+            core.VisibleDistance = DifficultyPreset.VisibleDistance.GetValue(BotDifficulty);
+            core.VisibleAngle = DifficultyPreset.VisibleAngle.GetValue(BotDifficulty);
+            core.CanGrenade = DifficultyPreset.CanUseGrenades.GetValue(BotDifficulty);
         }
 
         public SAINBotPreset DifficultyPreset { get; private set; }

@@ -18,39 +18,19 @@ namespace SAIN.Editor
         private static GUILayoutOption ResultWidth => GUILayout.Width(SliderResultWidth.Value);
         private static GUILayoutOption LabeltWidth => GUILayout.Width(SliderLabelWidth.Value);
 
-        public static bool ExpandableMenu(string name, bool value, string description = null, float indent = 0f)
-        {
-            // Add a Rect for the background
-            Rect backgroundRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(RectLayout.MainWindow.width), GUILayout.Height(25));
-            //GUI.DrawTexture(backgroundRect, Util.Colors.TextureDarkBlue);
 
-            GUILayout.BeginHorizontal();
-            if (indent != 0f)
-            {
-                GUILayout.Space(indent);
-            }
+        public static bool ExpandableMenu(string name, bool value, string description = null)
+        {
             Buttons.InfoBox(description);
             GUILayout.Label(name, Height, ExpandWidth);
-            if (GUILayout.Button(ExpandCollapse(value), Height, ExpandWidth))
-            {
-                value = !value;
-            }
-            GUILayout.FlexibleSpace();
-            GUILayout.EndHorizontal();
-
-            return value;
+            return GUILayout.Toggle(value, value ? "[Collapse]" : "[Expand]");
         }
 
-        private static string ExpandCollapse(bool value)
-        {
-            return value ? "[Collapse]" : "[Expand]";
-        }
-
-        public static bool CreateButtonOption(ConfigEntry<bool> entry, string name, string description = null)
+        public static bool CreateButtonOption(ConfigEntry<bool> entry)
         {
             bool value = false;
             GUILayout.BeginHorizontal();
-            if (Buttons.ButtonConfigEntry(entry, name))
+            if (Buttons.ButtonConfigEntry(entry))
             {
                 value = true;
             }
@@ -58,11 +38,11 @@ namespace SAIN.Editor
             return value;
         }
 
-        public static bool CreateButtonOption(SAINProperty<bool> entry)
+        public static bool CreateButtonOption(SAINProperty<bool> entry, BotDifficulty difficulty)
         {
             bool value = false;
             GUILayout.BeginHorizontal();
-            if (Buttons.ButtonProperty(entry))
+            if (Buttons.ButtonProperty(entry, difficulty))
             {
                 value = true;
             }
@@ -70,29 +50,67 @@ namespace SAIN.Editor
             return value;
         }
 
-        public static float HorizSlider<T>(string name, ConfigEntry<T> entry, float min, float max, float rounding = 1f, string description = "", bool assignConfig = true)
+        public static void HorizSlider<T>(ConfigEntry<T> entry, float rounding)
         {
             GUILayout.BeginHorizontal();
 
-            Buttons.InfoBox(description);
-            GUILayout.Box(name, LabeltWidth, Height);
-            GUILayout.Box(min.ToString(), BlankBoxBG, MinMaxWidth, Height);
-            CheckMouse("Min");
+            Buttons.InfoBox(entry.Description.Description);
+            GUILayout.Box(entry.Definition.Key, LabeltWidth, Height);
 
-            float result = CreateSlider(entry, min, max, rounding, assignConfig);
+            object min = MinMax(entry, out object max);
 
-            GUILayout.Box(max.ToString(), BlankBoxBG, MinMaxWidth, Height);
-            CheckMouse("Max");
+            if (min != null)
+            {
+                GUILayout.Box(min.ToString(), BlankBoxBG, MinMaxWidth, Height);
+                CheckMouse("Min");
+            }
+
+            if (ReturnFloat(entry, out float sliderValue))
+            {
+                sliderValue = CreateSlider(sliderValue, min, max, rounding);
+                AssignValue(entry, sliderValue);
+            }
+            else
+            {
+                bool boolValue = (bool)(object)entry.Value;
+                boolValue = GUILayout.Toggle((bool)(object)entry.Value, boolValue ? "On" : "Off");
+                AssignValue((ConfigEntry<bool>)(object)entry, boolValue);
+            }
+
+            if (max != null)
+            {
+                GUILayout.Box(max.ToString(), BlankBoxBG, MinMaxWidth, Height);
+                CheckMouse("Max");
+            }
 
             GUILayout.Box(entry.Value.ToString(), ResultWidth, Height);
             GUILayout.FlexibleSpace();
             Buttons.ResetButton(entry);
             GUILayout.EndHorizontal();
-            return result;
         }
 
-        public static float HorizSlider(SAINProperty<float> entry)
+        private static object MinMax<T>(ConfigEntry<T> entry, out object max)
         {
+            if (entry?.Description?.AcceptableValues == null || entry.SettingType == typeof(bool))
+            {
+                max = null;
+                return null;
+            }
+            if (entry.SettingType == typeof(float))
+            {
+                max = entry.Description.AcceptableValues.Clamp(float.MaxValue);
+                return entry.Description.AcceptableValues.Clamp(float.MinValue);
+            }
+            else
+            {
+                max = entry.Description.AcceptableValues.Clamp(int.MaxValue);
+                return entry.Description.AcceptableValues.Clamp(int.MinValue);
+            }
+        }
+
+        public static void HorizSlider(SAINProperty<float> entry, BotDifficulty difficulty)
+        {
+            float value = entry.GetValue(difficulty);
             GUILayout.BeginHorizontal();
 
             Buttons.InfoBox(entry.Description);
@@ -103,15 +121,16 @@ namespace SAIN.Editor
             GUILayout.Box(entry.Min.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Min");
 
-            entry.Value = CreateSlider(entry.Value, entry.Min, entry.Max, entry.Rounding);
+            value = CreateSlider(value, entry.Min, entry.Max, entry.Rounding);
 
             GUILayout.Box(entry.Max.ToString(), BlankBoxBG, MinMaxWidth, Height);
             CheckMouse("Max");
 
-            GUILayout.Box(entry.Value.ToString(), ResultWidth, Height);
+            GUILayout.Box(value.ToString(), ResultWidth, Height);
             Buttons.ResetButton(entry);
             GUILayout.EndHorizontal();
-            return entry.Value;
+
+            entry.SetValue(difficulty, value);
         }
 
         public static float HorizSlider(string name, float value, float min, float max, float rounding = 1f, string description = null)
@@ -135,23 +154,20 @@ namespace SAIN.Editor
             return result;
         }
 
-        private static float CreateSlider<T>(ConfigEntry<T> entry, float min, float max, float rounding = 1f, bool assignConfig = true)
+        private static float CreateSlider<T>(ConfigEntry<T> entry, object min, object max, float rounding = 1f)
         {
             if (ReturnFloat(entry, out float sliderValue))
             {
                 sliderValue = CreateSlider(sliderValue, min, max, rounding);
-                if (assignConfig)
-                {
-                    AssignValue(entry, sliderValue);
-                }
+                AssignValue(entry, sliderValue);
             }
             return sliderValue;
         }
 
-        private static float CreateSlider(float value, float min, float max, float rounding = 1f)
+        private static float CreateSlider(float value, object min, object max, float rounding = 1f)
         {
-            float progress = (value - min) / (max - min);
-            value = GUILayout.HorizontalSlider(value, min, max, SlWidth, Height);
+            float progress = (value - (float)min) / ((float)max - (float)min);
+            value = GUILayout.HorizontalSlider(value, (float)min, (float)max, SlWidth, Height);
             DrawSliderBackGrounds(progress);
 
             value = Mathf.Round(value * rounding) / rounding;

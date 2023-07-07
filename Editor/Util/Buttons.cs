@@ -28,26 +28,41 @@ namespace SAIN.Editor
             CheckMouse(description);
         }
 
-        public static bool ButtonConfigEntry(ConfigEntry<bool> entry, string name, string description = null)
+        public static bool ButtonConfigEntry(ConfigEntry<bool> entry)
         {
-            InfoBox(description);
-            GUILayout.Box(name, GUILayout.Height(Height));
+            InfoBox(entry.Description.Description);
+
+            GUILayout.Box(entry.Definition.Key, GUILayout.Height(Height));
+
             GUILayout.Space(25);
+
             entry.Value = Button(null, entry.Value, Height);
+
             GUILayout.Space(25);
+
             ResetButton(entry);
+
             return entry.Value;
         }
 
-        public static bool ButtonProperty(SAINProperty<bool> entry)
+        public static bool ButtonProperty(SAINProperty<bool> entry, BotDifficulty difficulty)
         {
+            bool value = entry.GetValue(difficulty);
+
             InfoBox(entry.Description);
+
             GUILayout.Box(entry.Name, GUILayout.Height(Height));
+
             GUILayout.Space(25);
-            entry.Value = Button(null, entry.Value, Height);
+
+            value = Button(null, value, Height);
+
             GUILayout.Space(25);
+
             ResetButton(entry);
-            return entry.Value;
+
+            entry.SetValue(difficulty, value);
+            return value;
         }
 
         private const float ResetWidth = 60f;
@@ -65,7 +80,18 @@ namespace SAIN.Editor
             if (GUILayout.Button("Reset", GUILayout.Width(ResetWidth), GUILayout.Height(Height)))
             {
                 MenuClickSound();
-                DefaultValue(entry);
+                if (entry is ConfigEntry<float> floatEntry)
+                {
+                    floatEntry.Value = (float)floatEntry.DefaultValue;
+                }
+                if (entry is ConfigEntry<int> intEntry)
+                {
+                    intEntry.Value = (int)intEntry.DefaultValue;
+                }
+                if (entry is ConfigEntry<bool> boolEntry)
+                {
+                    boolEntry.Value = (bool)boolEntry.DefaultValue;
+                }
             }
         }
 

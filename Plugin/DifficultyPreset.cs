@@ -1,9 +1,5 @@
-﻿using BepInEx.Configuration;
-using EFT;
+﻿using EFT;
 using Newtonsoft.Json;
-using SAIN.Editor;
-using SAIN.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -12,6 +8,10 @@ namespace SAIN
     public class SAINBotPreset
     {
         [JsonConstructor]
+        public SAINBotPreset()
+        {
+        }
+
         public SAINBotPreset(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
         {
             KeyPair = keypair;
@@ -245,15 +245,7 @@ namespace SAIN
     public class SAINProperty<T>
     {
         [JsonConstructor]
-        public SAINProperty(string name, T defaultValue, T minValue, T maxValue, string description, float rounding = 1f, bool unused = true)
-        {
-            Name = name;
-            DefaultVal = defaultValue;
-            Min = minValue;
-            Max = maxValue;
-            Description = description;
-            Rounding = rounding;
-        }
+        public SAINProperty() {}
 
         public SAINProperty(string name, T defaultVal, T minVal, T maxVal, string description = null, float rounding = 1f)
         {
@@ -263,7 +255,13 @@ namespace SAIN
             Min = minVal;
             Max = maxVal;
             Rounding = rounding;
-            Value = defaultVal;
+
+            T Value = defaultVal;
+
+            DifficultyValue.Add(BotDifficulty.easy, Value);
+            DifficultyValue.Add(BotDifficulty.normal, Value);
+            DifficultyValue.Add(BotDifficulty.hard, Value);
+            DifficultyValue.Add(BotDifficulty.impossible, Value);
         }
 
         public SAINProperty(string name, string description, bool defaultVal)
@@ -273,8 +271,17 @@ namespace SAIN
             DefaultVal = (T)(object)defaultVal;
             Min = (T)(object)false;
             Max = (T)(object)true;
-            Value = (T)(object)defaultVal;
+
+            T Value = (T)(object)defaultVal;
+
+            DifficultyValue.Add(BotDifficulty.easy, Value);
+            DifficultyValue.Add(BotDifficulty.normal, Value);
+            DifficultyValue.Add(BotDifficulty.hard, Value);
+            DifficultyValue.Add(BotDifficulty.impossible, Value);
         }
+
+        [JsonProperty]
+        public Dictionary<BotDifficulty, T> DifficultyValue { get; set; } = new Dictionary<BotDifficulty, T>();
 
         [JsonProperty]
         public readonly float Rounding;
@@ -289,7 +296,13 @@ namespace SAIN
         [JsonProperty]
         public readonly T Max;
 
-        [JsonProperty]
-        public T Value { get; set; }
+        public T GetValue(BotDifficulty difficulty)
+        {
+            return DifficultyValue[difficulty];
+        }
+        public void SetValue(BotDifficulty difficulty, T Value)
+        {
+            DifficultyValue[difficulty] = Value;
+        }
     }
 }
