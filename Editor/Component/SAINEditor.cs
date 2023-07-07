@@ -3,6 +3,7 @@ using Comfort.Common;
 using EFT.Console.Core;
 using EFT.UI;
 using UnityEngine;
+using System;
 using static SAIN.Editor.Buttons;
 using static SAIN.Editor.ConfigValues;
 using static SAIN.Editor.EditorSettings;
@@ -15,15 +16,32 @@ using static SAIN.Editor.GUISections.Toolbar;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
 using SAIN.Helpers;
+using Colors = SAIN.Editor.Util.Colors;
 using Font = UnityEngine.Font;
 
 namespace SAIN.Editor
 {
-    public class EditorGUI
+    public class SAINEditor : MonoBehaviour
     {
-        public EditorGUI()
+        void Awake()
         {
+            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(EditorGUI.OpenPanel));
+
+            TogglePanel = SAINPlugin.SAINConfig.Bind("SAIN Settings Editor", "", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
+
+            PresetEditor.Init();
+
+            Textures = new Textures(gameObject);
+            Colors = new Colors(gameObject);
         }
+
+        void Start()
+        {
+            Textures.Init();
+        }
+
+        public Colors Colors { get; private set; }
+        public Textures Textures { get; private set; }
 
         public static EditorCustomization Settings { get; private set; }
 
@@ -31,7 +49,7 @@ namespace SAIN.Editor
 
         private static GameObject input;
 
-        private static bool guiStatus = false;
+        private static bool MainWindowOpen = false;
 
         [ConsoleCommand("Open SAIN Difficulty Editor")]
         public static void OpenPanel()
@@ -41,9 +59,9 @@ namespace SAIN.Editor
                 input = GameObject.Find("___Input");
             }
 
-            guiStatus = !guiStatus;
-            Cursor.visible = guiStatus;
-            if (guiStatus)
+            MainWindowOpen = !MainWindowOpen;
+            Cursor.visible = MainWindowOpen;
+            if (MainWindowOpen)
             {
                 CursorSettings.SetCursor(ECursorType.Idle);
                 Cursor.lockState = CursorLockMode.None;
@@ -55,18 +73,16 @@ namespace SAIN.Editor
                 Cursor.lockState = CursorLockMode.Locked;
                 Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuDropdown);
             }
-            input.SetActive(!guiStatus);
+            input.SetActive(!MainWindowOpen);
             ConsoleScreen.Log("[SAIN]: Opening Editor...");
         }
 
         private bool CloseEditor;
 
-        public void Update()
+        void Update()
         {
-            if ((Input.GetKeyDown(KeyCode.Escape) && guiStatus) || Input.GetKeyDown(TogglePanel.Value.MainKey) || CloseEditor)
+            if ((Input.GetKeyDown(KeyCode.Escape) && MainWindowOpen) || Input.GetKeyDown(TogglePanel.Value.MainKey) || CloseEditor)
             {
-                JsonUtility.SaveToJson.EditorSettings(Settings);
-                SelectedTab = 0;
                 CloseEditor = false;
                 //Caching input manager GameObject which script is responsible for reading the player inputs
                 if (input == null)
@@ -74,9 +90,9 @@ namespace SAIN.Editor
                     input = GameObject.Find("___Input");
                 }
 
-                guiStatus = !guiStatus;
-                Cursor.visible = guiStatus;
-                if (guiStatus)
+                MainWindowOpen = !MainWindowOpen;
+                Cursor.visible = MainWindowOpen;
+                if (MainWindowOpen)
                 {
                     //Changing the default windows cursor to an EFT-style one and playing a sound when the menu appears
                     CursorSettings.SetCursor(ECursorType.Idle);
@@ -91,12 +107,12 @@ namespace SAIN.Editor
                     Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuDropdown);
                 }
                 //Disabling the input manager so the player won't move
-                input.SetActive(!guiStatus);
+                input.SetActive(!MainWindowOpen);
             }
         }
 
         private static Vector2 ScaledPivot;
-        public void OnGUI()
+        void OnGUI()
         {
             if (!Inited)
             {
@@ -113,7 +129,7 @@ namespace SAIN.Editor
                 InitStyles();
                 ScaledPivot = new Vector2(ScalingFactor, ScalingFactor);
             }
-            if (guiStatus)
+            if (MainWindowOpen)
             {
                 GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
                 ApplyTextures(GUI.skin.window, Backgrounds[SelectedTab]);
@@ -236,14 +252,6 @@ namespace SAIN.Editor
                 if (GUILayout.Button("Font"))
                 {
                     OpenFontMenu = !OpenFontMenu;
-                }
-                if (GUILayout.Button("Reset Advanced to Default"))
-                {
-                    MenuClickSound();
-                }
-                if (GUILayout.Button("Reset ALL Settings"))
-                {
-                    ResetClickSound();
                 }
                 if (GUILayout.Button("Mysterious Button"))
                 {

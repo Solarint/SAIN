@@ -42,7 +42,7 @@ namespace SAIN.Patches
                 float scale = dist / 30f;
                 scale = Mathf.Clamp(scale, min, 1f);
                 float newResult = __result * scale;
-                //Logger.LogWarning($"New Aim Time: [{newResult}] Old Aim Time: [{__result}] Distance: [{dist}]");
+                //DefaultLogger.LogWarning($"New Aim Time: [{newResult}] Old Aim Time: [{__result}] Distance: [{dist}]");
                 __result = newResult;
             }
         }

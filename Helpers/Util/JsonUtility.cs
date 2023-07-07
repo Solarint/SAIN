@@ -14,6 +14,8 @@ namespace SAIN.Helpers
 {
     public static class JsonUtility
     {
+        private static ManualLogSource Logger => Utility.Logger;
+
         public static string BotPresetPath(WildSpawnType type, BotDifficulty difficulty)
         {
             string path = GetPluginPath("SAIN");
@@ -262,6 +264,5 @@ namespace SAIN.Helpers
         }
 
         private static readonly string PluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource("JsonUtility");
     }
 }

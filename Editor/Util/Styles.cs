@@ -43,21 +43,21 @@ namespace SAIN.Editor
             GUI.skin.toggle.alignment = TextAnchor.MiddleCenter;
             GUI.skin.toggle.fontStyle = FontStyle.Bold;
 
-            ApplyTextures(GUI.skin.toggle, TexMidGray, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed);
-
-            ApplyTextures(GUI.skin.button, TexMidGray, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed);
-            ApplyTextures(GUI.skin.horizontalSlider, null);
-
-            ApplyTextures(GUI.skin.verticalScrollbar, TexVeryDarkGray);
-
-            ApplyTextures(GUI.skin.verticalScrollbarThumb, TextureDarkRed);
-            
-            ApplyTextures(GUI.skin.verticalScrollbarUpButton, TexDarkGray);
-
-            ApplyTextures(GUI.skin.verticalScrollbarDownButton, TexDarkGray);
-
-            ApplyTextures(GUI.skin.box, TexVeryDarkGray);
-            ApplyTextures(GUI.skin.label, TexVeryDarkGray);
+            //ApplyTextures(GUI.skin.toggle, TexMidGray, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed);
+            //
+            //ApplyTextures(GUI.skin.button, TexMidGray, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed, TextureLightRed, TextureDarkRed);
+            //ApplyTextures(GUI.skin.horizontalSlider, null);
+            //
+            //ApplyTextures(GUI.skin.verticalScrollbar, TexVeryDarkGray);
+            //
+            //ApplyTextures(GUI.skin.verticalScrollbarThumb, TextureDarkRed);
+            //
+            //ApplyTextures(GUI.skin.verticalScrollbarUpButton, TexDarkGray);
+            //
+            //ApplyTextures(GUI.skin.verticalScrollbarDownButton, TexDarkGray);
+            //
+            //ApplyTextures(GUI.skin.box, TexVeryDarkGray);
+            //ApplyTextures(GUI.skin.label, TexVeryDarkGray);
 
 
             GUI.skin.window.normal.textColor = Color.white;

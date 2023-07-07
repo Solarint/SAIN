@@ -26,7 +26,7 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             TimeEnemyCreated = Time.time;
 
-            //Logger.LogInfo($"New Enemy [{person.GetPlayer.name}] for {BotOwner.name}");
+            //DefaultLogger.LogInfo($"New Enemy [{person.GetPlayer.name}] for {BotOwner.name}");
 
             //BifacialTransform bottransform = bot.Transform;
             //BodyPartType type;

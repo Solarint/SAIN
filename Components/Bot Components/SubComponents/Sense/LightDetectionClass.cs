@@ -39,7 +39,7 @@ namespace SAIN.Components
             float randomYawAngle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
             float randomPitchAngle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
 
-            // Create a Quaternion rotation based on the random yaw and pitch angles
+            // Add a Quaternion rotation based on the random yaw and pitch angles
             Quaternion randomRotation = Quaternion.Euler(randomPitchAngle, randomYawAngle, 0);
 
             // Rotate the player's look direction by the Quaternion rotation

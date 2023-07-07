@@ -61,7 +61,7 @@ namespace SAIN.Patches
 
                         finalTarget -= vertOffset;
 
-                        //Logger.LogWarning("Headshot protection activated");
+                        //DefaultLogger.LogWarning("Headshot protection activated");
                         DebugGizmos.SingleObjects.Line(headPos, finalTarget, Color.red, 0.1f, true, 5f);
                         DebugGizmos.SingleObjects.Sphere(finalTarget, 0.1f, Color.red, true, 10f);
                         DebugGizmos.SingleObjects.Line(headPos, ___botOwner_0.WeaponRoot.position, Color.red, 0.025f, true, 5f);

@@ -8,6 +8,7 @@ using SAIN.Editor;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using UnityEngine;
+using Comfort.Common;
 
 namespace SAIN
 {
@@ -33,18 +34,18 @@ namespace SAIN
             {
                 throw new Exception("Missing BigBrain");
             }
+
             SAINBotPresetManager.Init();
-            PresetEditor.Init();
 
             ConfigInit();
             EFTPatches.Init();
             BigBrainSAIN.Init();
 
-            UITextures.LoadTextures();
-            EditorGUI = new EditorGUI();
-
             ModsCheckTimer = Time.time + 5f;
         }
+
+        public static SAINEditor SAINEditor { get; private set; }
+        private static GameObject EditorObject { get; set; }
 
         private void ConfigInit()
         {
@@ -63,7 +64,12 @@ namespace SAIN
 
         private void Update()
         {
-            EditorGUI.Update();
+            if (SAINEditor == null)
+            {
+                EditorObject = new GameObject("SAINEditorObject");
+                SAINEditor = EditorObject.GetOrAddComponent<SAINEditor>();
+            }
+            //EditorGUI.Update();
             BotControllerHandler.Update();
 
             if (!ModsChecked && ModsCheckTimer < Time.time)
@@ -81,11 +87,6 @@ namespace SAIN
                     Logger.LogInfo("SAIN: Looting Bots Detected.");
                 }
             }
-        }
-
-        private void OnGUI()
-        {
-            EditorGUI.OnGUI();
         }
 
         private float ModsCheckTimer;

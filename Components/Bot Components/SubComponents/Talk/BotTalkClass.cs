@@ -280,7 +280,7 @@ namespace SAIN.Classes
         {
             if (!PhraseDictionary.ContainsKey(trigger))
             {
-                //Logger.LogError($"Phrase [{trigger}] is not in dictionary, adding it.");
+                //DefaultLogger.LogError($"Phrase [{trigger}] is not in dictionary, adding it.");
 
                 var phrase = new PhraseInfo(trigger, 10, 20f);
                 Phrases.Add(phrase);

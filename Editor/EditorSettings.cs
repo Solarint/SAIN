@@ -84,14 +84,6 @@ namespace SAIN.Editor
         {
             EditorParameters.Init();
 
-            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(EditorGUI.OpenPanel));
-
-            EditorGUI.TogglePanel = SAINConfig.Bind(
-                "SAIN Settings Editor",
-                "",
-                new KeyboardShortcut(KeyCode.F5),
-                "The keyboard shortcut that toggles editor");
-
             // General
             NoBushESPToggle = Bind(nameof(NoBushESPToggle), true);
             HeadShotProtection = Bind(nameof(HeadShotProtection), true);

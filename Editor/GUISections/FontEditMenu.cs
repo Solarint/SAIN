@@ -39,11 +39,11 @@ namespace SAIN.Editor.GUISections
                 FontButtonStyle.font = font;
                 if (GUI.skin.font == font)
                 {
-                    FontButtonStyle.normal.background = Colors.TextureDarkRed;
+                    //FontButtonStyle.normal.background = Colors.TextureDarkRed;
                 }
                 else
                 {
-                    FontButtonStyle.normal.background = Colors.TexMidGray;
+                    //FontButtonStyle.normal.background = Colors.TexMidGray;
                 }
                 if (GUILayout.Button(font.name, FontButtonStyle, GUILayout.Height(25), GUILayout.Width(125)))
                 {

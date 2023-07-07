@@ -74,7 +74,7 @@ namespace SAIN.Editor
             Texture2D old = GUI.skin.button.normal.background;
             if (value == true)
             {
-                GUI.skin.button.normal.background = Colors.TextureDarkRed;
+                //GUI.skin.button.normal.background = Colors.TextureDarkRed;
             }
             name = name ?? ToggleOnOff(value.Value);
 

@@ -20,9 +20,9 @@ namespace SAIN.Editor
 
         public static bool ExpandableMenu(string name, bool value, string description = null, float indent = 0f)
         {
-            // Create a Rect for the background
+            // Add a Rect for the background
             Rect backgroundRect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none, GUILayout.Width(RectLayout.MainWindow.width), GUILayout.Height(25));
-            GUI.DrawTexture(backgroundRect, Util.Colors.TextureDarkBlue);
+            //GUI.DrawTexture(backgroundRect, Util.Colors.TextureDarkBlue);
 
             GUILayout.BeginHorizontal();
             if (indent != 0f)

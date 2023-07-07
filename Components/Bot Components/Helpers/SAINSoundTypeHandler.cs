@@ -32,18 +32,18 @@ namespace SAIN.Components.Helpers
 
             if (Item != null)
             {
-                //Logger.LogInfo($"Item: {Item.GetType().Name} : Sound {sound}");
+                //DefaultLogger.LogInfo($"Item: {Item.GetType().Name} : Sound {sound}");
                 if (Item is GrenadeClass)
                 {
                     if (sound == "Pin")
                     {
-                        //Logger.LogWarning("Grenade Pin!");
+                        //DefaultLogger.LogWarning("Grenade Pin!");
                         soundType = SAINSoundType.GrenadePin;
                         soundDist = 15f;
                     }
                     if (sound == "Draw")
                     {
-                        //Logger.LogWarning("Grenade Draw!");
+                        //DefaultLogger.LogWarning("Grenade Draw!");
                         soundType = SAINSoundType.GrenadeDraw;
                         soundDist = 15f;
                     }
@@ -52,7 +52,7 @@ namespace SAIN.Components.Helpers
                 {
                     if (sound == "CapRemove" || sound == "Inject")
                     {
-                        //Logger.LogWarning("Heal!");
+                        //DefaultLogger.LogWarning("Heal!");
                         soundType = SAINSoundType.Heal;
                         soundDist = 15f;
                     }
@@ -61,7 +61,7 @@ namespace SAIN.Components.Helpers
                 {
                     if (sound == "MagOut")
                     {
-                        //Logger.LogWarning("Weapon Reload!");
+                        //DefaultLogger.LogWarning("Weapon Reload!");
                         soundType = SAINSoundType.Reload;
                         soundDist = 20f;
                     }

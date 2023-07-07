@@ -1,40 +1,34 @@
-﻿using UnityEngine;
-using System.IO;
-using static SAIN.Editor.EditorParameters;
-using static SAIN.Editor.Styles;
-using static SAIN.Editor.RectLayout;
+﻿using SAIN.Editor;
+using UnityEngine;
 
-namespace SAIN.Editor
+namespace SAIN.Helpers.Textures
 {
-    internal class UITextures
+    internal static class Modify
     {
-        public static Texture2D[] Backgrounds { get; private set; } = new Texture2D[TabCount];
-
-        public static void LoadTextures()
+        public static Texture2D[] CreateNewBackgrounds(Recolor recolor, string path, int count = 4)
         {
-            string imagePath = "BepInEx/plugins/SAINUI/background.png"; // Specify the path of the saved texture
-
-            byte[] textureBytes = File.ReadAllBytes(imagePath);
-            Texture2D loadedTexture = new Texture2D(1296, 1728); // Add a new Texture2D
-
-            loadedTexture.LoadImage(textureBytes);
-            for (int i = 0; i < TabCount; i++)
+            Texture2D texture = Load.Single(path);
+            if (texture == null)
             {
-                var rotated = RotateTexture(loadedTexture);
-                var recolored = RecolorTexture(rotated, -0.05f, -0.15f, -0.15f);
-                Backgrounds[i] = recolored;
+                return null;
             }
+            Texture2D[] Backgrounds = new Texture2D[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                float angle = i * 90f;
+                var rotated = RotateTexture(texture, angle);
+                Backgrounds[i] = RecolorTexture(rotated, recolor.R, recolor.G, recolor.B);
+            }
+            return Backgrounds;
         }
 
-        private static Texture2D RotateTexture(Texture2D originalTexture)
+        public static Texture2D RotateTexture(Texture2D originalTexture, float rotationAngle)
         {
             int width = originalTexture.width;
             int height = originalTexture.height;
 
             Texture2D rotatedTexture = new Texture2D(width, height);
-
-            // Generate a random rotation angle in degrees
-            float rotationAngle = Random.Range(0f, 360f);
 
             // Calculate the pivot point for rotation
             Vector2 pivot = new Vector2(width / 2f, height / 2f);
@@ -64,7 +58,7 @@ namespace SAIN.Editor
             return rotatedTexture;
         }
 
-        private static Texture2D RecolorTexture(Texture2D originalTexture, float R, float G, float B)
+        public static Texture2D RecolorTexture(Texture2D originalTexture, float R, float G, float B)
         {
             int width = originalTexture.width;
             int height = originalTexture.height;
@@ -99,7 +93,7 @@ namespace SAIN.Editor
             return recoloredTexture;
         }
 
-        public static Texture2D CreateTexture(int width, int height, int borderSize = 5, Color fillColor = default, Color borderColor = default)
+        public static Texture2D CreateTextureWithBorder(int width, int height, int borderSize = 5, Color fillColor = default, Color borderColor = default)
         {
             fillColor = fillColor == default ? Color.white : fillColor;
             borderColor = borderColor == default ? Color.red : borderColor;
@@ -128,18 +122,5 @@ namespace SAIN.Editor
             return texture;
         }
 
-        public static Rect DrawSliderBackGrounds(float progress)
-        {
-            Rect lastRect = GUILayoutUtility.GetLastRect();
-            float lineHeight = 5f;
-            float filledY = lastRect.y + (lastRect.height - lineHeight * 2f) * 0.5f;
-            float sliderY = lastRect.y + (lastRect.height - lineHeight) * 0.5f;
-            Rect Filled = new Rect(lastRect.x, filledY, lastRect.width * progress, lineHeight * 2f);
-            Rect Background = new Rect(lastRect.x, sliderY, lastRect.width, lineHeight);
-
-            GUI.DrawTexture(Background, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, Color.white, 0, 0);
-            GUI.DrawTexture(Filled, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(1f, 0.25f, 0.25f), 0, 0);
-            return lastRect;
-        }
     }
 }

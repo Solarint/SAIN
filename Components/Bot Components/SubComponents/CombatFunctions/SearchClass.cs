@@ -196,7 +196,7 @@ namespace SAIN.Classes
             var SqrMagnitude = (point - BotOwner.Position).sqrMagnitude;
             if (SqrMagnitude <= 0.5f)
             {
-                //Logger.LogInfo($"Search Destination is too close. SqrMagnitude: [{SqrMagnitude}]");
+                //DefaultLogger.LogInfo($"Search Destination is too close. SqrMagnitude: [{SqrMagnitude}]");
                 return NavMeshPathStatus.PathInvalid;
             }
 
@@ -253,7 +253,7 @@ namespace SAIN.Classes
                 return Path.status;
             }
 
-            //Logger.LogError($"Couldn't Find NavMesh at Point {point}");
+            //DefaultLogger.LogError($"Couldn't Find NavMesh at Point {point}");
             return NavMeshPathStatus.PathInvalid;
         }
 
