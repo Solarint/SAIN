@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.IO;
 using static SAIN.Editor.EditorParameters;
-using static SAIN.Editor.Styles;
+using static SAIN.Editor.StyleOptions;
 using static SAIN.Editor.RectLayout;
 
 namespace SAIN.Editor
@@ -15,7 +15,7 @@ namespace SAIN.Editor
             string imagePath = "BepInEx/plugins/SAINUI/background.png"; // Specify the path of the saved texture
 
             byte[] textureBytes = File.ReadAllBytes(imagePath);
-            Texture2D loadedTexture = new Texture2D(1296, 1728); // Add a new Texture2D
+            Texture2D loadedTexture = new Texture2D(1296, 1728); // AddToScheme a new Texture2D
 
             loadedTexture.LoadImage(textureBytes);
             for (int i = 0; i < TabCount; i++)
@@ -43,13 +43,13 @@ namespace SAIN.Editor
             {
                 for (int x = 0; x < width; x++)
                 {
-                    // Calculate the position relative to the pivot
+                    // Calculate the DrawPosition relative to the pivot
                     Vector2 position = new Vector2(x, y) - pivot;
 
-                    // Apply rotation to the position
+                    // Apply rotation to the DrawPosition
                     Vector2 rotatedPosition = Quaternion.Euler(0f, 0f, rotationAngle) * position;
 
-                    // Calculate the final position after rotation
+                    // Calculate the final DrawPosition after rotation
                     Vector2 finalPosition = rotatedPosition + pivot;
 
                     // Get the pixel color from the original texture
@@ -87,7 +87,7 @@ namespace SAIN.Editor
                     adjustedGreen = Mathf.Clamp01(adjustedGreen);
                     adjustedBlue = Mathf.Clamp01(adjustedBlue);
 
-                    // Add a new Color with adjusted channel values
+                    // AddToScheme a new Color with adjusted channel values
                     Color adjustedPixel = new Color(adjustedRed, adjustedGreen, adjustedBlue, originalPixel.a);
 
                     recoloredTexture.SetPixel(x, y, adjustedPixel);

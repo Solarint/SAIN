@@ -478,7 +478,7 @@ namespace SAIN.Helpers
         /// </summary>
         /// <param name="transform">The parent transform.</param>
         /// <param name="name">The name of the child transforms to search for.</param>
-        /// <param name="onlyActive">Whether to only include active child transforms.</param>
+        /// <param name="onlyActive">Whether to only include Active child transforms.</param>
         /// <returns>A list of child transforms with the given name.</returns>
         public static List<Transform> GetChildsName(Transform transform, string name, bool onlyActive = true)
         {

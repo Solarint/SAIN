@@ -1,4 +1,6 @@
 ﻿using EFT;
+using SAIN.BotPresets;
+using static HBAO_Core;
 
 namespace SAIN.Classes
 {
@@ -7,36 +9,28 @@ namespace SAIN.Classes
         public BotPresetClass(BotOwner owner, SAINBotInfo info) : base(owner, info)
         {
             BotOwner.Settings.FileSettings.Core.CanRun = true;
-            PresetHandler();
-            SAINBotPresetManager.PresetUpdated += PresetUpdated;
+            var preset = PresetManager.TypePresets[BotType].Preset;
+            UpdateSettings(preset);
+            PresetManager.PresetUpdated += PresetUpdated;
         }
 
-        private void PresetHandler()
+        public void PresetUpdated(WildSpawnType type, BotPreset preset)
         {
-            DifficultyPreset = SAINBotPresetManager.LoadPreset(BotType, BotDifficulty);
-        }
-
-        public void PresetUpdated(WildSpawnType type, BotDifficulty diff, SAINBotPreset preset)
-        {
-            if (DifficultyPreset != null)
+            if (BotType == type)
             {
-                if (DifficultyPreset.BotType == type && DifficultyPreset.Difficulty == diff)
-                {
-                    DifficultyPreset = preset;
-                    UpdateSettings();
-                }
+                UpdateSettings(preset);
             }
         }
 
-        public void UpdateSettings()
+        public void UpdateSettings(BotPreset preset)
         {
+            DifficultyPreset = preset;
             var core = BotOwner.Settings.FileSettings.Core;
-            core.VisibleDistance = DifficultyPreset.VisibleDistance.GetValue(BotDifficulty);
-            core.VisibleAngle = DifficultyPreset.VisibleAngle.GetValue(BotDifficulty);
-            core.CanGrenade = DifficultyPreset.CanUseGrenades.GetValue(BotDifficulty);
+            core.VisibleDistance = (float)DifficultyPreset.VisibleDistance.GetValue(BotDifficulty);
+            core.VisibleAngle = (float)DifficultyPreset.VisibleAngle.GetValue(BotDifficulty);
+            core.CanGrenade = (bool)DifficultyPreset.CanUseGrenades.GetValue(BotDifficulty);
         }
 
-        public SAINBotPreset DifficultyPreset { get; private set; }
-        public BotDifficultySettingsClass Settings => BotOwner.Settings;
+        public BotPreset DifficultyPreset { get; private set; }
     }
 }

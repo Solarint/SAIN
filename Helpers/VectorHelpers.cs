@@ -15,7 +15,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Calculates the point between two vectors using a given force and mass.
         /// </summary>
-        /// <param name="position">The starting position.</param>
+        /// <param name="position">The starting DrawPosition.</param>
         /// <param name="force">The force to be applied.</param>
         /// <param name="mass">The mass of the object.</param>
         /// <returns>The point between the two vectors.</returns>
@@ -38,7 +38,7 @@ namespace SAIN.Helpers
         /// <param name="from">The starting point.</param>
         /// <param name="midPoint">The middle point.</param>
         /// <param name="target">The target point.</param>
-        /// <param name="hitPos">The hit position.</param>
+        /// <param name="hitPos">The hit DrawPosition.</param>
         /// <returns>True if the three points are connected, false otherwise.</returns>
         private static bool CheckThreePoints(Vector3 from, Vector3 midPoint, Vector3 target, out Vector3 hitPos)
         {
@@ -388,7 +388,7 @@ namespace SAIN.Helpers
         /// Tests four sides of a given direction and returns the best direction.
         /// </summary>
         /// <param name="dir">The direction to test.</param>
-        /// <param name="headPos">The position of the head.</param>
+        /// <param name="headPos">The DrawPosition of the head.</param>
         /// <returns>The best direction.</returns>
         public static Vector3 Test4Sides(Vector3 dir, Vector3 headPos)
         {
@@ -410,9 +410,9 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Tests a given direction from a given position for a given Distance.
+        /// Tests a given direction from a given DrawPosition for a given Distance.
         /// </summary>
-        /// <param name="headPos">The position to start the test from.</param>
+        /// <param name="headPos">The DrawPosition to start the test from.</param>
         /// <param name="dir">The direction to test.</param>
         /// <param name="dist">The Distance to test.</param>
         /// <returns>True if the test was successful, false otherwise.</returns>
@@ -422,9 +422,9 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Tests a given direction from a given position for a given Distance and returns a boolean indicating if the direction is clear and a Vector3 of the point of impact if it is not.
+        /// Tests a given direction from a given DrawPosition for a given Distance and returns a boolean indicating if the direction is clear and a Vector3 of the point of impact if it is not.
         /// </summary>
-        /// <param name="headPos">The starting position of the test.</param>
+        /// <param name="headPos">The starting DrawPosition of the test.</param>
         /// <param name="dir">The direction of the test.</param>
         /// <param name="dist">The Distance of the test.</param>
         /// <param name="outPos">The point of impact if the direction is not clear.</param>

@@ -20,7 +20,7 @@ namespace SAIN
                 return;
             }
 
-            // Add Components to main player
+            // AddToScheme Components to main player
             if (!ComponentAdded)
             {
                 BotController = gameWorld.GetOrAddComponent<SAINBotController>();

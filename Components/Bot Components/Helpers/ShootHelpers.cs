@@ -32,7 +32,7 @@ namespace SAIN.Helpers
                 scaledDistance = 1f;
             }
 
-            return scaledDistance * BurstMulti.Value;
+            return scaledDistance;
         }
 
         public static float FullAutoTimePerShot(int bFirerate)

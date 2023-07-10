@@ -8,15 +8,11 @@ namespace SAIN.Helpers.Textures
         public static Texture2D[] CreateNewBackgrounds(Recolor recolor, string path, int count = 4)
         {
             Texture2D texture = Load.Single(path);
-            if (texture == null)
-            {
-                return null;
-            }
             Texture2D[] Backgrounds = new Texture2D[count];
 
             for (int i = 0; i < count; i++)
             {
-                float angle = i * 90f;
+                float angle = Random.Range(45f, 290f);
                 var rotated = RotateTexture(texture, angle);
                 Backgrounds[i] = RecolorTexture(rotated, recolor.R, recolor.G, recolor.B);
             }
@@ -37,13 +33,13 @@ namespace SAIN.Helpers.Textures
             {
                 for (int x = 0; x < width; x++)
                 {
-                    // Calculate the position relative to the pivot
+                    // Calculate the DrawPosition relative to the pivot
                     Vector2 position = new Vector2(x, y) - pivot;
 
-                    // Apply rotation to the position
+                    // Apply rotation to the DrawPosition
                     Vector2 rotatedPosition = Quaternion.Euler(0f, 0f, rotationAngle) * position;
 
-                    // Calculate the final position after rotation
+                    // Calculate the final DrawPosition after rotation
                     Vector2 finalPosition = rotatedPosition + pivot;
 
                     // Get the pixel color from the original texture
@@ -56,6 +52,11 @@ namespace SAIN.Helpers.Textures
 
             rotatedTexture.Apply();
             return rotatedTexture;
+        }
+
+        public static Texture2D RecolorTexture(Texture2D originalTexture, Color color)
+        {
+            return RecolorTexture(originalTexture, color.r, color.g, color.b);
         }
 
         public static Texture2D RecolorTexture(Texture2D originalTexture, float R, float G, float B)
@@ -81,7 +82,7 @@ namespace SAIN.Helpers.Textures
                     adjustedGreen = Mathf.Clamp01(adjustedGreen);
                     adjustedBlue = Mathf.Clamp01(adjustedBlue);
 
-                    // Add a new Color with adjusted channel values
+                    // AddToScheme a new Color with adjusted channel values
                     Color adjustedPixel = new Color(adjustedRed, adjustedGreen, adjustedBlue, originalPixel.a);
 
                     recoloredTexture.SetPixel(x, y, adjustedPixel);

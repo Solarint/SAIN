@@ -241,7 +241,7 @@ namespace SAIN.Helpers
         public class Components
         {
             /// <summary>
-            /// Creates a line between two game objects and adds a script to update the line's position and color every frame.
+            /// Creates a line between two game objects and adds a script to update the line's DrawPosition and color every frame.
             /// </summary>
             /// <param name="startObject">The starting game object.</param>
             /// <param name="endObject">The ending game object.</param>
@@ -262,7 +262,7 @@ namespace SAIN.Helpers
                 lineRenderer.SetPosition(0, startObject.transform.position);
                 lineRenderer.SetPosition(1, endObject.transform.position);
 
-                // Add a script to update the line's position and color every frame
+                // AddToScheme a script to update the line's DrawPosition and color every frame
                 var followLineScript = lineObject.AddComponent<FollowLineScript>();
                 followLineScript.startObject = startObject;
                 followLineScript.endObject = endObject;

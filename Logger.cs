@@ -67,7 +67,7 @@ namespace SAIN
             if (methodInfo)
             {
                 StackTrace stackTrace = new StackTrace();
-                StackFrame stackFrame = stackTrace.GetFrame(1);
+                StackFrame stackFrame = stackTrace.GetFrame(2);
                 MethodBase method = stackFrame.GetMethod();
                 message = CreateMessage(method, message);
             }

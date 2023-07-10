@@ -51,7 +51,7 @@ namespace SAIN.Classes
 
                     if (!BotOwner.BotsGroup.IsEnemy(player) && BotOwner.BotsGroup.Neutrals.ContainsKey(player))
                     {
-                        //BotOwner.BotsGroup.LastSoundsController.AddNeutralSound(player, position);
+                        //BotOwner.BotsGroup.LastSoundsController.AddNeutralSound(player, DrawPosition);
                         return;
                     }
 
@@ -386,7 +386,7 @@ namespace SAIN.Classes
 
                 LayerMask mask = LayerMaskClass.HighPolyWithTerrainNoGrassMask;
 
-                // Add a RaycastHit array and set it to the Physics.RaycastAll
+                // AddToScheme a RaycastHit array and set it to the Physics.RaycastAll
                 var direction = botpos - enemypos;
                 RaycastHit[] hits = Physics.RaycastAll(enemypos, direction, direction.magnitude, mask);
 

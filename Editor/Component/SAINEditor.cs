@@ -4,61 +4,137 @@ using EFT.Console.Core;
 using EFT.UI;
 using UnityEngine;
 using System;
-using static SAIN.Editor.Buttons;
-using static SAIN.Editor.ConfigValues;
 using static SAIN.Editor.EditorSettings;
 using static SAIN.Editor.RectLayout;
 using static SAIN.Editor.Sounds;
-using static SAIN.Editor.Styles;
-using static SAIN.Editor.ToolTips;
 using static SAIN.Editor.UITextures;
-using static SAIN.Editor.GUISections.Toolbar;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
-using SAIN.Helpers;
-using Colors = SAIN.Editor.Util.Colors;
-using Font = UnityEngine.Font;
+using ColorsClass = SAIN.Editor.Util.ColorsClass;
+using static SAIN.Editor.Names.StyleNames;
+using EFT;
 
 namespace SAIN.Editor
 {
     public class SAINEditor : MonoBehaviour
     {
+        public Action EditorToggled { get; set; }
+
         void Awake()
         {
-            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(EditorGUI.OpenPanel));
+            ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(OpenEditor));
+            ConsoleScreen.Processor.RegisterCommand("pausegame", new Action(TogglePause));
 
-            TogglePanel = SAINPlugin.SAINConfig.Bind("SAIN Settings Editor", "", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
+            OpenEditorButton = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor", false, "Opens the Editor on press");
+            OpenEditorConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
+            PauseConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "PauseButton", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
 
-            PresetEditor.Init();
 
-            Textures = new Textures(gameObject);
-            Colors = new Colors(gameObject);
+            TexturesClass = new TexturesClass(gameObject);
+            Colors = new ColorsClass(gameObject);
+            StyleOptions = new StyleOptions(gameObject);
+            PresetEditor = new PresetEditor(gameObject);
+            Builder = new BuilderClass(gameObject);
+            Buttons = new ButtonsClass(gameObject);
+            ToolTips = new ToolTips(gameObject);
+            MouseFunctions = new MouseFunctions(gameObject);
         }
 
-        void Start()
+        public MouseFunctions MouseFunctions { get; private set; }
+        public ToolTips ToolTips { get; private set; }
+        public ButtonsClass Buttons { get; private set; }
+        public BuilderClass Builder { get; private set; }
+        public PresetEditor PresetEditor { get; private set; }
+        public StyleOptions StyleOptions { get; private set; }
+        public ColorsClass Colors { get; private set; }
+        public TexturesClass TexturesClass { get; private set; }
+
+        internal static ConfigEntry<bool> OpenEditorButton;
+        internal static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry;
+        internal static ConfigEntry<KeyboardShortcut> PauseConfigEntry;
+
+        public bool GameIsPaused { get; private set; }
+
+        private GameObject EFTInput;
+
+        public bool MainWindowOpen { get; private set; } = false;
+
+        [ConsoleCommand("Open SAIN GUI Editor")]
+        private void OpenEditor()
         {
-            Textures.Init();
-        }
-
-        public Colors Colors { get; private set; }
-        public Textures Textures { get; private set; }
-
-        public static EditorCustomization Settings { get; private set; }
-
-        internal static ConfigEntry<KeyboardShortcut> TogglePanel;
-
-        private static GameObject input;
-
-        private static bool MainWindowOpen = false;
-
-        [ConsoleCommand("Open SAIN Difficulty Editor")]
-        public static void OpenPanel()
-        {
-            if (input == null)
+            if (!MainWindowOpen)
             {
-                input = GameObject.Find("___Input");
+                GUIToggle();
+                ConsoleScreen.Log("[SAIN]: Opening Editor...");
             }
+        }
+        private void CloseEditor()
+        {
+            if (MainWindowOpen)
+            {
+                GUIToggle();
+            }
+        }
 
+        private void TogglePause()
+        {
+            Player mainPlayer = Singleton<GameWorld>.Instance?.MainPlayer;
+            if (mainPlayer?.HandsAnimator != null)
+            {
+                GameIsPaused = !GameIsPaused;
+                if (GameIsPaused)
+                {
+                    ConsoleScreen.Log("Pausing Game...");
+
+                    Time.timeScale = 0f;
+                    mainPlayer.HandsAnimator.SetAnimationSpeed(0f);
+                }
+                else
+                {
+                    Time.timeScale = 1f;
+                    mainPlayer.HandsAnimator.SetAnimationSpeed(1f);
+                }
+            }
+            else
+            {
+                GameIsPaused = false;
+            }
+        }
+
+        public bool ShiftKeyPressed { get; private set; }
+        public bool CtrlKeyPressed { get; private set; }
+
+        void Update()
+        {
+            ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
+            CtrlKeyPressed = Input.GetKey(KeyCode.LeftControl);
+
+            if (EFTInput == null)
+            {
+                EFTInput = GameObject.Find("___Input");
+            }
+            if (MainWindowOpen && EFTInput != null && EFTInput.activeSelf)
+            {
+                EFTInput?.SetActive(false);
+            }
+            if (PauseConfigEntry.Value.IsDown())
+            {
+                TogglePause();
+            }
+            if (OpenEditorConfigEntry.Value.IsDown() || 
+                (Input.GetKeyDown(KeyCode.Escape) && MainWindowOpen) || 
+                OpenEditorButton.Value)
+            {
+                if (OpenEditorButton.Value)
+                {
+                    OpenEditorButton.Value = false;
+                }
+                GUIToggle();
+            }
+        }
+
+        private void GUIToggle()
+        {
             MainWindowOpen = !MainWindowOpen;
             Cursor.visible = MainWindowOpen;
             if (MainWindowOpen)
@@ -69,114 +145,134 @@ namespace SAIN.Editor
             }
             else
             {
+                PresetEditor.OpenAdjustmentWindow = false;
                 CursorSettings.SetCursor(ECursorType.Invisible);
                 Cursor.lockState = CursorLockMode.Locked;
                 Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuDropdown);
             }
-            input.SetActive(!MainWindowOpen);
-            ConsoleScreen.Log("[SAIN]: Opening Editor...");
+            EFTInput.SetActive(!MainWindowOpen);
         }
 
-        private bool CloseEditor;
-
-        void Update()
-        {
-            if ((Input.GetKeyDown(KeyCode.Escape) && MainWindowOpen) || Input.GetKeyDown(TogglePanel.Value.MainKey) || CloseEditor)
-            {
-                CloseEditor = false;
-                //Caching input manager GameObject which script is responsible for reading the player inputs
-                if (input == null)
-                {
-                    input = GameObject.Find("___Input");
-                }
-
-                MainWindowOpen = !MainWindowOpen;
-                Cursor.visible = MainWindowOpen;
-                if (MainWindowOpen)
-                {
-                    //Changing the default windows cursor to an EFT-style one and playing a sound when the menu appears
-                    CursorSettings.SetCursor(ECursorType.Idle);
-                    Cursor.lockState = CursorLockMode.None;
-                    Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuContextMenu);
-                }
-                else
-                {
-                    //Hiding cursor and playing a sound when the menu disappears
-                    CursorSettings.SetCursor(ECursorType.Invisible);
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuDropdown);
-                }
-                //Disabling the input manager so the player won't move
-                input.SetActive(!MainWindowOpen);
-            }
-        }
-
-        private static Vector2 ScaledPivot;
         void OnGUI()
         {
-            if (!Inited)
-            {
-                Inited = true;
-
-                Settings = JsonUtility.LoadFromJson.EditorSettings();
-                if (Settings != null && Settings.FontName != null)
-                {
-                    GUI.skin.font = Font.CreateDynamicFontFromOSFont(Settings.FontName, Settings.FontSize);
-                }
-
-                Fonts.Init();
-                RectLayout.Init();
-                InitStyles();
-                ScaledPivot = new Vector2(ScalingFactor, ScalingFactor);
-            }
             if (MainWindowOpen)
             {
+                if (!Inited)
+                {
+                    TexturesClass.Init();
+                    StyleOptions.Init();
+                    Fonts.Init();
+                    Inited = true;
+                }
+
                 GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
-                ApplyTextures(GUI.skin.window, Backgrounds[SelectedTab]);
-                MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor");
-                DrawToolTip();
+
+                MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", StyleOptions.GetStyle(window));
+
+                ToolTips.DrawToolTip();
+
+                if (PresetEditor.OpenAdjustmentWindow)
+                {
+                    AdjustmentRect = Builder.NewWindow(1, AdjustmentRect, PresetEditor.GUIAdjustment, "GUI Adjustment");
+                }
             }
         }
 
+        public Rect AdjustmentRect = new Rect(500, 50, 600f, 500f);
+
+        public bool IsTabSelected(string tab)
+        {
+            return Tabs[SelectedTab] == tab;
+        }
+
+        public static readonly string Home = nameof(Home);
+        public static readonly string Hearing = nameof(Hearing);
+        public static readonly string Personalities = nameof(Personalities);
+        public static readonly string Advanced = nameof(Advanced);
+        public static readonly string[] Tabs = { Home, Hearing, Personalities, Advanced };
+
         private static bool Inited = false;
+        float CurrentTabGridHeight = 15f;
+        float[] TabGridHeights = new float[Tabs.Length];
+        Rect[] TabGridOptions = new Rect[Tabs.Length];
+        Rect[] TabGridOptionsDetections = new Rect[Tabs.Length];
 
-        private static Vector2 ScrollPos = Vector2.zero;
+        const float TabMenuHeight = 45f;
+        const float TabMenuVerticalMargin = 5f;
 
-        public static Vector2 MousePos = Vector2.zero;
+        private void TabSelectMenu()
+        {
+            float startY = ExitButton.height + TabMenuVerticalMargin;
+            float optionWidth = MainWindow.width / Tabs.Length;
+            float optionX = 0f;
+
+            var gridStyle = StyleOptions.GetStyle(toggle);
+
+            for (int i = 0; i < Tabs.Length; i++)
+            {
+                float optionDrawHeight = TabGridHeights[i];
+
+                Rect rect = new Rect(i * optionWidth, startY, optionWidth, TabMenuHeight);
+                optionDrawHeight = AdjustHeight(optionDrawHeight, rect, TabMenuHeight);
+                rect.height = optionDrawHeight;
+
+                if (optionDrawHeight < TabMenuHeight)
+                {
+                    gridStyle.fontSize = 0;
+                }
+
+                if (GUI.Toggle(rect, SelectedTab == i, Tabs[i], gridStyle)) 
+                { 
+                    SelectedTab = i;
+                }
+
+                TabGridHeights[i] = optionDrawHeight;
+                optionX += optionWidth;
+            }
+        }
+
+        private float AdjustHeight( float current , Rect rect , float clamp , float incPerFrame = 3f, float closeMulti = 0.66f)
+        {
+            if (MouseFunctions.IsMouseInside(rect))
+            {
+                current += incPerFrame;
+            }
+            else
+            {
+                current -= incPerFrame * closeMulti;
+            }
+            current = Mathf.Clamp(current, 0, clamp);
+            return current;
+        }
 
         private static bool OpenFontMenu = false;
         private void MainWindowFunc(int TWCWindowID)
         {
-            GUI.DragWindow(DragRectangle);
-            if (GUI.Button(ExitButton, "X"))
+            GUI.DrawTexture(MainWindow, Backgrounds[SelectedTab], ScaleMode.ScaleAndCrop);
+            GUI.DragWindow(DragBarMainWindow);
+            if (GUI.Button(ExitButton, "X", StyleOptions.GetStyle(button)))
             {
                 ResetClickSound();
-                CloseEditor = true;
+                CloseEditor();
             }
 
+            TabSelectMenu();
+
             GUILayout.BeginVertical();
+            GUILayout.Space(MainWindow.height * 0.05f + TabMenuHeight + TabMenuVerticalMargin);
 
-            CreateTabSelection();
-
-            string name;
-            string description;
 
             if (IsTabSelected(Home))
             {
-                if (ExpandGeneral = BuilderUtil.ExpandableMenu("General Settings", ExpandGeneral, "General Global SAIN Settings, No Bush ESP, Headshot Protection, Mod Detection"))
+                if (ExpandGeneral = Builder.ExpandableMenu("General Settings", ExpandGeneral, "General Global SAIN Settings, No Bush ESP, Headshot Protection, Mod Detection"))
                 {
-                    name = "No Bush ESP";
-                    description = "Adds extra vision check for bots to help prevent bots seeing or shooting through foliage.";
-                    BuilderUtil.CreateButtonOption(NoBushESPToggle);
-
-                    name = "HeadShot Protection";
-                    description = "Experimental, will kick bot's aiming target if it ends up on the player's head.";
-                    BuilderUtil.CreateButtonOption(HeadShotProtection);
+                    Builder.CreateButtonOption(NoBushESPToggle);
+                    Builder.CreateButtonOption(HeadShotProtection);
 
                     GUILayout.Box("Mod Detection");
                     GUILayout.BeginHorizontal();
-                    SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
-                    SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
+                    Buttons.SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
+                    Buttons.SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
                     GUILayout.EndHorizontal();
                 }
 
@@ -188,79 +284,48 @@ namespace SAIN.Editor
                 GUILayout.Box("For The Memes. Recommended not to use these during normal gameplay!");
                 GUILayout.Box("Bots will be more predictable and exploitable.");
 
-                name = "All GigaChads";
-                if (BuilderUtil.CreateButtonOption(AllGigaChads))
+                if (Builder.CreateButtonOption(AllGigaChads))
                 {
                     AllChads.Value = false;
                     AllRats.Value = false;
                 }
-                name = "All Chads";
-                if (BuilderUtil.CreateButtonOption(AllChads))
+                if (Builder.CreateButtonOption(AllChads))
                 {
                     AllGigaChads.Value = false;
                     AllRats.Value = false;
                 }
-                name = "All Rats";
-                if (BuilderUtil.CreateButtonOption(AllRats))
+                if (Builder.CreateButtonOption(AllRats))
                 {
                     AllGigaChads.Value = false;
                     AllChads.Value = false;
                 }
 
-                description = "The Chance that any random bot will get assigned this personality, regardless of Gear and Level";
+                Builder.HorizSlider(RandomGigaChadChance, 1);
 
-                name = "Random GigaChad Chance";
-                BuilderUtil.HorizSlider(RandomGigaChadChance, 1);
+                Builder.HorizSlider(RandomChadChance, 1);
 
-                name = "Random Chad Chance";
-                BuilderUtil.HorizSlider(RandomChadChance, 1);
+                Builder.HorizSlider(RandomRatChance, 1);
 
-                name = "Random Rat Chance";
-                BuilderUtil.HorizSlider(RandomRatChance, 1);
-
-                name = "Random Coward Chance";
-                BuilderUtil.HorizSlider(RandomCowardChance, 1);
+                Builder.HorizSlider(RandomCowardChance, 1);
             }
             if (IsTabSelected(Hearing))
             {
-                description = "Audible Gun Range is multiplied by this number when using a suppressor";
-                BuilderUtil.HorizSlider(SuppressorModifier, 100f);
-                //BuilderUtil.HorizSlider("Suppressor Modifier", SuppressorModifier, 0.1f, 0.75f, 100f, description);
-
-                description = "Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo";
-                BuilderUtil.HorizSlider(SubsonicModifier, 100f);
-                //BuilderUtil.HorizSlider("Subsonic Ammo Modifier", SubsonicModifier, 0.1f, 0.75f, 100f, description);
-
-                description = "How far bots can hear specific ammo calibers. In Meters";
-                BuilderUtil.HorizSlider(AudioRangePistol, 1f);
-                BuilderUtil.HorizSlider(AudioRangeRifle, 1f);
-                BuilderUtil.HorizSlider(AudioRangeMidRifle, 1f);
-                BuilderUtil.HorizSlider(AudioRangeLargeCal, 1f);
-                BuilderUtil.HorizSlider(AudioRangeShotgun, 1f);
-                //BuilderUtil.HorizSlider("Pistol Caliber", AudioRangePistol, 75f, 500f, 1f, description);
-                //BuilderUtil.HorizSlider("556 or 545 Caliber", AudioRangeRifle, 75f, 500f, 1f, description);
-                //BuilderUtil.HorizSlider("762 Caliber", AudioRangeMidRifle, 75f, 500f, 1f, description);
-                //BuilderUtil.HorizSlider("Large Caliber", AudioRangeLargeCal, 75f, 500f, 1f, description);
-                //BuilderUtil.HorizSlider("Shotguns", AudioRangeShotgun, 75f, 500f, 1f, description);
+                Builder.HorizSlider(SuppressorModifier, 100f);
+                Builder.HorizSlider(SubsonicModifier, 100f);
+                Builder.HorizSlider(AudioRangePistol, 1f);
+                Builder.HorizSlider(AudioRangeRifle, 1f);
+                Builder.HorizSlider(AudioRangeMidRifle, 1f);
+                Builder.HorizSlider(AudioRangeLargeCal, 1f);
+                Builder.HorizSlider(AudioRangeShotgun, 1f);
+                Builder.HorizSlider(AudioRangeOther, 1f);
             }
             if (IsTabSelected(Advanced))
             {
                 GUILayout.Box("Advanced Settings. Edit at your own risk.");
 
-                name = "Max Recoil";
-                description = "The Max Recoil that can be applied from a single gunshot.";
-                BuilderUtil.HorizSlider(MaxRecoil, 100f);
-                //BuilderUtil.HorizSlider(name, MaxRecoil, 0.5f, 10f, 100f, description);
-
-                name = "Add Recoil";
-                description = "Linearly Adds or Subtracts Recoil from each gunshot";
-                BuilderUtil.HorizSlider(AddRecoil, 100f);
-                //BuilderUtil.HorizSlider(name, AddRecoil, -1f, 1f, 100f, description);
-
-                name = "Recoil Decay";
-                description = "How much to Decay recoil per frame. 0.9 = 10 percent recoil decay per frame";
-                BuilderUtil.HorizSlider(RecoilDecay, 1000f);
-                //BuilderUtil.HorizSlider(name, RecoilDecay, 0.5f, 0.99f, 1000f, description);
+                Builder.HorizSlider(MaxRecoil, 100f);
+                Builder.HorizSlider(AddRecoil, 100f);
+                Builder.HorizSlider(RecoilDecay, 1000f);
 
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("Font"))
@@ -279,12 +344,12 @@ namespace SAIN.Editor
                     FontEditMenu.OpenMenu();
                 }
 
-                ColorEditorMenu();
+                //ColorEditorMenu();
             }
 
             GUILayout.EndVertical();
         }
 
-        private static bool ExpandGeneral = false;
+        public bool ExpandGeneral = false;
     }
 }

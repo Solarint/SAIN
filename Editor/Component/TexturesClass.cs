@@ -1,26 +1,59 @@
 ﻿using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
-using SAIN.Editor.Component;
 using SAIN.Helpers.Textures;
+using SAIN.Editor.Abstract;
 
 namespace SAIN.Editor
 {
-    public class Textures : EditorAbstract
+    public class TexturesClass : EditorAbstract
     {
-        public Textures(GameObject editor) : base(editor)
+        public TexturesClass(GameObject editor) : base(editor)
         {
             Load.Textures(UIElementsFolder, UIElements);
-            Load.Textures(ColorTexturesFolder, ColorTextures);
-            Load.Textures(CustomTexturesFolder, CustomTextures);
-            LoadBackgrounds();
+            //Load.TexturesClass(ColorTexturesFolder, ColorTextures);
+            //Load.TexturesClass(CustomTexturesFolder, CustomTextures);
+            //LoadBackgrounds();
+            Backgrounds = Modify.CreateNewBackgrounds(BackgroundRecolor, OriginalBackgroundPath, BackGroundCount);
+        }
+
+        public Texture2D GetRecoloredUI(string uiKey, string colorKey)
+        {
+            return Modify.RecolorTexture(GetUI(uiKey), Editor.Colors.GetColor(colorKey));
+        }
+
+        public Texture2D GetColor(string name)
+        {
+            if (ColorTextures.ContainsKey(name))
+            {
+                return ColorTextures[name];
+            }
+            return Texture2D.redTexture;
+        }
+
+        public Texture2D GetUI(string name)
+        {
+            if (UIElements.ContainsKey(name))
+            {
+                return UIElements[name];
+            }
+            return Texture2D.redTexture;
+        }
+
+        public Texture2D GetCustom(string name)
+        {
+            if (CustomTextures.ContainsKey(name))
+            {
+                return CustomTextures[name];
+            }
+            return Texture2D.redTexture;
         }
 
         public void Init()
         {
             CreateTextures();
-            Save.Textures(ColorTexturesFolder, ColorTextures);
-            Save.Textures(BackgroundsPath, "background", Backgrounds);
+            //Save.TexturesClass(ColorTexturesFolder, ColorTextures);
+            //Save.TexturesClass(BackgroundsPath, "background", Backgrounds);
         }
 
         private const int BackGroundCount = 4;
@@ -39,23 +72,10 @@ namespace SAIN.Editor
             var colors = Editor.Colors.ColorScheme;
             foreach (var color in colors)
             {
-                AddTexture(color.Key, color.Value, ColorTextures);
+                Texture2D texture = NewTexture(color.Value);
+                ColorTextures.Add(color.Key, texture);
+                //AddTexture(color.Key, color.Value, ColorTextures);
             }
-        }
-
-        public Texture2D AddTexture(string name, Color color, Dictionary<string, Texture2D> dict)
-        {
-            Texture2D texture = NewTexture(color);
-            if (!dict.ContainsKey(name))
-            {
-                dict.Add(name, texture);
-            }
-            return texture;
-        }
-
-        public void AddCustom(string name, Color color)
-        {
-            AddTexture(name, color, CustomTextures);
         }
 
         public Texture2D NewTexture(Color color)
@@ -87,10 +107,10 @@ namespace SAIN.Editor
 
         private void LoadBackgrounds()
         {
-            Backgrounds = Load.Textures(BackgroundsPath);
-            if (Backgrounds == null || Backgrounds.Length == 0)
+            //Backgrounds = Load.TexturesClass(BackgroundsPath);
+            if (Backgrounds == null || Backgrounds.Length < BackGroundCount)
             {
-                Backgrounds = Modify.CreateNewBackgrounds(BackgroundRecolor, BackgroundsPath, BackGroundCount);
+                Backgrounds = Modify.CreateNewBackgrounds(BackgroundRecolor, OriginalBackgroundPath, BackGroundCount);
             }
         }
 
@@ -98,8 +118,8 @@ namespace SAIN.Editor
         private const string UIElementsFolder = TexturesPath + "UIElements";
         private const string ColorTexturesFolder = TexturesPath + "Colors";
         private const string CustomTexturesFolder = TexturesPath + "Custom";
-        private const string BackgroundsPath = TexturesPath + "Backgrounds";
-        private const string OriginalBackgroundPath = BackgroundsPath + "/original.png";
+        private const string BackgroundsPath = TexturesPath + "Backgrounds/Custom";
+        private const string OriginalBackgroundPath = TexturesPath + "Backgrounds/original.png";
     }
 
     public sealed class Recolor

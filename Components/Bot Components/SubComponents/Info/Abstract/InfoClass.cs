@@ -74,7 +74,6 @@ namespace SAIN.Classes
             }
             return followerTypes.Contains(bottype) || bottype == WildSpawnType.sectantWarrior;
         }
-
         public float DifficultyModifier
         {
             get

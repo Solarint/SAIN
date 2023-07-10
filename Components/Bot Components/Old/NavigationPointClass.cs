@@ -174,7 +174,7 @@ namespace SAIN.Classes
             while (i < Path.corners.Length - 1)
             {
                 Vector3 cornerA = Path.corners[i];
-                // Add the first corner to our new movePath
+                // AddToScheme the first corner to our new movePath
                 newPath.Add(new PathPoint(cornerA));
 
                 if (CheckAllCornersShortcut(Path, i, out int intResult, out var pathAdd))
@@ -222,7 +222,7 @@ namespace SAIN.Classes
 
             // The direction from the first corner to the corner after the next
             Vector3 direction = cornerC - cornerA;
-            // Raise the position slightly to avoid hitting tiny objects.
+            // Raise the DrawPosition slightly to avoid hitting tiny objects.
             Vector3 rayPoint = cornerA + Vector3.up * UpOffset;
 
             jump = false;
@@ -256,7 +256,7 @@ namespace SAIN.Classes
 
             // The direction from the first corner to the corner after the next
             Vector3 direction = cornerC - cornerA;
-            // Raise the position slightly to avoid hitting tiny objects.
+            // Raise the DrawPosition slightly to avoid hitting tiny objects.
             Vector3 rayPoint = cornerA + Vector3.up * UpOffset;
 
             bool canSkip = false;

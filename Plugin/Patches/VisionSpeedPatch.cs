@@ -14,15 +14,15 @@ namespace SAIN.Patches
         public static float CalcVisSpeed(float dist)
         {
             float result = 1f;
-            if (dist >= CloseFarThresh.Value)
-            {
-                result *= FarVisionSpeed.Value;
-            }
-            else
-            {
-                result *= CloseVisionSpeed.Value;
-            }
-            result *= VisionSpeed.Value;
+            //if (dist >= CloseFarThresh.Value)
+            //{
+                //result *= FarVisionSpeed.Value;
+            //}
+            //else
+            //{
+                //result *= CloseVisionSpeed.Value;
+            //}
+            //result *= VisionSpeed.Value;
 
             return result;
         }

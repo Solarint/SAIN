@@ -15,12 +15,12 @@ namespace SAIN.Editor.GUISections
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Reset", GUILayout.Height(35)))
             {
-                GUI.skin.font = Styles.DefaultFont;
+                //GUI.skin.font = StyleOptions.DefaultFont;
             }
             if (GUILayout.Button("Save Font", GUILayout.Height(35)))
             {
-                EditorGUI.Settings.FontName = GUI.skin.font.name;
-                EditorGUI.Settings.FontSize = GUI.skin.font.fontSize;
+                //EditorGUI.Settings.FontName = GUI.skin.font.name;
+                //EditorGUI.Settings.FontSize = GUI.skin.font.fontSize;
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
@@ -39,11 +39,11 @@ namespace SAIN.Editor.GUISections
                 FontButtonStyle.font = font;
                 if (GUI.skin.font == font)
                 {
-                    //FontButtonStyle.normal.background = Colors.TextureDarkRed;
+                    //FontButtonStyle.Normal.background = ColorsClass.TextureDarkRed;
                 }
                 else
                 {
-                    //FontButtonStyle.normal.background = Colors.TexMidGray;
+                    //FontButtonStyle.Normal.background = ColorsClass.TexMidGray;
                 }
                 if (GUILayout.Button(font.name, FontButtonStyle, GUILayout.Height(25), GUILayout.Width(125)))
                 {

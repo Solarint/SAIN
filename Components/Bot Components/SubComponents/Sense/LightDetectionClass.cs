@@ -39,7 +39,7 @@ namespace SAIN.Components
             float randomYawAngle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
             float randomPitchAngle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
 
-            // Add a Quaternion rotation based on the random yaw and pitch angles
+            // AddToScheme a Quaternion rotation based on the random yaw and pitch angles
             Quaternion randomRotation = Quaternion.Euler(randomPitchAngle, randomYawAngle, 0);
 
             // Rotate the player's look direction by the Quaternion rotation
@@ -141,13 +141,13 @@ namespace SAIN.Components
         }
 
         /// <summary>
-        /// Estimates a search position based on the player, flash, and bot positions, and a dispersion value.
+        /// Estimates a search DrawPosition based on the player, flash, and bot positions, and a dispersion value.
         /// </summary>
-        /// <param name="playerPos">The position of the player.</param>
-        /// <param name="flashPos">The position of the flashlight point.</param>
-        /// <param name="botPos">The position of the bot.</param>
+        /// <param name="playerPos">The DrawPosition of the player.</param>
+        /// <param name="flashPos">The DrawPosition of the flashlight point.</param>
+        /// <param name="botPos">The DrawPosition of the bot.</param>
         /// <param name="dispersion">What the Distance to enemy is divided by to produce dispersion. Higher is more accurate</param>
-        /// <returns>The estimated search position.</returns>
+        /// <returns>The estimated search DrawPosition.</returns>
         private Vector3 EstimateSearchPosition(Vector3 playerPos, Vector3 flashPos, Vector3 botPos, float dispersion)
         {
             Vector3 estimatedPosition = Vector3.Lerp(playerPos, flashPos, Random.Range(0.0f, 0.25f));

@@ -1,20 +1,19 @@
 ﻿using EFT;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Reflection;
 
-namespace SAIN
+namespace SAIN.BotPresets
 {
-    public class SAINBotPreset
+    public class BotPreset
     {
         [JsonConstructor]
-        public SAINBotPreset()
+        public BotPreset()
         {
         }
 
-        public SAINBotPreset(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
+        public BotPreset(WildSpawnType wildSpawnType)
         {
-            KeyPair = keypair;
+            WildSpawnType = wildSpawnType;
             Init();
         }
 
@@ -70,6 +69,22 @@ namespace SAIN
             name = "Faster CQB Reactions";
             desc = "Sets whether this bot reacts faster at close ranges";
             FasterCQBReactions = new SAINProperty<bool>(name, desc, true);
+
+            name = "Faster CQB Reactions Max Distance";
+            desc = "Sets whether this bot reacts faster at close ranges";
+            def = 30f;
+            min = 1f;
+            max = 100f;
+            round = 1f;
+            FasterCQBReactionsDistance = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Faster CQB Reactions Minimum Speed";
+            desc = "Sets whether this bot reacts faster at close ranges";
+            def = 1f;
+            min = 0.25f;
+            max = 3f;
+            round = 100f;
+            FasterCQBReactionsMinimum = new SAINProperty<float>(name, def, min, max, desc, round);
 
             name = "Can Use Grenades";
             desc = "Can This Bot Use Grenades at all?";
@@ -180,16 +195,8 @@ namespace SAIN
             MinPercentage = new SAINProperty<float>(name, def, min, max, desc, round);
         }
 
-        public PropertyInfo[] GetProperties()
-        {
-            return SAINBotPresetManager.Properties;
-        }
-
         [JsonProperty]
-        public KeyValuePair<WildSpawnType, BotDifficulty> KeyPair { get; private set; }
-
-        public WildSpawnType BotType => KeyPair.Key;
-        public BotDifficulty Difficulty => KeyPair.Value;
+        public WildSpawnType WildSpawnType { get; private set; }
 
         [JsonProperty]
         public SAINProperty<float> AudibleRangeMultiplier { get; set; }
@@ -239,15 +246,19 @@ namespace SAIN
         [JsonProperty]
         public SAINProperty<bool> FasterCQBReactions { get; set; }
         [JsonProperty]
+        public SAINProperty<float> FasterCQBReactionsDistance { get; set; }
+        [JsonProperty]
+        public SAINProperty<float> FasterCQBReactionsMinimum { get; set; }
+        [JsonProperty]
         public SAINProperty<bool> CanUseGrenades { get; set; }
     }
 
-    public class SAINProperty<T>
+    public class SAINProperty<T> : ISAINProperty
     {
         [JsonConstructor]
         public SAINProperty() {}
 
-        public SAINProperty(string name, T defaultVal, T minVal, T maxVal, string description = null, float rounding = 1f)
+        public SAINProperty(string name, object defaultVal, object minVal, object maxVal, string description = null, float rounding = 1f)
         {
             Name = name;
             Description = description;
@@ -256,7 +267,7 @@ namespace SAIN
             Max = maxVal;
             Rounding = rounding;
 
-            T Value = defaultVal;
+            object Value = defaultVal;
 
             DifficultyValue.Add(BotDifficulty.easy, Value);
             DifficultyValue.Add(BotDifficulty.normal, Value);
@@ -268,11 +279,11 @@ namespace SAIN
         {
             Name = name;
             Description = description;
-            DefaultVal = (T)(object)defaultVal;
-            Min = (T)(object)false;
-            Max = (T)(object)true;
+            DefaultVal = defaultVal;
+            Min = false;
+            Max = true;
 
-            T Value = (T)(object)defaultVal;
+            object Value = defaultVal;
 
             DifficultyValue.Add(BotDifficulty.easy, Value);
             DifficultyValue.Add(BotDifficulty.normal, Value);
@@ -281,7 +292,7 @@ namespace SAIN
         }
 
         [JsonProperty]
-        public Dictionary<BotDifficulty, T> DifficultyValue { get; set; } = new Dictionary<BotDifficulty, T>();
+        public Dictionary<BotDifficulty, object> DifficultyValue { get; set; } = new Dictionary<BotDifficulty, object>();
 
         [JsonProperty]
         public readonly float Rounding;
@@ -290,19 +301,26 @@ namespace SAIN
         [JsonProperty]
         public readonly string Description;
         [JsonProperty]
-        public readonly T DefaultVal;
+        public readonly object DefaultVal;
         [JsonProperty]
-        public readonly T Min;
+        public readonly object Min;
         [JsonProperty]
-        public readonly T Max;
+        public readonly object Max;
 
-        public T GetValue(BotDifficulty difficulty)
+        public object GetValue(BotDifficulty difficulty)
         {
             return DifficultyValue[difficulty];
         }
-        public void SetValue(BotDifficulty difficulty, T Value)
+
+        public void SetValue(BotDifficulty difficulty, object Value)
         {
             DifficultyValue[difficulty] = Value;
         }
+    }
+
+    public interface ISAINProperty
+    {
+        object GetValue(BotDifficulty difficulty);
+        void SetValue(BotDifficulty difficulty, object value);
     }
 }

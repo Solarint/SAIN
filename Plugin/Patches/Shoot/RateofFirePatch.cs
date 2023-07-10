@@ -3,12 +3,11 @@ using Aki.Reflection.Utils;
 using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
-using System.Linq;
 using System;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Helpers.Shoot;
-using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Patches
 {
@@ -19,7 +18,7 @@ namespace SAIN.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            //return AccessTools.Method(typeof(GClass544), "method_7"); 
+            //return AccessTools.Method(typeof(GClass544), "method_7");
             _aimingDataType = PatchConstants.EftTypes.Single(x => x.GetProperty("LastSpreadCount") != null && x.GetProperty("LastAimTime") != null);
             _aimingDataMethod7 = AccessTools.Method(_aimingDataType, "method_7");
             return _aimingDataMethod7;
@@ -28,22 +27,20 @@ namespace SAIN.Patches
         [PatchPostfix]
         public static void PatchPostfix(ref BotOwner ___botOwner_0, float dist, ref float __result)
         {
-            if (!FasterCQBReactions.Value)
+            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
-                return;
-            }
-            if (dist <= 30)
-            {
-                float min = 0.075f;
-                if (___botOwner_0.IsRole(WildSpawnType.assault))
+                if (component.Info.FasterCQBReactions)
                 {
-                    min = 0.15f;
+                    float maxDist = component.Info.FasterCQBReactionsDistance;
+                    if (dist <= maxDist)
+                    {
+                        float min = component.Info.FasterCQBReactionsMinimum;
+                        float scale = dist / maxDist;
+                        scale = Mathf.Clamp(scale, min, 1f);
+                        float newResult = __result * scale;
+                        __result = newResult;
+                    }
                 }
-                float scale = dist / 30f;
-                scale = Mathf.Clamp(scale, min, 1f);
-                float newResult = __result * scale;
-                //DefaultLogger.LogWarning($"New Aim Time: [{newResult}] Old Aim Time: [{__result}] Distance: [{dist}]");
-                __result = newResult;
             }
         }
     }
@@ -74,7 +71,7 @@ namespace SAIN.Patches
                 float distance = ___botOwner_0.AimingData.LastDist2Target;
                 float scaledDistance = FullAutoBurstLength(___botOwner_0, distance);
 
-                ___float_0 = scaledDistance * BurstMulti.Value + Time.time;
+                ___float_0 = scaledDistance + Time.time;
 
                 return false;
             }

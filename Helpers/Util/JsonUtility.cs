@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using static HBAO_Core;
+using SAIN.BotPresets;
 
 namespace SAIN.Helpers
 {
@@ -16,7 +16,7 @@ namespace SAIN.Helpers
     {
         private static ManualLogSource Logger => Utility.Logger;
 
-        public static string BotPresetPath(WildSpawnType type, BotDifficulty difficulty)
+        public static string BotPresetPath(WildSpawnType type)
         {
             string path = GetPluginPath("SAIN");
             path = Path.Combine(path, "DifficultyPresets");
@@ -25,28 +25,6 @@ namespace SAIN.Helpers
                 Directory.CreateDirectory(path);
             }
             path = Path.Combine(path, type.ToString());
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            path = Path.Combine(path, difficulty.ToString());
-            path += ".json";
-            return path;
-        }
-        public static string BotPresetPath(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
-        {
-            string path = GetPluginPath("SAIN");
-            path = Path.Combine(path, "DifficultyPresets");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            path = Path.Combine(path, keypair.Key.ToString());
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            path = Path.Combine(path, keypair.Value.ToString());
             path += ".json";
             return path;
         }
@@ -55,9 +33,9 @@ namespace SAIN.Helpers
         {
             private static int count = 1;
 
-            public static void DifficultyPreset(SAINBotPreset preset)
+            public static void DifficultyPreset(BotPreset preset)
             {
-                string path = BotPresetPath(preset.KeyPair.Key, preset.KeyPair.Value);
+                string path = BotPresetPath(preset.WildSpawnType);
                 string json = JsonConvert.SerializeObject(preset);
                 File.WriteAllText(path, json);
             }
@@ -140,30 +118,14 @@ namespace SAIN.Helpers
                 }
             }
 
-            public static SAINBotPreset DifficultyPreset(KeyValuePair<WildSpawnType, BotDifficulty> keypair)
+            public static BotPreset DifficultyPreset(WildSpawnType type)
             {
-                string path = BotPresetPath(keypair.Key, keypair.Value);
+                string path = BotPresetPath(type);
 
                 if (File.Exists(path))
                 {
                     string json = File.ReadAllText(path);
-                    var preset = JsonConvert.DeserializeObject<SAINBotPreset>(json); // Deserialize to SAINBotPreset
-                    return preset;
-                }
-                else
-                {
-                    Logger.LogWarning($"File {path} does not exist");
-                    return null;
-                }
-            }
-            public static SAINBotPreset DifficultyPreset(WildSpawnType type, BotDifficulty difficulty)
-            {
-                string path = BotPresetPath(type, difficulty);
-
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path); 
-                    var preset = JsonConvert.DeserializeObject<SAINBotPreset>(json); // Deserialize to SAINBotPreset
+                    var preset = JsonConvert.DeserializeObject<BotPreset>(json); // Deserialize to BotPreset
                     return preset;
                 }
                 else

@@ -210,7 +210,7 @@ namespace SAIN.Components
                 return;
             }
 
-            // Add Components to main player
+            // AddToScheme Components to main player
             if (!ComponentAdded)
             {
                 MainPlayer.GetOrAddComponent<PlayerTalkComponent>();

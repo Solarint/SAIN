@@ -56,41 +56,14 @@ namespace SAIN.Helpers.Textures
             }
         }
 
-        public static bool Textures(string path, Dictionary<int, Texture2D> dict)
-        {
-            if (Directory.Exists(path))
-            {
-                string[] fileNames = Directory.GetFiles(path, "*.png");
-                if (fileNames.Length == 0)
-                {
-                    LogMessage($"No Files Found");
-                    return false;
-                }
-
-                for (int i = 0; i < fileNames.Length; i++)
-                {
-                    string fileName = Path.GetFileNameWithoutExtension(fileNames[i]);
-                    Texture2D texture = Single(fileName);
-                    dict.Add(i, texture);
-                }
-                return dict.Count > 0;
-            }
-            else
-            {
-                LogMessage($"[{path}] does not exist");
-                Directory.CreateDirectory(path);
-                return false;
-            }
-        }
-
         public static Texture2D[] Textures(string path)
         {
             if (Directory.Exists(path))
             {
-                string[] fileNames = Directory.GetFiles(path, "*.png");
+                string[] fileNames = Directory.GetFiles(path);
                 if (fileNames.Length == 0)
                 {
-                    LogMessage($"No Files Found");
+                    LogWarning($"No Files Found", typeof(Load), true);
                     return null;
                 }
 
@@ -98,8 +71,9 @@ namespace SAIN.Helpers.Textures
 
                 for (int i = 0; i < fileNames.Length; i++)
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(fileNames[i]);
                     Texture2D texture = Single(fileNames[i]);
+
+                    string fileName = Path.GetFileNameWithoutExtension(fileNames[i]);
                     texture.name = fileName;
                     array[i] = texture;
                 }

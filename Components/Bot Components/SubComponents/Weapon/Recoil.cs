@@ -32,7 +32,7 @@ namespace SAIN.Classes
             float randomvertRecoil = Random.Range(-vertRecoil, vertRecoil);
 
             Vector3 vector = new Vector3(targetpoint.x + randomHorizRecoil, targetpoint.y + randomvertRecoil, targetpoint.z + randomHorizRecoil);
-            vector = MathHelpers.VectorClamp(vector, -maxrecoil, maxrecoil) * ConfigModifier;
+            vector = MathHelpers.VectorClamp(vector, -maxrecoil, maxrecoil) * SAIN.Info.RecoilMultiplier;
 
             return vector;
         }
@@ -63,28 +63,6 @@ namespace SAIN.Classes
                 {
                     return Time.time + SemiAutoTimePerShot * 0.8f;
                 }
-            }
-        }
-
-        private float ConfigModifier
-        {
-            get
-            {
-                float modifier = 1f;
-                if (SAIN.Info.IsPMC)
-                {
-                    modifier *= PMCRecoil.Value;
-                }
-                else if (SAIN.Info.IsScav)
-                {
-                    modifier *= ScavRecoil.Value;
-                }
-                else
-                {
-                    modifier *= OtherRecoil.Value;
-                }
-                modifier *= BotRecoilGlobal.Value;
-                return modifier;
             }
         }
 

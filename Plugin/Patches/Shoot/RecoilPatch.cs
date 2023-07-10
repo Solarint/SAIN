@@ -38,7 +38,7 @@ namespace SAIN.Patches
                 IAIDetails person = ___botOwner_0.Memory.GoalEnemy?.Person;
                 if (person != null)
                 {
-                    // Get the head position of a bot's current enemy if it exists
+                    // Get the head DrawPosition of a bot's current enemy if it exists
                     Vector3 headPos = person.MainParts[BodyPartType.head].Position;
                     // Check the Distance to the bot's aiming target, and see if its really close or on the player's head
                     float dist = (headPos - finalTarget).magnitude;
@@ -125,7 +125,7 @@ namespace SAIN.Patches
                 {
                     return true;
                 }
-                // Repurposing float_1 as a recoil reset timer
+                // Repurposing float_1 as a recoil Reset timer
                 if (___float_1 < Time.time)
                 {
                     ___vector3_0 = recoil.CalculateDecay(___vector3_0, out float time);

@@ -19,7 +19,6 @@ namespace SAIN
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
     {
-        public static EditorGUI EditorGUI;
         private void Awake()
         {
             if (!TarkovVersion.CheckEftVersion(Logger, Info, Config))
@@ -34,8 +33,6 @@ namespace SAIN
             {
                 throw new Exception("Missing BigBrain");
             }
-
-            SAINBotPresetManager.Init();
 
             ConfigInit();
             EFTPatches.Init();
@@ -64,16 +61,18 @@ namespace SAIN
 
         private void Update()
         {
-            if (SAINEditor == null)
-            {
-                EditorObject = new GameObject("SAINEditorObject");
-                SAINEditor = EditorObject.GetOrAddComponent<SAINEditor>();
-            }
-            //EditorGUI.Update();
             BotControllerHandler.Update();
 
             if (!ModsChecked && ModsCheckTimer < Time.time)
             {
+                if (SAINEditor == null)
+                {
+                    ModsCheckTimer = Time.time + 1f;
+                    EditorObject = new GameObject("SAINEditorObject");
+                    SAINEditor = EditorObject.GetOrAddComponent<SAINEditor>();
+                    return;
+                }
+
                 ModsChecked = true;
 
                 RealismLoaded = Chainloader.PluginInfos.ContainsKey("RealismMod");

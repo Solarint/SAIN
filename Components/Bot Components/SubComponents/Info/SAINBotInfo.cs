@@ -2,6 +2,7 @@
 using EFT;
 using UnityEngine;
 using static SAIN.Editor.EditorSettings;
+using SAIN.BotPresets;
 
 namespace SAIN.Classes
 {
@@ -23,9 +24,19 @@ namespace SAIN.Classes
 
             WeaponInfo = new WeaponInfo(BotOwner, this);
 
-            PercentageBeforeExtract = Random.Range(MinPercentage.Value, MaxPercentage.Value);
+            PercentageBeforeExtract = Random.Range(MinPercentage, MaxPercentage);
             LastPower = PowerLevel;
         }
+
+        public float MinPercentage => (float)SAINBotPreset.MinPercentage.GetValue(BotDifficulty);
+        public float MaxPercentage => (float)SAINBotPreset.MaxPercentage.GetValue(BotDifficulty);
+        public bool EnableExtracts => (bool)SAINBotPreset.EnableExtracts.GetValue(BotDifficulty);
+        public bool CanTalk => (bool)BotPresetClass.DifficultyPreset.CanTalk.GetValue(BotDifficulty);
+        public float RecoilMultiplier => (float)BotPresetClass.DifficultyPreset.RecoilMultiplier.GetValue(BotDifficulty);
+        public float AccuractMultiplier => (float)BotPresetClass.DifficultyPreset.AccuracyMulti.GetValue(BotDifficulty);
+        public bool FasterCQBReactions => (bool)BotPresetClass.DifficultyPreset.FasterCQBReactions.GetValue(BotDifficulty);
+        public float FasterCQBReactionsDistance => (float)BotPresetClass.DifficultyPreset.FasterCQBReactionsDistance.GetValue(BotDifficulty);
+        public float FasterCQBReactionsMinimum => (float)BotPresetClass.DifficultyPreset.FasterCQBReactionsMinimum.GetValue(BotDifficulty);
 
         public float DifficultyModifier => InfoClass.DifficultyModifier;
         public bool IAmBoss => InfoClass.IAmBoss;
@@ -34,7 +45,7 @@ namespace SAIN.Classes
         public bool IsPMC => InfoClass.IsPMC;
 
         public BotPresetClass BotPresetClass { get; private set; }
-        public SAINBotPreset SAINBotPreset => BotPresetClass.DifficultyPreset;
+        public BotPreset SAINBotPreset => BotPresetClass.DifficultyPreset;
 
         public InfoClass InfoClass { get; private set; }
 
@@ -80,8 +91,6 @@ namespace SAIN.Classes
         }
 
         private int GroupCount = 0;
-
-        public bool CanBotTalk => TalkGlobal.Value && BotPresetClass?.DifficultyPreset?.CanTalk.GetValue(BotDifficulty) == true;
 
         public float HoldGroundDelay { get; private set; }
 
@@ -166,7 +175,7 @@ namespace SAIN.Classes
 
         public void Dispose()
         {
-            SAINBotPresetManager.PresetUpdated -= BotPresetClass.PresetUpdated;
+            PresetManager.PresetUpdated -= BotPresetClass.PresetUpdated;
         }
     }
 }

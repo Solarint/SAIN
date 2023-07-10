@@ -77,7 +77,7 @@ namespace SAIN.Classes
 
                     CheckForEnemyTalk();
 
-                    if (TauntTimer < Time.time && BotTaunts.Value)
+                    if (TauntTimer < Time.time)
                     {
                         TauntTimer = Time.time + TauntFreq * Random.Range(0.5f, 1.5f);
 

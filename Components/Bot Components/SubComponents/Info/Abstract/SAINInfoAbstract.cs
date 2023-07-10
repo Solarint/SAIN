@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using SAIN.BotPresets;
 
 namespace SAIN.Classes
 {
@@ -18,7 +19,7 @@ namespace SAIN.Classes
         public bool IsPMC => InfoClass.IsPMC;
 
         public BotPresetClass BotPresetClass { get; private set; }
-        public SAINBotPreset SAINBotPreset => BotPresetClass.DifficultyPreset;
+        public BotPreset SAINBotPreset => BotPresetClass.DifficultyPreset;
 
         public SAINBotInfo SAINInfo { get; private set; }
         private InfoClass InfoClass => SAINInfo.InfoClass;

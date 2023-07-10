@@ -4,6 +4,8 @@ using System.Drawing.Text;
 using Font = UnityEngine.Font;
 using UnityEngine;
 using System;
+using SAIN.Helpers;
+using static EFT.SpeedTree.TreeWind;
 
 namespace SAIN.Editor.Util
 {
@@ -14,8 +16,16 @@ namespace SAIN.Editor.Util
         public static int FontIndex = 0;
         public static Font SelectedFont => AvailableFonts[FontIndex];
 
+        public static EditorCustomization Settings { get; private set; }
+
         public static void Init()
         {
+            Settings = JsonUtility.LoadFromJson.EditorSettings();
+            if (Settings != null && Settings.FontName != null)
+            {
+                GUI.skin.font = Font.CreateDynamicFontFromOSFont(Settings.FontName, Settings.FontSize);
+            }
+
             List<Font> availableFonts = GetAvailableFonts();
             AvailableFonts = availableFonts.ToArray();
             FontNames = new string[AvailableFonts.Length];

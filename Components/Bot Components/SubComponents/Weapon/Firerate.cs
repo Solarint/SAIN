@@ -40,7 +40,7 @@ namespace SAIN.Classes
             }
 
             // Final Result which is randomized +- 15%
-            float finalTime = final * Random.Range(0.85f, 1.15f) / FireratMulti.Value;
+            float finalTime = final * Random.Range(0.85f, 1.15f);
 
             return finalTime;
         }

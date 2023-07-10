@@ -90,7 +90,7 @@ namespace SAIN.Components
                 return;
             }
 
-            // Get the firearmsController for the player, this will be their active weapon
+            // Get the firearmsController for the player, this will be their Active weapon
             Player.FirearmController firearmController = player.HandsController as Player.FirearmController;
             if (firearmController == null)
             {

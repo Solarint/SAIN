@@ -22,7 +22,7 @@ namespace SAIN.Classes
             EnemyTalk = new EnemyTalk(BotOwner);
         }
 
-        public bool CanTalk => SAIN.Info.CanBotTalk;
+        public bool CanTalk => SAIN.Info.CanTalk;
 
         public void Say(EPhraseTrigger type, ETagStatus? additionalMask = null, bool withGroupDelay = false)
         {
@@ -64,7 +64,7 @@ namespace SAIN.Classes
 
                 if (allTalkDelay < Time.time && TalkPack != null)
                 {
-                    allTalkDelay = Time.time + GlobalTalkLimit.Value;
+                    allTalkDelay = Time.time + 2f;
                     if (TalkPack.phraseInfo.Phrase == EPhraseTrigger.Roger || TalkPack.phraseInfo.Phrase == EPhraseTrigger.Negative)
                     {
                         if (SAIN.Squad.VisibleMembers != null && SAIN.Squad.LeaderComponent != null && SAIN.Squad.VisibleMembers.Contains(SAIN.Squad.LeaderComponent) && SAIN.Enemy?.IsVisible == false)
@@ -221,7 +221,7 @@ namespace SAIN.Classes
             if (PhraseDictionary.ContainsKey(type))
             {
                 var phrase = PhraseDictionary[type];
-                if (phrase.TimeLastSaid + phrase.TimeDelay * TalkGlobalFreq.Value < Time.time)
+                if (phrase.TimeLastSaid + phrase.TimeDelay < Time.time)
                 {
                     var data = new BotTalkPackage(phrase, mask);
 

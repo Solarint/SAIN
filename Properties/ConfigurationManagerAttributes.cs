@@ -39,14 +39,14 @@ internal sealed class ConfigurationManagerAttributes
     public System.Action<BepInEx.Configuration.ConfigEntryBase> CustomDrawer;
 
     /// <summary>
-    /// Custom setting editor that allows polling keyboard input with the Input (or UnityInput) class.
+    /// Custom setting editor that allows polling keyboard EFTInput with the Input (or UnityInput) class.
     /// Use either CustomDrawer or CustomHotkeyDrawer, using both at the same time leads to undefined behaviour.
     /// </summary>
     public CustomHotkeyDrawerFunc CustomHotkeyDrawer;
 
     /// <summary>
-    /// Custom setting draw action that allows polling keyboard input with the Input class.
-    /// Note: Make sure to focus on your UI control when you are accepting input so user doesn't type in the search box or in another setting (best to do this on every frame).
+    /// Custom setting draw action that allows polling keyboard EFTInput with the Input class.
+    /// Note: Make sure to focus on your UI control when you are accepting EFTInput so user doesn't type in the search box or in another setting (best to do this on every frame).
     /// If you don't draw any selectable UI controls You can use `GUIUtility.keyboardControl = -1;` on every frame to make sure that nothing is selected.
     /// </summary>
     /// <example>
@@ -59,7 +59,7 @@ internal sealed class ConfigurationManagerAttributes
     ///                     
     ///         // Use Input.GetKeyDown and others here, remember to set isEditing to false after you're done!
     ///         // It's best to check Input.anyKeyDown and set isEditing to false immediately if it's true,
-    ///         // so that the input doesn't have a chance to propagate to the game itself.
+    ///         // so that the EFTInput doesn't have a chance to propagate to the game itself.
     /// 
     ///         if (GUILayout.ButtonConfigEntry("Stop"))
     ///             isEditing = false;

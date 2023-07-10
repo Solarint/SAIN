@@ -282,7 +282,7 @@ namespace SAIN.Classes
             Vector3 PeekStartPosition = blindCorner + cornerStartDir;
             Vector3 dirFromStart = dangerPoint - PeekStartPosition;
 
-            // Rotate to the opposite side depending on the angle of the danger point to the start position.
+            // Rotate to the opposite side depending on the angle of the danger point to the start DrawPosition.
             float signAngle = GetSignedAngle(dirToBlindCorner.normalized, dirFromStart.normalized);
             float rotationAngle = signAngle > 0 ? -90f : 90f;
             Quaternion rotation = Quaternion.Euler(0f, rotationAngle, 0f);
@@ -291,7 +291,7 @@ namespace SAIN.Classes
             direction *= OppositePointMagnitude;
 
             Vector3 PeekEndPosition;
-            // if we hit an object on the way to our Peek FinalDestination, change the peek startPeekPos to be the resulting hit position;
+            // if we hit an object on the way to our Peek FinalDestination, change the peek startPeekPos to be the resulting hit DrawPosition;
             if (CheckForObstacles(PeekStartPosition, direction, out Vector3 result))
             {
                 // Shorten the direction as to not try to path directly into a wall.

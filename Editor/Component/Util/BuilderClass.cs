@@ -1,36 +1,43 @@
 ﻿using BepInEx.Configuration;
 using UnityEngine;
-using static SAIN.Editor.EditorGUI;
 using static SAIN.Editor.EditorParameters;
 using static SAIN.Editor.UITextures;
 using static SAIN.Editor.ConfigValues;
-using static SAIN.Editor.Styles;
+using static SAIN.Editor.StyleOptions;
 using static SAIN.Editor.ToolTips;
+using SAIN.BotPresets;
+using System.Collections.Generic;
+using static SAIN.Editor.Names.StyleNames;
+using SAIN.Editor.Abstract;
 
 namespace SAIN.Editor
 {
-    internal class BuilderUtil
+    public class BuilderClass : EditorAbstract
     {
-        private static GUILayoutOption Height => GUILayout.Height(25f);
-        private static GUILayoutOption ExpandWidth => GUILayout.Width(150f);
-        private static GUILayoutOption MinMaxWidth => GUILayout.Width(SliderMinMaxWidth.Value);
-        private static GUILayoutOption SlWidth => GUILayout.Width(SliderWidth.Value);
-        private static GUILayoutOption ResultWidth => GUILayout.Width(SliderResultWidth.Value);
-        private static GUILayoutOption LabeltWidth => GUILayout.Width(SliderLabelWidth.Value);
+        public BuilderClass(GameObject go) : base(go) { }
+
+        private static float ExpandWidth => 150f;
+        private static float MinMaxWidth => SliderMinMaxWidth.Value;
+        private static float SlWidth => SliderWidth.Value;
+        private static float ResultWidth => SliderResultWidth.Value;
+        private static float LabelWidth => SliderLabelWidth.Value;
 
 
-        public static bool ExpandableMenu(string name, bool value, string description = null)
+        public bool ExpandableMenu(string name, bool value, string description = null)
         {
-            Buttons.InfoBox(description);
-            GUILayout.Label(name, Height, ExpandWidth);
-            return GUILayout.Toggle(value, value ? "[Collapse]" : "[Expand]");
+            GUILayout.BeginHorizontal();
+            ButtonsClass.InfoBox(description, true);
+            Label(name, ExpandWidth, true);
+            value = Toggle(value, value ? "[Close]" : "[Open]", true);
+            GUILayout.EndHorizontal();
+            return value;
         }
 
-        public static bool CreateButtonOption(ConfigEntry<bool> entry)
+        public bool CreateButtonOption(ConfigEntry<bool> entry)
         {
             bool value = false;
             GUILayout.BeginHorizontal();
-            if (Buttons.ButtonConfigEntry(entry))
+            if (ButtonsClass.ButtonConfigEntry(entry))
             {
                 value = true;
             }
@@ -38,11 +45,11 @@ namespace SAIN.Editor
             return value;
         }
 
-        public static bool CreateButtonOption(SAINProperty<bool> entry, BotDifficulty difficulty)
+        public bool CreateButtonOption(SAINProperty<bool> entry, BotDifficulty difficulty)
         {
             bool value = false;
             GUILayout.BeginHorizontal();
-            if (Buttons.ButtonProperty(entry, difficulty))
+            if (ButtonsClass.ButtonProperty(entry, difficulty))
             {
                 value = true;
             }
@@ -50,18 +57,18 @@ namespace SAIN.Editor
             return value;
         }
 
-        public static void HorizSlider<T>(ConfigEntry<T> entry, float rounding)
+        public void HorizSlider<T>(ConfigEntry<T> entry, float rounding)
         {
             GUILayout.BeginHorizontal();
 
-            Buttons.InfoBox(entry.Description.Description);
-            GUILayout.Box(entry.Definition.Key, LabeltWidth, Height);
+            ButtonsClass.InfoBox(entry.Description.Description);
+            Box(entry.Definition.Key, LabelWidth);
 
             object min = MinMax(entry, out object max);
 
             if (min != null)
             {
-                GUILayout.Box(min.ToString(), BlankBoxBG, MinMaxWidth, Height);
+                BlankBox(min.ToString(), MinMaxWidth);
                 CheckMouse("Min");
             }
 
@@ -73,23 +80,23 @@ namespace SAIN.Editor
             else
             {
                 bool boolValue = (bool)(object)entry.Value;
-                boolValue = GUILayout.Toggle((bool)(object)entry.Value, boolValue ? "On" : "Off");
+                boolValue = Toggle((bool)(object)entry.Value, boolValue ? "On" : "Off");
                 AssignValue((ConfigEntry<bool>)(object)entry, boolValue);
             }
 
             if (max != null)
             {
-                GUILayout.Box(max.ToString(), BlankBoxBG, MinMaxWidth, Height);
+                BlankBox(max.ToString(), MinMaxWidth);
                 CheckMouse("Max");
             }
 
-            GUILayout.Box(entry.Value.ToString(), ResultWidth, Height);
+            Box(entry.Value.ToString(), ResultWidth);
             GUILayout.FlexibleSpace();
-            Buttons.ResetButton(entry);
+            ButtonsClass.ResetButton(entry);
             GUILayout.EndHorizontal();
         }
 
-        private static object MinMax<T>(ConfigEntry<T> entry, out object max)
+        private object MinMax<T>(ConfigEntry<T> entry, out object max)
         {
             if (entry?.Description?.AcceptableValues == null || entry.SettingType == typeof(bool))
             {
@@ -108,53 +115,53 @@ namespace SAIN.Editor
             }
         }
 
-        public static void HorizSlider(SAINProperty<float> entry, BotDifficulty difficulty)
+        public void HorizSlider(SAINProperty<float> entry, BotDifficulty difficulty)
         {
-            float value = entry.GetValue(difficulty);
+            float value = (float)entry.GetValue(difficulty);
             GUILayout.BeginHorizontal();
 
-            Buttons.InfoBox(entry.Description);
-            GUILayout.Box(entry.Name, LabeltWidth, Height);
+            ButtonsClass.InfoBox(entry.Description);
+            Box(entry.Name, LabelWidth);
 
             GUILayout.FlexibleSpace();
 
-            GUILayout.Box(entry.Min.ToString(), BlankBoxBG, MinMaxWidth, Height);
+            BlankBox(entry.Min.ToString(), MinMaxWidth);
             CheckMouse("Min");
 
             value = CreateSlider(value, entry.Min, entry.Max, entry.Rounding);
 
-            GUILayout.Box(entry.Max.ToString(), BlankBoxBG, MinMaxWidth, Height);
+            BlankBox(entry.Max.ToString(), MinMaxWidth);
             CheckMouse("Max");
 
-            GUILayout.Box(value.ToString(), ResultWidth, Height);
-            Buttons.ResetButton(entry);
+            Box(value.ToString(), ResultWidth);
+            ButtonsClass.ResetButton(entry);
             GUILayout.EndHorizontal();
 
             entry.SetValue(difficulty, value);
         }
 
-        public static float HorizSlider(string name, float value, float min, float max, float rounding = 1f, string description = null)
+        public float HorizSlider(string name, float value, float min, float max, float rounding = 1f, string description = null)
         {
             GUILayout.BeginHorizontal();
 
-            Buttons.InfoBox(description);
-            GUILayout.Box(name, LabeltWidth, Height);
+            ButtonsClass.InfoBox(description);
+            Box(name, LabelWidth);
 
-            GUILayout.Box(min.ToString(), BlankBoxBG, MinMaxWidth, Height);
+            Box(min.ToString(), MinMaxWidth);
             CheckMouse("Min");
 
             float result = CreateSlider(value, min, max, rounding);
 
-            GUILayout.Box(max.ToString(), BlankBoxBG, MinMaxWidth, Height);
+            Box(max.ToString(), MinMaxWidth);
             CheckMouse("Max");
 
-            GUILayout.Box(value.ToString(), ResultWidth, Height);
+            Box(value.ToString(), ResultWidth);
 
             GUILayout.EndHorizontal();
             return result;
         }
 
-        private static float CreateSlider<T>(ConfigEntry<T> entry, object min, object max, float rounding = 1f)
+        private float CreateSlider<T>(ConfigEntry<T> entry, object min, object max, float rounding = 1f)
         {
             if (ReturnFloat(entry, out float sliderValue))
             {
@@ -164,10 +171,10 @@ namespace SAIN.Editor
             return sliderValue;
         }
 
-        private static float CreateSlider(float value, object min, object max, float rounding = 1f)
+        private float CreateSlider(float value, object min, object max, float rounding = 1f)
         {
             float progress = (value - (float)min) / ((float)max - (float)min);
-            value = GUILayout.HorizontalSlider(value, (float)min, (float)max, SlWidth, Height);
+            value = HorizontalSlider(value, (float)min, (float)max, SlWidth);
             DrawSliderBackGrounds(progress);
 
             value = Mathf.Round(value * rounding) / rounding;
