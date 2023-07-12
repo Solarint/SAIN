@@ -174,7 +174,7 @@ namespace SAIN.Classes
             while (i < Path.corners.Length - 1)
             {
                 Vector3 cornerA = Path.corners[i];
-                // AddToScheme the first corner to our new movePath
+                // AddorUpdateColorScheme the first corner to our new movePath
                 newPath.Add(new PathPoint(cornerA));
 
                 if (CheckAllCornersShortcut(Path, i, out int intResult, out var pathAdd))

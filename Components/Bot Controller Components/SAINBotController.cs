@@ -210,7 +210,7 @@ namespace SAIN.Components
                 return;
             }
 
-            // AddToScheme Components to main player
+            // AddorUpdateColorScheme Components to main player
             if (!ComponentAdded)
             {
                 MainPlayer.GetOrAddComponent<PlayerTalkComponent>();

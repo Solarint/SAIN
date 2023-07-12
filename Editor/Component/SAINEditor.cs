@@ -7,12 +7,12 @@ using System;
 using static SAIN.Editor.EditorSettings;
 using static SAIN.Editor.RectLayout;
 using static SAIN.Editor.Sounds;
-using static SAIN.Editor.UITextures;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
 using ColorsClass = SAIN.Editor.Util.ColorsClass;
 using static SAIN.Editor.Names.StyleNames;
 using EFT;
+using UnityEngine.EventSystems;
 
 namespace SAIN.Editor
 {
@@ -38,8 +38,10 @@ namespace SAIN.Editor
             Buttons = new ButtonsClass(gameObject);
             ToolTips = new ToolTips(gameObject);
             MouseFunctions = new MouseFunctions(gameObject);
+            WindowLayoutCreator = new WindowLayoutCreator(gameObject);
         }
 
+        public WindowLayoutCreator WindowLayoutCreator { get; private set; }
         public MouseFunctions MouseFunctions { get; private set; }
         public ToolTips ToolTips { get; private set; }
         public ButtonsClass Buttons { get; private set; }
@@ -153,6 +155,8 @@ namespace SAIN.Editor
             EFTInput.SetActive(!MainWindowOpen);
         }
 
+        float baseHeight;
+
         void OnGUI()
         {
             if (MainWindowOpen)
@@ -163,6 +167,9 @@ namespace SAIN.Editor
                     StyleOptions.Init();
                     Fonts.Init();
                     Inited = true;
+                    baseHeight = MainWindow.height;
+                    DragBackgroundTexture = TexturesClass.GetColor(Names.ColorNames.MidGray);
+                    OpenTabRect = new Rect(0, 85, MainWindow.width, 1000f);
                 }
 
                 GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
@@ -180,109 +187,123 @@ namespace SAIN.Editor
 
         public Rect AdjustmentRect = new Rect(500, 50, 600f, 500f);
 
-        public bool IsTabSelected(string tab)
-        {
-            return Tabs[SelectedTab] == tab;
-        }
-
+        public static readonly string None = nameof(None);
         public static readonly string Home = nameof(Home);
+        public static readonly string BotPresets = nameof(BotPresets);
         public static readonly string Hearing = nameof(Hearing);
         public static readonly string Personalities = nameof(Personalities);
         public static readonly string Advanced = nameof(Advanced);
-        public static readonly string[] Tabs = { Home, Hearing, Personalities, Advanced };
+        public static readonly string[] Tabs = { Home, BotPresets, Hearing, Personalities, Advanced };
 
         private static bool Inited = false;
-        float CurrentTabGridHeight = 15f;
-        float[] TabGridHeights = new float[Tabs.Length];
-        Rect[] TabGridOptions = new Rect[Tabs.Length];
-        Rect[] TabGridOptionsDetections = new Rect[Tabs.Length];
 
-        const float TabMenuHeight = 45f;
-        const float TabMenuVerticalMargin = 5f;
+        float TabMenuHeight = 50f;
+        float TabMenuVerticalMargin = 5f;
 
-        private void TabSelectMenu()
+        private void CreateNewTabMenuRects()
         {
-            float startY = ExitButton.height + TabMenuVerticalMargin;
-            float optionWidth = MainWindow.width / Tabs.Length;
-            float optionX = 0f;
+            TabMenuRect = new Rect(0, ExitRect.height + TabMenuVerticalMargin, MainWindow.width, TabMenuHeight);
+            TabRects = Builder.HorizontalGridRects(TabMenuRect, Tabs.Length, 15f);
+        }
 
-            var gridStyle = StyleOptions.GetStyle(toggle);
+        private void TabSelectMenu(float minHeight = 15, float speed = 3, float closeSpeedMulti = 0.66f)
+        {
+            if (TabMenuRect == null || TabRects == null)
+            {
+                CreateNewTabMenuRects();
+            }
 
+            OpenTab = Builder.SelectionGridExpandHeight(TabMenuRect, Tabs, OpenTab, TabRects, minHeight, speed, closeSpeedMulti);
+        }
+
+        Rect[] TabRects;
+        Rect TabMenuRect;
+        Rect OpenTabRect;
+
+        private bool TabSelected(string tab, out Rect tabRect, float targetHeight)
+        {
+            bool selected = OpenTab == tab;
+            //OpenTabRect.height += 45;
+            //OpenTabRect.height = Mathf.Clamp(OpenTabRect.height, 0f, targetHeight);
+            //MainWindow.height = baseHeight + OpenTabRect.height;
+            tabRect = OpenTabRect;
+            return selected;
+        }
+
+        private int FindSelected()
+        {
             for (int i = 0; i < Tabs.Length; i++)
             {
-                float optionDrawHeight = TabGridHeights[i];
-
-                Rect rect = new Rect(i * optionWidth, startY, optionWidth, TabMenuHeight);
-                optionDrawHeight = AdjustHeight(optionDrawHeight, rect, TabMenuHeight);
-                rect.height = optionDrawHeight;
-
-                if (optionDrawHeight < TabMenuHeight)
+                if (Tabs[i] == OpenTab)
                 {
-                    gridStyle.fontSize = 0;
+                    return i;
                 }
-
-                if (GUI.Toggle(rect, SelectedTab == i, Tabs[i], gridStyle)) 
-                { 
-                    SelectedTab = i;
-                }
-
-                TabGridHeights[i] = optionDrawHeight;
-                optionX += optionWidth;
             }
+            return 0;
         }
 
-        private float AdjustHeight( float current , Rect rect , float clamp , float incPerFrame = 3f, float closeMulti = 0.66f)
-        {
-            if (MouseFunctions.IsMouseInside(rect))
-            {
-                current += incPerFrame;
-            }
-            else
-            {
-                current -= incPerFrame * closeMulti;
-            }
-            current = Mathf.Clamp(current, 0, clamp);
-            return current;
-        }
+        Texture2D DragBackgroundTexture;
+
+        string OpenTab = None;
 
         private static bool OpenFontMenu = false;
+
         private void MainWindowFunc(int TWCWindowID)
         {
-            GUI.DrawTexture(MainWindow, Backgrounds[SelectedTab], ScaleMode.ScaleAndCrop);
-            GUI.DragWindow(DragBarMainWindow);
-            if (GUI.Button(ExitButton, "X", StyleOptions.GetStyle(button)))
+            var dragStyle = Builder.GetStyle(blankbox);
+            dragStyle.alignment = TextAnchor.MiddleLeft;
+            dragStyle.padding = new RectOffset(10, 10, 0, 0);
+            GUI.DrawTexture(DragRect, DragBackgroundTexture, ScaleMode.StretchToFill, true, 0);
+            GUI.Box(DragRect, "SAIN GUI Editor", dragStyle);
+            GUI.DragWindow(DragRect);
+            if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", StyleOptions.GetStyle(button)))
+            {
+                MenuClickSound();
+                TogglePause();
+            }
+            if (GUI.Button(ExitRect, "X", StyleOptions.GetStyle(button)))
             {
                 ResetClickSound();
                 CloseEditor();
             }
 
-            TabSelectMenu();
+            TabSelectMenu(25f, 3f, 0.5f);
 
-            GUILayout.BeginVertical();
-            GUILayout.Space(MainWindow.height * 0.05f + TabMenuHeight + TabMenuVerticalMargin);
-
-
-            if (IsTabSelected(Home))
+            if (NoTabSelected())
             {
-                if (ExpandGeneral = Builder.ExpandableMenu("General Settings", ExpandGeneral, "General Global SAIN Settings, No Bush ESP, Headshot Protection, Mod Detection"))
-                {
-                    Builder.CreateButtonOption(NoBushESPToggle);
-                    Builder.CreateButtonOption(HeadShotProtection);
-
-                    GUILayout.Box("Mod Detection");
-                    GUILayout.BeginHorizontal();
-                    Buttons.SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
-                    Buttons.SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
-                    GUILayout.EndHorizontal();
-                }
-
-                PresetEditor.PresetMenu();
+                return;
             }
-            if (IsTabSelected(Personalities))
+            float spacing = DragRect.height + TabMenuRect.height + 5;
+            Builder.Space(spacing);
+            if (TabSelected(BotPresets, out Rect tabRect, 1000f))
             {
-                GUILayout.Box("Personality Settings");
-                GUILayout.Box("For The Memes. Recommended not to use these during normal gameplay!");
-                GUILayout.Box("Bots will be more predictable and exploitable.");
+                Builder.BeginArea(tabRect);
+                PresetEditor.OpenPresetWindow(tabRect);
+                Builder.EndArea();
+                return;
+            }
+
+            Builder.BeginVertical();
+
+            if (TabSelected(Home, out tabRect, 1000f))
+            {
+                Builder.CreateButtonOption(NoBushESPToggle);
+                Builder.CreateButtonOption(HeadShotProtection);
+
+                Builder.Box("Mod Detection");
+
+                Builder.BeginHorizontal();
+
+                Buttons.SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
+                Buttons.SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
+
+                Builder.EndHorizontal();
+            }
+            else if (TabSelected(Personalities, out tabRect, 1000f))
+            {
+                Builder.Box("Personality Settings");
+                Builder.Box("For The Memes. Recommended not to use these during normal gameplay!");
+                Builder.Box("Bots will be more predictable and exploitable.");
 
                 if (Builder.CreateButtonOption(AllGigaChads))
                 {
@@ -301,14 +322,11 @@ namespace SAIN.Editor
                 }
 
                 Builder.HorizSlider(RandomGigaChadChance, 1);
-
                 Builder.HorizSlider(RandomChadChance, 1);
-
                 Builder.HorizSlider(RandomRatChance, 1);
-
                 Builder.HorizSlider(RandomCowardChance, 1);
             }
-            if (IsTabSelected(Hearing))
+            else if (TabSelected(Hearing, out tabRect, 1000f))
             {
                 Builder.HorizSlider(SuppressorModifier, 100f);
                 Builder.HorizSlider(SubsonicModifier, 100f);
@@ -319,35 +337,47 @@ namespace SAIN.Editor
                 Builder.HorizSlider(AudioRangeShotgun, 1f);
                 Builder.HorizSlider(AudioRangeOther, 1f);
             }
-            if (IsTabSelected(Advanced))
+            else if (TabSelected(Advanced, out tabRect, 1000f))
             {
-                GUILayout.Box("Advanced Settings. Edit at your own risk.");
+                Builder.Box("Advanced Settings. Edit at your own risk.");
 
                 Builder.HorizSlider(MaxRecoil, 100f);
                 Builder.HorizSlider(AddRecoil, 100f);
                 Builder.HorizSlider(RecoilDecay, 1000f);
 
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Font"))
+                Builder.BeginHorizontal();
+                if (Builder.Button("Font"))
                 {
                     OpenFontMenu = !OpenFontMenu;
                 }
-                if (GUILayout.Button("Mysterious Button"))
+                if (Builder.Button("Mysterious Button"))
                 {
                     Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.PlayerIsDead);
                     Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.QuestFailed);
                 }
-                GUILayout.EndHorizontal();
+                Builder.EndHorizontal();
 
                 if (OpenFontMenu)
                 {
                     FontEditMenu.OpenMenu();
                 }
 
-                //ColorEditorMenu();
+                WindowLayoutCreator.CreateGUIAdjustmentSliders();
             }
+            Builder.EndVertical();
+        }
 
-            GUILayout.EndVertical();
+        bool NoTabSelected()
+        {
+            bool noTab = OpenTab == None;
+            if (noTab)
+            {
+                //OpenTabRect.height -= 30;
+                //OpenTabRect.height = Mathf.Clamp(OpenTabRect.height, baseHeight, 1000);
+                //MainWindow.height -= 30f;
+                //MainWindow.height = Mathf.Clamp(MainWindow.height, baseHeight, 1000);
+            }
+            return noTab;
         }
 
         public bool ExpandGeneral = false;

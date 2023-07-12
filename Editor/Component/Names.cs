@@ -14,6 +14,9 @@ namespace SAIN.Editor
             public const string MidGray = nameof(MidGray);
             public const string DarkGray = nameof(DarkGray);
             public const string VeryDarkGray = nameof(VeryDarkGray);
+            public const string VeryVeryDarkGray = nameof(VeryVeryDarkGray);
+
+            public const string Black = nameof(Black);
 
             public const string LightBlue = nameof(LightBlue);
             public const string MidBlue = nameof(MidBlue);
@@ -49,6 +52,8 @@ namespace SAIN.Editor
             public const string list = nameof(list);
             public const string tooltip = nameof(tooltip);
             public const string blankbox = nameof(blankbox);
+            public const string group = nameof(group);
+            public const string selectionGrid = nameof(selectionGrid);
         }
     }
 }

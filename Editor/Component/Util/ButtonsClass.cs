@@ -26,13 +26,13 @@ namespace SAIN.Editor
         {
             InfoBox(entry.Description.Description);
 
-            Box(entry.Definition.Key);
+            Box(entry.Definition.Key, 200f);
 
-            GUILayout.Space(25);
+            Space(25);
 
             entry.Value = CustomToggle(entry.Value);
 
-            GUILayout.Space(25);
+            Space(25);
 
             ResetButton(entry);
 
@@ -45,13 +45,13 @@ namespace SAIN.Editor
 
             InfoBox(entry.Description);
 
-            Box(entry.Name);
+            Box(entry.Name, 200f);
 
-            GUILayout.Space(25);
+            Space(25);
 
             value = CustomToggle(value);
 
-            GUILayout.Space(25);
+            Space(25);
 
             ResetButton(entry);
 
@@ -131,10 +131,8 @@ namespace SAIN.Editor
         }
         public void SingleTextBool(string text, bool value)
         {
-            Color old = GUI.backgroundColor;
             string status = value ? ": Detected" : ": Not Detected";
             Box(text + status);
-            GUI.backgroundColor = old;
         }
     }
 }

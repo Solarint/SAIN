@@ -24,7 +24,7 @@ namespace SAIN.Editor
 
         public void Init()
         {
-            Settings = JsonUtility.LoadFromJson.EditorSettings();
+            Settings = JsonUtility.Load.EditorSettings();
             if (Settings != null && Settings.FontName != null)
             {
                 CustomFont = Font.CreateDynamicFontFromOSFont(Settings.FontName, Settings.FontSize);
@@ -61,7 +61,7 @@ namespace SAIN.Editor
                         count = 0;
                     }
                     Color color = AvailableColors[i];
-                    var texture = UITextures.CreateTexture(2, 2, 0, color);
+                    var texture = Helpers.Textures.ModifyTexture.CreateTextureWithBorder(2, 2, 0, color);
                     GUIStyle style = new GUIStyle(GUI.skin.box);
                     style.normal.background = texture;
                     style.onNormal.background = texture;
@@ -73,6 +73,11 @@ namespace SAIN.Editor
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
+        }
+
+        public GUIStyle GetFontStyleDynamic(string key, bool active)
+        {
+            return CustomStyle.GetFontStyleDynamic(key, active);
         }
 
         private static float Red = 0;
@@ -119,6 +124,14 @@ namespace SAIN.Editor
                 StyleDictionary.Add(key, new GUIStyle());
                 return StyleDictionary[key];
             }
+        }
+
+        public GUIStyle GetFontStyleDynamic(string key, bool active)
+        {
+            var style = GetStyle(key);
+            style.fontStyle = active ? FontStyle.Bold : FontStyle.Normal;
+            style.alignment = TextAnchor.LowerLeft;
+            return style;
         }
 
         public void SaveStyle(string key, GUIStyle style)
@@ -175,13 +188,9 @@ namespace SAIN.Editor
             BGAllStates(BlankBackgroundStyle, null);
             ApplyTextColorAllStates(BlankBackgroundStyle, Color.white, Color.white);
 
-            //var A = GetUI("A");
-            //var Button_Large_A = Editor.TexturesClass.GetRecoloredUI("Button_Large_A", DarkRed);
-
             var TexMidGray = GetColor(MidGray);
             var TexDarkGray = GetColor(DarkGray);
             var TexVeryDarkGray = GetColor(VeryDarkGray);
-            //var TexLightRed = GetColor(LightRed);
             var TexMidRed = GetColor(MidRed);
             var TexDarkRed = GetColor(DarkRed);
 
@@ -202,7 +211,7 @@ namespace SAIN.Editor
 
             BGAllStates(HorizontalSliderStyle, null);
             BGAllStates(HorizontalSliderThumbStyle, null);
-            BGAllStates(WindowStyle, Editor.TexturesClass.Backgrounds[0]);
+            BGAllStates(WindowStyle, TexVeryDarkGray);
             BGAllStates(VerticalScrollbarStyle, TexVeryDarkGray);
             BGAllStates(VerticalScrollbarThumbStyle, TexDarkRed);
             BGAllStates(VerticalScrollbarUpButtonStyle, TexDarkGray);
@@ -210,6 +219,14 @@ namespace SAIN.Editor
             BGAllStates(BoxStyle, TexVeryDarkGray);
             BGAllStates(LabelStyle, TexVeryDarkGray);
 
+            var offset = new RectOffset(10, 10, 1, 1);
+            var selectGridStyle = new GUIStyle(ToggleStyle)
+            {
+                padding = offset,
+                border = offset
+            };
+
+            SaveStyle(selectionGrid, selectGridStyle);
             SaveStyle(horizontalSliderThumb, HorizontalSliderThumbStyle);
             SaveStyle(button, ButtonStyle);
             SaveStyle(box, BoxStyle);
@@ -234,10 +251,6 @@ namespace SAIN.Editor
         {
             return Editor.TexturesClass.GetColor(key);
         }
-        private Texture2D GetUI(string key)
-        {
-            return Editor.TexturesClass.GetUI(key);
-        }
 
         private void StyleTextAndSave(string key, Color color, Color? active = null, TextAnchor? anchor = null, FontStyle? fontStyle = null)
         {
@@ -253,54 +266,21 @@ namespace SAIN.Editor
             ApplyTextColorAllStates(style, color, active);
         }
 
-        private readonly FontStyle BoldFont = FontStyle.Bold;
-        private readonly FontStyle NormalFont = FontStyle.Normal;
-        private readonly TextAnchor MidCenterAlign = TextAnchor.MiddleCenter;
-        private readonly TextAnchor MidLeftAlign = TextAnchor.MiddleLeft;
-
         private void SetTextSettings()
         {
             var white = Color.white;
-            StyleTextAndSave(box, white, white, MidCenterAlign, BoldFont);
+            StyleTextAndSave(box, white, white, TextAnchor.MiddleCenter, FontStyle.Bold);
             StyleTextAndSave(label, white, white, TextAnchor.MiddleLeft, FontStyle.Normal);
 
             Color ColorGold = Editor.Colors.GetColor(Gold);
             StyleTextAndSave(list, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
-            StyleTextAndSave(button, white, ColorGold, MidCenterAlign, BoldFont);
-            StyleTextAndSave(toggle, white, ColorGold, MidCenterAlign, BoldFont);
-            StyleTextAndSave(textField, white, ColorGold, MidLeftAlign, NormalFont);
-            StyleTextAndSave(textArea, white, ColorGold, MidLeftAlign, NormalFont);
+            StyleTextAndSave(button, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);
+            StyleTextAndSave(toggle, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);
+            StyleTextAndSave(textField, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
+            StyleTextAndSave(textArea, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
+            StyleTextAndSave(selectionGrid, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Bold);
 
             StyleTextAndSave(window, white);
-        }
-    }
-
-    public class ReferenceDictionaryClass
-    {
-        public readonly Dictionary<string, VariableReference> Dictionary = new Dictionary<string, VariableReference>();
-
-        public void SaveVar(string key, Func<object> getter, Action<object> setter)
-        {
-            Dictionary.Add(key, new VariableReference(getter, setter));
-        }
-
-        public void ChangeVar(string key, GUIStyle style) // changing any of them
-        {
-            if (Dictionary[key].Get() is GUIStyle)
-            {
-                Dictionary[key].Set(style);
-            }
-        }
-    }
-
-    public sealed class VariableReference
-    {
-        public Func<object> Get { get; private set; }
-        public Action<object> Set { get; private set; }
-        public VariableReference(Func<object> getter, Action<object> setter)
-        {
-            Get = getter;
-            Set = setter;
         }
     }
 }

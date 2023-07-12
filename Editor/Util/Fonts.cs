@@ -20,7 +20,7 @@ namespace SAIN.Editor.Util
 
         public static void Init()
         {
-            Settings = JsonUtility.LoadFromJson.EditorSettings();
+            Settings = JsonUtility.Load.EditorSettings();
             if (Settings != null && Settings.FontName != null)
             {
                 GUI.skin.font = Font.CreateDynamicFontFromOSFont(Settings.FontName, Settings.FontSize);

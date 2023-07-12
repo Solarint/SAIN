@@ -17,29 +17,26 @@ namespace SAIN.Editor
         {
             if (text == null) return;
 
-            var rect = GUILayoutUtility.GetLastRect();
-            Vector2 mousePos = Event.current.mousePosition;
-            if (rect.Contains(mousePos) && Event.current.type == EventType.Repaint)
+            if (MouseFunctions.IsMouseInside())
             {
+                OpenToolTip = true;
+                Vector2 mousePos = Event.current.mousePosition;
                 ToolTipContent = Create(text);
                 Vector2 tooltipSize = ToolTipStyle.CalcSize(ToolTipContent);
-                //ToolTip = new Rect(rect.x + rect.width + 20, rect.y + rect.height + 50, tooltipSize.x, tooltipSize.y);
                 ToolTipRect = new Rect(mousePos.x + 20, mousePos.y + 50, tooltipSize.x, tooltipSize.y);
             }
         }
 
         public void CheckMouseTable(List<string> options)
         {
+            if (options == null) return;
+
             var rect = GUILayoutUtility.GetLastRect();
             Vector2 mousePos = Event.current.mousePosition;
             if (rect.Contains(mousePos) && Event.current.type == EventType.Repaint)
             {
                 OpenToolTip = true;
                 ToolTipContent = StringList(options);
-            }
-            else
-            {
-                OpenToolTip = false;
             }
         }
 
@@ -55,6 +52,7 @@ namespace SAIN.Editor
                 Vector2 tooltipSize = ToolTipStyle.CalcSize(ToolTipContent);
                 ToolTipRect = new Rect(mousePos.x + 20, mousePos.y + 50, tooltipSize.x, tooltipSize.y);
                 ToolTipRect = GUI.Window(1, ToolTipRect, ToolTipFunc, "");
+                OpenToolTip = false;
             }
         }
 

@@ -11,7 +11,7 @@ using static SAIN.Logger;
 
 namespace SAIN.Helpers.Textures
 {
-    internal static class Save
+    internal static class SaveTexture
     {
         public static void Textures(string path, Dictionary<string, Texture2D> dict)
         {

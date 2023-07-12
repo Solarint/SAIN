@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static UnityEngine.GUILayout;
 using static SAIN.Editor.Names;
+using SAIN.Editor.GUISections;
+using UnityEngine.UIElements;
 
 namespace SAIN.Editor
 {
@@ -15,7 +16,6 @@ namespace SAIN.Editor
         public PresetEditor(GameObject obj) : base(obj)
         {
             List<string> sections = new List<string>();
-            List<string> props = new List<string>();
             WildSpawnTypes = PresetManager.BotTypes;
             foreach (var type in WildSpawnTypes)
             {
@@ -28,22 +28,75 @@ namespace SAIN.Editor
             Sections = sections.ToArray();
         }
 
-        public void PresetMenu()
+        public void OpenPresetWindow(Rect windowRect)
         {
-            if (ExpandPresetEditor = BuilderClass.ExpandableMenu("Bot Preset Editor", ExpandPresetEditor, "Edit Values for particular bot types and difficulty settings"))
+            PresetWindow = windowRect;
+            Rect12Height = windowRect.height;
+
+            OpenFirstMenu = BuilderClass.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
+            if (OpenFirstMenu)
             {
-                FirstMenu();
+                SectionRectangle = new Rect(0, 30, SectionRectWidth, FinalWindowHeight);
+                BeginArea(SectionRectangle);
+                SelectSection(SectionRectangle);
+                EndArea();
+
+                TypeRectangle = new Rect(TypeRectX, 30, TypeRectWidth, FinalWindowHeight);
+
+                BeginArea(TypeRectangle);
+
+                FirstMenuScroll = BeginScrollView(FirstMenuScroll);
+                SelectType();
+                EndScrollView();
+
+                EndArea();
+
+                Space(SectionRectangle.height + SectionRectangle.y);
+                BeginHorizontal();
+
+                float width = PresetWindow.width / 3;
+                if (Button("Confirm", width, true))
+                {
+                    OpenFirstMenu = false;
+                }
+                if (Button("Clear", width, true))
+                {
+                    SelectedSections.Clear();
+                    SelectedWildSpawnTypes.Clear();
+                }
+                OpenAdjustmentWindow = Toggle(OpenAdjustmentWindow, "Open GUI Adjustment", width, true);
+
+                EndHorizontal();
                 DifficultyTable();
+            }
+
+            OpenPropertySelection = BuilderClass.ExpandableMenu("Properties", OpenPropertySelection, "Select which properties you wish to modify.");
+            if (OpenPropertySelection)
+            {
                 PropertyMenu();
+            }
+
+            OpenPresetEditMenu = BuilderClass.ExpandableMenu("Presets", OpenPresetEditMenu, "Modify selected properties here");
+            if (OpenPresetEditMenu)
+            {
                 PresetEditWindow();
             }
         }
+
+        bool OpenFirstMenu = true;
+        bool OpenPropertyMenu = false;
+        bool OpenPresetEditMenu = false;
+        Rect PresetWindow;
+
+        float FinalWindowWidth => Editor.WindowLayoutCreator.FinalWindowWidth;
+
+        float FinalWindowHeight => 300f;
 
         private float Rect1OptionSpacing = 2f;
         private float Rect2OptionSpacing = 2f;
         private float SectionSelOptionHeight => (Rect12Height / Sections.Length) - (Rect1OptionSpacing);
         private float SectionRectX => BothRectGap;
-        private float SectionRectWidth = 165f;
+        private float SectionRectWidth = 150f;
         private float BothRectGap = 6f;
         private float TypeRectWidth => RectLayout.MainWindow.width - SectionRectWidth - BothRectGap * 2f;
         private float TypeRectX => SectionRectX + SectionRectWidth + BothRectGap;
@@ -64,28 +117,6 @@ namespace SAIN.Editor
         private Rect TypeRectangle;
 
         private Vector2 FirstMenuScroll = Vector2.zero;
-        private void FirstMenu()
-        {
-            SectionRectangle = new Rect(SectionRectX, MenuStartHeight, SectionRectWidth, Rect12Height);
-            BeginArea(SectionRectangle);
-            SelectSection();
-            EndArea();
-
-            TypeRectangle = new Rect(TypeRectX, MenuStartHeight, TypeRectWidth, Rect12HeightMinusMargin);
-            //Rect scrollRect = new Rect(ScrollMargin, ScrollMargin, TypeRectWidth - ScrollMargin * 2f, ScrollHeight);
-
-            BeginArea(TypeRectangle);
-
-            FirstMenuScroll = BeginScrollView(FirstMenuScroll);
-            SelectType();
-            EndScrollView();
-
-            EndArea();
-
-            Space(Rect12Height);
-
-            OpenAdjustmentWindow = Toggle(OpenAdjustmentWindow, "Open GUI Adjustment");
-        }
 
         private Rect RelativeRect( Rect mainRect , Rect insideRect, Rect lastRect)
         {
@@ -170,62 +201,16 @@ namespace SAIN.Editor
             return Mathf.Round(value * dec) / dec;
         }
 
-        private void SelectSection()
+        Rect[] SectionRects;
+
+        private void SelectSection(Rect window)
         {
-            BeginVertical();
-            Space(Rect1OptionSpacing);
-
-            for (int i = 0; i < Sections.Length; i++)
+            if (SectionRects == null)
             {
-                string section = Sections[i];
-                bool selected = SelectedSections.Contains(section);
-
-                GUIStyle style = new GUIStyle(GetStyle(StyleNames.list))
-                {
-                    fontStyle = FontStyle.Normal,
-                    alignment = TextAnchor.MiddleLeft
-                };
-
-                if (selected)
-                {
-                    style.fontStyle = FontStyle.Bold;
-                    int normalFontSize = style.fontSize;
-                    int increase = Mathf.RoundToInt(SectOptFontSizeInc);
-                    style.fontSize = normalFontSize + increase;
-                }
-
-                BeginHorizontal();
-                Space(Rect1OptionSpacing);
-
-                float width = SectionRectWidth - Rect1OptionSpacing * 2;
-                if (Toggle(selected, section, style, Width(width), Height(SectionSelOptionHeight)))
-                {
-                    if (!selected)
-                    {
-                        SelectedSections.Add(section);
-                    }
-                }
-                else
-                {
-                    if (selected)
-                    {
-                        SelectedSections.Remove(section);
-                    }
-                }
-                if (MouseFunctions.CheckMouseDrag())
-                {
-                    if (!selected)
-                    {
-                        SelectedSections.Add(section);
-                    }
-                }
-
-                Space(Rect1OptionSpacing);
-                EndHorizontal();
+                SectionRects = BuilderClass.VerticalGridRects(window, Sections.Length, 80f);
             }
 
-            Space(Rect1OptionSpacing);
-            EndVertical();
+            BuilderClass.SelectionGridExpandWidth(window, Sections, SelectedSections, SectionRects, 70f, 5);
         }
 
         private void SelectType()
@@ -290,7 +275,7 @@ namespace SAIN.Editor
         }
 
         public readonly string[] Sections;
-        private readonly List<string> SelectedSections = new List<string>();
+        private List<string> SelectedSections = new List<string>();
 
         private readonly BotType[] WildSpawnTypes;
         private readonly List<BotType> SelectedWildSpawnTypes = new List<BotType>();
@@ -302,12 +287,6 @@ namespace SAIN.Editor
             {
                 return;
             }
-            bool oldValue = SelectAllDifficulties;
-            SelectAllDifficulties = LabelAndAll(
-                "Select Difficulty",
-                SelectAllDifficulties,
-                labelHeight,
-                labelWidth);
 
             BeginHorizontal();
 
@@ -315,8 +294,6 @@ namespace SAIN.Editor
             for (int i = 0; i < BotDifficultyOptions.Length; i++)
             {
                 var diff = BotDifficultyOptions[i];
-
-                CheckAddAll(SelectAllDifficulties, oldValue, SelectedDifficulties, diff);
 
                 spacing = SelectionGridOption(
                     spacing,
@@ -337,19 +314,6 @@ namespace SAIN.Editor
 
         private void PropertyMenu(int optionsPerLine = 3, float labelHeight = 35f, float labelWidth = 200f, float optionHeight = 25f, float scrollHeight = 200f)
         {
-            OpenPropertySelection = BuilderClass.ExpandableMenu("Properties", OpenPropertySelection, "Select which properties you wish to modify.");
-            if (!OpenPropertySelection)
-            {
-                return;
-            }
-
-            bool oldValue = SelectAllProperties;
-            SelectAllProperties = LabelAndAll(
-                "Select Properties",
-                SelectAllProperties,
-                labelHeight,
-                labelWidth);
-
             PropertyScroll = BeginScrollView(PropertyScroll, Height(scrollHeight));
 
             BeginHorizontal();
@@ -358,8 +322,6 @@ namespace SAIN.Editor
             int spacing = 0;
             for (int i = 0; i < properties.Count; i++)
             {
-                CheckAddAll(SelectAllProperties, oldValue, SelectedProperties, properties[i]);
-
                 spacing = SelectionGridOption(
                     spacing,
                     properties[i].Name,
@@ -439,7 +401,7 @@ namespace SAIN.Editor
 
         private void CreatePropertyOption(PropertyInfo property, BotType type)
         {
-            BotDifficulty diff = SelectedDifficulties[SelectedDifficulties.Count];
+            BotDifficulty diff = SelectedDifficulties[SelectedDifficulties.Count - 1];
             Type propertyType = property.PropertyType;
             if (propertyType == typeof(SAINProperty<float>))
             {

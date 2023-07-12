@@ -39,7 +39,7 @@ namespace SAIN.Editor.Util
             }
         }
 
-        public static void ApplyTextColorAllStates(GUIStyle style, Color normal, Color? active)
+        public static void ApplyTextColorAllStates(GUIStyle style, Color normal, Color? active = null)
         {
             active = active ?? normal;
             var activeVal = active.Value;

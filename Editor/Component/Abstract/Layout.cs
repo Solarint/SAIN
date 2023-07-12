@@ -224,7 +224,6 @@ namespace SAIN.Editor.Abstract
             }
             Box(description, Width(InfoWidth), StandardHeight);
             //CheckMouse(description);
-
             Space(gap);
 
             Label(label, Width(LabelWidth), StandardHeight);
@@ -239,6 +238,77 @@ namespace SAIN.Editor.Abstract
 
             GUILayout.EndHorizontal();
             return value;
+        }
+
+        public void BeginHorizontal()
+        {
+            GUILayout.BeginHorizontal();
+        }
+        public void EndHorizontal()
+        {
+            GUILayout.EndHorizontal();
+        }
+        public void BeginVertical()
+        {
+            GUILayout.BeginVertical();
+        }
+        public void EndVertical()
+        {
+            GUILayout.EndVertical();
+        }
+        public void BeginArea(Rect rect)
+        {
+            GUILayout.BeginArea(rect);
+        }
+        public void EndArea()
+        {
+            GUILayout.EndArea();
+        }
+
+        public void Space(float value)
+        {
+            GUILayout.Space(value);
+        }
+
+        public void BeginGroup(Rect rect)
+        {
+            GUI.BeginGroup(rect, GetStyle(window));
+        }
+
+        public void EndGroup()
+        {
+            GUI.EndGroup();
+        }
+
+        public GUILayoutOption ExpandHeight(bool value)
+        {
+            return GUILayout.ExpandHeight(value);
+        }
+        public GUILayoutOption ExpandWidth(bool value)
+        {
+            return GUILayout.ExpandWidth(value);
+        }
+
+        public void FlexibleSpace()
+        {
+            GUILayout.FlexibleSpace();
+        }
+
+        public Vector2 BeginScrollView(Vector2 scrollPos)
+        {
+            return GUILayout.BeginScrollView(scrollPos, GetStyle(scrollView));
+        }
+        public Vector2 BeginScrollView(Rect rect, Vector2 scrollPos, Rect viewRect)
+        {
+            return GUI.BeginScrollView(rect, scrollPos, viewRect, GetStyle(horizontalScrollbar), GetStyle(verticalScrollbar));
+        }
+        public void EndScrollView()
+        {
+            GUILayout.EndScrollView();
+        }
+        public void EndScrollView(bool handleScrollWheel)
+        {
+            GUI.EndScrollView(handleScrollWheel);
         }
 
         public Vector2 BeginScrollView(Vector2 pos, params GUILayoutOption[] options)
@@ -258,11 +328,6 @@ namespace SAIN.Editor.Abstract
         public GUILayoutOption Width(float width)
         {
             return GUILayout.Width(width);
-        }
-
-        public void Space(float width)
-        {
-            GUILayout.Space(width);
         }
 
         public Rect NewWindow(int id, Rect viewRect, GUI.WindowFunction func, string title)

@@ -244,6 +244,7 @@
     <Compile Include="Components\Bot Components\SubComponents\HeardSoundsComponent.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotSpawnController.cs" />
+    <Compile Include="Editor\Component\GUISections\WindowLayoutCreator.cs" />
     <Compile Include="Editor\Component\Names.cs" />
     <Compile Include="Editor\Component\Util\ApplyToStyle.cs" />
     <Compile Include="Editor\Component\Util\ColorsClass.cs" />
@@ -260,11 +261,10 @@
     <Compile Include="Editor\Util\Fonts.cs" />
     <Compile Include="Editor\Util\InputField.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
-    <Compile Include="Helpers\Util\ColorUtility.cs" />
     <Compile Include="Logger.cs" />
-    <Compile Include="Helpers\Util\Textures\Modify.cs" />
-    <Compile Include="Helpers\Util\Textures\Save.cs" />
-    <Compile Include="Helpers\Util\Textures\Load.cs" />
+    <Compile Include="Helpers\Util\Textures\ModifyTexture.cs" />
+    <Compile Include="Helpers\Util\Textures\SaveTexture.cs" />
+    <Compile Include="Helpers\Util\Textures\LoadTexture.cs" />
     <Compile Include="Helpers\Util\Utility.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
@@ -303,7 +303,6 @@
     <Compile Include="Editor\Component\Util\RectLayout.cs" />
     <Compile Include="Editor\Component\Util\StyleOptions.cs" />
     <Compile Include="Editor\Util\ToolTips.cs" />
-    <Compile Include="Editor\Util\UITextures.cs" />
     <Compile Include="Plugin\Config\ConfigAbstract.cs" />
     <Compile Include="BotPresets\PresetManager.cs" />
     <Compile Include="BotPresets\BotPreset.cs" />

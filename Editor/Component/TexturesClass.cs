@@ -10,16 +10,6 @@ namespace SAIN.Editor
     {
         public TexturesClass(GameObject editor) : base(editor)
         {
-            Load.Textures(UIElementsFolder, UIElements);
-            //Load.TexturesClass(ColorTexturesFolder, ColorTextures);
-            //Load.TexturesClass(CustomTexturesFolder, CustomTextures);
-            //LoadBackgrounds();
-            Backgrounds = Modify.CreateNewBackgrounds(BackgroundRecolor, OriginalBackgroundPath, BackGroundCount);
-        }
-
-        public Texture2D GetRecoloredUI(string uiKey, string colorKey)
-        {
-            return Modify.RecolorTexture(GetUI(uiKey), Editor.Colors.GetColor(colorKey));
         }
 
         public Texture2D GetColor(string name)
@@ -27,15 +17,6 @@ namespace SAIN.Editor
             if (ColorTextures.ContainsKey(name))
             {
                 return ColorTextures[name];
-            }
-            return Texture2D.redTexture;
-        }
-
-        public Texture2D GetUI(string name)
-        {
-            if (UIElements.ContainsKey(name))
-            {
-                return UIElements[name];
             }
             return Texture2D.redTexture;
         }
@@ -52,16 +33,10 @@ namespace SAIN.Editor
         public void Init()
         {
             CreateTextures();
-            //Save.TexturesClass(ColorTexturesFolder, ColorTextures);
-            //Save.TexturesClass(BackgroundsPath, "background", Backgrounds);
         }
 
         private const int BackGroundCount = 4;
-        private readonly Recolor BackgroundRecolor = new Recolor(-0.08f, -0.18f, -0.18f);
-
-        public Texture2D[] Backgrounds { get; private set; }
-
-        public readonly Dictionary<string, Texture2D> UIElements = new Dictionary<string, Texture2D>();
+        //private readonly Recolor BackgroundRecolor = new Recolor(-0.08f, -0.18f, -0.18f);
 
         public readonly Dictionary<string, Texture2D> ColorTextures = new Dictionary<string, Texture2D>();
 
@@ -69,12 +44,13 @@ namespace SAIN.Editor
 
         private void CreateTextures()
         {
-            var colors = Editor.Colors.ColorScheme;
-            foreach (var color in colors)
+            var dictionary = Editor.Colors.ColorScheme;
+            foreach (var wrapper in dictionary.Values)
             {
-                Texture2D texture = NewTexture(color.Value);
-                ColorTextures.Add(color.Key, texture);
-                //AddTexture(color.Key, color.Value, ColorTextures);
+                Color colorValue = wrapper.Color;
+                Texture2D texture = NewTexture(colorValue);
+                ColorTextures.Add(wrapper.Name, texture);
+                //AddTexture(wrapper.Key, wrapper.Value, ColorTextures);
             }
         }
 
@@ -105,21 +81,12 @@ namespace SAIN.Editor
             return lastRect;
         }
 
-        private void LoadBackgrounds()
-        {
-            //Backgrounds = Load.TexturesClass(BackgroundsPath);
-            if (Backgrounds == null || Backgrounds.Length < BackGroundCount)
-            {
-                Backgrounds = Modify.CreateNewBackgrounds(BackgroundRecolor, OriginalBackgroundPath, BackGroundCount);
-            }
-        }
-
-        private const string TexturesPath = "BepInEx/plugins/SAIN/UI/Textures/";
-        private const string UIElementsFolder = TexturesPath + "UIElements";
-        private const string ColorTexturesFolder = TexturesPath + "Colors";
-        private const string CustomTexturesFolder = TexturesPath + "Custom";
-        private const string BackgroundsPath = TexturesPath + "Backgrounds/Custom";
-        private const string OriginalBackgroundPath = TexturesPath + "Backgrounds/original.png";
+        //private const string TexturesPath = "BepInEx/plugins/SAIN/UI/Textures/";
+        //private const string UIElementsFolder = TexturesPath + "UIElements";
+        //private const string ColorTexturesFolder = TexturesPath + "Colors";
+        //private const string CustomTexturesFolder = TexturesPath + "Custom";
+        //private const string BackgroundsPath = TexturesPath + "Backgrounds/Custom";
+        //private const string OriginalBackgroundPath = TexturesPath + "Backgrounds/original.png";
     }
 
     public sealed class Recolor

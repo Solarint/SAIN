@@ -1,14 +1,16 @@
-using Aki.Common.Utils;
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
+using SAIN.BotPresets;
 using SAIN.Editor;
+using SAIN.Editor.Util;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using SAIN.BotPresets;
+using static HBAO_Core;
 
 namespace SAIN.Helpers
 {
@@ -16,41 +18,66 @@ namespace SAIN.Helpers
     {
         private static ManualLogSource Logger => Utility.Logger;
 
-        public static string BotPresetPath(WildSpawnType type)
-        {
-            string path = GetPluginPath("SAIN");
-            path = Path.Combine(path, "DifficultyPresets");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            path = Path.Combine(path, type.ToString());
-            path += ".json";
-            return path;
-        }
-
-        public static class SaveToJson
+        public static class Save
         {
             private static int count = 1;
 
-            public static void DifficultyPreset(BotPreset preset)
+            public static void SaveObject(object objectToSave, string fileExtension, string fileName, params string[] folders)
             {
-                string path = BotPresetPath(preset.WildSpawnType);
-                string json = JsonConvert.SerializeObject(preset);
-                File.WriteAllText(path, json);
+                if (CheckNull(objectToSave)) return;
+
+                string foldersPath = GetFoldersPath(folders);
+                string filePath = Path.Combine(foldersPath, fileName);
+                filePath += fileExtension;
+
+                string json = JsonConvert.SerializeObject(objectToSave);
+                File.WriteAllText(filePath, json);
+            }
+
+            public static void SaveJson(object objectToSave, string fileName, params string[] folders)
+            {
+                if (CheckNull(objectToSave)) return;
+
+                SaveObject(objectToSave, ".json", fileName, folders);
+            }
+
+            public static void SaveScheme(BaseColorSchemeClass scheme)
+            {
+                if (CheckNull(scheme)) return;
+
+                SaveJson(scheme, ColorScheme, UIFolder, ColorsFolder);
+            }
+
+            public static void SavePreset(BotPreset preset)
+            {
+                if (CheckNull(preset)) return;
+
+                SaveJson(preset, preset.WildSpawnType.ToString(), PresetsFolder);
+            }
+
+            public static void SavePresets(BotPreset[] presets)
+            {
+                for (int i = 0; i < presets.Length; i++)
+                {
+                    SavePreset(presets[i]);
+                }
+            }
+
+            static bool CheckNull(object obj)
+            {
+                bool isNull = obj == null;
+                if (isNull)
+                {
+                    LogError("Object is Null, cannot save.");
+                }
+                return isNull;
             }
 
             public static void EditorSettings(EditorCustomization custom)
             {
-                string path = GetPluginPath("SAIN");
-                path = Path.Combine(path, "editor");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                path += ".json";
-                string json = JsonConvert.SerializeObject(custom);
-                File.WriteAllText(path, json);
+                if (CheckNull(custom)) return;
+
+                SaveJson(custom, "EditorSettings", UIFolder);
             }
 
             public static void List<T>(List<T> inputList, string inputFolder, string inputName, bool useMapName, bool overwrite = true)
@@ -96,41 +123,88 @@ namespace SAIN.Helpers
 
                 name += ".json";
 
-                return Path.Combine(GetPluginPath(inputFolder), name);
+                return Path.Combine(GetSAINPluginPath(inputFolder), name);
             }
         }
 
-        public static class LoadFromJson
+        const string EditorName = "Editor";
+        const string SAINName = "SAIN";
+        const string PresetsFolder = "BotPresets";
+        const string UIFolder = "UI";
+        const string TextureFolder = "Textures";
+        const string ColorsFolder = "Colors";
+        const string ColorScheme = nameof(ColorScheme);
+        const string ColorNames = nameof(ColorNames);
+
+        public static class Load
         {
-            public static EditorCustomization EditorSettings()
+            public static BaseColorSchemeClass LoadColorScheme()
             {
-                string path = GetPluginPath("SAIN");
-                path = Path.Combine(path, "editor");
-                path += ".json";
-                if (File.Exists(path))
+                BaseColorSchemeClass result;
+                if (LoadJsonFile( out string schemeJson , ColorScheme, UIFolder, ColorsFolder ))
                 {
-                    string json = File.ReadAllText(path);
-                    return JsonConvert.DeserializeObject<EditorCustomization>(json);
+                    result = DeserializeObject<BaseColorSchemeClass>( schemeJson );
                 }
                 else
                 {
-                    return new EditorCustomization();
+                    result = new BaseColorSchemeClass(nameof(SAIN));
                 }
+                if (LoadJsonFile(out string namesJson, ColorNames, UIFolder, ColorsFolder))
+                {
+                    DeserializeObject<ColorNames>(namesJson);
+                }
+                else
+                {
+                    var names = new ColorNames(nameof(SAIN));
+                    Save.SaveJson(names, ColorNames, UIFolder, ColorsFolder);
+                }
+                return result;
             }
 
-            public static BotPreset DifficultyPreset(WildSpawnType type)
+            public static T DeserializeObject<T>(string file)
             {
-                string path = BotPresetPath(type);
+                return JsonConvert.DeserializeObject<T>(file);
+            }
 
-                if (File.Exists(path))
+            [CanBeNull]
+            public static string LoadTextFile(string fileExtension, string fileName, params string[] folders)
+            {
+                string foldersPath = GetFoldersPath(folders);
+                string filePath = Path.Combine(foldersPath, fileName);
+
+                filePath += fileExtension;
+
+                if (File.Exists(filePath))
                 {
-                    string json = File.ReadAllText(path);
-                    var preset = JsonConvert.DeserializeObject<BotPreset>(json); // Deserialize to BotPreset
-                    return preset;
+                    return File.ReadAllText(filePath);
+                }
+                return null;
+            }
+
+            private static bool LoadJsonFile(out string json, string fileName, params string[] folders)
+            {
+                json = LoadTextFile(".json", fileName, folders);
+                return json != null;
+            }
+
+            public static EditorCustomization EditorSettings()
+            {
+                if (LoadJsonFile(out string json, EditorName, UIFolder))
+                {
+                    return DeserializeObject<EditorCustomization>(json);
+                }
+                return new EditorCustomization();
+            }
+
+            public static BotPreset BotPreset(WildSpawnType type)
+            {
+                if (LoadJsonFile(out string json, type.ToString(), PresetsFolder))
+                {
+                    return DeserializeObject<BotPreset>(json); // Deserialize to BotPreset
                 }
                 else
                 {
-                    Logger.LogWarning($"File {path} does not exist");
+                    LogWarning($"BotPreset for {type} does not exist");
                     return null;
                 }
             }
@@ -142,12 +216,12 @@ namespace SAIN.Helpers
                 var name = GetNameAndSubNames(inputName, forMap);
                 name += ".json";
 
-                var filePath = Path.Combine(GetPluginPath(inputFolder), name);
+                var filePath = Path.Combine(GetSAINPluginPath(inputFolder), name);
 
                 if (File.Exists(filePath))
                 {
                     var json = File.ReadAllText(filePath);
-                    outputList = JsonConvert.DeserializeObject<List<T>>(json);
+                    outputList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<T>>(json);
                 }
                 else
                 {
@@ -163,7 +237,7 @@ namespace SAIN.Helpers
 
                 string name = GetNameAndSubNames(inputName, forMap);
 
-                string filePath = Path.Combine(GetPluginPath(inputFolder), name);
+                string filePath = Path.Combine(GetSAINPluginPath(inputFolder), name);
 
                 List<T> values = new List<T>();
 
@@ -177,7 +251,7 @@ namespace SAIN.Helpers
                         {
                             string json = File.ReadAllText(item);
 
-                            var savedList = JsonConvert.DeserializeObject<List<T>>(json);
+                            var savedList = Newtonsoft.Json.JsonConvert.DeserializeObject<List<T>>(json);
 
                             values.AddRange(savedList);
                         }
@@ -190,6 +264,14 @@ namespace SAIN.Helpers
                 }
 
                 return outputList != null;
+            }
+        }
+
+        private static void CheckDirectionary(string path)
+        {
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
             }
         }
 
@@ -213,18 +295,49 @@ namespace SAIN.Helpers
             }
         }
 
-        private static string GetPluginPath(string folder)
+        private static string GetFoldersPath(params string[] folders)
         {
-            var path = Path.Combine(PluginFolder, folder);
-
-            if (!Directory.Exists(path))
+            string path = GetSAINPluginPath();
+            for (int i = 0; i < folders.Length; i++)
             {
-                Directory.CreateDirectory(path);
+                path = Path.Combine(path, folders[i]);
             }
-
+            CheckDirectionary(path);
             return path;
         }
 
+        private static string GetSAINPluginPath(string folder)
+        {
+            string path = Path.Combine(GetSAINPluginPath(), folder);
+            CheckDirectionary(path);
+            return path;
+        }
+
+        private static string GetSAINPluginPath()
+        {
+            var path = Path.Combine(PluginFolder, SAINFolder);
+            CheckDirectionary(path);
+            return path;
+        }
+
+        private const string SAINFolder = nameof(SAIN);
         private static readonly string PluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        private static void LogInfo(string message)
+        {
+            SAIN.Logger.LogInfo(message, typeof(JsonUtility), true);
+        }
+        private static void LogDebug(string message)
+        {
+            SAIN.Logger.LogDebug(message, typeof(JsonUtility), true);
+        }
+        private static void LogWarning(string message)
+        {
+            SAIN.Logger.LogWarning(message, typeof(JsonUtility), true);
+        }
+        private static void LogError(string message)
+        {
+            SAIN.Logger.LogError(message, typeof(JsonUtility), true);
+        }
     }
 }

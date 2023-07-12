@@ -44,16 +44,16 @@ namespace SAIN.Editor
         public static int SelectedTab { get; set; } = 0;
         public static int TabCount { get; } = SAINEditor.Tabs.Length;
 
-        public static Rect MainWindow = new Rect(50, 50, 800, 800);
-        public static Rect ExitButton = new Rect(MainWindow.width* 0.95f, 0, MainWindow.width * 0.05f, MainWindow.height * 0.05f);
-        public static Rect DragBarMainWindow = new Rect(0, 0, MainWindow.width * 0.95f, MainWindow.height * 0.05f);
-        public static Rect PresetMenuRect => new Rect(MainWindow.x + MainWindow.width, MainWindow.y + MainWindow.height, 800f, 800f);
-        public static Rect PauseGameOptionRect = new Rect(MainWindow.width * 0.8f, 0, MainWindow.width * 0.15f, MainWindow.height * 0.05f);
+        public static Rect MainWindow = new Rect(0, 0, 1920, 1080);
+         
+        static float ExitWidthHeight = 25f;
+        static float PauseWidth = 120f;
+        static float ExitStartX = MainWindow.width - ExitWidthHeight;
+        static float PauseStartX = ExitStartX - PauseWidth;
+        static float DragWidth = PauseStartX;
 
-
-        public float MainMenuWidth = 800f;
-        public float MainMenuHeight = 800f;
-        public float PresetMenuWidth = 800f;
-        public float PresetMenuHeight = 600f;
+        public static Rect ExitRect = new Rect(ExitStartX, 0, ExitWidthHeight, ExitWidthHeight);
+        public static Rect DragRect = new Rect(0, 0, DragWidth, ExitWidthHeight);
+        public static Rect PauseRect = new Rect(PauseStartX, 0, PauseWidth, ExitWidthHeight);
     }
 }

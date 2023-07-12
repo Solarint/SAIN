@@ -29,11 +29,11 @@ namespace SAIN.BotPresets
 
         private static BotPreset PresetHandler(WildSpawnType wildType)
         {
-            BotPreset Preset = JsonUtility.LoadFromJson.DifficultyPreset(wildType);
+            BotPreset Preset = JsonUtility.Load.BotPreset(wildType);
             if (Preset == null)
             {
                 Preset = new BotPreset(wildType);
-                JsonUtility.SaveToJson.DifficultyPreset(Preset);
+                JsonUtility.Save.SavePreset(Preset);
             }
             return Preset;
         }

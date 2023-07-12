@@ -6,11 +6,11 @@ using static SAIN.Logger;
 
 namespace SAIN.Helpers.Textures
 {
-    internal static class Load
+    internal static class LoadTexture
     {
         private static void LogMessage(string message)
         {
-            LogWarning(message, typeof(Load), true);
+            LogWarning(message, typeof(LoadTexture), true);
         }
 
         public static Texture2D Single(string path)
@@ -63,7 +63,7 @@ namespace SAIN.Helpers.Textures
                 string[] fileNames = Directory.GetFiles(path);
                 if (fileNames.Length == 0)
                 {
-                    LogWarning($"No Files Found", typeof(Load), true);
+                    LogWarning($"No Files Found", typeof(LoadTexture), true);
                     return null;
                 }
 

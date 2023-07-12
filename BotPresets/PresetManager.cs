@@ -74,7 +74,7 @@ namespace SAIN.BotPresets
 
         public static void UpdatePreset(BotPreset preset)
         {
-            JsonUtility.SaveToJson.DifficultyPreset(preset);
+            JsonUtility.Save.SavePreset(preset);
             if (SAINPlugin.BotController != null && SAINPlugin.BotController.Bots.Count > 0)
             {
                 PresetUpdated(preset.WildSpawnType, preset);

@@ -386,7 +386,7 @@ namespace SAIN.Classes
 
                 LayerMask mask = LayerMaskClass.HighPolyWithTerrainNoGrassMask;
 
-                // AddToScheme a RaycastHit array and set it to the Physics.RaycastAll
+                // AddorUpdateColorScheme a RaycastHit array and set it to the Physics.RaycastAll
                 var direction = botpos - enemypos;
                 RaycastHit[] hits = Physics.RaycastAll(enemypos, direction, direction.magnitude, mask);
 
