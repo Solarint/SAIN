@@ -201,6 +201,7 @@ namespace SAIN.Components
             Destroy(Hearing);
             Destroy(Talk);
             Destroy(Decision);
+            Destroy(Cover.CoverFinder);
             Destroy(Cover);
             Destroy(FlashLight);
             Destroy(SelfActions);
