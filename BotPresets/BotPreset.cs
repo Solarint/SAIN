@@ -258,7 +258,7 @@ namespace SAIN.BotPresets
         [JsonConstructor]
         public SAINProperty() {}
 
-        public SAINProperty(string name, object defaultVal, object minVal, object maxVal, string description = null, float rounding = 1f)
+        public SAINProperty(string name, T defaultVal, T minVal, T maxVal, string description = null, float rounding = 1f)
         {
             Name = name;
             Description = description;
@@ -267,32 +267,36 @@ namespace SAIN.BotPresets
             Max = maxVal;
             Rounding = rounding;
 
-            object Value = defaultVal;
-
-            DifficultyValue.Add(BotDifficulty.easy, Value);
-            DifficultyValue.Add(BotDifficulty.normal, Value);
-            DifficultyValue.Add(BotDifficulty.hard, Value);
-            DifficultyValue.Add(BotDifficulty.impossible, Value);
+            T Value = defaultVal;
+            DifficultyValue = new Dictionary<BotDifficulty, T>
+            {
+                { BotDifficulty.easy, Value },
+                { BotDifficulty.normal, Value },
+                { BotDifficulty.hard, Value },
+                { BotDifficulty.impossible, Value }
+            };
         }
 
         public SAINProperty(string name, string description, bool defaultVal)
         {
             Name = name;
             Description = description;
-            DefaultVal = defaultVal;
-            Min = false;
-            Max = true;
+            DefaultVal = (T)(object)defaultVal;
+            Min = (T)(object)false;
+            Max = (T)(object)true;
 
-            object Value = defaultVal;
-
-            DifficultyValue.Add(BotDifficulty.easy, Value);
-            DifficultyValue.Add(BotDifficulty.normal, Value);
-            DifficultyValue.Add(BotDifficulty.hard, Value);
-            DifficultyValue.Add(BotDifficulty.impossible, Value);
+            T Value = (T)(object) defaultVal;
+            DifficultyValue = new Dictionary<BotDifficulty, T>
+            {
+                { BotDifficulty.easy, Value },
+                { BotDifficulty.normal, Value },
+                { BotDifficulty.hard, Value },
+                { BotDifficulty.impossible, Value }
+            };
         }
 
         [JsonProperty]
-        public Dictionary<BotDifficulty, object> DifficultyValue { get; set; } = new Dictionary<BotDifficulty, object>();
+        public Dictionary<BotDifficulty, T> DifficultyValue { get; set; }
 
         [JsonProperty]
         public readonly float Rounding;
@@ -301,18 +305,18 @@ namespace SAIN.BotPresets
         [JsonProperty]
         public readonly string Description;
         [JsonProperty]
-        public readonly object DefaultVal;
+        public readonly T DefaultVal;
         [JsonProperty]
-        public readonly object Min;
+        public readonly T Min;
         [JsonProperty]
-        public readonly object Max;
+        public readonly T Max;
 
         public object GetValue(BotDifficulty difficulty)
         {
             return DifficultyValue[difficulty];
         }
 
-        public void SetValue(BotDifficulty difficulty, object Value)
+        public void SetValue(BotDifficulty difficulty, T Value)
         {
             DifficultyValue[difficulty] = Value;
         }

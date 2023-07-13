@@ -299,24 +299,24 @@ namespace SAIN.Editor
             float value = (float)entry.GetValue(difficulty);
             BeginHorizontal();
 
-            //ButtonsClass.InfoBox(entry.Description);
-            //Box(entry.Name, LabelWidth);
+            ButtonsClass.InfoBox(entry.Description);
+            Box(entry.Name, LabelWidth);
 
-            //FlexibleSpace();
+            FlexibleSpace();
 
-            //BlankBox(entry.Min.ToString(), MinMaxWidth);
-            //CheckMouse("Min");
+            BlankBox(entry.Min.ToString(), MinMaxWidth);
+            CheckMouse("Min");
 
-            //value = CreateSlider(value, entry.Min, entry.Max, entry.Rounding);
+            value = CreateSlider(value, entry.Min, entry.Max, entry.Rounding);
 
-            //BlankBox(entry.Max.ToString(), MinMaxWidth);
-            //CheckMouse("Max");
+            BlankBox(entry.Max.ToString(), MinMaxWidth);
+            CheckMouse("Max");
 
-            //Box(value.ToString(), ResultWidth);
-            //ButtonsClass.ResetButton(entry);
-            //EndHorizontal();
+            Box(value.ToString(), ResultWidth);
+            ButtonsClass.ResetButton(entry);
+            EndHorizontal();
 
-            //entry.SetValue(difficulty, value);
+            entry.SetValue(difficulty, value);
         }
 
         public float HorizSlider(string name, float value, float min, float max, float rounding = 1f, string description = null)
