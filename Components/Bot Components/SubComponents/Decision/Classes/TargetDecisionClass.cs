@@ -26,8 +26,9 @@ namespace SAIN.Classes
                 }
             }
 
+            bool shallNotSearch = ShallNotSearch();
 
-            if (StartInvestigate())
+            if (StartInvestigate() && !shallNotSearch)
             {
                 Decision = SAINSoloDecision.Investigate;
             }
@@ -35,7 +36,7 @@ namespace SAIN.Classes
             {
                 Decision = SAINSoloDecision.RunToCover;
             }
-            else if (StartSearch())
+            else if (StartSearch() && !shallNotSearch)
             {
                 if (CurrentDecision != SAINSoloDecision.Search)
                 {
@@ -70,6 +71,21 @@ namespace SAIN.Classes
                     {
                         return true;
                     }
+                }
+            }
+            return false;
+        }
+
+        public bool ShallNotSearch()
+        {
+            Vector3? target = SAIN.CurrentTargetPosition;
+            if (target != null && !SAIN.Info.IsPMC && SAIN.BotZoneCollider != null)
+            {
+                Vector3 closestPointInZone = SAIN.BotZoneCollider.ClosestPointOnBounds(target.Value);
+                float distance = (target.Value - closestPointInZone).magnitude;
+                if (distance > 50f)
+                {
+                    return true;
                 }
             }
             return false;

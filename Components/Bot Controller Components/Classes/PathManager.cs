@@ -11,14 +11,14 @@ namespace SAIN.Components.BotController
     {
         public PathManager()
         {
-            Get8Directions();
+            //Get8Directions();
         }
 
         private readonly Vector3[] Directions = new Vector3[8];
 
         public void Update()
         {
-            FindExitForNextBot();
+            //FindExitForNextBot();
         }
 
         private void Get8Directions()

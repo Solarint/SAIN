@@ -36,7 +36,7 @@ namespace SAIN.Layers
 
                     if (BotOwner.WeaponManager.HaveBullets)
                     {
-                        SAIN.Shoot(false);
+                        SAIN.Shoot();
                     }
                 }
                 else

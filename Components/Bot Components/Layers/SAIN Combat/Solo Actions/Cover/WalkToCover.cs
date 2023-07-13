@@ -112,7 +112,7 @@ namespace SAIN.Layers
                 if (SuppressTimer < Time.time && BotOwner.WeaponManager.HaveBullets)
                 {
                     SuppressTimer = Time.time + 0.5f * Random.Range(0.66f, 1.25f);
-                    SAIN.Shoot(false);
+                    SAIN.Shoot();
                 }
             }
             else

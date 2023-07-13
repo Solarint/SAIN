@@ -28,6 +28,11 @@ namespace SAIN.Components
 
         private void Update()
         {
+            if (SAIN == null || BotOwner == null ||  BotOwner.GetPlayer == null)
+            {
+                Dispose();
+                return;
+            }
             if (DebugCoverFinder.Value)
             {
                 if (CoverPoints.Count > 0)
@@ -276,9 +281,12 @@ namespace SAIN.Components
         private Vector3 LastCheckPos = Vector3.zero + Vector3.down * 100f;
         private int LastHitCount = 0;
 
-        public void OnDestroy()
+        public void Dispose()
         {
-            StopAllCoroutines();
+            try {
+                StopAllCoroutines();
+                Destroy(this); }
+            catch { }
         }
 
         private BotOwner BotOwner => SAIN?.BotOwner;

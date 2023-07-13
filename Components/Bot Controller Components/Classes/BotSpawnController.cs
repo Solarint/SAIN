@@ -79,7 +79,6 @@ namespace SAIN.Components.BotController
                     SAINBotDictionary.Remove(bot.ProfileId);
                     if (bot.TryGetComponent<SAINComponent>(out var component))
                     {
-                        component.BotOwner.LeaveData.OnLeave -= RemoveBot;
                         component.Dispose();
                     }
                 }

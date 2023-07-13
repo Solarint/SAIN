@@ -27,12 +27,9 @@ namespace SAIN.Components
         private void Update()
         {
             // Check if the bot is alive before continuing
-            if (Player.HealthController?.IsAlive == false || Player == null)
+            if (Player == null || Player.HealthController.IsAlive == false)
             {
-                if (Player != null & Player.IsYourPlayer)
-                {
-                    Dispose();
-                }
+                Dispose();
                 return;
             }
 
@@ -40,14 +37,11 @@ namespace SAIN.Components
 
             if (gameWorld == null || gameWorld.RegisteredPlayers == null)
             {
-                if (Player != null & Player.IsYourPlayer)
-                {
-                    Dispose();
-                }
+                Dispose();
                 return;
             }
 
-            if (FrameCount >= 3)
+            if (FrameCount >= 5)
             {
                 FrameCount = 0;
                 if (WhiteLight)
@@ -69,8 +63,12 @@ namespace SAIN.Components
 
         public void Dispose()
         {
-            StopAllCoroutines();
-            Destroy(this);
+            try
+            {
+                StopAllCoroutines();
+                Destroy(this);
+            }
+            catch { }
         }
 
         public bool IRLaser { get; private set; }

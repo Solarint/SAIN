@@ -60,6 +60,7 @@ namespace SAIN.Components
         {
             if (GameWorld == null)
             {
+                Dispose();
                 return;
             }
             if (BotGame == null)
@@ -295,22 +296,27 @@ namespace SAIN.Components
 
         private void Dispose()
         {
-            StopAllCoroutines();
-
-            GameWorld.OnDispose -= Dispose;
-
-            AISoundPlayed -= SoundPlayed;
-            Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
-            Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
-
-            foreach (var obstacle in DeathObstacles)
+            try
             {
-                obstacle?.Dispose();
-            }
+                StopAllCoroutines();
 
-            DeathObstacles.Clear();
-            Bots.Clear();
-            Destroy(this);
+                GameWorld.OnDispose -= Dispose;
+
+                AISoundPlayed -= SoundPlayed;
+                Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
+                Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
+
+                if (Bots.Count > 0)
+                {
+                    foreach (var bot in Bots)
+                    {
+                        bot.Value?.Dispose();
+                    }
+                }
+                Bots.Clear();
+                Destroy(this);
+            }
+            catch { }
         }
 
         public bool GetBot(string profileId, out SAINComponent bot)

@@ -69,7 +69,7 @@ namespace SAIN.Classes.Mover
             {
                 SetBlindFire(blindfire);
                 SAIN.Steering.LookToPoint(BlindFireTargetPos + Random.insideUnitSphere * 1f);
-                SAIN.Shoot(false);
+                SAIN.Shoot();
 
                 BlindFireTimer = Time.time + 1f;
             }

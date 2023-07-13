@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Components;
+using SAIN.Patches.Components;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -46,7 +47,12 @@ namespace SAIN.Classes
 
         private void Update()
         {
-            if (SAIN == null || !SAIN.BotActive || SAIN.GameIsEnding)
+            if (SAIN == null || BotOwner == null || BotOwner.GetPlayer == null)
+            {
+                Dispose();
+                return;
+            }
+            if (!SAIN.BotActive || SAIN.GameIsEnding)
             {
                 ActivateCoverFinder(false);
                 return;
@@ -79,9 +85,16 @@ namespace SAIN.Classes
             }
         }
 
-        public void OnDestroy()
+        public void Dispose()
         {
-            Player.HealthController.ApplyDamageEvent -= OnBeingHit;
+            try
+            {
+                Player.HealthController.ApplyDamageEvent -= OnBeingHit;
+                StopAllCoroutines();
+                CoverFinder?.Dispose();
+                Destroy(this);
+            }
+            catch { }
         }
 
         public CoverPoint ClosestPoint

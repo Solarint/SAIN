@@ -1,11 +1,10 @@
 ﻿using BepInEx.Logging;
-using SAIN.Helpers;
+using Comfort.Common;
 using EFT;
+using SAIN.Components;
+using SAIN.Helpers;
 using UnityEngine;
 using static SAIN.UserSettings.SoundConfig;
-using Comfort.Common;
-using EFT.InventoryLogic;
-using SAIN.Components;
 
 namespace SAIN.Classes
 {
@@ -142,20 +141,17 @@ namespace SAIN.Classes
             bool isGunSound = type == AISoundType.gun || type == AISoundType.silencedGun;
             bool bulletfelt = shooterDistance < bulletfeeldistance;
 
+            float dispersion = (type == AISoundType.gun) ? shooterDistance / 15f : shooterDistance / 10f;
+            float dispNum = EFTMath.Random(-dispersion, dispersion);
+            Vector3 vector = new Vector3(pos.x + dispNum, pos.y, pos.z + dispNum);
+
             if (wasHeard)
             {
-                float dispersion = (type == AISoundType.gun) ? shooterDistance / 50f : shooterDistance / 20f;
-
-                float num2 = EFTMath.Random(-dispersion, dispersion);
-                float num3 = EFTMath.Random(-dispersion, dispersion);
-
-                Vector3 vector = new Vector3(pos.x + num2, pos.y, pos.z + num3);
-
                 try
                 {
                     BotOwner.BotsGroup.AddPointToSearch(vector, power, BotOwner);
                 }
-                catch (System.Exception) { }
+                catch { }
 
                 if (shooterDistance < BotOwner.Settings.FileSettings.Hearing.RESET_TIMER_DIST)
                 {
@@ -164,8 +160,8 @@ namespace SAIN.Classes
 
                 if (person != null && isGunSound)
                 {
-                    Vector3 to = pos + person.LookDirection;
-                    bool soundclose = IsSoundClose(out var firedAtMe, pos, to, 10f);
+                    Vector3 to = vector + person.LookDirection;
+                    bool soundclose = IsSoundClose(out var firedAtMe, vector, to, 10f);
 
                     if (soundclose && firedAtMe)
                     {
@@ -175,7 +171,6 @@ namespace SAIN.Classes
                             BotOwner.Memory.SetUnderFire();
                         }
                         catch (System.Exception) { }
-
 
                         if (shooterDistance > 50f)
                         {
@@ -192,12 +187,12 @@ namespace SAIN.Classes
             }
             else if (person != null && isGunSound && bulletfelt)
             {
-                Vector3 to = pos + person.LookDirection;
-                bool soundclose = IsSoundClose(out var firedAtMe, pos, to, 10f);
+                Vector3 to = vector + person.LookDirection;
+                bool soundclose = IsSoundClose(out var firedAtMe, vector, to, 10f);
 
                 if (firedAtMe && soundclose)
                 {
-                    var estimate = GetEstimatedPoint(pos);
+                    var estimate = GetEstimatedPoint(vector);
 
                     SAIN.UnderFireFromPosition = estimate;
 
@@ -328,14 +323,19 @@ namespace SAIN.Classes
                 position.y += 0.1f;
             }
 
-            // Check if the source is the player
-            bool isrealplayer = player.GetPlayer.name == "PlayerSuperior(Clone)";
-
+            Vector3 direction = (botheadpos - position).normalized;
+            float soundDistance = direction.magnitude;
+            bool PMC = SAIN.Info.IsPMC;
             // Checks if something is within line of sight
-            if (Physics.Raycast(botheadpos, (botheadpos - position).normalized, power, LayerMaskClass.HighPolyWithTerrainNoGrassMask))
+            if (Physics.Raycast(botheadpos, direction, power, LayerMaskClass.HighPolyWithTerrainNoGrassMask))
             {
+                if (soundDistance > 125f && !PMC)
+                {
+                    occlusion = 0f;
+                    return false;
+                }
                 // If the sound source is the player, raycast and find number of collisions
-                if (isrealplayer)
+                if (player.GetPlayer.IsYourPlayer)
                 {
                     // Check if the sound originates from an environment other than the BotOwner's
                     float environmentmodifier = EnvironmentCheck(player);

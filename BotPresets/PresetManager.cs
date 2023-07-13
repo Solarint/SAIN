@@ -39,11 +39,20 @@ namespace SAIN.BotPresets
         public static object GetPresetValue(BotType type, PropertyInfo property, BotDifficulty difficulty)
         {
             object sourcePropValue = property.GetValue(type.Preset);
-            if (sourcePropValue is SAINProperty<object> sourceProp && sourceProp is ISAINProperty source)
+            if (sourcePropValue is SAINProperty<float> floatProp)
             {
-                return source.GetValue(difficulty);
+                return floatProp.GetValue(difficulty);
+            }
+            if (sourcePropValue is SAINProperty<bool> boolProp)
+            {
+                return boolProp.GetValue(difficulty);
             }
             return null;
+        }
+
+        public static SAINProperty<T> GetSainProp<T>(BotType type, PropertyInfo property)
+        {
+            return (SAINProperty<T>)property.GetValue(type.Preset);
         }
 
         public static void SetPresetValue(object value, List<BotType> types, PropertyInfo property, BotDifficulty difficulty)
@@ -65,11 +74,11 @@ namespace SAIN.BotPresets
         public static void SetPresetValue(object value, BotType type, PropertyInfo property, BotDifficulty difficulty)
         {
             object targetPropValue = property.GetValue(type.Preset);
-            if (targetPropValue is SAINProperty<object> targetProp && targetProp is ISAINProperty target)
-            {
-                target.SetValue(difficulty, value);
-                UpdatePreset(type.Preset);
-            }
+            //if (targetPropValue is SAINProperty<object> targetProp && targetProp is ISAINProperty target)
+            //{
+            //    target.SetValue(difficulty, value);
+            //    UpdatePreset(type.Preset);
+            //}
         }
 
         public static void UpdatePreset(BotPreset preset)

@@ -19,12 +19,15 @@ namespace SAIN.Components
             AddComponents(BotOwner);
         }
 
+        public Collider BotZoneCollider => BotZone?.Collider;
+        public AIPlaceInfo BotZone => BotOwner.AIData.PlaceInfo;
+
         public List<Vector3> ExitsToLocation { get; private set; } = new List<Vector3>();
 
         public void UpdateExitsToLoc(Vector3[] exits)
         {
-            ExitsToLocation.Clear();
-            ExitsToLocation.AddRange(exits);
+            //ExitsToLocation.Clear();
+            //ExitsToLocation.AddRange(exits);
         }
 
         public string ProfileId => BotOwner.ProfileId;
@@ -64,35 +67,30 @@ namespace SAIN.Components
 
         private void Update()
         {
-            UpdatePatrolData();
+            if (this == null || IsDead || Singleton<GameWorld>.Instance == null || Singleton<IBotGame>.Instance == null)
+            {
+                Dispose();
+                return;
+            }
+
+            if (GameIsEnding)
+            {
+                return;
+            }
 
             if (BotActive)
             {
-                ToggleComponents(true);
-            }
-            else
-            {
-                ToggleComponents(false);
-            }
-
-            if (BotActive && !GameIsEnding)
-            {
-                Info.Update();
-
-                FriendlyFireClass.Update();
-
-                Enemy?.Update();
-
+                UpdatePatrolData();
                 UpdateHealth();
 
-                BotOwner.DoorOpener.Update();
+                Info?.Update();
+                FriendlyFireClass?.Update();
+                Enemy?.Update();
+                BotOwner.DoorOpener?.Update();
 
-                if (Enemy == null)
+                if (Enemy == null && BotOwner.BotLight?.IsEnable == false)
                 {
-                    if (!BotOwner.BotLight.IsEnable)
-                    {
-                        BotOwner.BotLight.TurnOn();
-                    }
+                    BotOwner.BotLight.TurnOn();
                 }
             }
         }
@@ -130,23 +128,13 @@ namespace SAIN.Components
 
         public void Shoot(bool noBush = true, bool checkFF = true)
         {
-            bool startShoot = true;
-            if (noBush && NoBushESPActive)
-            {
-                startShoot = false;
-            }
-            if (checkFF && !FriendlyFireClass.ClearShot)
-            {
-                startShoot = false;
-            }
-            if (startShoot)
-            {
-                BotOwner.ShootData.Shoot();
-            }
-            else
+            if ((noBush && NoBushESPActive) || (checkFF && !FriendlyFireClass.ClearShot))
             {
                 BotOwner.ShootData.EndShoot();
+                return;
             }
+
+            BotOwner.ShootData.Shoot();
         }
 
         private bool SAINActive => BigBrainSAIN.IsBotUsingSAINLayer(BotOwner);
@@ -182,7 +170,7 @@ namespace SAIN.Components
         {
             if (UpdateHealthTimer < Time.time)
             {
-                UpdateHealthTimer = Time.time + 0.25f;
+                UpdateHealthTimer = Time.time + 0.33f;
                 HealthStatus = BotOwner.GetPlayer.HealthStatus;
             }
         }
@@ -195,49 +183,31 @@ namespace SAIN.Components
 
         public void Dispose()
         {
-            StopAllCoroutines();
-
-            Info.Dispose();
-            Destroy(Squad);
-            Destroy(Equipment);
-            Destroy(BotStuck);
-            Destroy(Hearing);
-            Destroy(Talk);
-            Destroy(Decision);
-            Destroy(Cover);
-            Destroy(FlashLight);
-            Destroy(SelfActions);
-            Destroy(Steering);
-            Destroy(Grenade);
-            Destroy(Mover);
-            Destroy(NoBushESP);
-            Destroy(EnemyController);
-            Destroy(Sounds);
-
-            Destroy(this);
-        }
-
-        private void ToggleComponents(bool value)
-        {
-            if (Squad.enabled != value)
+            try
             {
-                Squad.enabled = value;
-                Equipment.enabled = value;
-                BotStuck.enabled = value;
-                Hearing.enabled = value;
-                Talk.enabled = value;
-                Decision.enabled = value;
-                Cover.enabled = value;
-                Cover.CoverFinder.enabled = value;
-                FlashLight.enabled = value;
-                SelfActions.enabled = value;
-                Steering.enabled = value;
-                Grenade.enabled = value;
-                Mover.enabled = value;
-                NoBushESP.enabled = value;
-                EnemyController.enabled = value;
-                Sounds.enabled = value;
+                StopAllCoroutines();
+
+                Info?.Dispose();
+                Cover?.Dispose();
+
+                Destroy(Squad);
+                Destroy(Equipment);
+                Destroy(BotStuck);
+                Destroy(Hearing);
+                Destroy(Talk);
+                Destroy(Decision);
+                Destroy(FlashLight);
+                Destroy(SelfActions);
+                Destroy(Steering);
+                Destroy(Grenade);
+                Destroy(Mover);
+                Destroy(NoBushESP);
+                Destroy(EnemyController);
+                Destroy(Sounds);
+
+                Destroy(this);
             }
+            catch { }
         }
 
         public SAINSoloDecision CurrentDecision => Decision.MainDecision;
@@ -245,7 +215,6 @@ namespace SAIN.Components
         public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
         public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
         public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
-
 
         public Vector3? CurrentTargetPosition
         {
@@ -258,7 +227,7 @@ namespace SAIN.Components
                 var Target = BotOwner.Memory.GoalTarget;
                 if (Target != null && Target?.Position != null)
                 {
-                    if ((Target.Position.Value - BotOwner.Position).sqrMagnitude < 1f)
+                    if ((Target.Position.Value - BotOwner.Position).sqrMagnitude < 2f)
                     {
                         Target.Clear();
                     }
@@ -279,16 +248,15 @@ namespace SAIN.Components
                         return Target.Position;
                     }
                 }
-                if (Time.time - BotOwner.Memory.LastTimeHit < 20f && !BotOwner.Memory.IsPeace)
-                {
-                    return BotOwner.Memory.LastHitPos;
-                }
+                //if (Time.time - BotOwner.Memory.LastTimeHit < 20f && !BotOwner.Memory.IsPeace)
+                //{
+                //    return BotOwner.Memory.LastHitPos;
+                //}
                 return null;
             }
         }
 
         public Vector3 UnderFireFromPosition { get; set; }
-
 
         public FriendlyFireClass FriendlyFireClass { get; private set; }
         public SoundsController Sounds { get; private set; }
@@ -307,10 +275,9 @@ namespace SAIN.Components
         public BotGrenadeClass Grenade { get; private set; }
         public SteeringClass Steering { get; private set; }
 
-        public bool IsDead => BotOwner?.IsDead == true;
-        public bool BotActive => BotOwner.BotState == EBotState.Active && !IsDead && BotOwner?.enabled == true && BotOwner?.GetPlayer?.enabled == true;
-        public bool GameIsEnding => GameHasEnded || Singleton<IBotGame>.Instance?.Status == GameStatus.Stopping;
-        public bool GameHasEnded => Singleton<IBotGame>.Instance == null;
+        public bool IsDead => BotOwner == null || BotOwner.IsDead == true || BotOwner.GetPlayer == null || BotOwner.GetPlayer.HealthController.IsAlive == false;
+        public bool BotActive => IsDead == false && BotOwner.enabled && BotOwner.GetPlayer.enabled && BotOwner.BotState == EBotState.Active;
+        public bool GameIsEnding => Singleton<IBotGame>.Instance == null || Singleton<IBotGame>.Instance.Status == GameStatus.Stopping;
 
         public bool Healthy => HealthStatus == ETagStatus.Healthy;
         public bool Injured => HealthStatus == ETagStatus.Injured;

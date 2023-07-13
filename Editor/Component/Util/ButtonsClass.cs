@@ -30,7 +30,7 @@ namespace SAIN.Editor
 
             Space(25);
 
-            entry.Value = CustomToggle(entry.Value);
+            entry.BoxedValue = CustomToggle((bool)entry.BoxedValue);
 
             Space(25);
 

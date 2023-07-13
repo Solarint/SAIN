@@ -40,11 +40,11 @@ namespace SAIN.Editor
         {
             if (entry is ConfigEntry<float> floatEntry)
             {
-                floatEntry.Value = value;
+                floatEntry.BoxedValue = value;
             }
             if (entry is ConfigEntry<int> intEntry)
             {
-                intEntry.Value = Mathf.RoundToInt(value);
+                intEntry.BoxedValue = Mathf.RoundToInt(value);
             }
         }
 
@@ -52,32 +52,32 @@ namespace SAIN.Editor
         {
             if (entry is ConfigEntry<float> floatEntry)
             {
-                floatEntry.Value = value;
+                floatEntry.BoxedValue = value;
             }
             if (entry is ConfigEntry<int> intEntry)
             {
-                intEntry.Value = value;
+                intEntry.BoxedValue = value;
             }
         }
 
         public static void AssignValue(ConfigEntry<bool> entry, bool value)
         {
-            entry.Value = value;
+            entry.BoxedValue = value;
         }
 
         public static void DefaultValue<T>(ConfigEntry<T> entry)
         {
             if (entry is ConfigEntry<float> floatEntry)
             {
-                floatEntry.Value = (float)floatEntry.DefaultValue;
+                floatEntry.BoxedValue = (float)floatEntry.DefaultValue;
             }
             if (entry is ConfigEntry<int> intEntry)
             {
-                intEntry.Value = (int)intEntry.DefaultValue;
+                intEntry.BoxedValue = (int)intEntry.DefaultValue;
             }
             if (entry is ConfigEntry<bool> boolEntry)
             {
-                boolEntry.Value = (bool)boolEntry.DefaultValue;
+                boolEntry.BoxedValue = (bool)boolEntry.DefaultValue;
             }
         }
     }

@@ -253,7 +253,7 @@ namespace SAIN.BotPresets
         public SAINProperty<bool> CanUseGrenades { get; set; }
     }
 
-    public class SAINProperty<T> : ISAINProperty
+    public class SAINProperty<T>
     {
         [JsonConstructor]
         public SAINProperty() {}
@@ -316,11 +316,5 @@ namespace SAIN.BotPresets
         {
             DifficultyValue[difficulty] = Value;
         }
-    }
-
-    public interface ISAINProperty
-    {
-        object GetValue(BotDifficulty difficulty);
-        void SetValue(BotDifficulty difficulty, object value);
     }
 }

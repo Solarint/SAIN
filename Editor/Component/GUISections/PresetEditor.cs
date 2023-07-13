@@ -8,6 +8,9 @@ using UnityEngine;
 using static SAIN.Editor.Names;
 using SAIN.Editor.GUISections;
 using UnityEngine.UIElements;
+using BepInEx.Configuration;
+using static UnityEngine.EventSystems.EventTrigger;
+using System.Windows.Forms.VisualStyles;
 
 namespace SAIN.Editor
 {
@@ -399,30 +402,23 @@ namespace SAIN.Editor
             SelectedProperties.Clear();
         }
 
-        private void CreatePropertyOption(PropertyInfo property, BotType type)
+        private void CreatePropertyOption(PropertyInfo property, BotType botType)
         {
             BotDifficulty diff = SelectedDifficulties[SelectedDifficulties.Count - 1];
-            Type propertyType = property.PropertyType;
-            if (propertyType == typeof(SAINProperty<float>))
+
+            if (property.PropertyType == typeof(SAINProperty<float>))
             {
-                var floatProperty = (SAINProperty<float>)property.GetValue(type.Preset);
+                SAINProperty<float> floatProperty = PresetManager.GetSainProp<float>(botType, property);
                 BuilderClass.HorizSlider(floatProperty, diff);
             }
-            else if (propertyType == typeof(SAINProperty<bool>))
+            else if (property.PropertyType == typeof(SAINProperty<bool>))
             {
-                var boolProperty = (SAINProperty<bool>)property.GetValue(type.Preset);
-                BuilderClass.CreateButtonOption(boolProperty, diff);
+                SAINProperty<bool> boolProperty = PresetManager.GetSainProp<bool>(botType, property);
+                ButtonsClass.ButtonProperty(boolProperty, diff);
             }
-        }
-
-        private void CheckAddAll<T>(bool addAll, bool oldValue, List<T> list, T item)
-        {
-            if (addAll)
+            else
             {
-                if (!list.Contains(item))
-                {
-                    list.Add(item);
-                }
+                Logger.LogError("Value is not float or bool!", GetType(), true);
             }
         }
 
