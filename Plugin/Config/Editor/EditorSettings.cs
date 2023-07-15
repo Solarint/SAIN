@@ -72,14 +72,27 @@ namespace SAIN.UserSettings
             FireratMulti = BindFloat(nameof(FireratMulti));
 
             // Personality
-            AllChads = BindBool(nameof(AllChads));
-            AllGigaChads = BindBool(nameof(AllGigaChads));
-            AllRats = BindBool(nameof(AllRats));
+            AllChads = BindBool(nameof(AllChads), null, false);
+            AllGigaChads = BindBool(nameof(AllGigaChads), null, false);
+            AllRats = BindBool(nameof(AllRats), null, false);
 
             RandomGigaChadChance = BindInt(nameof(RandomGigaChadChance), null, 3);
             RandomChadChance = BindInt(nameof(RandomChadChance), null, 3);
             RandomRatChance = BindInt(nameof(RandomRatChance), null, 30);
             RandomCowardChance = BindInt(nameof(RandomCowardChance), null, 30);
+
+            // NOTE: This is to resolve an issue where previous versions could result in "All*" all being true
+            //       If more than 1 "All" option is true, disable them all
+            int allPersonalityValuesEnabled = 0;
+            allPersonalityValuesEnabled += AllChads.Value ? 1 : 0;
+            allPersonalityValuesEnabled += AllGigaChads.Value ? 1 : 0;
+            allPersonalityValuesEnabled += AllRats.Value ? 1 : 0;
+            if (allPersonalityValuesEnabled > 1)
+            {
+                AllChads.Value = false;
+                AllGigaChads.Value = false;
+                AllRats.Value = false;
+            }
         }
 
         public static ConfigEntry<float> BindFloat(string name, string section = null, float defaultValue = 1f, ConfigDescription description = null)

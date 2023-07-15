@@ -14,8 +14,9 @@ namespace SAIN.Classes
 {
     public class PersonalityClass : SAINBot
     {
-        public PersonalityClass(BotOwner owner) : base(owner) 
+        public PersonalityClass(BotOwner owner, SAINBotInfo botInfo) : base(owner) 
         {
+            Info = botInfo;
             SetPersonality();
         }
 
@@ -72,7 +73,7 @@ namespace SAIN.Classes
             }
         }
 
-        private SAINBotInfo Info => SAIN.Info;
+        private SAINBotInfo Info;
 
         private bool CanBeChad
         {

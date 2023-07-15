@@ -30,12 +30,12 @@ namespace SAIN.Layers
 
         public override void Start()
         {
-            BotOwner.PatrollingData.Pause();
+            BotOwner.PatrollingData?.Pause();
         }
 
         public override void Stop()
         {
-            BotOwner.PatrollingData.Unpause();
+            BotOwner.PatrollingData?.Unpause();
         }
 
         public override void Update()
