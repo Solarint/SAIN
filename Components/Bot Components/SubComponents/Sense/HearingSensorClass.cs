@@ -58,7 +58,12 @@ namespace SAIN.Classes
                     {
                         if (distance < 5f)
                         {
-                            BotOwner.Memory.Spotted(false, null, null);
+                            try
+                            {
+                                // BotOwner.Memory.Spotted(false, null, null);
+                                BotOwner.WeaponManager?.Stationary?.Spotted();
+                            }
+                            catch { }
                         }
 
                         ReactToSound(player, position, distance, true, type);

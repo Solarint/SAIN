@@ -67,7 +67,7 @@ namespace SAIN.Editor
                 new AcceptableValueRange<float>(0.05f, 1f),
                 new ConfigurationManagerAttributes { Browsable = false }));
 
-            name = "Suppressed Subsonic Sound Modifier";
+            name = "Subsonic Sound Modifier";
             description = "Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo";
             SubsonicModifier = SAINConfig.Bind(section, name, 0.6f,
                 new ConfigDescription(description,
@@ -113,35 +113,42 @@ namespace SAIN.Editor
                 new ConfigurationManagerAttributes { Browsable = false }));
 
             // Advanced Recoil
+            name = "Max Recoil Per Shot";
+            description = "Maximum Impulse force from a single shot for a bot.";
             MaxRecoil = SAINConfig.Bind(section, name, 2f,
                 new ConfigDescription(description,
                 new AcceptableValueRange<float>(0.1f, 10f),
                 new ConfigurationManagerAttributes { Browsable = false }));
 
+            name = "Add or Subtract Recoil";
+            description = "Linearly add or subtract from the final recoil result";
             AddRecoil = SAINConfig.Bind(section, name, 0f,
                 new ConfigDescription(description,
                 new AcceptableValueRange<float>(-5f, 5f),
                 new ConfigurationManagerAttributes { Browsable = false }));
 
+            name = "Recoil Decay p/frame";
+            description = "How much to decay the recoil impulse per frame. 0.8 means 20% of the recoil will be removed per frame.";
             RecoilDecay = SAINConfig.Bind(section, name, 0.8f,
                 new ConfigDescription(description,
+
                 new AcceptableValueRange<float>(0.1f, 0.99f),
                 new ConfigurationManagerAttributes { Browsable = false }));
 
             description = "Force All Bots To This Personality";
 
             // Personality
-            AllChads = SAINConfig.Bind(section, "All Chads", true,
+            AllChads = SAINConfig.Bind(section, "All Chads", false,
                 new ConfigDescription(description,
                 null,
                 new ConfigurationManagerAttributes { Browsable = false }));
 
-            AllGigaChads = SAINConfig.Bind(section, "All GigaChads", true,
+            AllGigaChads = SAINConfig.Bind(section, "All GigaChads", false,
                 new ConfigDescription(description,
                 null,
                 new ConfigurationManagerAttributes { Browsable = false }));
 
-            AllRats = SAINConfig.Bind(section, "All Rats", true,
+            AllRats = SAINConfig.Bind(section, "All Rats", false,
                 new ConfigDescription(description,
                 null,
                 new ConfigurationManagerAttributes { Browsable = false }));
@@ -171,6 +178,20 @@ namespace SAIN.Editor
                 new ConfigDescription(description,
                 new AcceptableValueRange<float>(0f, 100f),
                 new ConfigurationManagerAttributes { Browsable = false }));
+
+
+            // NOTE: This is to resolve an issue where previous versions could result in "All*" all being true
+            //       If more than 1 "All" option is true, disable them all
+            int allPersonalityValuesEnabled = 0;
+            allPersonalityValuesEnabled += AllChads.Value ? 1 : 0;
+            allPersonalityValuesEnabled += AllGigaChads.Value ? 1 : 0;
+            allPersonalityValuesEnabled += AllRats.Value ? 1 : 0;
+            if (allPersonalityValuesEnabled > 1)
+            {
+                AllChads.Value = false;
+                AllGigaChads.Value = false;
+                AllRats.Value = false;
+            }
 
         }
     }

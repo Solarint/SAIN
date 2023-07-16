@@ -115,13 +115,13 @@ namespace SAIN.Components
         {
             if (LayersActive)
             {
-                BotOwner.PatrollingData.Pause();
+                BotOwner.PatrollingData?.Pause();
             }
             else
             {
                 if (Enemy == null)
                 {
-                    BotOwner.PatrollingData.Unpause();
+                    BotOwner.PatrollingData?.Unpause();
                 }
             }
         }

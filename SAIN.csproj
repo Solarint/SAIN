@@ -389,15 +389,6 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\$(TargetName)-$(ConfigurationName).dll"
-
-if $(ConfigurationName) == Debug (
-    copy "$(TargetDir)$(TargetName).pdb" "C:\Games\spt 3.5.7\BepInEx\plugins\$(TargetName).pdb"
-) else (
-    del "C:\Games\spt 3.5.7\BepInEx\plugins\$(TargetName).pdb"
-)
-)
-
-</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\$(TargetName)-$(ConfigurationName).dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -21,36 +21,28 @@ namespace SAIN.Classes
         private void Update()
         {
             if (BotOwner == null || SAIN == null) return;
-            if (ActiveGrenades.Count > 0)
+
+            GrenadeDangerPoint = null;
+            for (int i = ActiveGrenades.Count - 1; i >= 0; i--)
             {
-                for (int i = ActiveGrenades.Count - 1; i >= 0; i--)
+                var tracker = ActiveGrenades[i];
+                if (tracker == null || tracker.Grenade == null)
                 {
-                    var tracker = ActiveGrenades[i];
-                    if (tracker == null || tracker.Grenade == null)
-                    {
-                        ActiveGrenades.RemoveAt(i);
-                    }
+                    ActiveGrenades.RemoveAt(i);
+                }
+            }
+            for (int i = 0; i < ActiveGrenades.Count; i++)
+            {
+                GrenadeTracker tracker = ActiveGrenades[i];
+                if (tracker != null && tracker.Grenade != null && tracker.GrenadeSpotted)
+                {
+                    GrenadeDangerPoint = tracker.Grenade.transform.position;
+                    break;
                 }
             }
         }
 
-        public Vector3? GrenadeDangerPoint
-        {
-            get
-            {
-                if (ActiveGrenades.Count > 0)
-                {
-                    foreach (var tracker in ActiveGrenades)
-                    {
-                        if (tracker?.Grenade?.transform != null && tracker?.GrenadeSpotted == true)
-                        {
-                            return tracker.Grenade.transform.position;
-                        }
-                    }
-                }
-                return null;
-            }
-        }
+        public Vector3? GrenadeDangerPoint { get; private set; }
 
         public bool ShallThrowGrenade()
         {
