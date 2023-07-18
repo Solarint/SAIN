@@ -30,14 +30,21 @@ namespace SAIN.Classes
                 ClearEnemies();
             }
 
-            // If our current enemy no longer exists, clean up
-            if (Enemy?.EnemyPlayer == null || Enemy?.EnemyPlayer.AIData?.BotOwner == null || Enemy.EnemyPlayer.AIData.BotOwner.ProfileId == BotOwner.ProfileId)
+            // If the current enemy is AI, but no longer has a BotOwner or is ourselves, reset it
+            if (Enemy?.EnemyPlayer != null && Enemy.EnemyPlayer.IsAI == true && (Enemy?.EnemyPlayer.AIData?.BotOwner == null || Enemy.EnemyPlayer.AIData.BotOwner.ProfileId == BotOwner.ProfileId))
             {
                 Enemy = null;
             }
 
-            // For extra sanity, if the GoalEnemy's person's BotOwner is null, or ourselves, reset that too
-            if (BotOwner.Memory.GoalEnemy?.Person?.AIData?.BotOwner == null || BotOwner.Memory.GoalEnemy.Person.AIData.BotOwner.ProfileId == BotOwner.ProfileId)
+            // If our current enemy no longer exists, clean up
+            if (Enemy?.EnemyPlayer == null)
+            {
+                Enemy = null;
+            }
+
+            // For extra sanity, if the GoalEnemy is AI, and its BotOwner is null, or itself, reset that too
+            if (BotOwner.Memory.GoalEnemy?.Person?.IsAI == true && 
+                (BotOwner.Memory.GoalEnemy?.Person?.AIData?.BotOwner == null || BotOwner.Memory.GoalEnemy.Person.AIData.BotOwner.ProfileId == BotOwner.ProfileId))
             {
                 BotOwner.Memory.GoalEnemy = null;
             }
