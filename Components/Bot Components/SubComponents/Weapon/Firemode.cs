@@ -46,14 +46,12 @@ namespace SAIN.Classes
 
                 if (mode != EFireMode.doublet && CurrentWeapon.SelectedFireMode != mode)
                 {
+                    CurrentWeapon.FireMode.SetFireMode(mode);
+
                     var animate = BotOwner.GetPlayer?.HandsController?.FirearmsAnimator;
                     if (animate != null)
                     {
                         BotOwner.GetPlayer.HandsController.FirearmsAnimator.SetFireMode(mode);
-                    }
-                    else
-                    {
-                        CurrentWeapon.FireMode.SetFireMode(mode);
                     }
                 }
                 else
