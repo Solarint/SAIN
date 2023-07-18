@@ -11,7 +11,7 @@ namespace SAIN.Editor.Util
 {
     public class ColorsClass : EditorAbstract
     {
-        public ColorsClass(GameObject go) : base(go)
+        public ColorsClass(SAINEditor editor) : base(editor)
         {
             BaseColorScheme = JsonUtility.Load.LoadColorScheme();
         }

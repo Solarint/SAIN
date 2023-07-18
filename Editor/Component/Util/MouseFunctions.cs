@@ -7,12 +7,22 @@ namespace SAIN.Editor.Util
 {
     public class MouseFunctions : EditorAbstract
     {
-        public MouseFunctions(GameObject gameObject) : base(gameObject)
+        public MouseFunctions(SAINEditor editor) : base(editor)
         {
-            MouseDrag = gameObject.AddComponent<MouseDragComponent>();
+            MouseDrag = new MouseDragClass(editor);
         }
 
-        public MouseDragComponent MouseDrag { get; private set; }
+        public void Update()
+        {
+            MouseDrag.Update();
+        }
+
+        public void OnGUI()
+        {
+            MouseDrag.OnGUI();
+        }
+
+        public MouseDragClass MouseDrag { get; private set; }
 
         public bool CheckMouseDrag()
         {
@@ -68,15 +78,13 @@ namespace SAIN.Editor.Util
         private Vector2 MousePos => Event.current.mousePosition;
     }
 
-    public class MouseDragComponent : MonoBehaviour
+    public class MouseDragClass : EditorAbstract
     {
-        void Awake()
+        public MouseDragClass(SAINEditor editor) : base(editor)
         {
-            Editor = GetComponent<SAINEditor>();
             FullScreen = new Rect(0, 0, Screen.width, Screen.height);
         }
 
-        private SAINEditor Editor;
         GUIStyle BlankStyle;
 
         public Rect DragRectangle = Rect.zero;
@@ -86,7 +94,7 @@ namespace SAIN.Editor.Util
         private readonly Vector2[] mousePositions2D = new Vector2[2];
         private bool drawRect = false;
 
-        private void OnGUI()
+        public void OnGUI()
         {
             if (BlankStyle == null)
             {
@@ -133,7 +141,7 @@ namespace SAIN.Editor.Util
             DragRectangle = Rect.zero;
         }
 
-        private void Update()
+        public void Update()
         {
             if (Event.current.isMouse && Event.current.type == EventType.MouseDrag)
             {

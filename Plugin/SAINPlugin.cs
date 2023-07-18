@@ -38,7 +38,14 @@ namespace SAIN
             EFTPatches.Init();
             BigBrainSAIN.Init();
 
+            SAINEditor = new SAINEditor();
+            SAINEditor.Init();
             ModsCheckTimer = Time.time + 5f;
+        }
+
+        void Start()
+        {
+
         }
 
         public static SAINEditor SAINEditor { get; private set; }
@@ -59,20 +66,14 @@ namespace SAIN
 
         public static ConfigFile SAINConfig { get; private set; }
 
-        private void Update()
+        void Update()
         {
+            SAINEditor.Update();
+
             BotControllerHandler.Update();
 
             if (!ModsChecked && ModsCheckTimer < Time.time)
             {
-                if (SAINEditor == null)
-                {
-                    ModsCheckTimer = Time.time + 1f;
-                    EditorObject = new GameObject("SAINEditorObject");
-                    SAINEditor = EditorObject.GetOrAddComponent<SAINEditor>();
-                    return;
-                }
-
                 ModsChecked = true;
 
                 RealismLoaded = Chainloader.PluginInfos.ContainsKey("RealismMod");
@@ -86,6 +87,11 @@ namespace SAIN
                     Logger.LogInfo("SAIN: Looting Bots Detected.");
                 }
             }
+        }
+
+        void OnGUI()
+        {
+            SAINEditor.OnGUI();
         }
 
         private float ModsCheckTimer;

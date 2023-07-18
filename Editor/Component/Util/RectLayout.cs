@@ -6,7 +6,7 @@ namespace SAIN.Editor
 {
     public class RectLayout : EditorAbstract
     {
-        public RectLayout(GameObject go) : base(go)
+        public RectLayout(SAINEditor editor) : base(editor)
         {
 
         }

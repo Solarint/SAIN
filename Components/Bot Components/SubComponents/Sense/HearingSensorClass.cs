@@ -186,7 +186,11 @@ namespace SAIN.Classes
 
                 if (!BotOwner.Memory.GoalTarget.HavePlaceTarget() && BotOwner.Memory.GoalEnemy == null)
                 {
-                    BotOwner.BotsGroup.CalcGoalForBot(BotOwner);
+                    try
+                    {
+                        BotOwner.BotsGroup.CalcGoalForBot(BotOwner);
+                    }
+                    catch { }
                     return;
                 }
             }

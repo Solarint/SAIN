@@ -16,11 +16,9 @@ using UnityEngine.EventSystems;
 
 namespace SAIN.Editor
 {
-    public class SAINEditor : MonoBehaviour
+    public class SAINEditor
     {
-        public Action EditorToggled { get; set; }
-
-        void Awake()
+        public SAINEditor()
         {
             ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(OpenEditor));
             ConsoleScreen.Processor.RegisterCommand("pausegame", new Action(TogglePause));
@@ -28,17 +26,22 @@ namespace SAIN.Editor
             OpenEditorButton = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor", false, "Opens the Editor on press");
             OpenEditorConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
             PauseConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "PauseButton", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
+        }
 
 
-            TexturesClass = new TexturesClass(gameObject);
-            Colors = new ColorsClass(gameObject);
-            StyleOptions = new StyleOptions(gameObject);
-            PresetEditor = new PresetEditor(gameObject);
-            Builder = new BuilderClass(gameObject);
-            Buttons = new ButtonsClass(gameObject);
-            ToolTips = new ToolTips(gameObject);
-            MouseFunctions = new MouseFunctions(gameObject);
-            WindowLayoutCreator = new WindowLayoutCreator(gameObject);
+        public Action EditorToggled { get; set; }
+
+        public void Init()
+        {
+            TexturesClass = new TexturesClass(this);
+            Colors = new ColorsClass(this);
+            StyleOptions = new StyleOptions(this);
+            PresetEditor = new PresetEditor(this);
+            Builder = new BuilderClass(this);
+            Buttons = new ButtonsClass(this);
+            ToolTips = new ToolTips(this);
+            MouseFunctions = new MouseFunctions(this);
+            WindowLayoutCreator = new WindowLayoutCreator(this);
         }
 
         public WindowLayoutCreator WindowLayoutCreator { get; private set; }
@@ -106,7 +109,7 @@ namespace SAIN.Editor
         public bool ShiftKeyPressed { get; private set; }
         public bool CtrlKeyPressed { get; private set; }
 
-        void Update()
+        public void Update()
         {
             ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
             CtrlKeyPressed = Input.GetKey(KeyCode.LeftControl);
@@ -133,6 +136,8 @@ namespace SAIN.Editor
                 }
                 GUIToggle();
             }
+
+            //MouseFunctions.Update();
         }
 
         private void GUIToggle()
@@ -157,7 +162,7 @@ namespace SAIN.Editor
 
         float baseHeight;
 
-        void OnGUI()
+        public void OnGUI()
         {
             if (MainWindowOpen)
             {
@@ -182,6 +187,8 @@ namespace SAIN.Editor
                 {
                     AdjustmentRect = Builder.NewWindow(1, AdjustmentRect, PresetEditor.GUIAdjustment, "GUI Adjustment");
                 }
+
+                //MouseFunctions.OnGUI();
             }
         }
 

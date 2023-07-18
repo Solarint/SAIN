@@ -9,7 +9,7 @@ namespace SAIN.Editor
 {
     public class ToolTips : EditorAbstract
     {
-        public ToolTips(GameObject gameObject) : base(gameObject) { }
+        public ToolTips(SAINEditor editor) : base(editor) { }
 
         private GUIStyle ToolTipStyle => Editor.StyleOptions.GetStyle(tooltip);
 

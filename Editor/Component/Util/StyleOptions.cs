@@ -13,9 +13,9 @@ namespace SAIN.Editor
 {
     public class StyleOptions : EditorAbstract
     {
-        public StyleOptions(GameObject obj) : base(obj)
+        public StyleOptions(SAINEditor editor) : base(editor)
         {
-            CustomStyle = new CustomStyleClass(obj);
+            CustomStyle = new CustomStyleClass(editor);
         }
 
         public Font CustomFont { get; private set; }
@@ -99,9 +99,9 @@ namespace SAIN.Editor
 
     public class CustomStyleClass
     {
-        public CustomStyleClass(GameObject editorObject)
+        public CustomStyleClass(SAINEditor editor)
         {
-            Editor = editorObject.GetComponent<SAINEditor>();
+            Editor = editor;
         }
 
         public void Init()

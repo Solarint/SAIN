@@ -16,7 +16,7 @@ namespace SAIN.Editor
 {
     public class PresetEditor : EditorAbstract
     {
-        public PresetEditor(GameObject obj) : base(obj)
+        public PresetEditor(SAINEditor editor) : base(editor)
         {
             List<string> sections = new List<string>();
             WildSpawnTypes = PresetManager.BotTypes;

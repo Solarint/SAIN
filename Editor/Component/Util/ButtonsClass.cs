@@ -12,7 +12,7 @@ namespace SAIN.Editor
 {
     public class ButtonsClass : EditorAbstract
     {
-        public ButtonsClass(GameObject gameObject) : base(gameObject) { }
+        public ButtonsClass(SAINEditor editor) : base(editor) { }
 
         private const float InfoWidth = 35f;
 

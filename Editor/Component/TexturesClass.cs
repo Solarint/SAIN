@@ -8,7 +8,7 @@ namespace SAIN.Editor
 {
     public class TexturesClass : EditorAbstract
     {
-        public TexturesClass(GameObject editor) : base(editor)
+        public TexturesClass(SAINEditor editor) : base(editor)
         {
         }
 

@@ -11,7 +11,7 @@ namespace SAIN.Editor.GUISections
 {
     public class WindowLayoutCreator : EditorAbstract
     {
-        public WindowLayoutCreator(GameObject gameObject) : base(gameObject)
+        public WindowLayoutCreator(SAINEditor editor) : base(editor)
         {
             Windows = new Rect[SAINEditor.Tabs.Length];
             for (int i = 0; i < Windows.Length; i++)

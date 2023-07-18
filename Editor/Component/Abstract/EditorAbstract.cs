@@ -5,7 +5,7 @@ namespace SAIN.Editor.Abstract
 {
     public abstract class EditorAbstract : LayoutAbstract
     {
-        public EditorAbstract(GameObject editor) : base(editor) { }
+        public EditorAbstract(SAINEditor editor) : base(editor) { }
 
         public BuilderClass BuilderClass => Editor.Builder;
         public TexturesClass TexturesClass => Editor.TexturesClass;

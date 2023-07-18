@@ -6,9 +6,9 @@ namespace SAIN.Editor.Abstract
 {
     public abstract class LayoutAbstract
     {
-        public LayoutAbstract(GameObject editor)
+        public LayoutAbstract(SAINEditor editor)
         {
-            Editor = editor.GetComponent<SAINEditor>();
+            Editor = editor;
         }
 
         public SAINEditor Editor { get; private set; }

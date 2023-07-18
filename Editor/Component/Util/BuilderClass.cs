@@ -14,7 +14,7 @@ namespace SAIN.Editor
 {
     public class BuilderClass : EditorAbstract
     {
-        public BuilderClass(GameObject go) : base(go) { }
+        public BuilderClass(SAINEditor editor) : base(editor) { }
 
         private static float ExpandMenuWidth => 150f;
         private static float MinMaxWidth => SliderMinMaxWidth.Value;
