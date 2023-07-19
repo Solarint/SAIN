@@ -30,34 +30,15 @@ namespace SAIN.Classes
                 ClearEnemies();
             }
 
-            // If the current enemy is AI, but no longer has a BotOwner or is ourselves, reset it
-            if (Enemy?.EnemyPlayer != null && Enemy.EnemyPlayer.IsAI == true && (Enemy?.EnemyPlayer.AIData?.BotOwner == null || Enemy.EnemyPlayer.AIData.BotOwner.ProfileId == BotOwner.ProfileId))
-            {
-                Enemy = null;
-            }
-
-            // If our current enemy no longer exists, clean up
-            if (Enemy?.EnemyPlayer == null)
-            {
-                Enemy = null;
-            }
-
-            // For extra sanity, if the GoalEnemy is AI, and its BotOwner is null, or itself, reset that too
-            if (BotOwner.Memory.GoalEnemy?.Person?.IsAI == true && 
-                (BotOwner.Memory.GoalEnemy?.Person?.AIData?.BotOwner == null || BotOwner.Memory.GoalEnemy.Person.AIData.BotOwner.ProfileId == BotOwner.ProfileId))
-            {
-                BotOwner.Memory.GoalEnemy = null;
-            }
-
             var goalEnemy = BotOwner.Memory.GoalEnemy;
-            if (goalEnemy?.Person != null && goalEnemy.Person.HealthController.IsAlive)
+            if (IsValidEnemy(goalEnemy))
             {
                 AddEnemy(goalEnemy.Person);
             }
             else
             {
                 goalEnemy = BotOwner.Memory.LastEnemy;
-                if (goalEnemy?.Person != null && goalEnemy.Person.HealthController.IsAlive)
+                if (IsValidEnemy(goalEnemy))
                 {
                     AddEnemy(goalEnemy.Person);
                 }
@@ -66,6 +47,31 @@ namespace SAIN.Classes
                     Enemy = null;
                 }
             }
+        }
+
+        private bool IsValidEnemy(GClass475 goalEnemy)
+        {
+            if (goalEnemy?.Person == null)
+            {
+                return false;
+            }
+
+            if (goalEnemy.Person.IsAI && (goalEnemy.Person.AIData?.BotOwner == null || goalEnemy.Person.AIData.BotOwner.BotState != EBotState.Active))
+            {
+                return false;
+            }
+
+            if (goalEnemy.Person.IsAI && goalEnemy.Person.AIData.BotOwner.ProfileId == BotOwner.ProfileId)
+            {
+                return false;
+            }
+
+            if (!goalEnemy.Person.HealthController.IsAlive)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public void AddEnemy(IAIDetails person)

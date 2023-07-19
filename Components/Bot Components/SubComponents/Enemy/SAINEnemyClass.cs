@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.UIElements;
 
 namespace SAIN.Classes
 {
@@ -109,15 +110,24 @@ namespace SAIN.Classes
             if (DistanceTimer < Time.time)
             {
                 DistanceTimer = Time.time + 0.1f;
-                float distance = GetMagnitudeToBot(Position);
-                RealDistance = distance;
-                LastSeenDistance = IsVisible ? distance : GetMagnitudeToBot(PositionLastSeen);
-                DistanceFromLastSeen = IsVisible ? 0f : (PositionLastSeen - Position).magnitude;
+                if (Person != null)
+                {
+                    float distance = GetMagnitudeToBot(Position);
+                    RealDistance = distance;
+                    LastSeenDistance = IsVisible ? distance : GetMagnitudeToBot(PositionLastSeen);
+                    DistanceFromLastSeen = IsVisible ? 0f : (PositionLastSeen - Position).magnitude;
+                }
+                else
+                {
+                    RealDistance = 0;
+                    LastSeenDistance = 0;
+                    DistanceFromLastSeen = 0;
+                }
             }
         }
 
         public float DistanceFromLastSeen { get; private set; }
-        public Vector3 Position => Person.Position;
+        public Vector3 Position => (Person != null ? Person.Position : Vector3.zero);
 
         private float GetMagnitudeToBot(Vector3 point)
         {

@@ -34,6 +34,7 @@ namespace SAIN.Classes
         private void Update()
         {
             if (BotOwner == null) return;
+            if (BotOwner.GetPlayer == null) return;
 
             SetStamina();
 
@@ -58,7 +59,7 @@ namespace SAIN.Classes
                 {
                     reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
                 }
-                BotOwner.Mover.GoToPoint(pointToGo, false, reachDist, false, false, false);
+                BotOwner.Mover?.GoToPoint(pointToGo, false, reachDist, false, false, false);
                 if (crawl)
                 {
                     Prone.SetProne(true);
@@ -77,7 +78,7 @@ namespace SAIN.Classes
                 {
                     reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
                 }
-                BotOwner.Mover.GoToByWay(Way, reachDist, BotOwner.Position);
+                BotOwner.Mover?.GoToByWay(Way, reachDist, BotOwner.Position);
                 if (crawl)
                 {
                     Prone.SetProne(true);
@@ -137,14 +138,14 @@ namespace SAIN.Classes
 
         public void SetTargetMoveSpeed(float speed)
         {
-            BotOwner.Mover.SetTargetMoveSpeed(speed);
+            BotOwner.Mover?.SetTargetMoveSpeed(speed);
         }
 
         public float DestMoveSpeed { get; private set; }
 
         public void StopMove()
         {
-            BotOwner.Mover.Stop();
+            BotOwner.Mover?.Stop();
             if (IsSprinting)
             {
                 Sprint(false);
@@ -154,7 +155,7 @@ namespace SAIN.Classes
         public void Sprint(bool value)
         {
             IsSprinting = value;
-            BotOwner.Mover.Sprint(value);
+            BotOwner.Mover?.Sprint(value);
             if (value)
             {
                 SAIN.Steering.LookToMovingDirection();

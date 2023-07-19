@@ -105,7 +105,7 @@ namespace SAIN.Layers
                     ReCalcPathTimer = Time.time + 4f;
                     if (NoSprint)
                     {
-                        BotOwner.Mover.GoToPoint(point, true, 0.5f, false, false);
+                        BotOwner.Mover?.GoToPoint(point, true, 0.5f, false, false);
                     }
                     else
                     {

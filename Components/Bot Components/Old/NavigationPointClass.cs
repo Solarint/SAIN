@@ -93,7 +93,7 @@ namespace SAIN.Classes
                         {
                             reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
                         }
-                        BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
+                        BotOwner.Mover?.GoToByWay(Path.corners, reachDist, Vector3.zero);
 
                         return Path.status;
                     }
@@ -115,7 +115,7 @@ namespace SAIN.Classes
                     {
                         reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
                     }
-                    BotOwner.Mover.GoToByWay(Path.corners, reachDist, Vector3.zero);
+                    BotOwner.Mover?.GoToByWay(Path.corners, reachDist, Vector3.zero);
                     return true;
                 }
             }
@@ -138,7 +138,7 @@ namespace SAIN.Classes
                     bool start = NavPath.status == NavMeshPathStatus.PathComplete || !MustHavePath;
                     if (NavPath.corners.Length > 1 && start)
                     {
-                        BotOwner.Mover.Stop();
+                        BotOwner.Mover?.Stop();
                         var movePath = GetPath(NavPath.corners);
                         ReachDistance = reachDist > 0 ? reachDist : 0.5f;
                         ActivePath = movePath;
@@ -289,7 +289,7 @@ namespace SAIN.Classes
 
         public bool BotIsComeTo()
         {
-            return BotOwner.Mover.IsComeTo(ReachDistance, false);
+            return BotOwner.Mover?.IsComeTo(ReachDistance, false) == true;
         }
 
         public bool BotIsAtPoint(bool Sqr = true, float reachDist = -1f)
