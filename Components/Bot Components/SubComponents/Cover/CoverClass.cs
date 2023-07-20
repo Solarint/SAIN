@@ -206,6 +206,10 @@ namespace SAIN.Classes
         {
             get
             {
+                if (BotOwner?.Mover == null)
+                {
+                    return false;
+                }
                 var point = CoverInUse;
                 return point != null && (point.Position - BotOwner.Mover.CurPathLastPoint).sqrMagnitude < 1f;
             }

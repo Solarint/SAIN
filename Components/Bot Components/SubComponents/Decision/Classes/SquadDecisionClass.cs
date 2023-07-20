@@ -174,7 +174,7 @@ namespace SAIN.Classes
                 float leadDistance = directionToLead.magnitude;
                 if (enemy != null)
                 {
-                    Vector3 EnemyPos = enemy.Position;
+                    Vector3 EnemyPos = enemy.CurrPosition;
                     Vector3 directionToEnemy = EnemyPos - BotPos;
                     float EnemyDistance = directionToEnemy.magnitude;
                     if (EnemyDistance < leadDistance)

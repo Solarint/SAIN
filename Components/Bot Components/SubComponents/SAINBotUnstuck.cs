@@ -93,6 +93,10 @@ namespace SAIN.Classes
             var decision = SAIN.CurrentDecision;
             if (!BotIsMoving && CanBeStuckDecisions(decision))
             {
+                if (BotOwner.Mover == null)
+                {
+                    return false;
+                }
                 Vector3 botPos = BotOwner.Position;
                 botPos.y += 0.4f;
                 Vector3 moveDir = BotOwner.Mover.DirCurPoint;
@@ -133,6 +137,10 @@ namespace SAIN.Classes
         {
             if (CanBeStuckDecisions(SAIN.CurrentDecision) && !BotIsMoving && !BotOwner.DoorOpener.Interacting && SAIN.Decision.TimeSinceChangeDecision > 0.5f)
             {
+                if (BotOwner.Mover == null)
+                {
+                    return false;
+                }
                 Vector3 botPos = BotOwner.Position;
                 botPos.y += 0.4f;
                 Vector3 moveDir = BotOwner.Mover.DirCurPoint;

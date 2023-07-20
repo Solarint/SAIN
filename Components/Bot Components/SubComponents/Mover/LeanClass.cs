@@ -24,7 +24,7 @@ namespace SAIN.Classes.Mover
             if (LeanTimer < Time.time)
             {
                 LeanTimer = Time.time + 0.5f;
-                FindLeanDirectionRayCast(enemy.Position);
+                FindLeanDirectionRayCast(enemy.CurrPosition);
             }
         }
 

@@ -102,7 +102,7 @@ namespace SAIN.Classes
                         var health = SAIN.HealthStatus;
                         if (health != ETagStatus.Healthy && health != ETagStatus.Injured)
                         {
-                            float dist = (SAIN.Enemy.Position - BotOwner.Position).magnitude;
+                            float dist = (SAIN.Enemy.CurrPosition - BotOwner.Position).magnitude;
                             if (dist < 30f)
                             {
                                 bool random = Helpers.EFTMath.RandomBool(1f);
@@ -180,7 +180,7 @@ namespace SAIN.Classes
             var sainEnemy = SAIN.Enemy;
             var type = SAIN.Info.Personality;
 
-            float distanceToEnemy = Vector3.Distance(sainEnemy.Position, BotPos);
+            float distanceToEnemy = Vector3.Distance(sainEnemy.CurrPosition, BotPos);
 
             if (distanceToEnemy < TauntDist)
             {

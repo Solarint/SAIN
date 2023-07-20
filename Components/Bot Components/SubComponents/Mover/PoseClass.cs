@@ -59,14 +59,14 @@ namespace SAIN.Classes.Mover
 
         public void SetTargetPose(float num)
         {
-            BotOwner.Mover.SetPose(num);
+            BotOwner.Mover?.SetPose(num);
         }
 
         public bool SetTargetPose(float? num)
         {
             if (num != null)
             {
-                BotOwner.Mover.SetPose(num.Value);
+                BotOwner.Mover?.SetPose(num.Value);
             }
             return num != null;
         }

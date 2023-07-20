@@ -80,7 +80,7 @@ namespace SAIN.Layers
         {
             if (SAIN.Enemy != null)
             {
-                BotOwner.SuppressShoot.InitToPoint(SAIN.Enemy.PositionLastSeen);
+                BotOwner.SuppressShoot.InitToPoint(SAIN.Enemy.LastSeenPosition);
             }
         }
 

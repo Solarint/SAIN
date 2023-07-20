@@ -376,18 +376,21 @@ namespace SAIN.Editor
 
         private void SaveValues(BotType editingType)
         {
-            BotDifficulty editingDiff = SelectedDifficulties[SelectedDifficulties.Count];
-            foreach (var Property in SelectedProperties)
+            return;
+            foreach (var diff in SelectedDifficulties)
             {
-                try
+                foreach (var Property in SelectedProperties)
                 {
-                    object value = PresetManager.GetPresetValue(editingType, Property, editingDiff);
-                    PresetManager.SetPresetValue(value, SelectedWildSpawnTypes, Property, SelectedDifficulties);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(Property.Name, GetType(), true);
-                    Logger.LogError(ex.Message, GetType(), true);
+                    try
+                    {
+                        object value = PresetManager.GetPresetValue(editingType, Property, diff);
+                        PresetManager.SetPresetValue(value, SelectedWildSpawnTypes, Property, SelectedDifficulties);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(Property.Name, GetType(), true);
+                        Logger.LogError(ex.Message, GetType(), true);
+                    }
                 }
             }
 

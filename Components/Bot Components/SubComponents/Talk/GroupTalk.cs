@@ -418,7 +418,7 @@ namespace SAIN.Classes
                     }
                     else
                     {
-                        EnemyDirectionCheck(enemy.Position, out trigger, out mask);
+                        EnemyDirectionCheck(enemy.CurrPosition, out trigger, out mask);
                     }
                 }
 

@@ -37,10 +37,9 @@ namespace SAIN.Layers
                 SAIN.Decision.ResetDecisions();
                 return;
             }
-            if (!SAIN.Steering.SteerByPriority(false))
-            {
-                SAIN.Steering.LookToMovingDirection();
-            }
+
+            SAIN.Steering.SteerByPriority();
+
             if (RecalcPathtimer < Time.time)
             {
                 RecalcPathtimer = Time.time + 4f;

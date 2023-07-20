@@ -185,7 +185,7 @@ namespace SAIN.Classes
 
             if (enemy.TimeSinceSeen > 3f && enemy.TimeSinceSeen < 15f && enemy.Seen)
             {
-                if (SAIN.Grenade.EFTBotGrenade.CanThrowGrenade(enemy.Position))
+                if (SAIN.Grenade.EFTBotGrenade.CanThrowGrenade(enemy.CurrPosition))
                 {
                     EndThrowTimer = Time.time;
                     return true;

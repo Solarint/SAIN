@@ -43,12 +43,12 @@ namespace SAIN.Classes.Mover
                     var enemy = SAIN.Enemy;
                     if (enemy != null)
                     {
-                        float distance = (enemy.Position - BotPosition).magnitude;
+                        float distance = (enemy.CurrPosition - BotPosition).magnitude;
                         if (distance > 30f)
                         {
                             if (withShoot)
                             {
-                                return CanShootFromProne(enemy.Position);
+                                return CanShootFromProne(enemy.CurrPosition);
                             }
                             return true;
                         }
@@ -65,12 +65,12 @@ namespace SAIN.Classes.Mover
                 var enemy = SAIN.Enemy;
                 if (enemy != null)
                 {
-                    float distance = (enemy.Position - BotPosition).magnitude;
+                    float distance = (enemy.CurrPosition - BotPosition).magnitude;
                     if (distance > mindist)
                     {
                         if (withShoot)
                         {
-                            return CanShootFromProne(enemy.Position);
+                            return CanShootFromProne(enemy.CurrPosition);
                         }
                         return true;
                     }
@@ -86,10 +86,10 @@ namespace SAIN.Classes.Mover
                 var enemy = SAIN.Enemy;
                 if (enemy != null)
                 {
-                    float distance = (enemy.Position - BotPosition).magnitude;
+                    float distance = (enemy.CurrPosition - BotPosition).magnitude;
                     if (distance > mindist)
                     {
-                        return !CanShootFromProne(enemy.Position);
+                        return !CanShootFromProne(enemy.CurrPosition);
                     }
                 }
             }
@@ -105,7 +105,7 @@ namespace SAIN.Classes.Mover
                 {
                     return true;
                 }
-                float distance = (enemy.Position - BotPosition).magnitude;
+                float distance = (enemy.CurrPosition - BotPosition).magnitude;
                 if (distance > mindist)
                 {
                     return !IsChestPosVisible(enemy.EnemyHeadPosition);

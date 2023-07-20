@@ -35,9 +35,9 @@ namespace SAIN.Layers
             {
                 BotOwner.GoToPoint(pos, false, -1, false, false, false);
             }
-            else if (!EnemyVisible && (SAIN.Enemy.Position - BotOwner.Position).sqrMagnitude > 2f)
+            else if (!EnemyVisible && (SAIN.Enemy.CurrPosition - BotOwner.Position).sqrMagnitude > 2f)
             {
-                BotOwner.MoveToEnemyData.TryMoveToEnemy(SAIN.Enemy.Position);
+                BotOwner.MoveToEnemyData.TryMoveToEnemy(SAIN.Enemy.CurrPosition);
             }
 
             Shoot.Update();

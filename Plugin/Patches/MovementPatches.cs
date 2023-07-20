@@ -37,7 +37,7 @@ namespace SAIN.Patches.Movement
 
                 if (Etype == EInteractionType.Open || Etype == EInteractionType.Breach)
                 {
-                    bool enemyClose = Vector3.Distance(bot.Position, bot.Enemy.Position) < 30f;
+                    bool enemyClose = Vector3.Distance(bot.Position, bot.Enemy.CurrPosition) < 30f;
 
                     if (enemyClose || ___botOwner_0.Memory.IsUnderFire)
                     {

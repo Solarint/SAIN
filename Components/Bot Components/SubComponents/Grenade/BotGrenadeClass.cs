@@ -69,7 +69,7 @@ namespace SAIN.Classes
                     return GrenadeThrowType.None;
                 }
 
-                float distance = (BotOwner.Position - SAIN.Enemy.Position).magnitude;
+                float distance = (BotOwner.Position - SAIN.Enemy.CurrPosition).magnitude;
 
                 if (distance <= 10f)
                 {
@@ -111,7 +111,7 @@ namespace SAIN.Classes
                 return false;
             }
 
-            var lastKnownPos = SAIN.Enemy.PositionLastSeen;
+            var lastKnownPos = SAIN.Enemy.LastSeenPosition;
             lastKnownPos.y += 1.45f;
 
             var lastKnownDirection = lastKnownPos - botPos;

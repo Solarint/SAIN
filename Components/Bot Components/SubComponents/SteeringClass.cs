@@ -73,17 +73,17 @@ namespace SAIN.Classes
                 LookToEnemy(SAIN.Enemy);
                 return true;
             }
-            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 30f, 1f);
+            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 30f, 2f);
             if (sound != null)
             {
                 LookToHearPos(sound.Position);
                 return true;
             }
-            if (BotOwner.DangerPointsData.HaveDangePoints && BotOwner.DangerPointsData.place != null)
-            {
-                LookToPoint(BotOwner.DangerPointsData.place.Position);
-                return true;
-            }
+            //if (BotOwner.DangerPointsData.HaveDangePoints && BotOwner.DangerPointsData.place != null)
+            //{
+            //    LookToPoint(BotOwner.DangerPointsData.place.Position);
+            //    return true;
+            //}
             if (SAIN.Enemy?.TimeSinceSeen < 12f && SAIN.Enemy.Seen)
             {
                 LookToEnemyLastSeenPos();
@@ -91,16 +91,14 @@ namespace SAIN.Classes
             }
             else
             {
+                if (SAIN.CurrentDecision == SAINSoloDecision.Search || SAIN.CurrentDecision == SAINSoloDecision.Investigate)
+                {
+                    LookToMovingDirection();
+                    return false;
+                }
                 if (lookRandomifFalse)
                 {
-                    if (SAIN.ExitsToLocation != null && SAIN.ExitsToLocation.Count > 0)
-                    {
-                        LookToRoomExits();
-                    }
-                    else
-                    {
-                        LookToRandomPosition();
-                    }
+                    LookToRandomPosition();
                 }
                 return false;
             }
@@ -118,7 +116,7 @@ namespace SAIN.Classes
             {
                 if (!enemy.IsVisible)
                 {
-                    Vector3 pos = enemy.PositionLastSeen;
+                    Vector3 pos = enemy.LastSeenPosition;
                     pos += Vector3.up * 1f;
                     LookToPoint(pos);
                     return true;
@@ -132,9 +130,9 @@ namespace SAIN.Classes
             var enemy = SAIN.Enemy;
             if (enemy != null)
             {
-                if (enemy.Seen && (enemy.Position - enemy.PositionLastSeen).sqrMagnitude < 10f)
+                if (enemy.Seen && (enemy.CurrPosition - enemy.LastSeenPosition).sqrMagnitude < 10f)
                 {
-                    LookToPoint(enemy.Position);
+                    LookToPoint(enemy.CurrPosition);
                     return true;
                 }
             }
@@ -217,7 +215,7 @@ namespace SAIN.Classes
         {
             if (enemy != null)
             {
-                LookToPoint(enemy.Position + Vector3.up * 0.85f);
+                LookToPoint(enemy.CurrPosition + Vector3.up * 0.85f);
             }
         }
 

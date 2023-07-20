@@ -44,10 +44,10 @@ namespace SAIN.Layers
                 SAIN.SelfActions.TryReload();
             }
 
-            Vector3 lastSeenPos = enemy.PositionLastSeen;
+            Vector3 lastSeenPos = enemy.LastSeenPosition;
             if ((BotOwner.Position - lastSeenPos).sqrMagnitude < 2f)
             {
-                lastSeenPos = enemy.Position;
+                lastSeenPos = enemy.CurrPosition;
             }
 
             float distance = enemy.RealDistance;

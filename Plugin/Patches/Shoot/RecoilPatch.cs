@@ -42,13 +42,14 @@ namespace SAIN.Patches
                     Vector3 headPos = person.MainParts[BodyPartType.head].Position;
                     // Check the Distance to the bot's aiming target, and see if its really close or on the player's head
                     float dist = (headPos - finalTarget).magnitude;
-                    if (dist < 0.075f)
+                    if (dist < 0.1f)
                     {
                         // Shift the aim target up if it was going to be a headshot
-                        Vector3 vertOffset = Vector3.up * 0.1f;
+
+                        //Vector3 vertOffset = Vector3.up * 0.1f;
                         Quaternion rotation = Quaternion.Euler(0f, 90f, 0f);
                         Vector3 direction = headPos - ___botOwner_0.WeaponRoot.position;
-                        Vector3 right = rotation * direction.normalized * 0.1f;
+                        Vector3 right = rotation * direction.normalized * 0.2f;
 
                         if (EFTMath.RandomBool())
                         {
@@ -59,7 +60,7 @@ namespace SAIN.Patches
                             finalTarget -= right;
                         }
 
-                        finalTarget -= vertOffset;
+                        //finalTarget -= vertOffset;
 
                         //DefaultLogger.LogWarning("Headshot protection activated");
                         DebugGizmos.SingleObjects.Line(headPos, finalTarget, Color.red, 0.1f, true, 5f);

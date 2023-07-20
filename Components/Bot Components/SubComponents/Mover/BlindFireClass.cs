@@ -50,7 +50,7 @@ namespace SAIN.Classes.Mover
             }
             else
             {
-                BlindFireTargetPos = enemy.PositionLastSeen + Vector3.up * 1f;
+                BlindFireTargetPos = enemy.LastSeenPosition + Vector3.up * 1f;
             }
 
             int blindfire = CheckOverHeadBlindFire(BlindFireTargetPos);

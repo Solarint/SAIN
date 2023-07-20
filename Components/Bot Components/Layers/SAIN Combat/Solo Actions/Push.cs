@@ -53,7 +53,7 @@ namespace SAIN.Layers
             }
 
             Vector3[] EnemyPath = SAIN.Enemy.Path.corners;
-            Vector3 EnemyPos = SAIN.Enemy.Position;
+            Vector3 EnemyPos = SAIN.Enemy.CurrPosition;
             if (NewDestTimer < Time.time)
             {
                 NewDestTimer = Time.time + 1f;

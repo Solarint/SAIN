@@ -150,7 +150,7 @@ namespace SAIN.Classes
                 return false;
             }
             bool CheckTime = timeChangeDec < 5f;
-            bool Moving = BotOwner.Mover.RealDestPoint != Vector3.one && BotOwner.Mover.DirDestination.magnitude > 2f;
+            bool Moving = BotOwner.Mover?.RealDestPoint != Vector3.one && BotOwner.Mover?.DirDestination.magnitude > 2f;
             return Running && Moving && CheckTime;
         }
 

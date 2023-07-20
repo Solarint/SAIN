@@ -152,7 +152,7 @@ namespace SAIN.Components
             {
                 SAINComponent bot = BotsWithEnemies[i];
                 var MainParts = bot.Enemy.BodyParts;
-                float seenCoef = bot.Vision.GetSeenCoef(bot.Enemy.Person.Transform, bot.Enemy.Person.AIData, bot.Enemy.TimeLastSeen, bot.Enemy.PositionLastSeen);
+                float seenCoef = bot.Vision.GetSeenCoef(bot.Enemy.Person.Transform, bot.Enemy.Person.AIData, bot.Enemy.TimeLastSeen, bot.Enemy.LastSeenPosition);
 
                 int partsCanShoot = 0;
                 int partVisCount = 0;

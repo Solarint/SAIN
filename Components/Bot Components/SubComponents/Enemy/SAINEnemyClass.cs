@@ -109,15 +109,36 @@ namespace SAIN.Classes
             if (DistanceTimer < Time.time)
             {
                 DistanceTimer = Time.time + 0.1f;
-                float distance = GetMagnitudeToBot(Position);
-                RealDistance = distance;
-                LastSeenDistance = IsVisible ? distance : GetMagnitudeToBot(PositionLastSeen);
-                DistanceFromLastSeen = IsVisible ? 0f : (PositionLastSeen - Position).magnitude;
+                if (Person != null)
+                {
+                    float distance = GetMagnitudeToBot(CurrPosition);
+                    RealDistance = distance;
+                    LastSeenDistance = IsVisible ? distance : GetMagnitudeToBot(LastSeenPosition);
+                    DistanceFromLastSeen = IsVisible ? 0f : (LastSeenPosition - CurrPosition).magnitude;
+
+                    if (IsVisible)
+                    {
+                        ArrivedAtLastSeenPosition = false;
+                    }
+                    else if ((LastSeenPosition - BotOwner.Position).sqrMagnitude < 2f)
+                    {
+                        ArrivedAtLastSeenPosition = true;
+                    }
+                }
+                else
+                {
+                    RealDistance = 0;
+                    LastSeenDistance = 0;
+                    DistanceFromLastSeen = 0;
+                    ArrivedAtLastSeenPosition = false;
+                }
             }
         }
 
+        public bool ArrivedAtLastSeenPosition { get; private set; }
         public float DistanceFromLastSeen { get; private set; }
-        public Vector3 Position => Person.Position;
+
+        public Vector3 CurrPosition => (Person != null ? Person.Position : Vector3.zero);
 
         private float GetMagnitudeToBot(Vector3 point)
         {
@@ -195,7 +216,7 @@ namespace SAIN.Classes
 
         public float RealDistance { get; private set; }
         public float LastSeenDistance { get; private set; }
-        public Vector3 PositionLastSeen { get; private set; }
+        public Vector3 LastSeenPosition { get; private set; }
         public float VisibleStartTime { get; private set; }
         public float TimeSinceSeen => Seen ? Time.time - TimeLastSeen : -1f;
         public bool Seen { get; private set; }
@@ -211,7 +232,7 @@ namespace SAIN.Classes
             CanShoot = value;
         }
 
-        public Vector3 Direction => Position - BotPosition;
+        public Vector3 Direction => CurrPosition - BotPosition;
         private float CheckLosTimer;
 
         public void UpdateVisible(bool inLineOfSight)
@@ -237,7 +258,7 @@ namespace SAIN.Classes
                 if (wasVisible)
                 {
                     TimeLastSeen = Time.time;
-                    PositionLastSeen = Person.Position;
+                    LastSeenPosition = Person.Position;
                 }
             }
 

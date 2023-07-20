@@ -222,7 +222,7 @@ namespace SAIN.Components
             {
                 if (Enemy != null)
                 {
-                    return Enemy.Position;
+                    return Enemy.CurrPosition;
                 }
                 var Target = BotOwner.Memory.GoalTarget;
                 if (Target != null && Target?.Position != null)
