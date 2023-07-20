@@ -109,8 +109,17 @@ namespace SAIN.Classes
                 foreach (string id in Enemies.Keys)
                 {
                     var enemy = Enemies[id];
-                    if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer.AIData?.BotOwner == null || enemy.EnemyPlayer.AIData.BotOwner.ProfileId == BotOwner.ProfileId ||
-                        enemy.EnemyPlayer?.HealthController?.IsAlive == false)
+
+                    // Common checks between PMC and bots
+                    if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer.HealthController?.IsAlive == false)
+                    {
+                        EnemyIDsToRemove.Add(id);
+                    }
+                    // Checks specific to bots
+                    else if (enemy.EnemyPlayer.IsAI && (
+                        enemy.EnemyPlayer.AIData?.BotOwner == null || 
+                        enemy.EnemyPlayer.AIData.BotOwner.ProfileId == BotOwner.ProfileId || 
+                        enemy.EnemyPlayer.AIData.BotOwner.BotState != EBotState.Active))
                     {
                         EnemyIDsToRemove.Add(id);
                     }
