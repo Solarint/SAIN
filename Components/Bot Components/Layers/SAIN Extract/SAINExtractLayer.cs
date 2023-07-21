@@ -2,7 +2,6 @@
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
-using static SAIN.UserSettings.ExtractConfig;
 
 namespace SAIN.Layers
 {
@@ -28,9 +27,21 @@ namespace SAIN.Layers
             return new Action(typeof(ExtractAction), "Extract");
         }
 
+        private bool EnableExtracts
+        {
+            get
+            {
+                if (SAINPlugin.BotController.GetBot(BotOwner.ProfileId, out var bot))
+                {
+                    return bot.Info.EnableExtracts;
+                }
+                return false;
+            }
+        }
+
         public override bool IsActive()
         {
-            if (SAIN.ExfilPosition == null || !EnableExtracts.Value)
+            if (SAIN.ExfilPosition == null || !EnableExtracts)
             {
                 return false;
             }

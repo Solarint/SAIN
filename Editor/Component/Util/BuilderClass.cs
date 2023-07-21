@@ -205,9 +205,9 @@ namespace SAIN.Editor
         public bool ExpandableMenu(string name, bool value, string description = null)
         {
             BeginHorizontal();
-            ButtonsClass.InfoBox(description, true);
-            Label(name, ExpandMenuWidth, true);
-            value = Toggle(value, value ? "[Close]" : "[Open]", true);
+            ButtonsClass.InfoBox(description);
+            Label(name, Width(ExpandMenuWidth));
+            value = Toggle(value, value ? "[Close]" : "[Open]");
             EndHorizontal();
             return value;
         }
@@ -241,13 +241,13 @@ namespace SAIN.Editor
             BeginHorizontal();
 
             ButtonsClass.InfoBox(entry.Description.Description);
-            Box(entry.Definition.Key, LabelWidth);
+            Box(entry.Definition.Key, Width(LabelWidth));
 
             object min = MinMax(entry, out object max);
 
             if (min != null)
             {
-                BlankBox(min.ToString(), MinMaxWidth);
+                BlankBox(min.ToString(), Width(MinMaxWidth));
                 CheckMouse("Min");
             }
 
@@ -265,11 +265,11 @@ namespace SAIN.Editor
 
             if (max != null)
             {
-                BlankBox(max.ToString(), MinMaxWidth);
+                BlankBox(max.ToString(), Width(MinMaxWidth));
                 CheckMouse("Max");
             }
 
-            Box(entry.Value.ToString(), ResultWidth);
+            Box(entry.Value.ToString(), Width(ResultWidth));
             FlexibleSpace();
             ButtonsClass.ResetButton(entry);
             EndHorizontal();
@@ -300,20 +300,20 @@ namespace SAIN.Editor
             BeginHorizontal();
 
             ButtonsClass.InfoBox(entry.Description);
-            Box(entry.Name, LabelWidth);
+            Box(entry.Name, Width(LabelWidth));
 
             FlexibleSpace();
 
-            BlankBox(entry.Min.ToString(), MinMaxWidth);
+            BlankBox(entry.Min.ToString(), Width(MinMaxWidth));
             CheckMouse("Min");
 
             value = CreateSlider(value, entry.Min, entry.Max, entry.Rounding);
 
-            BlankBox(entry.Max.ToString(), MinMaxWidth);
+            BlankBox(entry.Max.ToString(), Width(MinMaxWidth));
             CheckMouse("Max");
 
-            Box(value.ToString(), ResultWidth);
-            ButtonsClass.ResetButton(entry);
+            Box(value.ToString(), Width(ResultWidth));
+            ButtonsClass.ResetButton(entry, difficulty);
             EndHorizontal();
 
             entry.SetValue(difficulty, value);
@@ -324,17 +324,17 @@ namespace SAIN.Editor
             BeginHorizontal();
 
             ButtonsClass.InfoBox(description);
-            Box(name, LabelWidth);
+            Box(name, Width(LabelWidth));
 
-            Box(min.ToString(), MinMaxWidth);
+            Box(min.ToString(), Width(MinMaxWidth));
             CheckMouse("Min");
 
             float result = CreateSlider(value, min, max, rounding);
 
-            Box(max.ToString(), MinMaxWidth);
+            Box(max.ToString(), Width(MinMaxWidth));
             CheckMouse("Max");
 
-            Box(value.ToString(), ResultWidth);
+            Box(value.ToString(), Width(ResultWidth));
 
             EndHorizontal();
             return result;

@@ -3,7 +3,7 @@ using EFT;
 using EFT.InventoryLogic;
 using EFT.Weather;
 using UnityEngine;
-using static SAIN.UserSettings.SoundConfig;
+using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Helpers
 {

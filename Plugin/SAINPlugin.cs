@@ -12,7 +12,7 @@ using Comfort.Common;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN Beta", "3.4")]
+    [BepInPlugin("me.sol.sain", "SAIN Beta", "3.5")]
     [BepInDependency("xyz.drakia.bigbrain", "0.1.4")]
     [BepInDependency("xyz.drakia.waypoints", "1.1.2")]
     [BepInDependency("com.spt-aki.core", "3.5.8")]
@@ -25,7 +25,7 @@ namespace SAIN
             {
                 throw new Exception($"Invalid EFT Version");
             }
-            
+
             // If BigBrain isn't loaded, we need to exit too. Normally this would be handled via
             // the BepInDependency, but due to remapping between 3.5.7 and 3.5.8 we also have to/
             // manually check for now
@@ -38,24 +38,22 @@ namespace SAIN
             EFTPatches.Init();
             BigBrainSAIN.Init();
 
-            SAINEditor = new SAINEditor();
-            SAINEditor.Init();
             ModsCheckTimer = Time.time + 5f;
         }
 
         void Start()
         {
-
+            SAINEditor.Init();
         }
 
-        public static SAINEditor SAINEditor { get; private set; }
-        private static GameObject EditorObject { get; set; }
+        public static readonly SAINEditor SAINEditor = new SAINEditor();
 
         private void ConfigInit()
         {
             SAINConfig = Config;
+
             EditorSettings.Init();
-            ExtractConfig.Init(Config);
+
             TalkConfig.Init(Config);
             VisionConfig.Init(Config);
             DebugConfig.Init(Config);
@@ -87,6 +85,11 @@ namespace SAIN
                     Logger.LogInfo("SAIN: Looting Bots Detected.");
                 }
             }
+        }
+
+        private void LateUpdate()
+        {
+            SAINEditor.LateUpdate();
         }
 
         void OnGUI()

@@ -320,5 +320,18 @@ namespace SAIN.BotPresets
         {
             DifficultyValue[difficulty] = Value;
         }
+
+        public void Reset(BotDifficulty difficulty)
+        {
+            DifficultyValue[difficulty] = DefaultVal;
+        }
+
+        public void ResetAll()
+        {
+            Reset(BotDifficulty.easy);
+            Reset(BotDifficulty.normal);
+            Reset(BotDifficulty.hard);
+            Reset(BotDifficulty.impossible);
+        }
     }
 }

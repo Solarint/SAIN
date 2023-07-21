@@ -148,38 +148,32 @@ namespace SAIN.Editor
 
         private void CreateStyles()
         {
-            var ButtonStyle = new GUIStyle(GUI.skin.button);
-            var BoxStyle = new GUIStyle(GUI.skin.box);
-            var ToggleStyle = new GUIStyle(GUI.skin.toggle);
-            var TextAreaStyle = new GUIStyle(GUI.skin.textArea);
-            var TextFieldStyle = new GUIStyle(GUI.skin.textField);
-            var WindowStyle = new GUIStyle(GUI.skin.window);
-            var VerticalScrollbarDownButtonStyle = new GUIStyle(GUI.skin.verticalScrollbarDownButton);
-            var VerticalScrollbarStyle = new GUIStyle(GUI.skin.verticalScrollbar);
-            var VerticalScrollbarThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb);
-            var VerticalScrollbarUpButtonStyle = new GUIStyle(GUI.skin.verticalScrollbarUpButton);
-            var LabelStyle = new GUIStyle(GUI.skin.label);
-            var HorizontalSliderStyle = new GUIStyle(GUI.skin.horizontalSlider);
-            var HorizontalSliderThumbStyle = new GUIStyle(GUI.skin.horizontalSliderThumb);
-            var VerticalSliderStyle = new GUIStyle(GUI.skin.verticalSlider);
-            var VerticalSliderThumbStyle = new GUIStyle(GUI.skin.verticalSliderThumb);
-            var ListStyle = new GUIStyle(GUI.skin.toggle);            
-
-            var ToolTipStyle = new GUIStyle(GUI.skin.box)
+            GUIStyle ButtonStyle = new GUIStyle(GUI.skin.button);
+            GUIStyle BoxStyle = new GUIStyle(GUI.skin.box);
+            GUIStyle ToggleStyle = new GUIStyle(GUI.skin.toggle);
+            GUIStyle TextAreaStyle = new GUIStyle(GUI.skin.textArea);
+            GUIStyle TextFieldStyle = new GUIStyle(GUI.skin.textField);
+            GUIStyle WindowStyle = new GUIStyle(GUI.skin.window);
+            GUIStyle VerticalScrollbarDownButtonStyle = new GUIStyle(GUI.skin.verticalScrollbarDownButton);
+            GUIStyle VerticalScrollbarStyle = new GUIStyle(GUI.skin.verticalScrollbar);
+            GUIStyle VerticalScrollbarThumbStyle = new GUIStyle(GUI.skin.verticalScrollbarThumb);
+            GUIStyle VerticalScrollbarUpButtonStyle = new GUIStyle(GUI.skin.verticalScrollbarUpButton);
+            GUIStyle LabelStyle = new GUIStyle(GUI.skin.label);
+            GUIStyle HorizontalSliderStyle = new GUIStyle(GUI.skin.horizontalSlider);
+            GUIStyle HorizontalSliderThumbStyle = new GUIStyle(GUI.skin.horizontalSliderThumb);
+            GUIStyle VerticalSliderStyle = new GUIStyle(GUI.skin.verticalSlider);
+            GUIStyle VerticalSliderThumbStyle = new GUIStyle(GUI.skin.verticalSliderThumb);
+            GUIStyle ListStyle = new GUIStyle(GUI.skin.toggle);
+            GUIStyle ToolTipStyle = new GUIStyle(GUI.skin.box)
             {
                 padding = new RectOffset(6, 6, 6, 6),
                 border = new RectOffset(2, 2, 2, 2),
                 wordWrap = true,
                 clipping = TextClipping.Clip,
-                alignment = TextAnchor.UpperLeft,
-                fontStyle = FontStyle.Bold
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal
             };
-
-            Texture2D tooltiptex = Texture2D.blackTexture;
-            BGAllStates(ToolTipStyle, tooltiptex);
-            ApplyTextColorAllStates(ToolTipStyle, Color.white, Color.white);
-
-            var BlankBackgroundStyle = new GUIStyle(GUI.skin.box)
+            GUIStyle BlankBackgroundStyle = new GUIStyle(GUI.skin.box)
             {
                 alignment = TextAnchor.MiddleCenter,
                 fontStyle = FontStyle.Bold
@@ -193,6 +187,9 @@ namespace SAIN.Editor
             var TexVeryDarkGray = GetColor(VeryDarkGray);
             var TexMidRed = GetColor(MidRed);
             var TexDarkRed = GetColor(DarkRed);
+
+            BGAllStates(ToolTipStyle, TexVeryDarkGray);
+            ApplyTextColorAllStates(ToolTipStyle, Color.white, Color.white);
 
             BGNormal(ListStyle, TexMidGray, TexDarkRed);
             BGActive(ListStyle, TexMidGray, TexDarkRed);

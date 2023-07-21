@@ -13,12 +13,17 @@ using ColorsClass = SAIN.Editor.Util.ColorsClass;
 using static SAIN.Editor.Names.StyleNames;
 using EFT;
 using UnityEngine.EventSystems;
+using System.Reflection;
+using BepInEx;
+using EFT.Visual;
 
 namespace SAIN.Editor
 {
     public class SAINEditor
     {
-        public SAINEditor()
+        public SAINEditor() { }
+
+        public void Init()
         {
             ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(OpenEditor));
             ConsoleScreen.Processor.RegisterCommand("pausegame", new Action(TogglePause));
@@ -26,13 +31,20 @@ namespace SAIN.Editor
             OpenEditorButton = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor", false, "Opens the Editor on press");
             OpenEditorConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
             PauseConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "PauseButton", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
-        }
 
+            // Use reflection to keep compatibility with unity 4.x since it doesn't have Cursor
+            var tCursor = typeof(Cursor);
+            _curLockState = tCursor.GetProperty("lockState", BindingFlags.Static | BindingFlags.Public);
+            _curVisible = tCursor.GetProperty("visible", BindingFlags.Static | BindingFlags.Public);
 
-        public Action EditorToggled { get; set; }
+            if (_curLockState == null && _curVisible == null)
+            {
+                _obsoleteCursor = true;
 
-        public void Init()
-        {
+                _curLockState = typeof(Screen).GetProperty("lockCursor", BindingFlags.Static | BindingFlags.Public);
+                _curVisible = typeof(Screen).GetProperty("showCursor", BindingFlags.Static | BindingFlags.Public);
+            }
+
             TexturesClass = new TexturesClass(this);
             Colors = new ColorsClass(this);
             StyleOptions = new StyleOptions(this);
@@ -43,6 +55,14 @@ namespace SAIN.Editor
             MouseFunctions = new MouseFunctions(this);
             WindowLayoutCreator = new WindowLayoutCreator(this);
         }
+
+        internal static Texture2D TooltipBg { get; private set; }
+
+        private PropertyInfo _curLockState;
+        private PropertyInfo _curVisible;
+        private int _previousCursorLockState;
+        private bool _previousCursorVisible;
+        private bool _obsoleteCursor;
 
         public WindowLayoutCreator WindowLayoutCreator { get; private set; }
         public MouseFunctions MouseFunctions { get; private set; }
@@ -62,20 +82,20 @@ namespace SAIN.Editor
 
         private GameObject EFTInput;
 
-        public bool MainWindowOpen { get; private set; } = false;
-
         [ConsoleCommand("Open SAIN GUI Editor")]
+
         private void OpenEditor()
         {
-            if (!MainWindowOpen)
+            if (!DisplayingWindow)
             {
                 GUIToggle();
                 ConsoleScreen.Log("[SAIN]: Opening Editor...");
             }
         }
+
         private void CloseEditor()
         {
-            if (MainWindowOpen)
+            if (DisplayingWindow)
             {
                 GUIToggle();
             }
@@ -114,21 +134,13 @@ namespace SAIN.Editor
             ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
             CtrlKeyPressed = Input.GetKey(KeyCode.LeftControl);
 
-            if (EFTInput == null)
-            {
-                EFTInput = GameObject.Find("___Input");
-            }
-            if (MainWindowOpen && EFTInput != null && EFTInput.activeSelf)
-            {
-                EFTInput?.SetActive(false);
-            }
+            if (DisplayingWindow) SetUnlockCursor(0, true);
+
             if (PauseConfigEntry.Value.IsDown())
             {
                 TogglePause();
             }
-            if (OpenEditorConfigEntry.Value.IsDown() || 
-                (Input.GetKeyDown(KeyCode.Escape) && MainWindowOpen) || 
-                OpenEditorButton.Value)
+            if (OpenEditorConfigEntry.Value.IsDown() || (Input.GetKeyDown(KeyCode.Escape) && DisplayingWindow) || OpenEditorButton.Value)
             {
                 if (OpenEditorButton.Value)
                 {
@@ -136,59 +148,93 @@ namespace SAIN.Editor
                 }
                 GUIToggle();
             }
+        }
 
-            //MouseFunctions.Update();
+        private void SetUnlockCursor(int lockState, bool cursorVisible)
+        {
+            if (_curLockState != null)
+            {
+                // Do through reflection for unity 4 compat
+                //Cursor.lockState = CursorLockMode.None;
+                //Cursor.visible = true;
+                if (_obsoleteCursor)
+                    _curLockState.SetValue(null, Convert.ToBoolean(lockState), null);
+                else
+                    _curLockState.SetValue(null, lockState, null);
+
+                _curVisible.SetValue(null, cursorVisible, null);
+            }
+        }
+
+        public void LateUpdate()
+        {
+            if (DisplayingWindow) SetUnlockCursor(0, true);
         }
 
         private void GUIToggle()
         {
-            MainWindowOpen = !MainWindowOpen;
-            Cursor.visible = MainWindowOpen;
-            if (MainWindowOpen)
-            {
-                CursorSettings.SetCursor(ECursorType.Idle);
-                Cursor.lockState = CursorLockMode.None;
-                Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuContextMenu);
-            }
-            else
-            {
-                PresetEditor.OpenAdjustmentWindow = false;
-                CursorSettings.SetCursor(ECursorType.Invisible);
-                Cursor.lockState = CursorLockMode.Locked;
-                Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.MenuDropdown);
-            }
-            EFTInput.SetActive(!MainWindowOpen);
+            DisplayingWindow = !DisplayingWindow;
         }
-
-        float baseHeight;
 
         public void OnGUI()
         {
-            if (MainWindowOpen)
+            if (DisplayingWindow)
             {
                 if (!Inited)
                 {
+                    Inited = true;
+
                     TexturesClass.Init();
                     StyleOptions.Init();
                     Fonts.Init();
-                    Inited = true;
-                    baseHeight = MainWindow.height;
                     DragBackgroundTexture = TexturesClass.GetColor(Names.ColorNames.MidGray);
+                    TooltipBg = TexturesClass.GetColor(Names.ColorNames.VeryDarkGray);
                     OpenTabRect = new Rect(0, 85, MainWindow.width, 1000f);
                 }
+
+                SetUnlockCursor(0, true);
 
                 GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
 
                 MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", StyleOptions.GetStyle(window));
-
-                ToolTips.DrawToolTip();
 
                 if (PresetEditor.OpenAdjustmentWindow)
                 {
                     AdjustmentRect = Builder.NewWindow(1, AdjustmentRect, PresetEditor.GUIAdjustment, "GUI Adjustment");
                 }
 
-                //MouseFunctions.OnGUI();
+                UnityInput.Current.ResetInputAxes();
+            }
+        }
+
+        private bool _displayingWindow;
+
+        public bool DisplayingWindow
+        {
+            get => _displayingWindow;
+            set
+            {
+                if (_displayingWindow == value) return;
+                _displayingWindow = value;
+
+                if (_displayingWindow)
+                {
+                    // Do through reflection for unity 4 compat
+                    if (_curLockState != null)
+                    {
+                        _previousCursorLockState = _obsoleteCursor ? Convert.ToInt32((bool)_curLockState.GetValue(null, null)) : (int)_curLockState.GetValue(null, null);
+                        _previousCursorVisible = (bool)_curVisible.GetValue(null, null);
+                    }
+                }
+                else
+                {
+                    if (!_previousCursorVisible || _previousCursorLockState != 0) // 0 = CursorLockMode.None
+                    {
+                        SetUnlockCursor(_previousCursorLockState, _previousCursorVisible);
+                    }
+
+                    PresetEditor.OpenAdjustmentWindow = false;
+                }
             }
         }
 
@@ -229,24 +275,8 @@ namespace SAIN.Editor
 
         private bool TabSelected(string tab, out Rect tabRect, float targetHeight)
         {
-            bool selected = OpenTab == tab;
-            //OpenTabRect.height += 45;
-            //OpenTabRect.height = Mathf.Clamp(OpenTabRect.height, 0f, targetHeight);
-            //MainWindow.height = baseHeight + OpenTabRect.height;
             tabRect = OpenTabRect;
-            return selected;
-        }
-
-        private int FindSelected()
-        {
-            for (int i = 0; i < Tabs.Length; i++)
-            {
-                if (Tabs[i] == OpenTab)
-                {
-                    return i;
-                }
-            }
-            return 0;
+            return OpenTab == tab;
         }
 
         Texture2D DragBackgroundTexture;
@@ -287,104 +317,123 @@ namespace SAIN.Editor
                 Builder.BeginArea(tabRect);
                 PresetEditor.OpenPresetWindow(tabRect);
                 Builder.EndArea();
-                return;
             }
-
-            Builder.BeginVertical();
-
-            if (TabSelected(Home, out tabRect, 1000f))
+            else
             {
-                Builder.CreateButtonOption(NoBushESPToggle);
-                Builder.CreateButtonOption(HeadShotProtection);
+                Builder.BeginVertical();
 
-                Builder.Box("Mod Detection");
+                if (TabSelected(Home, out tabRect, 1000f))
+                {
+                    Builder.CreateButtonOption(NoBushESPToggle);
+                    Builder.CreateButtonOption(HeadShotProtection);
 
-                Builder.BeginHorizontal();
+                    Builder.Box("Mod Detection");
 
-                Buttons.SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
-                Buttons.SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
+                    Builder.BeginHorizontal();
 
-                Builder.EndHorizontal();
+                    Buttons.SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
+                    Buttons.SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
+
+                    Builder.EndHorizontal();
+                }
+                else if (TabSelected(Personalities, out tabRect, 1000f))
+                {
+                    Builder.Box("Personality Settings");
+                    Builder.Box("For The Memes. Recommended not to use these during normal gameplay!");
+                    Builder.Box("Bots will be more predictable and exploitable.");
+
+                    if (Builder.CreateButtonOption(AllGigaChads))
+                    {
+                        AllChads.Value = false;
+                        AllRats.Value = false;
+                    }
+                    if (Builder.CreateButtonOption(AllChads))
+                    {
+                        AllGigaChads.Value = false;
+                        AllRats.Value = false;
+                    }
+                    if (Builder.CreateButtonOption(AllRats))
+                    {
+                        AllGigaChads.Value = false;
+                        AllChads.Value = false;
+                    }
+
+                    Builder.HorizSlider(RandomGigaChadChance, 1);
+                    Builder.HorizSlider(RandomChadChance, 1);
+                    Builder.HorizSlider(RandomRatChance, 1);
+                    Builder.HorizSlider(RandomCowardChance, 1);
+                }
+                else if (TabSelected(Hearing, out tabRect, 1000f))
+                {
+                    Builder.HorizSlider(SuppressorModifier, 100f);
+                    Builder.HorizSlider(SubsonicModifier, 100f);
+                    Builder.HorizSlider(AudioRangePistol, 1f);
+                    Builder.HorizSlider(AudioRangeRifle, 1f);
+                    Builder.HorizSlider(AudioRangeMidRifle, 1f);
+                    Builder.HorizSlider(AudioRangeLargeCal, 1f);
+                    Builder.HorizSlider(AudioRangeShotgun, 1f);
+                    Builder.HorizSlider(AudioRangeOther, 1f);
+                }
+                else if (TabSelected(Advanced, out tabRect, 1000f))
+                {
+                    Builder.Box("Advanced Settings. Edit at your own risk.");
+
+                    Builder.HorizSlider(MaxRecoil, 100f);
+                    Builder.HorizSlider(AddRecoil, 100f);
+                    Builder.HorizSlider(RecoilDecay, 1000f);
+
+                    Builder.BeginHorizontal();
+                    if (Builder.Button("Font"))
+                    {
+                        OpenFontMenu = !OpenFontMenu;
+                    }
+                    if (Builder.Button("Mysterious Button"))
+                    {
+                        Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.PlayerIsDead);
+                        Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.QuestFailed);
+                    }
+                    Builder.EndHorizontal();
+
+                    if (OpenFontMenu)
+                    {
+                        FontEditMenu.OpenMenu();
+                    }
+
+                    WindowLayoutCreator.CreateGUIAdjustmentSliders();
+                }
+
+                Builder.EndVertical();
             }
-            else if (TabSelected(Personalities, out tabRect, 1000f))
-            {
-                Builder.Box("Personality Settings");
-                Builder.Box("For The Memes. Recommended not to use these during normal gameplay!");
-                Builder.Box("Bots will be more predictable and exploitable.");
 
-                if (Builder.CreateButtonOption(AllGigaChads))
-                {
-                    AllChads.Value = false;
-                    AllRats.Value = false;
-                }
-                if (Builder.CreateButtonOption(AllChads))
-                {
-                    AllGigaChads.Value = false;
-                    AllRats.Value = false;
-                }
-                if (Builder.CreateButtonOption(AllRats))
-                {
-                    AllGigaChads.Value = false;
-                    AllChads.Value = false;
-                }
-
-                Builder.HorizSlider(RandomGigaChadChance, 1);
-                Builder.HorizSlider(RandomChadChance, 1);
-                Builder.HorizSlider(RandomRatChance, 1);
-                Builder.HorizSlider(RandomCowardChance, 1);
-            }
-            else if (TabSelected(Hearing, out tabRect, 1000f))
-            {
-                Builder.HorizSlider(SuppressorModifier, 100f);
-                Builder.HorizSlider(SubsonicModifier, 100f);
-                Builder.HorizSlider(AudioRangePistol, 1f);
-                Builder.HorizSlider(AudioRangeRifle, 1f);
-                Builder.HorizSlider(AudioRangeMidRifle, 1f);
-                Builder.HorizSlider(AudioRangeLargeCal, 1f);
-                Builder.HorizSlider(AudioRangeShotgun, 1f);
-                Builder.HorizSlider(AudioRangeOther, 1f);
-            }
-            else if (TabSelected(Advanced, out tabRect, 1000f))
-            {
-                Builder.Box("Advanced Settings. Edit at your own risk.");
-
-                Builder.HorizSlider(MaxRecoil, 100f);
-                Builder.HorizSlider(AddRecoil, 100f);
-                Builder.HorizSlider(RecoilDecay, 1000f);
-
-                Builder.BeginHorizontal();
-                if (Builder.Button("Font"))
-                {
-                    OpenFontMenu = !OpenFontMenu;
-                }
-                if (Builder.Button("Mysterious Button"))
-                {
-                    Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.PlayerIsDead);
-                    Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.QuestFailed);
-                }
-                Builder.EndHorizontal();
-
-                if (OpenFontMenu)
-                {
-                    FontEditMenu.OpenMenu();
-                }
-
-                WindowLayoutCreator.CreateGUIAdjustmentSliders();
-            }
-            Builder.EndVertical();
+            DrawTooltip();
         }
+
+        public Rect ToolTipRect = Rect.zero;
+        public GUIContent ToolTipContent;
+
+        private void DrawTooltip()
+        {
+            string tooltip = GUI.tooltip;
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                var currentEvent = Event.current;
+
+                const int width = 200;
+
+                var height = ToolTipStyle.CalcHeight(new GUIContent(tooltip), width) + 10;
+
+                var x = currentEvent.mousePosition.x;
+                var y = currentEvent.mousePosition.y + 15;
+
+                GUI.Box(new Rect(x, y, width, height), tooltip, ToolTipStyle);
+            }
+        }
+
+        private GUIStyle ToolTipStyle => StyleOptions.GetStyle(tooltip);
 
         bool NoTabSelected()
         {
-            bool noTab = OpenTab == None;
-            if (noTab)
-            {
-                //OpenTabRect.height -= 30;
-                //OpenTabRect.height = Mathf.Clamp(OpenTabRect.height, baseHeight, 1000);
-                //MainWindow.height -= 30f;
-                //MainWindow.height = Mathf.Clamp(MainWindow.height, baseHeight, 1000);
-            }
-            return noTab;
+            return OpenTab == None;
         }
 
         public bool ExpandGeneral = false;

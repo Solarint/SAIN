@@ -298,7 +298,7 @@
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverFinderComponent.cs" />
     <Compile Include="Editor\Util\AssignConfig.cs" />
-    <Compile Include="Editor\Component\EditorSettings.cs" />
+    <Compile Include="Plugin\Config\EditorSettings.cs" />
     <Compile Include="Editor\Component\Util\BuilderClass.cs" />
     <Compile Include="Editor\Component\Util\RectLayout.cs" />
     <Compile Include="Editor\Component\Util\StyleOptions.cs" />
@@ -306,7 +306,6 @@
     <Compile Include="Plugin\Config\ConfigAbstract.cs" />
     <Compile Include="BotPresets\PresetManager.cs" />
     <Compile Include="BotPresets\BotPreset.cs" />
-    <Compile Include="Plugin\Config\ExtractConfig.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />
     <Compile Include="Plugin\Config\TalkConfig.cs" />

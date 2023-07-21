@@ -101,7 +101,7 @@ namespace SAIN.Editor.Util
                 BlankStyle = new GUIStyle(GUI.skin.window);
                 ApplyToStyle.BGAllStates(BlankStyle, null);
             }
-            if (Editor.MainWindowOpen && drawRect)
+            if (Editor.DisplayingWindow && drawRect)
             {
                 FullScreen = GUI.Window(999, FullScreen, EmptyWindowFunc, "", BlankStyle);
             }

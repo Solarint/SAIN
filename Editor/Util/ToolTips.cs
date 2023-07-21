@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using SAIN.Editor.Abstract;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static SAIN.Editor.StyleOptions;
 using static SAIN.Editor.Names.StyleNames;
-using SAIN.Editor.Abstract;
 
 namespace SAIN.Editor
 {
     public class ToolTips : EditorAbstract
     {
-        public ToolTips(SAINEditor editor) : base(editor) { }
+        public ToolTips(SAINEditor editor) : base(editor)
+        {
+        }
 
         private GUIStyle ToolTipStyle => Editor.StyleOptions.GetStyle(tooltip);
 
@@ -46,13 +46,23 @@ namespace SAIN.Editor
 
         public void DrawToolTip()
         {
-            if (OpenToolTip)
+            if (Event.current.type == EventType.Repaint)
             {
-                Vector2 mousePos = Event.current.mousePosition;
-                Vector2 tooltipSize = ToolTipStyle.CalcSize(ToolTipContent);
-                ToolTipRect = new Rect(mousePos.x + 20, mousePos.y + 50, tooltipSize.x, tooltipSize.y);
-                ToolTipRect = GUI.Window(1, ToolTipRect, ToolTipFunc, "");
-                OpenToolTip = false;
+                if (GUI.tooltip != null)
+                {
+                    Vector2 mousePos = Event.current.mousePosition;
+                    Vector2 tooltipSize = ToolTipStyle.CalcSize(ToolTipContent);
+                    ToolTipRect = new Rect(mousePos.x + 20, mousePos.y + 50, tooltipSize.x, tooltipSize.y);
+                    GUI.Label(ToolTipRect, GUI.tooltip);
+
+                    if (OpenToolTip)
+                    {
+                        ToolTipRect = new Rect(mousePos.x + 20, mousePos.y + 50, tooltipSize.x, tooltipSize.y);
+                        ToolTipRect = GUI.Window(1, ToolTipRect, ToolTipFunc, "");
+                        OpenToolTip = false;
+                    }
+                }
+                GUI.tooltip = null;
             }
         }
 

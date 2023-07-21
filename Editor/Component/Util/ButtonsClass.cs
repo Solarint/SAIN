@@ -16,17 +16,17 @@ namespace SAIN.Editor
 
         private const float InfoWidth = 35f;
 
-        public void InfoBox(string description, bool extended = false)
+        public void InfoBox(string description)
         {
-            Box("?", 25f, extended);
-            CheckMouse(description);
+            Box("?", description, Width(25f));
+            //CheckMouse(description);
         }
 
         public bool ButtonConfigEntry(ConfigEntry<bool> entry)
         {
             InfoBox(entry.Description.Description);
 
-            Box(entry.Definition.Key, 200f);
+            Box(entry.Definition.Key, Width(200f));
 
             Space(25);
 
@@ -43,9 +43,11 @@ namespace SAIN.Editor
         {
             bool value = (bool)entry.GetValue(difficulty);
 
+            BeginHorizontal();
+
             InfoBox(entry.Description);
 
-            Box(entry.Name, 200f);
+            Box(entry.Name, Width(200f));
 
             Space(25);
 
@@ -53,7 +55,9 @@ namespace SAIN.Editor
 
             Space(25);
 
-            ResetButton(entry);
+            ResetButton(entry, difficulty);
+
+            EndHorizontal();
 
             entry.SetValue(difficulty, value);
             return value;
@@ -63,29 +67,19 @@ namespace SAIN.Editor
 
         public void ResetButton<T>(ConfigEntry<T> entry)
         {
-            if (Button("Reset", ResetWidth))
+            if (Button("Reset", Width(ResetWidth)))
             {
                 MenuClickSound();
                 DefaultValue(entry);
             }
         }
-        public void ResetButton<T>(SAINProperty<T> entry)
+
+        public void ResetButton<T>(SAINProperty<T> entry, BotDifficulty difficulty)
         {
-            if (Button("Reset", ResetWidth))
+            if (Button("Reset", Width(ResetWidth)))
             {
                 MenuClickSound();
-                if (entry is ConfigEntry<float> floatEntry)
-                {
-                    floatEntry.Value = (float)floatEntry.DefaultValue;
-                }
-                if (entry is ConfigEntry<int> intEntry)
-                {
-                    intEntry.Value = (int)intEntry.DefaultValue;
-                }
-                if (entry is ConfigEntry<bool> boolEntry)
-                {
-                    boolEntry.Value = (bool)boolEntry.DefaultValue;
-                }
+                entry.Reset(difficulty);
             }
         }
 
@@ -96,7 +90,7 @@ namespace SAIN.Editor
 
             if (width != null)
             {
-                value = Toggle(value, name, width.Value);
+                value = Toggle(value, name, Width(width.Value));
             }
             else
             {
