@@ -15,6 +15,9 @@ namespace SAIN.Classes
 
         private void Awake()
         {
+            // We include the "PlayerSpiritAura" mask to support Visceral Bodies, which replaces all foliage and grass with this layer
+            NoBushMask = (LayerMaskClass.HighPolyWithTerrainMaskAI | (1 << LayerMask.NameToLayer("PlayerSpiritAura")));
+
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -85,7 +88,7 @@ namespace SAIN.Classes
             return false;
         }
 
-        private static LayerMask NoBushMask => LayerMaskClass.HighPolyWithTerrainMaskAI;
+        private LayerMask NoBushMask;
         public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider",
         "timber", "spruce", "bush", "metal", "wood", "grass" };
     }

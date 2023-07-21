@@ -22,7 +22,7 @@ namespace SAIN.Classes
         private SAINSelfDecision SelfDecision => SAIN.Decision.CurrentSelfDecision;
 
         private bool WasUsingMeds = false;
-        private bool UsingMeds => BotOwner.Medecine.Using;
+        private bool UsingMeds => BotOwner.Medecine?.Using == true;
 
         private void Update()
         {

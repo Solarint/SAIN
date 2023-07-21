@@ -4,6 +4,7 @@ using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UIElements;
 
 namespace SAIN.Classes
 {
@@ -28,6 +29,18 @@ namespace SAIN.Classes
             {
                 ClearEnemyTimer = Time.time + 1f;
                 ClearEnemies();
+            }
+
+            // If our current enemy no longer exists, clean up
+            if (Enemy?.EnemyPlayer == null || Enemy?.EnemyPlayer.AIData?.BotOwner == null)
+            {
+                Enemy = null;
+            }
+
+            // For extra sanity, if the GoalEnemy's person's BotOwner is null, reset that too
+            if (BotOwner.Memory.GoalEnemy?.Person?.AIData?.BotOwner == null)
+            {
+                BotOwner.Memory.GoalEnemy = null;
             }
 
             var goalEnemy = BotOwner.Memory.GoalEnemy;
@@ -84,7 +97,7 @@ namespace SAIN.Classes
                 foreach (string id in Enemies.Keys)
                 {
                     var enemy = Enemies[id];
-                    if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer?.HealthController?.IsAlive == false)
+                    if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer.AIData?.BotOwner == null || enemy.EnemyPlayer?.HealthController?.IsAlive == false)
                     {
                         EnemyIDsToRemove.Add(id);
                     }
