@@ -28,7 +28,7 @@ namespace SAIN.Classes
         {
             if (SAIN == null) return;
             var enemy = BotOwner.Memory.GoalEnemy;
-            if (enemy != null && enemy?.Person?.GetPlayer?.IsYourPlayer == true)
+            if (enemy != null && enemy?.Person?.IsYourPlayer == true)
             {
                 if (NoBushTimer < Time.time)
                 {
@@ -64,7 +64,7 @@ namespace SAIN.Classes
             var enemy = BotOwner.Memory.GoalEnemy;
             if (enemy != null && enemy?.IsVisible == true)
             {
-                Player player = enemy?.Person?.GetPlayer;
+                Player player = enemy?.Person as Player;
                 if (player?.IsYourPlayer == true)
                 {
                     Vector3 direction = player.MainParts[BodyPartType.head].Position - SAIN.HeadPosition;

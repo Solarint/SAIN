@@ -1,9 +1,9 @@
 # Fetch the version from EscapeFromTarkov.exe
-$tarkovPath = '{0}\..\..\..\EscapeFromTarkov.exe' -f $PSScriptRoot
+$tarkovPath = '{0}\..\..\..\..\EscapeFromTarkov.exe' -f $PSScriptRoot
 $tarkovVersion = (Get-Item -Path $tarkovPath).VersionInfo.FileVersionRaw.Revision
 
 # Update AssemblyVersion
-$assemblyPath = '{0}\..\Properties\AssemblyInfo.cs' -f $PSScriptRoot
+$assemblyPath = '{0}\..\..\Properties\AssemblyInfo.cs' -f $PSScriptRoot
 $versionPattern = '^\[assembly: TarkovVersion\(.*\)\]'
 (Get-Content $assemblyPath) | ForEach-Object {
     if ($_ -match $versionPattern){

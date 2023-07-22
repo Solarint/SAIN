@@ -32,10 +32,13 @@ namespace SAIN.Patches
 
     public class BetterAudioPatch : ModulePatch
     {
-        private static FieldInfo _Player;
+        private static MethodInfo _Player;
+        private static FieldInfo _PlayerBridge;
+
         protected override MethodBase GetTargetMethod()
         {
-            _Player = AccessTools.Field(typeof(BaseSoundPlayer), "Player");
+            _PlayerBridge = AccessTools.Field(typeof(BaseSoundPlayer), "playersBridge");
+            _Player = AccessTools.PropertyGetter(_PlayerBridge.FieldType, "iPlayer");
             return AccessTools.Method(typeof(BaseSoundPlayer), "SoundEventHandler");
         }
 
@@ -46,7 +49,11 @@ namespace SAIN.Patches
             {
                 return;
             }
-            SAINSoundTypeHandler.AISoundPlayer(soundName, (Player)_Player.GetValue(__instance));
+
+            object playerBridge = _PlayerBridge.GetValue(__instance);
+            Player player = _Player.Invoke(playerBridge, null) as Player;
+
+            SAINSoundTypeHandler.AISoundPlayer(soundName, player);
         }
     }
 }

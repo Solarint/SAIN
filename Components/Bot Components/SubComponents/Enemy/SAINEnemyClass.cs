@@ -21,7 +21,7 @@ namespace SAIN.Classes
         public SAINEnemy(BotOwner bot, IAIDetails person, float BotDifficultyMod) : base(bot)
         {
             Person = person;
-            EnemyPlayer = person.GetPlayer;
+            EnemyPlayer = person as Player;
             BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             TimeEnemyCreated = Time.time;

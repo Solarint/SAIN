@@ -226,8 +226,8 @@ namespace SAIN.Classes
             var enemy = SAIN.Enemy;
             if (AddReponseToQueue() == false)
             {
-                var player = enemy.Person.GetPlayer;
-                if (player.IsYourPlayer && Vector3.Distance(player.Transform.position, BotPos) < ResponseDist)
+                var player = enemy.Person as Player;
+                if (player?.IsYourPlayer == true && Vector3.Distance(player.Transform.position, BotPos) < ResponseDist)
                 {
                     if (PlayerTalk.PlayerTalked)
                     {
@@ -277,7 +277,7 @@ namespace SAIN.Classes
                             }
                             else
                             {
-                                var component = player.GetComponent<PlayerTalkComponent>();
+                                var component = GamePlayerOwner.MyPlayer.GetComponent<PlayerTalkComponent>();
                                 enemyTalked = component?.PlayerTalked == true && component?.TagStatus != ETagStatus.Unaware;
                             }
 

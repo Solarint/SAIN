@@ -354,4 +354,7 @@
 
 </PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File $(ProjectDir)\Plugin\VersionChecker\setbuild.ps1</PreBuildEvent>
+  </PropertyGroup>
 </Project>

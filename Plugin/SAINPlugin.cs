@@ -11,10 +11,10 @@ using UnityEngine;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN Beta 3", "2.0")]
-    [BepInDependency("xyz.drakia.bigbrain", "0.1.4")]
-    [BepInDependency("xyz.drakia.waypoints", "1.1.2")]
-    [BepInDependency("com.spt-aki.core", "3.5.8")]
+    [BepInPlugin("me.sol.sain", "SAIN Beta", "3.4.5")]
+    [BepInDependency("xyz.drakia.bigbrain", "0.2.0")]
+    [BepInDependency("xyz.drakia.waypoints", "1.2.0")]
+    [BepInDependency("com.spt-aki.core", "3.6.0")]
     [BepInProcess("EscapeFromTarkov.exe")]
     public class SAINPlugin : BaseUnityPlugin
     {
@@ -24,14 +24,6 @@ namespace SAIN
             if (!TarkovVersion.CheckEftVersion(Logger, Info, Config))
             {
                 throw new Exception($"Invalid EFT Version");
-            }
-            
-            // If BigBrain isn't loaded, we need to exit too. Normally this would be handled via
-            // the BepInDependency, but due to remapping between 3.5.7 and 3.5.8 we also have to/
-            // manually check for now
-            if (!Chainloader.PluginInfos.ContainsKey("xyz.drakia.bigbrain"))
-            {
-                throw new Exception("Missing BigBrain");
             }
 
             ConfigInit();

@@ -50,8 +50,8 @@ namespace SAIN.Components
             PathManager.Awake();
             BotExtractManager.Awake();
 
-            Singleton<GClass629>.Instance.OnGrenadeThrow += GrenadeThrown;
-            Singleton<GClass629>.Instance.OnGrenadeExplosive += GrenadeExplosion;
+            Singleton<GClass633>.Instance.OnGrenadeThrow += GrenadeThrown;
+            Singleton<GClass633>.Instance.OnGrenadeExplosive += GrenadeExplosion;
             AISoundPlayed += SoundPlayed;
         }
 
@@ -177,7 +177,7 @@ namespace SAIN.Components
                     continue;
                 }
                 var Enemy = bot.Enemy;
-                if (Enemy != null && Enemy.Person.GetPlayer.ProfileId == player.ProfileId)
+                if (Enemy != null && Enemy.Person.ProfileId == player.ProfileId)
                 {
                     if (Enemy.RealDistance <= range)
                     {
@@ -245,18 +245,21 @@ namespace SAIN.Components
             return DotProd > dotProductMin;
         }
 
-        private void GrenadeExplosion(Vector3 explosionPosition, Player player, bool isSmoke, float smokeRadius, float smokeLifeTime)
+        private void GrenadeExplosion(Vector3 explosionPosition, string playerProfileID, bool isSmoke, float smokeRadius, float smokeLifeTime)
         {
-            if (player == null)
+            if (playerProfileID == null)
             {
                 return;
             }
+            GInterface82 alivePlayerBridgeByProfileID = Singleton<GameWorld>.Instance.GetAlivePlayerBridgeByProfileID(playerProfileID);
+            IAIDetails player = alivePlayerBridgeByProfileID.iPlayer;
+
             Vector3 position = player.Position;
             if (isSmoke)
             {
-                Singleton<GClass629>.Instance.PlaySound(player, explosionPosition, 50f, AISoundType.gun);
-                float radius = smokeRadius * GClass560.Core.SMOKE_GRENADE_RADIUS_COEF;
-                foreach (KeyValuePair<BotZone, GClass507> keyValuePair in DefaultController.Groups())
+                Singleton<GClass633>.Instance.PlaySound(player, explosionPosition, 50f, AISoundType.gun);
+                float radius = smokeRadius * GClass562.Core.SMOKE_GRENADE_RADIUS_COEF;
+                foreach (KeyValuePair<BotZone, GClass508> keyValuePair in DefaultController.Groups())
                 {
                     foreach (BotGroupClass botGroupClass in keyValuePair.Value.GetGroups(true))
                     {
@@ -266,7 +269,7 @@ namespace SAIN.Components
             }
             if (!isSmoke)
             {
-                Singleton<GClass629>.Instance.PlaySound(player, explosionPosition, 200f, AISoundType.gun);
+                Singleton<GClass633>.Instance.PlaySound(player, explosionPosition, 200f, AISoundType.gun);
             }
         }
 
@@ -279,7 +282,7 @@ namespace SAIN.Components
             var danger = VectorHelpers.DangerPoint(position, force, mass);
             foreach (var bot in Bots.Values)
             {
-                if (bot?.IsDead == false && bot.BotOwner.BotsGroup.IsEnemy(grenade.Player))
+                if (bot?.IsDead == false && bot.BotOwner.BotsGroup.IsEnemy(grenade.Player.iPlayer))
                 {
                     if ((danger - bot.Position).sqrMagnitude < 200f * 200f)
                     {
@@ -299,8 +302,8 @@ namespace SAIN.Components
             GameWorld.OnDispose -= Dispose;
 
             AISoundPlayed -= SoundPlayed;
-            Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
-            Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
+            Singleton<GClass633>.Instance.OnGrenadeThrow -= GrenadeThrown;
+            Singleton<GClass633>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
 
             foreach (var obstacle in DeathObstacles)
             {

@@ -236,7 +236,7 @@ namespace SAIN.Classes
             }
         }
 
-        public MovementState CurrentState => BotOwner.GetPlayer.MovementContext.CurrentState;
+        public MovementState CurrentState => BotOwner.GetPlayer.CurrentManagedState;
         public bool CanJump => BotOwner.GetPlayer.MovementContext.CanJump;
 
         private float JumpTimer = 0f;
