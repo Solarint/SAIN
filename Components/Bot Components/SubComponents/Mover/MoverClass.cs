@@ -34,6 +34,7 @@ namespace SAIN.Classes
         private void Update()
         {
             if (BotOwner == null) return;
+            if (BotOwner.GetPlayer == null) return;
 
             SetStamina();
 

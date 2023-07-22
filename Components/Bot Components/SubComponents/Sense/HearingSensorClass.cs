@@ -40,7 +40,7 @@ namespace SAIN.Classes
         {
             if (player != null)
             {
-                if (BotOwner.GetPlayer == player as Player)
+                if (BotOwner.ProfileId == player.ProfileId)
                 {
                     return;
                 }

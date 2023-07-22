@@ -232,8 +232,7 @@ namespace SAIN.Classes
             SAINEnemy enemy = SAIN.Enemy;
             if (enemy != null)
             {
-                Player player = enemy.Person as Player;
-                if (enemy.RealDistance < 30f && player.MovementContext.ActualLinearSpeed > 0.33f)
+                if (enemy.RealDistance < 30f)
                 {
                     LookToEnemy(enemy);
                     return true;

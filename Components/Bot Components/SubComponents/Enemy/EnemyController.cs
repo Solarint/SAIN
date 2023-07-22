@@ -31,27 +31,15 @@ namespace SAIN.Classes
                 ClearEnemies();
             }
 
-            // If our current enemy no longer exists, clean up
-            if (Enemy?.EnemyPlayer == null || Enemy?.EnemyPlayer.AIData?.BotOwner == null)
-            {
-                Enemy = null;
-            }
-
-            // For extra sanity, if the GoalEnemy's person's BotOwner is null, reset that too
-            if (BotOwner.Memory.GoalEnemy?.Person?.AIData?.BotOwner == null)
-            {
-                BotOwner.Memory.GoalEnemy = null;
-            }
-
             var goalEnemy = BotOwner.Memory.GoalEnemy;
-            if (goalEnemy?.Person != null && goalEnemy.Person.HealthController.IsAlive)
+            if (IsValidEnemy(goalEnemy))
             {
                 AddEnemy(goalEnemy.Person);
             }
             else
             {
                 goalEnemy = BotOwner.Memory.LastEnemy;
-                if (goalEnemy?.Person != null && goalEnemy.Person.HealthController.IsAlive)
+                if (IsValidEnemy(goalEnemy))
                 {
                     AddEnemy(goalEnemy.Person);
                 }
@@ -60,6 +48,31 @@ namespace SAIN.Classes
                     Enemy = null;
                 }
             }
+        }
+
+        private bool IsValidEnemy(GClass476 goalEnemy)
+        {
+            if (goalEnemy?.Person == null)
+            {
+                return false;
+            }
+
+            if (goalEnemy.Person.IsAI && (goalEnemy.Person.AIData?.BotOwner == null || goalEnemy.Person.AIData.BotOwner.BotState != EBotState.Active))
+            {
+                return false;
+            }
+
+            if (goalEnemy.Person.IsAI && goalEnemy.Person.AIData.BotOwner.ProfileId == BotOwner.ProfileId)
+            {
+                return false;
+            }
+
+            if (!goalEnemy.Person.HealthController.IsAlive)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public void AddEnemy(IAIDetails person)
@@ -97,7 +110,16 @@ namespace SAIN.Classes
                 foreach (string id in Enemies.Keys)
                 {
                     var enemy = Enemies[id];
-                    if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer.AIData?.BotOwner == null || enemy.EnemyPlayer?.HealthController?.IsAlive == false)
+                    // Common checks between PMC and bots
+                    if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer.HealthController?.IsAlive == false)
+                    {
+                        EnemyIDsToRemove.Add(id);
+                    }
+                    // Checks specific to bots
+                    else if (enemy.EnemyPlayer.IsAI && (
+                        enemy.EnemyPlayer.AIData?.BotOwner == null ||
+                        enemy.EnemyPlayer.AIData.BotOwner.ProfileId == BotOwner.ProfileId ||
+                        enemy.EnemyPlayer.AIData.BotOwner.BotState != EBotState.Active))
                     {
                         EnemyIDsToRemove.Add(id);
                     }

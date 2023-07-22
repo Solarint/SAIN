@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 using System.Linq;
+using Comfort.Common;
 
 namespace SAIN.Classes
 {
@@ -21,7 +22,7 @@ namespace SAIN.Classes
         public SAINEnemy(BotOwner bot, IAIDetails person, float BotDifficultyMod) : base(bot)
         {
             Person = person;
-            EnemyPlayer = person as Player;
+            EnemyPlayer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(person.ProfileId);
             BotDifficultyModifier = BotDifficultyMod;
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             TimeEnemyCreated = Time.time;
@@ -109,15 +110,24 @@ namespace SAIN.Classes
             if (DistanceTimer < Time.time)
             {
                 DistanceTimer = Time.time + 0.1f;
-                float distance = GetMagnitudeToBot(Position);
-                RealDistance = distance;
-                LastSeenDistance = IsVisible ? distance : GetMagnitudeToBot(PositionLastSeen);
-                DistanceFromLastSeen = IsVisible ? 0f : (PositionLastSeen - Position).magnitude;
+                if (Person != null)
+                {
+                    float distance = GetMagnitudeToBot(Position);
+                    RealDistance = distance;
+                    LastSeenDistance = IsVisible ? distance : GetMagnitudeToBot(PositionLastSeen);
+                    DistanceFromLastSeen = IsVisible ? 0f : (PositionLastSeen - Position).magnitude;
+                }
+                else
+                {
+                    RealDistance = 0;
+                    LastSeenDistance = 0;
+                    DistanceFromLastSeen = 0;
+                }
             }
         }
 
         public float DistanceFromLastSeen { get; private set; }
-        public Vector3 Position => Person.Position;
+        public Vector3 Position => (Person != null ? Person.Position : Vector3.zero);
 
         private float GetMagnitudeToBot(Vector3 point)
         {
