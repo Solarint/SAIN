@@ -77,7 +77,7 @@ namespace SAIN.Layers
                 MoveToExtract(distance, point);
             }
 
-            if (NoSprint)
+            if (NoSprint && BotOwner.BotState == EBotState.Active)
             {
                 SAIN.Mover.Sprint(false);
                 SAIN.Steering.SteerByPriority();
