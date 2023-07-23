@@ -30,12 +30,10 @@ namespace SAIN.Layers
 
         private void FindTarget()
         {
-            if (SAIN?.CurrentTargetPosition != null)
+            Vector3 pos = Search.SearchMovePos();
+            if (Search?.GoToPoint(pos) != NavMeshPathStatus.PathInvalid)
             {
-                if (Search?.GoToPoint(SAIN.CurrentTargetPosition.Value) != NavMeshPathStatus.PathInvalid)
-                {
-                    TargetPosition = SAIN.CurrentTargetPosition.Value;
-                }
+                TargetPosition = pos;
             }
         }
 
