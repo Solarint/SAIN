@@ -8,6 +8,7 @@ using System.Reflection;
 using UnityEngine;
 using HarmonyLib;
 using System.Drawing;
+using Systems.Effects;
 
 namespace SAIN.Layers
 {
@@ -137,6 +138,7 @@ namespace SAIN.Layers
                 Logger.LogInfo($"{BotOwner.name} Extracted at {point} at {System.DateTime.UtcNow}");
 
                 var botgame = Singleton<IBotGame>.Instance;
+                Singleton<Effects>.Instance.EffectsCommutator.StopBleedingForPlayer(BotOwner.GetPlayer);
                 BotOwner.Deactivate();
                 BotOwner.Dispose();
                 botgame.BotsController.BotDied(BotOwner);
