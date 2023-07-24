@@ -8,6 +8,7 @@ using System.Reflection;
 using UnityEngine;
 using HarmonyLib;
 using System.Drawing;
+using Systems.Effects;
 
 namespace SAIN.Layers
 {
@@ -77,10 +78,18 @@ namespace SAIN.Layers
                 MoveToExtract(distance, point);
             }
 
-            if (NoSprint && BotOwner.BotState == EBotState.Active)
+            if (BotOwner.BotState == EBotState.Active)
             {
-                SAIN.Mover.Sprint(false);
-                SAIN.Steering.SteerByPriority();
+                if (NoSprint)
+                {
+                    SAIN.Mover.Sprint(false);
+                    SAIN.Steering.SteerByPriority();
+                    Shoot.Update();
+                }
+                else
+                {
+                    SAIN.Steering.LookToMovingDirection();
+                }
             }
         }
 
@@ -129,9 +138,12 @@ namespace SAIN.Layers
                 Logger.LogInfo($"{BotOwner.name} Extracted at {point} at {System.DateTime.UtcNow}");
 
                 var botgame = Singleton<IBotGame>.Instance;
+                Singleton<Effects>.Instance.EffectsCommutator.StopBleedingForPlayer(BotOwner.GetPlayer);
                 BotOwner.Deactivate();
                 BotOwner.Dispose();
-                botgame.BotUnspawn(BotOwner);
+                botgame.BotsController.BotDied(BotOwner);
+                botgame.BotsController.DestroyInfo(BotOwner.GetPlayer);
+                Object.DestroyImmediate(BotOwner.gameObject);
                 Object.Destroy(BotOwner);
             }
         }
