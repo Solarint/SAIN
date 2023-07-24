@@ -21,7 +21,7 @@ namespace SAIN.Patches
         {
             try
             {
-                Singleton<GClass629>.Instance.PlaySound(null, __instance.transform.position, 20f, AISoundType.gun);
+                Singleton<GClass633>.Instance.PlaySound(null, __instance.transform.position, 20f, AISoundType.gun);
                 Logger.LogInfo($"Played AISound for grenade bounce");
             }
             catch

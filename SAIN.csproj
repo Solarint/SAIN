@@ -352,13 +352,9 @@
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\$(TargetName)-$(ConfigurationName).dll"
 
-if $(ConfigurationName) == Debug (
-    copy "$(TargetDir)$(TargetName).pdb" "C:\Games\spt 3.5.7\BepInEx\plugins\$(TargetName).pdb"
-) else (
-    del "C:\Games\spt 3.5.7\BepInEx\plugins\$(TargetName).pdb"
-)
-)
-
 </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File $(ProjectDir)\Plugin\VersionChecker\setbuild.ps1</PreBuildEvent>
   </PropertyGroup>
 </Project>

@@ -35,7 +35,7 @@ namespace SAIN.Layers
             {
                 BotOwner.GoToPoint(pos, false, -1, false, false, false);
             }
-            else if (!EnemyVisible)
+            else if (!EnemyVisible && (SAIN.Enemy.Position - BotOwner.Position).sqrMagnitude > 2f)
             {
                 BotOwner.MoveToEnemyData.TryMoveToEnemy(SAIN.Enemy.Position);
             }
@@ -45,7 +45,7 @@ namespace SAIN.Layers
 
         private bool BackUp(out Vector3 trgPos)
         {
-            Vector3 a = -GClass782.NormalizeFastSelf(SAIN.Enemy.Direction);
+            Vector3 a = -GClass790.NormalizeFastSelf(SAIN.Enemy.Direction);
             trgPos = Vector3.zero;
             float num = 0f;
             Vector3 random = Random.onUnitSphere * 1f;

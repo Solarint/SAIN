@@ -19,7 +19,6 @@ namespace SAIN.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            //return AccessTools.Method(typeof(GClass544), "method_7"); 
             _aimingDataType = PatchConstants.EftTypes.Single(x => x.GetProperty("LastSpreadCount") != null && x.GetProperty("LastAimTime") != null);
             _aimingDataMethod7 = AccessTools.Method(_aimingDataType, "method_7");
             return _aimingDataMethod7;

@@ -115,13 +115,13 @@ namespace SAIN.Components
         {
             if (LayersActive)
             {
-                BotOwner.PatrollingData.Pause();
+                BotOwner.PatrollingData?.Pause();
             }
             else
             {
                 if (Enemy == null)
                 {
-                    BotOwner.PatrollingData.Unpause();
+                    BotOwner.PatrollingData?.Unpause();
                 }
             }
         }
@@ -201,6 +201,7 @@ namespace SAIN.Components
             Destroy(Hearing);
             Destroy(Talk);
             Destroy(Decision);
+            Destroy(Cover.CoverFinder);
             Destroy(Cover);
             Destroy(FlashLight);
             Destroy(SelfActions);

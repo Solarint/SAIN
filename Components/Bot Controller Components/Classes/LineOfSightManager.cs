@@ -15,7 +15,7 @@ namespace SAIN.Components
         private readonly float SpherecastRadius = 0.025f;
         private LayerMask SightLayers => LayerMaskClass.HighPolyWithTerrainMaskAI;
         private readonly int MinJobSize = 6;
-        private List<Player> RegisteredPlayers => Singleton<GameWorld>.Instance.RegisteredPlayers;
+        private List<Player> RegisteredPlayers => Singleton<GameWorld>.Instance.AllAlivePlayersList;
 
         private int Frames = 0;
 

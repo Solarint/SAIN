@@ -18,11 +18,11 @@ namespace SAIN.Helpers
 
         public void CheckIfDazzleApplied(IAIDetails person)
         {
-            if (person.GetPlayer == null)
+            if (person == null || !(person is Player player))
             {
                 return;
             }
-            if (person.GetPlayer.TryGetComponent<FlashLightComponent>(out var flashlight))
+            if (player.TryGetComponent<FlashLightComponent>(out var flashlight))
             {
                 if (flashlight.WhiteLight)
                 {
@@ -146,7 +146,7 @@ namespace SAIN.Helpers
         /// <param name="BotOwner">The BotOwner to apply the modifications to.</param>
         private void ApplyDazzle(float dazzleModif, float gainSightModif)
         {
-            GClass557 modif = new GClass557
+            GClass559 modif = new GClass559
             {
                 PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,
                 AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,

@@ -84,9 +84,9 @@ namespace SAIN.Helpers
             }
 
             // Plays the sound
-            if (Singleton<GClass629>.Instantiated)
+            if (Singleton<GClass633>.Instantiated)
             {
-                Singleton<GClass629>.Instance.PlaySound(player, player.WeaponRoot.position, range, soundtype);
+                Singleton<GClass633>.Instance.PlaySound(player, player.WeaponRoot.position, range, soundtype);
             }
         }
 

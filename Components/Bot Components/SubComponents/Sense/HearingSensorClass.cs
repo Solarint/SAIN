@@ -18,12 +18,12 @@ namespace SAIN.Classes
         {
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            Singleton<GClass629>.Instance.OnSoundPlayed += HearSound;
+            Singleton<GClass633>.Instance.OnSoundPlayed += HearSound;
         }
 
         public void OnDestroy()
         {
-            Singleton<GClass629>.Instance.OnSoundPlayed -= HearSound;
+            Singleton<GClass633>.Instance.OnSoundPlayed -= HearSound;
         }
 
         public void HearSound(IAIDetails player, Vector3 position, float power, AISoundType type)
@@ -40,7 +40,7 @@ namespace SAIN.Classes
         {
             if (player != null)
             {
-                if (BotOwner.GetPlayer == player.GetPlayer)
+                if (BotOwner.ProfileId == player.ProfileId)
                 {
                     return;
                 }
@@ -59,7 +59,12 @@ namespace SAIN.Classes
                     {
                         if (distance < 5f)
                         {
-                            BotOwner.Memory.Spotted(false, null, null);
+                            // Note: This can throw an exception sometimes, we'll just ignore it for now
+                            try
+                            {
+                                BotOwner.Memory.Spotted(false, null, null);
+                            }
+                            catch { }
                         }
 
                         ReactToSound(player, position, distance, true, type);
@@ -329,7 +334,7 @@ namespace SAIN.Classes
             }
 
             // Check if the source is the player
-            bool isrealplayer = player.GetPlayer.name == "PlayerSuperior(Clone)";
+            bool isrealplayer = player.IsYourPlayer;
 
             // Checks if something is within line of sight
             if (Physics.Raycast(botheadpos, (botheadpos - position).normalized, power, LayerMaskClass.HighPolyWithTerrainNoGrassMask))
@@ -350,7 +355,7 @@ namespace SAIN.Classes
                     occlusion = power * finalmodifier;
 
                     // Debug
-                    if (DebugOcclusion.Value) Logger.LogDebug($"Raycast Check. Heard?: {distance < occlusion}: For [{BotOwner.name}]: from [{player.GetPlayer.name}] new reduced power: [{occlusion}] because modifier = [{finalmodifier}]");
+                    if (DebugOcclusion.Value) Logger.LogDebug($"Raycast Check. Heard?: {distance < occlusion}: For [{BotOwner.name}]: from [{(player as Player).name}] new reduced power: [{occlusion}] because modifier = [{finalmodifier}]");
 
                     return distance < occlusion;
                 }
@@ -372,7 +377,7 @@ namespace SAIN.Classes
         private float EnvironmentCheck(IAIDetails enemy)
         {
             int botlocation = BotOwner.AIData.EnvironmentId;
-            int enemylocation = enemy.GetPlayer.AIData.EnvironmentId;
+            int enemylocation = enemy.AIData.EnvironmentId;
             return botlocation == enemylocation ? 1f : 0.66f;
         }
 

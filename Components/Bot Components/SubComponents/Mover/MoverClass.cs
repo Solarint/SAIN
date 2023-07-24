@@ -34,6 +34,7 @@ namespace SAIN.Classes
         private void Update()
         {
             if (BotOwner == null) return;
+            if (BotOwner.GetPlayer == null) return;
 
             SetStamina();
 
@@ -236,7 +237,7 @@ namespace SAIN.Classes
             }
         }
 
-        public MovementState CurrentState => BotOwner.GetPlayer.MovementContext.CurrentState;
+        public MovementState CurrentState => BotOwner.GetPlayer.CurrentManagedState;
         public bool CanJump => BotOwner.GetPlayer.MovementContext.CanJump;
 
         private float JumpTimer = 0f;

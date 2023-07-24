@@ -15,7 +15,7 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
 
             FindBotType();
-            PersonalityClass = new PersonalityClass(BotOwner);
+            PersonalityClass = new PersonalityClass(BotOwner, this);
             CalcHoldGroundDelay();
             CalcTimeBeforeSearch();
 

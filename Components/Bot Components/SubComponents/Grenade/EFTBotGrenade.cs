@@ -12,7 +12,7 @@ namespace SAIN.Classes
 {
     public class EFTBotGrenade : SAINBot
     {
-        public GClass513 AIGreanageThrowData { get; private set; }
+        public GClass514 AIGreanageThrowData { get; private set; }
 
         public event Action<GrenadeClass> OnGrenadeThrowComplete
         {
@@ -126,7 +126,7 @@ namespace SAIN.Classes
 
         public EFTBotGrenade(BotOwner owner) : base(owner)
         {
-            GClass560.Core.G = Mathf.Abs(Physics.gravity.y);
+            GClass562.Core.G = Mathf.Abs(Physics.gravity.y);
             method_0();
             method_2();
         }
@@ -199,7 +199,7 @@ namespace SAIN.Classes
                     }
                     ThrowindNow = true;
                     action_1?.Invoke();
-                    BotOwner.GetPlayer.SetInHandsForQuickUse(SavedGrenade, new Callback<GInterface116>(method_9));
+                    BotOwner.GetPlayer.SetInHandsForQuickUse(SavedGrenade, new Callback<GInterface122>(method_9));
                     return;
                 case GrenadeActionType.change2grenade:
                     method_5();
@@ -246,7 +246,7 @@ namespace SAIN.Classes
             }
             if (SAIN.Grenade.GetThrowType(out var direction, out Vector3 point) != GrenadeThrowType.None)
             {
-                GClass513 gclass = GClass515.CanThrowGrenade2(from, point, MaxPower, AIGreandeAng.ang15, 1f, 0f);
+                GClass514 gclass = GClass516.CanThrowGrenade2(from, point, MaxPower, AIGreandeAng.ang15, 1f, 0f);
                 if (gclass.CanThrow)
                 {
                     SetThrowData(gclass);
@@ -256,7 +256,7 @@ namespace SAIN.Classes
             return false;
         }
 
-        public bool SetThrowData(GClass513 data)
+        public bool SetThrowData(GClass514 data)
         {
             AIGreanageThrowData = data;
             BotOwner.BotsGroup.GroupGrenade.ThrowGrenade(BotOwner);
@@ -273,9 +273,9 @@ namespace SAIN.Classes
             float grenadePrecision = BotOwner.Settings.FileSettings.Grenade.GrenadePrecision;
             if (grenadePrecision > 0f)
             {
-                float x = GClass783.Random(-grenadePrecision, grenadePrecision);
-                float y = GClass783.Random(-grenadePrecision, grenadePrecision);
-                float z = GClass783.Random(-grenadePrecision, grenadePrecision);
+                float x = GClass791.Random(-grenadePrecision, grenadePrecision);
+                float y = GClass791.Random(-grenadePrecision, grenadePrecision);
+                float z = GClass791.Random(-grenadePrecision, grenadePrecision);
                 vector3_0 = new Vector3(x, y, z);
                 return;
             }
@@ -324,14 +324,14 @@ namespace SAIN.Classes
                 LastThrowDirection = AIGreanageThrowData.Direction + vector3_0;
                 BotOwner.Steering.LookToDirection(LastThrowDirection, 500f);
                 LastThrowDirection.Normalize();
-                Vector3 vector = GClass782.NormalizeFastSelf(BotOwner.LookDirection);
+                Vector3 vector = GClass790.NormalizeFastSelf(BotOwner.LookDirection);
                 Vector3 vector2 = LastThrowDirection;
                 float y = 0f;
                 float y2 = 0f;
                 vector2.y = y;
                 vector.y = y2;
-                vector = GClass782.NormalizeFastSelf(vector);
-                vector2 = GClass782.NormalizeFastSelf(vector2);
+                vector = GClass790.NormalizeFastSelf(vector);
+                vector2 = GClass790.NormalizeFastSelf(vector2);
                 if (Mathf.Abs(vector.x - vector2.x) < 0.1f && Mathf.Abs(vector.z - vector2.z) < 0.1f)
                 {
                     return true;
@@ -357,7 +357,7 @@ namespace SAIN.Classes
             method_7();
             if (!BotOwner.WeaponManager.Selector.TakePrevWeapon())
             {
-                BotOwner.DelayActions.Add(2f, new Action(method_11));
+                BotOwner.AITaskManager.RegisterDelayedTask(2f, new Action(method_11));
             }
             BotOwner.SetYAngle(0f);
             if (action_0 != null && grenade != null)
@@ -388,12 +388,12 @@ namespace SAIN.Classes
         }
 
         [CompilerGenerated]
-        private void method_9(Result<GInterface116> result)
+        private void method_9(Result<GInterface122> result)
         {
             float_0 = Time.time + 3f;
             if (result.Value != null)
             {
-                result.Value.SetOnUsedCallback(new Callback<GInterface115<GrenadeClass>>(method_10));
+                result.Value.SetOnUsedCallback(new Callback<GInterface121<GrenadeClass>>(method_10));
             }
             else
             {
@@ -405,7 +405,7 @@ namespace SAIN.Classes
         }
 
         [CompilerGenerated]
-        private void method_10(Result<GInterface115<GrenadeClass>> result1)
+        private void method_10(Result<GInterface121<GrenadeClass>> result1)
         {
             method_6(SavedGrenade);
         }

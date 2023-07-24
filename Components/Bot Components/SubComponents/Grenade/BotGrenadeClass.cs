@@ -42,7 +42,7 @@ namespace SAIN.Classes
                 {
                     foreach (var tracker in ActiveGrenades)
                     {
-                        if (tracker?.Grenade?.transform != null && tracker?.GrenadeSpotted == true)
+                        if (tracker?.Grenade != null && tracker?.Grenade?.transform != null && tracker?.GrenadeSpotted == true)
                         {
                             return tracker.Grenade.transform.position;
                         }
