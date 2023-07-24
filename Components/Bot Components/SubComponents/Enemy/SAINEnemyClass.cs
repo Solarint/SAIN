@@ -116,6 +116,15 @@ namespace SAIN.Classes
                     RealDistance = distance;
                     LastSeenDistance = IsVisible ? distance : GetMagnitudeToBot(PositionLastSeen);
                     DistanceFromLastSeen = IsVisible ? 0f : (PositionLastSeen - Position).magnitude;
+
+                    if (IsVisible)
+                    {
+                        ArrivedAtLastSeenPosition = false;
+                    }
+                    else if ((PositionLastSeen - BotOwner.Position).sqrMagnitude < 2f)
+                    {
+                        ArrivedAtLastSeenPosition = true;
+                    }
                 }
                 else
                 {
@@ -126,6 +135,7 @@ namespace SAIN.Classes
             }
         }
 
+        public bool ArrivedAtLastSeenPosition { get; private set; }
         public float DistanceFromLastSeen { get; private set; }
         public Vector3 Position => (Person != null ? Person.Position : Vector3.zero);
 

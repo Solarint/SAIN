@@ -47,7 +47,7 @@ namespace SAIN.Classes
 
             if (!SAIN.BotStuck.BotIsMoving && SAIN.BotStuck.TimeSpentNotMoving > 3f)
             {
-                TargetPosition = SAIN.CurrentTargetPosition;
+                TargetPosition = SearchMovePos();
                 if (TargetPosition != null)
                 {
                     DirectMove = true;
@@ -77,19 +77,105 @@ namespace SAIN.Classes
         {
             if (SearchMovePoint == null || shallSprint)
             {
+                Vector3 pos = SearchMovePos();
                 if (TargetPosition == null)
                 {
-                    TargetPosition = SAIN.CurrentTargetPosition;
+                    TargetPosition = pos;
                 }
                 if (!DirectMove && TargetPosition != null)
                 {
                     DirectMove = true;
-                    BotOwner.BotRun.Run(TargetPosition.Value, false);
-                    ActiveDestination = TargetPosition.Value;
+                    BotOwner.BotRun.Run(pos, false);
+                    ActiveDestination = pos;
                 }
                 return true;
             }
             return false;
+        }
+
+        public Vector3 SearchMovePos()
+        {
+            if (SAIN.Enemy != null && SAIN.Enemy.Seen)
+            {
+                if (SAIN.Enemy.IsVisible)
+                {
+                    return SAIN.Enemy.Position;
+                }
+                else
+                {
+                    if (SAIN.Enemy.ArrivedAtLastSeenPosition)
+                    {
+                        return RandomSearch();
+                    }
+                    else
+                    {
+                        return SAIN.Enemy.PositionLastSeen;
+                    }
+                }
+            }
+            else
+            {
+                var Target = BotOwner.Memory.GoalTarget;
+                if (Target != null && Target?.Position != null)
+                {
+                    if ((Target.Position.Value - BotOwner.Position).sqrMagnitude < 2f)
+                    {
+                        Target.Clear();
+                    }
+                    else
+                    {
+                        return Target.Position.Value;
+                    }
+                }
+                var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 200f, true);
+                if (sound != null && !sound.IsCome)
+                {
+                    if ((sound.Position - BotOwner.Position).sqrMagnitude < 2f)
+                    {
+                        sound.IsCome = true;
+                    }
+                    else
+                    {
+                        return sound.Position;
+                    }
+                }
+            }
+
+            return RandomSearch();
+        }
+
+        const float ComeToRandomDist = 3f;
+
+        private Vector3 RandomSearch()
+        {
+            float dist = (RandomSearchPoint - BotOwner.Position).sqrMagnitude;
+            if (dist < ComeToRandomDist || dist > 60f * 60f)
+            {
+                RandomSearchPoint = GenerateSearchPoint();
+            }
+            return RandomSearchPoint;
+        }
+
+        private Vector3 RandomSearchPoint;
+
+        private Vector3 GenerateSearchPoint()
+        {
+            Vector3 start = BotOwner.Position;
+            float dispersion = 30f;
+            for (int i = 0; i < 10; i++)
+            {
+                float dispNum = EFTMath.Random(-dispersion, dispersion);
+                Vector3 vector = new Vector3(start.x + dispNum, start.y, start.z + dispNum);
+                if (NavMesh.SamplePosition(vector, out var hit, 2f, -1))
+                {
+                    NavMeshPath path = new NavMeshPath();
+                    if (NavMesh.CalculatePath(hit.position, start, -1, path) && path.status == NavMeshPathStatus.PathComplete)
+                    {
+                        return hit.position;
+                    }
+                }
+            }
+            return start;
         }
 
         private bool MoveToPeek(bool shallLean)

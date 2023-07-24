@@ -94,4 +94,34 @@ namespace SAIN.Patches.Generic
             }
         }
     }
+
+    internal class BotGroupAddEnemyPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod() => typeof(BotGroupClass).GetMethod("AddEnemy");
+        [PatchPrefix]
+        public static bool PatchPrefix(IAIDetails person)
+        {
+            if (person == null || (person.IsAI && person.AIData?.BotOwner?.GetPlayer == null))
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    internal class BotMemoryAddEnemyPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod() => typeof(BotMemoryClass).GetMethod("AddEnemy");
+        [PatchPrefix]
+        public static bool PatchPrefix(IAIDetails enemy)
+        {
+            if (enemy == null || (enemy.IsAI && enemy.AIData?.BotOwner?.GetPlayer == null))
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
 }
