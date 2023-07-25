@@ -31,7 +31,7 @@ namespace SAIN.Classes
             core.VisibleAngle = (float)preset.VisibleAngle.GetValue(BotDifficulty);
             core.CanGrenade = (bool)preset.CanUseGrenades.GetValue(BotDifficulty);
 
-            SAIN.Info.CalcExtractTime();
+            SAINInfo.CalcExtractTime();
         }
 
         public void SetProperties(BotPreset preset)
