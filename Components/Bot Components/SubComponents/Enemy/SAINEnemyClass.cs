@@ -59,6 +59,12 @@ namespace SAIN.Classes
 
         public void Update()
         {
+            if (!SAIN.HasEnemy)
+            {
+                SAIN.EnemyController.ClearEnemy();
+                return;
+            }
+
             UpdateDistance();
             UpdatePath();
 

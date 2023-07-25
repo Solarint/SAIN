@@ -17,6 +17,7 @@ namespace SAIN.Classes
         }
 
         public SAINEnemy Enemy { get; private set; }
+        public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.BotPlayer != null;
 
         private SAINComponent SAIN;
 
@@ -48,6 +49,11 @@ namespace SAIN.Classes
                     Enemy = null;
                 }
             }
+        }
+
+        public void ClearEnemy()
+        {
+            Enemy = null;
         }
 
         private bool IsValidEnemy(GClass476 goalEnemy)
