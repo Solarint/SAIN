@@ -43,7 +43,7 @@ namespace SAIN.BotPresets
             VisibleAngle = new SAINProperty<float>(name, def, min, max, desc, round);
 
             name = "Base Vision Speed Multiplier";
-            desc = "The Base vision speed multiplier. Bots will see this much faster, or slower, at any range.";
+            desc = "The Base vision speed multiplier. Bots will see this much faster, or slower, at any range. Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
             def = 1f;
             min = 0.25f;
             max = 3f;
@@ -71,7 +71,7 @@ namespace SAIN.BotPresets
             FasterCQBReactions = new SAINProperty<bool>(name, desc, true);
 
             name = "Faster CQB Reactions Max Distance";
-            desc = "Sets whether this bot reacts faster at close ranges";
+            desc = "Max distance a bot can react faster for Faster CQB Reactions. Scales with distance.";
             def = 30f;
             min = 1f;
             max = 100f;
@@ -79,10 +79,10 @@ namespace SAIN.BotPresets
             FasterCQBReactionsDistance = new SAINProperty<float>(name, def, min, max, desc, round);
 
             name = "Faster CQB Reactions Minimum Speed";
-            desc = "Sets whether this bot reacts faster at close ranges";
-            def = 1f;
-            min = 0.25f;
-            max = 3f;
+            desc = "Absolute minimum speed (in seconds) that bot can react and shoot";
+            def = 0.1f;
+            min = 0.0f;
+            max = 1f;
             round = 100f;
             FasterCQBReactionsMinimum = new SAINProperty<float>(name, def, min, max, desc, round);
 
@@ -107,7 +107,7 @@ namespace SAIN.BotPresets
             FarVisionSpeed = new SAINProperty<float>(name, def, min, max, desc, round);
 
             name = "Close/Far Threshold";
-            desc = "The Distance that defines what is Close Or Far for the above options.";
+            desc = "The Distance that defines what is close or far for the Close Speed and Far Speed properties.";
             def = 50f;
             min = 5f;
             max = 100f;
@@ -131,7 +131,7 @@ namespace SAIN.BotPresets
             MaxFootstepAudioDistance = new SAINProperty<float>(name, def, min, max, desc, round);
 
             name = "Accuracy Multiplier";
-            desc = "Modifies a bot's base accuracy. Higher = less accurate. 1.5 = 1.5x higher accuracy spread";
+            desc = "Modifies a bot's base accuracy and spread. Higher = less accurate. 1.5 = 1.5x higher accuracy spread";
             def = 1f;
             min = 0.25f;
             max = 3f;

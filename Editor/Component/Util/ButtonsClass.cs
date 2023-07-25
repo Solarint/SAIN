@@ -14,11 +14,17 @@ namespace SAIN.Editor
     {
         public ButtonsClass(SAINEditor editor) : base(editor) { }
 
-        private const float InfoWidth = 35f;
+        private const float InfoWidth = 25f;
+
+        public void InfoBox(string description, float height)
+        {
+            Box("?", description, Width(InfoWidth), Height(height));
+            //CheckMouse(description);
+        }
 
         public void InfoBox(string description)
         {
-            Box("?", description, Width(25f));
+            Box("?", description, Width(InfoWidth));
             //CheckMouse(description);
         }
 
@@ -65,12 +71,29 @@ namespace SAIN.Editor
 
         private const float ResetWidth = 60f;
 
+        public void ResetButton<T>(ConfigEntry<T> entry, float height)
+        {
+            if (Button("Reset", Width(ResetWidth), Height(height)))
+            {
+                MenuClickSound();
+                DefaultValue(entry);
+            }
+        }
         public void ResetButton<T>(ConfigEntry<T> entry)
         {
             if (Button("Reset", Width(ResetWidth)))
             {
                 MenuClickSound();
                 DefaultValue(entry);
+            }
+        }
+
+        public void ResetButton<T>(SAINProperty<T> entry, BotDifficulty difficulty, float height)
+        {
+            if (Button("Reset", Width(ResetWidth), Height(height)))
+            {
+                MenuClickSound();
+                entry.Reset(difficulty);
             }
         }
 

@@ -208,7 +208,7 @@ namespace SAIN.Editor
         public static void Init()
         {
             InfoIconWidth = Bind(nameof(InfoIconWidth), 15f, Layout);
-            SliderLabelWidth = Bind(nameof(SliderLabelWidth), 220f, Layout);
+            SliderLabelWidth = Bind(nameof(SliderLabelWidth), 325f, Layout);
             SliderSpaceWidth = Bind(nameof(SliderSpaceWidth), 10f, Layout);
             SliderMinMaxWidth = Bind(nameof(SliderMinMaxWidth), 45f, Layout);
             SliderWidth = Bind(nameof(SliderWidth), 275f, Layout);
