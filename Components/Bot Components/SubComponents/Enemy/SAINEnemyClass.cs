@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 using System.Linq;
+using Comfort.Common;
 
 namespace SAIN.Classes
 {
@@ -16,13 +17,12 @@ namespace SAIN.Classes
         public EnemyBodyPart HeadPart { get; private set; }
         public Player EnemyPlayer { get; private set; }
 
-        private readonly float BotDifficultyModifier;
-
-        public SAINEnemy(BotOwner bot, IAIDetails person, float BotDifficultyMod) : base(bot)
+        public SAINEnemy(BotOwner bot, IAIDetails person) : base(bot)
         {
             Person = person;
             EnemyPlayer = person.GetPlayer;
-            BotDifficultyModifier = BotDifficultyMod;
+            //EnemyPlayer = Singleton<GameWorld>.Instance.GetAlivePlayerByProfileID(person.ProfileId);
+
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             TimeEnemyCreated = Time.time;
 
@@ -58,6 +58,12 @@ namespace SAIN.Classes
 
         public void Update()
         {
+            if (!SAIN.HasEnemy)
+            {
+                SAIN.EnemyController.ClearEnemy();
+                return;
+            }
+
             UpdateDistance();
             UpdatePath();
 

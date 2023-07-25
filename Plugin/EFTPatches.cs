@@ -17,11 +17,15 @@ namespace SAIN
         {
             new Patches.Movement.KickPatch().Enable();
             new Patches.BetterAudioPatch().Enable();
+
             new Patches.Generic.InitHelper().Enable();
             new Patches.Generic.GetBotController().Enable();
             new Patches.Generic.GetBotSpawnerClass().Enable();
             new Patches.Generic.GrenadeThrownActionPatch().Enable();
             new Patches.Generic.GrenadeExplosionActionPatch().Enable();
+
+            new Patches.Generic.BotGroupAddEnemyPatch().Enable();
+            new Patches.Generic.BotMemoryAddEnemyPatch().Enable();
         }
 
         private static void ShootPatches()

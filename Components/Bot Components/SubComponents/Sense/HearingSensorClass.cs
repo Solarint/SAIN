@@ -115,6 +115,10 @@ namespace SAIN.Classes
                     range *= 1.25f;
                 }
 
+                range *= SAIN.Info.AudibleRangeMultiplier;
+
+                range = Mathf.Round(range * 10f) / 10f;
+
                 if (DebugSound.Value)
                 {
                     Logger.LogDebug($" Sound modifier results before clamp: Original:[{power}] Modified:[{range}] Sprinting? [{BotOwner.GetPlayer.IsSprintEnabled}] MyMoveSpeed 0 to 1: [{speed}] Health: [{SAIN.HealthStatus}] Heavy Helmet? [{SAIN.Equipment.HasHeavyHelmet}] Headphones? [{SAIN.Equipment.HasEarPiece}]");
@@ -275,7 +279,7 @@ namespace SAIN.Classes
         {
             //Set the close hearing and far hearing variables
             float closehearing = 10f;
-            float farhearing = 50f;
+            float farhearing = SAIN.Info.MaxFootstepAudioDistance;
 
             //Check if the Distance is less than or equal to the close hearing
             if (d <= closehearing)

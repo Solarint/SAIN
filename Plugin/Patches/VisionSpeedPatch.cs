@@ -1,6 +1,7 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
+using SAIN.BotPresets;
 using SAIN.UserSettings;
 using System;
 using System.Reflection;
@@ -11,18 +12,18 @@ namespace SAIN.Patches
 {
     public class Math
     {
-        public static float CalcVisSpeed(float dist)
+        public static float CalcVisSpeed(float dist, BotPreset preset, BotDifficulty difficulty)
         {
             float result = 1f;
-            //if (dist >= CloseFarThresh.Value)
-            //{
-                //result *= FarVisionSpeed.Value;
-            //}
-            //else
-            //{
-                //result *= CloseVisionSpeed.Value;
-            //}
-            //result *= VisionSpeed.Value;
+            if (dist >= (float)preset.CloseFarThresh.GetValue(difficulty))
+            {
+                result *= (float)preset.FarVisionSpeed.GetValue(difficulty);
+            }
+            else
+            {
+                result *= (float)preset.CloseVisionSpeed.GetValue(difficulty);
+            }
+            result *= (float)preset.VisionSpeedModifier.GetValue(difficulty);
 
             return result;
         }
@@ -145,12 +146,18 @@ namespace SAIN.Patches
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result)
+        public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result, ref BotOwner ___botOwner_0)
         {
             float dist = (BotTransform.position - enemy.position).magnitude;
             float weatherModifier = SAINPlugin.BotController.WeatherVisibility;
             float inverseWeatherModifier = Mathf.Sqrt(2f - weatherModifier);
-            __result *= Math.CalcVisSpeed(dist);
+
+            WildSpawnType wildSpawnType = ___botOwner_0.Profile.Info.Settings.Role;
+            if (PresetManager.TypePresets.TryGetValue(wildSpawnType, out var botType) )
+            {
+                BotDifficulty diff = ___botOwner_0.Profile.Info.Settings.BotDifficulty;
+                __result *= Math.CalcVisSpeed(dist, botType.Preset, diff);
+            }
             if (dist > 20f)
             {
                 __result *= inverseWeatherModifier;

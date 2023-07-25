@@ -91,7 +91,7 @@ namespace SAIN.BotPresets
             CanUseGrenades = new SAINProperty<bool>(name, desc, true);
 
             name = "Close Speed";
-            desc = "Vision speed multiplier at close range. Bots will see this much faster, or slower, at close range.";
+            desc = "Vision speed multiplier at close range. Bots will see this much faster, or slower, at close range. Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
             def = 1f;
             min = 0.25f;
             max = 3f;
@@ -99,7 +99,7 @@ namespace SAIN.BotPresets
             CloseVisionSpeed = new SAINProperty<float>(name, def, min, max, desc, round);
 
             name = "Far Speed";
-            desc = "Vision speed multiplier at Far range. Bots will see this much faster, or slower, at Far range.";
+            desc = "Vision speed multiplier at Far range, the range is defined by (Close/Far Threshold Property). Bots will see this much faster, or slower, at Far range. Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
             def = 1f;
             min = 0.25f;
             max = 3f;
@@ -121,6 +121,14 @@ namespace SAIN.BotPresets
             max = 3f;
             round = 100f;
             AudibleRangeMultiplier = new SAINProperty<float>(name, def, min, max, desc, round);
+
+            name = "Max Footstep Audio Distance";
+            desc = "The Maximum Range that a bot can hear footsteps, in meters.";
+            def = 50f;
+            min = 5f;
+            max = 100f;
+            round = 1f;
+            MaxFootstepAudioDistance = new SAINProperty<float>(name, def, min, max, desc, round);
 
             name = "Accuracy Multiplier";
             desc = "Modifies a bot's base accuracy. Higher = less accurate. 1.5 = 1.5x higher accuracy spread";
@@ -201,8 +209,13 @@ namespace SAIN.BotPresets
         [JsonProperty]
         public SAINProperty<float> AudibleRangeMultiplier { get; set; }
         [JsonProperty]
+        public SAINProperty<float> MaxFootstepAudioDistance { get; set; }
+
+        [JsonProperty]
         public SAINProperty<float> AccuracyMulti { get; set; }
 
+        [JsonProperty]
+        public SAINProperty<float> VisionSpeedModifier { get; set; }
         [JsonProperty]
         public SAINProperty<float> CloseVisionSpeed { get; set; }
         [JsonProperty]
@@ -241,8 +254,6 @@ namespace SAIN.BotPresets
         public SAINProperty<float> VisibleDistance { get; set; }
         [JsonProperty]
         public SAINProperty<float> VisibleAngle { get; set; }
-        [JsonProperty]
-        public SAINProperty<float> VisionSpeedModifier { get; set; }
         [JsonProperty]
         public SAINProperty<bool> FasterCQBReactions { get; set; }
         [JsonProperty]

@@ -46,7 +46,11 @@ namespace SAIN.Patches
             {
                 return;
             }
-            SAINSoundTypeHandler.AISoundPlayer(soundName, (Player)_Player.GetValue(__instance));
+            Player player = (Player)_Player.GetValue(__instance);
+            if (player != null)
+            {
+                SAINSoundTypeHandler.AISoundPlayer(soundName, player);
+            }
         }
     }
 }

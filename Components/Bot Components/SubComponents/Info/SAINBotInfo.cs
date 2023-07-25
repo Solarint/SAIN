@@ -1,8 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
-using UnityEngine;
-using static SAIN.Editor.EditorSettings;
 using SAIN.BotPresets;
+using UnityEngine;
 
 namespace SAIN.Classes
 {
@@ -24,19 +23,42 @@ namespace SAIN.Classes
 
             WeaponInfo = new WeaponInfo(BotOwner, this);
 
-            PercentageBeforeExtract = Random.Range(MinPercentage, MaxPercentage);
             LastPower = PowerLevel;
         }
 
-        public float MinPercentage => (float)SAINBotPreset.MinPercentage.GetValue(BotDifficulty);
-        public float MaxPercentage => (float)SAINBotPreset.MaxPercentage.GetValue(BotDifficulty);
-        public bool EnableExtracts => (bool)SAINBotPreset.EnableExtracts.GetValue(BotDifficulty);
-        public bool CanTalk => (bool)BotPresetClass.DifficultyPreset.CanTalk.GetValue(BotDifficulty);
-        public float RecoilMultiplier => (float)BotPresetClass.DifficultyPreset.RecoilMultiplier.GetValue(BotDifficulty);
-        public float AccuractMultiplier => (float)BotPresetClass.DifficultyPreset.AccuracyMulti.GetValue(BotDifficulty);
-        public bool FasterCQBReactions => (bool)BotPresetClass.DifficultyPreset.FasterCQBReactions.GetValue(BotDifficulty);
-        public float FasterCQBReactionsDistance => (float)BotPresetClass.DifficultyPreset.FasterCQBReactionsDistance.GetValue(BotDifficulty);
-        public float FasterCQBReactionsMinimum => (float)BotPresetClass.DifficultyPreset.FasterCQBReactionsMinimum.GetValue(BotDifficulty);
+        public void CalcExtractTime()
+        {
+            PercentageBeforeExtract = Random.Range(MinPercentage, MaxPercentage);
+        }
+
+        public float MinPercentage => BotPresetClass.MinPercentage;
+        public float MaxPercentage => BotPresetClass.MaxPercentage;
+        public bool EnableExtracts => BotPresetClass.EnableExtracts;
+
+        public float RecoilMultiplier => BotPresetClass.RecoilMultiplier;
+        public float AccuracyMultiplier => BotPresetClass.AccuracyMultiplier;
+
+        public bool FasterCQBReactions => BotPresetClass.FasterCQBReactions;
+        public float FasterCQBReactionsDistance => BotPresetClass.FasterCQBReactionsDistance;
+        public float FasterCQBReactionsMinimum => BotPresetClass.FasterCQBReactionsMinimum;
+
+        public float AudibleRangeMultiplier => BotPresetClass.AudibleRangeMultiplier;
+        public float MaxFootstepAudioDistance => BotPresetClass.MaxFootstepAudioDistance;
+
+        public float BurstMulti => BotPresetClass.BurstMulti;
+        public float FireratMulti => BotPresetClass.FireratMulti;
+
+        public float VisionSpeedModifier => BotPresetClass.VisionSpeedModifier;
+        public float CloseVisionSpeed => BotPresetClass.CloseVisionSpeed;
+        public float FarVisionSpeed => BotPresetClass.FarVisionSpeed;
+        public float CloseFarThresh => BotPresetClass.CloseFarThresh;
+
+        public bool CanTalk => BotPresetClass.CanTalk;
+        public bool BotTaunts => BotPresetClass.BotTaunts;
+        public bool SquadTalk => BotPresetClass.SquadTalk;
+        public float SquadMemberTalkFreq => BotPresetClass.SquadMemberTalkFreq;
+        public float SquadLeadTalkFreq => BotPresetClass.SquadLeadTalkFreq;
+        public float TalkFrequency => BotPresetClass.TalkFrequency;
 
         public float DifficultyModifier => InfoClass.DifficultyModifier;
         public bool IAmBoss => InfoClass.IAmBoss;
@@ -45,7 +67,7 @@ namespace SAIN.Classes
         public bool IsPMC => InfoClass.IsPMC;
 
         public BotPresetClass BotPresetClass { get; private set; }
-        public BotPreset SAINBotPreset => BotPresetClass.DifficultyPreset;
+        public BotPreset DifficultyPreset => BotPresetClass.DifficultyPreset;
 
         public InfoClass InfoClass { get; private set; }
 

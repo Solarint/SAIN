@@ -1,11 +1,8 @@
-﻿using EFT.Visual;
-using Newtonsoft.Json.Linq;
-using SAIN.BotPresets;
+﻿using SAIN.BotPresets;
 using SAIN.Editor.Abstract;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static Mono.Security.X509.X520;
 using static SAIN.Editor.Names;
 
 namespace SAIN.Editor
@@ -95,7 +92,6 @@ namespace SAIN.Editor
         }
 
         private bool OpenFirstMenu = true;
-        private bool OpenPropertyMenu = false;
         private bool OpenPropEdit = false;
         private Rect PresetWindow;
 

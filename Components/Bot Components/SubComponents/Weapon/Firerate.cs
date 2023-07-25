@@ -36,11 +36,15 @@ namespace SAIN.Classes
             // Sets a different time between shots if a weapon is full auto or burst and the enemy isn't close
             if ((CurrentWeapon.SelectedFireMode == Weapon.EFireMode.fullauto || CurrentWeapon.SelectedFireMode == Weapon.EFireMode.burst))
             {
-                final = Mathf.Clamp(final, 0.2f, 3f);
+                final = Mathf.Clamp(final, 0.1f, 3f);
             }
+
+            final /= SAIN.Info.FireratMulti;
 
             // Final Result which is randomized +- 15%
             float finalTime = final * Random.Range(0.85f, 1.15f);
+
+            finalTime = Mathf.Round(finalTime * 100f) / 100f;
 
             return finalTime;
         }

@@ -15,6 +15,8 @@ namespace SAIN.Classes
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
+        public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.BotPlayer != null;
+
         public SAINEnemy Enemy { get; private set; }
 
         private SAINComponent SAIN;
@@ -41,6 +43,11 @@ namespace SAIN.Classes
             }
         }
 
+        public void ClearEnemy()
+        {
+            Enemy = null;
+        }
+
         public void AddEnemy(IAIDetails person)
         {
             string id = person.ProfileId;
@@ -61,7 +68,7 @@ namespace SAIN.Classes
             }
             else
             {
-                Enemy = new SAINEnemy(BotOwner, person, 1f);
+                Enemy = new SAINEnemy(BotOwner, person);
                 Enemies.Add(id, Enemy);
             }
         }

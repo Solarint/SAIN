@@ -21,7 +21,7 @@ namespace SAIN.Classes
 
         public void ManualUpdate()
         {
-            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.AccuractMultiplier;
+            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.AccuracyMultiplier;
 
             if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true)
             {
@@ -29,7 +29,7 @@ namespace SAIN.Classes
                 if (BotOwner.WeaponManager.CurrentWeapon?.Template != LastCheckedWeapon)
                 {
                     LastCheckedWeapon = CurrentWeapon.Template;
-                    FinalModifier = Modifiers.FinalModifier;
+                    FinalModifier = Mathf.Round(Modifiers.FinalModifier * 100f) / 100f;
                 }
             }
         }

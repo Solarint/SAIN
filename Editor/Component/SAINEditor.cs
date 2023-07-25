@@ -383,10 +383,10 @@ namespace SAIN.Editor
                     Builder.HorizSlider(RecoilDecay, 1000f);
 
                     Builder.BeginHorizontal();
-                    if (Builder.Button("Font"))
-                    {
-                        OpenFontMenu = !OpenFontMenu;
-                    }
+                    //if (Builder.Button("Font"))
+                    //{
+                    //    OpenFontMenu = !OpenFontMenu;
+                    //}
                     if (Builder.Button("Mysterious Button"))
                     {
                         Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.PlayerIsDead);
@@ -394,12 +394,12 @@ namespace SAIN.Editor
                     }
                     Builder.EndHorizontal();
 
-                    if (OpenFontMenu)
-                    {
-                        FontEditMenu.OpenMenu();
-                    }
+                    //if (OpenFontMenu)
+                    //{
+                    //    FontEditMenu.OpenMenu();
+                    //}
 
-                    WindowLayoutCreator.CreateGUIAdjustmentSliders();
+                    //WindowLayoutCreator.CreateGUIAdjustmentSliders();
                 }
 
                 Builder.EndVertical();

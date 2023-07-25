@@ -17,8 +17,11 @@ namespace SAIN.Helpers
             }
 
             float modifier = component.Info.WeaponInfo.FinalModifier;
+            float BurstMulti = component.Info.BurstMulti;
 
             float k = 0.08f * modifier; // How fast for the burst length to falloff with Distance
+            k /= BurstMulti;
+            k = Mathf.Round(k * 100f) / 100f;
             float scaledDistance = InverseScaleWithLogisticFunction(distance, k, 20f);
 
             scaledDistance = Mathf.Clamp(scaledDistance, 0.001f, 1f);

@@ -178,8 +178,8 @@ namespace SAIN.Components
         public FriendlyFireStatus FriendlyFireStatus { get; private set; }
         private float UpdateHealthTimer = 0f;
 
-        public bool HasEnemy => Enemy != null;
-        public SAINEnemy Enemy => EnemyController.Enemy;
+        public bool HasEnemy => EnemyController.HasEnemy;
+        public SAINEnemy Enemy => HasEnemy ? EnemyController.Enemy : null;
 
         public void Dispose()
         {
@@ -220,7 +220,7 @@ namespace SAIN.Components
         {
             get
             {
-                if (Enemy != null)
+                if (HasEnemy)
                 {
                     return Enemy.CurrPosition;
                 }

@@ -61,7 +61,7 @@ namespace SAIN.Patches
         {
             __instance.CanGrenade = true;
             __instance.CanRun = true;
-            __instance.GainSightCoef *= 1.1f;
+            //__instance.GainSightCoef *= 1.1f;
             __instance.VisibleAngle = 160f;
         }
     }
@@ -78,7 +78,7 @@ namespace SAIN.Patches
         {
             __instance.CAN_STOP_SHOOT_CAUSE_ANIMATOR = true;
             __instance.CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
-            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.0f;
+            __instance.AUTOMATIC_FIRE_SCATTERING_COEF = 1.5f;
             __instance.BASE_AUTOMATIC_TIME = 0.5f;
             __instance.RECOIL_DELTA_PRESS = 0.0f;
         }

@@ -211,8 +211,8 @@
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BotPresets\BotType.cs" />
-    <Compile Include="BotPresets\BotTypeDefinitions.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\BotType.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\BotTypeDefinitions.cs" />
     <Compile Include="Components\Bot Components\Helpers\MathHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
     <Compile Include="Components\Bot Components\SAINDebugEnum.cs" />
@@ -304,8 +304,8 @@
     <Compile Include="Editor\Component\Util\StyleOptions.cs" />
     <Compile Include="Editor\Util\ToolTips.cs" />
     <Compile Include="Plugin\Config\ConfigAbstract.cs" />
-    <Compile Include="BotPresets\PresetManager.cs" />
-    <Compile Include="BotPresets\BotPreset.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\PresetManager.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\BotPreset.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />
     <Compile Include="Plugin\Config\TalkConfig.cs" />
