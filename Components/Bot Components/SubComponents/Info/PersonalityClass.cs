@@ -14,7 +14,6 @@ namespace SAIN.Classes
         public void Update()
         {
             SetPersonality();
-            PersonalityManager.Personalities[SAINPersonality.Timmy].CanTaunt = false;
         }
 
         public void SetPersonality()

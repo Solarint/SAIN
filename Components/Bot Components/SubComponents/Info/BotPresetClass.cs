@@ -173,11 +173,6 @@ namespace SAIN.Classes
             settings.Scattering = Scattering;
         }
 
-        void SettingsPatches()
-        {
-
-        }
-
         public BotCoreSettings Core { get; private set; }
         public BotGlobalLayData Lay { get; private set; }
         public BotGlobalAimingSettings Aiming { get; private set; }
