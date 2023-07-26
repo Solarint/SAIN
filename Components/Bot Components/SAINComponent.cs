@@ -41,7 +41,6 @@ namespace SAIN.Components
             Equipment = bot.GetOrAddComponent<BotEquipmentClass>();
 
             Info = new SAINBotInfo(bot);
-            Info.Init();
 
             BotStuck = bot.GetOrAddComponent<SAINBotUnstuck>();
             Hearing = bot.GetOrAddComponent<HearingSensorClass>();

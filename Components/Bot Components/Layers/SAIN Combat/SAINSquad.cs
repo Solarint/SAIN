@@ -78,7 +78,7 @@ namespace SAIN.Layers
             stringBuilder.AppendLine($"SAIN Info:");
             var info = SAIN.Info;
             stringBuilder.AppendLabeledValue("Decisions", $"Base: {SAIN.CurrentDecision} Self: {SAIN.Decision.CurrentSelfDecision} Squad: {SAIN.Decision.CurrentSquadDecision}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("Personality", $"{info.Personality} {info.BotType}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Personality", $"{info.Personality} {info.WildSpawnType}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Power of Equipment", $"{info.PowerLevel}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Start Search + Hold Ground Time", $"{info.TimeBeforeSearch} + {info.HoldGroundDelay}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Difficulty + Modifier", $"{info.BotDifficulty} + {info.DifficultyModifier}", Color.white, Color.yellow, true);

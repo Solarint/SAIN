@@ -1,27 +1,29 @@
 using BepInEx.Logging;
 using EFT;
 using EFT.InventoryLogic;
+using System.Linq;
 using UnityEngine;
+using static EFT.InventoryLogic.Weapon;
 using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {
     public class WeaponInfo : SAINWeaponInfoAbstract
     {
-        public WeaponInfo(BotOwner bot, SAINBotInfo info) : base(bot, info)
+        public WeaponInfo(BotOwner bot) : base(bot)
         {
-            Modifiers = new ModifierClass(bot, info);
+            Modifiers = new ModifierClass(bot);
             DefaultAccuracy = BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF;
-            Recoil = new Recoil(bot, info);
-            Firerate = new Firerate(bot, info);
-            Firemode = new Firemode(bot, info);
+            Recoil = new Recoil(bot);
+            Firerate = new Firerate(bot);
+            Firemode = new Firemode(bot);
         }
 
         private readonly float DefaultAccuracy;
 
         public void ManualUpdate()
         {
-            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.AccuracyMultiplier;
+            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.AimUpgradeByTimeMin;
 
             if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true)
             {
@@ -93,7 +95,7 @@ namespace SAIN.Classes
 
     public class ModifierClass : SAINWeaponInfoAbstract
     {
-        public ModifierClass(BotOwner bot, SAINBotInfo info) : base(bot, info) { }
+        public ModifierClass(BotOwner bot) : base(bot) { }
 
         private const float WeaponClassScaling = 0.3f;
         private const float RecoilScaling = 0.2f;
@@ -407,11 +409,96 @@ namespace SAIN.Classes
 
     public abstract class SAINWeaponInfoAbstract : SAINInfoAbstract
     {
-        public SAINWeaponInfoAbstract(BotOwner owner, SAINBotInfo info) : base(owner, info)
+        public SAINWeaponInfoAbstract(BotOwner owner) : base(owner)
         {
         }
 
-        public WeaponInfo WeaponInfo => SAINInfo.WeaponInfo;
+        public bool IsFireModeSet(EFireMode mode)
+        {
+            return SelectedFireMode == mode;
+        }
+        public bool IsSetFullAuto()
+        {
+            return IsFireModeSet(EFireMode.fullauto);
+        }
+        public bool IsSetBurst()
+        {
+            return IsFireModeSet(EFireMode.burst);
+        }
+        public bool IsSetSemiAuto()
+        {
+            return IsFireModeSet(EFireMode.single);
+        }
+
+        public bool HasFullAuto()
+        {
+            return HasFireMode(EFireMode.fullauto);
+        }
+        public bool HasBurst()
+        {
+            return HasFireMode(EFireMode.burst);
+        }
+        public bool HasSemi()
+        {
+            return HasFireMode(EFireMode.single);
+        }
+        public bool HasDoubleAction()
+        {
+            return HasFireMode(EFireMode.doubleaction);
+        }
+
+        public bool HasFireMode(EFireMode fireMode)
+        {
+            var modes = CurrentWeapon?.WeapFireType;
+            if (modes == null) return false;
+            return modes.Contains(fireMode);
+        }
+
+        public Weapon.EFireMode SelectedFireMode
+        {
+            get
+            {
+                if (CurrentWeapon != null)
+                {
+                    return CurrentWeapon.SelectedFireMode;
+                }
+                return EFireMode.fullauto;
+            }
+        }
+
+        public float RecoilForceUp
+        {
+            get
+            {
+                var template = CurrentWeapon?.Template;
+                if (template != null)
+                {
+                    return template.RecoilForceUp;
+                }
+                else
+                {
+                    return 150f;
+                }
+            }
+        }
+
+        public float RecoilForceBack
+        {
+            get
+            {
+                var template = CurrentWeapon?.Template;
+                if (template != null)
+                {
+                    return template.RecoilForceBack;
+                }
+                else
+                {
+                    return 150f;
+                }
+            }
+        }
+
+        public WeaponInfo WeaponInfo => SAIN.Info?.WeaponInfo;
 
         public string WeaponClass => CurrentWeapon.Template.weapClass;
 

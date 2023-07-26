@@ -8,7 +8,7 @@ namespace SAIN.Classes
 {
     public class Recoil : SAINWeaponInfoAbstract
     {
-        public Recoil(BotOwner owner, SAINBotInfo info) : base(owner, info) { }
+        public Recoil(BotOwner owner) : base(owner) { }
 
         public Vector3 CalculateRecoil(Vector3 targetpoint)
         {
@@ -20,8 +20,8 @@ namespace SAIN.Classes
             distance /= 20f;
             distance = distance * 0.75f + 0.25f;
 
-            float weaponhorizrecoil = (CurrentWeapon.Template.RecoilForceUp / RecoilBaseline) * WeaponInfo.FinalModifier;
-            float weaponvertrecoil = (CurrentWeapon.Template.RecoilForceBack / RecoilBaseline) * WeaponInfo.FinalModifier;
+            float weaponhorizrecoil = CalcRecoil(RecoilForceUp);
+            float weaponvertrecoil = CalcRecoil(RecoilForceBack);
 
             float horizRecoil = (1f * weaponhorizrecoil + AddRecoil.Value) * distance;
             float vertRecoil = (1f * weaponvertrecoil + AddRecoil.Value) * distance;
@@ -35,6 +35,16 @@ namespace SAIN.Classes
             vector = MathHelpers.VectorClamp(vector, -maxrecoil, maxrecoil) * SAIN.Info.RecoilMultiplier;
 
             return vector;
+        }
+
+        float CalcRecoil(float recoilVal)
+        {
+            float result = recoilVal / RecoilBaseline;
+            if (WeaponInfo != null)
+            {
+                result *= WeaponInfo.FinalModifier;
+            }
+            return result;
         }
 
         public Vector3 CalculateDecay(Vector3 oldVector, out float rate)
@@ -55,7 +65,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (CurrentWeapon.SelectedFireMode == Weapon.EFireMode.fullauto || CurrentWeapon.SelectedFireMode == Weapon.EFireMode.burst)
+                if (IsSetFullAuto() || IsSetBurst())
                 {
                     return Time.time + FullAutoTimePerShot * 0.8f;
                 }
@@ -70,7 +80,7 @@ namespace SAIN.Classes
         {
             get
             {
-                float roundspersecond = CurrentWeapon.Template.SingleFireRate / 60;
+                float roundspersecond = SingleFireRate / 60;
 
                 float secondsPerShot = 1f / roundspersecond;
 
@@ -78,11 +88,24 @@ namespace SAIN.Classes
             }
         }
 
+        private float SingleFireRate
+        {
+            get
+            {
+                var template = CurrentWeapon?.Template;
+                if (template != null)
+                {
+                    return template.SingleFireRate;
+                }
+                return 600f;
+            }
+        }
+
         private float SemiAutoTimePerShot
         {
             get
             {
-                return 1f / (CurrentWeapon.Template.SingleFireRate / 60f);
+                return 1f / (SingleFireRate / 60f);
             }
         }
 

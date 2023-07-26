@@ -10,7 +10,7 @@ namespace SAIN.Classes
 {
     public class Firerate : SAINWeaponInfoAbstract
     {
-        public Firerate(BotOwner owner, SAINBotInfo info) : base(owner, info) { }
+        public Firerate(BotOwner owner) : base(owner) { }
 
         public void Update()
         {
@@ -30,11 +30,15 @@ namespace SAIN.Classes
             float minTime = 0.1f; // minimum time per shot
             float maxTime = 4f; // maximum time per shot
             float EnemyDistance = (BotOwner.AimingData.RealTargetPoint - BotOwner.WeaponRoot.position).magnitude;
-            float permeter = EnemyDistance / (PerMeter / WeaponInfo.FinalModifier);
+            float permeter = EnemyDistance / PerMeter;
+            if (WeaponInfo != null)
+            {
+                permeter *= WeaponInfo.FinalModifier;
+            }
             float final = Mathf.Clamp(permeter, minTime, maxTime);
 
             // Sets a different time between shots if a weapon is full auto or burst and the enemy isn't close
-            if ((CurrentWeapon.SelectedFireMode == Weapon.EFireMode.fullauto || CurrentWeapon.SelectedFireMode == Weapon.EFireMode.burst))
+            if (IsSetFullAuto() || IsSetBurst())
             {
                 final = Mathf.Clamp(final, 0.1f, 3f);
             }

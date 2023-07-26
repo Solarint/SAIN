@@ -1,6 +1,4 @@
 ﻿using EFT;
-using System;
-using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static EFT.InventoryLogic.Weapon;
@@ -9,55 +7,61 @@ namespace SAIN.Classes
 {
     public class Firemode : SAINWeaponInfoAbstract
     {
-        public Firemode(BotOwner owner, SAINBotInfo info) : base(owner, info) { }
+        public Firemode(BotOwner owner) : base(owner) { }
 
         private const float SemiAutoSwapDist = 40f;
         private const float FullAutoSwapDist = 30f;
 
         public void CheckSwap()
         {
-            if (BotOwner.WeaponManager.Stationary?.Taken == false)
+            if (BotOwner?.WeaponManager?.Stationary?.Taken == false)
             {
                 float distance = SAIN.DistanceToAimTarget;
                 EFireMode mode = EFireMode.doublet;
 
                 if (distance > SemiAutoSwapDist)
                 {
-                    if (CurrentWeapon.WeapFireType.Contains(EFireMode.single))
+                    if (HasSemi())
                     {
                         mode = EFireMode.single;
                     }
                 }
                 else if (distance <= FullAutoSwapDist)
                 {
-                    if (CurrentWeapon.WeapFireType.Contains(EFireMode.fullauto))
+                    if (HasFullAuto())
                     {
                         mode = EFireMode.fullauto;
                     }
-                    else if (CurrentWeapon.WeapFireType.Contains(EFireMode.burst))
+                    else if (HasBurst())
                     {
                         mode = EFireMode.burst;
                     }
-                    else if (CurrentWeapon.WeapFireType.Contains(EFireMode.doubleaction))
+                    else if (HasDoubleAction())
                     {
                         mode = EFireMode.doubleaction;
                     }
                 }
 
-                if (mode != EFireMode.doublet && CurrentWeapon.SelectedFireMode != mode)
+                if (mode != EFireMode.doublet && CanSetMode(mode))
                 {
-                    CurrentWeapon.FireMode.SetFireMode(mode);
-                    var animate = BotOwner.GetPlayer?.HandsController?.FirearmsAnimator;
-                    if (animate != null)
-                    {
-                        BotOwner.GetPlayer.HandsController.FirearmsAnimator.SetFireMode(mode);
-                    }
+                    SetFireMode(mode);
                 }
                 else
                 {
                     CheckWeapon();
                 }
             }
+        }
+
+        public void SetFireMode(EFireMode fireMode)
+        {
+            CurrentWeapon?.FireMode?.SetFireMode(fireMode);
+            BotOwner?.GetPlayer?.HandsController?.FirearmsAnimator?.SetFireMode(fireMode);
+        }
+
+        public bool CanSetMode(EFireMode fireMode)
+        {
+            return CurrentWeapon != null && HasFireMode(fireMode) && !IsFireModeSet(fireMode);
         }
 
         private void CheckWeapon()

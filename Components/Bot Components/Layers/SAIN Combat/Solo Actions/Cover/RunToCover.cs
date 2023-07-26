@@ -107,7 +107,7 @@ namespace SAIN.Layers
         {
             stringBuilder.AppendLine($"SAIN Info:");
             stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.Personality}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.BotType}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.WildSpawnType}", Color.white, Color.yellow, true);
             CoverPoint cover = SAIN.Cover.CoverInUse;
             if (cover != null)
             {

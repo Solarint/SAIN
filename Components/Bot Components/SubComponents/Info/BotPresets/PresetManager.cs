@@ -35,6 +35,20 @@ namespace SAIN.BotPresets
         public static readonly List<PropertyInfo> Properties;
         public static readonly Dictionary<WildSpawnType, BotType> TypePresets;
 
+        public static bool GetPreset(WildSpawnType type, out BotPreset preset)
+        {
+            preset = null;
+            if (TypePresets != null && TypePresets.ContainsKey(type))
+            {
+                preset = TypePresets[type].Preset;
+            }
+            return preset != null;
+        }
+
+        public static PresetValues GetPresetValues(BotPreset preset, BotDifficulty difficulty)
+        {
+            return preset.GetValues(difficulty);
+        }
 
         public static object GetPresetValue(BotType type, PropertyInfo property, BotDifficulty difficulty)
         {

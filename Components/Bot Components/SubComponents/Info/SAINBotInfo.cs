@@ -5,111 +5,74 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class SAINBotInfo : SAINBot
+    public class SAINBotInfo : SAINInfoAbstract
     {
         public SAINBotInfo(BotOwner botOwner) : base(botOwner)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource("SAIN Info");
-            InfoClass = new InfoClass(botOwner);
+            GlobalSettings.Update(BotOwner);
+
+            BotPresetClass = new BotPresetClass(BotOwner);
+            PersonalityClass = new PersonalityClass(BotOwner);
+            WeaponInfo = new WeaponInfo(BotOwner);
         }
 
-        public void Init()
-        {
-            BotPresetClass = new BotPresetClass(BotOwner, this);
-            PersonalityClass = new PersonalityClass(BotOwner, this);
+        public PresetValues FileSettings => BotPresetClass.PresetValues;
 
-            CalcHoldGroundDelay();
-            CalcTimeBeforeSearch();
+        public bool EnableExtracts => FileSettings.EnableExtracts;
 
-            WeaponInfo = new WeaponInfo(BotOwner, this);
+        public float RecoilMultiplier => FileSettings.RecoilMultiplier;
+        public float AimUpgradeByTimeMin => FileSettings.MAX_AIMING_UPGRADE_BY_TIME;
+        public float MaxAimTime => FileSettings.MAX_AIM_TIME;
 
-            LastPower = PowerLevel;
-        }
+        public bool FasterCQBReactions => FileSettings.FasterCQBReactions;
+        public float FasterCQBReactionsDistance => FileSettings.FasterCQBReactionsDistance;
+        public float FasterCQBReactionsMinimum => FileSettings.FasterCQBReactionsMinimum;
 
-        public void CalcExtractTime()
-        {
-            PercentageBeforeExtract = Random.Range(MinPercentage, MaxPercentage);
-        }
+        public float AudibleRangeMultiplier => FileSettings.AudibleRangeMultiplier;
+        public float MaxFootstepAudioDistance => FileSettings.MaxFootstepAudioDistance;
 
-        public float MinPercentage => BotPresetClass.MinPercentage;
-        public float MaxPercentage => BotPresetClass.MaxPercentage;
-        public bool EnableExtracts => BotPresetClass.EnableExtracts;
+        public float BurstMulti => FileSettings.BurstMulti;
+        public float FireratMulti => FileSettings.FireratMulti;
 
-        public float RecoilMultiplier => BotPresetClass.RecoilMultiplier;
-        public float AccuracyMultiplier => BotPresetClass.AccuracyMultiplier;
+        public float VisionSpeedModifier => FileSettings.VisionSpeedModifier;
+        public float CloseVisionSpeed => FileSettings.CloseVisionSpeed;
+        public float FarVisionSpeed => FileSettings.FarVisionSpeed;
+        public float CloseFarThresh => FileSettings.CloseFarThresh;
 
-        public bool FasterCQBReactions => BotPresetClass.FasterCQBReactions;
-        public float FasterCQBReactionsDistance => BotPresetClass.FasterCQBReactionsDistance;
-        public float FasterCQBReactionsMinimum => BotPresetClass.FasterCQBReactionsMinimum;
-
-        public float AudibleRangeMultiplier => BotPresetClass.AudibleRangeMultiplier;
-        public float MaxFootstepAudioDistance => BotPresetClass.MaxFootstepAudioDistance;
-
-        public float BurstMulti => BotPresetClass.BurstMulti;
-        public float FireratMulti => BotPresetClass.FireratMulti;
-
-        public float VisionSpeedModifier => BotPresetClass.VisionSpeedModifier;
-        public float CloseVisionSpeed => BotPresetClass.CloseVisionSpeed;
-        public float FarVisionSpeed => BotPresetClass.FarVisionSpeed;
-        public float CloseFarThresh => BotPresetClass.CloseFarThresh;
-
-        public bool CanTalk => BotPresetClass.CanTalk;
-        public bool BotTaunts => BotPresetClass.BotTaunts;
-        public bool SquadTalk => BotPresetClass.SquadTalk;
-        public float SquadMemberTalkFreq => BotPresetClass.SquadMemberTalkFreq;
-        public float SquadLeadTalkFreq => BotPresetClass.SquadLeadTalkFreq;
-        public float TalkFrequency => BotPresetClass.TalkFrequency;
-
-        public float DifficultyModifier => InfoClass.DifficultyModifier;
-        public bool IAmBoss => InfoClass.IAmBoss;
-        public bool IsFollower => InfoClass.IsFollower;
-        public bool IsScav => InfoClass.IsScav;
-        public bool IsPMC => InfoClass.IsPMC;
+        public bool CanTalk => FileSettings.CanTalk;
+        public bool BotTaunts => FileSettings.BotTaunts;
+        public bool SquadTalk => FileSettings.SquadTalk;
+        public float SquadMemberTalkFreq => FileSettings.SquadMemberTalkFreq;
+        public float SquadLeadTalkFreq => FileSettings.SquadLeadTalkFreq;
+        public float TalkFrequency => FileSettings.TalkFrequency;
 
         public BotPresetClass BotPresetClass { get; private set; }
-        public BotPreset DifficultyPreset => BotPresetClass.DifficultyPreset;
-
-        public InfoClass InfoClass { get; private set; }
-
-        public BotDifficulty BotDifficulty => InfoClass.BotDifficulty;
-        public WildSpawnType BotType => InfoClass.BotType;
-        public float PowerLevel => InfoClass.PowerLevel;
-        public EPlayerSide Faction => InfoClass.Faction;
-
-        public readonly ManualLogSource Logger;
 
         public float TimeBeforeSearch { get; private set; } = 0f;
-        public float PercentageBeforeExtract { get; private set; }
+        public float PercentageBeforeExtract => BotPresetClass.PercentageBeforeExtract;
 
-        private float LastPower;
+        float LastPower = -1f;
 
         public void Update()
         {
-            if (SAIN == null) return;
+            if (LastPower != PowerLevel)
+            {
+                LastPower = PowerLevel;
+                GroupCount = BotOwner.BotsGroup.MembersCount;
 
-            if (TimeBeforeSearch == 0f || BotOwner.BotsGroup.MembersCount != GroupCount)
+                PersonalityClass.Update();
+
+                CalcTimeBeforeSearch();
+                CalcHoldGroundDelay();
+            }
+            if (BotOwner.BotsGroup.MembersCount != GroupCount)
             {
                 GroupCount = BotOwner.BotsGroup.MembersCount;
                 CalcTimeBeforeSearch();
             }
 
-            if (LastPower != PowerLevel)
-            {
-                LastPower = PowerLevel;
-                PersonalityClass.Update();
-                CalcTimeBeforeSearch();
-            }
 
             WeaponInfo.ManualUpdate();
-
-            if (SAIN.Squad.BotInGroup && !SAIN.Squad.IAmLeader)
-            {
-                var Leader = SAIN.Squad.LeaderComponent;
-                if (Leader != null)
-                {
-                    PercentageBeforeExtract = Leader.Info.PercentageBeforeExtract;
-                }
-            }
         }
 
         private int GroupCount = 0;
@@ -142,11 +105,11 @@ namespace SAIN.Classes
             float searchTime;
             if (IsFollower && SAIN.Squad.BotInGroup)
             {
-                searchTime = 3f;
+                searchTime = 6f;
             }
             else if (IAmBoss && SAIN.Squad.BotInGroup)
             {
-                searchTime = 20f;
+                searchTime = 30f;
             }
             else
             {

@@ -8,7 +8,6 @@ using SAIN.Editor;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using UnityEngine;
-using Comfort.Common;
 
 namespace SAIN
 {

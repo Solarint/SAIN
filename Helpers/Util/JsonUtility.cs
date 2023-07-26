@@ -181,7 +181,7 @@ namespace SAIN.Helpers
                 return null;
             }
 
-            private static bool LoadJsonFile(out string json, string fileName, params string[] folders)
+            public static bool LoadJsonFile(out string json, string fileName, params string[] folders)
             {
                 json = LoadTextFile(".json", fileName, folders);
                 return json != null;

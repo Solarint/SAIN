@@ -221,10 +221,12 @@
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\SpottedCoverPoint.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\FrameWait.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\Abstract\InfoClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\PresetDefaults.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\GlobalSettingsPatches.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\PersonalityClass.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\Abstract\BotPresetClass.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\Abstract\SAINInfoAbstract.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresetClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\SAINInfoAbstract.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Info\SetGlobalSettings.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firerate.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firemode.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Recoil.cs" />
