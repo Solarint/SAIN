@@ -1,6 +1,8 @@
 ﻿using EFT;
+using Newtonsoft.Json;
 using SAIN.BotPresets;
-using System;
+using SAIN.Components.BotSettings;
+using SAIN.Helpers;
 
 namespace SAIN.Classes
 {
@@ -8,8 +10,9 @@ namespace SAIN.Classes
     {
         public BotPresetClass(BotOwner owner) : base(owner)
         {
-            DefaultBotSettings = new BotSettingsClass(owner);
-            BotSettings = new BotSettingsClass(owner);
+            DefaultBotSettings = new SAINBotSettingsClass(owner);
+            BotSettings = new SAINBotSettingsClass(owner);
+            //BotSettings = BotSettingsManager.GetBotSettings(WildSpawnType, BotDifficulty);
 
             if (PresetManager.GetPreset(WildSpawnType, out var preset))
             {
@@ -20,8 +23,8 @@ namespace SAIN.Classes
         }
 
         public PresetValues PresetValues { get; set; }
-        public BotSettingsClass DefaultBotSettings { get; private set; }
-        public BotSettingsClass BotSettings { get; private set; }
+        public SAINBotSettingsClass DefaultBotSettings { get; private set; }
+        public SAINBotSettingsClass BotSettings { get; private set; }
 
         public void PresetUpdated(WildSpawnType type, BotPreset preset)
         {
@@ -47,7 +50,8 @@ namespace SAIN.Classes
             aim.MAX_AIMING_UPGRADE_BY_TIME = defaultAim.MAX_AIMING_UPGRADE_BY_TIME / PresetValues.MAX_AIMING_UPGRADE_BY_TIME;
             aim.MAX_AIM_TIME = defaultAim.MAX_AIM_TIME / PresetValues.MAX_AIM_TIME;
 
-            BotSettings.AssignSettings();
+            BotSettings.SetNewSettings(BotOwner);
+            //JsonUtility.Save.SaveBotSettings(BotSettings, BotOwner);
         }
 
         void UpdateExtractTime()
@@ -127,15 +131,15 @@ namespace SAIN.Classes
         public BotPreset DifficultyPreset { get; private set; }
     }
 
-    public class BotSettingsClass
+    public class SAINBotSettingsClass
     {
-        public readonly BotOwner BotOwner;
+        [JsonConstructor]
+        public SAINBotSettingsClass() { }
 
-        public BotSettingsClass(BotOwner owner)
+        public SAINBotSettingsClass(BotOwner owner)
         {
-            BotOwner = owner;
-
-            Core = new BotCoreSettings(owner);
+            Core = new BotCoreSettings();
+            Core.SetDefaults(owner);
 
             var settings = owner.Settings.FileSettings.Copy();
             Aiming = settings.Aiming;
@@ -153,11 +157,31 @@ namespace SAIN.Classes
             Scattering = settings.Scattering;
         }
 
-        public void AssignSettings()
+        public SAINBotSettingsClass(GClass562 settings)
         {
-            Core.AssignSettings();
+            Core = new BotCoreSettings();
+            Core.SetDefaults(settings);
 
-            var settings = BotOwner.Settings.FileSettings;
+            Aiming = settings.Aiming;
+            Look = settings.Look;
+            Shoot = settings.Shoot;
+            Move = settings.Move;
+            Grenade = settings.Grenade;
+            Cover = settings.Cover;
+            Patrol = settings.Patrol;
+            Hearing = settings.Hearing;
+            Mind = settings.Mind;
+            Lay = settings.Lay;
+            Boss = settings.Boss;
+            Change = settings.Change;
+            Scattering = settings.Scattering;
+        }
+
+        public void SetNewSettings(BotOwner owner)
+        {
+            Core.SetNewSettings(owner);
+
+            var settings = owner.Settings.FileSettings;
             settings.Aiming = Aiming;
             settings.Look = Look;
             settings.Shoot = Shoot;
@@ -173,31 +197,40 @@ namespace SAIN.Classes
             settings.Scattering = Scattering;
         }
 
-        public BotCoreSettings Core { get; private set; }
-        public BotGlobalLayData Lay { get; private set; }
-        public BotGlobalAimingSettings Aiming { get; private set; }
-        public BotGlobalLookData Look { get; private set; }
-        public BotGlobalShootData Shoot { get; private set; }
-        public BotGlobalsMoveSettings Move { get; private set; }
-        public BotGlobalsGrenadeSettings Grenade { get; private set; }
-        public BotGlobalsChangeSettings Change { get; private set; }
-        public BotGlobalsCoverSettings Cover { get; private set; }
-        public BotGlobalPatrolSettings Patrol { get; private set; }
-        public BotGlobasHearingSettings Hearing { get; private set; }
-        public BotGlobalsMindSettings Mind { get; private set; }
-        public BotGlobalsBossSettings Boss { get; private set; }
-        public BotGlobalsScatteringSettings Scattering { get; private set; }
+        [JsonProperty]
+        public BotCoreSettings Core { get; private set; } = new BotCoreSettings();
+        [JsonProperty]
+        public BotGlobalLayData Lay { get; private set; } = new BotGlobalLayData();
+        [JsonProperty]
+        public BotGlobalAimingSettings Aiming { get; private set; } = new BotGlobalAimingSettings();
+        [JsonProperty]
+        public BotGlobalLookData Look { get; private set; } = new BotGlobalLookData();
+        [JsonProperty]
+        public BotGlobalShootData Shoot { get; private set; } = new BotGlobalShootData();
+        [JsonProperty]
+        public BotGlobalsMoveSettings Move { get; private set; } = new BotGlobalsMoveSettings();
+        [JsonProperty]
+        public BotGlobalsGrenadeSettings Grenade { get; private set; } = new BotGlobalsGrenadeSettings();
+        [JsonProperty]
+        public BotGlobalsChangeSettings Change { get; private set; } = new BotGlobalsChangeSettings();
+        [JsonProperty]
+        public BotGlobalsCoverSettings Cover { get; private set; } = new BotGlobalsCoverSettings();
+        [JsonProperty]
+        public BotGlobalPatrolSettings Patrol { get; private set; } = new BotGlobalPatrolSettings();
+        [JsonProperty]
+        public BotGlobasHearingSettings Hearing { get; private set; } = new BotGlobasHearingSettings();
+        [JsonProperty]
+        public BotGlobalsMindSettings Mind { get; private set; } = new BotGlobalsMindSettings();
+        [JsonProperty]
+        public BotGlobalsBossSettings Boss { get; private set; } = new BotGlobalsBossSettings();
+        [JsonProperty]
+        public BotGlobalsScatteringSettings Scattering { get; private set; } = new BotGlobalsScatteringSettings();
 
         public class BotCoreSettings
         {
-            public readonly BotOwner BotOwner;
-
-            public BotCoreSettings(BotOwner owner)
+            public void SetDefaults(BotOwner owner)
             {
-                BotOwner = owner;
-
                 var core = owner.Settings.FileSettings.Core;
-
                 VisibleAngle = core.VisibleAngle;
                 VisibleDistance = core.VisibleDistance;
                 GainSightCoef = core.GainSightCoef;
@@ -213,23 +246,58 @@ namespace SAIN.Classes
                 AccuratySpeed = core.AccuratySpeed;
             }
 
-            public void AssignSettings()
+            public void SetDefaults(GClass562 settings)
             {
-                var settings = BotOwner.Settings.FileSettings;
+                var core = settings.Core;
+                VisibleAngle = core.VisibleAngle;
+                VisibleDistance = core.VisibleDistance;
+                GainSightCoef = core.GainSightCoef;
+                ScatteringPerMeter = core.ScatteringPerMeter;
+                DamageCoeff = core.DamageCoeff;
+                HearingSense = core.HearingSense;
+                CanRun = true;
+                CanGrenade = core.CanGrenade;
+                AimingType = core.AimingType;
+                PistolFireDistancePref = core.PistolFireDistancePref;
+                ShotgunFireDistancePref = core.ShotgunFireDistancePref;
+                RifleFireDistancePref = core.RifleFireDistancePref;
+                AccuratySpeed = core.AccuratySpeed;
+            }
 
-                settings.Core.VisibleAngle = VisibleAngle;
-                settings.Core.VisibleDistance = VisibleDistance;
-                settings.Core.GainSightCoef = GainSightCoef;
-                settings.Core.ScatteringPerMeter = ScatteringPerMeter;
-                settings.Core.DamageCoeff = DamageCoeff;
-                settings.Core.HearingSense = HearingSense;
-                settings.Core.CanRun = true;
-                settings.Core.CanGrenade = CanGrenade;
-                settings.Core.AimingType = AimingType;
-                settings.Core.PistolFireDistancePref = PistolFireDistancePref;
-                settings.Core.ShotgunFireDistancePref = ShotgunFireDistancePref;
-                settings.Core.RifleFireDistancePref = RifleFireDistancePref;
-                settings.Core.AccuratySpeed = AccuratySpeed;
+            public void SetNewSettings(BotOwner owner)
+            {
+                var core = owner.Settings.FileSettings.Core;
+                core.VisibleAngle = VisibleAngle;
+                core.VisibleDistance = VisibleDistance;
+                core.GainSightCoef = GainSightCoef;
+                core.ScatteringPerMeter = ScatteringPerMeter;
+                core.DamageCoeff = DamageCoeff;
+                core.HearingSense = HearingSense;
+                core.CanRun = true;
+                core.CanGrenade = CanGrenade;
+                core.AimingType = AimingType;
+                core.PistolFireDistancePref = PistolFireDistancePref;
+                core.ShotgunFireDistancePref = ShotgunFireDistancePref;
+                core.RifleFireDistancePref = RifleFireDistancePref;
+                core.AccuratySpeed = AccuratySpeed;
+            }
+
+            public void SetNewSettings(GClass562 settings)
+            {
+                var core = settings.Core;
+                core.VisibleAngle = VisibleAngle;
+                core.VisibleDistance = VisibleDistance;
+                core.GainSightCoef = GainSightCoef;
+                core.ScatteringPerMeter = ScatteringPerMeter;
+                core.DamageCoeff = DamageCoeff;
+                core.HearingSense = HearingSense;
+                core.CanRun = true;
+                core.CanGrenade = CanGrenade;
+                core.AimingType = AimingType;
+                core.PistolFireDistancePref = PistolFireDistancePref;
+                core.ShotgunFireDistancePref = ShotgunFireDistancePref;
+                core.RifleFireDistancePref = RifleFireDistancePref;
+                core.AccuratySpeed = AccuratySpeed;
             }
 
             public float VisibleAngle = 110f;

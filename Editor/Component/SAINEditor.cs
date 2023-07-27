@@ -16,6 +16,9 @@ using UnityEngine.EventSystems;
 using System.Reflection;
 using BepInEx;
 using EFT.Visual;
+using SAIN.Editor.Abstract;
+using SAIN.Classes;
+using System.Collections.Generic;
 
 namespace SAIN.Editor
 {
@@ -25,13 +28,23 @@ namespace SAIN.Editor
 
         public void Init()
         {
+            InitBinds();
+            InitCursor();
+            InitClasses();
+        }
+
+        void InitBinds()
+        {
             ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(OpenEditor));
             ConsoleScreen.Processor.RegisterCommand("pausegame", new Action(TogglePause));
 
             OpenEditorButton = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor", false, "Opens the Editor on press");
             OpenEditorConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
             PauseConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "PauseButton", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
+        }
 
+        void InitCursor()
+        {
             // Use reflection to keep compatibility with unity 4.x since it doesn't have Cursor
             var tCursor = typeof(Cursor);
             _curLockState = tCursor.GetProperty("lockState", BindingFlags.Static | BindingFlags.Public);
@@ -44,7 +57,10 @@ namespace SAIN.Editor
                 _curLockState = typeof(Screen).GetProperty("lockCursor", BindingFlags.Static | BindingFlags.Public);
                 _curVisible = typeof(Screen).GetProperty("showCursor", BindingFlags.Static | BindingFlags.Public);
             }
+        }
 
+        void InitClasses()
+        {
             TexturesClass = new TexturesClass(this);
             Colors = new ColorsClass(this);
             StyleOptions = new StyleOptions(this);
@@ -54,9 +70,15 @@ namespace SAIN.Editor
             ToolTips = new ToolTips(this);
             MouseFunctions = new MouseFunctions(this);
             WindowLayoutCreator = new WindowLayoutCreator(this);
+            BotSettingsEditor = new BotSettingsEditor(this);
+            BotPersonalityEditor = new BotPersonalityEditor(this);
         }
 
         internal static Texture2D TooltipBg { get; private set; }
+
+        internal static ConfigEntry<bool> OpenEditorButton;
+        internal static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry;
+        internal static ConfigEntry<KeyboardShortcut> PauseConfigEntry;
 
         private PropertyInfo _curLockState;
         private PropertyInfo _curVisible;
@@ -64,6 +86,8 @@ namespace SAIN.Editor
         private bool _previousCursorVisible;
         private bool _obsoleteCursor;
 
+        public BotPersonalityEditor BotPersonalityEditor { get; private set; }
+        public BotSettingsEditor BotSettingsEditor { get; private set; }
         public WindowLayoutCreator WindowLayoutCreator { get; private set; }
         public MouseFunctions MouseFunctions { get; private set; }
         public ToolTips ToolTips { get; private set; }
@@ -73,10 +97,6 @@ namespace SAIN.Editor
         public StyleOptions StyleOptions { get; private set; }
         public ColorsClass Colors { get; private set; }
         public TexturesClass TexturesClass { get; private set; }
-
-        internal static ConfigEntry<bool> OpenEditorButton;
-        internal static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry;
-        internal static ConfigEntry<KeyboardShortcut> PauseConfigEntry;
 
         public bool GameIsPaused { get; private set; }
 
@@ -335,33 +355,11 @@ namespace SAIN.Editor
                     Buttons.SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
 
                     Builder.EndHorizontal();
+                    //BotSettingsEditor.CreateEditMenu();
                 }
                 else if (TabSelected(Personalities, out tabRect, 1000f))
                 {
-                    Builder.Box("Personality Settings");
-                    Builder.Box("For The Memes. Recommended not to use these during normal gameplay!");
-                    Builder.Box("Bots will be more predictable and exploitable.");
-
-                    if (Builder.CreateButtonOption(AllGigaChads))
-                    {
-                        AllChads.Value = false;
-                        AllRats.Value = false;
-                    }
-                    if (Builder.CreateButtonOption(AllChads))
-                    {
-                        AllGigaChads.Value = false;
-                        AllRats.Value = false;
-                    }
-                    if (Builder.CreateButtonOption(AllRats))
-                    {
-                        AllGigaChads.Value = false;
-                        AllChads.Value = false;
-                    }
-
-                    Builder.HorizSlider(RandomGigaChadChance, 1);
-                    Builder.HorizSlider(RandomChadChance, 1);
-                    Builder.HorizSlider(RandomRatChance, 1);
-                    Builder.HorizSlider(RandomCowardChance, 1);
+                    BotPersonalityEditor.PersonalityMenu();
                 }
                 else if (TabSelected(Hearing, out tabRect, 1000f))
                 {

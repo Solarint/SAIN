@@ -13,7 +13,7 @@ namespace SAIN.Editor.Util
     {
         public ColorsClass(SAINEditor editor) : base(editor)
         {
-            BaseColorScheme = JsonUtility.Load.LoadColorScheme();
+            BaseColorScheme = new BaseColorSchemeClass(nameof(SAIN));
         }
 
         public Dictionary<string, ColorWrapper> ColorScheme => BaseColorScheme.ColorSchemeDictionary;

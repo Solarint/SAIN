@@ -23,7 +23,7 @@ namespace SAIN.Classes
 
         public void ManualUpdate()
         {
-            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.AimUpgradeByTimeMin;
+            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.FileSettings.AccuracySpreadMulti;
 
             if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true)
             {

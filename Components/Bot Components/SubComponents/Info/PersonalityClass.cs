@@ -3,6 +3,9 @@ using Newtonsoft.Json;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using static EFT.UI.CharacterSelectionStartScreen;
 using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
@@ -13,154 +16,72 @@ namespace SAIN.Classes
 
         public void Update()
         {
-            SetPersonality();
+            Personality = GetPersonality();
+            PersonalitySettings = PersonalityManager.Personalities[Personality];
         }
 
-        public void SetPersonality()
+        public SAINPersonality GetPersonality()
         {
-            if (CanBeGigaChad)
+            if (AllGigaChads.Value || CanBePersonality(SAINPersonality.GigaChad))
             {
-                Personality = SAINPersonality.GigaChad;
+                return SAINPersonality.GigaChad;
             }
-            else if (CanBeChad)
+            if (AllChads.Value || CanBePersonality(SAINPersonality.Chad))
             {
-                Personality = SAINPersonality.Chad;
+                return SAINPersonality.Chad;
             }
-            else if (CanBeRat)
+            if (AllRats.Value || CanBePersonality(SAINPersonality.Rat))
             {
-                Personality = SAINPersonality.Rat;
+                return SAINPersonality.Rat;
             }
-            else if (CanBeCoward)
+            if (CanBePersonality(SAINPersonality.Timmy))
             {
-                Personality = SAINPersonality.Coward;
+                return SAINPersonality.Timmy;
             }
-            else if (CanBeTimmy)
+            if (CanBePersonality(SAINPersonality.Coward))
             {
-                Personality = SAINPersonality.Timmy;
+                return SAINPersonality.Coward;
             }
-            else
-            {
-                Personality = SAINPersonality.Normal;
-            }
+            return SAINPersonality.Normal;
         }
 
-        private bool CanBeGigaChad
+        bool CanBePersonality(SAINPersonality personality)
         {
-            get
+            var Personalities = PersonalityManager.Personalities;
+            if (Personalities == null || !Personalities.ContainsKey(personality))
             {
-                if (AllGigaChads.Value)
-                {
-                    return true;
-                }
-                if (PowerLevel > 110f && IsPMC && EFTMath.RandomBool(75))
-                {
-                    return true;
-                }
-                if (EFTMath.RandomBool(RandomGigaChadChance.Value))
-                {
-                    return true;
-                }
                 return false;
             }
-        }
-
-        private bool CanBeChad
-        {
-            get
-            {
-                if (AllChads.Value)
-                {
-                    return true;
-                }
-                if (PowerLevel > 85f && IsPMC && EFTMath.RandomBool(65))
-                {
-                    return true;
-                }
-                if (EFTMath.RandomBool(RandomChadChance.Value))
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        private bool CanBeTimmy
-        {
-            get
-            {
-                if (BotOwner.Profile.Info.Level <= 10 && PowerLevel < 25f)
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        private bool CanBeRat
-        {
-            get
-            {
-                if (AllRats.Value)
-                {
-                    return true;
-                }
-                if (PowerLevel < 40 && EFTMath.RandomBool(RandomRatChance.Value))
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
-
-        private bool CanBeCoward
-        {
-            get
-            {
-                if (EFTMath.RandomBool(RandomCowardChance.Value))
-                {
-                    return true;
-                }
-                return false;
-            }
+            return Personalities[personality].CanBePersonality(BotType, PowerLevel, PlayerLevel);
         }
 
         public SAINPersonality Personality { get; private set; }
+        public PersonalitySettingsClass PersonalitySettings { get; private set; }
     }
 
     public class PersonalityManager
     {
         static PersonalityManager()
         {
-            Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
-
-            var array = (SAINPersonality[])Enum.GetValues(typeof(SAINPersonality));
-            foreach ( var item in array)
-            {
-                if (JsonUtility.Load.LoadJsonFile(out string json, item.ToString(), "Personalities"))
-                {
-                    var persClass = JsonUtility.Load.DeserializeObject<PersonalitySettingsClass>(json);
-                    Personalities.Add(item, persClass);
-                }
-            }
+            Personalities = JsonUtility.Load.LoadPersonalityClasses();
 
             InitDefaults();
 
-            foreach (var pers in Personalities)
-            {
-                JsonUtility.Save.SaveJson(pers.Value, pers.Key.ToString(), "Personalities");
-            }
+            JsonUtility.Save.SavePersonalities(Personalities);
         }
+
+        static readonly BotTypeEnum[] PMCOnly = { BotTypeEnum.PMC };
 
         static void InitDefaults()
         {
             var pers = SAINPersonality.Rat;
-            if (!Personalities.ContainsKey(pers))
+            if (!Personalities.ContainsKey(SAINPersonality.Rat))
             {
                 string name = pers.ToString();
                 string description = "Scum of Tarkov. Rarely Seeks out enemies, and will hide and ambush.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    RandomChancePowerLevel = 60,
+                    RandomChanceIfMeetRequirements = 60,
                     TrueRandomChance = 30,
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
                     SearchBaseTime = SearchBaseTime(pers),
@@ -220,9 +141,9 @@ namespace SAIN.Classes
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
                     CanJumpCorners = true,
-                    RandomChancePowerLevel = 60,
+                    RandomChanceIfMeetRequirements = 60,
                     TrueRandomChance = 3,
-                    MustBePMC = true,
+                    AllowedBotTypes = PMCOnly,
                     CanTaunt = true,
                     TauntFrequency = 8,
                     TauntMaxDistance = 50f,
@@ -243,9 +164,9 @@ namespace SAIN.Classes
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
                     CanJumpCorners = true,
-                    RandomChancePowerLevel = 60,
+                    RandomChanceIfMeetRequirements = 60,
                     TrueRandomChance = 3,
-                    MustBePMC = true,
+                    AllowedBotTypes = PMCOnly,
                     CanTaunt = true,
                     TauntFrequency = 8,
                     TauntMaxDistance = 50f,
@@ -329,13 +250,11 @@ namespace SAIN.Classes
         [JsonProperty]
         public float TrueRandomChance { get; set; } = 3;
         [JsonProperty]
-        public float RandomChancePowerLevel { get; set; } = 60;
+        public float RandomChanceIfMeetRequirements { get; set; } = 60;
         [JsonProperty]
         public float PowerLevelMin { get; set; } = 0;
         [JsonProperty]
-        public float PowerLevelMax { get; set; } = 1000;
-        [JsonProperty]
-        public bool MustBePMC { get; set; } = false;
+        public float PowerLevelMax { get; set; } = 500;
 
         [JsonProperty]
         public float HoldGroundBaseTime { get; set; } = 1f;
@@ -354,5 +273,35 @@ namespace SAIN.Classes
         public float TauntFrequency { get; set; } = 20f;
         [JsonProperty]
         public float TauntMaxDistance { get; set; } = 20f;
+        [JsonProperty]
+        public BotTypeEnum[] AllowedBotTypes { get; set; } =
+        {
+            BotTypeEnum.None,
+            BotTypeEnum.Boss,
+            BotTypeEnum.Follower,
+            BotTypeEnum.PMC,
+            BotTypeEnum.Scav,
+        };
+
+        public bool CanBePersonality(BotTypeEnum botType, float PowerLevel, int PlayerLevel)
+        {
+            if (EFTMath.RandomBool(TrueRandomChance))
+            {
+                return true;
+            }
+            if (!AllowedBotTypes.Contains(botType))
+            {
+                return false;
+            }
+            if (PowerLevel > PowerLevelMax || PowerLevel < PowerLevelMin)
+            {
+                return false;
+            }
+            if (PlayerLevel > MaxLevel)
+            {
+                return false;
+            }
+            return EFTMath.RandomBool(RandomChanceIfMeetRequirements);
+        }
     }
 }

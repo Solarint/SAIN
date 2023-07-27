@@ -7,7 +7,7 @@ namespace SAIN.Editor.Abstract
     {
         public EditorAbstract(SAINEditor editor) : base(editor) { }
 
-        public BuilderClass BuilderClass => Editor.Builder;
+        public BuilderClass Builder => Editor.Builder;
         public TexturesClass TexturesClass => Editor.TexturesClass;
         public ButtonsClass ButtonsClass => Editor.Buttons;
         public ColorsClass ColorsClass => Editor.Colors;

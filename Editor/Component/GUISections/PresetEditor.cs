@@ -30,7 +30,7 @@ namespace SAIN.Editor
             Rect12Height = windowRect.height;
 
             BeginHorizontal();
-            OpenFirstMenu = BuilderClass.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
+            OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
             if (Button("Clear", Width(150)))
             {
                 SelectedSections.Clear();
@@ -78,13 +78,13 @@ namespace SAIN.Editor
 
             EndHorizontal();
 
-            OpenPropSelect = BuilderClass.ExpandableMenu("Properties List", OpenPropSelect, "Select which properties you wish to modify.");
+            OpenPropSelect = Builder.ExpandableMenu("Properties List", OpenPropSelect, "Select which properties you wish to modify.");
             if (OpenPropSelect)
             {
                 PropSelectionMenu(4, 25, 150);
             }
 
-            OpenPropEdit = BuilderClass.ExpandableMenu("Selected Properties", OpenPropEdit, "Modify selected properties here");
+            OpenPropEdit = Builder.ExpandableMenu("Selected Properties", OpenPropEdit, "Modify selected properties here");
             if (OpenPropEdit)
             {
                 PropEditMenu();
@@ -214,10 +214,10 @@ namespace SAIN.Editor
         {
             if (SectionRects == null)
             {
-                SectionRects = BuilderClass.VerticalGridRects(window, Sections.Length, 80f);
+                SectionRects = Builder.VerticalGridRects(window, Sections.Length, 80f);
             }
 
-            BuilderClass.SelectionGridExpandWidth(window, Sections, SelectedSections, SectionRects, 80f, 5);
+            Builder.SelectionGridExpandWidth(window, Sections, SelectedSections, SectionRects, 80f, 5);
         }
 
         private void SelectType()
@@ -495,7 +495,7 @@ namespace SAIN.Editor
             if (property.PropertyType == typeof(SAINProperty<float>))
             {
                 SAINProperty<float> floatProperty = PresetManager.GetSainProp<float>(botType, property);
-                BuilderClass.HorizSlider(floatProperty, EditDifficulty);
+                Builder.HorizSlider(floatProperty, EditDifficulty);
             }
             else if (property.PropertyType == typeof(SAINProperty<bool>))
             {

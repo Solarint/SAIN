@@ -33,7 +33,7 @@ namespace SAIN.Layers
             {
                 if (SAINPlugin.BotController.GetBot(BotOwner.ProfileId, out var bot))
                 {
-                    return bot.Info.EnableExtracts;
+                    return bot.Info.FileSettings.EnableExtracts;
                 }
                 return false;
             }

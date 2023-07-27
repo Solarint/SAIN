@@ -17,7 +17,7 @@ namespace SAIN.Helpers
             }
 
             float modifier = component.Info.WeaponInfo.FinalModifier;
-            float BurstMulti = component.Info.BurstMulti;
+            float BurstMulti = component.Info.FileSettings.BurstMulti;
 
             float k = 0.08f * modifier; // How fast for the burst length to falloff with Distance
             k /= BurstMulti;

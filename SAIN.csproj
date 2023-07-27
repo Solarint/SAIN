@@ -211,8 +211,8 @@
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\BotType.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\BotTypeDefinitions.cs" />
+    <Compile Include="BotPresets\BotType.cs" />
+    <Compile Include="BotPresets\BotTypeDefinitions.cs" />
     <Compile Include="Components\Bot Components\Helpers\MathHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
     <Compile Include="Components\Bot Components\SAINDebugEnum.cs" />
@@ -221,8 +221,9 @@
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\SpottedCoverPoint.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\FrameWait.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\PresetDefaults.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\GlobalSettingsPatches.cs" />
+    <Compile Include="BotPresets\PresetDefaults.cs" />
+    <Compile Include="BotSettings\BotSettingsManager.cs" />
+    <Compile Include="BotSettings\GlobalSettingsPatches.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\PersonalityClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\BotPresetClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\SAINInfoAbstract.cs" />
@@ -246,6 +247,8 @@
     <Compile Include="Components\Bot Components\SubComponents\HeardSoundsComponent.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotSpawnController.cs" />
+    <Compile Include="Editor\Component\GUISections\BotPersonalityEditor.cs" />
+    <Compile Include="Editor\Component\GUISections\BotSettingsEditor.cs" />
     <Compile Include="Editor\Component\GUISections\WindowLayoutCreator.cs" />
     <Compile Include="Editor\Component\Names.cs" />
     <Compile Include="Editor\Component\Util\ApplyToStyle.cs" />
@@ -306,8 +309,8 @@
     <Compile Include="Editor\Component\Util\StyleOptions.cs" />
     <Compile Include="Editor\Util\ToolTips.cs" />
     <Compile Include="Plugin\Config\ConfigAbstract.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\PresetManager.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresets\BotPreset.cs" />
+    <Compile Include="BotPresets\PresetManager.cs" />
+    <Compile Include="BotPresets\BotPreset.cs" />
     <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />
     <Compile Include="Plugin\Config\TalkConfig.cs" />

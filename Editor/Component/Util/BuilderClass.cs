@@ -338,7 +338,7 @@ namespace SAIN.Editor
             return result;
         }
 
-        private float CreateSlider(float value, object min, object max, float rounding = 1f, float? height = null)
+        public float CreateSlider(float value, object min, object max, float rounding = 1f, float? height = null)
         {
             float progress = (value - (float)min) / ((float)max - (float)min);
             if (height != null)

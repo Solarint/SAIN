@@ -29,12 +29,13 @@ namespace SAIN.Patches
         {
             if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
-                if (component.Info.FasterCQBReactions)
+                var settings = component.Info.FileSettings;
+                if (settings.FasterCQBReactions)
                 {
-                    float maxDist = component.Info.FasterCQBReactionsDistance;
+                    float maxDist = settings.FasterCQBReactionsDistance;
                     if (dist <= maxDist)
                     {
-                        float min = component.Info.FasterCQBReactionsMinimum;
+                        float min = settings.FasterCQBReactionsMinimum;
                         float scale = dist / maxDist;
                         scale = Mathf.Clamp(scale, min, 1f);
                         float newResult = __result * scale;

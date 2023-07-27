@@ -43,7 +43,7 @@ namespace SAIN.Classes
                 final = Mathf.Clamp(final, 0.1f, 3f);
             }
 
-            final /= SAIN.Info.FireratMulti;
+            final /= SAIN.Info.FileSettings.FireratMulti;
 
             // Final Result which is randomized +- 15%
             float finalTime = final * Random.Range(0.85f, 1.15f);

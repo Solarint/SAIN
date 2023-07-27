@@ -15,6 +15,29 @@ namespace SAIN.Classes
             Update(fileSettings.Grenade);
             Update(fileSettings.Look);
         }
+
+        public static void Update(GClass562 settings)
+        {
+            Update(settings.Mind);
+            Update(settings.Aiming);
+            Update(settings.Shoot);
+            Update(settings.Scattering);
+            Update(settings.Move);
+            Update(settings.Grenade);
+            Update(settings.Look);
+        }
+
+        public static void Update(SAINBotSettingsClass settings)
+        {
+            Update(settings.Mind);
+            Update(settings.Aiming);
+            Update(settings.Shoot);
+            Update(settings.Scattering);
+            Update(settings.Move);
+            Update(settings.Grenade);
+            Update(settings.Look);
+        }
+
         public static void Update(BotGlobalsMindSettings settings)
         {
             settings.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 240f;

@@ -35,10 +35,10 @@ namespace SAIN.Editor
         public void ColorEditorMenu()
         {
             GUILayout.BeginVertical();
-            Red = BuilderClass.HorizSlider("Red", Red, 0f, 1f, 100f);
-            Green = BuilderClass.HorizSlider("Blue", Green, 0f, 1f, 100f);
-            Blue = BuilderClass.HorizSlider("Blue", Blue, 0f, 1f, 100f);
-            Alpha = BuilderClass.HorizSlider("Alpha", Alpha, 0f, 1f, 100f);
+            Red = Builder.HorizSlider("Red", Red, 0f, 1f, 100f);
+            Green = Builder.HorizSlider("Blue", Green, 0f, 1f, 100f);
+            Blue = Builder.HorizSlider("Blue", Blue, 0f, 1f, 100f);
+            Alpha = Builder.HorizSlider("Alpha", Alpha, 0f, 1f, 100f);
 
             if (Button("Save"))
             {

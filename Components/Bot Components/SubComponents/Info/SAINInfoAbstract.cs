@@ -15,25 +15,25 @@ namespace SAIN.Classes
             SetDiffModifier(BotType, BotDifficulty);
         }
 
-        public BotType BotType { get; private set; }
+        public BotTypeEnum BotType { get; private set; }
 
-        public bool IAmBoss => BotType == BotType.Boss;
-        public bool IsFollower => BotType == BotType.Follower;
-        public bool IsScav => BotType == BotType.Scav;
-        public bool IsPMC => BotType == BotType.PMC;
+        public bool IAmBoss => BotType == BotTypeEnum.Boss;
+        public bool IsFollower => BotType == BotTypeEnum.Follower;
+        public bool IsScav => BotType == BotTypeEnum.Scav;
+        public bool IsPMC => BotType == BotTypeEnum.PMC;
 
-        void SetDiffModifier(BotType type, BotDifficulty difficulty)
+        void SetDiffModifier(BotTypeEnum type, BotDifficulty difficulty)
         {
             float modifier;
             switch (type)
             {
-                case BotType.Boss:
+                case BotTypeEnum.Boss:
                     modifier = 0.85f; break;
-                case BotType.Follower:
+                case BotTypeEnum.Follower:
                     modifier = 0.95f; break;
-                case BotType.Scav:
+                case BotTypeEnum.Scav:
                     modifier = 1.25f; break;
-                case BotType.PMC:
+                case BotTypeEnum.PMC:
                     modifier = 0.75f; break;
                 default:
                     modifier = 1f; break;
@@ -71,6 +71,7 @@ namespace SAIN.Classes
         public WildSpawnType WildSpawnType => BotOwner.Profile.Info.Settings.Role;
         public float PowerLevel => BotOwner.AIData.PowerOfEquipment;
         public EPlayerSide Faction => BotOwner.Profile.Side;
+        public int PlayerLevel => BotOwner.Profile.Info.Level;
 
         public readonly ManualLogSource Logger;
 
@@ -107,28 +108,28 @@ namespace SAIN.Classes
         static WildSpawnType[] BossTypes;
         static WildSpawnType[] FollowerTypes;
 
-        public static BotType FindType(WildSpawnType wildSpawnType)
+        public static BotTypeEnum FindType(WildSpawnType wildSpawnType)
         {
             string wildString = wildSpawnType.ToString();
             if (CheckIsBoss(wildSpawnType))
             {
-                return BotType.Boss;
+                return BotTypeEnum.Boss;
             }
             else if (CheckIsFollower(wildSpawnType))
             {
-                return BotType.Follower;
+                return BotTypeEnum.Follower;
             }
             else if (wildSpawnType == WildSpawnType.assault || wildSpawnType == WildSpawnType.cursedAssault || wildSpawnType == WildSpawnType.marksman)
             {
-                return BotType.Scav;
+                return BotTypeEnum.Scav;
             }
             else if (wildString == "sptUsec" || wildString == "sptBear")
             {
-                return BotType.PMC;
+                return BotTypeEnum.PMC;
             }
             else
             {
-                return BotType.None;
+                return BotTypeEnum.None;
             }
         }
 
@@ -143,7 +144,7 @@ namespace SAIN.Classes
         }
     }
 
-    public enum BotType
+    public enum BotTypeEnum
     {
         None,
         Scav,

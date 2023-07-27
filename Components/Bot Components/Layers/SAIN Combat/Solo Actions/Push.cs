@@ -32,11 +32,11 @@ namespace SAIN.Layers
             if (SAIN.Enemy.InLineOfSight)
             {
                 Shoot.Update();
-                if (SAIN.Info.Personality == SAINPersonality.GigaChad)
+                if (SAIN.Info.PersonalityClass.PersonalitySettings.CanJumpCorners)
                 {
                     if (TryJumpTimer < Time.time)
                     {
-                        TryJumpTimer = Time.time + 10f;
+                        TryJumpTimer = Time.time + 5f;
                         SAIN.Mover.TryJump();
                     }
                 }
@@ -99,7 +99,7 @@ namespace SAIN.Layers
                 BotOwner.BotRun.Run(Destination, false);
             }
 
-            if (SAIN.Info.Personality == SAINPersonality.GigaChad && TryJumpTimer < Time.time)
+            if (SAIN.Info.PersonalityClass.PersonalitySettings.CanJumpCorners && TryJumpTimer < Time.time)
             {
                 var corner = SAIN.Enemy?.LastCornerToEnemy;
                 if (corner != null)

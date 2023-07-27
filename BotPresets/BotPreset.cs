@@ -33,6 +33,7 @@ namespace SAIN.BotPresets
             return result;
         }
 
+        [JsonIgnore]
         public Dictionary<BotDifficulty, PresetValues> DifficultyValues { get; set; } = new Dictionary<BotDifficulty, PresetValues>();
 
         [JsonProperty]
@@ -122,6 +123,7 @@ namespace SAIN.BotPresets
 
             RecoilMultiplier = (float)preset.RecoilMultiplier.GetValue(difficulty);
             AccuracySpreadMulti = (float)preset.AccuracySpreadMulti.GetValue(difficulty);
+            MAX_AIMING_UPGRADE_BY_TIME = (float)preset.AimUpgradeByTimeMin.GetValue(difficulty);
             MAX_AIM_TIME = (float)preset.MaxAimTime.GetValue(difficulty);
 
             FasterCQBReactions = (bool)preset.FasterCQBReactions.GetValue(difficulty);

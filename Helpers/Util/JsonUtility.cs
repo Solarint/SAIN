@@ -4,13 +4,15 @@ using EFT;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using SAIN.BotPresets;
+using SAIN.Classes;
 using SAIN.Editor;
 using SAIN.Editor.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using static HBAO_Core;
+using static Mono.Security.X509.X509Stores;
 
 namespace SAIN.Helpers
 {
@@ -32,6 +34,14 @@ namespace SAIN.Helpers
 
                 string json = JsonConvert.SerializeObject(objectToSave);
                 File.WriteAllText(filePath, json);
+            }
+
+            public static void SavePersonalities(Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities)
+            {
+                foreach (var pers in Personalities)
+                {
+                    SaveJson(pers.Value, pers.Key.ToString(), "Personalities");
+                }
             }
 
             public static void SaveJson(object objectToSave, string fileName, params string[] folders)
@@ -125,6 +135,20 @@ namespace SAIN.Helpers
 
                 return Path.Combine(GetSAINPluginPath(inputFolder), name);
             }
+
+            public static void SaveBotSettings(SAINBotSettingsClass settings, BotOwner owner)
+            {
+                var role = owner.Profile.Info.Settings.Role;
+                var diff = owner.Profile.Info.Settings.BotDifficulty;
+                SaveBotSettings(settings, diff, role);
+            }
+
+            public static void SaveBotSettings(SAINBotSettingsClass settings, BotDifficulty difficulty, WildSpawnType role)
+            {
+                string diffFolder = difficulty.ToString();
+                string filename = role.ToString();
+                SaveJson(settings, filename, SettingsFolder, diffFolder);
+            }
         }
 
         const string EditorName = "Editor";
@@ -135,6 +159,7 @@ namespace SAIN.Helpers
         const string ColorsFolder = "Colors";
         const string ColorScheme = nameof(ColorScheme);
         const string ColorNames = nameof(ColorNames);
+        const string SettingsFolder = "BotSettings";
 
         public static class Load
         {
@@ -148,6 +173,7 @@ namespace SAIN.Helpers
                 else
                 {
                     result = new BaseColorSchemeClass(nameof(SAIN));
+                    //Save.SaveJson(result, ColorScheme, UIFolder, ColorsFolder);
                 }
                 if (LoadJsonFile(out string namesJson, ColorNames, UIFolder, ColorsFolder))
                 {
@@ -179,6 +205,45 @@ namespace SAIN.Helpers
                     return File.ReadAllText(filePath);
                 }
                 return null;
+            }
+
+            public static SAINBotSettingsClass LoadBotSettings(WildSpawnType role, BotDifficulty diff)
+            {
+                SAINBotSettingsClass botSettings = null;
+                string diffFolder = diff.ToString();
+                string filename = role.ToString();
+                if (LoadJsonFile(out string json, filename, SettingsFolder, diffFolder))
+                {
+                    botSettings = DeserializeObject<SAINBotSettingsClass>(json);
+                }
+
+                return botSettings;
+            }
+
+            public static SAINBotSettingsClass LoadBotSettings(BotOwner owner)
+            {
+                var role = owner.Profile.Info.Settings.Role;
+                var diff = owner.Profile.Info.Settings.BotDifficulty;
+
+                SAINBotSettingsClass botSettings = LoadBotSettings(role, diff) ?? new SAINBotSettingsClass(owner);
+
+                return botSettings;
+            }
+
+            public static Dictionary<SAINPersonality, PersonalitySettingsClass> LoadPersonalityClasses()
+            {
+                var Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
+
+                var array = (SAINPersonality[])Enum.GetValues(typeof(SAINPersonality));
+                foreach (var item in array)
+                {
+                    if (LoadJsonFile(out string json, item.ToString(), "Personalities"))
+                    {
+                        var persClass = DeserializeObject<PersonalitySettingsClass>(json);
+                        Personalities.Add(item, persClass);
+                    }
+                }
+                return Personalities;
             }
 
             public static bool LoadJsonFile(out string json, string fileName, params string[] folders)

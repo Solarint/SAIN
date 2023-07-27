@@ -77,9 +77,9 @@ namespace SAIN.Classes
 
                     CheckForEnemyTalk();
 
-                    if (SAIN.Info.BotTaunts && TauntTimer < Time.time)
+                    if (SAIN.Info.FileSettings.BotTaunts && SAIN.Info.PersonalityClass.PersonalitySettings.CanTaunt && TauntTimer < Time.time)
                     {
-                        TauntTimer = Time.time + TauntFreq * Random.Range(0.5f, 1.5f);
+                        TauntTimer = Time.time + SAIN.Info.PersonalityClass.PersonalitySettings.TauntFrequency * Random.Range(0.5f, 1.5f);
 
                         TauntEnemy();
                     }
@@ -182,7 +182,7 @@ namespace SAIN.Classes
 
             float distanceToEnemy = Vector3.Distance(sainEnemy.CurrPosition, BotPos);
 
-            if (distanceToEnemy < TauntDist)
+            if (distanceToEnemy < SAIN.Info.PersonalityClass.PersonalitySettings.TauntMaxDistance)
             {
                 if (sainEnemy.CanShoot && sainEnemy.IsVisible)
                 {

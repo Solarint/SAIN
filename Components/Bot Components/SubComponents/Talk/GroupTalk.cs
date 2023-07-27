@@ -111,7 +111,7 @@ namespace SAIN.Classes
                 return;
             }
 
-            if (!SAIN.Info.SquadTalk)
+            if (!SAIN.Info.FileSettings.SquadTalk)
             {
                 return;
             }
@@ -191,13 +191,13 @@ namespace SAIN.Classes
             {
                 if (BotSquad.IAmLeader && LeaderTimer < Time.time)
                 {
-                    LeaderTimer = Time.time + LeaderFreq * Randomized * SAIN.Info.SquadLeadTalkFreq;
+                    LeaderTimer = Time.time + LeaderFreq * Randomized * SAIN.Info.FileSettings.SquadLeadTalkFreq;
 
                     if (!CheckIfLeaderShouldCommand())
                     {
                         if (CheckFriendliesTimer < Time.time && CheckFriendlyLocation(out var trigger))
                         {
-                            CheckFriendliesTimer = Time.time + 10f * SAIN.Info.SquadLeadTalkFreq;
+                            CheckFriendliesTimer = Time.time + 10f * SAIN.Info.FileSettings.SquadLeadTalkFreq;
 
                             SAIN.Talk.Say(trigger);
                             AllMembersSay(EPhraseTrigger.Roger, ETagStatus.Aware, Random.Range(0.5f, 1.5f), 40f);
@@ -214,7 +214,7 @@ namespace SAIN.Classes
             if (HurtTalkTimer < Time.time)
             {
                 var trigger = EPhraseTrigger.PhraseNone;
-                HurtTalkTimer = Time.time + 15f * Random.Range(0.66f, 1.33f) * SAIN.Info.SquadMemberTalkFreq;
+                HurtTalkTimer = Time.time + 15f * Random.Range(0.66f, 1.33f) * SAIN.Info.FileSettings.SquadMemberTalkFreq;
 
                 if (SAIN.HasEnemy && SAIN.Enemy.PathDistance < 10f)
                 {
@@ -333,7 +333,7 @@ namespace SAIN.Classes
         {
             if (CommandSayTimer < Time.time)
             {
-                CommandSayTimer = Time.time + 5f * SAIN.Info.SquadLeadTalkFreq;
+                CommandSayTimer = Time.time + 5f * SAIN.Info.FileSettings.SquadLeadTalkFreq;
                 var commandTrigger = EPhraseTrigger.PhraseNone;
                 var trigger = EPhraseTrigger.PhraseNone;
                 var gesture = EGesture.None;
