@@ -17,7 +17,7 @@ namespace SAIN.Classes
         }
 
         public SAINEnemy Enemy { get; private set; }
-        public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.BotPlayer != null;
+        public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.BotPlayer != null && (!Enemy.Person.IsAI || Enemy.Person.AIData.BotOwner.BotState == EBotState.Active);
 
         private SAINComponent SAIN;
 
