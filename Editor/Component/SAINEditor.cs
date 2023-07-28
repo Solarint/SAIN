@@ -12,13 +12,8 @@ using SAIN.Editor.Util;
 using ColorsClass = SAIN.Editor.Util.ColorsClass;
 using static SAIN.Editor.Names.StyleNames;
 using EFT;
-using UnityEngine.EventSystems;
 using System.Reflection;
 using BepInEx;
-using EFT.Visual;
-using SAIN.Editor.Abstract;
-using SAIN.Classes;
-using System.Collections.Generic;
 
 namespace SAIN.Editor
 {

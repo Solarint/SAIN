@@ -15,7 +15,7 @@ namespace SAIN.Editor.GUISections
     {
         public BotSettingsEditor(SAINEditor editor) : base(editor)
         {
-            BotSettingsDictionary = BotSettingsManager.BotSettingsDictionary;
+            //BotSettingsDictionary = BotSettingsManager.BotSettingsDictionary;
             GetSettingsLists();
         }
 
@@ -45,8 +45,6 @@ namespace SAIN.Editor.GUISections
 
             ScrollViewEditMenu = BeginScrollView(ScrollViewEditMenu);
             BeginVertical();
-
-            
 
             foreach (var settingsCategory in BotSettings)
             {

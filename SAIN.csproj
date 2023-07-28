@@ -297,7 +297,6 @@
     <Compile Include="Components\Bot Components\SubComponents\Sense\HearingSensorClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Sense\LastHeardSoundClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\CombatFunctions\SearchClass.cs" />
-    <Compile Include="Components\Bot Components\Old\NavigationPointClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Decision\Classes\SquadDecisionClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
