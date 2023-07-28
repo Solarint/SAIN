@@ -1,6 +1,7 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
+using SAIN.BotPresets;
 using SAIN.Components;
 using UnityEngine;
 using static SAIN.Editor.EditorSettings;
@@ -14,22 +15,15 @@ namespace SAIN.Classes
         public EnemyTalk(BotOwner bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            PlayerTalk = Singleton<GameWorld>.Instance.MainPlayer.GetComponent<PlayerTalkComponent>();
         }
 
         private void Init()
         {
-            var type = SAIN.Info.Personality;
-            if (type == SAINPersonality.Chad || type == SAINPersonality.GigaChad)
-            {
-                TauntDist = 50f;
-                TauntFreq = 8f;
-            }
-            else
-            {
-                TauntDist = 20f;
-                TauntFreq = 20f;
-            }
+            var settings = PersonalitySettings;
+            TauntDist = settings.TauntMaxDistance;
+            TauntFreq = settings.TauntFrequency;
+            CanTaunt = settings.CanTaunt && FileSettings.BotTaunts;
+            CanRespond = settings.CanRespondToVoice;
 
             TauntDist *= Random.Range(0.66f, 1.33f);
             TauntFreq *= Random.Range(0.66f, 1.33f);
@@ -37,17 +31,25 @@ namespace SAIN.Classes
             ResponseDist = TauntDist * Random.Range(0.66f, 1.33f);
         }
 
-        private readonly PlayerTalkComponent PlayerTalk;
         private float ResponseDist;
+        private bool CanTaunt;
+        private bool CanRespond;
 
         private const float EnemyCheckFreq = 0.25f;
         private float TauntDist = 0f;
         private float TauntFreq = 0f;
 
+        PersonalitySettingsClass PersonalitySettings => SAIN?.Info?.PersonalityClass?.PersonalitySettings;
+        PresetValues FileSettings => SAIN?.Info?.FileSettings;
+
         public void Update()
         {
             if (SAIN == null) return;
 
+            if (PersonalitySettings == null || FileSettings == null)
+            {
+                return;
+            }
             if (TauntFreq == 0f)
             {
                 Init();
@@ -60,31 +62,20 @@ namespace SAIN.Classes
                     return;
                 }
 
-                var pers = SAIN.Info.Personality;
-                if (pers == SAINPersonality.Coward || pers == SAINPersonality.Timmy || pers == SAINPersonality.Rat)
-                {
-                    return;
-                }
-
                 if (FakeDeath())
                 {
                     return;
                 }
 
-                if (LastEnemyCheckTime < Time.time)
+                if (CanRespond && LastEnemyCheckTime < Time.time)
                 {
                     LastEnemyCheckTime = Time.time + EnemyCheckFreq;
-
-                    CheckForEnemyTalk();
-
-                    if (SAIN.Info.FileSettings.BotTaunts && SAIN.Info.PersonalityClass.PersonalitySettings.CanTaunt && TauntTimer < Time.time)
-                    {
-                        TauntTimer = Time.time + SAIN.Info.PersonalityClass.PersonalitySettings.TauntFrequency * Random.Range(0.5f, 1.5f);
-
-                        TauntEnemy();
-                    }
-
                     StartResponse();
+                }
+                if (CanTaunt && TauntTimer < Time.time)
+                {
+                    TauntTimer = Time.time + TauntFreq * Random.Range(0.5f, 1.5f);
+                    TauntEnemy();
                 }
             }
         }
@@ -135,33 +126,12 @@ namespace SAIN.Classes
                     var health = SAIN.HealthStatus;
                     if (health != ETagStatus.Healthy)
                     {
-                        float dist = (SAIN.Enemy.Person.Position - BotOwner.Position).magnitude;
+                        float dist = (SAIN.Enemy.CurrPosition - BotOwner.Position).magnitude;
                         if (dist < 30f)
                         {
                             if (random)
                             {
-                                EPhraseTrigger trigger;
-
-                                float randomValue = Random.Range(0f, 1f);
-
-                                if (randomValue <= 0.25f)
-                                {
-                                    trigger = EPhraseTrigger.Stop;
-                                }
-                                else if (randomValue <= 0.5f)
-                                {
-                                    trigger = EPhraseTrigger.OnBeingHurtDissapoinment;
-                                }
-                                else if (randomValue <= 0.75f)
-                                {
-                                    trigger = EPhraseTrigger.NeedHelp;
-                                }
-                                else
-                                {
-                                    trigger = EPhraseTrigger.HoldFire;
-                                }
-
-                                Talk.Say(trigger);
+                                Talk.Say(BegPhrases.PickRandom());
                                 return true;
                             }
                         }
@@ -172,6 +142,7 @@ namespace SAIN.Classes
         }
 
         private float BegTimer = 0f;
+        readonly EPhraseTrigger[] BegPhrases = { EPhraseTrigger.Stop, EPhraseTrigger.OnBeingHurtDissapoinment, EPhraseTrigger.NeedHelp, EPhraseTrigger.HoldFire };
 
         private bool TauntEnemy()
         {
@@ -180,20 +151,13 @@ namespace SAIN.Classes
             var sainEnemy = SAIN.Enemy;
             var type = SAIN.Info.Personality;
 
-            float distanceToEnemy = Vector3.Distance(sainEnemy.CurrPosition, BotPos);
+            float distanceToEnemy = Vector3.Distance(sainEnemy.CurrPosition, BotOwner.Position);
 
-            if (distanceToEnemy < SAIN.Info.PersonalityClass.PersonalitySettings.TauntMaxDistance)
+            if (distanceToEnemy <= TauntDist)
             {
                 if (sainEnemy.CanShoot && sainEnemy.IsVisible)
                 {
-                    if (sainEnemy.EnemyLookingAtMe)
-                    {
-                        tauntEnemy = true;
-                    }
-                    if (type == SAINPersonality.Chad)
-                    {
-                        tauntEnemy = true;
-                    }
+                    tauntEnemy = sainEnemy.EnemyLookingAtMe || type == SAINPersonality.Chad;
                 }
                 if (type == SAINPersonality.GigaChad)
                 {
@@ -221,22 +185,6 @@ namespace SAIN.Classes
             return tauntEnemy;
         }
 
-        private void CheckForEnemyTalk()
-        {
-            var enemy = SAIN.Enemy;
-            if (AddReponseToQueue() == false)
-            {
-                var player = enemy.Person.GetPlayer;
-                if (player.IsYourPlayer && Vector3.Distance(player.Transform.position, BotPos) < ResponseDist)
-                {
-                    if (PlayerTalk.PlayerTalked)
-                    {
-                        SetEnemyTalk(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
-                    }
-                }
-            }
-        }
-
         private void StartResponse()
         {
             if (LastEnemyTalk != null)
@@ -244,66 +192,22 @@ namespace SAIN.Classes
                 float delay = LastEnemyTalk.TalkDelay;
                 if (LastEnemyTalk.TalkTime + delay < Time.time)
                 {
-                    Talk.Say(LastEnemyTalk.Trigger, LastEnemyTalk.Status, true);
+                    Talk.Say(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
                     LastEnemyTalk = null;
                 }
             }
         }
 
-        private bool AddReponseToQueue()
-        {
-            // Get each of the bot enemy Talk Components
-            var players = Singleton<GameWorld>.Instance.RegisteredPlayers;
-            foreach (var player in players)
-            {
-                // Check the component and if the bot recently tauntEnemy
-                if (player != null && player.HealthController.IsAlive)
-                {
-                    if (player.IsAI && player.AIData.BotOwner.BotState != EBotState.Active)
-                    {
-                        continue;
-                    }
-
-                    // Check the Distance between the bots to see if they can hear them
-                    if (Vector3.Distance(player.Position, BotOwner.Position) < ResponseDist)
-                    {
-                        if (BotOwner.BotsGroup.Enemies.ContainsKey(player))
-                        {
-                            bool enemyTalked;
-                            if (player.IsAI)
-                            {
-                                var recentTalk = player.AIData.BotOwner.GetComponent<SAINComponent>()?.Talk.RecentTalk;
-                                enemyTalked = recentTalk != null && recentTalk.Mask != ETagStatus.Unaware;
-                            }
-                            else
-                            {
-                                var component = player.GetComponent<PlayerTalkComponent>();
-                                enemyTalked = component?.PlayerTalked == true && component?.TagStatus != ETagStatus.Unaware;
-                            }
-
-                            if (enemyTalked)
-                            {
-                                SetEnemyTalk(EPhraseTrigger.OnFight, ETagStatus.Combat, true);
-
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private void SetEnemyTalk(EPhraseTrigger trigger, ETagStatus status, bool withGroupDelay)
+        public void SetEnemyTalk(Player player)
         {
             if (LastEnemyTalk == null)
             {
-                LastEnemyTalk = new EnemyTalkObject(trigger, status, withGroupDelay);
+                if (Vector3.Distance(player.Position, BotOwner.Position) < ResponseDist)
+                {
+                    LastEnemyTalk = new EnemyTalkObject();
+                }
             }
         }
-
-        private Vector3 BotPos => BotOwner.Transform.position;
 
         private float LastEnemyCheckTime = 0f;
         private EnemyTalkObject LastEnemyTalk;

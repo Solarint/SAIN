@@ -1,10 +1,6 @@
 ﻿using EFT;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.Profiling;
 
 namespace SAIN.Components.BotController
 {
@@ -46,8 +42,13 @@ namespace SAIN.Components.BotController
         {
             try
             {
-                if (bot != null)
+                if (bot != null && bot.GetPlayer != null)
                 {
+                    var role = bot.Profile.Info.Settings.Role;
+                    if (role == WildSpawnType.bossZryachiy || role == WildSpawnType.followerZryachiy)
+                    {
+                        return;
+                    }
                     string profileId = bot.ProfileId;
                     if (!SAINBotDictionary.ContainsKey(profileId))
                     {

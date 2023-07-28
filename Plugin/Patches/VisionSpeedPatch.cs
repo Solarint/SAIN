@@ -31,7 +31,6 @@ namespace SAIN.Patches
 
     public class VisibleDistancePatch : ModulePatch
     {
-        private static float DebugTimer = 0f;
         private static PropertyInfo _LookSensor;
         private static PropertyInfo _clearVisibleDistProperty;
         private static PropertyInfo _visibleDistProperty;
@@ -40,21 +39,22 @@ namespace SAIN.Patches
         protected override MethodBase GetTargetMethod()
         {
             _LookSensor = AccessTools.Property(typeof(BotOwner), "LookSensor");
-            Type lookSensorType = _LookSensor.PropertyType;
+            Type lookType = _LookSensor.PropertyType;
 
-            _clearVisibleDistProperty = lookSensorType.GetProperty("ClearVisibleDist");
-            _visibleDistProperty = lookSensorType.GetProperty("VisibleDist");
-            _HourServerProperty = lookSensorType.GetProperty("HourServer");
+            _clearVisibleDistProperty = lookType.GetProperty("ClearVisibleDist");
+            _visibleDistProperty = lookType.GetProperty("VisibleDist");
+            _HourServerProperty = lookType.GetProperty("HourServer");
 
-            return AccessTools.Method(lookSensorType, "method_2");
+            return AccessTools.Method(lookType, "method_2");
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_3, object __instance)
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_3)
         {
             if (___float_3 < Time.time)
             {
                 float timeMod = 1f;
+                float weatherMod = 1f;
 
                 // Checks to make sure a date and time is present
                 if (___botOwner_0.GameDateTime != null)
@@ -62,60 +62,29 @@ namespace SAIN.Patches
                     DateTime dateTime = SAINPlugin.BotController.GameDateTime;
                     timeMod = SAINPlugin.BotController.TimeOfDayVisibility;
                     // Set the value of the "HourServer" property to the hour from the DateTime object
-                    _HourServerProperty.SetValue(__instance, (int)((short)dateTime.Hour));
+                    _HourServerProperty.SetValue(___botOwner_0.LookSensor, (int)((short)dateTime.Hour));
                 }
-
-                float weatherMod = SAINPlugin.BotController.WeatherVisibility;
-
-                float visdistcoef = ___botOwner_0.Settings.Current._visibleDistCoef;
-                float defaultvision = ___botOwner_0.Settings.Current.CurrentVisibleDistance;
-
-                float MaxVision;
-                float currentVisionDistance;
-                // User ToggleOnOff for if Global Fog is disabled
-                if (VisionConfig.OverrideVisionDist.Value)
+                if (SAINPlugin.BotController != null)
                 {
-                    // Uses default settings with a max vision cap for safety if a bot is flashed.
-                    if (___botOwner_0.FlashGrenade.IsFlashed)
-                    {
-                        currentVisionDistance = defaultvision;
-                        MaxVision = 30f;
-                    }
-                    // Unlocked Vision Distance.
-                    else
-                    {
-                        currentVisionDistance = VisionConfig.AbsoluteMaxVisionDistance.Value * visdistcoef;
-                        MaxVision = VisionConfig.AbsoluteMaxVisionDistance.Value;
-                    }
-                }
-                // If global fog toggle is off, use default settings. And Take SQRT of weather mod to reduce its intensity. Clamp at 0.5 as well.
-                else
-                {
-                    currentVisionDistance = defaultvision;
-                    MaxVision = defaultvision;
-                    weatherMod = Mathf.Sqrt(weatherMod);
+                    weatherMod = SAINPlugin.BotController.WeatherVisibility;
                     weatherMod = Mathf.Clamp(weatherMod, 0.5f, 1f);
                 }
 
+                float currentVisionDistance = ___botOwner_0.Settings.Current.CurrentVisibleDistance;
+
                 // Sets a minimum cap based on weather conditions to avoid bots having too low of a vision Distance while at peace in bad weather
-                float currentVisionDistanceCapped = Mathf.Clamp(currentVisionDistance * weatherMod, 80f, MaxVision);
+                float currentVisionDistanceCapped = Mathf.Clamp(currentVisionDistance * weatherMod, 80f, currentVisionDistance);
 
                 // Applies SeenTime Modifier to the final vision Distance results
                 float finalVisionDistance = currentVisionDistanceCapped * timeMod;
 
-                _clearVisibleDistProperty.SetValue(__instance, finalVisionDistance);
-                _visibleDistProperty.SetValue(__instance, ___botOwner_0.NightVision.UpdateVision(finalVisionDistance));
-                _visibleDistProperty.SetValue(__instance, ___botOwner_0.BotLight.UpdateLightEnable(finalVisionDistance));
+                _clearVisibleDistProperty.SetValue(___botOwner_0.LookSensor, finalVisionDistance);
 
-                // Log Everything!
-                if (VisionConfig.DebugWeather.Value && DebugTimer < Time.time)
-                {
-                    DebugTimer = Time.time + 5f;
-                    System.Console.WriteLine($"SAIN Weather: VisibleDist: [{finalVisionDistance}]");
-                }
+                finalVisionDistance = ___botOwner_0.NightVision.UpdateVision(finalVisionDistance);
+                finalVisionDistance = ___botOwner_0.BotLight.UpdateLightEnable(finalVisionDistance);
+                _visibleDistProperty.SetValue(___botOwner_0.LookSensor, finalVisionDistance);
 
-                // Original Logic. Update Frequency - once a minute
-                ___float_3 = Time.time + (float)(___botOwner_0.FlashGrenade.IsFlashed ? 3 : 10);
+                ___float_3 = Time.time + (___botOwner_0.FlashGrenade.IsFlashed ? 3 : 20);
             }
             return false;
         }

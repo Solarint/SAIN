@@ -25,8 +25,7 @@ namespace SAIN.Patches
 
             if (__instance.IsYourPlayer)
             {
-                var component = __instance.GetComponent<PlayerTalkComponent>();
-                component?.TalkEvent(@event, mask, aggressive);
+                SAINPlugin.BotController?.PlayerTalk(@event, mask, __instance);
                 return true;
             }
             else
@@ -35,8 +34,15 @@ namespace SAIN.Patches
                 {
                     return false;
                 }
-                return PatchHelpers.CheckTalkEvent(__instance, @event, mask);
+                if (PatchHelpers.CheckTalkEvent(__instance, @event))
+                {
+                    SAINPlugin.BotController?.PlayerTalk(@event, mask, __instance);
+                    return true;
+                }
+
+                return false;
             }
+
         }
     }
 
@@ -58,9 +64,7 @@ namespace SAIN.Patches
                 return false;
             }
 
-            PatchHelpers.AllowDefaultBotTalk(___botOwner_0, type, additionalMask);
-
-            return false;
+            return PatchHelpers.AllowDefaultBotTalk(___botOwner_0, type, additionalMask);
         }
     }
 
@@ -122,28 +126,22 @@ namespace SAIN.Patches
             return botOwner?.BotsGroup?.MembersCount > 1;
         }
 
-        public static bool CheckTalkEvent(Player player, EPhraseTrigger trigger, ETagStatus mask)
+        public static bool CheckTalkEvent(Player player, EPhraseTrigger trigger)
         {
-            if (player.IsAI)
-            {
-                if (BotInGroup(player.AIData.BotOwner) || GoodSoloTriggers.Contains(trigger))
-                {
-                    var component = player.AIData.BotOwner.GetComponent<SAINComponent>();
-                    component?.Talk.TalkEvent(trigger, mask);
-                    return true;
-                }
-            }
-
-            return false;
+            return player.IsAI && (BotInGroup(player.AIData.BotOwner) || GoodSoloTriggers.Contains(trigger));
         }
 
         public static bool AllowDefaultBotTalk(BotOwner botOwner, EPhraseTrigger trigger, ETagStatus? mask)
         {
+            var component = botOwner.GetComponent<SAINComponent>();
+            if (component == null)
+            {
+                return true;
+            }
             if (BotInGroup(botOwner))
             {
                 if (GoodGroupTriggers.Contains(trigger))
                 {
-                    var component = botOwner.GetComponent<SAINComponent>();
                     component?.Talk.Say(trigger, mask);
                 }
             }
@@ -151,7 +149,6 @@ namespace SAIN.Patches
             {
                 if (GoodSoloTriggers.Contains(trigger))
                 {
-                    var component = botOwner.GetComponent<SAINComponent>();
                     component?.Talk.Say(trigger, mask);
                 }
             }

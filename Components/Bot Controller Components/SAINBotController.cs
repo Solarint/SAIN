@@ -15,6 +15,7 @@ namespace SAIN.Components
     public class SAINBotController : MonoBehaviour
     {
         public Action<SAINSoundType, Player, float> AISoundPlayed { get; private set; }
+        public Action<EPhraseTrigger, ETagStatus, Player> PlayerTalk { get; private set; }
 
         public Dictionary<string, SAINComponent> Bots => BotSpawnController.Bots;
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
@@ -54,6 +55,7 @@ namespace SAIN.Components
             Singleton<GClass629>.Instance.OnGrenadeThrow += GrenadeThrown;
             Singleton<GClass629>.Instance.OnGrenadeExplosive += GrenadeExplosion;
             AISoundPlayed += SoundPlayed;
+            PlayerTalk += PlayerTalked;
         }
 
         private void Update()
@@ -78,6 +80,25 @@ namespace SAIN.Components
             //PathManager.Update();
             //AddNavObstacles();
             //UpdateObstacles();
+        }
+
+        void PlayerTalked(EPhraseTrigger phrase, ETagStatus mask, Player player)
+        {
+            if (player == null || Bots == null)
+            {
+                return;
+            }
+            foreach (var bot in Bots)
+            {
+                SAINComponent sain = bot.Value;
+                if (sain != null && sain.BotOwner != null && bot.Key != player.ProfileId)
+                {
+                    if (phrase == EPhraseTrigger.OnFight && sain.BotOwner.EnemiesController.IsEnemy(player))
+                    {
+                        sain.Talk.EnemyTalk.SetEnemyTalk(player);
+                    }
+                }
+            }
         }
 
         public void BotDeath(BotOwner bot)
@@ -303,6 +324,7 @@ namespace SAIN.Components
                 GameWorld.OnDispose -= Dispose;
 
                 AISoundPlayed -= SoundPlayed;
+                PlayerTalk -= PlayerTalked;
                 Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
                 Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
 

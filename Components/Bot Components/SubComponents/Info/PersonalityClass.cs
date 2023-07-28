@@ -129,6 +129,7 @@ namespace SAIN.Classes
                 {
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
                     SearchBaseTime = SearchBaseTime(pers),
+                    CanRespondToVoice = true,
                 };
                 Personalities.Add(pers, settings);
             }
@@ -145,6 +146,7 @@ namespace SAIN.Classes
                     TrueRandomChance = 3,
                     AllowedBotTypes = PMCOnly,
                     CanTaunt = true,
+                    CanRespondToVoice = true,
                     TauntFrequency = 8,
                     TauntMaxDistance = 50f,
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
@@ -168,6 +170,7 @@ namespace SAIN.Classes
                     TrueRandomChance = 3,
                     AllowedBotTypes = PMCOnly,
                     CanTaunt = true,
+                    CanRespondToVoice = true,
                     TauntFrequency = 8,
                     TauntMaxDistance = 50f,
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
@@ -269,6 +272,8 @@ namespace SAIN.Classes
         public bool CanJumpCorners { get; set; } = false;
         [JsonProperty]
         public bool CanTaunt { get; set; } = false;
+        [JsonProperty]
+        public bool CanRespondToVoice { get; set; } = false;
         [JsonProperty]
         public float TauntFrequency { get; set; } = 20f;
         [JsonProperty]
