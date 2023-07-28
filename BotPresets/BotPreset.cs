@@ -4,16 +4,29 @@ using System.Collections.Generic;
 
 namespace SAIN.BotPresets
 {
+    public class SAINPresetInfo
+    {
+        public string Name;
+        public string Description;
+        public string SAINVersion;
+
+        [JsonIgnore]
+        public List<BotPreset> Presets;
+    }
     public class BotPreset
     {
         [JsonConstructor]
         public BotPreset() { }
 
-        public BotPreset(WildSpawnType wildSpawnType)
+        public BotPreset(WildSpawnType wildSpawnType, string displayName)
         {
             WildSpawnType = wildSpawnType;
             PresetDefaults.Init(this);
+            DisplayName = displayName;
         }
+
+        [JsonProperty]
+        public string DisplayName;
 
         public PresetValues GetValues(BotDifficulty difficulty)
         {

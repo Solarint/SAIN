@@ -13,7 +13,7 @@ namespace SAIN.BotPresets
             Section = section;
             WildSpawnType = type;
 
-            Preset = PresetHandler(WildSpawnType);
+            Preset = PresetHandler();
         }
 
         public BotType(string originalName, string name, string section, string description)
@@ -24,15 +24,15 @@ namespace SAIN.BotPresets
             Section = section;
             WildSpawnType = PresetManager.GetType(originalName);
 
-            Preset = PresetHandler(WildSpawnType);
+            Preset = PresetHandler();
         }
 
-        private static BotPreset PresetHandler(WildSpawnType wildType)
+        public BotPreset PresetHandler()
         {
-            BotPreset Preset = JsonUtility.Load.BotPreset(wildType);
+            BotPreset Preset = JsonUtility.Load.BotPreset(Name);
             if (Preset == null)
             {
-                Preset = new BotPreset(wildType);
+                Preset = new BotPreset(WildSpawnType, Name);
                 JsonUtility.Save.SavePreset(Preset);
             }
             return Preset;

@@ -30,6 +30,20 @@ namespace SAIN.BotPresets
             }
         }
 
+        public static void UpdatePresets()
+        {
+            foreach (var type in BotTypes)
+            {
+                type.PresetHandler();
+            }
+            TypePresets.Clear();
+            for (int i = 0; i < BotTypes.Length; i++)
+            {
+                BotType type = BotTypes[i];
+                TypePresets.Add(type.WildSpawnType, type);
+            }
+        }
+
         public static Action<WildSpawnType, BotPreset> PresetUpdated { get; set; }
         public static BotType[] BotTypes;
         public static readonly List<PropertyInfo> Properties;

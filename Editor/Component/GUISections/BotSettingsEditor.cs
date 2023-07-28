@@ -38,6 +38,12 @@ namespace SAIN.Editor.GUISections
         }
 
         readonly Dictionary<string, bool> SubMenus = new Dictionary<string, bool>();
+        readonly string[] Presets;
+
+        void LoadPresets()
+        {
+            
+        }
 
         public void CreateEditMenu()
         {

@@ -11,7 +11,14 @@ using UnityEngine;
 
 namespace SAIN
 {
-    [BepInPlugin("me.sol.sain", "SAIN Beta", "3.5")]
+    public static class PluginInfo
+    {
+        public const string GUID = "me.sol.sain";
+        public const string Name = "SAIN Beta";
+        public const string Version = "3.5";
+    }
+
+    [BepInPlugin(PluginInfo.GUID, PluginInfo.Name, PluginInfo.Version)]
     [BepInDependency("xyz.drakia.bigbrain", "0.1.4")]
     [BepInDependency("xyz.drakia.waypoints", "1.1.2")]
     [BepInDependency("com.spt-aki.core", "3.5.8")]

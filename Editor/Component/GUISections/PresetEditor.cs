@@ -1,16 +1,35 @@
 ﻿using SAIN.BotPresets;
 using SAIN.Editor.Abstract;
+using SAIN.Helpers;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Editor.Names;
 
 namespace SAIN.Editor
 {
+    public class PresetEditorDefaults
+    {
+        public string SelectedPreset;
+        public string DefaultPreset;
+    }
+
     public class PresetEditor : EditorAbstract
     {
+        public PresetEditorDefaults PresetEditorSettings { get; private set; }
+
         public PresetEditor(SAINEditor editor) : base(editor)
         {
+            string DefaultPreset = nameof(SAIN) + "_" + PluginInfo.Version + "_hard";
+            var settings = JsonUtility.Load.LoadPresetSettings(DefaultPreset);
+
+            JsonUtility.Save.SelectedPresetName = settings.SelectedPreset;
+            SelectedPresetInfo = LoadPreset(settings.SelectedPreset);
+            PresetEditorSettings = settings;
+
+            PresetManager.UpdatePresets();
+
             List<string> sections = new List<string>();
             WildSpawnTypes = PresetManager.BotTypes;
             foreach (var type in WildSpawnTypes)
@@ -24,28 +43,91 @@ namespace SAIN.Editor
             Sections = sections.ToArray();
         }
 
+        public static string GetLastFolderName(string filePath)
+        {
+            string directoryName = Path.GetDirectoryName(filePath);
+            string[] folders = directoryName.Split(Path.DirectorySeparatorChar);
+            return folders[folders.Length - 1];
+        }
+
+        private List<SAINPresetInfo> PresetInfoOptions = new List<SAINPresetInfo>();
+        private float RecheckOptionsTimer;
+        private SAINPresetInfo SelectedPresetInfo;
+
+        private SAINPresetInfo LoadPreset(string name)
+        {
+            return JsonUtility.Load.LoadPreset(name);
+        }
+
+        void LoadPresetOptions(bool refresh = false)
+        {
+            if (RecheckOptionsTimer < Time.time || refresh)
+            {
+                RecheckOptionsTimer = Time.time + 10f;
+                PresetInfoOptions = JsonUtility.Load.GetPresetOptions(PresetInfoOptions);
+            }
+        }
+
         public void OpenPresetWindow(Rect windowRect)
         {
             PresetWindow = windowRect;
             Rect12Height = windowRect.height;
 
+            BeginVertical();
+
             BeginHorizontal();
-            OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
-            if (Button("Clear", Width(150)))
+            const float LabelHeight = 25f;
+            Box("Installed Presets", Height(LabelHeight));
+            Box("Select an installed preset for SAIN Settings", Height(LabelHeight));
+            bool refresh = Button("Refresh", "Refresh installed Presets", Height(LabelHeight));
+            LoadPresetOptions(refresh);
+            EndHorizontal();
+
+            BeginHorizontal();
+            const float InstalledHeight = 30;
+            float endHeight = InstalledHeight + LabelHeight;
+
+            int presetSpacing = 0;
+            SAINPresetInfo selectedPreset = SelectedPresetInfo;
+            for (int i = 0; i < PresetInfoOptions.Count; i++)
             {
-                SelectedSections.Clear();
-                SelectedWildSpawnTypes.Clear();
+                var preset = PresetInfoOptions[i];
+                bool selected = selectedPreset.Name == preset.Name;
+                if (Toggle(selected, preset.Name, preset.Description, Height(InstalledHeight)))
+                {
+                    selectedPreset = preset;
+                }
+                if (presetSpacing >= 6)
+                {
+                    endHeight += InstalledHeight;
+                    presetSpacing = 0;
+                    EndHorizontal();
+                    BeginHorizontal();
+                }
+                presetSpacing++;
             }
             EndHorizontal();
 
+            EndVertical();
+
+            if (selectedPreset != SelectedPresetInfo)
+            {
+                SelectedPresetInfo = selectedPreset;
+                JsonUtility.Save.SelectedPresetName = selectedPreset.Name;
+                PresetManager.UpdatePresets();
+                Reset();
+            }
+
+            OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
             if (OpenFirstMenu)
             {
-                SectionRectangle = new Rect(0, 0, SectionRectWidth, FinalWindowHeight);
+                float startHeight = endHeight + 25;
+                SectionRectangle = new Rect(0, startHeight, SectionRectWidth, FinalWindowHeight);
                 BeginArea(SectionRectangle);
                 SelectSection(SectionRectangle);
                 EndArea();
 
-                TypeRectangle = new Rect(TypeRectX, 0, TypeRectWidth, FinalWindowHeight);
+                TypeRectangle = new Rect(TypeRectX, startHeight, TypeRectWidth, FinalWindowHeight);
 
                 BeginArea(TypeRectangle);
 
@@ -55,7 +137,13 @@ namespace SAIN.Editor
 
                 EndArea();
 
-                Space(SectionRectangle.height + SectionRectangle.y);
+                Space(SectionRectangle.height);
+
+                if (Button("Clear", Width(150)))
+                {
+                    SelectedSections.Clear();
+                    SelectedWildSpawnTypes.Clear();
+                }
             }
 
             BeginHorizontal();
@@ -91,7 +179,7 @@ namespace SAIN.Editor
             }
         }
 
-        private bool OpenFirstMenu = true;
+        private bool OpenFirstMenu = false;
         private bool OpenPropEdit = false;
         private Rect PresetWindow;
 
@@ -441,7 +529,7 @@ namespace SAIN.Editor
             return result;
         }
 
-        BotDifficulty EditDifficulty => SelectedDifficulties[SelectedDifficulties.Count - 1];
+        private BotDifficulty EditDifficulty => SelectedDifficulties[SelectedDifficulties.Count - 1];
 
         private void SaveValues(BotType editingType)
         {
