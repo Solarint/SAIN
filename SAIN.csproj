@@ -375,7 +375,6 @@
     <Compile Include="Plugin\SAINPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Components\SAINBotAbstractClass.cs" />
-    <Compile Include="Components\Player Components\PlayerTalkComponent.cs" />
     <Compile Include="Plugin\VersionChecker\TarkovVersion.cs" />
   </ItemGroup>
   <ItemGroup>

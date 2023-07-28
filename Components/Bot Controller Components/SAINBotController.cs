@@ -235,7 +235,6 @@ namespace SAIN.Components
             // AddorUpdateColorScheme Components to main player
             if (!ComponentAdded)
             {
-                MainPlayer.GetOrAddComponent<PlayerTalkComponent>();
                 MainPlayer.GetOrAddComponent<FlashLightComponent>();
                 ComponentAdded = true;
             }
