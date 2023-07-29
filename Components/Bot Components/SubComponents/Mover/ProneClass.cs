@@ -129,8 +129,8 @@ namespace SAIN.Classes.Mover
             Vector3 from = vector2;
             from.y = vector.y;
             float num = Vector3.Angle(from, vector2);
-            float lay_DOWN_ANG_SHOOT = GClass562.Core.LAY_DOWN_ANG_SHOOT;
-            return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && GClass253.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
+            float lay_DOWN_ANG_SHOOT = GClass564.Core.LAY_DOWN_ANG_SHOOT;
+            return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && GClass255.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
         }
 
         public BotLayClass BotLay => BotOwner.BotLay;

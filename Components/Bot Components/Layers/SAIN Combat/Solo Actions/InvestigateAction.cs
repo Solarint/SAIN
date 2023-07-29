@@ -64,7 +64,7 @@ namespace SAIN.Layers
         private readonly SAINComponent SAIN;
 
         public ManualLogSource Logger;
-        private GClass271 SearchPoint;
+        private GClass273 SearchPoint;
 
         public override void Start()
         {

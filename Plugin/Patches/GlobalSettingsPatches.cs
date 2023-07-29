@@ -53,11 +53,11 @@ namespace SAIN.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Constructor(typeof(GClass556));
+            return AccessTools.Constructor(typeof(GClass558));
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(GClass556 __instance)
+        public static void PatchPostfix(GClass558 __instance)
         {
             __instance.CanGrenade = true;
             __instance.CanRun = true;
@@ -124,11 +124,11 @@ namespace SAIN.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass561), "Update");
+            return AccessTools.Method(typeof(GClass563), "Update");
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(GClass561 __instance)
+        public static void PatchPostfix(GClass563 __instance)
         {
             __instance.CARE_ENEMY_ONLY_TIME = 120f;
             //__instance.ENEMY_TO_BE_CURRENT = 20f;

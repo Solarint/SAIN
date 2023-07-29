@@ -9,10 +9,10 @@ namespace SAIN.Classes.CombatFunctions
         public ShootClass(BotOwner owner, SAINComponent sain) : base(owner)
         {
             SAIN = sain;
-            BotShoot = new GClass182(owner);
+            BotShoot = new GClass183(owner);
         }
 
-        private readonly GClass182 BotShoot;
+        private readonly GClass183 BotShoot;
         private BotOwner BotOwner => botOwner_0;
 
         private readonly SAINComponent SAIN;

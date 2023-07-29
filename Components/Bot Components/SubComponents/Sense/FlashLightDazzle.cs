@@ -146,7 +146,7 @@ namespace SAIN.Helpers
         /// <param name="BotOwner">The BotOwner to apply the modifications to.</param>
         private void ApplyDazzle(float dazzleModif, float gainSightModif)
         {
-            GClass559 modif = new GClass559
+            var modif = new GClass561
             {
                 PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,
                 AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,

@@ -18,12 +18,12 @@ namespace SAIN.Classes
         {
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            Singleton<GClass633>.Instance.OnSoundPlayed += HearSound;
+            Singleton<GClass635>.Instance.OnSoundPlayed += HearSound;
         }
 
         public void OnDestroy()
         {
-            Singleton<GClass633>.Instance.OnSoundPlayed -= HearSound;
+            Singleton<GClass635>.Instance.OnSoundPlayed -= HearSound;
         }
 
         public void HearSound(IAIDetails player, Vector3 position, float power, AISoundType type)

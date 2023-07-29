@@ -50,8 +50,8 @@ namespace SAIN.Components
             PathManager.Awake();
             BotExtractManager.Awake();
 
-            Singleton<GClass633>.Instance.OnGrenadeThrow += GrenadeThrown;
-            Singleton<GClass633>.Instance.OnGrenadeExplosive += GrenadeExplosion;
+            Singleton<GClass635>.Instance.OnGrenadeThrow += GrenadeThrown;
+            Singleton<GClass635>.Instance.OnGrenadeExplosive += GrenadeExplosion;
             AISoundPlayed += SoundPlayed;
         }
 
@@ -257,9 +257,9 @@ namespace SAIN.Components
             Vector3 position = player.Position;
             if (isSmoke)
             {
-                Singleton<GClass633>.Instance.PlaySound(player, explosionPosition, 50f, AISoundType.gun);
-                float radius = smokeRadius * GClass562.Core.SMOKE_GRENADE_RADIUS_COEF;
-                foreach (KeyValuePair<BotZone, GClass508> keyValuePair in DefaultController.Groups())
+                Singleton<GClass635>.Instance.PlaySound(player, explosionPosition, 50f, AISoundType.gun);
+                float radius = smokeRadius * GClass564.Core.SMOKE_GRENADE_RADIUS_COEF;
+                foreach (KeyValuePair<BotZone, GClass510> keyValuePair in DefaultController.Groups())
                 {
                     foreach (BotGroupClass botGroupClass in keyValuePair.Value.GetGroups(true))
                     {
@@ -269,7 +269,7 @@ namespace SAIN.Components
             }
             if (!isSmoke)
             {
-                Singleton<GClass633>.Instance.PlaySound(player, explosionPosition, 200f, AISoundType.gun);
+                Singleton<GClass635>.Instance.PlaySound(player, explosionPosition, 200f, AISoundType.gun);
             }
         }
 
@@ -302,8 +302,8 @@ namespace SAIN.Components
             GameWorld.OnDispose -= Dispose;
 
             AISoundPlayed -= SoundPlayed;
-            Singleton<GClass633>.Instance.OnGrenadeThrow -= GrenadeThrown;
-            Singleton<GClass633>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
+            Singleton<GClass635>.Instance.OnGrenadeThrow -= GrenadeThrown;
+            Singleton<GClass635>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
 
             foreach (var obstacle in DeathObstacles)
             {

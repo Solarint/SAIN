@@ -12,7 +12,7 @@ namespace SAIN.Classes
 {
     public class EFTBotGrenade : SAINBot
     {
-        public GClass514 AIGreanageThrowData { get; private set; }
+        public GClass516 AIGreanageThrowData { get; private set; }
 
         public event Action<GrenadeClass> OnGrenadeThrowComplete
         {
@@ -126,7 +126,7 @@ namespace SAIN.Classes
 
         public EFTBotGrenade(BotOwner owner) : base(owner)
         {
-            GClass562.Core.G = Mathf.Abs(Physics.gravity.y);
+            GClass564.Core.G = Mathf.Abs(Physics.gravity.y);
             method_0();
             method_2();
         }
@@ -246,7 +246,7 @@ namespace SAIN.Classes
             }
             if (SAIN.Grenade.GetThrowType(out var direction, out Vector3 point) != GrenadeThrowType.None)
             {
-                GClass514 gclass = GClass516.CanThrowGrenade2(from, point, MaxPower, AIGreandeAng.ang15, 1f, 0f);
+                GClass516 gclass = GClass518.CanThrowGrenade2(from, point, MaxPower, AIGreandeAng.ang15, 1f, 0f);
                 if (gclass.CanThrow)
                 {
                     SetThrowData(gclass);
@@ -256,7 +256,7 @@ namespace SAIN.Classes
             return false;
         }
 
-        public bool SetThrowData(GClass514 data)
+        public bool SetThrowData(GClass516 data)
         {
             AIGreanageThrowData = data;
             BotOwner.BotsGroup.GroupGrenade.ThrowGrenade(BotOwner);
@@ -273,9 +273,9 @@ namespace SAIN.Classes
             float grenadePrecision = BotOwner.Settings.FileSettings.Grenade.GrenadePrecision;
             if (grenadePrecision > 0f)
             {
-                float x = GClass791.Random(-grenadePrecision, grenadePrecision);
-                float y = GClass791.Random(-grenadePrecision, grenadePrecision);
-                float z = GClass791.Random(-grenadePrecision, grenadePrecision);
+                float x = GClass793.Random(-grenadePrecision, grenadePrecision);
+                float y = GClass793.Random(-grenadePrecision, grenadePrecision);
+                float z = GClass793.Random(-grenadePrecision, grenadePrecision);
                 vector3_0 = new Vector3(x, y, z);
                 return;
             }
@@ -324,14 +324,14 @@ namespace SAIN.Classes
                 LastThrowDirection = AIGreanageThrowData.Direction + vector3_0;
                 BotOwner.Steering.LookToDirection(LastThrowDirection, 500f);
                 LastThrowDirection.Normalize();
-                Vector3 vector = GClass790.NormalizeFastSelf(BotOwner.LookDirection);
+                Vector3 vector = GClass792.NormalizeFastSelf(BotOwner.LookDirection);
                 Vector3 vector2 = LastThrowDirection;
                 float y = 0f;
                 float y2 = 0f;
                 vector2.y = y;
                 vector.y = y2;
-                vector = GClass790.NormalizeFastSelf(vector);
-                vector2 = GClass790.NormalizeFastSelf(vector2);
+                vector = GClass792.NormalizeFastSelf(vector);
+                vector2 = GClass792.NormalizeFastSelf(vector2);
                 if (Mathf.Abs(vector.x - vector2.x) < 0.1f && Mathf.Abs(vector.z - vector2.z) < 0.1f)
                 {
                     return true;

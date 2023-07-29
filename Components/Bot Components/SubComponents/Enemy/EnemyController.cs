@@ -56,7 +56,7 @@ namespace SAIN.Classes
             Enemy = null;
         }
 
-        private bool IsValidEnemy(GClass476 goalEnemy)
+        private bool IsValidEnemy(GClass478 goalEnemy)
         {
             if (goalEnemy?.Person == null)
             {

@@ -228,7 +228,7 @@ namespace SAIN.Components.BotController
         public float EscapeTimeSeconds(GameTimerClass timer)
         {
             DateTime? escapeDateTime = timer.EscapeDateTime;
-            return (float)((escapeDateTime != null) ? (escapeDateTime.Value - GClass1290.UtcNow) : TimeSpan.MaxValue).TotalSeconds;
+            return (float)((escapeDateTime != null) ? (escapeDateTime.Value - GClass1292.UtcNow) : TimeSpan.MaxValue).TotalSeconds;
         }
     }
 }

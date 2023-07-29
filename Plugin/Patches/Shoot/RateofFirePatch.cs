@@ -86,7 +86,7 @@ namespace SAIN.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass363), "UpdateFirearmsController");
+            return AccessTools.Method(typeof(GClass365), "UpdateFirearmsController");
         }
 
         [PatchPostfix]
@@ -102,7 +102,7 @@ namespace SAIN.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass363), "method_1");
+            return AccessTools.Method(typeof(GClass365), "method_1");
         }
 
         [PatchPostfix]

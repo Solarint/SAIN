@@ -19,7 +19,7 @@ namespace SAIN.Classes
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             Inventory = (InventoryClass)AccessTools.Property(typeof(Player), "Inventory").GetValue(BotOwner.GetPlayer);
-            InventoryController = (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2657_0").GetValue(BotOwner.GetPlayer);
+            InventoryController = (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2659_0").GetValue(BotOwner.GetPlayer);
         }
 
         public InventoryControllerClass InventoryController { get; private set; }
