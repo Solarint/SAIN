@@ -28,7 +28,7 @@ namespace SAIN.Editor
             SelectedPresetInfo = LoadPreset(settings.SelectedPreset);
             PresetEditorSettings = settings;
 
-            PresetManager.UpdatePresets();
+            PresetManager.UpdatePresetsAndDict();
 
             List<string> sections = new List<string>();
             WildSpawnTypes = PresetManager.BotTypes;
@@ -63,7 +63,7 @@ namespace SAIN.Editor
         {
             if (RecheckOptionsTimer < Time.time || refresh)
             {
-                RecheckOptionsTimer = Time.time + 10f;
+                RecheckOptionsTimer = Time.time + 30f;
                 PresetInfoOptions = JsonUtility.Load.GetPresetOptions(PresetInfoOptions);
             }
         }
@@ -114,7 +114,7 @@ namespace SAIN.Editor
             {
                 SelectedPresetInfo = selectedPreset;
                 JsonUtility.Save.SelectedPresetName = selectedPreset.Name;
-                PresetManager.UpdatePresets();
+                PresetManager.UpdatePresetsAndDict();
                 Reset();
             }
 

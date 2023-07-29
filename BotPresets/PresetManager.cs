@@ -30,17 +30,12 @@ namespace SAIN.BotPresets
             }
         }
 
-        public static void UpdatePresets()
+        public static void UpdatePresetsAndDict()
         {
-            foreach (var type in BotTypes)
-            {
-                type.PresetHandler();
-            }
-            TypePresets.Clear();
             for (int i = 0; i < BotTypes.Length; i++)
             {
-                BotType type = BotTypes[i];
-                TypePresets.Add(type.WildSpawnType, type);
+                BotTypes[i].PresetHandler();
+                TypePresets[BotTypes[i].WildSpawnType] = BotTypes[i];
             }
         }
 
@@ -59,54 +54,9 @@ namespace SAIN.BotPresets
             return preset != null;
         }
 
-        public static PresetValues GetPresetValues(BotPreset preset, BotDifficulty difficulty)
-        {
-            return preset.GetValues(difficulty);
-        }
-
-        public static object GetPresetValue(BotType type, PropertyInfo property, BotDifficulty difficulty)
-        {
-            object sourcePropValue = property.GetValue(type.Preset);
-            if (sourcePropValue is SAINProperty<float> floatProp)
-            {
-                return floatProp.GetValue(difficulty);
-            }
-            if (sourcePropValue is SAINProperty<bool> boolProp)
-            {
-                return boolProp.GetValue(difficulty);
-            }
-            return null;
-        }
-
         public static SAINProperty<T> GetSainProp<T>(BotType type, PropertyInfo property)
         {
             return (SAINProperty<T>)property.GetValue(type.Preset);
-        }
-
-        public static void SetPresetValue(object value, List<BotType> types, PropertyInfo property, BotDifficulty difficulty)
-        {
-            foreach (var type in types)
-            {
-                SetPresetValue(value, type, property, difficulty);
-            }
-        }
-
-        public static void SetPresetValue(object value, List<BotType> types, PropertyInfo property, List<BotDifficulty> difficulties)
-        {
-            foreach (var difficulty in difficulties)
-            {
-                SetPresetValue(value, types, property, difficulty);
-            }
-        }
-
-        public static void SetPresetValue(object value, BotType type, PropertyInfo property, BotDifficulty difficulty)
-        {
-            object targetPropValue = property.GetValue(type.Preset);
-            //if (targetPropValue is SAINProperty<object> targetProp && targetProp is ISAINProperty target)
-            //{
-            //    target.SetValue(difficulty, value);
-            //    UpdatePreset(type.Preset);
-            //}
         }
 
         public static void UpdatePreset(BotPreset preset)

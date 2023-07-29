@@ -29,12 +29,8 @@ namespace SAIN.BotPresets
 
         public BotPreset PresetHandler()
         {
-            BotPreset Preset = JsonUtility.Load.BotPreset(Name);
-            if (Preset == null)
-            {
-                Preset = new BotPreset(WildSpawnType, Name);
-                JsonUtility.Save.SavePreset(Preset);
-            }
+            BotPreset Preset = JsonUtility.Load.BotPreset(Name) ?? new BotPreset(WildSpawnType, Name);
+            PresetManager.UpdatePreset(Preset);
             return Preset;
         }
 
