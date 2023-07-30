@@ -54,7 +54,7 @@ internal sealed class ConfigurationManagerAttributes
     /// {
     ///     if (isEditing)
     ///     {
-    ///         // Make sure nothing else is selected since we aren't focusing on a text box with GUI.FocusControl.
+    ///         // Make sure nothing else is selected since we aren't focusing on a text box with GUIModify.FocusControl.
     ///         GUIUtility.keyboardControl = -1;
     ///                     
     ///         // Use Input.GetKeyDown and others here, remember to set isEditing to false after you're done!
@@ -78,7 +78,7 @@ internal sealed class ConfigurationManagerAttributes
     /// Setting currently being set (if available).
     /// </param>
     /// <param name="isCurrentlyAcceptingInput">
-    /// Set this ref parameter to true when you want the current setting drawer to receive Input events.
+    /// Modify this ref parameter to true when you want the current setting drawer to receive Input events.
     /// The value will persist after being set, use it to see if the current instance is being edited.
     /// Remember to set it to false after you are done!
     /// </param>
@@ -117,7 +117,7 @@ internal sealed class ConfigurationManagerAttributes
     public string Description;
 
     /// <summary>
-    /// Name of the setting.
+    /// DisplayName of the setting.
     /// </summary>
     public string DispName;
 

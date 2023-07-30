@@ -24,6 +24,22 @@ namespace SAIN.Editor
 
         CustomStyleClass CustomStyle => Editor.StyleOptions.CustomStyle;
 
+        public void MinValueBox(object value, params GUILayoutOption[] options)
+        {
+            if (value  == null) return;
+            Box(value.ToString(), "Minimum", options);
+        }
+        public void MaxValueBox(object value, params GUILayoutOption[] options)
+        {
+            if (value == null) return;
+            Box(value.ToString(), "Maximum", options);
+        }
+        public void ResultBox(object value, params GUILayoutOption[] options)
+        {
+            if (value == null) return;
+            Box(value.ToString(), "The Value this option is set to", options);
+        }
+
         public string SelectionGridExpandHeight(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
         {
             BeginGroup(menuRect);

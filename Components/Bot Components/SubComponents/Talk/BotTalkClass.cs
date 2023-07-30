@@ -24,7 +24,7 @@ namespace SAIN.Classes
             {
                 GlobalPhraseDictionary = new Dictionary<EPhraseTrigger, PhraseInfo>();
                 PhraseObjectsAdd();
-                //JsonUtility.Save.SaveJson(GlobalPhraseDictionary, filename);
+                //JsonUtility.Save.Export(GlobalPhraseDictionary, filename);
             }
         }
 

@@ -15,12 +15,12 @@ namespace SAIN.Editor.GUISections
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Reset", GUILayout.Height(35)))
             {
-                //GUI.skin.font = StyleOptions.DefaultFont;
+                //GUIModify.skin.font = StyleOptions.DefaultFont;
             }
             if (GUILayout.Button("Save Font", GUILayout.Height(35)))
             {
-                //EditorGUI.Settings.FontName = GUI.skin.font.name;
-                //EditorGUI.Settings.FontSize = GUI.skin.font.fontSize;
+                //EditorGUI.Dictionary.FontName = GUIModify.skin.font.name;
+                //EditorGUI.Dictionary.FontSize = GUIModify.skin.font.fontSize;
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();

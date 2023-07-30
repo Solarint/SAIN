@@ -31,7 +31,6 @@ namespace SAIN.Editor
             PresetManager.UpdatePresetsAndDict();
 
             List<string> sections = new List<string>();
-            WildSpawnTypes = PresetManager.BotTypes;
             foreach (var type in WildSpawnTypes)
             {
                 if (!sections.Contains(type.Section))
@@ -114,8 +113,9 @@ namespace SAIN.Editor
             {
                 SelectedPresetInfo = selectedPreset;
                 JsonUtility.Save.SelectedPresetName = selectedPreset.Name;
-                PresetManager.UpdatePresetsAndDict();
+
                 Reset();
+                PresetManager.UpdatePresetsAndDict();
             }
 
             OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
@@ -329,7 +329,7 @@ namespace SAIN.Editor
 
                 Space(Rect2OptionSpacing);
 
-                for (int j = 0; j < WildSpawnTypes.Length; j++)
+                for (int j = 0; j < WildSpawnTypes.Count; j++)
                 {
                     BotType type = WildSpawnTypes[j];
                     if (type.Section == section)
@@ -372,7 +372,7 @@ namespace SAIN.Editor
         public readonly string[] Sections;
         private readonly List<string> SelectedSections = new List<string>();
 
-        private readonly BotType[] WildSpawnTypes;
+        private List<BotType> WildSpawnTypes => PresetManager.BotTypes;
         private readonly List<BotType> SelectedWildSpawnTypes = new List<BotType>();
 
         public readonly BotDifficulty[] BotDifficultyOptions = { BotDifficulty.easy, BotDifficulty.normal, BotDifficulty.hard, BotDifficulty.impossible };

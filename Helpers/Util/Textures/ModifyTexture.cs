@@ -45,7 +45,7 @@ namespace SAIN.Helpers.Textures
                     // Get the pixel color from the original texture
                     Color pixel = originalTexture.GetPixel((int)finalPosition.x, (int)finalPosition.y);
 
-                    // Set the pixel color in the rotated texture
+                    // Modify the pixel color in the rotated texture
                     rotatedTexture.SetPixel(x, y, pixel);
                 }
             }

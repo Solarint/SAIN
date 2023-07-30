@@ -8,6 +8,7 @@ using SAIN.Editor;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using UnityEngine;
+using SAIN.BotSettings;
 
 namespace SAIN
 {

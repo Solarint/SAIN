@@ -387,7 +387,7 @@ namespace SAIN.Classes
             }
             else
             {
-                // Set the startPeekPos to be the result if no objects are in the way. This is resulting wide peek startPeekPos.
+                // Modify the startPeekPos to be the result if no objects are in the way. This is resulting wide peek startPeekPos.
                 PeekEndPosition = result;
             }
 

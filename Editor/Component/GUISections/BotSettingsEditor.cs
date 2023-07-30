@@ -1,13 +1,12 @@
 ﻿using EFT;
 using SAIN.BotPresets;
 using SAIN.Classes;
-using SAIN.Components.BotSettings;
+using SAIN.BotSettings;
 using SAIN.Editor.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.Classes.SAINBotSettingsClass;
 
 namespace SAIN.Editor.GUISections
 {
@@ -84,7 +83,6 @@ namespace SAIN.Editor.GUISections
         public readonly Dictionary<string, List<FieldInfo>> BotSettings = new Dictionary<string, List<FieldInfo>>();
         public readonly Type[] SettingsTypes =
         {
-            typeof(BotCoreSettings),
             typeof(BotGlobalLayData),
             typeof(BotGlobalAimingSettings),
             typeof(BotGlobalLookData),

@@ -9,8 +9,6 @@ namespace SAIN.Classes
     {
         public SAINBotInfo(BotOwner botOwner) : base(botOwner)
         {
-            GlobalSettings.Update(BotOwner);
-
             BotPresetClass = new BotPresetClass(BotOwner);
             PersonalityClass = new PersonalityClass(BotOwner);
             WeaponInfo = new WeaponInfo(BotOwner);

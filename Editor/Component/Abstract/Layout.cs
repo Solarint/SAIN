@@ -68,6 +68,10 @@ namespace SAIN.Editor.Abstract
         {
             Label(new GUIContent(text, tooltip), GetStyle(label), options);
         }
+        public void Label(GUIContent content, params GUILayoutOption[] options)
+        {
+            Label(content, GetStyle(label), options);
+        }
 
         public string TextField(string text, params GUILayoutOption[] options)
         {
@@ -132,7 +136,7 @@ namespace SAIN.Editor.Abstract
         public float HorizontalSlider(float value, float min, float max, params GUILayoutOption[] options)
         {
             value = GUILayout.HorizontalSlider(value, min, max, GetStyle(horizontalSlider), GetStyle(horizontalSliderThumb), options);
-            //GUI.tooltip = value.ToString();
+            //GUIModify.tooltip = value.ToString();
             return value;
         }
 

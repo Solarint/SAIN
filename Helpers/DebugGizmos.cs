@@ -45,12 +45,12 @@ namespace SAIN.Helpers
                 var lineObject = new GameObject();
                 var lineRenderer = lineObject.AddComponent<LineRenderer>();
 
-                // Set the color and width of the line
+                // Modify the color and width of the line
                 lineRenderer.material.color = color;
                 lineRenderer.startWidth = lineWidth;
                 lineRenderer.endWidth = taperLine ? lineWidth / 4f : lineWidth;
 
-                // Set the start and end points of the line
+                // Modify the start and end points of the line
                 lineRenderer.SetPosition(0, startPoint);
                 lineRenderer.SetPosition(1, endPoint);
 
@@ -72,12 +72,12 @@ namespace SAIN.Helpers
                 var rayObject = new GameObject();
                 var lineRenderer = rayObject.AddComponent<LineRenderer>();
 
-                // Set the color and width of the line
+                // Modify the color and width of the line
                 lineRenderer.material.color = color;
                 lineRenderer.startWidth = lineWidth;
                 lineRenderer.endWidth = taperLine ? lineWidth / 4f : lineWidth;
 
-                // Set the start and end points of the line to draw a rays
+                // Modify the start and end points of the line to draw a rays
                 lineRenderer.SetPosition(0, startPoint);
                 lineRenderer.SetPosition(1, startPoint + direction.normalized * length);
 
@@ -253,12 +253,12 @@ namespace SAIN.Helpers
                 var lineObject = new GameObject();
                 var lineRenderer = lineObject.AddComponent<LineRenderer>();
 
-                // Set the color and width of the line
+                // Modify the color and width of the line
                 lineRenderer.material.color = color;
                 lineRenderer.startWidth = lineWidth;
                 lineRenderer.endWidth = lineWidth;
 
-                // Set the initial start and end points of the line
+                // Modify the initial start and end points of the line
                 lineRenderer.SetPosition(0, startObject.transform.position);
                 lineRenderer.SetPosition(1, endObject.transform.position);
 

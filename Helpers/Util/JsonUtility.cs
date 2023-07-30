@@ -12,10 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
-using UnityEngine;
-using static Mono.Security.X509.X520;
+using SAIN.BotSettings;
 
 namespace SAIN.Helpers
 {
@@ -178,9 +175,8 @@ namespace SAIN.Helpers
 
             public static void SaveBotSettings(SAINBotSettingsClass settings, BotDifficulty difficulty, WildSpawnType role, string presetName)
             {
-                string diffFolder = difficulty.ToString();
                 string filename = role.ToString();
-                SaveJson(settings, filename, EFTBotConfigFolders(presetName, diffFolder));
+                SaveJson(settings, filename, EFTBotConfigFolders(presetName));
             }
         }
 
@@ -196,7 +192,7 @@ namespace SAIN.Helpers
                 else
                 {
                     result = new BaseColorSchemeClass(nameof(SAIN));
-                    //Save.SaveJson(result, ColorScheme, UIFolder, ColorsFolder);
+                    //Save.Export(result, ColorScheme, UIFolder, ColorsFolder);
                 }
                 if (LoadJsonFile(out string namesJson, ColorNames, UIFolder, ColorsFolder))
                 {
@@ -312,39 +308,6 @@ namespace SAIN.Helpers
                 return null;
             }
 
-            public static SAINBotSettingsClass LoadBotSettings(WildSpawnType role, BotDifficulty diff)
-            {
-                return LoadBotSettings(role, diff, Save.SelectedPresetName);
-            }
-
-            public static SAINBotSettingsClass LoadBotSettings(WildSpawnType role, BotDifficulty diff, string presetName)
-            {
-                SAINBotSettingsClass botSettings = null;
-                string diffFolder = diff.ToString();
-                string filename = role.ToString();
-                if (LoadJsonFile(out string json, filename, EFTBotConfigFolders(presetName, diffFolder)))
-                {
-                    botSettings = DeserializeObject<SAINBotSettingsClass>(json);
-                }
-
-                return botSettings;
-            }
-
-            public static SAINBotSettingsClass LoadBotSettings(BotOwner owner)
-            {
-                return LoadBotSettings(owner, Save.SelectedPresetName);
-            }
-
-            public static SAINBotSettingsClass LoadBotSettings(BotOwner owner, string presetName)
-            {
-                var role = owner.Profile.Info.Settings.Role;
-                var diff = owner.Profile.Info.Settings.BotDifficulty;
-
-                SAINBotSettingsClass botSettings = LoadBotSettings(role, diff, presetName) ?? new SAINBotSettingsClass(owner);
-
-                return botSettings;
-            }
-
             public static Dictionary<SAINPersonality, PersonalitySettingsClass> LoadPersonalityClasses()
             {
                 var Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
@@ -427,14 +390,13 @@ namespace SAIN.Helpers
             };
             return result;
         }
-        public static string[] EFTBotConfigFolders(string presetName, string diffFolder)
+        public static string[] EFTBotConfigFolders(string presetName)
         {
             string[] result = new string[]
             {
                     PresetsFolder,
                     presetName + PresetEnd,
-                    BotConfigFolder,
-                    diffFolder
+                    BotConfigFolder
             };
             return result;
         }

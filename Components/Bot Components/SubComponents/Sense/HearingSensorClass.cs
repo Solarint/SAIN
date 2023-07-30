@@ -277,7 +277,7 @@ namespace SAIN.Classes
 
         private bool IsSoundClose(float d)
         {
-            //Set the close hearing and far hearing variables
+            //Modify the close hearing and far hearing variables
             float closehearing = 10f;
             float farhearing = SAIN.Info.FileSettings.MaxFootstepAudioDistance;
 

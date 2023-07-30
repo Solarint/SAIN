@@ -213,6 +213,25 @@
   <ItemGroup>
     <Compile Include="BotPresets\BotType.cs" />
     <Compile Include="BotPresets\BotTypeDefinitions.cs" />
+    <Compile Include="BotSettings\BotSettingsClass.cs" />
+    <Compile Include="BotSettings\Categories\SAINLookSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINAimingSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINGrenadeSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINChangeSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINPatrolSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINHearingSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINMindSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINScatterSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINLaySettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINShootSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINMoveSettings.cs" />
+    <Compile Include="BotSettings\Categories\SAINCoreSettings.cs" />
+    <Compile Include="BotSettings\Categories\InitDictionary.cs" />
+    <Compile Include="BotSettings\Categories\Util\BotDefaultValues.cs" />
+    <Compile Include="BotSettings\Categories\Util\Modify.cs" />
+    <Compile Include="BotSettings\Categories\Util\Wrapper.cs" />
+    <Compile Include="BotSettings\BotSettingsDictionary.cs" />
+    <Compile Include="Helpers\GetProperties.cs" />
     <Compile Include="Components\Bot Components\Helpers\MathHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
     <Compile Include="Components\Bot Components\SAINDebugEnum.cs" />
@@ -223,11 +242,9 @@
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
     <Compile Include="BotPresets\PresetDefaults.cs" />
     <Compile Include="BotSettings\BotSettingsManager.cs" />
-    <Compile Include="BotSettings\GlobalSettingsPatches.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\PersonalityClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\BotPresetClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\SAINInfoAbstract.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\SetGlobalSettings.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firerate.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firemode.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Recoil.cs" />
@@ -266,6 +283,8 @@
     <Compile Include="Editor\Util\Fonts.cs" />
     <Compile Include="Editor\Util\InputField.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
+    <Compile Include="Helpers\SAINDictionary.cs" />
+    <Compile Include="Helpers\ServerBotSettings.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Helpers\Util\Textures\ModifyTexture.cs" />
     <Compile Include="Helpers\Util\Textures\SaveTexture.cs" />

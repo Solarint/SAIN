@@ -10,20 +10,11 @@ namespace SAIN.BotPresets
     {
         static PresetManager()
         {
-            Properties = new List<PropertyInfo>();
-            PropertyInfo[] properties = typeof(BotPreset).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            foreach (PropertyInfo property in properties)
-            {
-                Type propertyType = property.PropertyType;
-                if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(SAINProperty<>))
-                {
-                    Properties.Add(property);
-                }
-            }
-
-            BotTypes = BotTypeDefinitions.BotTypes;
+            Properties = new List<PropertyInfo>(GetReflectionInfo.GetBotPresetProperties());
+            BotTypes = new List<BotType>(BotTypeDefinitions.BotTypes);
             TypePresets = new Dictionary<WildSpawnType, BotType>();
-            for (int i = 0; i < BotTypes.Length; i++)
+
+            for (int i = 0; i < BotTypes.Count; i++)
             {
                 BotType type = BotTypes[i];
                 TypePresets.Add(type.WildSpawnType, type);
@@ -32,7 +23,7 @@ namespace SAIN.BotPresets
 
         public static void UpdatePresetsAndDict()
         {
-            for (int i = 0; i < BotTypes.Length; i++)
+            for (int i = 0; i < BotTypes.Count; i++)
             {
                 BotTypes[i].PresetHandler();
                 TypePresets[BotTypes[i].WildSpawnType] = BotTypes[i];
@@ -40,7 +31,7 @@ namespace SAIN.BotPresets
         }
 
         public static Action<WildSpawnType, BotPreset> PresetUpdated { get; set; }
-        public static BotType[] BotTypes;
+        public static List<BotType> BotTypes;
         public static readonly List<PropertyInfo> Properties;
         public static readonly Dictionary<WildSpawnType, BotType> TypePresets;
 
