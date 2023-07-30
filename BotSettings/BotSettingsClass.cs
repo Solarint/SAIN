@@ -1,49 +1,13 @@
 ﻿using EFT;
-using Newtonsoft.Json;
+using HarmonyLib;
 using SAIN.BotSettings.Categories;
 using SAIN.BotSettings.Categories.Util;
-using SAIN.Helpers;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace SAIN.BotSettings
 {
-    public class BotSettingsHandler
-    {
-        static readonly Dictionary<WildSpawnType, SAINDictionary<SAINBotSettingsClass>> GlobalSettingsDictionary = new Dictionary<WildSpawnType, SAINDictionary<SAINBotSettingsClass>>();
-
-        static SAINDictionary<SAINBotSettingsClass> GetSettings(WildSpawnType type)
-        {
-            if (!GlobalSettingsDictionary.ContainsKey(type))
-            {
-                string currentPreset = JsonUtility.Save.SelectedPresetName;
-                string[] path = JsonUtility.EFTBotConfigFolders(currentPreset);
-
-                var BotSettings = new SAINDictionary<SAINBotSettingsClass>(type.ToString(), path);
-                if (BotSettings.NewFileCreated)
-                {
-                    BotSettings.Add(BotDifficulty.easy, new SAINBotSettingsClass(type, BotDifficulty.easy));
-                    BotSettings.Add(BotDifficulty.normal, new SAINBotSettingsClass(type, BotDifficulty.normal));
-                    BotSettings.Add(BotDifficulty.hard, new SAINBotSettingsClass(type, BotDifficulty.hard));
-                    BotSettings.Add(BotDifficulty.impossible, new SAINBotSettingsClass(type, BotDifficulty.impossible));
-                    BotSettings.Export();
-                }
-                GlobalSettingsDictionary.Add(type, BotSettings);
-            }
-            return GlobalSettingsDictionary[type];
-        }
-
-        public static SAINBotSettingsClass GetSettings(BotOwner owner)
-        {
-            var type = owner.Profile.Info.Settings.Role;
-            var diff = owner.Profile.Info.Settings.BotDifficulty;
-
-            var Result = GetSettings(type).Get(diff);
-            Result.BotDefaultValues.Init(owner);
-
-            return Result;
-        }
-    }
-
     public class SAINBotSettingsClass
     {
         public SAINBotSettingsClass(WildSpawnType type, BotDifficulty diff)
@@ -88,5 +52,84 @@ namespace SAIN.BotSettings
         public SAINPatrolSettings Patrol = new SAINPatrolSettings();
         public SAINScatterSettings Scattering = new SAINScatterSettings();
         public SAINShootSettings Shoot = new SAINShootSettings();
+    }
+
+    public class FieldWrapper
+    {
+        public FieldWrapper(Type propType, string property, params string[] fieldStrings)
+        {
+            PropertyInfo _property = AccessTools.Property(propType, property);
+            if (_property != null)
+            {
+                foreach (string field in fieldStrings)
+                {
+                    FieldInfo section = AccessTools.Field(_property.PropertyType, field);
+                    if (section != null)
+                    {
+                        FieldSections.Add(section.Name, section);
+                        var fields = section.FieldType.GetFields();
+                        Fields.Add(section, fields);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Field: {field} Not Found");
+                    }
+                }
+
+                Console.WriteLine($"{_property.Name}: Sections: {FieldSections.Count} Fields: {Fields.Count}");
+            }
+            else
+            {
+                Console.WriteLine($"{property} Not Found");
+            }
+        }
+
+        public FieldWrapper(Type propType)
+        {
+            foreach (var field in propType.GetFields())
+            {
+                FieldSections.Add(field.Name, field);
+                var fields = field.FieldType.GetFields();
+                Fields.Add(field, fields);
+            }
+        }
+
+        public readonly Dictionary<string, FieldInfo> FieldSections = new Dictionary<string, FieldInfo>();
+        public readonly Dictionary<FieldInfo, FieldInfo[]> Fields = new Dictionary<FieldInfo, FieldInfo[]>();
+    }
+
+    public class BotOwnerSettings
+    {
+        public BotOwnerSettings(BotOwner owner)
+        {
+            BotOwner = owner;
+            UpdateValue(nameof(SAINCoreSettings.VisibleDistance), 100f);
+        }
+
+        public void UpdateValue(string key, object value)
+        {
+            bool complete = false;
+            var Dictionary = BotSettingsHandler.EFTBotSettingsFields.Fields;
+            foreach (var keyPair in Dictionary)
+            {
+                var Settings = keyPair.Key.GetValue(BotOwner.Settings.FileSettings);
+                var fields = keyPair.Value;
+                foreach (var field in fields)
+                {
+                    if (field.Name == key)
+                    {
+                        complete = true;
+                        field.SetValue(Settings, value);
+                        break;
+                    }
+                }
+                if (complete)
+                {
+                    break;
+                }
+            }
+        }
+
+        public readonly BotOwner BotOwner;
     }
 }

@@ -177,8 +177,14 @@ namespace SAIN.Editor
             {
                 PropEditMenu();
             }
+
+            OpenAdvanced = Builder.ExpandableMenu("Advanced", OpenAdvanced, "Modify internal bot configs");
+            if (OpenAdvanced)
+            {
+            }
         }
 
+        bool OpenAdvanced = false;
         private bool OpenFirstMenu = false;
         private bool OpenPropEdit = false;
         private Rect PresetWindow;

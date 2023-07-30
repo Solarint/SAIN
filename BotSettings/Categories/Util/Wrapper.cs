@@ -18,7 +18,7 @@ namespace SAIN.BotSettings.Categories.Util
         public object Max;
         public float? Rounding;
 
-        public void GUIModify()
+        public object GUIModify()
         {
             ModifySettings.GUIModify(this);
         }

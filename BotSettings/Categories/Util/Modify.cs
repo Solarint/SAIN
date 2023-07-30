@@ -12,7 +12,7 @@ namespace SAIN.BotSettings.Categories.Util
         static readonly float ResultWidth = 100f;
         static readonly float DefaultButtonWidth = 120f;
 
-        public static void GUIModify(SettingsWrapper wrapper)
+        public static object GUIModify(SettingsWrapper wrapper)
         {
             // If the wrapper has no set value, set it to default
             if (wrapper.Value == null)
@@ -22,7 +22,7 @@ namespace SAIN.BotSettings.Categories.Util
             // If the wrapper still has no value, or it is set to be hidden return
             if (wrapper.Hidden == true || wrapper.Value == null)
             {
-                return;
+                return wrapper.Value;
             }
 
             Builder.BeginHorizontal();
@@ -44,6 +44,8 @@ namespace SAIN.BotSettings.Categories.Util
             ResetButton(wrapper);
 
             Builder.EndHorizontal();
+
+            return wrapper.Value;
         }
 
         static void Info(SettingsWrapper wrapper)

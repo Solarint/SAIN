@@ -18,8 +18,11 @@ namespace SAIN.Classes
             }
 
             PresetManager.PresetUpdated += PresetUpdated;
+
+            BotOwnerSettings = new BotOwnerSettings(owner);
         }
 
+        public BotOwnerSettings BotOwnerSettings { get; private set; }
         public PresetValues PresetValues { get; set; }
         public SAINBotSettingsClass DefaultBotSettings { get; private set; }
         public SAINBotSettingsClass BotSettings { get; private set; }
