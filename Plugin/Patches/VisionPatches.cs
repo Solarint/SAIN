@@ -2,13 +2,14 @@
 using EFT;
 using HarmonyLib;
 using SAIN.BotPresets;
+using SAIN.Components;
 using SAIN.UserSettings;
 using System;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Editor.EditorSettings;
 
-namespace SAIN.Patches
+namespace SAIN.Patches.Vision
 {
     public class Math
     {
@@ -130,6 +131,33 @@ namespace SAIN.Patches
             if (dist > 20f)
             {
                 __result *= inverseWeatherModifier;
+            }
+        }
+    }
+
+    public class CheckFlashlightPatch : ModulePatch
+    {
+        private static FieldInfo _tacticalModesField;
+        private static MethodInfo _UsingLight;
+        protected override MethodBase GetTargetMethod()
+        {
+            _UsingLight = AccessTools.PropertySetter(typeof(AiDataClass), "UsingLight");
+
+            _tacticalModesField = AccessTools.Field(typeof(TacticalComboVisualController), "list_0");
+
+            return AccessTools.Method(typeof(Player.FirearmController), "SetLightsState");
+        }
+
+        [PatchPostfix]
+        public static void PatchPostfix(ref Player ____player)
+        {
+            if (____player.gameObject.TryGetComponent<FlashLightComponent>(out var component))
+            {
+                component.CheckDevice(____player, _tacticalModesField);
+                if (!component.WhiteLight && !component.Laser)
+                {
+                    _UsingLight.Invoke(____player.AIData, new object[] { false });
+                }
             }
         }
     }

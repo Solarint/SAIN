@@ -13,10 +13,8 @@ namespace SAIN.Classes
         private void Awake()
         {
             SAIN = GetComponent<SAINComponent>();
-            EFTBotGrenade = new EFTBotGrenade(BotOwner);
         }
 
-        public EFTBotGrenade EFTBotGrenade { get; private set; }
 
         private void Update()
         {

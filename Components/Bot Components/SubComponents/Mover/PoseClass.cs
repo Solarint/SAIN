@@ -11,12 +11,13 @@ using System.Reflection;
 using HarmonyLib;
 using SAIN.Classes.Mover;
 using SAIN.Helpers;
+using SAIN.Components;
 
 namespace SAIN.Classes.Mover
 {
     public class PoseClass : SAINBot
     {
-        public PoseClass(BotOwner owner) : base(owner)
+        public PoseClass(SAINComponent owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -24,7 +25,7 @@ namespace SAIN.Classes.Mover
         private void DebugFindOffset()
         {
             float lowWeapRootY = BotOwner.WeaponRoot.position.y - BotOwner.Position.y;
-            float playerPose = BotPlayer.PoseLevel;
+            float playerPose = GetPlayer.PoseLevel;
             if (playerPose == 0f)
             {
                 Logger.LogInfo($"WeaponRoot at 0 pose: [{lowWeapRootY}]");

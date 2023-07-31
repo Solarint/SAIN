@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using SAIN.Components;
 using UnityEngine;
 using static SAIN.UserSettings.DebugConfig;
 
@@ -7,10 +8,10 @@ namespace SAIN.Classes
 {
     public class SelfActionDecisionClass : SAINBot
     {
-        public SelfActionDecisionClass(BotOwner bot) : base(bot) { }
+        public SelfActionDecisionClass(SAINComponent bot) : base(bot) { }
 
         public SAINSelfDecision CurrentSelfAction => SAIN.Decision.CurrentSelfDecision;
-        private SAINEnemyPath EnemyDistance => SAIN.Decision.EnemyDistance;
+        private SAINEnemyPathEnum EnemyDistance => SAIN.Decision.EnemyDistance;
 
         public bool GetDecision(out SAINSelfDecision Decision)
         {
@@ -166,7 +167,7 @@ namespace SAIN.Classes
                     {
                         takeStims = true;
                     }
-                    else if (pathStatus == SAINEnemyPath.Far || pathStatus == SAINEnemyPath.VeryFar)
+                    else if (pathStatus == SAINEnemyPathEnum.Far || pathStatus == SAINEnemyPathEnum.VeryFar)
                     {
                         takeStims = true;
                     }
@@ -192,19 +193,19 @@ namespace SAIN.Classes
                     var status = SAIN;
                     if (status.Injured)
                     {
-                        if (!enemy.InLineOfSight && !SeenRecent && pathStatus != SAINEnemyPath.VeryClose && pathStatus != SAINEnemyPath.Close)
+                        if (!enemy.InLineOfSight && !SeenRecent && pathStatus != SAINEnemyPathEnum.VeryClose && pathStatus != SAINEnemyPathEnum.Close)
                         {
                             useFirstAid = true;
                         }
                     }
                     else if (status.BadlyInjured)
                     {
-                        if (!enemy.InLineOfSight && pathStatus != SAINEnemyPath.VeryClose && enemy.TimeSinceSeen < 2f)
+                        if (!enemy.InLineOfSight && pathStatus != SAINEnemyPathEnum.VeryClose && enemy.TimeSinceSeen < 2f)
                         {
                             useFirstAid = true;
                         }
 
-                        if (pathStatus == SAINEnemyPath.VeryFar)
+                        if (pathStatus == SAINEnemyPathEnum.VeryFar)
                         {
                             useFirstAid = true;
                         }
@@ -215,7 +216,7 @@ namespace SAIN.Classes
                         {
                             useFirstAid = true;
                         }
-                        if (pathStatus == SAINEnemyPath.VeryFar || pathStatus == SAINEnemyPath.Far)
+                        if (pathStatus == SAINEnemyPathEnum.VeryFar || pathStatus == SAINEnemyPathEnum.Far)
                         {
                             useFirstAid = true;
                         }
@@ -248,11 +249,11 @@ namespace SAIN.Classes
                 {
                     return true;
                 }
-                if (pathStatus == SAINEnemyPath.VeryClose)
+                if (pathStatus == SAINEnemyPathEnum.VeryClose)
                 {
                     return true;
                 }
-                if (BotOwner.WeaponManager.Reload.BulletCount > 1 && pathStatus == SAINEnemyPath.Close)
+                if (BotOwner.WeaponManager.Reload.BulletCount > 1 && pathStatus == SAINEnemyPathEnum.Close)
                 {
                     return true;
                 }
@@ -281,7 +282,7 @@ namespace SAIN.Classes
                     {
                         needToReload = true;
                     }
-                    else if (EnemyDistance != SAINEnemyPath.VeryClose && !enemy.IsVisible)
+                    else if (EnemyDistance != SAINEnemyPathEnum.VeryClose && !enemy.IsVisible)
                     {
                         needToReload = true;
                     }
@@ -307,7 +308,7 @@ namespace SAIN.Classes
                     var pathStatus = enemy.CheckPathDistance();
                     bool SeenRecent = enemy.TimeSinceSeen < 10f;
 
-                    if (!SeenRecent && pathStatus != SAINEnemyPath.VeryClose && pathStatus != SAINEnemyPath.Close)
+                    if (!SeenRecent && pathStatus != SAINEnemyPathEnum.VeryClose && pathStatus != SAINEnemyPathEnum.Close)
                     {
                         useSurgery = true;
                     }

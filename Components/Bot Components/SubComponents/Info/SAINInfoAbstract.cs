@@ -3,12 +3,13 @@ using EFT;
 using SAIN.BotPresets;
 using System.Linq;
 using System;
+using SAIN.Components;
 
 namespace SAIN.Classes
 {
     public abstract class SAINInfoAbstract : SAINBot
     {
-        public SAINInfoAbstract(BotOwner owner) : base(owner)
+        public SAINInfoAbstract(SAINComponent owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource("SAIN Info");
             BotType = FindBotType.FindType(WildSpawnType);

@@ -19,13 +19,13 @@ namespace SAIN.Classes
         {
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SelfActionDecisions = new SelfActionDecisionClass(BotOwner);
-            EnemyDecisions = new EnemyDecisionClass(BotOwner);
-            GoalTargetDecisions = new TargetDecisionClass(BotOwner);
-            SquadDecisions = new SquadDecisionClass(BotOwner);
+            SelfActionDecisions = new SelfActionDecisionClass(SAIN);
+            EnemyDecisions = new EnemyDecisionClass(SAIN);
+            GoalTargetDecisions = new TargetDecisionClass(SAIN);
+            SquadDecisions = new SquadDecisionClass(SAIN);
         }
 
-        public SAINEnemyPath EnemyDistance { get; private set; }
+        public SAINEnemyPathEnum EnemyDistance { get; private set; }
 
         public SAINSoloDecision MainDecision { get; private set; }
         public SAINSoloDecision OldMainDecision { get; private set; }
@@ -62,7 +62,7 @@ namespace SAIN.Classes
                 if (UpdateEnemyTimer < Time.time)
                 {
                     UpdateEnemyTimer = Time.time + 0.33f;
-                    EnemyDistance = SAIN.HasEnemy ? SAIN.Enemy.CheckPathDistance() : SAINEnemyPath.NoEnemy;
+                    EnemyDistance = SAIN.HasEnemy ? SAIN.Enemy.CheckPathDistance() : SAINEnemyPathEnum.NoEnemy;
                 }
 
                 GetDecision();

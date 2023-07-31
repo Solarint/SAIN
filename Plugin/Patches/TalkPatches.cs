@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SAIN.Patches
+namespace SAIN.Patches.Talk
 {
     public class PlayerTalkPatch : ModulePatch
     {

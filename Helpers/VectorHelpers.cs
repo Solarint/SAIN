@@ -1,4 +1,7 @@
-﻿using EFT.UI.Ragfair;
+﻿using Aki.Reflection.Patching;
+using EFT;
+using EFT.UI.Ragfair;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,6 +63,8 @@ namespace SAIN.Helpers
             return true;
         }
 
+        public static float Gravity;
+
         /// <summary>
         /// Calculates the force vector from the given parameters.
         /// </summary>
@@ -71,7 +76,7 @@ namespace SAIN.Helpers
 
             Vector2 vector = new Vector2(v.magnitude, force.y);
 
-            float num = 2f * vector.x * vector.y / GClass560.Core.G;
+            float num = 2f * vector.x * vector.y / HelpersGClass.Gravity;
 
             if (vector.y < 0f)
             {
@@ -79,6 +84,33 @@ namespace SAIN.Helpers
             }
 
             return NormalizeFastSelf(v) * num + from;
+        }
+
+        public static bool CanShootToTarget(ShootPointClass shootToPoint, Vector3 firePos, LayerMask mask, bool doubleSide = false)
+        {
+            if (shootToPoint == null)
+            {
+                return false;
+            }
+            bool flag = false;
+            Vector3 vector = shootToPoint.Point - firePos;
+            Ray ray = new Ray(firePos, vector);
+            float magnitude = vector.magnitude;
+            if (!Physics.Raycast(ray, out RaycastHit raycastHit, magnitude * shootToPoint.DistCoef, mask))
+            {
+                if (doubleSide)
+                {
+                    if (!Physics.Raycast(new Ray(shootToPoint.Point, -vector), out raycastHit, magnitude, mask))
+                    {
+                        flag = true;
+                    }
+                }
+                else
+                {
+                    flag = true;
+                }
+            }
+            return flag;
         }
 
         /// <summary>
@@ -536,11 +568,6 @@ namespace SAIN.Helpers
 
         public static void Init()
         {
-            if (Started)
-            {
-                return;
-            }
-
             int[] array = new int[8];
             int num = 45;
             int num2 = 4;
@@ -565,7 +592,6 @@ namespace SAIN.Helpers
             CreateVectorArray8Dir(Vector3.left, array);
             CreateVectorArray8Dir(Vector3.right, array);
             CreateVectorArray8Dir(Vector3.back, array);
-            Started = true;
         }
 
         private static bool Started = false;

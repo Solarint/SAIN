@@ -231,6 +231,7 @@
     <Compile Include="BotSettings\Categories\Util\Modify.cs" />
     <Compile Include="BotSettings\Categories\Util\Wrapper.cs" />
     <Compile Include="BotSettings\BotSettingsDictionary.cs" />
+    <Compile Include="Helpers\HelpersGClass.cs" />
     <Compile Include="Helpers\GetProperties.cs" />
     <Compile Include="Components\Bot Components\Helpers\MathHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
@@ -249,9 +250,6 @@
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firemode.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Recoil.cs" />
     <Compile Include="Components\Bot Components\SubComponents\NoBushESP.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyBodyPart.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Grenade\EFTBotGrenade.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Enemy\SAINEnemy_Vision.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Mover\SideStepClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Mover\BlindFireClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Mover\PoseClass.cs" />
@@ -283,6 +281,7 @@
     <Compile Include="Editor\Util\Fonts.cs" />
     <Compile Include="Editor\Util\InputField.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
+    <Compile Include="Helpers\EFTInfo.cs" />
     <Compile Include="Helpers\SAINDictionary.cs" />
     <Compile Include="Helpers\ServerBotSettings.cs" />
     <Compile Include="Logger.cs" />
@@ -292,7 +291,7 @@
     <Compile Include="Helpers\Util\Utility.cs" />
     <Compile Include="Plugin\BigBrainSAIN.cs" />
     <Compile Include="Plugin\BotControllerHandler.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Enemy\ShootClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\ShootClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\BotEquipmentClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\WeatherVisionClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\TimeClass.cs" />
@@ -348,17 +347,13 @@
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSquad.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\ExtractAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Extract\SAINExtractLayer.cs" />
-    <Compile Include="Plugin\EFTPatches.cs" />
-    <Compile Include="Plugin\Patches\Audio\HearSensorActivatePatch.cs" />
-    <Compile Include="Plugin\Patches\FlashLight\CheckFlashlightPatch.cs" />
-    <Compile Include="Plugin\Patches\VisionSpeedPatch.cs" />
+    <Compile Include="Plugin\Patches\HearingPatches.cs" />
+    <Compile Include="Plugin\Patches\VisionPatches.cs" />
     <Compile Include="Plugin\Patches\MovementPatches.cs" />
-    <Compile Include="Plugin\Patches\Audio\InitiateShotPatch.cs" />
     <Compile Include="Plugin\Patches\Shoot\RateofFirePatch.cs" />
     <Compile Include="Plugin\Patches\Shoot\RecoilPatch.cs" />
     <Compile Include="Plugin\Patches\Audio\StepSoundPatch.cs" />
-    <Compile Include="Plugin\Patches\Audio\TalkPatch.cs" />
-    <Compile Include="Plugin\Patches\Audio\TryPlayShootSoundPatch.cs" />
+    <Compile Include="Plugin\Patches\TalkPatches.cs" />
     <Compile Include="Components\Player Components\FlashLightComponent.cs" />
     <Compile Include="Components\Bot Components\SubComponents\SelfActionClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\WeaponInfoClass.cs" />
@@ -368,7 +363,7 @@
     <Compile Include="Components\Bot Components\SubComponents\Talk\EnemyTalkObject.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Talk\GroupTalk.cs" />
     <Compile Include="Components\Bot Components\SubComponents\BotSquadClass.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Enemy\SAINEnemyClass.cs" />
+    <Compile Include="Components\Bot Components\SubComponents\Enemy\SAINEnemy.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\SAINBotInfo.cs" />
     <Compile Include="Components\Bot Components\SAINEnum.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Grenade\GrenadeTrackerComponent.cs" />
@@ -386,14 +381,14 @@
     <Compile Include="Plugin\Config\DebugConfigs.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\DogFight.cs" />
     <Compile Include="Components\Bot Components\Helpers\CornersHelper.cs" />
-    <Compile Include="Plugin\Patches\GlobalSettingsPatches.cs" />
     <Compile Include="Plugin\Patches\AddComponentPatch.cs" />
     <Compile Include="Properties\ConfigurationManagerAttributes.cs" />
     <Compile Include="Plugin\Patches\GenericPatches.cs" />
     <Compile Include="Plugin\SAINPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Components\SAINBotAbstractClass.cs" />
+    <Compile Include="Components\Bot Components\SAINBotAbstractClass.cs" />
     <Compile Include="Plugin\VersionChecker\TarkovVersion.cs" />
+    <Compile Include="Plugin\PluginInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

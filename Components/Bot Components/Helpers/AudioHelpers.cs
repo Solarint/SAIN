@@ -36,32 +36,21 @@ namespace SAIN.Helpers
         {
             // Decides if Suppressor modifier should be applied + subsonic
             float supmod = 1f;
+            bool suppressed = soundtype == AISoundType.silencedGun;
 
-            if (soundtype == AISoundType.silencedGun)
+            if (suppressed && subsonic)
             {
-                if (subsonic)
-                {
-                    supmod *= SubsonicModifier.Value;
-                }
-                else
-                {
-                    supmod *= SuppressorModifier.Value;
-                }
+                supmod *= SubsonicModifier.Value;
+            }
+            else if (suppressed)
+            {
+                supmod *= SuppressorModifier.Value;
             }
 
             range *= supmod;
+            range *= RainSoundModifier();
 
-            // Applies Rain Modifier
-            if (WeatherController.Instance?.WeatherCurve != null)
-            {
-                range *= RainSoundModifier();
-            }
-
-            // Plays the sound
-            if (Singleton<GClass629>.Instantiated)
-            {
-                Singleton<GClass629>.Instance.PlaySound(player, player.WeaponRoot.position, range, soundtype);
-            }
+            HelpersGClass.PlaySound(player, player.WeaponRoot.position, range, soundtype);
         }
 
         /// <summary>

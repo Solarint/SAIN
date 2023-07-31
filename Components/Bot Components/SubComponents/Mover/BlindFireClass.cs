@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using EFT;
+using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace SAIN.Classes.Mover
 {
     public class BlindFireClass : SAINBot
     {
-        public BlindFireClass(BotOwner bot) : base(bot)
+        public BlindFireClass(SAINComponent bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
@@ -77,7 +78,7 @@ namespace SAIN.Classes.Mover
 
         public Vector3 BlindFireTargetPos { get; private set; }
         public bool BlindFireActive => CurrentBlindFireSetting != 0;
-        public int CurrentBlindFireSetting => BotPlayer.MovementContext.BlindFire;
+        public int CurrentBlindFireSetting => GetPlayer.MovementContext.BlindFire;
         private float BlindFireTimer = 0f;
 
         private int CheckOverHeadBlindFire(Vector3 targetPos)

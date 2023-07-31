@@ -13,7 +13,7 @@ namespace SAIN.Classes
 {
     public class SquadLeaderClass : SAINBot
     {
-        public SquadLeaderClass(BotOwner owner) : base(owner)
+        public SquadLeaderClass(SAINComponent owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }

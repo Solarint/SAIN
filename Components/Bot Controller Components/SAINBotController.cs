@@ -52,8 +52,8 @@ namespace SAIN.Components
             PathManager.Awake();
             BotExtractManager.Awake();
 
-            Singleton<GClass629>.Instance.OnGrenadeThrow += GrenadeThrown;
-            Singleton<GClass629>.Instance.OnGrenadeExplosive += GrenadeExplosion;
+            Singleton<GClass635>.Instance.OnGrenadeThrow += GrenadeThrown;
+            Singleton<GClass635>.Instance.OnGrenadeExplosive += GrenadeExplosion;
             AISoundPlayed += SoundPlayed;
             PlayerTalk += PlayerTalked;
         }
@@ -200,23 +200,23 @@ namespace SAIN.Components
                     continue;
                 }
                 var Enemy = bot.Enemy;
-                if (Enemy != null && Enemy.Person.GetPlayer.ProfileId == player.ProfileId)
+                if (Enemy?.Person != null && Enemy.Person.ProfileId == player.ProfileId)
                 {
                     if (Enemy.RealDistance <= range)
                     {
                         if (soundType == SAINSoundType.GrenadePin || soundType == SAINSoundType.GrenadeDraw)
                         {
-                            Enemy.EnemyHasGrenadeOut = true;
+                            Enemy.EnemyStatus.EnemyHasGrenadeOut = true;
                             return;
                         }
                         if (soundType == SAINSoundType.Reload)
                         {
-                            Enemy.EnemyIsReloading = true;
+                            Enemy.EnemyStatus.EnemyIsReloading = true;
                             return;
                         }
                         if (soundType == SAINSoundType.Heal)
                         {
-                            Enemy.EnemyIsHealing = true;
+                            Enemy.EnemyStatus.EnemyIsHealing = true;
                             return;
                         }
                     }
@@ -267,18 +267,19 @@ namespace SAIN.Components
             return DotProd > dotProductMin;
         }
 
-        private void GrenadeExplosion(Vector3 explosionPosition, Player player, bool isSmoke, float smokeRadius, float smokeLifeTime)
+        private void GrenadeExplosion(Vector3 explosionPosition, string playerProfileID, bool isSmoke, float smokeRadius, float smokeLifeTime)
         {
-            if (player == null)
+            if (playerProfileID == null)
             {
                 return;
             }
+            Player player = EFTInfo.GetPlayer(playerProfileID);
             Vector3 position = player.Position;
             if (isSmoke)
             {
-                Singleton<GClass629>.Instance.PlaySound(player, explosionPosition, 50f, AISoundType.gun);
-                float radius = smokeRadius * GClass560.Core.SMOKE_GRENADE_RADIUS_COEF;
-                foreach (KeyValuePair<BotZone, GClass507> keyValuePair in DefaultController.Groups())
+                HelpersGClass.PlaySound(player, explosionPosition, 50f, AISoundType.gun);
+                float radius = smokeRadius * HelpersGClass.SMOKE_GRENADE_RADIUS_COEF;
+                foreach (var keyValuePair in DefaultController.Groups())
                 {
                     foreach (BotGroupClass botGroupClass in keyValuePair.Value.GetGroups(true))
                     {
@@ -288,7 +289,7 @@ namespace SAIN.Components
             }
             if (!isSmoke)
             {
-                Singleton<GClass629>.Instance.PlaySound(player, explosionPosition, 200f, AISoundType.gun);
+                HelpersGClass.PlaySound(player, explosionPosition, 200f, AISoundType.gun);
             }
         }
 
@@ -301,12 +302,9 @@ namespace SAIN.Components
             var danger = VectorHelpers.DangerPoint(position, force, mass);
             foreach (var bot in Bots.Values)
             {
-                if (bot?.IsDead == false && bot.BotOwner.BotsGroup.IsEnemy(grenade.Player))
+                if (bot != null && (danger - bot.Position).sqrMagnitude < 200f * 200f)
                 {
-                    if ((danger - bot.Position).sqrMagnitude < 200f * 200f)
-                    {
-                        bot.Grenade.EnemyGrenadeThrown(grenade, danger);
-                    }
+                    bot.Grenade.EnemyGrenadeThrown(grenade, danger);
                 }
             }
         }
@@ -324,8 +322,8 @@ namespace SAIN.Components
 
                 AISoundPlayed -= SoundPlayed;
                 PlayerTalk -= PlayerTalked;
-                Singleton<GClass629>.Instance.OnGrenadeThrow -= GrenadeThrown;
-                Singleton<GClass629>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
+                Singleton<GClass635>.Instance.OnGrenadeThrow -= GrenadeThrown;
+                Singleton<GClass635>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
 
                 if (Bots.Count > 0)
                 {

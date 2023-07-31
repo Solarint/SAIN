@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,7 +13,7 @@ namespace SAIN.Classes
         public bool PeekingCorner { get; private set; }
         public MoveDangerPoint SearchMovePoint { get; private set; }
 
-        public SearchClass(BotOwner bot) : base(bot)
+        public SearchClass(SAINComponent bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }

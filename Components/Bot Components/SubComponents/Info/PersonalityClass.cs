@@ -1,5 +1,6 @@
 ﻿using EFT;
 using Newtonsoft.Json;
+using SAIN.Components;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace SAIN.Classes
 {
     public class PersonalityClass : SAINInfoAbstract
     {
-        public PersonalityClass(BotOwner owner) : base(owner) { }
+        public PersonalityClass(SAINComponent owner) : base(owner) { }
 
         public void Update()
         {

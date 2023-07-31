@@ -10,7 +10,7 @@ namespace SAIN.Classes
 {
     public class Firerate : SAINWeaponInfoAbstract
     {
-        public Firerate(BotOwner owner) : base(owner) { }
+        public Firerate(SAINComponent owner) : base(owner) { }
 
         public void Update()
         {

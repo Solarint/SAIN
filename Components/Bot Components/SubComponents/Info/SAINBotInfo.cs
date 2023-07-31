@@ -1,17 +1,18 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.BotPresets;
+using SAIN.Components;
 using UnityEngine;
 
 namespace SAIN.Classes
 {
     public class SAINBotInfo : SAINInfoAbstract
     {
-        public SAINBotInfo(BotOwner botOwner) : base(botOwner)
+        public SAINBotInfo(SAINComponent botOwner) : base(botOwner)
         {
-            BotPresetClass = new BotPresetClass(BotOwner);
-            PersonalityClass = new PersonalityClass(BotOwner);
-            WeaponInfo = new WeaponInfo(BotOwner);
+            BotPresetClass = new BotPresetClass(botOwner);
+            PersonalityClass = new PersonalityClass(botOwner);
+            WeaponInfo = new WeaponInfo(botOwner);
         }
 
         public PresetValues FileSettings => BotPresetClass.PresetValues;

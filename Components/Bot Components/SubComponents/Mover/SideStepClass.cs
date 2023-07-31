@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using EFT;
+using SAIN.Components;
 using UnityEngine;
 
 namespace SAIN.Classes.Mover
@@ -8,7 +9,7 @@ namespace SAIN.Classes.Mover
     {
         public SideStepSetting SideStepSetting { get; private set; }
 
-        public SideStepClass(BotOwner bot) : base(bot)
+        public SideStepClass(SAINComponent bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -18,7 +19,7 @@ namespace SAIN.Classes.Mover
             SideStepSetting = SideStepSetting.None;
             if (current != 0f)
             {
-                BotPlayer.MovementContext.SetSidestep(0f);
+                GetPlayer.MovementContext.SetSidestep(0f);
             }
         }
 
@@ -100,11 +101,11 @@ namespace SAIN.Classes.Mover
         {
             if (current != value)
             {
-                BotPlayer.MovementContext.SetSidestep(value);
+                GetPlayer.MovementContext.SetSidestep(value);
             }
         }
 
-        public float CurrentSideStep => BotPlayer.MovementContext.GetSidestep();
+        public float CurrentSideStep => GetPlayer.MovementContext.GetSidestep();
 
         private readonly ManualLogSource Logger;
     }

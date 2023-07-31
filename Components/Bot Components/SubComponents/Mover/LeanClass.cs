@@ -1,5 +1,6 @@
 using BepInEx.Logging;
 using EFT;
+using SAIN.Components;
 using UnityEngine;
 
 namespace SAIN.Classes.Mover
@@ -8,7 +9,7 @@ namespace SAIN.Classes.Mover
     {
         public LeanSetting LeanDirection { get; private set; }
 
-        public LeanClass(BotOwner bot) : base(bot)
+        public LeanClass(SAINComponent bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }

@@ -2,12 +2,13 @@
 using UnityEngine;
 using Random = UnityEngine.Random;
 using static EFT.InventoryLogic.Weapon;
+using SAIN.Components;
 
 namespace SAIN.Classes
 {
     public class Firemode : SAINWeaponInfoAbstract
     {
-        public Firemode(BotOwner owner) : base(owner) { }
+        public Firemode(SAINComponent owner) : base(owner) { }
 
         private const float SemiAutoSwapDist = 40f;
         private const float FullAutoSwapDist = 30f;

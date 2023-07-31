@@ -9,7 +9,7 @@ namespace SAIN.Classes
 {
     public class SquadDecisionClass : SAINBot
     {
-        public SquadDecisionClass(BotOwner bot) : base(bot) { }
+        public SquadDecisionClass(SAINComponent bot) : base(bot) { }
 
         protected ManualLogSource Logger => SAIN.Decision.Logger;
         private SquadClass Squad => SAIN.Squad;

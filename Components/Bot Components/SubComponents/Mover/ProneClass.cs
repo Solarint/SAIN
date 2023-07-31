@@ -9,12 +9,14 @@ using UnityEngine;
 using BepInEx.Logging;
 using System.Reflection;
 using HarmonyLib;
+using SAIN.Components;
+using SAIN.Helpers;
 
 namespace SAIN.Classes.Mover
 {
     public class ProneClass : SAINBot
     {
-        public ProneClass(BotOwner owner) : base(owner)
+        public ProneClass(SAINComponent owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             BotLayProperty = AccessTools.Property(typeof(BotOwner), "BotLay").PropertyType.GetProperty("IsLay");
@@ -38,7 +40,7 @@ namespace SAIN.Classes.Mover
             var status = point.CoverStatus;
             if (status == CoverStatus.FarFromCover || status == CoverStatus.None)
             {
-                if (BotPlayer.MovementContext.CanProne)
+                if (GetPlayer.MovementContext.CanProne)
                 {
                     var enemy = SAIN.Enemy;
                     if (enemy != null)
@@ -60,7 +62,7 @@ namespace SAIN.Classes.Mover
 
         public bool ShallProne(bool withShoot, float mindist = 30f)
         {
-            if (BotPlayer.MovementContext.CanProne)
+            if (GetPlayer.MovementContext.CanProne)
             {
                 var enemy = SAIN.Enemy;
                 if (enemy != null)
@@ -81,7 +83,7 @@ namespace SAIN.Classes.Mover
 
         public bool ShallProneHide(float mindist = 30f)
         {
-            if (BotPlayer.MovementContext.CanProne)
+            if (GetPlayer.MovementContext.CanProne)
             {
                 var enemy = SAIN.Enemy;
                 if (enemy != null)
@@ -129,8 +131,8 @@ namespace SAIN.Classes.Mover
             Vector3 from = vector2;
             from.y = vector.y;
             float num = Vector3.Angle(from, vector2);
-            float lay_DOWN_ANG_SHOOT = GClass560.Core.LAY_DOWN_ANG_SHOOT;
-            return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && GClass252.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
+            float lay_DOWN_ANG_SHOOT = HelpersGClass.LAY_DOWN_ANG_SHOOT;
+            return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && VectorHelpers.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
         }
 
         public BotLayClass BotLay => BotOwner.BotLay;

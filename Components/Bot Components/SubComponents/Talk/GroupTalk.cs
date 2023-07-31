@@ -13,7 +13,7 @@ namespace SAIN.Classes
         protected ManualLogSource Logger;
         private BotTalkClass Talk => SAIN.Talk;
 
-        public GroupTalk(BotOwner bot) : base(bot)
+        public GroupTalk(SAINComponent bot) : base(bot)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -388,7 +388,7 @@ namespace SAIN.Classes
                 {
                     if (gesture != EGesture.None && SAIN.Squad.VisibleMembers.Count > 0 && SAIN.Enemy?.IsVisible == false)
                     {
-                        BotPlayer.HandsController.ShowGesture(gesture);
+                        GetPlayer.HandsController.ShowGesture(gesture);
                     }
                     if (SAIN.Squad.VisibleMembers.Count / (float)SAIN.Squad.SquadMembers.Count < 0.5f)
                     {

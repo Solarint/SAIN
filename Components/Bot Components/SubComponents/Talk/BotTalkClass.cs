@@ -36,8 +36,8 @@ namespace SAIN.Classes
             SAIN = GetComponent<SAINComponent>();
             PersonalPhraseDict = new Dictionary<EPhraseTrigger, PhraseInfo>(GlobalPhraseDictionary);
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            GroupTalk = new GroupTalk(BotOwner);
-            EnemyTalk = new EnemyTalk(BotOwner);
+            GroupTalk = new GroupTalk(SAIN);
+            EnemyTalk = new EnemyTalk(SAIN);
         }
 
         public bool CanTalk => SAIN.Info.FileSettings.CanTalk;

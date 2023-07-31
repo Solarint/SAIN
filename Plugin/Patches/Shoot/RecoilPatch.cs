@@ -10,12 +10,11 @@ using System.Linq;
 using static SAIN.Editor.EditorSettings;
 using SAIN.Helpers;
 
-namespace SAIN.Patches
+namespace SAIN.Patches.Shoot
 {
     public class AimOffsetPatch : ModulePatch
     {
         private static Type _aimingDataType;
-
         protected override MethodBase GetTargetMethod()
         {
             _aimingDataType = PatchConstants.EftTypes.Single(x => x.GetProperty("LastSpreadCount") != null && x.GetProperty("LastAimTime") != null);
@@ -23,7 +22,7 @@ namespace SAIN.Patches
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(GClass544 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
+        public static bool PatchPrefix(GClass547 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
             // Applies aiming offset, recoil offset, and scatter offsets
             Vector3 finalTarget = __instance.RealTargetPoint
@@ -42,7 +41,7 @@ namespace SAIN.Patches
                     Vector3 headPos = person.MainParts[BodyPartType.head].Position;
                     // Check the Distance to the bot's aiming target, and see if its really close or on the player's head
                     float dist = (headPos - finalTarget).magnitude;
-                    if (dist < 0.1f)
+                    if (dist < 0.15f)
                     {
                         // Shift the aim target up if it was going to be a headshot
 

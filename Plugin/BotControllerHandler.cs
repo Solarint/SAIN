@@ -12,16 +12,15 @@ namespace SAIN
             var gameWorld = Singleton<GameWorld>.Instance;
             if (gameWorld == null)
             {
-                ComponentAdded = false;
                 if (BotController != null)
                 {
+                    ComponentAdded = false;
                     BotController = null;
                 }
                 return;
             }
 
-            // AddorUpdateColorScheme Components to main player
-            if (!ComponentAdded)
+            if (!ComponentAdded || BotController == null)
             {
                 BotController = gameWorld.GetOrAddComponent<SAINBotController>();
                 ComponentAdded = true;
@@ -29,6 +28,6 @@ namespace SAIN
         }
 
         public static SAINBotController BotController { get; private set; }
-        public static bool ComponentAdded { get; private set; }
+        static bool ComponentAdded = false;
     }
 }

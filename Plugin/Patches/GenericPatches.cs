@@ -43,20 +43,6 @@ namespace SAIN.Patches.Generic
         }
     }
 
-    public class InitHelper : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotControllerClass), "Init");
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(ref BotOwner __instance)
-        {
-            VectorHelpers.Init();
-        }
-    }
-
     public class GrenadeThrownActionPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()

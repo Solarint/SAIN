@@ -9,7 +9,7 @@ namespace SAIN.Components
 {
     public class CoverAnalyzer : SAINBot
     {
-        public CoverAnalyzer(BotOwner botOwner, CoverFinderComponent coverFinder) : base(botOwner)
+        public CoverAnalyzer(SAINComponent botOwner, CoverFinderComponent coverFinder) : base(botOwner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             Path = new NavMeshPath();

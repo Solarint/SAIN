@@ -7,17 +7,16 @@ namespace SAIN
 {
     public abstract class SAINBot
     {
-        public SAINBot(BotOwner bot)
+        public SAINBot(SAINComponent bot)
         {
-            BotOwner = bot;
-            SAIN = bot.GetOrAddComponent<SAINComponent>();
+            SAIN = bot;
+            BotOwner = bot?.BotOwner;
         }
 
         public BotOwner BotOwner { get; private set; }
         public SAINComponent SAIN { get; private set; }
-        public Player BotPlayer => BotOwner.GetPlayer;
+        public Player GetPlayer => BotOwner.GetPlayer;
         public Vector3 BotPosition => BotOwner.Position;
-        public WildSpawnType Role => BotOwner.Profile.Info.Settings.Role;
         public SAINSoloDecision CurrentDecision => SAIN.Decision.MainDecision;
         public SAINSelfDecision SelfDecision => SAIN.Decision.CurrentSelfDecision;
         public SAINSquadDecision SquadDecision => SAIN.Decision.CurrentSquadDecision;

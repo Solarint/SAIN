@@ -3,6 +3,7 @@ using Comfort.Common;
 using EFT;
 using SAIN.Classes;
 using SAIN.Classes.Sense;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -40,7 +41,7 @@ namespace SAIN.Components
             Squad = bot.GetOrAddComponent<SquadClass>();
             Equipment = bot.GetOrAddComponent<BotEquipmentClass>();
 
-            Info = new SAINBotInfo(bot);
+            Info = new SAINBotInfo(this);
 
             BotStuck = bot.GetOrAddComponent<SAINBotUnstuck>();
             Hearing = bot.GetOrAddComponent<HearingSensorClass>();
@@ -55,7 +56,10 @@ namespace SAIN.Components
             NoBushESP = bot.GetOrAddComponent<NoBushESP>();
             EnemyController = bot.GetOrAddComponent<EnemyController>();
             Sounds = bot.GetOrAddComponent<SoundsController>();
-            FriendlyFireClass = new FriendlyFireClass(bot);
+
+            FriendlyFireClass = new FriendlyFireClass(this);
+            Vision = new VisionClass(this);
+
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
@@ -82,10 +86,12 @@ namespace SAIN.Components
                 UpdatePatrolData();
                 UpdateHealth();
 
-                Info?.Update();
-                FriendlyFireClass?.Update();
+                Vision.Update();
+                Info.Update();
+                FriendlyFireClass.Update();
+                BotOwner.DoorOpener.Update();
+
                 Enemy?.Update();
-                BotOwner.DoorOpener?.Update();
 
                 if (Enemy == null && BotOwner.BotLight?.IsEnable == false)
                 {

@@ -24,7 +24,7 @@ namespace SAIN.Layers
 
         public override void Start()
         {
-            Search = new SearchClass(BotOwner);
+            Search = new SearchClass(SAIN);
             FindTarget();
         }
 

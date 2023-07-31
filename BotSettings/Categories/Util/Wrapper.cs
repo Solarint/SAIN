@@ -20,7 +20,7 @@ namespace SAIN.BotSettings.Categories.Util
 
         public object GUIModify()
         {
-            ModifySettings.GUIModify(this);
+            return ModifySettings.GUIModify(this);
         }
     }
 }

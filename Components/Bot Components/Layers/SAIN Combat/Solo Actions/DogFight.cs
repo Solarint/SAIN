@@ -3,6 +3,7 @@ using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
+using SAIN.Helpers;
 using UnityEngine;
 using UnityEngine.AI;
 using static SAIN.UserSettings.DebugConfig;
@@ -45,7 +46,7 @@ namespace SAIN.Layers
 
         private bool BackUp(out Vector3 trgPos)
         {
-            Vector3 a = -GClass782.NormalizeFastSelf(SAIN.Enemy.Direction);
+            Vector3 a = -VectorHelpers.NormalizeFastSelf(SAIN.Enemy.Direction);
             trgPos = Vector3.zero;
             float num = 0f;
             Vector3 random = Random.onUnitSphere * 1f;

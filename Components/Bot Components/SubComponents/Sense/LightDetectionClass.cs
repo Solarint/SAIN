@@ -15,7 +15,7 @@ namespace SAIN.Components
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
 
-            LocalPlayer = Singleton<GameWorld>.Instance.RegisteredPlayers.Find(p => p.IsYourPlayer);
+            LocalPlayer = Singleton<GameWorld>.Instance.RegisteredPlayers.Find(p => p.IsYourPlayer) as Player;
             PlayerFlashComponent = LocalPlayer.GetComponent<FlashLightComponent>();
         }
 

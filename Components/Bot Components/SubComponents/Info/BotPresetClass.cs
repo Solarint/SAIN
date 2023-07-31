@@ -2,15 +2,16 @@
 using Newtonsoft.Json;
 using SAIN.BotPresets;
 using SAIN.BotSettings;
+using SAIN.Components;
 using SAIN.Helpers;
 
 namespace SAIN.Classes
 {
     public class BotPresetClass : SAINInfoAbstract
     {
-        public BotPresetClass(BotOwner owner) : base(owner)
+        public BotPresetClass(SAINComponent owner) : base(owner)
         {
-            BotSettings = BotSettingsHandler.GetSettings(owner);
+            BotSettings = BotSettingsHandler.GetSettings(owner.BotOwner);
 
             if (PresetManager.GetPreset(WildSpawnType, out var preset))
             {
@@ -19,7 +20,7 @@ namespace SAIN.Classes
 
             PresetManager.PresetUpdated += PresetUpdated;
 
-            BotOwnerSettings = new BotOwnerSettings(owner);
+            BotOwnerSettings = new BotOwnerSettings(owner.BotOwner);
         }
 
         public BotOwnerSettings BotOwnerSettings { get; private set; }

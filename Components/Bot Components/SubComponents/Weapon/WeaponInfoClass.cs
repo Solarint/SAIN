@@ -1,6 +1,7 @@
 using BepInEx.Logging;
 using EFT;
 using EFT.InventoryLogic;
+using SAIN.Components;
 using System.Linq;
 using UnityEngine;
 using static EFT.InventoryLogic.Weapon;
@@ -10,7 +11,7 @@ namespace SAIN.Classes
 {
     public class WeaponInfo : SAINWeaponInfoAbstract
     {
-        public WeaponInfo(BotOwner bot) : base(bot)
+        public WeaponInfo(SAINComponent bot) : base(bot)
         {
             Modifiers = new ModifierClass(bot);
             DefaultAccuracy = BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF;
@@ -95,7 +96,7 @@ namespace SAIN.Classes
 
     public class ModifierClass : SAINWeaponInfoAbstract
     {
-        public ModifierClass(BotOwner bot) : base(bot) { }
+        public ModifierClass(SAINComponent bot) : base(bot) { }
 
         private const float WeaponClassScaling = 0.3f;
         private const float RecoilScaling = 0.2f;
@@ -289,7 +290,7 @@ namespace SAIN.Classes
             }
             else
             {
-                switch (Role)
+                switch (WildSpawnType)
                 {
                     case WildSpawnType.assault:
                         botTypeModifier = 1.0f;
@@ -409,9 +410,7 @@ namespace SAIN.Classes
 
     public abstract class SAINWeaponInfoAbstract : SAINInfoAbstract
     {
-        public SAINWeaponInfoAbstract(BotOwner owner) : base(owner)
-        {
-        }
+        public SAINWeaponInfoAbstract(SAINComponent owner) : base(owner) {}
 
         public bool IsFireModeSet(EFireMode mode)
         {

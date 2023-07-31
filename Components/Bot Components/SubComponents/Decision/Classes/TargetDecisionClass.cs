@@ -1,12 +1,13 @@
 ﻿using EFT;
 using EFT.Hideout.ShootingRange;
+using SAIN.Components;
 using UnityEngine;
 
 namespace SAIN.Classes
 {
     public class TargetDecisionClass : SAINBot
     {
-        public TargetDecisionClass(BotOwner bot) : base(bot) { }
+        public TargetDecisionClass(SAINComponent bot) : base(bot) { }
         public float FoundTargetTimer { get; private set; }
 
         public bool GetDecision(out SAINSoloDecision Decision)

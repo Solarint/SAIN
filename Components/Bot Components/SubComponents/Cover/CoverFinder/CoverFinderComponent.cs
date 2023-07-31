@@ -17,7 +17,7 @@ namespace SAIN.Components
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             ColliderFinder = new ColliderFinder();
-            CoverAnalyzer = new CoverAnalyzer(BotOwner, this);
+            CoverAnalyzer = new CoverAnalyzer(SAIN, this);
         }
 
         public List<CoverPoint> CoverPoints { get; private set; } = new List<CoverPoint>();

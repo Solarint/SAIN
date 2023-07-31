@@ -1,15 +1,15 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Components;
-using SAIN.Helpers;
 using UnityEngine;
+using static SAIN.Helpers.HelpersGClass;
 using static SAIN.UserSettings.DazzleConfig;
 
 namespace SAIN.Helpers
 {
     public class FlashLightDazzle : SAINBot
     {
-        public FlashLightDazzle(BotOwner owner) : base(owner)
+        public FlashLightDazzle(SAINComponent owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
@@ -18,11 +18,8 @@ namespace SAIN.Helpers
 
         public void CheckIfDazzleApplied(IAIDetails person)
         {
-            if (person.GetPlayer == null)
-            {
-                return;
-            }
-            if (person.GetPlayer.TryGetComponent<FlashLightComponent>(out var flashlight))
+            var flashlight = SAIN.FlashLight;
+            if (flashlight != null)
             {
                 if (flashlight.WhiteLight)
                 {
@@ -146,21 +143,21 @@ namespace SAIN.Helpers
         /// <param name="BotOwner">The BotOwner to apply the modifications to.</param>
         private void ApplyDazzle(float dazzleModif, float gainSightModif)
         {
-            GClass557 modif = new GClass557
-            {
-                PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,
-                AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value,
-                LayChanceDangerCoef = 1f,
-                VisibleDistCoef = 1f,
-                GainSightCoef = gainSightModif,
-                ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value,
-                PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value,
-                HearingDistCoef = 1f,
-                TriggerDownDelay = 1f,
-                WaitInCoverCoef = 1f
-            };
+            float PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value;
+            float AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value;
+            float ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value;
+            float PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value;
 
-            BotOwner.Settings.Current.Apply(modif, 0.1f);
+            BotStatGClassWrapper Modifiers = new BotStatGClassWrapper
+                (
+                    PrecicingSpeedCoef, 
+                    AccuratySpeedCoef,
+                    gainSightModif, 
+                    ScatteringCoef,
+                    PriorityScatteringCoef
+                );
+
+            BotOwner.Settings.Current.Apply(Modifiers.Modifiers, 0.1f);
         }
 
         /// <summary>

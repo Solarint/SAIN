@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using UnityEngine.AI;
 using UnityEngine;
 using BepInEx.Logging;
+using SAIN.Components;
 
 namespace SAIN.Classes
 {
     public class JumpClass : SAINBot
     {
-        public JumpClass(BotOwner owner) : base(owner)
+        public JumpClass(SAINComponent owner) : base(owner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }

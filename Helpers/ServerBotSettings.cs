@@ -57,9 +57,9 @@ namespace SAIN.Helpers
             }
         }
 
-        public static GClass562 GetSettings(BotDifficulty difficulty, WildSpawnType type)
+        public static GClass566 GetSettings(BotDifficulty difficulty, WildSpawnType type)
         {
-            return GClass560.GetSettings(difficulty, type);
+            return GClass564.GetSettings(difficulty, type);
         }
 
         public static Dictionary<Type, FieldInfo[]> SAINSettingsFields = new Dictionary<Type, FieldInfo[]>();

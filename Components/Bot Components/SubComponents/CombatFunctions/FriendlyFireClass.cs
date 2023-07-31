@@ -1,4 +1,5 @@
 ﻿using EFT;
+using SAIN.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace SAIN.Classes
 {
     public class FriendlyFireClass : SAINBot
     {
-        public FriendlyFireClass(BotOwner owner) : base(owner) { }
+        public FriendlyFireClass(SAINComponent owner) : base(owner) { }
 
         public FriendlyFireStatus FriendlyFireStatus { get; private set; }
         public bool ClearShot => FriendlyFireStatus != FriendlyFireStatus.FriendlyBlock;

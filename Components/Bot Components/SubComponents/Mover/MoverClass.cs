@@ -24,11 +24,11 @@ namespace SAIN.Classes
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
 
-            BlindFire = new BlindFireClass(BotOwner);
-            SideStep = new SideStepClass(BotOwner);
-            Lean = new LeanClass(BotOwner);
-            Prone = new ProneClass(BotOwner);
-            Pose = new PoseClass(BotOwner);
+            BlindFire = new BlindFireClass(SAIN);
+            SideStep = new SideStepClass(SAIN);
+            Lean = new LeanClass(SAIN);
+            Prone = new ProneClass(SAIN);
+            Pose = new PoseClass(SAIN);
         }
 
         private void Update()
@@ -197,7 +197,7 @@ namespace SAIN.Classes
             if (JumpTimer < Time.time && CanJump)
             {
                 JumpTimer = Time.time + 1f;
-                CurrentState.Jump();
+                BotOwner.GetPlayer.MovementContext.TryJump();
             }
         }
 
@@ -237,7 +237,6 @@ namespace SAIN.Classes
             }
         }
 
-        public MovementState CurrentState => BotOwner.GetPlayer.MovementContext.CurrentState;
         public bool CanJump => BotOwner.GetPlayer.MovementContext.CanJump;
 
         private float JumpTimer = 0f;

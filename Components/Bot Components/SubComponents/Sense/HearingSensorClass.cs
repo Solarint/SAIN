@@ -17,12 +17,12 @@ namespace SAIN.Classes
         {
             SAIN = GetComponent<SAINComponent>();
             Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            Singleton<GClass629>.Instance.OnSoundPlayed += HearSound;
+            Singleton<GClass635>.Instance.OnSoundPlayed += HearSound;
         }
 
         public void OnDestroy()
         {
-            Singleton<GClass629>.Instance.OnSoundPlayed -= HearSound;
+            Singleton<GClass635>.Instance.OnSoundPlayed -= HearSound;
         }
 
         public void HearSound(IAIDetails player, Vector3 position, float power, AISoundType type)
@@ -39,7 +39,7 @@ namespace SAIN.Classes
         {
             if (player != null)
             {
-                if (BotOwner.GetPlayer == player.GetPlayer)
+                if (BotOwner.ProfileId == player.ProfileId)
                 {
                     return;
                 }
@@ -348,7 +348,7 @@ namespace SAIN.Classes
                     return false;
                 }
                 // If the sound source is the player, raycast and find number of collisions
-                if (player.GetPlayer.IsYourPlayer)
+                if (player.IsYourPlayer)
                 {
                     // Check if the sound originates from an environment other than the BotOwner's
                     float environmentmodifier = EnvironmentCheck(player);
@@ -361,9 +361,6 @@ namespace SAIN.Classes
 
                     // Apply Modifier
                     occlusion = power * finalmodifier;
-
-                    // Debug
-                    if (DebugOcclusion.Value) Logger.LogDebug($"Raycast Check. Heard?: {distance < occlusion}: For [{BotOwner.name}]: from [{player.GetPlayer.name}] new reduced power: [{occlusion}] because modifier = [{finalmodifier}]");
 
                     return distance < occlusion;
                 }
@@ -385,7 +382,7 @@ namespace SAIN.Classes
         private float EnvironmentCheck(IAIDetails enemy)
         {
             int botlocation = BotOwner.AIData.EnvironmentId;
-            int enemylocation = enemy.GetPlayer.AIData.EnvironmentId;
+            int enemylocation = enemy.AIData.EnvironmentId;
             return botlocation == enemylocation ? 1f : 0.66f;
         }
 

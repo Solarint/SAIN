@@ -1,5 +1,4 @@
 ﻿using BepInEx.Logging;
-using Comfort.Common;
 using EFT;
 using SAIN.Components;
 using System.Collections.Generic;
@@ -25,22 +24,37 @@ namespace SAIN.Classes
         private void Update()
         {
             if (SAIN == null) return;
-            var enemy = BotOwner.Memory.GoalEnemy;
-            if (enemy != null && enemy?.Person?.GetPlayer?.IsYourPlayer == true)
+
+            if (!NoBushESPToggle.Value)
             {
-                if (NoBushTimer < Time.time)
+                NoBushESPActive = false;
+                return;
+            }
+
+            var enemy = BotOwner.Memory.GoalEnemy;
+            if (enemy != null && enemy?.IsVisible == true)
+            {
+                Player player = enemy?.Person as Player;
+                if (player?.IsYourPlayer == true)
                 {
-                    NoBushTimer = Time.time + 0.1f;
-                    NoBushESPActive = NoBushESPCheck();
-                }
-                if (NoBushESPActive)
-                {
-                    BotOwner.AimingData?.LoseTarget();
-                    if (!SAIN.LayersActive)
+                    if (NoBushTimer < Time.time)
                     {
-                        BotOwner.ShootData.EndShoot();
-                        enemy.SetCanShoot(false);
+                        NoBushTimer = Time.time + 0.1f;
+                        NoBushESPActive = NoBushESPCheck(player);
                     }
+                    if (NoBushESPActive)
+                    {
+                        BotOwner.AimingData?.LoseTarget();
+                        if (!SAIN.LayersActive)
+                        {
+                            BotOwner.ShootData.EndShoot();
+                            enemy.SetCanShoot(false);
+                        }
+                    }
+                }
+                else
+                {
+                    NoBushESPActive = false;
                 }
             }
             else
@@ -53,33 +67,21 @@ namespace SAIN.Classes
 
         private float NoBushTimer = 0f;
 
-        public bool NoBushESPCheck()
+        public bool NoBushESPCheck(IAIDetails player)
         {
-            if (!NoBushESPToggle.Value)
+            Vector3 direction = player.MainParts[BodyPartType.head].Position - SAIN.HeadPosition;
+            if (Physics.Raycast(SAIN.HeadPosition, direction.normalized, out var hit, direction.magnitude, NoBushMask))
             {
-                return false;
-            }
-            var enemy = BotOwner.Memory.GoalEnemy;
-            if (enemy != null && enemy?.IsVisible == true)
-            {
-                Player player = enemy?.Person?.GetPlayer;
-                if (player?.IsYourPlayer == true)
+                if (hit.transform?.parent?.gameObject == null)
                 {
-                    Vector3 direction = player.MainParts[BodyPartType.head].Position - SAIN.HeadPosition;
-                    if (Physics.Raycast(SAIN.HeadPosition, direction.normalized, out var hit, direction.magnitude, NoBushMask))
+                    return false;
+                }
+                string ObjectName = hit.transform?.parent?.gameObject?.name;
+                foreach (string exclusion in ExclusionList)
+                {
+                    if (ObjectName.ToLower().Contains(exclusion))
                     {
-                        if (hit.transform?.parent?.gameObject == null)
-                        {
-                            return false;
-                        }
-                        string ObjectName = hit.transform?.parent?.gameObject?.name;
-                        foreach (string exclusion in ExclusionList)
-                        {
-                            if (ObjectName.ToLower().Contains(exclusion))
-                            {
-                                return true;
-                            }
-                        }
+                        return true;
                     }
                 }
             }
@@ -87,6 +89,7 @@ namespace SAIN.Classes
         }
 
         private LayerMask NoBushMask;
+
         public static List<string> ExclusionList = new List<string> { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider",
         "timber", "spruce", "bush", "metal", "wood", "grass" };
     }

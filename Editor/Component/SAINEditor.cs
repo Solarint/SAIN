@@ -346,8 +346,8 @@ namespace SAIN.Editor
 
                     Builder.BeginHorizontal();
 
-                    Buttons.SingleTextBool("Looting Bots", SAINPlugin.LootingBotsLoaded);
-                    Buttons.SingleTextBool("Realism Mod", SAINPlugin.RealismLoaded);
+                    Buttons.SingleTextBool("Looting Bots", PluginInfo.LootingBots.Loaded);
+                    Buttons.SingleTextBool("Realism Mod", PluginInfo.RealismMod.Loaded);
 
                     Builder.EndHorizontal();
                     //BotSettingsEditor.CreateEditMenu();

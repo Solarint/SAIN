@@ -9,7 +9,7 @@ using System.Reflection;
 using UnityEngine;
 using static SAIN.Helpers.Shoot;
 
-namespace SAIN.Patches
+namespace SAIN.Patches.Shoot
 {
     public class AimTimePatch : ModulePatch
     {
@@ -101,7 +101,7 @@ namespace SAIN.Patches
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass363), "method_1");
+            return AccessTools.Method(typeof(GClass365), "method_1");
         }
 
         [PatchPostfix]

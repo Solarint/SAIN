@@ -7,7 +7,7 @@ using SAIN.Helpers;
 using System.Reflection;
 using UnityEngine;
 
-namespace SAIN.Patches
+namespace SAIN.Patches.Shoot
 {
     public class GrenadeSoundPatch : ModulePatch
     {
@@ -21,7 +21,7 @@ namespace SAIN.Patches
         {
             try
             {
-                Singleton<GClass629>.Instance.PlaySound(null, __instance.transform.position, 20f, AISoundType.gun);
+                HelpersGClass.PlaySound(null, __instance.transform.position, 20f, AISoundType.gun);
                 Logger.LogInfo($"Played AISound for grenade bounce");
             }
             catch

@@ -1,12 +1,13 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using SAIN.Components;
 using UnityEngine;
 
 namespace SAIN.Classes
 {
     public class EnemyDecisionClass : SAINBot
     {
-        public EnemyDecisionClass(BotOwner bot) : base(bot) { }
+        public EnemyDecisionClass(SAINComponent bot) : base(bot) { }
 
         public bool GetDecision(out SAINSoloDecision Decision)
         {
@@ -87,7 +88,8 @@ namespace SAIN.Classes
                 {
                     if (!SAIN.Decision.SelfActionDecisions.LowOnAmmo(0.5f) && SAIN.HealthStatus != ETagStatus.Dying && BotOwner.CanSprintPlayer)
                     {
-                        if (enemy.EnemyIsReloading || enemy.EnemyIsHealing || enemy.EnemyHasGrenadeOut)
+                        var enemyStatus = enemy.EnemyStatus;
+                        if (enemyStatus.EnemyIsReloading || enemyStatus.EnemyIsHealing || enemyStatus.EnemyHasGrenadeOut)
                         {
                             return true;
                         }
@@ -161,7 +163,7 @@ namespace SAIN.Classes
         private bool StartDogFightAction(SAINEnemy enemy)
         {
             var pathStatus = enemy.CheckPathDistance();
-            return (pathStatus == SAINEnemyPath.VeryClose && SAIN.Enemy.IsVisible) || SAIN.Cover.CoverInUse?.Spotted == true;
+            return (pathStatus == SAINEnemyPathEnum.VeryClose && SAIN.Enemy.IsVisible) || SAIN.Cover.CoverInUse?.Spotted == true;
         }
 
         private bool StartThrowNade(SAINEnemy enemy)
@@ -185,11 +187,11 @@ namespace SAIN.Classes
 
             if (enemy.TimeSinceSeen > 3f && enemy.TimeSinceSeen < 15f && enemy.Seen)
             {
-                if (SAIN.Grenade.EFTBotGrenade.CanThrowGrenade(enemy.CurrPosition))
-                {
-                    EndThrowTimer = Time.time;
-                    return true;
-                }
+                //if (SAIN.Grenade.EFTBotGrenade.CanThrowGrenade(enemy.CurrPosition))
+                //{
+                //    EndThrowTimer = Time.time;
+                //    return true;
+                //}
             }
 
             return false;
@@ -220,11 +222,12 @@ namespace SAIN.Classes
 
         private bool ContinueThrow()
         {
-            if (SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData == null || Time.time - EndThrowTimer > 3f)
-            {
-                return false;
-            }
-            return CurrentDecision == SAINSoloDecision.ThrowGrenade && SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData?.ThrowComplete == false;
+            return false;
+            //if (SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData == null || Time.time - EndThrowTimer > 3f)
+            //{
+            //    return false;
+            //}
+            //return CurrentDecision == SAINSoloDecision.ThrowGrenade && SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData?.ThrowComplete == false;
         }
 
         private bool StartRunForCover()

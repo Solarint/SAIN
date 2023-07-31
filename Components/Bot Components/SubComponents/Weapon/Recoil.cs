@@ -1,5 +1,6 @@
 ﻿using EFT;
 using EFT.InventoryLogic;
+using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
 using static SAIN.Editor.EditorSettings;
@@ -8,7 +9,7 @@ namespace SAIN.Classes
 {
     public class Recoil : SAINWeaponInfoAbstract
     {
-        public Recoil(BotOwner owner) : base(owner) { }
+        public Recoil(SAINComponent owner) : base(owner) { }
 
         public Vector3 CalculateRecoil(Vector3 targetpoint)
         {
@@ -113,7 +114,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (!SAINPlugin.RealismLoaded)
+                if (!PluginInfo.RealismMod.Loaded)
                 {
                     return 250f;
                 }

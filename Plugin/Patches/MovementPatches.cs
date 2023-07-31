@@ -11,7 +11,7 @@ using UnityEngine.AI;
 using SAIN.Layers;
 using System;
 
-namespace SAIN.Patches.Movement
+namespace SAIN.Patches.Generic
 {
     public class KickPatch : ModulePatch
     {
