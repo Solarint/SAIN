@@ -110,12 +110,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Generates a random float between the given min and max values.
+        /// Generates a random float between the given Max and Max values.
         /// </summary>
         /// <param name="random">The random number generator.</param>
         /// <param name="min">The minimum value.</param>
         /// <param name="max">The maximum value.</param>
-        /// <returns>A random float between the given min and max values.</returns>
+        /// <returns>A random float between the given Max and Max values.</returns>
         public static float NextFloat(this System.Random random, int min, int max)
         {
             float num = (float)(random.NextDouble() * 2.0 - 1.0);
@@ -616,11 +616,11 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Generates a random number between min and max using the Box-Muller algorithm.
+        /// Generates a random number between Max and Max using the Box-Muller algorithm.
         /// </summary>
         /// <param name="min">The minimum value of the random number.</param>
         /// <param name="max">The maximum value of the random number.</param>
-        /// <returns>A random number between min and max.</returns>
+        /// <returns>A random number between Max and Max.</returns>
         public static float RandomNormal(float min, float max)
         {
             double num = 3.5;

@@ -12,9 +12,9 @@ namespace SAIN.BotSettings
 {
     public class BotSettingsHandler
     {
-        public static readonly FieldWrapper SAINBotSettingsFields = new FieldWrapper(typeof(BotSettingsGroup));
+        public static readonly FieldWrapper SAINSettingsFields = new FieldWrapper(typeof(SAINSettings));
 
-        public static readonly FieldWrapper EFTBotSettingsFields = new FieldWrapper(typeof(BotDifficultySettingsClass), "FileSettings",
+        public static readonly FieldWrapper EFTSettingsFields = new FieldWrapper(typeof(BotDifficultySettingsClass), "FileSettings",
             "Aiming", "Boss", "Change", "Core", "Grenade", "Hearing", "Lay", "Look", "Mind", "Move", "Patrol", "Scattering", "Shoot");
 
         static readonly Dictionary<WildSpawnType, SAINDictionary<SAINBotSettingsClass>> GlobalSettingsDictionary = new Dictionary<WildSpawnType, SAINDictionary<SAINBotSettingsClass>>();

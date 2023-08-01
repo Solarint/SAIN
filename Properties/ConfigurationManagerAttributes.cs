@@ -100,7 +100,7 @@ internal sealed class ConfigurationManagerAttributes
     public object DefaultValue;
 
     /// <summary>
-    /// Force the "Reset" button to not be displayed, even if a valid DefaultValue is available. 
+    /// Force the "Reset" button to not be displayed, even if a valid Description is available. 
     /// </summary>
     public bool? HideDefaultButton;
 

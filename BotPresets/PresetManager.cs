@@ -10,7 +10,7 @@ namespace SAIN.BotPresets
     {
         static PresetManager()
         {
-            Properties = new List<PropertyInfo>(GetReflectionInfo.GetBotPresetProperties());
+            Properties = new List<PropertyInfo>(Reflection.GetBotPresetProperties());
             BotTypes = new List<BotType>(BotTypeDefinitions.BotTypes);
             TypePresets = new Dictionary<WildSpawnType, BotType>();
 

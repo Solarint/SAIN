@@ -18,7 +18,7 @@ namespace SAIN.Helpers
             }
 
             EFTFields = typeof(GClass562).GetFields(BindingFlags.Instance | BindingFlags.Public);
-            SAINFields = typeof(BotSettingsGroup).GetFields();
+            SAINFields = typeof(SAINSettings).GetFields();
             Loaded = true;
         }
 
@@ -101,7 +101,7 @@ namespace SAIN.Helpers
         {
             Type = type;
             BaseField = GetField(type, containingFields);
-            Fields = GetReflectionInfo.GetFields(type);
+            Fields = Reflection.GetFields(type);
         }
 
         public Type Type;

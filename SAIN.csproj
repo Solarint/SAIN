@@ -213,6 +213,16 @@
   <ItemGroup>
     <Compile Include="BotPresets\BotType.cs" />
     <Compile Include="BotPresets\BotTypeDefinitions.cs" />
+    <Compile Include="SAINPreset\Settings\AimSettings.cs" />
+    <Compile Include="SAINPreset\Settings\Attributes.cs" />
+    <Compile Include="SAINPreset\Settings\BotConfig\BotConfigSettings.cs" />
+    <Compile Include="SAINPreset\Settings\BotConfig\BotConfigEntry.cs" />
+    <Compile Include="SAINPreset\Settings\ExtractSettings.cs" />
+    <Compile Include="SAINPreset\Settings\FlashlightSettings.cs" />
+    <Compile Include="SAINPreset\Settings\GeneralSettings.cs" />
+    <Compile Include="SAINPreset\Settings\HearingSettings.cs" />
+    <Compile Include="SAINPreset\SAINPresetClass.cs" />
+    <Compile Include="SAINPreset\Settings\PersonalitySettings.cs" />
     <Compile Include="BotSettings\BotSettingsClass.cs" />
     <Compile Include="BotSettings\Categories\SAINLookSettings.cs" />
     <Compile Include="BotSettings\Categories\SAINAimingSettings.cs" />
@@ -226,13 +236,13 @@
     <Compile Include="BotSettings\Categories\SAINShootSettings.cs" />
     <Compile Include="BotSettings\Categories\SAINMoveSettings.cs" />
     <Compile Include="BotSettings\Categories\SAINCoreSettings.cs" />
-    <Compile Include="BotSettings\Categories\InitDictionary.cs" />
-    <Compile Include="BotSettings\Categories\Util\BotDefaultValues.cs" />
-    <Compile Include="BotSettings\Categories\Util\Modify.cs" />
-    <Compile Include="BotSettings\Categories\Util\Wrapper.cs" />
+    <Compile Include="BotSettings\InitDictionary.cs" />
+    <Compile Include="BotSettings\Util\BotDefaultValues.cs" />
+    <Compile Include="BotSettings\Util\Modify.cs" />
+    <Compile Include="BotSettings\Util\Wrapper.cs" />
     <Compile Include="BotSettings\BotSettingsDictionary.cs" />
     <Compile Include="Helpers\HelpersGClass.cs" />
-    <Compile Include="Helpers\GetProperties.cs" />
+    <Compile Include="Helpers\Reflection.cs" />
     <Compile Include="Components\Bot Components\Helpers\MathHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\MoveToEngage.cs" />
     <Compile Include="Components\Bot Components\SAINDebugEnum.cs" />
@@ -389,6 +399,8 @@
     <Compile Include="Components\Bot Components\SAINBotAbstractClass.cs" />
     <Compile Include="Plugin\VersionChecker\TarkovVersion.cs" />
     <Compile Include="Plugin\PluginInfo.cs" />
+    <Compile Include="SAINPreset\Settings\ShootSettings.cs" />
+    <Compile Include="SAINPreset\Settings\VisionSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

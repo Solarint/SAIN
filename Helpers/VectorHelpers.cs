@@ -206,7 +206,7 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Clamps the given Vector3 between the given min and max Vector3s.
+        /// Clamps the given Vector3 between the given Max and Max Vector3s.
         /// </summary>
         /// <param name="vector">The Vector3 to clamp.</param>
         /// <param name="min">The minimum Vector3.</param>

@@ -79,7 +79,7 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Applies dazzle to the enemy if they are within the max dazzle range and the raycast between the BotOwner and the enemy is not blocked.
+        /// Applies dazzle to the enemy if they are within the Max dazzle range and the raycast between the BotOwner and the enemy is not blocked.
         /// </summary>
         public void EnemyWithLaser(IAIDetails person)
         {

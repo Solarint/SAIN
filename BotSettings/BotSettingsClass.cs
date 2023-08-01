@@ -19,26 +19,11 @@ namespace SAIN.BotSettings
         public WildSpawnType WildSpawnType { get; private set; }
         public BotDifficulty BotDifficulty { get; private set; }
 
-        public BotSettingsGroup Settings { get; private set; } = new BotSettingsGroup();
+        public SAINSettings Settings { get; private set; } = new SAINSettings();
         public BotDefaultValues BotDefaultValues { get; private set; } = new BotDefaultValues();
-
-        public void SetBotVariablesFromSAIN(BotOwner owner)
-        {
-            var Aiming = owner.Settings.FileSettings.Aiming;
-            Aiming.MAX_AIMING_UPGRADE_BY_TIME = Settings.Aiming.MAX_AIMING_UPGRADE_BY_TIME;
-
-            var Core = owner.Settings.FileSettings.Core;
-            Core.VisibleAngle = Settings.Core.VisibleAngle;
-            Core.VisibleDistance = Settings.Core.VisibleDistance;
-            Core.GainSightCoef = Settings.Core.GainSightCoef;
-            Core.ScatteringPerMeter = Settings.Core.ScatteringPerMeter;
-            Core.DamageCoeff = Settings.Core.DamageCoeff;
-            Core.CanRun = true;
-            Core.CanGrenade = Settings.Core.CanGrenade;
-        }
     }
 
-    public class BotSettingsGroup
+    public class SAINSettings
     {
         public SAINAimingSettings Aiming = new SAINAimingSettings();
         public SAINChangeSettings Change = new SAINChangeSettings();
@@ -86,10 +71,14 @@ namespace SAIN.BotSettings
 
         public FieldWrapper(Type propType)
         {
+            // Get all the fields that exist in this type
             foreach (var field in propType.GetFields())
             {
+                // Save the field name and fieldInfo to a dictionary.
                 FieldSections.Add(field.Name, field);
+                // Get the fields of this field!
                 var fields = field.FieldType.GetFields();
+                // Adds that FieldArray and the field in a new dictionary.
                 Fields.Add(field, fields);
             }
         }
@@ -109,7 +98,7 @@ namespace SAIN.BotSettings
         public void UpdateValue(string key, object value)
         {
             bool complete = false;
-            var Dictionary = BotSettingsHandler.EFTBotSettingsFields.Fields;
+            var Dictionary = BotSettingsHandler.EFTSettingsFields.Fields;
             foreach (var keyPair in Dictionary)
             {
                 var Settings = keyPair.Key.GetValue(BotOwner.Settings.FileSettings);
