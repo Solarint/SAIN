@@ -350,7 +350,8 @@ namespace SAIN.Editor
                     Buttons.SingleTextBool("Realism Mod", PluginInfo.RealismMod.Loaded);
 
                     Builder.EndHorizontal();
-                    //BotSettingsEditor.CreateEditMenu();
+
+                    BotSettingsEditor.EditMenu();
                 }
                 else if (TabSelected(Personalities, out tabRect, 1000f))
                 {

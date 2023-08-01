@@ -18,14 +18,12 @@ namespace SAIN.Editor
 
         public void InfoBox(string description, float height)
         {
-            Box("?", description, Width(InfoWidth), Height(height));
-            //CheckMouse(description);
+            InfoBox(description, Width(InfoWidth), Height(height));
         }
 
-        public void InfoBox(string description)
+        public void InfoBox(string description, params GUILayoutOption[] options)
         {
-            Box("?", description, Width(InfoWidth));
-            //CheckMouse(description);
+            Box("?", description, options);
         }
 
         public bool ButtonConfigEntry(ConfigEntry<bool> entry)

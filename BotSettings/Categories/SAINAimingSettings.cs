@@ -47,17 +47,17 @@ namespace SAIN.BotSettings.Categories
 
         [Key(nameof(RECALC_MUST_TIME))]
         [DefaultValue(1)]
-        [Browsable(false)]
+        [IsHidden(true)]
         public int RECALC_MUST_TIME = 1;
 
         [Key(nameof(RECALC_MUST_TIME_MIN))]
         [DefaultValue(1)]
-        [Browsable(false)]
+        [IsHidden(true)]
         public int RECALC_MUST_TIME_MIN = 1;
 
         [Key(nameof(RECALC_MUST_TIME_MAX))]
         [DefaultValue(2)]
-        [Browsable(false)]
+        [IsHidden(true)]
         public int RECALC_MUST_TIME_MAX = 2;
 
         [Key(nameof(BASE_HIT_AFFECTION_DELAY_SEC))]

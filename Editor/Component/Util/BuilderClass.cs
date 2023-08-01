@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using static SAIN.Editor.Names.StyleNames;
 using SAIN.Editor.Abstract;
 using SAIN.Editor.Util;
+using System;
+using Newtonsoft.Json.Linq;
 
 namespace SAIN.Editor
 {
@@ -38,6 +40,15 @@ namespace SAIN.Editor
         {
             if (value == null) return;
             Box(value.ToString(), "The Value this option is set to", options);
+        }
+
+        public object Reset(object value, object defaultValue, params GUILayoutOption[] options)
+        {
+            if (Button("Reset", "Reset To Default Value", options))
+            {
+                value = defaultValue;
+            }
+            return value;
         }
 
         public string SelectionGridExpandHeight(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
@@ -369,6 +380,25 @@ namespace SAIN.Editor
 
             value = Mathf.Round(value * rounding) / rounding;
             return value;
+        }
+
+        public int CreateSlider(int value, int min, int max, params GUILayoutOption[] options)
+        {
+            value = Mathf.RoundToInt(HorizontalSlider(value, min, max, options));
+            Backgrounds(value, min, max);
+            return value;
+        }
+        public float CreateSlider(float value, float min, float max, params GUILayoutOption[] options)
+        {
+            value = HorizontalSlider(value, min, max, options);
+            Backgrounds(value, min, max);
+            return value;
+        }
+
+        void Backgrounds(float value, float min, float max)
+        {
+            float progress = (value - min) / (max - min);
+            TexturesClass.DrawSliderBackGrounds(progress);
         }
     }
 }

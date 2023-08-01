@@ -135,9 +135,7 @@ namespace SAIN.Editor.Abstract
 
         public float HorizontalSlider(float value, float min, float max, params GUILayoutOption[] options)
         {
-            value = GUILayout.HorizontalSlider(value, min, max, GetStyle(horizontalSlider), GetStyle(horizontalSliderThumb), options);
-            //GUIModify.tooltip = value.ToString();
-            return value;
+            return GUILayout.HorizontalSlider(value, min, max, GetStyle(horizontalSlider), GetStyle(horizontalSliderThumb), options);
         }
 
         public float HorizontalSliderNoStyle(string label, float value, float min, float max, float LabelWidth = 150f, float ValueWidth = 100f)
