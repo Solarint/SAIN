@@ -29,7 +29,6 @@ namespace SAIN.Editor
             {
                 CustomFont = Font.CreateDynamicFontFromOSFont(Settings.FontName, Settings.FontSize);
             }
-            CustomStyle.Init();
         }
 
         public void ColorEditorMenu()
@@ -104,10 +103,37 @@ namespace SAIN.Editor
             Editor = editor;
         }
 
-        public void Init()
+        bool CacheCleared = true;
+
+        public void Cache(bool value)
         {
-            CreateStyles();
-            SetTextSettings();
+            if (value)
+            {
+                CreateCache();
+            }
+            else
+            {
+                ClearCache();
+            }
+        }
+
+        void ClearCache()
+        {
+            if (!CacheCleared)
+            {
+                StyleDictionary.Clear();
+                CacheCleared = true;
+            }
+        }
+
+        void CreateCache()
+        {
+            if (CacheCleared)
+            {
+                CreateStyles();
+                SetTextSettings();
+                CacheCleared = false;
+            }
         }
 
         private readonly Dictionary<string, GUIStyle> StyleDictionary = new Dictionary<string, GUIStyle>();
@@ -204,17 +230,17 @@ namespace SAIN.Editor
             BGNormal(TextFieldStyle, TextAreaStyle, TexMidGray, TexMidRed);
             BGActive(TextFieldStyle, TextAreaStyle, TexDarkGray, TexMidRed);
             BGHover(TextFieldStyle, TextAreaStyle, TexDarkGray, TexMidRed);
-            BGFocused(TextFieldStyle, TextAreaStyle, TexVeryDarkGray, TexMidRed);
+            BGFocused(TextFieldStyle, TextAreaStyle, TexDarkGray, TexMidRed);
 
             BGAllStates(HorizontalSliderStyle, null);
             BGAllStates(HorizontalSliderThumbStyle, null);
             BGAllStates(WindowStyle, TexVeryDarkGray);
-            BGAllStates(VerticalScrollbarStyle, TexVeryDarkGray);
+            BGAllStates(VerticalScrollbarStyle, TexDarkGray);
             BGAllStates(VerticalScrollbarThumbStyle, TexDarkRed);
             BGAllStates(VerticalScrollbarUpButtonStyle, TexDarkGray);
             BGAllStates(VerticalScrollbarDownButtonStyle, TexDarkGray);
-            BGAllStates(BoxStyle, TexVeryDarkGray);
-            BGAllStates(LabelStyle, TexVeryDarkGray);
+            BGAllStates(BoxStyle, TexDarkGray);
+            BGAllStates(LabelStyle, TexDarkGray);
 
             var offset = new RectOffset(10, 10, 1, 1);
             var selectGridStyle = new GUIStyle(ToggleStyle)

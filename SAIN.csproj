@@ -213,6 +213,8 @@
   <ItemGroup>
     <Compile Include="BotPresets\BotType.cs" />
     <Compile Include="BotPresets\BotTypeDefinitions.cs" />
+    <Compile Include="BotSettings\Categories\FieldsCache.cs" />
+    <Compile Include="BotSettings\SAINSettings.cs" />
     <Compile Include="SAINPreset\Settings\AimSettings.cs" />
     <Compile Include="SAINPreset\Settings\Attributes.cs" />
     <Compile Include="SAINPreset\Settings\BotConfig\BotConfigSettings.cs" />

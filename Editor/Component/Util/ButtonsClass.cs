@@ -20,6 +20,10 @@ namespace SAIN.Editor
         {
             InfoBox(description, Width(InfoWidth), Height(height));
         }
+        public void InfoBox(string description, float height, float width)
+        {
+            InfoBox(description, Width(width), Height(height));
+        }
 
         public void InfoBox(string description, params GUILayoutOption[] options)
         {

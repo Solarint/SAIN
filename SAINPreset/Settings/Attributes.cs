@@ -5,73 +5,180 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using UnityEngine;
+using static SAIN.SAINPreset.Attributes.GetAttributeValue;
 
 namespace SAIN.SAINPreset.Attributes
 {
     public static class GetAttributeValue
     {
-        public class GUI
+        public class GUIEntryConfig
         {
-            public GUI(FieldInfo field)
-            {
-                Attributes = new AttributesClass(field);
+            const float TargetWidthScale = 1920;
+
+            public GUIEntryConfig(float entryHeight = 25f) 
+            { 
+                EntryHeight = entryHeight;
             }
 
-            public object EditValue(object value, params GUILayoutOption[] options)
+            public GUIEntryConfig(float entryHeight, float infoWidth, float labelWidth, float minMaxWidth, float sliderWidth, float resultWidth, float resetWidth)
             {
-                if (Attributes.IsHidden)
+                EntryHeight = entryHeight;
+                InfoWidth = infoWidth;
+                LabelWidth = labelWidth;
+                MinMaxWidth = minMaxWidth;
+                SliderWidth = sliderWidth;
+                ResultWidth = resultWidth;
+                ResetWidth = resetWidth;
+            }
+
+            public void OnGUIEditDimensions()
+            {
+                GUILayout.BeginVertical();
+                EntryHeight = HorizontalSlider(EntryHeight, 10f, 50f);
+                InfoWidth = HorizontalSlider(InfoWidth);
+                LabelWidth = HorizontalSlider(LabelWidth);
+                MinMaxWidth = HorizontalSlider(MinMaxWidth);
+                SliderWidth = HorizontalSlider(SliderWidth);
+                ResultWidth = HorizontalSlider(ResultWidth);
+                ResetWidth = HorizontalSlider(ResetWidth);
+                GUILayout.EndVertical();
+            }
+
+            static float HorizontalSlider(float value, float min = 0f, float max = 1f, float rounding = 100f) 
+            { 
+                value = GUILayout.HorizontalSlider(value, min, max); 
+                value = Mathf.Round(value * rounding) / rounding;
+                return value;
+            }
+
+            public float EntryHeight = 25f;
+
+            // Widths of the Entry in the AttributesGUI, from 0 to 1. Which will be scaled to 1080p. All Values should add to 1 to scale properly
+            public float InfoWidth = 0.03f;
+            public float LabelWidth = 0.15f;
+            public float MinMaxWidth = 0.08f;
+            public float SliderWidth = 0.35f;
+            public float ResultWidth = 0.1f;
+            public float ResetWidth = 0.05f;
+
+            public GUILayoutOption[] Info => Params(InfoWidth);
+            public GUILayoutOption[] Label => Params(LabelWidth);
+            public GUILayoutOption[] MinMax => Params(MinMaxWidth);
+            public GUILayoutOption[] Slider => Params(SliderWidth);
+            public GUILayoutOption[] Result => Params(ResultWidth);
+            public GUILayoutOption[] Reset => Params(ResetWidth);
+
+            GUILayoutOption[] Params(float width0to1) => new GUILayoutOption[]
+            {
+                GUILayout.Width(width0to1 * TargetWidthScale),
+                GUILayout.Height(EntryHeight)
+            };
+        }
+
+        public class AttributesGUI
+        {
+            public AttributesGUI(FieldInfo field)
+            {
+                Attributes = CheckDictionary(field);
+            }
+
+            static AttributesClass CheckDictionary(FieldInfo field)
+            {
+                if (!AttributesClasses.ContainsKey(field))
+                {
+                    AttributesClasses.Add(field, new AttributesClass(field));
+                }
+                return AttributesClasses[field];
+            }
+
+            public static void ClearCacheStatic()
+            {
+                AttributesClasses.Clear();
+            }
+            public void ClearCache()
+            {
+                AttributesClasses.Clear();
+            }
+
+            static readonly Dictionary<FieldInfo, AttributesClass> AttributesClasses = new Dictionary<FieldInfo, AttributesClass>();
+
+            public static object EditValue(object value, AttributesClass attributes, GUIEntryConfig entryConfig = null)
+            {
+                if (value == null || attributes == null)
+                {
+                    return null;
+                }
+                if (attributes.IsHidden)
                 {
                     return value;
+                }
+                if (entryConfig == null)
+                {
+                    entryConfig = new GUIEntryConfig();
                 }
 
                 Builder.BeginHorizontal();
 
-                Buttons.InfoBox(Attributes.Description, options);
-                Buttons.Label(Attributes.Name ?? Attributes.Key, options);
+                Buttons.InfoBox(attributes.Description, entryConfig.Info);
+                Buttons.Label(attributes.Name ?? attributes.Key, entryConfig.Label);
 
                 Type type = value.GetType();
                 if (type == typeof(bool))
                 {
                     bool boolVal = (bool)value;
-                    value = Builder.Toggle(boolVal, boolVal ? "On" : "Off", options);
+                    value = Builder.Toggle(boolVal, boolVal ? "On" : "Off", entryConfig.Slider);
                 }
                 else
                 {
-                    object min = Attributes.Min ?? 0f;
-                    object max = Attributes.Max ?? 500f;
+                    object min = attributes.Min ?? 0f;
+                    object max = attributes.Max ?? 500f;
 
-                    Builder.MinValueBox(min, options);
+                    Builder.MinValueBox(min, entryConfig.Info);
                     if (type == typeof(float))
                     {
-                        float flValue = Builder.CreateSlider((float)value, (float)min, (float)max, options);
-                        float rounding = Attributes.Rounding == null ? 10f : Attributes.Rounding.Value;
+                        float flValue = Builder.CreateSlider((float)value, (float)min, (float)max, entryConfig.Slider);
+                        float rounding = attributes.Rounding == null ? 10f : attributes.Rounding.Value;
                         value = Mathf.Round(flValue * rounding) / rounding;
                     }
                     else if (type == typeof(int))
                     {
-                        value = Builder.CreateSlider((int)value, (int)min, (int)max, options);
+                        value = Builder.CreateSlider((int)value, (int)min, (int)max, entryConfig.Slider);
                     }
 
-                    Builder.MaxValueBox(max, options);
+                    Builder.MaxValueBox(max, entryConfig.Info);
                 }
 
-                Builder.ResultBox(value, options);
-                value = Builder.Reset(value, Attributes.Default, options);
+                Builder.ResultBox(value, entryConfig.Result);
+                value = Builder.Reset(value, attributes.Default, entryConfig.Reset);
+
+                Builder.FlexibleSpace();
 
                 Builder.EndHorizontal();
 
                 return value;
             }
 
+            public static object EditValue(object value, FieldInfo field, GUIEntryConfig entryConfig = null)
+            {
+                return EditValue(value, CheckDictionary(field), entryConfig);
+            }
+
+            public object EditValue(object value, GUIEntryConfig entryConfig = null)
+            {
+                return EditValue(value, Attributes, entryConfig);
+            }
+
             readonly AttributesClass Attributes;
-            public static ButtonsClass Buttons => SAINPlugin.SAINEditor.Buttons;
-            public static BuilderClass Builder => SAINPlugin.SAINEditor.Builder;
+            static ButtonsClass Buttons => SAINPlugin.SAINEditor.Buttons;
+            static BuilderClass Builder => SAINPlugin.SAINEditor.Builder;
         }
+
         public sealed class AttributesClass
         {
             public AttributesClass(FieldInfo field)
             {
-                Key = Key(field);
+                Key = field.Name;
+
                 Name = Name(field);
                 Description = Description(field);
                 Default = Default(field);
@@ -91,8 +198,6 @@ namespace SAIN.SAINPreset.Attributes
             public readonly bool IsHidden = false;
         }
 
-        public static string Key(FieldInfo field)
-            => field.GetCustomAttribute<KeyAttribute>()?.Key;
         public static string Name(FieldInfo field)
             => field.GetCustomAttribute<NameAttribute>()?.Name;
         public static string Description(FieldInfo field)
@@ -107,22 +212,6 @@ namespace SAIN.SAINPreset.Attributes
             => field.GetCustomAttribute<RoundingAttribute>()?.Rounding;
         public static bool IsHidden(FieldInfo field) 
             => field.GetCustomAttribute<IsHiddenAttribute>()?.Value == true;
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class KeyAttribute : Attribute
-    {
-        public KeyAttribute(string key)
-        {
-            this.key = key;
-        }
-
-        public string Key
-        {
-            get { return key; }
-        }
-
-        readonly string key;
     }
 
     [AttributeUsage(AttributeTargets.Field)]

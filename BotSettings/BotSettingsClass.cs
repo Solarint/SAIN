@@ -2,6 +2,8 @@
 using HarmonyLib;
 using SAIN.BotSettings.Categories;
 using SAIN.BotSettings.Categories.Util;
+using SAIN.SAINPreset.Attributes;
+using System.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -21,22 +23,6 @@ namespace SAIN.BotSettings
 
         public SAINSettings Settings { get; private set; } = new SAINSettings();
         public BotDefaultValues BotDefaultValues { get; private set; } = new BotDefaultValues();
-    }
-
-    public class SAINSettings
-    {
-        public SAINAimingSettings Aiming = new SAINAimingSettings();
-        public SAINChangeSettings Change = new SAINChangeSettings();
-        public SAINCoreSettings Core = new SAINCoreSettings();
-        public SAINGrenadeSettings Grenade = new SAINGrenadeSettings();
-        public SAINHearingSettings Hearing = new SAINHearingSettings();
-        public SAINLaySettings Lay = new SAINLaySettings();
-        public SAINLookSettings Look = new SAINLookSettings();
-        public SAINMindSettings Mind = new SAINMindSettings();
-        public SAINMoveSettings Move = new SAINMoveSettings();
-        public SAINPatrolSettings Patrol = new SAINPatrolSettings();
-        public SAINScatterSettings Scattering = new SAINScatterSettings();
-        public SAINShootSettings Shoot = new SAINShootSettings();
     }
 
     public class FieldWrapper
@@ -92,7 +78,6 @@ namespace SAIN.BotSettings
         public BotOwnerSettings(BotOwner owner)
         {
             BotOwner = owner;
-            UpdateValue(nameof(SAINCoreSettings.VisibleDistance), 100f);
         }
 
         public void UpdateValue(string key, object value)

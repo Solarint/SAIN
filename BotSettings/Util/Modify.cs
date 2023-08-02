@@ -30,7 +30,7 @@ namespace SAIN.BotSettings.Categories.Util
             // Display the discription and name of the Setting
             Info(wrapper);
 
-            // Create GUI Option based on the type of setting.
+            // Create AttributesGUI Option based on the type of setting.
             if (wrapper.Type == typeof(bool))
             {
                 BoolOption(wrapper);

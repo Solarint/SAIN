@@ -4,6 +4,7 @@ using EFT.Console.Core;
 using EFT.UI;
 using UnityEngine;
 using System;
+using SAIN.BotSettings.Categories;
 using static SAIN.Editor.EditorSettings;
 using static SAIN.Editor.RectLayout;
 using static SAIN.Editor.Sounds;
@@ -14,6 +15,7 @@ using static SAIN.Editor.Names.StyleNames;
 using EFT;
 using System.Reflection;
 using BepInEx;
+using SAIN.BotSettings;
 
 namespace SAIN.Editor
 {
@@ -144,6 +146,8 @@ namespace SAIN.Editor
         public bool ShiftKeyPressed { get; private set; }
         public bool CtrlKeyPressed { get; private set; }
 
+        public readonly FieldsCache SAINSettingsCache = new FieldsCache(typeof(SAINSettings));
+
         public void Update()
         {
             ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
@@ -163,6 +167,8 @@ namespace SAIN.Editor
                 }
                 GUIToggle();
             }
+
+            SAINSettingsCache.CacheHandler(DisplayingWindow);
         }
 
         private void SetUnlockCursor(int lockState, bool cursorVisible)
@@ -200,12 +206,13 @@ namespace SAIN.Editor
                     Inited = true;
 
                     TexturesClass.Init();
-                    StyleOptions.Init();
                     Fonts.Init();
                     DragBackgroundTexture = TexturesClass.GetColor(Names.ColorNames.MidGray);
                     TooltipBg = TexturesClass.GetColor(Names.ColorNames.VeryDarkGray);
                     OpenTabRect = new Rect(0, 85, MainWindow.width, 1000f);
                 }
+
+                StyleOptions.CustomStyle.Cache(true);
 
                 SetUnlockCursor(0, true);
 
@@ -219,6 +226,10 @@ namespace SAIN.Editor
                 }
 
                 UnityInput.Current.ResetInputAxes();
+            }
+            else
+            {
+                StyleOptions.CustomStyle.Cache(false);
             }
         }
 

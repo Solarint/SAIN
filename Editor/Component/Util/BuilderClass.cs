@@ -229,13 +229,18 @@ namespace SAIN.Editor
             return current;
         }
 
-        public bool ExpandableMenu(string name, bool value, string description = null)
+        public bool ExpandableMenu(string name, bool value, string description = null, float height = 25f, float infoWidth = 30f)
         {
             BeginHorizontal();
-            ButtonsClass.InfoBox(description);
-            Label(name, Width(ExpandMenuWidth));
-            value = Toggle(value, value ? "[Close]" : "[Open]");
+
+            ButtonsClass.InfoBox(description, height, infoWidth);
+
+            Label(name, Height(height), Width(ExpandMenuWidth));
+
+            value = Toggle(value, value ? "[Close]" : "[Open]", Height(height));
+
             EndHorizontal();
+
             return value;
         }
 
