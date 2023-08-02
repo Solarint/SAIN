@@ -4,13 +4,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Helpers
 {
     public class DebugGizmos
     {
-        public static bool DrawGizmos => ToggleDebugGizmos.Value;
+        public static bool DrawGizmos => SAINPreset.Settings.GeneralSettings.DrawDebugGizmos;
 
         public class SingleObjects
         {

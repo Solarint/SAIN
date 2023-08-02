@@ -2,7 +2,6 @@
 using System;
 using System.Windows.Forms;
 using UnityEngine;
-using static SAIN.UserSettings.VisionConfig;
 
 namespace SAIN.Components.BotController
 {
@@ -12,13 +11,14 @@ namespace SAIN.Components.BotController
         {
             if (VisibilityTimer < Time.time)
             {
-                VisibilityTimer = Time.time + 30f;
+                VisibilityTimer = Time.time + 5f;
                 TimeOfDayVisibility = Visibilty();
             }
         }
 
         public DateTime GameDateTime { get; private set; }
         public float TimeOfDayVisibility { get; private set; }
+
         private float VisibilityTimer = 0f;
 
         private float Visibilty()
@@ -73,10 +73,6 @@ namespace SAIN.Components.BotController
                 else
                 {
                     timemodifier = 1f;
-                }
-                if (DebugWeather.Value)
-                {
-                    System.Console.WriteLine($"SAIN Weather: TimeModifier: [{timemodifier}], TimeofDay: [{timeofday}]");
                 }
                 return timemodifier;
             }

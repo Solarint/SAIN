@@ -1,9 +1,6 @@
 ﻿using EFT;
 using HarmonyLib;
-using SAIN.BotSettings.Categories;
 using SAIN.BotSettings.Categories.Util;
-using SAIN.SAINPreset.Attributes;
-using System.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

@@ -20,11 +20,6 @@ namespace SAIN.Editor
         public static ConfigEntry<bool> AllGigaChads { get; set; }
         public static ConfigEntry<bool> AllRats { get; set; }
 
-        public static ConfigEntry<float> RandomGigaChadChance { get; set; }
-        public static ConfigEntry<float> RandomChadChance { get; set; }
-        public static ConfigEntry<float> RandomRatChance { get; set; }
-        public static ConfigEntry<float> RandomCowardChance { get; set; }
-
         // Hearing
         public static ConfigEntry<float> SuppressorModifier { get; set; }
         public static ConfigEntry<float> SubsonicModifier { get; set; }
@@ -152,33 +147,6 @@ namespace SAIN.Editor
                 new ConfigDescription(description,
                 null,
                 new ConfigurationManagerAttributes { Browsable = false }));
-
-            description = "The Chance that any random bot will get assigned this personality, regardless of Gear and Level";
-
-            name = "Random Coward Chance";
-            RandomGigaChadChance = SAINConfig.Bind(section, name, 3f,
-                new ConfigDescription(description,
-                new AcceptableValueRange<float>(0f, 100f),
-                new ConfigurationManagerAttributes { Browsable = false }));
-
-            name = "Random Chad Chance";
-            RandomChadChance = SAINConfig.Bind(section, name, 3f,
-                new ConfigDescription(description,
-                new AcceptableValueRange<float>(0f, 100f),
-                new ConfigurationManagerAttributes { Browsable = false }));
-
-            name = "Random Rat Chance";
-            RandomCowardChance = SAINConfig.Bind(section, name, 30f,
-                new ConfigDescription(description,
-                new AcceptableValueRange<float>(0f, 100f),
-                new ConfigurationManagerAttributes { Browsable = false }));
-
-            name = "Random Coward Chance";
-            RandomRatChance = SAINConfig.Bind(section, name, 30f,
-                new ConfigDescription(description,
-                new AcceptableValueRange<float>(0f, 100f),
-                new ConfigurationManagerAttributes { Browsable = false }));
-
 
             // NOTE: This is to resolve an issue where previous versions could result in "All*" all being true
             //       If more than 1 "All" option is true, disable them all

@@ -40,11 +40,7 @@ namespace SAIN
             SAINConfig = Config;
 
             EditorSettings.Init();
-            TalkConfig.Init(Config);
-            VisionConfig.Init(Config);
-            DebugConfig.Init(Config);
             CoverConfig.Init(Config);
-            SoundConfig.Init(Config);
             DazzleConfig.Init(Config);
 
             new BotGlobalSettingsPatch().Enable();

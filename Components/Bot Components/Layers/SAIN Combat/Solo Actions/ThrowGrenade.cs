@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
@@ -51,7 +50,6 @@ namespace SAIN.Layers
         }
 
         private readonly SAINComponent SAIN;
-        public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
         private float StartTime = 0f;

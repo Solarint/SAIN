@@ -7,7 +7,6 @@ using SAIN.Classes;
 using SAIN.Layers;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 using System.Collections.Generic;
 using System.Text;
 
@@ -47,7 +46,6 @@ namespace SAIN.Layers
         }
 
         private readonly SAINComponent SAIN;
-        public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
 

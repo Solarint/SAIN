@@ -149,13 +149,6 @@ namespace SAIN.Helpers
                 return isNull;
             }
 
-            public static void EditorSettings(EditorCustomization custom)
-            {
-                if (CheckNull(custom)) return;
-
-                SaveJson(custom, "EditorSettings", UIFolder);
-            }
-
             public static void SaveBotSettings(SAINBotSettingsClass settings, BotOwner owner)
             {
                 SaveBotSettings(settings, owner, SelectedPresetName);
@@ -355,15 +348,6 @@ namespace SAIN.Helpers
                 }
                 result.DefaultPreset = DefaultPreset;
                 return result;
-            }
-
-            public static EditorCustomization EditorSettings()
-            {
-                if (LoadJsonFile(out string json, EditorName, UIFolder))
-                {
-                    return DeserializeObject<EditorCustomization>(json);
-                }
-                return new EditorCustomization();
             }
 
             public static BotPreset BotPreset(string name)

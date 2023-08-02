@@ -2,7 +2,6 @@
 using EFT;
 using SAIN.Components;
 using UnityEngine;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {

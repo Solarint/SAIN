@@ -4,7 +4,6 @@ using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
-using static SAIN.UserSettings.SoundConfig;
 
 namespace SAIN.Classes
 {
@@ -119,17 +118,7 @@ namespace SAIN.Classes
 
                 range = Mathf.Round(range * 10f) / 10f;
 
-                if (DebugSound.Value)
-                {
-                    Logger.LogDebug($" Sound modifier results before clamp: Original:[{power}] Modified:[{range}] Sprinting? [{BotOwner.GetPlayer.IsSprintEnabled}] MyMoveSpeed 0 to 1: [{speed}] Health: [{SAIN.HealthStatus}] Heavy Helmet? [{SAIN.Equipment.HasHeavyHelmet}] Headphones? [{SAIN.Equipment.HasEarPiece}]");
-                }
-
                 range = Mathf.Clamp(range, power / 3f, power * 1.33f);
-
-                if (DebugSound.Value)
-                {
-                    Logger.LogDebug($" Sound modifier results post clamp: Original: [{power}] Modified: [{range}] ");
-                }
 
                 return DoIHearSound(player, position, range, type, out distance, false);
             }
@@ -236,12 +225,6 @@ namespace SAIN.Classes
             var direction = projectionPoint - from;
 
             firedAtMe = !Physics.Raycast(from, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask);
-
-            if (DebugSolarintSound.Value && closeSound && firedAtMe)
-            {
-                DebugGizmos.SingleObjects.Sphere(projectionPoint, 0.1f, Color.red, true, 2f);
-                DebugGizmos.SingleObjects.Line(from, projectionPoint, Color.red, 0.025f, true, 2f);
-            }
 
             return closeSound;
         }

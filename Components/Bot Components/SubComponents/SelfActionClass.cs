@@ -3,7 +3,6 @@ using EFT;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {
@@ -64,10 +63,6 @@ namespace SAIN.Classes
             if (HealTimer < Time.time && heal.ShallStartUse())
             {
                 HealTimer = Time.time + 5f;
-                if (DebugBotDecisions.Value)
-                {
-                    Logger.LogDebug($"I healed!");
-                }
                 heal.TryApplyToCurrentPart();
             }
         }

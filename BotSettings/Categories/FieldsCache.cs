@@ -18,8 +18,6 @@ namespace SAIN.BotSettings.Categories
         readonly BindingFlags Flags;
         readonly Type Type;
 
-        public bool CacheSaved => Fields.Count > 0;
-
         public FieldInfo[] GetFields(Type type)
         {
             return Fields[type];
@@ -27,7 +25,7 @@ namespace SAIN.BotSettings.Categories
 
         public void CacheHandler(bool cacheFields)
         {
-            bool cacheSaved = Fields.Count > 0; ;
+            bool cacheSaved = Fields.Count > 0;
             if (cacheFields && !cacheSaved)
             {
                 foreach (FieldInfo field in Type.GetFields(Flags))

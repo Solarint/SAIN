@@ -16,15 +16,9 @@ namespace SAIN.Editor.Util
         public static int FontIndex = 0;
         public static Font SelectedFont => AvailableFonts[FontIndex];
 
-        public static EditorCustomization Settings { get; private set; }
 
         public static void Init()
         {
-            Settings = JsonUtility.Load.EditorSettings();
-            if (Settings != null && Settings.FontName != null)
-            {
-                GUI.skin.font = Font.CreateDynamicFontFromOSFont(Settings.FontName, Settings.FontSize);
-            }
 
             List<Font> availableFonts = GetAvailableFonts();
             AvailableFonts = availableFonts.ToArray();

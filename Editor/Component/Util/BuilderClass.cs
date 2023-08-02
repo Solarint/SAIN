@@ -3,7 +3,6 @@ using UnityEngine;
 using static SAIN.Editor.EditorParameters;
 using static SAIN.Editor.ConfigValues;
 using static SAIN.Editor.StyleOptions;
-using static SAIN.Editor.ToolTips;
 using SAIN.BotPresets;
 using System.Collections.Generic;
 using static SAIN.Editor.Names.StyleNames;

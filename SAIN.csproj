@@ -216,9 +216,10 @@
     <Compile Include="BotSettings\Categories\FieldsCache.cs" />
     <Compile Include="BotSettings\SAINSettings.cs" />
     <Compile Include="SAINPreset\Settings\AimSettings.cs" />
-    <Compile Include="SAINPreset\Settings\Attributes.cs" />
-    <Compile Include="SAINPreset\Settings\BotConfig\BotConfigSettings.cs" />
-    <Compile Include="SAINPreset\Settings\BotConfig\BotConfigEntry.cs" />
+    <Compile Include="SAINPreset\Attributes.cs" />
+    <Compile Include="SAINPreset\BotConfig\BotConfigSettings.cs" />
+    <Compile Include="SAINPreset\BotConfig\BotConfigEntry.cs" />
+    <Compile Include="SAINPreset\Settings\CoverSettings.cs" />
     <Compile Include="SAINPreset\Settings\ExtractSettings.cs" />
     <Compile Include="SAINPreset\Settings\FlashlightSettings.cs" />
     <Compile Include="SAINPreset\Settings\GeneralSettings.cs" />
@@ -285,7 +286,6 @@
     <Compile Include="Editor\Component\TexturesClass.cs" />
     <Compile Include="Editor\Component\Abstract\Layout.cs" />
     <Compile Include="Editor\Component\Util\MouseFunctions.cs" />
-    <Compile Include="Editor\EditorCustomization.cs" />
     <Compile Include="Editor\Component\GUISections\FontEditMenu.cs" />
     <Compile Include="Editor\Component\Util\ButtonsClass.cs" />
     <Compile Include="Editor\Util\CursorSettings.cs" />
@@ -336,14 +336,10 @@
     <Compile Include="Editor\Component\Util\BuilderClass.cs" />
     <Compile Include="Editor\Component\Util\RectLayout.cs" />
     <Compile Include="Editor\Component\Util\StyleOptions.cs" />
-    <Compile Include="Editor\Util\ToolTips.cs" />
     <Compile Include="Plugin\Config\ConfigAbstract.cs" />
     <Compile Include="BotPresets\PresetManager.cs" />
     <Compile Include="BotPresets\BotPreset.cs" />
-    <Compile Include="Plugin\Config\AudioConfig.cs" />
     <Compile Include="Plugin\Config\DazzleConfig.cs" />
-    <Compile Include="Plugin\Config\TalkConfig.cs" />
-    <Compile Include="Plugin\Config\VisionConfig.cs" />
     <Compile Include="Components\Bot Components\Helpers\AudioHelpers.cs" />
     <Compile Include="Components\Bot Components\Helpers\CoverPointHelpers.cs" />
     <Compile Include="Helpers\DebugGizmos.cs" />
@@ -390,7 +386,6 @@
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSolo.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ShootAction.cs" />
     <Compile Include="Components\Bot Components\SubComponents\SteeringClass.cs" />
-    <Compile Include="Plugin\Config\DebugConfigs.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\DogFight.cs" />
     <Compile Include="Components\Bot Components\Helpers\CornersHelper.cs" />
     <Compile Include="Plugin\Patches\AddComponentPatch.cs" />

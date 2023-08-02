@@ -7,12 +7,17 @@ namespace SAIN.Editor
     {
         public static void MenuClickSound()
         {
-            Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.ButtonClick);
+            PlaySound(EUISoundType.ButtonClick);
         }
 
         public static void ResetClickSound()
         {
-            Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.InsuranceInsured);
+            PlaySound(EUISoundType.InsuranceInsured);
+        }
+
+        public static void PlaySound(EUISoundType soundType)
+        {
+            Singleton<GUISounds>.Instance.PlayUISound(soundType);
         }
     }
 }

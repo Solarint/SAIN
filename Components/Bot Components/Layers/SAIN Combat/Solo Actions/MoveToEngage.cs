@@ -6,7 +6,6 @@ using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {

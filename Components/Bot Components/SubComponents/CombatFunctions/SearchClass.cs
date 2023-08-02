@@ -4,7 +4,6 @@ using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {
@@ -34,13 +33,6 @@ namespace SAIN.Classes
 
         public void Update(bool shallLean, bool shallSprint, float reachDist = -1f)
         {
-            if (DebugLayers.Value && ActiveDestination != null && DebugDrawTimer < Time.time)
-            {
-                float freq = 0.05f;
-                DebugDrawTimer = Time.time + freq;
-                DebugGizmos.SingleObjects.Line(BotOwner.Position, ActiveDestination, Color.magenta, 0.1f, true, freq, true);
-            }
-
             if (reachDist > 0)
             {
                 ReachDistance = reachDist;
@@ -296,10 +288,6 @@ namespace SAIN.Classes
                 {
                     if (Path.corners.Length < 3)
                     {
-                        if (DebugLayers.Value)
-                        {
-                            Logger.LogError($"Corners Length too low! [{Path.corners.Length}]");
-                        }
                     }
                     else if (Path.status == NavMeshPathStatus.PathComplete || !MustHavePath)
                     {

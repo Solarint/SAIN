@@ -4,7 +4,6 @@ using EFT;
 using SAIN.Classes.CombatFunctions;
 using SAIN.Components;
 using SAIN.Layers;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
@@ -34,8 +33,6 @@ namespace SAIN.Layers
             SAIN.Steering.SteerByPriority();
             Shoot.Update();
         }
-
-        public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
     }

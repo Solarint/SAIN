@@ -64,7 +64,6 @@ namespace SAIN.Editor
             PresetEditor = new PresetEditor(this);
             Builder = new BuilderClass(this);
             Buttons = new ButtonsClass(this);
-            ToolTips = new ToolTips(this);
             MouseFunctions = new MouseFunctions(this);
             WindowLayoutCreator = new WindowLayoutCreator(this);
             BotSettingsEditor = new BotSettingsEditor(this);
@@ -87,7 +86,6 @@ namespace SAIN.Editor
         public BotSettingsEditor BotSettingsEditor { get; private set; }
         public WindowLayoutCreator WindowLayoutCreator { get; private set; }
         public MouseFunctions MouseFunctions { get; private set; }
-        public ToolTips ToolTips { get; private set; }
         public ButtonsClass Buttons { get; private set; }
         public BuilderClass Builder { get; private set; }
         public PresetEditor PresetEditor { get; private set; }

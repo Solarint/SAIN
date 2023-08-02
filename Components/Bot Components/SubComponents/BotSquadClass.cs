@@ -4,7 +4,6 @@ using SAIN.Components;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Classes
 {
@@ -115,12 +114,6 @@ namespace SAIN.Classes
             if (IAmLeader && SquadID == "None")
             {
                 SquadID = Guid.NewGuid().ToString("N");
-            }
-            if (DebugBotInfo.Value)
-            {
-                Logger.LogDebug($"For Bot: [{SAIN.BotOwner.name}]: [{sain.BotOwner.name}] is Squad lead! " +
-                    $"Lead is Boss? {sain.Info.IAmBoss} Lead Power: [{sain.Info.PowerLevel}] My Power: [{SAIN.Info.PowerLevel}] " +
-                    $"Squad Power = [{SquadPowerLevel}] Members Count = [{SquadMembers.Count}]");
             }
         }
 

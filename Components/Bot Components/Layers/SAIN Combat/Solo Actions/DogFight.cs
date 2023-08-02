@@ -6,7 +6,6 @@ using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
@@ -88,7 +87,6 @@ namespace SAIN.Layers
         private readonly NavMeshPath navMeshPath_0 = new NavMeshPath();
 
         private readonly SAINComponent SAIN;
-        public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
 

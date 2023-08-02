@@ -19,17 +19,7 @@ namespace SAIN.Editor
         }
 
         public Font CustomFont { get; private set; }
-        public static EditorCustomization Settings { get; private set; }
         public CustomStyleClass CustomStyle { get; private set; }
-
-        public void Init()
-        {
-            Settings = JsonUtility.Load.EditorSettings();
-            if (Settings != null && Settings.FontName != null)
-            {
-                CustomFont = Font.CreateDynamicFontFromOSFont(Settings.FontName, Settings.FontSize);
-            }
-        }
 
         public void ColorEditorMenu()
         {

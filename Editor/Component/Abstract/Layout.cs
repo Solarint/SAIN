@@ -137,6 +137,10 @@ namespace SAIN.Editor.Abstract
         {
             return GUILayout.HorizontalSlider(value, min, max, GetStyle(horizontalSlider), GetStyle(horizontalSliderThumb), options);
         }
+        public float HorizontalSlider(Rect rect, float value, float min, float max)
+        {
+            return GUI.HorizontalSlider(rect, value, min, max, GetStyle(horizontalSlider), GetStyle(horizontalSliderThumb));
+        }
 
         public float HorizontalSliderNoStyle(string label, float value, float min, float max, float LabelWidth = 150f, float ValueWidth = 100f)
         {

@@ -2,7 +2,6 @@
 using System;
 using UnityEngine;
 using SAIN.UserSettings;
-using static SAIN.UserSettings.VisionConfig;
 
 namespace SAIN.Helpers
 {
@@ -15,11 +14,6 @@ namespace SAIN.Helpers
             {
                 if (WeatherController.Instance?.WeatherCurve == null)
                 {
-                    if (VisionConfig.DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
-                    {
-                        DebugTimer = UnityEngine.Time.time + 5f;
-                        System.Console.WriteLine($"SAIN Weather: No Weather Found!");
-                    }
                     return 1f;
                 }
 
@@ -36,13 +30,6 @@ namespace SAIN.Helpers
                 float weathermodifier = 1f * fogmod * rainmod * cloudsmod;
 
                 weathermodifier = Mathf.Clamp(weathermodifier, 0.2f, 1f);
-
-                // Log Everything!
-                if (DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
-                {
-                    DebugTimer = UnityEngine.Time.time + 5f;
-                    System.Console.WriteLine($"SAIN Weather: Final Weather Modifier: [{weathermodifier}], Fog: [{fogmod}], Rain: [{rainmod}], Clouds: [{cloudsmod}]");
-                }
 
                 return weathermodifier;
             }
@@ -239,10 +226,6 @@ namespace SAIN.Helpers
                 else
                 {
                     timemodifier = 1f;
-                }
-                if (DebugWeather.Value)
-                {
-                    System.Console.WriteLine($"SAIN Weather: TimeModifier: [{timemodifier}], TimeofDay: [{timeofday}]");
                 }
                 return timemodifier;
             }

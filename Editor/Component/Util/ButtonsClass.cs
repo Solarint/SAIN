@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using static SAIN.Editor.Sounds;
 using static SAIN.Editor.ConfigValues;
-using static SAIN.Editor.ToolTips;
 using Colors = SAIN.Editor.Util.ColorsClass;
 using BepInEx.Configuration;
 using SAIN.BotPresets;

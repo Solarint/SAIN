@@ -3,7 +3,6 @@ using EFT;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.UserSettings.TalkConfig;
 using static SAIN.Editor.EditorSettings;
 using SAIN.Helpers;
 
@@ -119,11 +118,6 @@ namespace SAIN.Classes
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, type);
             BotOwner.GetPlayer.Say(type, false, 0f, mask);
             PersonalPhraseDict[type].TimeLastSaid = Time.time;
-
-            if (DebugLogs.Value)
-            {
-                Logger.LogDebug($"Bot Said Phrase: [{type}] Mask: [{mask}]");
-            }
         }
 
         private void SendSayCommand(BotTalkPackage talkPackage)

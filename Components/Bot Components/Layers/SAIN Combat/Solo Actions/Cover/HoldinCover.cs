@@ -8,7 +8,6 @@ using SAIN.Layers;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DebugConfig;
 
 namespace SAIN.Layers
 {
@@ -73,7 +72,6 @@ namespace SAIN.Layers
         private float NewSideStepTimer;
 
         private readonly SAINComponent SAIN;
-        public bool DebugMode => DebugLayers.Value;
 
         public ManualLogSource Logger;
 

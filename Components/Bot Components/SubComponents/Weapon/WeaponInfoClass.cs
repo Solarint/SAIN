@@ -380,7 +380,7 @@ namespace SAIN.Classes
                 case "sniperRifle":
                     classmodifier = 0.75f;
                     // VSS and VAL Exception
-                    if (AmmoCaliber == "9x39") classmodifier = 0.3f;
+                    //if (AmmoCaliber == "9x39") classmodifier = 0.3f;
                     break;
 
                 case "shotgun":
