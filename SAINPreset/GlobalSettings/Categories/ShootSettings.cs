@@ -9,9 +9,9 @@ namespace SAIN.SAINPreset.Settings
 {
     public class ShootSettings
     {
-        public static float MaxRecoil;
-        public static float AddRecoil;
-        public static float RecoilDecay;
+        public float MaxRecoil;
+        public float AddRecoil;
+        public float RecoilDecay;
 
         public AmmoSettingDictionary AmmoShootability =
             new AmmoSettingDictionary(

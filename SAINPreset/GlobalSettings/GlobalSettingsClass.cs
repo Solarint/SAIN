@@ -5,8 +5,6 @@ namespace SAIN.SAINPreset.GlobalSettings
 {
     public class GlobalSettingsClass
     {
-        public EFTCoreSettings EFTCoreSettings = new EFTCoreSettings();
-
         public AimSettings Aiming = new AimSettings();
 
         public CoverSettings Cover = new CoverSettings();
@@ -24,5 +22,7 @@ namespace SAIN.SAINPreset.GlobalSettings
         public ShootSettings Shoot = new ShootSettings();
 
         public VisionSettings Vision = new VisionSettings();
+
+        public EFTCoreSettings EFTCoreSettings = new EFTCoreSettings();
     }
 }

@@ -6,44 +6,9 @@ namespace SAIN.SAINPreset.Settings
 {
     public class HearingSettings
     {
-        public static float AudibleRangeMultiplier;
-        public static float MaxFootstepAudioDistance;
+        public float AudibleRangeMultiplier;
+        public float MaxFootstepAudioDistance;
 
-        public static AmmoSettingDictionary AudibleRanges =
-            new AmmoSettingDictionary(
-                new Dictionary<Caliber, float>
-                {
-                    {Caliber.Caliber9x18PM, 125f},
-                    {Caliber.Caliber9x19PARA, 125f},
-                    {Caliber.Caliber46x30, 135},
-                    {Caliber.Caliber9x21, 130},
-                    {Caliber.Caliber57x28, 140},
-                    {Caliber.Caliber762x25TT, 140},
-                    {Caliber.Caliber1143x23ACP, 140},
-                    {Caliber.Caliber9x33R, 130},
-                    {Caliber.Caliber545x39, 180},
-                    {Caliber.Caliber556x45NATO, 180},
-                    {Caliber.Caliber9x39, 180},
-                    {Caliber.Caliber762x35, 180},
-                    {Caliber.Caliber762x39, 200},
-                    {Caliber.Caliber366TKM, 200},
-                    {Caliber.Caliber762x51, 225},
-                    {Caliber.Caliber127x55, 225},
-                    {Caliber.Caliber762x54R, 275},
-                    {Caliber.Caliber86x70, 300},
-                    {Caliber.Caliber20g, 225},
-                    {Caliber.Caliber12g, 225},
-                    {Caliber.Caliber23x75, 210},
-                    {Caliber.Caliber26x75, 50},
-                    {Caliber.Caliber30x29, 50},
-                    {Caliber.Caliber40x46, 50},
-                    {Caliber.Caliber40mmRU, 50}
-                }
-        );
-    }
-
-    public class WeaponAmmoClassSettings
-    {
         public AmmoSettingDictionary AudibleRanges =
             new AmmoSettingDictionary(
                 new Dictionary<Caliber, float>
@@ -75,55 +40,6 @@ namespace SAIN.SAINPreset.Settings
                     {Caliber.Caliber40mmRU, 50}
                 }
         );
-
-        public AmmoSettingDictionary AmmoShootability =
-            new AmmoSettingDictionary(
-                new Dictionary<Caliber, float>
-                {
-                    {Caliber.Caliber9x18PM, 0.2f},
-                    {Caliber.Caliber9x19PARA, 0.25f},
-                    {Caliber.Caliber46x30, 0.3f},
-                    {Caliber.Caliber9x21, 0.3f},
-                    {Caliber.Caliber57x28, 0.35f},
-                    {Caliber.Caliber762x25TT, 0.4f},
-                    {Caliber.Caliber1143x23ACP, 0.4f},
-                    {Caliber.Caliber9x33R, 0.65f},
-                    {Caliber.Caliber545x39, 0.5f},
-                    {Caliber.Caliber556x45NATO, 0.5f},
-                    {Caliber.Caliber9x39, 0.55f},
-                    {Caliber.Caliber762x35, 0.55f},
-                    {Caliber.Caliber762x39, 0.65f},
-                    {Caliber.Caliber366TKM, 0.65f},
-                    {Caliber.Caliber762x51, 0.7f},
-                    {Caliber.Caliber127x55, 0.75f},
-                    {Caliber.Caliber762x54R, 0.8f},
-                    {Caliber.Caliber86x70, 1.0f},
-                    {Caliber.Caliber20g, 0.65f},
-                    {Caliber.Caliber12g, 0.7f},
-                    {Caliber.Caliber23x75, 0.75f},
-                    {Caliber.Caliber26x75, 1f},
-                    {Caliber.Caliber30x29, 1f},
-                    {Caliber.Caliber40x46, 1f},
-                    {Caliber.Caliber40mmRU, 1f}
-                }
-        );
-
-        public WeaponSettingsDictionary WeaponShootability =
-            new WeaponSettingsDictionary(
-                new Dictionary<WeaponClass, float>
-                {
-                    {WeaponClass.AssaultRifle, 0.25f},
-                    {WeaponClass.AssaultCarbine, 0.3f},
-                    {WeaponClass.Machinegun, 0.25f},
-                    {WeaponClass.SMG, 0.2f},
-                    {WeaponClass.Pistol, 0.4f},
-                    {WeaponClass.MarksmanRifle, 0.5f},
-                    {WeaponClass.SniperRifle, 0.75f},
-                    {WeaponClass.Shotgun, 0.5f},
-                    {WeaponClass.GrenadeLauncher, 1f},
-                    {WeaponClass.SpecialWeapon, 1f}
-                }
-        );
     }
 
     public class AmmoSettingDictionary
@@ -143,20 +59,6 @@ namespace SAIN.SAINPreset.Settings
         }
 
         public Dictionary<Caliber, float> ValueDictionary;
-
-        public Dictionary<WeaponClass, float> WeaponShootability = new Dictionary<WeaponClass, float>()
-        {
-            {WeaponClass.AssaultRifle, 0.25f},
-            {WeaponClass.AssaultCarbine, 0.3f},
-            {WeaponClass.Machinegun, 0.25f},
-            {WeaponClass.SMG, 0.2f},
-            {WeaponClass.Pistol, 0.4f},
-            {WeaponClass.MarksmanRifle, 0.5f},
-            {WeaponClass.SniperRifle, 0.75f}, // Note: you may want to handle the VSS and VAL exception separately
-            {WeaponClass.Shotgun, 0.5f},
-            {WeaponClass.GrenadeLauncher, 1f},
-            {WeaponClass.SpecialWeapon, 1f}
-        };
     }
 
     public class WeaponSettingsDictionary

@@ -32,7 +32,7 @@ namespace SAIN.Components.Helpers
 
             if (Item != null)
             {
-                //DefaultLogger.LogInfo($"Item: {Item.GetType().DisplayName} : Sound {sound}");
+                //DefaultLogger.LogInfo($"Item: {Item.GetType().Name} : Sound {sound}");
                 if (Item is GrenadeClass)
                 {
                     if (sound == "Pin")

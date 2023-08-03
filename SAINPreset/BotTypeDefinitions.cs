@@ -1,4 +1,5 @@
 ﻿using EFT;
+using Newtonsoft.Json;
 using System;
 using static SAIN.Helpers.JsonUtility;
 
@@ -6,9 +7,11 @@ namespace SAIN.BotPresets
 {
     public sealed class BotType
     {
+        [JsonConstructor]
+        public BotType() { }
+
         public BotType(WildSpawnType type, string name, string section, string description)
         {
-            OriginalName = type.ToString();
             Name = name;
             Description = description;
             Section = section;
@@ -17,14 +20,12 @@ namespace SAIN.BotPresets
 
         public BotType(string wildSpawnType, string name, string section, string description)
         {
-            OriginalName = wildSpawnType;
             Name = name;
             Description = description;
             Section = section;
             WildSpawnType = (WildSpawnType)Enum.Parse(typeof(WildSpawnType), wildSpawnType);
         }
 
-        public readonly string OriginalName;
         public readonly string Name;
         public readonly string Description;
         public readonly string Section;
@@ -36,6 +37,8 @@ namespace SAIN.BotPresets
         static BotTypeDefinitions()
         {
             string fileName = nameof(BotTypes);
+            BotTypes = CreateBotTypes();
+            return;
             if (Load.LoadObject(out BotType[] botTypes, fileName))
             {
                 BotTypes = botTypes;

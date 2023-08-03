@@ -76,8 +76,8 @@ namespace SAIN.Editor
             for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
             {
                 var preset = PresetHandler.PresetOptions[i];
-                bool selected = selectedPreset.DisplayName == preset.DisplayName;
-                if (Toggle(selected, preset.DisplayName, preset.Description, Height(InstalledHeight)))
+                bool selected = selectedPreset.Name == preset.Name;
+                if (Toggle(selected, preset.Name, preset.Description, Height(InstalledHeight)))
                 {
                     selectedPreset = preset;
                 }

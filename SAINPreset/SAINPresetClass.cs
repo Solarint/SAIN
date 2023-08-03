@@ -10,7 +10,7 @@ namespace SAIN.SAINPreset
     {
         public SAINPresetClass(SAINPresetDefinition preset)
         {
-            HelpersGClass.LoadSettings();
+            //HelpersGClass.LoadSettings();
             Definition = preset;
             GlobalSettings = LoadGlobalSettings(preset);
             BotSettings = new BotSettings.BotSettingsClass(preset);
@@ -20,17 +20,17 @@ namespace SAIN.SAINPreset
 
         private static GlobalSettingsClass LoadGlobalSettings(SAINPresetDefinition Preset)
         {
-            string fileName = nameof(GlobalSettings);
-            string[] folders = new string[] { PresetsFolder, Preset.Key };
-
-            if (!Load.LoadObject(out GlobalSettingsClass result, fileName, folders))
+            string fileName = "GlobalSettings"; 
+            string presetsFolder = "Presets";
+            string presetNameFolder = Preset.Name;
+            if (!Load.LoadObject(out GlobalSettingsClass result, fileName, presetsFolder, presetNameFolder))
             {
                 result = new GlobalSettingsClass
                 {
                     EFTCoreSettings = EFTCoreSettings.GetCore()
                 };
 
-                Save.SaveJson(result, fileName, folders);
+                Save.SaveJson(result, fileName, presetsFolder, presetNameFolder);
             }
 
             return result;
@@ -38,55 +38,35 @@ namespace SAIN.SAINPreset
 
         public void SavePreset()
         {
-            string[] folders = new string[] { PresetsFolder, Definition.Key };
+            string[] folders = new string[] { PresetsFolder, Definition.Name };
             Save.SaveJson(Definition, "Info", folders);
             Save.SaveJson(GlobalSettings, nameof(GlobalSettings), folders);
             BotSettings.SaveSettings(Definition);
         }
 
-        public readonly SAINPresetDefinition Definition;
-        public readonly GlobalSettingsClass GlobalSettings;
-        public readonly BotSettings.BotSettingsClass BotSettings;
+        public SAINPresetDefinition Definition;
+        public GlobalSettingsClass GlobalSettings;
+        public BotSettings.BotSettingsClass BotSettings;
     }
 
     public sealed class SAINPresetDefinition
     {
         [JsonConstructor]
-        public SAINPresetDefinition()
-        { }
+        public SAINPresetDefinition() { }
 
-        public SAINPresetDefinition(string key, string displayName, string description, string creator)
+        public SAINPresetDefinition(string name, string description, string creator)
         {
-            Update(key, displayName, description, creator);
-        }
-
-        public void Update(string key = null, string displayname = null, string description = null, string creator = null)
-        {
-            if (key != null)
-            {
-                Key = key;
-            }
-            if (displayname != null)
-            {
-                DisplayName = displayname;
-            }
-            if (description != null)
-            {
-                Description = description;
-            }
-            if (creator != null)
-            {
-                Creator = creator;
-            }
+            Name = name;
+            Description = description;
+            Creator = creator;
             SAINVersion = PluginInfo.Version;
-            DateCreated = DateTime.Today.ToString();
+            DateCreated = DateTime.UtcNow.Date.ToString();
         }
 
-        public string Key { get; private set; }
-        public string DisplayName { get; private set; }
-        public string Description { get; private set; }
-        public string Creator { get; private set; }
-        public string SAINVersion { get; private set; }
-        public string DateCreated { get; private set; }
+        public string Name;
+        public string Description;
+        public string Creator;
+        public string SAINVersion;
+        public string DateCreated;
     }
 }

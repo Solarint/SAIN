@@ -9,9 +9,9 @@ namespace SAIN.SAINPreset.Settings
 {
     public class GeneralSettings
     {
-        public static bool NoBushESPToggle;
-        public static bool HeadShotProtection;
+        public bool NoBushESPToggle;
+        public bool HeadShotProtection;
 
-        public static bool DrawDebugGizmos = false;
+        public bool DrawDebugGizmos = false;
     }
 }

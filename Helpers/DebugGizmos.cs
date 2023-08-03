@@ -9,7 +9,7 @@ namespace SAIN.Helpers
 {
     public class DebugGizmos
     {
-        public static bool DrawGizmos => SAINPreset.Settings.GeneralSettings.DrawDebugGizmos;
+        public static bool DrawGizmos => SAINPlugin.LoadedPreset.GlobalSettings.General.DrawDebugGizmos;
 
         public class SingleObjects
         {

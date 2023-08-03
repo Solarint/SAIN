@@ -9,9 +9,9 @@ namespace SAIN.SAINPreset.Settings
 {
     public class CoverSettings
     {
-        public static float CoverMinHeight;
-        public static float CoverMinEnemyDistance;
-        public static float CoverUpdateFrequency;
-        public static bool DebugCoverFinder;
+        public float CoverMinHeight;
+        public float CoverMinEnemyDistance;
+        public float CoverUpdateFrequency;
+        public bool DebugCoverFinder;
     }
 }

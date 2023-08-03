@@ -37,14 +37,14 @@ namespace SAIN.Plugin
             {
                 if (!LoadPresetDefinition(DefaultPreset, out presetDefinition))
                 {
-                    presetDefinition = new SAINPresetDefinition(DefaultPreset, "SAIN Hard", "The Default SAIN Preset", "Solarint");
-                    SavePresetDefinition(presetDefinition);
+                    presetDefinition = new SAINPresetDefinition(DefaultPreset, "The Default SAIN Preset", "Solarint");
                 }
             }
+            SavePresetDefinition(presetDefinition);
             InitPresetFromDefinition(presetDefinition);
         }
 
-        static readonly string DefaultPreset = nameof(SAIN) + "_" + PluginInfo.Version + "_hard";
+        static readonly string DefaultPreset = "SAIN Hard";
 
         public static bool LoadPresetDefinition(string presetKey, out SAINPresetDefinition definition)
         {
@@ -53,7 +53,7 @@ namespace SAIN.Plugin
 
         public static void SavePresetDefinition(SAINPresetDefinition definition)
         {
-            Save.SaveJson(definition, "Info", PresetsFolder, definition.Key);
+            Save.SaveJson(definition, "Info", PresetsFolder, definition.Name);
         }
 
         public static void InitPresetFromDefinition(SAINPresetDefinition def)
@@ -61,7 +61,7 @@ namespace SAIN.Plugin
             LoadedPreset = new SAINPresetClass(def);
             var defaults = new PresetEditorDefaults
             {
-                SelectedPreset = def.Key,
+                SelectedPreset = def.Name,
                 DefaultPreset = DefaultPreset
             };
             Save.SaveJson(defaults, Settings, PresetsFolder);

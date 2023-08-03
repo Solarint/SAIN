@@ -25,8 +25,7 @@ namespace SAIN.BotSettings
                 string name = BotType.Name;
                 WildSpawnType wildSpawnType = BotType.WildSpawnType;
 
-                string[] sainFolders = Folders(Preset.Key, "SAIN");
-                string[] eftFolders = Folders(Preset.Key, "EFT");
+                string[] sainFolders = Folders(Preset.Name, "SAIN");
 
                 if (!Load.LoadObject(out SAINSettingsGroup settings, name, sainFolders))
                 {
@@ -34,6 +33,9 @@ namespace SAIN.BotSettings
                     Save.SaveJson(settings, name, sainFolders);
                 }
 
+                SAINSettings.Add(wildSpawnType, settings);
+                /*
+                string[] eftFolders = Folders(Preset.Name, "EFT");
                 if (!Load.LoadObject(out EFTBotSettings eftSettings, name, eftFolders))
                 {
                     eftSettings = new EFTBotSettings(name, wildSpawnType, Difficulties);
@@ -42,18 +44,20 @@ namespace SAIN.BotSettings
 
                 SAINSettings.Add(wildSpawnType, settings);
                 EFTSettings.Add(wildSpawnType, eftSettings);
+                */
             }
         }
 
         public void SaveSettings(SAINPresetDefinition preset)
         {
-            string[] sainFolders = Folders(preset.Key, "SAIN");
-            string[] eftFolders = Folders(preset.Key, "EFT");
+            string[] sainFolders = Folders(preset.Name, "SAIN");
+            string[] eftFolders = Folders(preset.Name, "EFT");
 
             foreach (SAINSettingsGroup settings in SAINSettings.Values)
             {
                 Save.SaveJson(settings, settings.Name, sainFolders);
             }
+            return;
 
             foreach (EFTBotSettings settings in EFTSettings.Values)
             {
