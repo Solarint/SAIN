@@ -24,7 +24,7 @@ namespace SAIN.Classes
 
         public void ManualUpdate()
         {
-            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.FileSettings.AccuracySpreadMulti;
+            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.FileSettings.Aiming.AccuracySpreadMulti;
 
             if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true)
             {

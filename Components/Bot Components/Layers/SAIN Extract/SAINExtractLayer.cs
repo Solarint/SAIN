@@ -16,7 +16,7 @@ namespace SAIN.Layers
 
         public SAINExtractLayer(BotOwner bot, int priority) : base(bot, priority)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             SAIN = bot.GetComponent<SAINComponent>();
         }
 
@@ -33,7 +33,7 @@ namespace SAIN.Layers
             {
                 if (SAINPlugin.BotController.GetBot(BotOwner.ProfileId, out var bot))
                 {
-                    return bot.Info.FileSettings.EnableExtracts;
+                    return bot.Info.FileSettings.Mind.EnableExtracts;
                 }
                 return false;
             }
@@ -57,7 +57,7 @@ namespace SAIN.Layers
                 if (!Logged)
                 {
                     Logged = true;
-                    Logger.LogInfo($"[{BotOwner.name}] Is Moving to Extract with [{percentageLeft}] percent of the raid remaining.");
+                    Logger.LogInfo($"[{BotOwner.name}] Is Moving to Extract with [{percentageLeft}] of the raid remaining.");
                 }
                 if (SAIN.Enemy == null)
                 {

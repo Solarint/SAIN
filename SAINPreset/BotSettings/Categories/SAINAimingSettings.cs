@@ -7,6 +7,11 @@ namespace SAIN.BotSettings.Categories
 {
     public class SAINAimingSettings
     {
+        public bool FasterCQBReactions = true;
+        public float FasterCQBReactionsDistance = 30f;
+        public float FasterCQBReactionsMinimum = 0.15f;
+        public float AccuracySpreadMulti = 1f;
+
         [Name("Aiming Upgrade By Time")]
         [Description(null)]
         [DefaultValue(0.8f)]

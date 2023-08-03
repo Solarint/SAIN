@@ -126,48 +126,4 @@ namespace SAIN.BotSettings.Categories.Util
             Shoot.RECOIL_DELTA_PRESS = settings.RECOIL_DELTA_PRESS;
         }
     }
-
-    public static class UpdateSettings
-    {
-        static void Update(BotOwner bot, SAINSettings sainSettings)
-        {
-            FieldWrapper sainFields = BotSettingsHandler.SAINSettingsFields;
-            FieldWrapper eftFields = BotSettingsHandler.EFTSettingsFields;
-
-        }
-
-        static void UpdateSection(BotOwner bot, SAINSettings sainSettings, FieldInfo field, FieldInfo[] fields)
-        {
-            object sectionValue = field.GetValue(sainSettings);
-            foreach (FieldInfo variable in fields)
-            {
-                string variableName = variable.Name;
-                object variableValue = variable.GetValue(sectionValue);
-
-            }
-        }
-
-        public static void UpdateValue(string key, object value, BotOwner bot)
-        {
-            bool complete = false;
-            foreach (KeyValuePair<FieldInfo, FieldInfo[]> keyPair in BotSettingsHandler.EFTSettingsFields.Fields)
-            {
-                object Settings = keyPair.Key.GetValue(bot.Settings.FileSettings);
-                FieldInfo[] fields = keyPair.Value;
-                foreach (FieldInfo field in fields)
-                {
-                    if (field.Name == key)
-                    {
-                        complete = true;
-                        field.SetValue(Settings, value);
-                        break;
-                    }
-                }
-                if (complete)
-                {
-                    break;
-                }
-            }
-        }
-    }
 }

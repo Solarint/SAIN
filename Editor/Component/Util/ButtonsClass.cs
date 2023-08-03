@@ -46,30 +46,6 @@ namespace SAIN.Editor
             return entry.Value;
         }
 
-        public bool ButtonProperty(SAINProperty<bool> entry, BotDifficulty difficulty)
-        {
-            bool value = (bool)entry.GetValue(difficulty);
-
-            BeginHorizontal();
-
-            InfoBox(entry.Description);
-
-            Box(entry.Name, Width(200f));
-
-            Space(25);
-
-            value = CustomToggle(value);
-
-            Space(25);
-
-            ResetButton(entry, difficulty);
-
-            EndHorizontal();
-
-            entry.SetValue(difficulty, value);
-            return value;
-        }
-
         private const float ResetWidth = 60f;
 
         public void ResetButton<T>(ConfigEntry<T> entry, float height)
@@ -86,24 +62,6 @@ namespace SAIN.Editor
             {
                 MenuClickSound();
                 DefaultValue(entry);
-            }
-        }
-
-        public void ResetButton<T>(SAINProperty<T> entry, BotDifficulty difficulty, float height)
-        {
-            if (Button("Reset", Width(ResetWidth), Height(height)))
-            {
-                MenuClickSound();
-                entry.Reset(difficulty);
-            }
-        }
-
-        public void ResetButton<T>(SAINProperty<T> entry, BotDifficulty difficulty)
-        {
-            if (Button("Reset", Width(ResetWidth)))
-            {
-                MenuClickSound();
-                entry.Reset(difficulty);
             }
         }
 

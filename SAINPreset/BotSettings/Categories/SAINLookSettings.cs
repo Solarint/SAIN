@@ -6,6 +6,11 @@ namespace SAIN.BotSettings.Categories
 {
     public class SAINLookSettings
     {
+        public float VisionSpeedModifier = 1;
+        public float CloseVisionSpeed = 1;
+        public float FarVisionSpeed = 1;
+        public float CloseFarThresh = 50;
+
         [Name("Can Use Flashlights")]
         [DefaultValue(true)]
         public bool CAN_USE_LIGHT = true;

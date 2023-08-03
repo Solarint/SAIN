@@ -1,6 +1,8 @@
 ﻿using SAIN.BotPresets;
 using SAIN.Editor.Abstract;
 using SAIN.Helpers;
+using SAIN.Plugin;
+using SAIN.SAINPreset;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -21,17 +23,8 @@ namespace SAIN.Editor
 
         public PresetEditor(SAINEditor editor) : base(editor)
         {
-            string DefaultPreset = nameof(SAIN) + "_" + PluginInfo.Version + "_hard";
-            var settings = JsonUtility.Load.LoadPresetSettings(DefaultPreset);
-
-            JsonUtility.Save.SelectedPresetName = settings.SelectedPreset;
-            SelectedPresetInfo = LoadPreset(settings.SelectedPreset);
-            PresetEditorSettings = settings;
-
-            PresetManager.UpdatePresetsAndDict();
-
             List<string> sections = new List<string>();
-            foreach (var type in WildSpawnTypes)
+            foreach (var type in BotTypeDefinitions.BotTypes)
             {
                 if (!sections.Contains(type.Section))
                 {
@@ -49,21 +42,13 @@ namespace SAIN.Editor
             return folders[folders.Length - 1];
         }
 
-        private List<SAINPresetInfo> PresetInfoOptions = new List<SAINPresetInfo>();
         private float RecheckOptionsTimer;
-        private SAINPresetInfo SelectedPresetInfo;
-
-        private SAINPresetInfo LoadPreset(string name)
-        {
-            return JsonUtility.Load.LoadPreset(name);
-        }
 
         void LoadPresetOptions(bool refresh = false)
         {
             if (RecheckOptionsTimer < Time.time || refresh)
             {
                 RecheckOptionsTimer = Time.time + 30f;
-                PresetInfoOptions = JsonUtility.Load.GetPresetOptions(PresetInfoOptions);
             }
         }
 
@@ -87,12 +72,12 @@ namespace SAIN.Editor
             float endHeight = InstalledHeight + LabelHeight;
 
             int presetSpacing = 0;
-            SAINPresetInfo selectedPreset = SelectedPresetInfo;
-            for (int i = 0; i < PresetInfoOptions.Count; i++)
+            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Definition;
+            for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
             {
-                var preset = PresetInfoOptions[i];
-                bool selected = selectedPreset.Name == preset.Name;
-                if (Toggle(selected, preset.Name, preset.Description, Height(InstalledHeight)))
+                var preset = PresetHandler.PresetOptions[i];
+                bool selected = selectedPreset.DisplayName == preset.DisplayName;
+                if (Toggle(selected, preset.DisplayName, preset.Description, Height(InstalledHeight)))
                 {
                     selectedPreset = preset;
                 }
@@ -109,13 +94,10 @@ namespace SAIN.Editor
 
             EndVertical();
 
-            if (selectedPreset != SelectedPresetInfo)
+            if (selectedPreset != SAINPlugin.LoadedPreset.Definition)
             {
-                SelectedPresetInfo = selectedPreset;
-                JsonUtility.Save.SelectedPresetName = selectedPreset.Name;
-
+                PresetHandler.InitPresetFromDefinition(selectedPreset);
                 Reset();
-                PresetManager.UpdatePresetsAndDict();
             }
 
             OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
@@ -335,9 +317,9 @@ namespace SAIN.Editor
 
                 Space(Rect2OptionSpacing);
 
-                for (int j = 0; j < WildSpawnTypes.Count; j++)
+                for (int j = 0; j < BotTypeDefinitions.BotTypes.Length; j++)
                 {
-                    BotType type = WildSpawnTypes[j];
+                    BotType type = BotTypeDefinitions.BotTypes[j];
                     if (type.Section == section)
                     {
                         GUIStyle style2 = new GUIStyle(GetStyle(StyleNames.toggle))
@@ -378,7 +360,6 @@ namespace SAIN.Editor
         public readonly string[] Sections;
         private readonly List<string> SelectedSections = new List<string>();
 
-        private List<BotType> WildSpawnTypes => PresetManager.BotTypes;
         private readonly List<BotType> SelectedWildSpawnTypes = new List<BotType>();
 
         public readonly BotDifficulty[] BotDifficultyOptions = { BotDifficulty.easy, BotDifficulty.normal, BotDifficulty.hard, BotDifficulty.impossible };
@@ -389,44 +370,6 @@ namespace SAIN.Editor
             PropertyScroll = BeginScrollView(PropertyScroll, Height(scrollHeight));
 
             BeginHorizontal();
-
-            var properties = PresetManager.Properties;
-            int spacing = 0;
-            for (int i = 0; i < properties.Count; i++)
-            {
-                var Property = properties[i];
-
-                string name = Property.Name;
-                string tooltip = string.Empty;
-
-                if (Property.PropertyType == typeof(SAINProperty<float>))
-                {
-                    var prop = (SAINProperty<float>)Property.GetValue(PresetManager.BotTypes[0].Preset);
-                    name = prop.Name;
-                    tooltip = prop.Description;
-                }
-                else if (Property.PropertyType == typeof(SAINProperty<bool>))
-                {
-                    var prop = (SAINProperty<bool>)Property.GetValue(PresetManager.BotTypes[0].Preset);
-                    name = prop.Name;
-                    tooltip = prop.Description;
-                }
-                else if (Property.PropertyType == typeof(SAINProperty<int>))
-                {
-                    var prop = (SAINProperty<int>)Property.GetValue(PresetManager.BotTypes[0].Preset);
-                    name = prop.Name;
-                    tooltip = prop.Description;
-                }
-
-                spacing = SelectionGridOption(
-                    spacing,
-                    name,
-                    SelectedProperties,
-                    Property,
-                    optionsPerLine,
-                    optionHeight,
-                    tooltip);
-            }
 
             EndHorizontal();
             EndScrollView();
@@ -481,7 +424,6 @@ namespace SAIN.Editor
 
             if (Button("Save", "Apply Values set below to all selected bot types for all selected difficulties", Height(35f), Width(200f)))
             {
-                SaveValues(typeInEdit);
                 return;
             }
             if (Button("Discard", "Clear all selected bots, difficulties, and properties", Height(35f), Width(200f)))
@@ -537,45 +479,6 @@ namespace SAIN.Editor
 
         private BotDifficulty EditDifficulty => SelectedDifficulties[SelectedDifficulties.Count - 1];
 
-        private void SaveValues(BotType editingType)
-        {
-            foreach (var botType in SelectedWildSpawnTypes)
-            {
-                foreach (var Property in SelectedProperties)
-                {
-                    if (Property.PropertyType == typeof(SAINProperty<float>))
-                    {
-                        CopyValue<float>(editingType, botType, Property, SelectedDifficulties, EditDifficulty);
-                    }
-                    else if (Property.PropertyType == typeof(SAINProperty<bool>))
-                    {
-                        CopyValue<bool>(editingType, botType, Property, SelectedDifficulties, EditDifficulty);
-                    }
-                    else if (Property.PropertyType == typeof(SAINProperty<int>))
-                    {
-                        CopyValue<int>(editingType, botType, Property, SelectedDifficulties, EditDifficulty);
-                    }
-                }
-
-                PresetManager.UpdatePreset(botType.Preset);
-            }
-
-            SelectedProperties.Clear();
-        }
-
-        private void CopyValue<T>(BotType editingType, BotType targetType, PropertyInfo Property, List<BotDifficulty> difficulties, BotDifficulty editingDiff)
-        {
-            SAINProperty<T> editingFloat = PresetManager.GetSainProp<T>(editingType, Property);
-            SAINProperty<T> targetFloat = PresetManager.GetSainProp<T>(targetType, Property);
-
-            T editValue = (T)editingFloat.GetValue(editingDiff);
-
-            foreach (var difficulty in difficulties)
-            {
-                targetFloat.SetValue(difficulty, editValue);
-            }
-        }
-
         private void Reset()
         {
             SelectedDifficulties.Clear();
@@ -586,20 +489,6 @@ namespace SAIN.Editor
 
         private void CreatePropertyOption(PropertyInfo property, BotType botType)
         {
-            if (property.PropertyType == typeof(SAINProperty<float>))
-            {
-                SAINProperty<float> floatProperty = PresetManager.GetSainProp<float>(botType, property);
-                Builder.HorizSlider(floatProperty, EditDifficulty);
-            }
-            else if (property.PropertyType == typeof(SAINProperty<bool>))
-            {
-                SAINProperty<bool> boolProperty = PresetManager.GetSainProp<bool>(botType, property);
-                ButtonsClass.ButtonProperty(boolProperty, EditDifficulty);
-            }
-            else
-            {
-                Logger.LogError("Value is not float or bool!", GetType(), true);
-            }
         }
 
         private int SelectionGridOption<T>(int spacing, string optionName, List<T> list, T item, float optionPerLine = 3f, float optionHeight = 25f, string tooltip = null)

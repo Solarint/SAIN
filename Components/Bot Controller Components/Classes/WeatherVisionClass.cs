@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static SAIN.UserSettings.VisionConfig;
 
 namespace SAIN.Components.BotController
 {
@@ -36,11 +35,6 @@ namespace SAIN.Components.BotController
         {
             if (WeatherController.Instance?.WeatherCurve == null)
             {
-                if (VisionConfig.DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
-                {
-                    DebugTimer = UnityEngine.Time.time + 5f;
-                    System.Console.WriteLine($"SAIN Weather: No Weather Found!");
-                }
                 return 1f;
             }
 
@@ -57,13 +51,6 @@ namespace SAIN.Components.BotController
             float weathermodifier = 1f * fogmod * rainmod * cloudsmod;
 
             weathermodifier = Mathf.Clamp(weathermodifier, 0.2f, 1f);
-
-            // Log Everything!
-            if (DebugWeather.Value && DebugTimer < UnityEngine.Time.time)
-            {
-                DebugTimer = UnityEngine.Time.time + 5f;
-                System.Console.WriteLine($"SAIN Weather: Final Weather Modifier: [{weathermodifier}], Fog: [{fogmod}], Rain: [{rainmod}], Clouds: [{cloudsmod}]");
-            }
 
             return weathermodifier;
         }

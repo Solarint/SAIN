@@ -2,6 +2,7 @@ using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
 using SAIN.BotPresets;
+using SAIN.BotSettings;
 using SAIN.Components;
 using UnityEngine;
 using static SAIN.Editor.EditorSettings;
@@ -22,7 +23,7 @@ namespace SAIN.Classes
             var settings = PersonalitySettings;
             TauntDist = settings.TauntMaxDistance;
             TauntFreq = settings.TauntFrequency;
-            CanTaunt = settings.CanTaunt && FileSettings.BotTaunts;
+            CanTaunt = settings.CanTaunt && FileSettings.Mind.BotTaunts;
             CanRespond = settings.CanRespondToVoice;
 
             TauntDist *= Random.Range(0.66f, 1.33f);
@@ -40,7 +41,7 @@ namespace SAIN.Classes
         private float TauntFreq = 0f;
 
         PersonalitySettingsClass PersonalitySettings => SAIN?.Info?.PersonalityClass?.PersonalitySettings;
-        PresetValues FileSettings => SAIN?.Info?.FileSettings;
+        SAINSettings FileSettings => SAIN?.Info?.FileSettings;
 
         public void Update()
         {

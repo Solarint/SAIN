@@ -255,17 +255,6 @@ namespace SAIN.Editor
             return value;
         }
 
-        public bool CreateButtonOption(SAINProperty<bool> entry, BotDifficulty difficulty)
-        {
-            bool value = false;
-            BeginHorizontal();
-            if (ButtonsClass.ButtonProperty(entry, difficulty))
-            {
-                value = true;
-            }
-            EndHorizontal();
-            return value;
-        }
 
         public void HorizSlider<T>(ConfigEntry<T> entry, float rounding)
         {
@@ -323,31 +312,6 @@ namespace SAIN.Editor
                 max = entry.Description.AcceptableValues.Clamp(int.MaxValue);
                 return entry.Description.AcceptableValues.Clamp(int.MinValue);
             }
-        }
-
-        public void HorizSlider(SAINProperty<float> entry, BotDifficulty difficulty)
-        {
-            float value = (float)entry.GetValue(difficulty);
-            BeginHorizontal();
-
-            ButtonsClass.InfoBox(entry.Description, 35f);
-            Box(entry.Name, Width(LabelWidth), Height(35));
-
-            FlexibleSpace();
-
-            BlankBox(entry.Min.ToString(), "Minimum", Width(MinMaxWidth), Height(35));
-            CheckMouse("Min");
-
-            value = CreateSlider(value, entry.Min, entry.Max, entry.Rounding, 35f);
-
-            BlankBox(entry.Max.ToString(), "Maximum", Width(MinMaxWidth), Height(35));
-            CheckMouse("Max");
-
-            Box(value.ToString(), "Set Value", Width(ResultWidth), Height(35));
-            ButtonsClass.ResetButton(entry, difficulty, 35f);
-            EndHorizontal();
-
-            entry.SetValue(difficulty, value);
         }
 
         public float HorizSlider(string name, float value, float min, float max, float rounding = 1f, string description = null)

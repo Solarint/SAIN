@@ -1,4 +1,6 @@
-﻿using SAIN.BotSettings.Categories;
+﻿using EFT;
+using Newtonsoft.Json;
+using SAIN.BotSettings.Categories;
 using SAIN.SAINPreset.Attributes;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,26 @@ using System.Threading.Tasks;
 
 namespace SAIN.BotSettings
 {
+    public class SAINSettingsGroup
+    {
+        [JsonConstructor]
+        public SAINSettingsGroup() { }
+
+        public SAINSettingsGroup(string name, WildSpawnType type, BotDifficulty[] difficulties)
+        {
+            Name = name;
+            WildSpawnType = type;
+            foreach (var difficulty in difficulties)
+            {
+                Settings.Add(difficulty, new SAINSettings());
+            }
+        }
+
+        public readonly string Name;
+        public readonly WildSpawnType WildSpawnType;
+        public readonly Dictionary<BotDifficulty, SAINSettings> Settings = new Dictionary<BotDifficulty, SAINSettings>();
+    }
+
     public class SAINSettings
     {
         [Name("Bot Aiming Settings")]

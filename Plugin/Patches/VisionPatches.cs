@@ -2,7 +2,9 @@
 using EFT;
 using HarmonyLib;
 using SAIN.BotPresets;
+using SAIN.BotSettings;
 using SAIN.Components;
+using SAIN.Plugin;
 using SAIN.UserSettings;
 using System;
 using System.Reflection;
@@ -13,18 +15,18 @@ namespace SAIN.Patches.Vision
 {
     public class Math
     {
-        public static float CalcVisSpeed(float dist, BotPreset preset, BotDifficulty difficulty)
+        public static float CalcVisSpeed(float dist, SAINSettings preset)
         {
             float result = 1f;
-            if (dist >= (float)preset.CloseFarThresh.GetValue(difficulty))
+            if (dist >= preset.Look.CloseFarThresh)
             {
-                result *= (float)preset.FarVisionSpeed.GetValue(difficulty);
+                result *= preset.Look.FarVisionSpeed;
             }
             else
             {
-                result *= (float)preset.CloseVisionSpeed.GetValue(difficulty);
+                result *= preset.Look.CloseVisionSpeed;
             }
-            result *= (float)preset.VisionSpeedModifier.GetValue(difficulty);
+            result *= preset.Look.VisionSpeedModifier;
 
             return result;
         }
@@ -123,10 +125,10 @@ namespace SAIN.Patches.Vision
             float inverseWeatherModifier = Mathf.Sqrt(2f - weatherModifier);
 
             WildSpawnType wildSpawnType = ___botOwner_0.Profile.Info.Settings.Role;
-            if (PresetManager.TypePresets.TryGetValue(wildSpawnType, out var botType) )
+            if (PresetHandler.LoadedPreset.BotSettings.SAINSettings.TryGetValue(wildSpawnType, out var botType) )
             {
                 BotDifficulty diff = ___botOwner_0.Profile.Info.Settings.BotDifficulty;
-                __result *= Math.CalcVisSpeed(dist, botType.Preset, diff);
+                __result *= Math.CalcVisSpeed(dist, botType.Settings[diff]);
             }
             if (dist > 20f)
             {

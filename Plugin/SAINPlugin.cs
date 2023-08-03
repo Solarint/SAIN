@@ -1,15 +1,15 @@
 ﻿using BepInEx;
-using DrakiaXYZ.VersionChecker;
-using SAIN.UserSettings;
-using System;
-using System.Collections.Generic;
-using SAIN.Components;
-using SAIN.Editor;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
-using UnityEngine;
-using SAIN.Patches;
+using DrakiaXYZ.VersionChecker;
+using SAIN.Components;
+using SAIN.Editor;
 using SAIN.Helpers;
+using SAIN.Plugin;
+using SAIN.SAINPreset;
+using SAIN.UserSettings;
+using System;
+using UnityEngine;
 using static SAIN.PluginInfo;
 
 namespace SAIN
@@ -19,7 +19,6 @@ namespace SAIN
     [BepInDependency(BigBrain.GUID, BigBrain.Version)]
     [BepInDependency(Waypoints.GUID, Waypoints.Version)]
     [BepInProcess("EscapeFromTarkov.exe")]
-
     public class SAINPlugin : BaseUnityPlugin
     {
         private void Awake()
@@ -39,11 +38,10 @@ namespace SAIN
 
             SAINConfig = Config;
 
+            PresetHandler.Init();
             EditorSettings.Init();
             CoverConfig.Init(Config);
             DazzleConfig.Init(Config);
-
-            new BotGlobalSettingsPatch().Enable();
 
             new Patches.Generic.KickPatch().Enable();
             new Patches.Generic.GetBotController().Enable();
@@ -81,20 +79,22 @@ namespace SAIN
             VectorHelpers.Init();
         }
 
+        public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
+
         public static readonly SAINEditor SAINEditor = new SAINEditor();
 
         public static ConfigFile SAINConfig { get; private set; }
 
-        void Update()
+        private void Update()
         {
             CheckMods.Update();
             SAINEditor.Update();
             BotControllerHandler.Update();
         }
 
-        void Start() => SAINEditor.Init();
+        private void Start() => SAINEditor.Init();
         private void LateUpdate() => SAINEditor.LateUpdate();
-        void OnGUI() => SAINEditor.OnGUI();
+        private void OnGUI() => SAINEditor.OnGUI();
 
         public static SAINBotController BotController => BotControllerHandler.BotController;
     }

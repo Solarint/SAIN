@@ -1,35 +1,92 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SAIN.SAINPreset.Settings;
-using SAIN.SAINPreset.Settings.BotConfig;
+﻿using Newtonsoft.Json;
+using SAIN.Helpers;
+using SAIN.SAINPreset.GlobalSettings;
+using System;
+using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.SAINPreset
 {
     public class SAINPresetClass
     {
-        public SAINPresetDefinition Info = new SAINPresetDefinition();
+        public SAINPresetClass(SAINPresetDefinition preset)
+        {
+            HelpersGClass.LoadSettings();
+            Definition = preset;
+            GlobalSettings = LoadGlobalSettings(preset);
+            BotSettings = new BotSettings.BotSettingsClass(preset);
+        }
 
-        // Global Config Settings
-        public GeneralSettings General = new GeneralSettings();
+        private const string PresetsFolder = "Presets";
 
-        public PersonalitySettings Personality = new PersonalitySettings();
+        private static GlobalSettingsClass LoadGlobalSettings(SAINPresetDefinition Preset)
+        {
+            string fileName = nameof(GlobalSettings);
+            string[] folders = new string[] { PresetsFolder, Preset.Key };
 
-        public HearingSettings Hearing = new HearingSettings();
+            if (!Load.LoadObject(out GlobalSettingsClass result, fileName, folders))
+            {
+                result = new GlobalSettingsClass
+                {
+                    EFTCoreSettings = EFTCoreSettings.GetCore()
+                };
 
-        public ExtractSettings Extract = new ExtractSettings();
+                Save.SaveJson(result, fileName, folders);
+            }
 
-        public BotConfigSettings BotConfig = new BotConfigSettings();
+            return result;
+        }
+
+        public void SavePreset()
+        {
+            string[] folders = new string[] { PresetsFolder, Definition.Key };
+            Save.SaveJson(Definition, "Info", folders);
+            Save.SaveJson(GlobalSettings, nameof(GlobalSettings), folders);
+            BotSettings.SaveSettings(Definition);
+        }
+
+        public readonly SAINPresetDefinition Definition;
+        public readonly GlobalSettingsClass GlobalSettings;
+        public readonly BotSettings.BotSettingsClass BotSettings;
     }
-    public class SAINPresetDefinition
+
+    public sealed class SAINPresetDefinition
     {
-        public string Key;
-        public string DisplayName;
-        public string Description;
-        public string Creator;
-        public string SAINVersion;
-        public string DateCreated;
+        [JsonConstructor]
+        public SAINPresetDefinition()
+        { }
+
+        public SAINPresetDefinition(string key, string displayName, string description, string creator)
+        {
+            Update(key, displayName, description, creator);
+        }
+
+        public void Update(string key = null, string displayname = null, string description = null, string creator = null)
+        {
+            if (key != null)
+            {
+                Key = key;
+            }
+            if (displayname != null)
+            {
+                DisplayName = displayname;
+            }
+            if (description != null)
+            {
+                Description = description;
+            }
+            if (creator != null)
+            {
+                Creator = creator;
+            }
+            SAINVersion = PluginInfo.Version;
+            DateCreated = DateTime.Today.ToString();
+        }
+
+        public string Key { get; private set; }
+        public string DisplayName { get; private set; }
+        public string Description { get; private set; }
+        public string Creator { get; private set; }
+        public string SAINVersion { get; private set; }
+        public string DateCreated { get; private set; }
     }
 }

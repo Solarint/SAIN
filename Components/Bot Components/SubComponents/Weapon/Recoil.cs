@@ -33,7 +33,7 @@ namespace SAIN.Classes
             float randomvertRecoil = Random.Range(-vertRecoil, vertRecoil);
 
             Vector3 vector = new Vector3(targetpoint.x + randomHorizRecoil, targetpoint.y + randomvertRecoil, targetpoint.z + randomHorizRecoil);
-            vector = MathHelpers.VectorClamp(vector, -maxrecoil, maxrecoil) * SAIN.Info.FileSettings.RecoilMultiplier;
+            vector = MathHelpers.VectorClamp(vector, -maxrecoil, maxrecoil) * SAIN.Info.FileSettings.Shoot.RecoilMultiplier;
 
             return vector;
         }

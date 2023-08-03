@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using SAIN.BotSettings;
+using SAIN.SAINPreset;
 
 namespace SAIN.Helpers
 {
@@ -20,23 +21,21 @@ namespace SAIN.Helpers
     {
         private static ManualLogSource Logger => Utility.Logger;
 
-        const string EditorName = "Editor";
-        const string SAINName = "SAIN";
-        const string PresetsFolder = "BotPresets";
-        const string SAINConfigPresetFolder = "SAINConfig";
-        const string BotConfigFolder = "EFTBotConfig";
-        const string UIFolder = "UI";
-        const string TextureFolder = "Textures";
-        const string ColorsFolder = "Colors";
-        const string ColorScheme = nameof(ColorScheme);
-        const string ColorNames = nameof(ColorNames);
-        const string SettingsFolder = "BotSettings";
-        const string JSON = ".json";
-        const string JSONSearch = "*" + JSON;
-        const string PresetEnd = "_preset";
-        const string PresetSearch = "*" + PresetEnd;
-        const string Settings = "settings";
-        const string Info = "info";
+        public const string EditorName = "Editor";
+        public const string SAINName = "SAIN";
+        public const string PresetsFolder = "Presets";
+        public const string SAINConfigPresetFolder = "SAINConfig";
+        public const string BotConfigFolder = "EFTBotConfig";
+        public const string UIFolder = "UI";
+        public const string TextureFolder = "Textures";
+        public const string ColorsFolder = "Colors";
+        public const string ColorScheme = nameof(ColorScheme);
+        public const string ColorNames = nameof(ColorNames);
+        public const string SettingsFolder = "BotSettings";
+        public const string JSON = ".json";
+        public const string JSONSearch = "*" + JSON;
+        public const string Settings = "Settings";
+        public const string Info = "Info";
 
         public static class Save
         {
@@ -60,25 +59,6 @@ namespace SAIN.Helpers
                 streamWriter.Close();
             }
 
-            public static void SavePreset(string name, string description, string version, List<BotPreset> presets)
-            {
-                var info = new SAINPresetInfo
-                {
-                    Name = name,
-                    Description = description,
-                    SAINVersion = version,
-                    Presets = presets
-                };
-                SavePreset(info);
-            }
-
-            public static void SavePreset(SAINPresetInfo preset)
-            {
-                string folderName = preset.Name + PresetEnd;
-                SaveJson(preset, Info, PresetFolders(folderName));
-                SavePresets(preset.Presets, folderName);
-            }
-
             public static void SavePersonalities(Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities)
             {
                 foreach (var pers in Personalities)
@@ -94,51 +74,6 @@ namespace SAIN.Helpers
                 SaveObject(objectToSave, ".json", fileName, folders);
             }
 
-            public static void SaveScheme(BaseColorSchemeClass scheme)
-            {
-                if (CheckNull(scheme)) return;
-
-                SaveJson(scheme, ColorScheme, UIFolder, ColorsFolder);
-            }
-
-            public static void SavePreset(BotPreset preset, string namedPresetFolder)
-            {
-                if (CheckNull(preset)) return;
-
-                SaveJson(preset, preset.DisplayName, SAINConfigFolders(namedPresetFolder));
-            }
-
-            public static void SavePreset(BotPreset preset)
-            {
-                SavePreset(preset, SelectedPresetName);
-            }
-
-            public static void SavePresets(BotPreset[] presets, string namedPresetFolder)
-            {
-                for (int i = 0; i < presets.Length; i++)
-                {
-                    SavePreset(presets[i], namedPresetFolder);
-                }
-            }
-
-            public static void SavePresets(BotPreset[] presets)
-            {
-                SavePresets(presets, SelectedPresetName);
-            }
-
-            public static void SavePresets(List<BotPreset> presets, string namedPresetFolder)
-            {
-                for (int i = 0; i < presets.Count; i++)
-                {
-                    SavePreset(presets[i], namedPresetFolder);
-                }
-            }
-
-            public static void SavePresets(List<BotPreset> presets)
-            {
-                SavePresets(presets, SelectedPresetName);
-            }
-
             static bool CheckNull(object obj)
             {
                 bool isNull = obj == null;
@@ -147,29 +82,6 @@ namespace SAIN.Helpers
                     LogError("Object is Null, cannot save.");
                 }
                 return isNull;
-            }
-
-            public static void SaveBotSettings(SAINBotSettingsClass settings, BotOwner owner)
-            {
-                SaveBotSettings(settings, owner, SelectedPresetName);
-            }
-
-            public static void SaveBotSettings(SAINBotSettingsClass settings, BotOwner owner, string presetName)
-            {
-                var role = owner.Profile.Info.Settings.Role;
-                var diff = owner.Profile.Info.Settings.BotDifficulty;
-                SaveBotSettings(settings, diff, role, presetName);
-            }
-
-            public static void SaveBotSettings(SAINBotSettingsClass settings, BotDifficulty difficulty, WildSpawnType role)
-            {
-                SaveBotSettings(settings, difficulty, role, SelectedPresetName);
-            }
-
-            public static void SaveBotSettings(SAINBotSettingsClass settings, BotDifficulty difficulty, WildSpawnType role, string presetName)
-            {
-                string filename = role.ToString();
-                SaveJson(settings, filename, EFTBotConfigFolders(presetName));
             }
         }
 
@@ -204,59 +116,18 @@ namespace SAIN.Helpers
                 return LoadAllFiles<T>(JSONSearch, folders);
             }
 
-            public static List<BotPreset> LoadPresetsFromFolder(params string[] folders)
-            {
-                return LoadAllFiles<BotPreset>(JSONSearch, folders);
-            }
-
-            public static SAINPresetInfo LoadPreset(string name)
-            {
-                string json = LoadTextFile(JSON, Info, PresetFolders(name));
-                if (json == null)
-                {
-                    return null;
-                }
-
-                var result = DeserializeObject<SAINPresetInfo>(json);
-                return result;
-            }
-
-            public static SAINPresetInfo LoadPresetList(SAINPresetInfo preset)
-            {
-                if (preset != null)
-                {
-                    preset.Presets = LoadPresetsFromFolder(SAINConfigFolders(preset.Name));
-                }
-                return preset;
-            }
-
-            public static string[] GetPresetOptions()
-            {
-                string foldersPath = GetFoldersPath(PresetsFolder);
-                return Directory.GetDirectories(foldersPath, PresetSearch);
-            }
-
-            public static List<string> GetPresetOptions(List<string> list)
+            public static List<SAINPresetDefinition> GetPresetOptions(List<SAINPresetDefinition> list)
             {
                 list.Clear();
                 string foldersPath = GetFoldersPath(PresetsFolder);
-                var array = Directory.GetDirectories(foldersPath, PresetSearch);
-                list.AddRange(array);
-                return list;
-            }
-
-            public static List<SAINPresetInfo> GetPresetOptions(List<SAINPresetInfo> list)
-            {
-                list.Clear();
-                string foldersPath = GetFoldersPath(PresetsFolder);
-                var array = Directory.GetDirectories(foldersPath, PresetSearch);
+                var array = Directory.GetDirectories(foldersPath);
                 foreach ( var item in array )
                 {
                     string path = Path.Combine(item, Info) + JSON;
                     if (File.Exists(path))
                     {
                         string json = File.ReadAllText(path);
-                        var obj = DeserializeObject<SAINPresetInfo>(json);
+                        var obj = DeserializeObject<SAINPresetDefinition>(json);
                         list.Add(obj);
                     }
                     else
@@ -286,7 +157,6 @@ namespace SAIN.Helpers
                 return JsonConvert.DeserializeObject<T>(file);
             }
 
-            [CanBeNull]
             public static string LoadTextFile(string fileExtension, string fileName, params string[] folders)
             {
                 string foldersPath = GetFoldersPath(folders);
@@ -334,65 +204,6 @@ namespace SAIN.Helpers
                 obj = default;
                 return false;
             }
-
-            public static PresetEditorDefaults LoadPresetSettings(string DefaultPreset)
-            {
-                if (!LoadObject<PresetEditorDefaults>(out var result, Settings, PresetsFolder))
-                {
-                    result = new PresetEditorDefaults
-                    {
-                        SelectedPreset = DefaultPreset,
-                        DefaultPreset = DefaultPreset
-                    };
-                    Save.SaveJson(result, Settings, PresetsFolder);
-                }
-                result.DefaultPreset = DefaultPreset;
-                return result;
-            }
-
-            public static BotPreset BotPreset(string name)
-            {
-                if (LoadJsonFile(out string json, name, SAINConfigFolders(Save.SelectedPresetName)))
-                {
-                    return DeserializeObject<BotPreset>(json); // Deserialize to BotPreset
-                }
-                else
-                {
-                    LogWarning($"BotPreset for {name} does not exist");
-                    return null;
-                }
-            }
-        }
-
-        public static string[] SAINConfigFolders(string presetName)
-        {
-            string[] result = new string[]
-            {
-                    PresetsFolder,
-                    presetName + PresetEnd,
-                    SAINConfigPresetFolder
-            };
-            return result;
-        }
-        public static string[] EFTBotConfigFolders(string presetName)
-        {
-            string[] result = new string[]
-            {
-                    PresetsFolder,
-                    presetName + PresetEnd,
-                    BotConfigFolder
-            };
-            return result;
-        }
-
-        public static string[] PresetFolders(string presetName)
-        {
-            string[] result = new string[]
-            {
-                    PresetsFolder,
-                    presetName + PresetEnd
-            };
-            return result;
         }
 
         private static void CheckDirectionary(string path)
@@ -403,26 +214,6 @@ namespace SAIN.Helpers
             }
         }
 
-        private static string GetNameAndSubNames(string filename, bool useMap)
-        {
-            return useMap ? CurrentMap + "_" + filename : filename;
-        }
-
-        private static string CurrentMap
-        {
-            get
-            {
-                if (Singleton<GameWorld>.Instance?.MainPlayer?.Location == null)
-                {
-                    return "null";
-                }
-                else
-                {
-                    return Singleton<GameWorld>.Instance.MainPlayer.Location.ToLower();
-                }
-            }
-        }
-
         private static string GetFoldersPath(params string[] folders)
         {
             string path = GetSAINPluginPath();
@@ -430,13 +221,6 @@ namespace SAIN.Helpers
             {
                 path = Path.Combine(path, folders[i]);
             }
-            CheckDirectionary(path);
-            return path;
-        }
-
-        private static string GetSAINPluginPath(string folder)
-        {
-            string path = Path.Combine(GetSAINPluginPath(), folder);
             CheckDirectionary(path);
             return path;
         }

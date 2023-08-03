@@ -1,6 +1,5 @@
 ﻿using SAIN.BotPresets;
 using SAIN.BotSettings;
-using SAIN.SAINPreset.Settings.BotConfig;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +16,6 @@ namespace SAIN.Helpers
                 return true;
             }
             return false;
-        }
-        public static Dictionary<Type, Dictionary<KeyValuePair<FieldInfo, FieldInfo>, object>>
-            GetAllValuesBotConfigs
-            (object obj, Dictionary<Type, Dictionary<KeyValuePair<FieldInfo, FieldInfo>, object>> Dictionary)
-        {
-            return GetAllValues<BotConfigEntry<float>, BotConfigEntry<bool>, BotConfigEntry<int>>(obj, Dictionary);
         }
 
         public static Dictionary<Type, Dictionary<KeyValuePair<FieldInfo, FieldInfo>, object>>
@@ -49,7 +42,7 @@ namespace SAIN.Helpers
             return Dictionary;
         }
 
-        public static Dictionary<Type, Dictionary<KeyValuePair<FieldInfo, FieldInfo>, object>> 
+        public static Dictionary<Type, Dictionary<KeyValuePair<FieldInfo, FieldInfo>, object>>
             GetAllValues<A, B, C>
             (object obj, Dictionary<Type, Dictionary<KeyValuePair<FieldInfo, FieldInfo>, object>> Dictionary)
         {
@@ -175,25 +168,6 @@ namespace SAIN.Helpers
                 }
             }
             return PropertyList;
-        }
-
-        public static List<PropertyInfo> GetBotPresetProperties()
-        {
-            var PropertyList = new List<PropertyInfo>();
-            foreach (PropertyInfo property in typeof(BotPreset).GetProperties(BindingFlags.Public | BindingFlags.Instance))
-            {
-                if (IsSainProperty(property))
-                {
-                    PropertyList.Add(property);
-                }
-            }
-            return PropertyList;
-        }
-
-        public static bool IsSainProperty(PropertyInfo property)
-        {
-            var propType = property.PropertyType;
-            return propType.IsGenericType && propType.GetGenericTypeDefinition() == typeof(SAINProperty<>);
         }
     }
 }

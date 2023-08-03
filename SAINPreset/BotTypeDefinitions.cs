@@ -1,12 +1,56 @@
 ﻿using EFT;
+using System;
+using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.BotPresets
 {
+    public sealed class BotType
+    {
+        public BotType(WildSpawnType type, string name, string section, string description)
+        {
+            OriginalName = type.ToString();
+            Name = name;
+            Description = description;
+            Section = section;
+            WildSpawnType = type;
+        }
+
+        public BotType(string wildSpawnType, string name, string section, string description)
+        {
+            OriginalName = wildSpawnType;
+            Name = name;
+            Description = description;
+            Section = section;
+            WildSpawnType = (WildSpawnType)Enum.Parse(typeof(WildSpawnType), wildSpawnType);
+        }
+
+        public readonly string OriginalName;
+        public readonly string Name;
+        public readonly string Description;
+        public readonly string Section;
+        public readonly WildSpawnType WildSpawnType;
+    }
+
     public class BotTypeDefinitions
     {
-        //   WildSpawnType                                      // DisplayName             // Section       // Description
-        public static readonly BotType[] BotTypes =
+        static BotTypeDefinitions()
         {
+            string fileName = nameof(BotTypes);
+            if (Load.LoadObject(out BotType[] botTypes, fileName))
+            {
+                BotTypes = botTypes;
+            }
+            else
+            {
+                BotTypes = CreateBotTypes();
+                Save.SaveJson(BotTypes, fileName);
+            }
+        }
+
+        static BotType[] CreateBotTypes()
+        {
+            return new BotType[]
+            {
             new BotType( WildSpawnType.assault,                 "Scav",                     "Scavs" ,       "Scavs!" ),
 
             new BotType( "sptUsec",                             "Usec",                     "PMCs" ,        "A PMC of the Usec Faction" ),
@@ -48,7 +92,9 @@ namespace SAIN.BotPresets
 
             new BotType( WildSpawnType.bossZryachiy,            "Zryachiy",                 "Bosses" ,      "Lighthouse Island Sniper Boss" ),
             new BotType( WildSpawnType.followerZryachiy,        "Zryachiy Guard",           "Followers" ,   "Lighthouse Island Sniper Boss Follower" )
-        };
+            };
+        }
 
+        public static readonly BotType[] BotTypes;
     }
 }

@@ -8,6 +8,11 @@ namespace SAIN.BotSettings.Categories
 {
     public class SAINShootSettings
     {
+        public float RecoilMultiplier;
+        public float BurstMulti;
+        public float FireratMulti;
+
+
         [IsHidden(true)]
         [DefaultValue(true)]
         public bool CAN_STOP_SHOOT_CAUSE_ANIMATOR = true;

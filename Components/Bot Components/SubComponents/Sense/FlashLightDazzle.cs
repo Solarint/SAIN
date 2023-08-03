@@ -71,8 +71,6 @@ namespace SAIN.Helpers
                             dazzlemodifier = GetDazzleModifier(person);
 
                         ApplyDazzle(dazzlemodifier, gainSight);
-
-                        DebugLogs(dazzlemodifier, gainSight, enemyDist);
                     }
                 }
             }
@@ -102,45 +100,11 @@ namespace SAIN.Helpers
                         }
 
                         ApplyDazzle(dazzlemodifier, gainSight);
-
-                        DebugLogs(dazzlemodifier, gainSight, enemyDist);
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// Logs debug information about the BotOwner's settings and the current dazzle, gainsight, and Distance values.
-        /// </summary>
-        /// <param name="BotOwner">The BotOwner owner.</param>
-        /// <param name="dazzlemod">The dazzle intensity.</param>
-        /// <param name="gainsightmod">The gainsight modifier.</param>
-        /// <param name="distance">The Distance.</param>
-        private void DebugLogs(float dazzlemod, float gainsightmod, float distance)
-        {
-            if (DebugFlash.Value)
-            {
-                var current = BotOwner.Settings.Current;
-                Logger.LogDebug($"" +
-                    $"_scatteringCoef: [{current._scatteringCoef}], " +
-                    $"_accuratySpeedCoef: [{current._accuratySpeedCoef}], " +
-                    $"_precicingSpeedCoef: [{current._precicingSpeedCoef}], " +
-                    $"_priorityScatteringCoef: [{current._priorityScatteringCoef}]");
-                Logger.LogDebug($"" +
-                    $"CurrentAccuratySpeed: [{current.CurrentAccuratySpeed}], " +
-                    $"CurrentPrecicingSpeed: [{current.CurrentPrecicingSpeed}], " +
-                    $"CurrentScattering: [{current.CurrentScattering}], " +
-                    $"PriorityScatter10meter: [{current.PriorityScatter10meter}]");
-                Logger.LogInfo($"Dazzle Intensity: [{dazzlemod}], GainSightModifier: [{gainsightmod}], distance : [{distance}]");
-            }
-        }
-
-        /// <summary>
-        /// Applies dazzle modifications to the BotOwner's settings for 0.1 seconds.
-        /// </summary>
-        /// <param name="dazzleModif">The dazzle modification.</param>
-        /// <param name="gainSightModif">The gain sight modification.</param>
-        /// <param name="BotOwner">The BotOwner to apply the modifications to.</param>
         private void ApplyDazzle(float dazzleModif, float gainSightModif)
         {
             float PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value;
@@ -148,7 +112,7 @@ namespace SAIN.Helpers
             float ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value;
             float PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value;
 
-            BotStatGClassWrapper Modifiers = new BotStatGClassWrapper
+            BotStatModifiers Modifiers = new BotStatModifiers
                 (
                     PrecicingSpeedCoef, 
                     AccuratySpeedCoef,

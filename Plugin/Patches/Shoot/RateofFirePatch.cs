@@ -29,7 +29,7 @@ namespace SAIN.Patches.Shoot
         {
             if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
-                var settings = component.Info.FileSettings;
+                var settings = component.Info.FileSettings.Aiming;
                 if (settings.FasterCQBReactions)
                 {
                     float maxDist = settings.FasterCQBReactionsDistance;

@@ -1,7 +1,9 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.BotPresets;
+using SAIN.BotSettings;
 using SAIN.Components;
+using SAIN.Plugin;
 using UnityEngine;
 
 namespace SAIN.Classes
@@ -10,17 +12,21 @@ namespace SAIN.Classes
     {
         public SAINBotInfo(SAINComponent botOwner) : base(botOwner)
         {
-            BotPresetClass = new BotPresetClass(botOwner);
+            GetFileSettings();
             PersonalityClass = new PersonalityClass(botOwner);
             WeaponInfo = new WeaponInfo(botOwner);
+            PresetHandler.PresetsUpdated += GetFileSettings;
         }
 
-        public PresetValues FileSettings => BotPresetClass.PresetValues;
+        public void GetFileSettings()
+        {
+            FileSettings = SAINPlugin.LoadedPreset.BotSettings.SAINSettings[WildSpawnType].Settings[BotDifficulty];
+            UpdateExtractTime();
+        }
 
-        public BotPresetClass BotPresetClass { get; private set; }
+        public SAINSettings FileSettings { get; private set; }
 
         public float TimeBeforeSearch { get; private set; } = 0f;
-        public float PercentageBeforeExtract => BotPresetClass.PercentageBeforeExtract;
 
         float LastPower = -1f;
 
@@ -87,6 +93,43 @@ namespace SAIN.Classes
             TimeBeforeSearch = searchTime;
         }
 
+        void UpdateExtractTime()
+        {
+            float percentage = Random.Range(FileSettings.Mind.MinExtractPercentage, FileSettings.Mind.MaxExtractPercentage) / 100f;
+
+            var squad = SAIN?.Squad;
+            var members = squad?.SquadMembers;
+            if (squad != null && squad.BotInGroup && members != null && members.Count > 0)
+            {
+                if (squad.IAmLeader)
+                {
+                    PercentageBeforeExtract = percentage;
+                    foreach (var member in members)
+                    {
+                        var infocClass = member.Value?.Info;
+                        if (infocClass != null)
+                        {
+                            infocClass.PercentageBeforeExtract = percentage;
+                        }
+                    }
+                }
+                else if (PercentageBeforeExtract == -1f)
+                {
+                    var Leader = squad?.LeaderComponent?.Info;
+                    if (Leader != null)
+                    {
+                        PercentageBeforeExtract = Leader.PercentageBeforeExtract;
+                    }
+                }
+            }
+            else
+            {
+                PercentageBeforeExtract = percentage;
+            }
+        }
+
+        public float PercentageBeforeExtract { get; set; } = -1f;
+
         private const float SearchRandomize = 0.33f;
 
         public PersonalityClass PersonalityClass { get; private set; }
@@ -96,7 +139,7 @@ namespace SAIN.Classes
 
         public void Dispose()
         {
-            PresetManager.PresetUpdated -= BotPresetClass.PresetUpdated;
+            PresetHandler.PresetsUpdated -= GetFileSettings;
         }
     }
 }

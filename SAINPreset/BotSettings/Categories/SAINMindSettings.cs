@@ -8,6 +8,33 @@ namespace SAIN.BotSettings.Categories
 {
     public class SAINMindSettings
     {
+        public float TalkFrequency = 2f;
+        public bool CanTalk = true;
+        public bool BotTaunts = true;
+        public bool SquadTalk = true;
+        public float SquadMemberTalkFreq = 3f;
+        public float SquadLeadTalkFreq = 3f;
+
+        [Name("Max Raid Percentage before Extract")]
+        [Description()]
+        [DefaultValue(30f)]
+        [Minimum(0f)]
+        [Maximum(100f)]
+        [Rounding(1)]
+        public float MaxExtractPercentage = 30f;
+
+        [Name("Min Raid Percentage before Extract")]
+        [Description()]
+        [DefaultValue(5f)]
+        [Minimum(0f)]
+        [Maximum(100f)]
+        [Rounding(1)]
+        public float MinExtractPercentage = 5f;
+
+        [Name("Enable Extracts")]
+        [DefaultValue(true)]
+        public bool EnableExtracts = true;
+
         [Name("Time To Forget About Enemy")]
         [Description("If a bot hasn't seen or heard their enemy after this amount of time, they will return to patrol")]
         [DefaultValue(240f)]
