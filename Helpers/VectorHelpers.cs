@@ -594,7 +594,6 @@ namespace SAIN.Helpers
             CreateVectorArray8Dir(Vector3.back, array);
         }
 
-        private static bool Started = false;
         private static readonly Dictionary<Vector3, Vector3[]> dictionary_0 = new Dictionary<Vector3, Vector3[]>();
     }
 

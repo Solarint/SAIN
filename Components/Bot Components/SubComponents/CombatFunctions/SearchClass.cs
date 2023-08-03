@@ -14,10 +14,7 @@ namespace SAIN.Classes
 
         public SearchClass(SAINComponent bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
-
-        private readonly ManualLogSource Logger;
 
         private void MoveToNextPoint(Vector3 point)
         {

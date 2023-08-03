@@ -12,11 +12,8 @@ namespace SAIN.Classes
 {
     public class EnemyTalk : SAINBot
     {
-        private ManualLogSource Logger;
-
         public EnemyTalk(SAINComponent bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
         private void Init()

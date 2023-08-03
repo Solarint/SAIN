@@ -30,7 +30,6 @@ namespace SAIN.Components.BotController
 
         private float GetNewModifiersTimer = 0f;
 
-        private static float DebugTimer = 0f;
         private static float Visibility()
         {
             if (WeatherController.Instance?.WeatherCurve == null)

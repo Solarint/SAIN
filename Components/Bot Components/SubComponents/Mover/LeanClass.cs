@@ -11,7 +11,6 @@ namespace SAIN.Classes.Mover
 
         public LeanClass(SAINComponent bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
         public void Update()
@@ -64,8 +63,6 @@ namespace SAIN.Classes.Mover
                 return angle;
             }
         }
-
-        private readonly ManualLogSource Logger;
 
         public void FindLeanDirectionRayCast(Vector3 targetPos)
         {

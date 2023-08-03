@@ -9,7 +9,6 @@ namespace SAIN.Helpers
     {
         public class Weather
         {
-            private static float DebugTimer = 0f;
             public static float Visibility()
             {
                 if (WeatherController.Instance?.WeatherCurve == null)

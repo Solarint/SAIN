@@ -10,7 +10,6 @@ namespace SAIN.Classes.Mover
     {
         public BlindFireClass(SAINComponent bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
         }
 
         public void ResetBlindFire()
@@ -128,7 +127,5 @@ namespace SAIN.Classes.Mover
                 BotOwner.GetPlayer.MovementContext.SetBlindFire(value);
             }
         }
-
-        private readonly ManualLogSource Logger;
     }
 }

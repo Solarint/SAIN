@@ -15,7 +15,6 @@ namespace SAIN.Classes
     {
         public SquadLeaderClass(SAINComponent owner) : base(owner)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
         public void ManualUpdate()
@@ -30,7 +29,5 @@ namespace SAIN.Classes
                 return;
             }
         }
-
-        private ManualLogSource Logger;
     }
 }

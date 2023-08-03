@@ -11,7 +11,6 @@ namespace SAIN.Classes.Mover
 
         public SideStepClass(SAINComponent bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
         public void ResetSideStep(float current)
@@ -106,7 +105,5 @@ namespace SAIN.Classes.Mover
         }
 
         public float CurrentSideStep => GetPlayer.MovementContext.GetSidestep();
-
-        private readonly ManualLogSource Logger;
     }
 }

@@ -11,10 +11,8 @@ namespace SAIN.Helpers
     {
         public FlashLightDazzle(SAINComponent owner) : base(owner)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        private readonly ManualLogSource Logger;
 
         public void CheckIfDazzleApplied(IAIDetails person)
         {

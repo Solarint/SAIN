@@ -1,4 +1,6 @@
-﻿using SAIN.Classes;
+﻿using EFT;
+using SAIN.BotPresets;
+using SAIN.Classes;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,22 @@ namespace SAIN.SAINPreset.Personalities
 {
     public class PersonalityManager
     {
+        static PersonalityManager()
+        {
+            AllTypes = new List<WildSpawnType>();
+            foreach (BotType type in BotTypeDefinitions.BotTypesList)
+            {
+                PMCTypes.Add(type.WildSpawnType);
+            }
+            PMCTypes = new List<WildSpawnType>
+            {
+                EnumValues.WildSpawn.Usec,
+                EnumValues.WildSpawn.Bear
+            };
+        }
+        public static List<WildSpawnType> AllTypes;
+        public static List<WildSpawnType> PMCTypes;
+
         public PersonalityManager(SAINPresetDefinition preset)
         {
             Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
@@ -36,8 +54,6 @@ namespace SAIN.SAINPreset.Personalities
             }
         }
 
-        static readonly BotTypeEnum[] PMCOnly = { BotTypeEnum.PMC };
-
         void InitDefaults()
         {
             var pers = SAINPersonality.Rat;
@@ -51,7 +67,8 @@ namespace SAIN.SAINPreset.Personalities
                     TrueRandomChance = 30,
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
                     SearchBaseTime = SearchBaseTime(pers),
-                    PowerLevelMax = 50f
+                    PowerLevelMax = 50f,
+                    AllowedBotTypes = AllTypes
                 };
                 Personalities.Add(pers, settings);
             }
@@ -67,7 +84,8 @@ namespace SAIN.SAINPreset.Personalities
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
                     SearchBaseTime = SearchBaseTime(pers),
                     PowerLevelMax = 40f,
-                    MaxLevel = 10
+                    MaxLevel = 10,
+                    AllowedBotTypes = AllTypes
                 };
                 Personalities.Add(pers, settings);
             }
@@ -82,6 +100,7 @@ namespace SAIN.SAINPreset.Personalities
                     TrueRandomChance = 30,
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
                     SearchBaseTime = SearchBaseTime(pers),
+                    AllowedBotTypes = AllTypes
                 };
                 Personalities.Add(pers, settings);
             }
@@ -96,6 +115,7 @@ namespace SAIN.SAINPreset.Personalities
                     HoldGroundBaseTime = HoldGroundBaseTime(pers),
                     SearchBaseTime = SearchBaseTime(pers),
                     CanRespondToVoice = true,
+                    AllowedBotTypes = AllTypes
                 };
                 Personalities.Add(pers, settings);
             }
@@ -110,7 +130,7 @@ namespace SAIN.SAINPreset.Personalities
                     CanJumpCorners = true,
                     RandomChanceIfMeetRequirements = 60,
                     TrueRandomChance = 3,
-                    AllowedBotTypes = PMCOnly,
+                    AllowedBotTypes = PMCTypes,
                     CanTaunt = true,
                     CanRespondToVoice = true,
                     TauntFrequency = 8,
@@ -134,7 +154,7 @@ namespace SAIN.SAINPreset.Personalities
                     CanJumpCorners = true,
                     RandomChanceIfMeetRequirements = 60,
                     TrueRandomChance = 3,
-                    AllowedBotTypes = PMCOnly,
+                    AllowedBotTypes = PMCTypes,
                     CanTaunt = true,
                     CanRespondToVoice = true,
                     TauntFrequency = 8,

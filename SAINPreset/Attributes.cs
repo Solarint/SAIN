@@ -162,6 +162,24 @@ namespace SAIN.SAINPreset.Attributes
             {
                 return EditValue(value, CheckDictionary(field), entryConfig);
             }
+            /*
+            public static bool EditValue(bool value, FieldInfo field, GUIEntryConfig entryConfig = null)
+            {
+                return (bool)EditValue(value, CheckDictionary(field), entryConfig);
+            }
+            public static float EditValue(float value, FieldInfo field, GUIEntryConfig entryConfig = null)
+            {
+                return (float)EditValue(value, CheckDictionary(field), entryConfig);
+            }
+            public static int EditValue(int value, FieldInfo field, GUIEntryConfig entryConfig = null)
+            {
+                return (int)EditValue(value, CheckDictionary(field), entryConfig);
+            }
+            */
+            public static T EditValue<T>(T value, FieldInfo field, GUIEntryConfig entryConfig = null)
+            {
+                return (T)EditValue(value, CheckDictionary(field), entryConfig);
+            }
 
             public object EditValue(object value, GUIEntryConfig entryConfig = null)
             {

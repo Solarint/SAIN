@@ -19,7 +19,6 @@ namespace SAIN.Classes.Mover
     {
         public PoseClass(SAINComponent owner) : base(owner)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
         private void DebugFindOffset()
@@ -183,7 +182,5 @@ namespace SAIN.Classes.Mover
             const float min = 0.5f;
             return height - min;
         }
-
-        private readonly ManualLogSource Logger;
     }
 }

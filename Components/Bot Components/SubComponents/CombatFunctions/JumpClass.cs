@@ -15,10 +15,8 @@ namespace SAIN.Classes
     {
         public JumpClass(SAINComponent owner) : base(owner)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
-        private readonly ManualLogSource Logger;
 
         public void Update()
         {

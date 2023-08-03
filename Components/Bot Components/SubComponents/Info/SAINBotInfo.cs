@@ -146,7 +146,7 @@ namespace SAIN.Classes
             {
                 return false;
             }
-            return Personalities[personality].CanBePersonality(BotType, PowerLevel, PlayerLevel);
+            return Personalities[personality].CanBePersonality(WildSpawnType, PowerLevel, PlayerLevel);
         }
 
         public SAINPersonality Personality { get; private set; }

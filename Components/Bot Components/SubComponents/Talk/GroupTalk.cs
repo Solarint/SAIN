@@ -10,12 +10,10 @@ namespace SAIN.Classes
 {
     public class GroupTalk : SAINBot
     {
-        protected ManualLogSource Logger;
         private BotTalkClass Talk => SAIN.Talk;
 
         public GroupTalk(SAINComponent bot) : base(bot)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
         }
 
         private void Subscribe()

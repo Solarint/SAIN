@@ -1,4 +1,5 @@
-﻿using SAIN.BotPresets;
+﻿using HarmonyLib;
+using SAIN.BotPresets;
 using SAIN.BotSettings;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,26 @@ namespace SAIN.Helpers
 {
     internal class Reflection
     {
+        public static T GetValue<T>(object obj, FieldInfo field)
+        {
+            return (T)field.GetValue(obj);
+        }
+
+        public static T GetValue<T>(object obj, PropertyInfo prop)
+        {
+            return (T)prop.GetValue(obj);
+        }
+
+        public static FieldInfo GetField(Type type, string fieldName)
+        {
+            return AccessTools.Field(type, fieldName);
+        }
+
+        public static PropertyInfo GetProperty(Type type, string propName)
+        {
+            return AccessTools.Property(type, propName);
+        }
+
         public static bool MeetsParameters<T>(T value, T[] array)
         {
             if (array == null || array.Length == 0 || array.Contains(value))

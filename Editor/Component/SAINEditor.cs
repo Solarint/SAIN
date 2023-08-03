@@ -15,6 +15,7 @@ using EFT;
 using System.Reflection;
 using BepInEx;
 using SAIN.BotSettings;
+using static SAIN.Helpers.Reflection;
 
 namespace SAIN.Editor
 {
@@ -91,10 +92,7 @@ namespace SAIN.Editor
         public StyleOptions StyleOptions { get; private set; }
         public ColorsClass Colors { get; private set; }
         public TexturesClass TexturesClass { get; private set; }
-
         public bool GameIsPaused { get; private set; }
-
-        private GameObject EFTInput;
 
         [ConsoleCommand("Open SAIN GUI Editor")]
 
@@ -385,23 +383,12 @@ namespace SAIN.Editor
                     Builder.HorizSlider(RecoilDecay, 1000f);
 
                     Builder.BeginHorizontal();
-                    //if (Builder.Button("Font"))
-                    //{
-                    //    OpenFontMenu = !OpenFontMenu;
-                    //}
                     if (Builder.Button("Mysterious Button"))
                     {
                         Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.PlayerIsDead);
                         Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.QuestFailed);
                     }
                     Builder.EndHorizontal();
-
-                    //if (OpenFontMenu)
-                    //{
-                    //    FontEditMenu.OpenMenu();
-                    //}
-
-                    //WindowLayoutCreator.CreateGUIAdjustmentSliders();
                 }
 
                 Builder.EndVertical();

@@ -16,13 +16,16 @@ namespace SAIN.Classes.Mover
 {
     public class ProneClass : SAINBot
     {
-        public ProneClass(SAINComponent owner) : base(owner)
+        static ProneClass()
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             BotLayProperty = AccessTools.Property(typeof(BotOwner), "BotLay").PropertyType.GetProperty("IsLay");
         }
 
-        private readonly PropertyInfo BotLayProperty;
+        public ProneClass(SAINComponent owner) : base(owner)
+        {
+        }
+
+        private static readonly PropertyInfo BotLayProperty;
 
         public bool IsProne => BotOwner.BotLay.IsLay;
 
@@ -136,7 +139,5 @@ namespace SAIN.Classes.Mover
         }
 
         public BotLayClass BotLay => BotOwner.BotLay;
-
-        private readonly ManualLogSource Logger;
     }
 }

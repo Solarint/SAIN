@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static SAIN.Editor.EditorSettings;
+using static SAIN.Helpers.Reflection;
+using static SAIN.SAINPreset.Attributes.GetAttributeValue.AttributesGUI;
 
 namespace SAIN.Editor.GUISections
 {
@@ -23,17 +25,23 @@ namespace SAIN.Editor.GUISections
             Box("For The Memes. Recommended not to use these during normal gameplay!");
             Box("Bots will be more predictable and exploitable.");
 
-            if (Builder.CreateButtonOption(AllGigaChads))
+            var pers = SAINPlugin.LoadedPreset.GlobalSettings.Personality;
+            Type type = pers.GetType();
+
+            pers.AllGigaChads = EditValue(pers.AllGigaChads, GetField(type, nameof(pers.AllGigaChads)));
+            if (pers.AllGigaChads)
             {
                 AllChads.Value = false;
                 AllRats.Value = false;
             }
-            if (Builder.CreateButtonOption(AllChads))
+            pers.AllChads = EditValue(pers.AllChads, GetField(type, nameof(pers.AllChads)));
+            if (pers.AllChads)
             {
                 AllGigaChads.Value = false;
                 AllRats.Value = false;
             }
-            if (Builder.CreateButtonOption(AllRats))
+            pers.AllRats = EditValue(pers.AllRats, GetField(type, nameof(pers.AllRats)));
+            if (pers.AllRats)
             {
                 AllGigaChads.Value = false;
                 AllChads.Value = false;
@@ -55,56 +63,16 @@ namespace SAIN.Editor.GUISections
                     continue;
                 }
 
-                personality.CanJumpCorners = Toggle(personality.CanJumpCorners, nameof(personality.CanJumpCorners));
-                personality.CanTaunt = Toggle(personality.CanTaunt, nameof(personality.CanTaunt));
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.TauntFrequency), GUILayout.Width(250f));
-                personality.TauntFrequency = Builder.CreateSlider(personality.TauntFrequency, 0f, 60f, 1f, 35f);
-                Builder.Box(personality.TauntFrequency.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.TauntMaxDistance), GUILayout.Width(250f));
-                personality.TauntMaxDistance = Builder.CreateSlider(personality.TauntMaxDistance, 5f, 100f, 1f, 35f);
-                Builder.Box(personality.TauntMaxDistance.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.HoldGroundBaseTime), GUILayout.Width(250f));
-                personality.HoldGroundBaseTime = Builder.CreateSlider(personality.HoldGroundBaseTime, 0f, 3f, 100f, 35f);
-                Builder.Box(personality.HoldGroundBaseTime.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.SearchBaseTime), GUILayout.Width(250f));
-                personality.SearchBaseTime = Builder.CreateSlider(personality.SearchBaseTime, 0f, 1000f, 10f, 35f);
-                Builder.Box(personality.SearchBaseTime.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.PowerLevelMin), GUILayout.Width(250f));
-                personality.PowerLevelMin = Builder.CreateSlider(personality.PowerLevelMin, 1f, 500f, 1f, 35f);
-                Builder.Box(personality.PowerLevelMin.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.PowerLevelMax), GUILayout.Width(250f));
-                personality.PowerLevelMax = Builder.CreateSlider(personality.PowerLevelMax, 1f, 500f, 1f, 35f);
-                Builder.Box(personality.PowerLevelMax.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.TrueRandomChance), GUILayout.Width(250f));
-                personality.TrueRandomChance = Builder.CreateSlider(personality.TrueRandomChance, 0f, 100f, 1f, 35f);
-                Builder.Box(personality.TrueRandomChance.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
-
-                Builder.BeginHorizontal();
-                Builder.Label(nameof(personality.RandomChanceIfMeetRequirements), GUILayout.Width(250f));
-                personality.RandomChanceIfMeetRequirements = Builder.CreateSlider(personality.RandomChanceIfMeetRequirements, 0f, 100f, 1f, 35f);
-                Builder.Box(personality.RandomChanceIfMeetRequirements.ToString(), GUILayout.Width(100f));
-                Builder.EndHorizontal();
+                personality.CanJumpCorners = EditValue(personality.CanJumpCorners, GetField(type, nameof(personality.CanJumpCorners)));
+                personality.CanTaunt = EditValue(personality.CanTaunt, GetField(type, nameof(personality.CanTaunt)));
+                personality.TauntFrequency = EditValue(personality.TauntFrequency, GetField(type, nameof(personality.TauntFrequency)));
+                personality.TauntMaxDistance = EditValue(personality.TauntMaxDistance, GetField(type, nameof(personality.TauntMaxDistance)));
+                personality.HoldGroundBaseTime = EditValue(personality.HoldGroundBaseTime, GetField(type, nameof(personality.HoldGroundBaseTime)));
+                personality.SearchBaseTime = EditValue(personality.SearchBaseTime, GetField(type, nameof(personality.SearchBaseTime)));
+                personality.PowerLevelMin = EditValue(personality.PowerLevelMin, GetField(type, nameof(personality.PowerLevelMin)));
+                personality.PowerLevelMax = EditValue(personality.PowerLevelMax, GetField(type, nameof(personality.PowerLevelMax)));
+                personality.TrueRandomChance = EditValue(personality.TrueRandomChance, GetField(type, nameof(personality.TrueRandomChance)));
+                personality.RandomChanceIfMeetRequirements = EditValue(personality.RandomChanceIfMeetRequirements, GetField(type, nameof(personality.RandomChanceIfMeetRequirements)));
             }
             Builder.EndScrollView();
         }

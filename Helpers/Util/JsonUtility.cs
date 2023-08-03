@@ -40,10 +40,6 @@ namespace SAIN.Helpers
 
         public static class Save
         {
-            private static int count = 1;
-
-            public static string SelectedPresetName { get; set; }
-
             public static void SaveObject(object objectToSave, string fileExtension, string fileName, params string[] folders)
             {
                 if (CheckNull(objectToSave)) return;

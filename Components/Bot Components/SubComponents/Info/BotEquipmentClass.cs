@@ -6,25 +6,28 @@ using SAIN.Components;
 using SAIN.Helpers;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace SAIN.Classes
 {
     public class BotEquipmentClass : SAINBot
     {
+        static BotEquipmentClass()
+        {
+            _InventoryProp = AccessTools.Property(typeof(Player), "Inventory");
+        }
+
+        static readonly PropertyInfo _InventoryProp;
+
         public BotEquipmentClass(SAINComponent sain) : base(sain)
         {
-            if (Logger == null)
-            {
-                Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            }
-            Inventory = (InventoryClass)AccessTools.Property(typeof(Player), "Inventory").GetValue(BotOwner.GetPlayer);
+            Inventory = Reflection.GetValue<InventoryClass>(BotOwner.GetPlayer, _InventoryProp);
             InventoryController = HelpersGClass.GetInventoryController(BotOwner.GetPlayer);
         }
 
         public InventoryControllerClass InventoryController { get; private set; }
 
-        private static ManualLogSource Logger;
 
         public InventoryClass Inventory { get; private set; }
         public Weapon CurrentWeapon => BotOwner.WeaponManager.CurrentWeapon;

@@ -11,7 +11,6 @@ namespace SAIN.Components
     {
         public CoverAnalyzer(SAINComponent botOwner, CoverFinderComponent coverFinder) : base(botOwner)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
             Path = new NavMeshPath();
             CoverFinder = coverFinder;
         }
@@ -255,7 +254,6 @@ namespace SAIN.Components
             return Physics.Raycast(point, direction, distance, LayerMaskClass.HighPolyWithTerrainMask);
         }
 
-        protected ManualLogSource Logger;
         private float MinObstacleHeight;
         private Vector3 OriginPoint;
         private Vector3 TargetPosition;

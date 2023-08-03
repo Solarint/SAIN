@@ -10,7 +10,6 @@ namespace SAIN.Classes.Sense
     {
         public VisionClass(SAINComponent component) : base(component)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
             FlashLightDazzle = new FlashLightDazzle(component);
         }
 
@@ -24,7 +23,5 @@ namespace SAIN.Classes.Sense
         }
 
         public FlashLightDazzle FlashLightDazzle { get; private set; }
-
-        private ManualLogSource Logger;
     }
 }

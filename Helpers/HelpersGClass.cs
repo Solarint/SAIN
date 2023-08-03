@@ -11,14 +11,22 @@ using SAIN.SAINPreset;
 using Aki.Reflection.CodeWrapper;
 using System.Security.Policy;
 using Newtonsoft.Json;
+using static EFT.Player;
 
 namespace SAIN.Helpers
 {
     internal class HelpersGClass
     {
+        static HelpersGClass()
+        {
+            _InventoryControllerProp = AccessTools.Property(typeof(Player), "GClass2659_0");
+        }
+
+        static readonly PropertyInfo _InventoryControllerProp;
+
         public static InventoryControllerClass GetInventoryController(Player player)
         {
-            return (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2659_0").GetValue(player);
+            return (InventoryControllerClass)_InventoryControllerProp.GetValue(player);
         }
 
         public static void LoadSettings()
@@ -63,8 +71,16 @@ namespace SAIN.Helpers
     {
         public static EFTCoreSettings GetCore()
         {
-            var core = GClass564.Core;
+            UpdateCoreSettings();
+            return new EFTCoreSettings
+            {
+                Core = GClass564.Core,
+            };
+        }
 
+        public static void UpdateCoreSettings()
+        {
+            var core = GClass564.Core;
             core.SCAV_GROUPS_TOGETHER = false;
             core.DIST_NOT_TO_GROUP = 50f;
             core.DIST_NOT_TO_GROUP_SQR = 50f * 50f;
@@ -76,13 +92,11 @@ namespace SAIN.Helpers
             core.PISTOL_POWER = 20f;
             core.SMG_POWER = 60f;
             core.SNIPE_POWER = 5f;
+        }
 
-            GClass564.Core = core;
-
-            return new EFTCoreSettings
-            {
-                Core = core,
-            };
+        public static void UpdateCoreSettings(EFTCoreSettings newCore)
+        {
+            GClass564.Core = newCore.Core;
         }
 
         public GClass563 Core;

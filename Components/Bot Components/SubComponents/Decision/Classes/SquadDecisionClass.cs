@@ -11,7 +11,6 @@ namespace SAIN.Classes
     {
         public SquadDecisionClass(SAINComponent bot) : base(bot) { }
 
-        protected ManualLogSource Logger => SAIN.Decision.Logger;
         private SquadClass Squad => SAIN.Squad;
 
         public bool GetDecision(out SAINSquadDecision Decision)

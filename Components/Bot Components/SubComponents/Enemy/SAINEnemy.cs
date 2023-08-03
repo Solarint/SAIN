@@ -12,7 +12,6 @@ namespace SAIN.Classes
     {
         static SAINEnemy()
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(SAINEnemy));
         }
 
         public SAINEnemy(SAINComponent bot, IAIDetails person) : base(bot)
@@ -79,8 +78,6 @@ namespace SAIN.Classes
         public SAINEnemyStatus EnemyStatus { get; private set; }
         public SAINEnemyVision EnemyVision { get; private set; }
         public SAINEnemyPath EnemyPath { get; private set; }
-
-        private static readonly ManualLogSource Logger;
     }
 
     public class SAINEnemyVision : SAINEnemyAbstract

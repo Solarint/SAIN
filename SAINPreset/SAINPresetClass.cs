@@ -32,6 +32,10 @@ namespace SAIN.SAINPreset
 
                 Save.SaveJson(result, fileName, presetsFolder, presetNameFolder);
             }
+            else
+            {
+                EFTCoreSettings.UpdateCoreSettings(result.EFTCoreSettings);
+            }
 
             return result;
         }

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using EFT;
+using Newtonsoft.Json;
 using SAIN.Classes;
 using SAIN.Helpers;
 using System;
@@ -40,16 +41,9 @@ namespace SAIN.SAINPreset.Personalities
         public float TauntFrequency = 20f;
         public float TauntMaxDistance = 20f;
 
-        public BotTypeEnum[] AllowedBotTypes =
-        {
-            BotTypeEnum.None,
-            BotTypeEnum.Boss,
-            BotTypeEnum.Follower,
-            BotTypeEnum.PMC,
-            BotTypeEnum.Scav,
-        };
+        public List<WildSpawnType> AllowedBotTypes = new List<WildSpawnType>();
 
-        public bool CanBePersonality(BotTypeEnum botType, float PowerLevel, int PlayerLevel)
+        public bool CanBePersonality(WildSpawnType botType, float PowerLevel, int PlayerLevel)
         {
             if (EFTMath.RandomBool(TrueRandomChance))
             {
