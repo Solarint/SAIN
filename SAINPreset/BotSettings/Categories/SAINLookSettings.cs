@@ -6,6 +6,62 @@ namespace SAIN.BotSettings.Categories
 {
     public class SAINLookSettings
     {
+        static void InitVision()
+        {
+            string name = "Max Visible Distance";
+            string desc = "The Maximum Vision Distance for this bot";
+            string section = "Vision";
+            float defaultVal = 150f;
+            float min = 50f;
+            float max = 500f;
+            float rounding = 1f;
+
+            name = "Visible Angle";
+            desc = "The Maximum Vision Cone for a bot";
+            section = "Vision";
+            defaultVal = 160f;
+            min = 45;
+            max = 180f;
+            rounding = 1f;
+
+            name = "Base Speed Multiplier";
+            desc = "The Base vision speed multiplier, affects all ranges to enemy. " +
+                "Bots will see this much faster, or slower, at any range. " +
+                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
+            section = "Vision";
+            defaultVal = 1f;
+            min = 0.25f;
+            max = 3f;
+            rounding = 100f;
+
+            name = "Close Multiplier";
+            desc = "Vision speed multiplier at close range. " +
+                "Bots will see this much faster, or slower, at close range. " +
+                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
+            section = "Vision";
+            defaultVal = 1f;
+            min = 0.25f;
+            max = 3f;
+            rounding = 100f;
+
+            name = "Far Multiplier";
+            desc = "Vision speed multiplier at Far range, the range is defined by (Close/Far Threshold Property). " +
+                "Bots will see this much faster, or slower, at Far range. " +
+                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
+            section = "Vision";
+            defaultVal = 1f;
+            min = 0.25f;
+            max = 3f;
+            rounding = 100f;
+
+            name = "Close/Far Threshold";
+            desc = "The Distance that defines what is close or far for the Close Speed and Far Speed properties.";
+            section = "Vision";
+            defaultVal = 50f;
+            min = 5f;
+            max = 100f;
+            rounding = 1f;
+        }
         public float VisionSpeedModifier = 1;
         public float CloseVisionSpeed = 1;
         public float FarVisionSpeed = 1;

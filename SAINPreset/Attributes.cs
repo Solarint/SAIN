@@ -1,11 +1,9 @@
-﻿using Mono.Security.Cryptography;
-using SAIN.Editor;
+﻿using SAIN.Editor;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.SAINPreset.Attributes.GetAttributeValue;
 
 namespace SAIN.SAINPreset.Attributes
 {
@@ -179,13 +177,13 @@ namespace SAIN.SAINPreset.Attributes
             {
                 Key = field.Name;
 
-                Name = Name(field);
-                Description = Description(field);
-                Default = Default(field);
-                Min = Minimum(field);
-                Max = Maximum(field);
-                Rounding = Rounding(field);
-                IsHidden = IsHidden(field);
+                Name = field.GetCustomAttribute<NameAttribute>()?.Name;
+                Description = field.GetCustomAttribute<DescriptionAttribute>()?.Description;
+                Default = field.GetCustomAttribute<DefaultValueAttribute>()?.Value;
+                Min = field.GetCustomAttribute<MinimumAttribute>()?.Min;
+                Max = field.GetCustomAttribute<MaximumAttribute>()?.Max;
+                Rounding = field.GetCustomAttribute<RoundingAttribute>()?.Rounding;
+                IsHidden = field.GetCustomAttribute<IsHiddenAttribute>()?.Value == true;
             }
 
             public readonly string Key;
@@ -197,21 +195,6 @@ namespace SAIN.SAINPreset.Attributes
             public readonly float? Rounding;
             public readonly bool IsHidden = false;
         }
-
-        public static string Name(FieldInfo field)
-            => field.GetCustomAttribute<NameAttribute>()?.Name;
-        public static string Description(FieldInfo field)
-            => field.GetCustomAttribute<DescriptionAttribute>()?.Description;
-        public static object Default(FieldInfo field)
-            => field.GetCustomAttribute<DefaultValueAttribute>()?.Value;
-        public static object Minimum(FieldInfo field)
-            => field.GetCustomAttribute<MinimumAttribute>()?.Min;
-        public static object Maximum(FieldInfo field)
-            => field.GetCustomAttribute<MaximumAttribute>()?.Max;
-        public static float? Rounding(FieldInfo field) 
-            => field.GetCustomAttribute<RoundingAttribute>()?.Rounding;
-        public static bool IsHidden(FieldInfo field) 
-            => field.GetCustomAttribute<IsHiddenAttribute>()?.Value == true;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
