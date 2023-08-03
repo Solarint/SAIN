@@ -5,7 +5,6 @@ using static SAIN.Editor.ConfigValues;
 using static SAIN.Editor.StyleOptions;
 using SAIN.BotPresets;
 using System.Collections.Generic;
-using static SAIN.Editor.Names.StyleNames;
 using SAIN.Editor.Abstract;
 using SAIN.Editor.Util;
 using System;
@@ -78,21 +77,21 @@ namespace SAIN.Editor
 
         GUIStyle StyleHandler(bool selected, bool hovering)
         {
-            var style = CustomStyle.GetFontStyleDynamic(selectionGrid, selected);
+            var style = CustomStyle.GetFontStyleDynamic(Style.selectionGrid, selected);
             Texture2D texture;
             if (selected)
             {
                 //Color ColorGold = Editor.Colors.GetColor(Names.ColorNames.Gold);
-                texture = Editor.TexturesClass.GetColor(Names.ColorNames.DarkRed);
+                texture = Editor.TexturesClass.GetColor(ColorNames.DarkRed);
                 //ApplyToStyle.ApplyTextColorAllStates(style, ColorGold);
             }
             else if (hovering)
             {
-                texture = Editor.TexturesClass.GetColor(Names.ColorNames.LightRed);
+                texture = Editor.TexturesClass.GetColor(ColorNames.LightRed);
             }
             else
             {
-                texture = Editor.TexturesClass.GetColor(Names.ColorNames.MidGray);
+                texture = Editor.TexturesClass.GetColor(ColorNames.MidGray);
             }
             ApplyToStyle.BGAllStates(style, texture);
             return style;

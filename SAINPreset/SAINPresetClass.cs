@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SAIN.Helpers;
 using SAIN.SAINPreset.GlobalSettings;
+using SAIN.SAINPreset.Personalities;
 using System;
 using static SAIN.Helpers.JsonUtility;
 
@@ -14,9 +15,8 @@ namespace SAIN.SAINPreset
             Definition = preset;
             GlobalSettings = LoadGlobalSettings(preset);
             BotSettings = new BotSettings.BotSettingsClass(preset);
+            PersonalityManager = new PersonalityManager(preset);
         }
-
-        private const string PresetsFolder = "Presets";
 
         private static GlobalSettingsClass LoadGlobalSettings(SAINPresetDefinition Preset)
         {
@@ -47,6 +47,7 @@ namespace SAIN.SAINPreset
         public SAINPresetDefinition Definition;
         public GlobalSettingsClass GlobalSettings;
         public BotSettings.BotSettingsClass BotSettings;
+        public PersonalityManager PersonalityManager;
     }
 
     public sealed class SAINPresetDefinition
@@ -60,7 +61,7 @@ namespace SAIN.SAINPreset
             Description = description;
             Creator = creator;
             SAINVersion = PluginInfo.Version;
-            DateCreated = DateTime.UtcNow.Date.ToString();
+            DateCreated = DateTime.UtcNow.Date.ToShortDateString();
         }
 
         public string Name;

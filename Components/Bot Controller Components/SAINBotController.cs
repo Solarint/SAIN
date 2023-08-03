@@ -76,8 +76,8 @@ namespace SAIN.Components
             TimeClass.Update();
             WeatherClass.Update();
             LineOfSightManager.Update();
-            //CoverManager.Update();
-            //PathManager.Update();
+            //CoverManager.ManualUpdate();
+            //PathManager.ManualUpdate();
             //AddNavObstacles();
             //UpdateObstacles();
         }

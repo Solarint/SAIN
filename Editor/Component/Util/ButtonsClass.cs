@@ -4,7 +4,6 @@ using static SAIN.Editor.ConfigValues;
 using Colors = SAIN.Editor.Util.ColorsClass;
 using BepInEx.Configuration;
 using SAIN.BotPresets;
-using static SAIN.Editor.Names.StyleNames;
 using SAIN.Editor.Abstract;
 
 namespace SAIN.Editor

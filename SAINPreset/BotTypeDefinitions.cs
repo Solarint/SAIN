@@ -1,6 +1,7 @@
 ﻿using EFT;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.BotPresets
@@ -32,27 +33,62 @@ namespace SAIN.BotPresets
         public readonly WildSpawnType WildSpawnType;
     }
 
+    public class BotTypeClassWrapper
+    {
+        public Dictionary<WildSpawnType, BotType> BotTypes = new Dictionary<WildSpawnType, BotType>();
+
+        [JsonIgnore]
+        public List<BotType> BotTypesList = new List<BotType>();
+    }
+
     public class BotTypeDefinitions
     {
+        private static readonly BotTypeClassWrapper Wrapper;
+        public static Dictionary<WildSpawnType, BotType> BotTypes => Wrapper.BotTypes;
+        public static List<BotType> BotTypesList => Wrapper.BotTypesList;
+
         static BotTypeDefinitions()
         {
-            string fileName = nameof(BotTypes);
-            BotTypes = CreateBotTypes();
-            return;
-            if (Load.LoadObject(out BotType[] botTypes, fileName))
+            Wrapper = new BotTypeClassWrapper
             {
-                BotTypes = botTypes;
+                BotTypesList = CreateBotTypes(),
+                BotTypes = new Dictionary<WildSpawnType, BotType>()
+            };
+
+            for (int i = 0; i < BotTypesList.Count; i++)
+            {
+                BotTypes.Add(BotTypesList[i].WildSpawnType, BotTypesList[i]);
+            }
+            return;
+            string fileName = "Bot Types";
+            if (Load.LoadObject(out BotTypeClassWrapper wrapper, fileName))
+            {
+                Wrapper = wrapper;
+                foreach (BotType botType in BotTypes.Values)
+                {
+                    BotTypesList.Add(botType);
+                }
             }
             else
             {
-                BotTypes = CreateBotTypes();
-                Save.SaveJson(BotTypes, fileName);
+                Wrapper = new BotTypeClassWrapper
+                {
+                    BotTypesList = CreateBotTypes(),
+                    BotTypes = new Dictionary<WildSpawnType, BotType>()
+                };
+
+                for (int i = 0; i < BotTypesList.Count; i++)
+                {
+                    BotTypes.Add(BotTypesList[i].WildSpawnType, BotTypesList[i]);
+                }
+
+                Save.SaveJson(Wrapper, fileName);
             }
         }
 
-        static BotType[] CreateBotTypes()
+        static List<BotType> CreateBotTypes()
         {
-            return new BotType[]
+            return new List<BotType>
             {
             new BotType( WildSpawnType.assault,                 "Scav",                     "Scavs" ,       "Scavs!" ),
 
@@ -97,7 +133,5 @@ namespace SAIN.BotPresets
             new BotType( WildSpawnType.followerZryachiy,        "Zryachiy Guard",           "Followers" ,   "Lighthouse Island Sniper Boss Follower" )
             };
         }
-
-        public static readonly BotType[] BotTypes;
     }
 }

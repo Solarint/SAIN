@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using SAIN.Editor.Util;
-using static SAIN.Editor.Names.StyleNames;
 using BepInEx;
 
 namespace SAIN.Editor.Abstract
@@ -21,27 +20,27 @@ namespace SAIN.Editor.Abstract
 
         public void Box(string text, string tooltip, params GUILayoutOption[] options)
         {
-            Box(new GUIContent(text, tooltip), GetStyle(box), options);
+            Box(new GUIContent(text, tooltip), GetStyle(Style.box), options);
         }
 
         public void Box(string text, params GUILayoutOption[] options)
         {
-            Box(new GUIContent(text), GetStyle(box), options);
+            Box(new GUIContent(text), GetStyle(Style.box), options);
         }
 
         public void BlankBox(string text, params GUILayoutOption[] options)
         {
-            Box(new GUIContent(text), GetStyle(blankbox), options);
+            Box(new GUIContent(text), GetStyle(Style.blankbox), options);
         }
 
         public void BlankBox(string text, string tooltip, params GUILayoutOption[] options)
         {
-            Box(new GUIContent(text, tooltip), GetStyle(blankbox), options);
+            Box(new GUIContent(text, tooltip), GetStyle(Style.blankbox), options);
         }
 
         public void ToolTip(Rect rect, GUIContent text)
         {
-            GUI.Box(rect, text, GetStyle(tooltip));
+            GUI.Box(rect, text, GetStyle(Style.tooltip));
         }
 
         public void Label(string text, GUIStyle style, params GUILayoutOption[] options)
@@ -61,26 +60,26 @@ namespace SAIN.Editor.Abstract
 
         public void Label(string text, params GUILayoutOption[] options)
         {
-            Label(new GUIContent(text), GetStyle(label), options);
+            Label(new GUIContent(text), GetStyle(Style.label), options);
         }
 
         public void Label(string text, string tooltip, params GUILayoutOption[] options)
         {
-            Label(new GUIContent(text, tooltip), GetStyle(label), options);
+            Label(new GUIContent(text, tooltip), GetStyle(Style.label), options);
         }
         public void Label(GUIContent content, params GUILayoutOption[] options)
         {
-            Label(content, GetStyle(label), options);
+            Label(content, GetStyle(Style.label), options);
         }
 
         public string TextField(string text, params GUILayoutOption[] options)
         {
-            return GUILayout.TextField(text, GetStyle(textField), options);
+            return GUILayout.TextField(text, GetStyle(Style.textField), options);
         }
 
         public string TextArea(string text, params GUILayoutOption[] options)
         {
-            return GUILayout.TextArea(text, GetStyle(textArea), options);
+            return GUILayout.TextArea(text, GetStyle(Style.textArea), options);
         }
 
         public bool Button(string text, params GUILayoutOption[] options)
@@ -95,7 +94,7 @@ namespace SAIN.Editor.Abstract
 
         public bool Button(GUIContent content, params GUILayoutOption[] options)
         {
-            return GUILayout.Button(content, GetStyle(button), options);
+            return GUILayout.Button(content, GetStyle(Style.button), options);
         }
 
         public bool Toggle(bool value, string text, params GUILayoutOption[] options)
@@ -110,7 +109,7 @@ namespace SAIN.Editor.Abstract
 
         public bool Toggle(bool value, GUIContent content, params GUILayoutOption[] options)
         {
-            return Toggle(value, content, GetStyle(toggle), options);
+            return Toggle(value, content, GetStyle(Style.toggle), options);
         }
 
         public bool Toggle(bool value, GUIContent content, GUIStyle style, params GUILayoutOption[] options)
@@ -135,12 +134,12 @@ namespace SAIN.Editor.Abstract
 
         public float HorizontalSlider(float value, float min, float max, params GUILayoutOption[] options)
         {
-            return GUILayout.HorizontalSlider(value, min, max, GetStyle(horizontalSlider), GetStyle(horizontalSliderThumb), options);
+            return GUILayout.HorizontalSlider(value, min, max, GetStyle(Style.horizontalSlider), GetStyle(Style.horizontalSliderThumb), options);
         }
 
         public float HorizontalSlider(Rect rect, float value, float min, float max)
         {
-            return GUI.HorizontalSlider(rect, value, min, max, GetStyle(horizontalSlider), GetStyle(horizontalSliderThumb));
+            return GUI.HorizontalSlider(rect, value, min, max, GetStyle(Style.horizontalSlider), GetStyle(Style.horizontalSliderThumb));
         }
 
         public float HorizontalSliderNoStyle(string label, float value, float min, float max, float LabelWidth = 150f, float ValueWidth = 100f)
@@ -189,7 +188,7 @@ namespace SAIN.Editor.Abstract
 
         public void BeginGroup(Rect rect)
         {
-            GUI.BeginGroup(rect, GetStyle(window));
+            GUI.BeginGroup(rect, GetStyle(Style.window));
         }
 
         public void EndGroup()
@@ -213,11 +212,11 @@ namespace SAIN.Editor.Abstract
 
         public Vector2 BeginScrollView(Vector2 scrollPos)
         {
-            return GUILayout.BeginScrollView(scrollPos, GetStyle(scrollView));
+            return GUILayout.BeginScrollView(scrollPos, GetStyle(Style.scrollView));
         }
         public Vector2 BeginScrollView(Rect rect, Vector2 scrollPos, Rect viewRect)
         {
-            return GUI.BeginScrollView(rect, scrollPos, viewRect, GetStyle(horizontalScrollbar), GetStyle(verticalScrollbar));
+            return GUI.BeginScrollView(rect, scrollPos, viewRect, GetStyle(Style.horizontalScrollbar), GetStyle(Style.verticalScrollbar));
         }
         public void EndScrollView()
         {
@@ -230,10 +229,10 @@ namespace SAIN.Editor.Abstract
 
         public Vector2 BeginScrollView(Vector2 pos, params GUILayoutOption[] options)
         {
-            return GUILayout.BeginScrollView(pos, GetStyle(verticalScrollbar), GetStyle(verticalScrollbar), options);
+            return GUILayout.BeginScrollView(pos, GetStyle(Style.verticalScrollbar), GetStyle(Style.verticalScrollbar), options);
         }
 
-        public GUIStyle GetStyle(string key)
+        public GUIStyle GetStyle(Style key)
         {
             return Editor.StyleOptions.CustomStyle.GetStyle(key);
         }
@@ -249,7 +248,7 @@ namespace SAIN.Editor.Abstract
 
         public Rect NewWindow(int id, Rect viewRect, GUI.WindowFunction func, string title)
         {
-            return GUI.Window(id, viewRect, func, title, GetStyle(window));
+            return GUI.Window(id, viewRect, func, title, GetStyle(Style.window));
         }
 
         public void CreateGUIAdjustmentSliders()

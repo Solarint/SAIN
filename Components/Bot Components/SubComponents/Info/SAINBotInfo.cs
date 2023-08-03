@@ -4,61 +4,46 @@ using SAIN.BotPresets;
 using SAIN.BotSettings;
 using SAIN.Components;
 using SAIN.Plugin;
+using SAIN.SAINPreset.Personalities;
 using UnityEngine;
 
 namespace SAIN.Classes
 {
     public class SAINBotInfo : SAINInfoAbstract
     {
-        public SAINBotInfo(SAINComponent botOwner) : base(botOwner)
+        public SAINBotInfo(SAINComponent sain) : base(sain)
         {
             GetFileSettings();
-            PersonalityClass = new PersonalityClass(botOwner);
-            WeaponInfo = new WeaponInfo(botOwner);
+            WeaponInfo = new WeaponInfo(sain);
             PresetHandler.PresetsUpdated += GetFileSettings;
         }
 
         public void GetFileSettings()
         {
             FileSettings = SAINPlugin.LoadedPreset.BotSettings.SAINSettings[WildSpawnType].Settings[BotDifficulty];
+
+            Personality = GetPersonality();
+            PersonalitySettings = SAINPlugin.LoadedPreset.PersonalityManager.Personalities[Personality];
+
             UpdateExtractTime();
+            CalcTimeBeforeSearch();
+            CalcHoldGroundDelay();
         }
 
         public SAINSettings FileSettings { get; private set; }
 
         public float TimeBeforeSearch { get; private set; } = 0f;
 
-        float LastPower = -1f;
-
-        public void Update()
+        public void ManualUpdate()
         {
-            if (LastPower != PowerLevel)
-            {
-                LastPower = PowerLevel;
-                GroupCount = BotOwner.BotsGroup.MembersCount;
-
-                PersonalityClass.Update();
-
-                CalcTimeBeforeSearch();
-                CalcHoldGroundDelay();
-            }
-            if (BotOwner.BotsGroup.MembersCount != GroupCount)
-            {
-                GroupCount = BotOwner.BotsGroup.MembersCount;
-                CalcTimeBeforeSearch();
-            }
-
-
             WeaponInfo.ManualUpdate();
         }
-
-        private int GroupCount = 0;
 
         public float HoldGroundDelay { get; private set; }
 
         public void CalcHoldGroundDelay()
         {
-            var settings = PersonalityClass.PersonalitySettings;
+            var settings = PersonalitySettings;
 
             float baseTime = settings.HoldGroundBaseTime;
             float min = settings.HoldGroundMinRandom;
@@ -80,7 +65,7 @@ namespace SAIN.Classes
             }
             else
             {
-                searchTime = PersonalityClass.PersonalitySettings.SearchBaseTime;
+                searchTime = PersonalitySettings.SearchBaseTime;
             }
 
             searchTime *= Random.Range(1f - SearchRandomize, 1f + SearchRandomize);
@@ -128,14 +113,50 @@ namespace SAIN.Classes
             }
         }
 
+        public SAINPersonality GetPersonality()
+        {
+            var persSettings = SAINPlugin.LoadedPreset.GlobalSettings.Personality;
+            if (persSettings.AllGigaChads || CanBePersonality(SAINPersonality.GigaChad))
+            {
+                return SAINPersonality.GigaChad;
+            }
+            if (persSettings.AllChads || CanBePersonality(SAINPersonality.Chad))
+            {
+                return SAINPersonality.Chad;
+            }
+            if (persSettings.AllRats || CanBePersonality(SAINPersonality.Rat))
+            {
+                return SAINPersonality.Rat;
+            }
+            if (CanBePersonality(SAINPersonality.Timmy))
+            {
+                return SAINPersonality.Timmy;
+            }
+            if (CanBePersonality(SAINPersonality.Coward))
+            {
+                return SAINPersonality.Coward;
+            }
+            return SAINPersonality.Normal;
+        }
+
+        private bool CanBePersonality(SAINPersonality personality)
+        {
+            var Personalities = SAINPlugin.LoadedPreset.PersonalityManager.Personalities;
+            if (Personalities == null || !Personalities.ContainsKey(personality))
+            {
+                return false;
+            }
+            return Personalities[personality].CanBePersonality(BotType, PowerLevel, PlayerLevel);
+        }
+
+        public SAINPersonality Personality { get; private set; }
+        public PersonalitySettingsClass PersonalitySettings { get; private set; }
+
         public float PercentageBeforeExtract { get; set; } = -1f;
 
         private const float SearchRandomize = 0.33f;
 
-        public PersonalityClass PersonalityClass { get; private set; }
         public WeaponInfo WeaponInfo { get; private set; }
-
-        public SAINPersonality Personality => PersonalityClass.Personality;
 
         public void Dispose()
         {

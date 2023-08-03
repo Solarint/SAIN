@@ -16,7 +16,7 @@ namespace SAIN.Classes
         public FriendlyFireStatus FriendlyFireStatus { get; private set; }
         public bool ClearShot => FriendlyFireStatus != FriendlyFireStatus.FriendlyBlock;
 
-        public void Update()
+        public void ManualUpdate()
         {
             if (CheckFriendlyFireTimer < Time.time)
             {

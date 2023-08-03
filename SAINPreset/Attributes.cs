@@ -118,7 +118,10 @@ namespace SAIN.SAINPreset.Attributes
                 Builder.BeginHorizontal();
 
                 Buttons.InfoBox(attributes.Description, entryConfig.Info);
-                Buttons.Label(attributes.Name ?? attributes.Key, entryConfig.Label);
+                GUIStyle style = Buttons.GetStyle(Style.label);
+                style.alignment = TextAnchor.MiddleLeft;
+                style.margin = new RectOffset(3, 3, 3, 3);
+                Buttons.Box(new GUIContent(attributes.Name), style);
 
                 Type type = value.GetType();
                 if (type == typeof(bool))
@@ -128,19 +131,20 @@ namespace SAIN.SAINPreset.Attributes
                 }
                 else
                 {
-                    object min = attributes.Min ?? 0f;
-                    object max = attributes.Max ?? 500f;
+                    float min = attributes.Min == null ? 0f : attributes.Min.Value;
+                    float max = attributes.Max == null ? 1000f : attributes.Max.Value;
 
                     Builder.MinValueBox(min, entryConfig.Info);
                     if (type == typeof(float))
                     {
-                        float flValue = Builder.CreateSlider((float)value, (float)min, (float)max, entryConfig.Slider);
+                        float flValue = Builder.CreateSlider((float)value, min, max, entryConfig.Slider);
                         float rounding = attributes.Rounding == null ? 10f : attributes.Rounding.Value;
                         value = Mathf.Round(flValue * rounding) / rounding;
                     }
                     else if (type == typeof(int))
                     {
-                        value = Builder.CreateSlider((int)value, (int)min, (int)max, entryConfig.Slider);
+                        float floatvalue = Builder.CreateSlider((int)value, min, max, entryConfig.Slider);
+                        value = Mathf.RoundToInt(floatvalue);
                     }
 
                     Builder.MaxValueBox(max, entryConfig.Info);
@@ -148,8 +152,6 @@ namespace SAIN.SAINPreset.Attributes
 
                 Builder.ResultBox(value, entryConfig.Result);
                 value = Builder.Reset(value, attributes.Default, entryConfig.Reset);
-
-                Builder.FlexibleSpace();
 
                 Builder.EndHorizontal();
 
@@ -175,9 +177,7 @@ namespace SAIN.SAINPreset.Attributes
         {
             public AttributesClass(FieldInfo field)
             {
-                Key = field.Name;
-
-                Name = field.GetCustomAttribute<NameAttribute>()?.Name;
+                Name = field.GetCustomAttribute<NameAttribute>()?.Name ?? field.Name;
                 Description = field.GetCustomAttribute<DescriptionAttribute>()?.Description;
                 Default = field.GetCustomAttribute<DefaultValueAttribute>()?.Value;
                 Min = field.GetCustomAttribute<MinimumAttribute>()?.Min;
@@ -186,12 +186,11 @@ namespace SAIN.SAINPreset.Attributes
                 IsHidden = field.GetCustomAttribute<IsHiddenAttribute>()?.Value == true;
             }
 
-            public readonly string Key;
             public readonly string Name;
             public readonly string Description;
             public readonly object Default;
-            public readonly object Min;
-            public readonly object Max;
+            public readonly float? Min;
+            public readonly float? Max;
             public readonly float? Rounding;
             public readonly bool IsHidden = false;
         }
@@ -216,33 +215,33 @@ namespace SAIN.SAINPreset.Attributes
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class MinimumAttribute : Attribute
     {
-        public MinimumAttribute(object min)
+        public MinimumAttribute(float min)
         {
             this.min = min;
         }
 
-        public object Min
+        public float Min
         {
             get { return min; }
         }
 
-        readonly object min;
+        readonly float min;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
     public sealed class MaximumAttribute : Attribute
     {
-        public MaximumAttribute(object max)
+        public MaximumAttribute(float max)
         {
             this.max = max;
         }
 
-        public object Max
+        public float Max
         {
             get { return max; }
         }
 
-        readonly object max;
+        readonly float max;
     }
 
     [AttributeUsage(AttributeTargets.Field)]

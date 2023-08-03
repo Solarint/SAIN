@@ -32,7 +32,7 @@ namespace SAIN.Layers
             if (SAIN.Enemy.InLineOfSight)
             {
                 Shoot.Update();
-                if (SAIN.Info.PersonalityClass.PersonalitySettings.CanJumpCorners)
+                if (SAIN.Info.PersonalitySettings.CanJumpCorners)
                 {
                     if (TryJumpTimer < Time.time)
                     {
@@ -99,7 +99,7 @@ namespace SAIN.Layers
                 BotOwner.BotRun.Run(Destination, false);
             }
 
-            if (SAIN.Info.PersonalityClass.PersonalitySettings.CanJumpCorners && TryJumpTimer < Time.time)
+            if (SAIN.Info.PersonalitySettings.CanJumpCorners && TryJumpTimer < Time.time)
             {
                 var corner = SAIN.Enemy?.LastCornerToEnemy;
                 if (corner != null)

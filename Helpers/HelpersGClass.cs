@@ -16,6 +16,11 @@ namespace SAIN.Helpers
 {
     internal class HelpersGClass
     {
+        public static InventoryControllerClass GetInventoryController(Player player)
+        {
+            return (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2659_0").GetValue(player);
+        }
+
         public static void LoadSettings()
         {
             GClass564.Load();

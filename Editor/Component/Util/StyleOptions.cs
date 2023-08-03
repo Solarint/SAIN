@@ -1,12 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.Editor.Names.ColorNames;
-using static SAIN.Editor.Names.StyleNames;
 using Color = UnityEngine.Color;
 using static SAIN.Editor.Util.ApplyToStyle;
-using SAIN.Helpers;
-using System;
-using System.Collections;
 using SAIN.Editor.Abstract;
 
 namespace SAIN.Editor
@@ -64,7 +59,7 @@ namespace SAIN.Editor
             GUILayout.EndVertical();
         }
 
-        public GUIStyle GetFontStyleDynamic(string key, bool active)
+        public GUIStyle GetFontStyleDynamic(Style key, bool active)
         {
             return CustomStyle.GetFontStyleDynamic(key, active);
         }
@@ -126,10 +121,10 @@ namespace SAIN.Editor
             }
         }
 
-        private readonly Dictionary<string, GUIStyle> StyleDictionary = new Dictionary<string, GUIStyle>();
+        private readonly Dictionary<Style, GUIStyle> StyleDictionary = new Dictionary<Style, GUIStyle>();
         private readonly SAINEditor Editor;
 
-        public GUIStyle GetStyle(string key)
+        public GUIStyle GetStyle(Style key)
         {
             if (StyleDictionary.ContainsKey(key))
             {
@@ -142,7 +137,7 @@ namespace SAIN.Editor
             }
         }
 
-        public GUIStyle GetFontStyleDynamic(string key, bool active)
+        public GUIStyle GetFontStyleDynamic(Style key, bool active)
         {
             var style = GetStyle(key);
             style.fontStyle = active ? FontStyle.Bold : FontStyle.Normal;
@@ -150,7 +145,7 @@ namespace SAIN.Editor
             return style;
         }
 
-        public void SaveStyle(string key, GUIStyle style)
+        public void SaveStyle(Style key, GUIStyle style)
         {
             if (StyleDictionary.ContainsKey(key))
             {
@@ -198,11 +193,11 @@ namespace SAIN.Editor
             BGAllStates(BlankBackgroundStyle, null);
             ApplyTextColorAllStates(BlankBackgroundStyle, Color.white, Color.white);
 
-            var TexMidGray = GetColor(MidGray);
-            var TexDarkGray = GetColor(DarkGray);
-            var TexVeryDarkGray = GetColor(VeryDarkGray);
-            var TexMidRed = GetColor(MidRed);
-            var TexDarkRed = GetColor(DarkRed);
+            var TexMidGray = GetColor(ColorNames.MidGray);
+            var TexDarkGray = GetColor(ColorNames.DarkGray);
+            var TexVeryDarkGray = GetColor(ColorNames.VeryDarkGray);
+            var TexMidRed = GetColor(ColorNames.MidRed);
+            var TexDarkRed = GetColor(ColorNames.DarkRed);
 
             BGAllStates(ToolTipStyle, TexVeryDarkGray);
             ApplyTextColorAllStates(ToolTipStyle, Color.white, Color.white);
@@ -239,33 +234,36 @@ namespace SAIN.Editor
                 border = offset
             };
 
-            SaveStyle(selectionGrid, selectGridStyle);
-            SaveStyle(horizontalSliderThumb, HorizontalSliderThumbStyle);
-            SaveStyle(button, ButtonStyle);
-            SaveStyle(box, BoxStyle);
-            SaveStyle(toggle, ToggleStyle);
-            SaveStyle(textField, TextFieldStyle);
-            SaveStyle(textArea, TextAreaStyle);
-            SaveStyle(window, WindowStyle);
-            SaveStyle(verticalScrollbarUpButton, VerticalScrollbarUpButtonStyle);
-            SaveStyle(verticalScrollbarThumb, VerticalScrollbarThumbStyle);
-            SaveStyle(verticalScrollbar, VerticalScrollbarStyle);
-            SaveStyle(verticalScrollbarDownButton, VerticalScrollbarDownButtonStyle);
-            SaveStyle(horizontalSlider, HorizontalSliderStyle);
-            SaveStyle(label, LabelStyle);
-            SaveStyle(list, ListStyle);
-            SaveStyle(verticalSlider, VerticalSliderStyle);
-            SaveStyle(verticalSliderThumb, VerticalSliderThumbStyle);
-            SaveStyle(blankbox, BlankBackgroundStyle);
-            SaveStyle(tooltip, ToolTipStyle);
+            LabelStyle.margin = BoxStyle.margin;
+            LabelStyle.padding = BoxStyle.margin;
+
+            SaveStyle(Style.selectionGrid, selectGridStyle);
+            SaveStyle(Style.horizontalSliderThumb, HorizontalSliderThumbStyle);
+            SaveStyle(Style.button, ButtonStyle);
+            SaveStyle(Style.box, BoxStyle);
+            SaveStyle(Style.toggle, ToggleStyle);
+            SaveStyle(Style.textField, TextFieldStyle);
+            SaveStyle(Style.textArea, TextAreaStyle);
+            SaveStyle(Style.window, WindowStyle);
+            SaveStyle(Style.verticalScrollbarUpButton, VerticalScrollbarUpButtonStyle);
+            SaveStyle(Style.verticalScrollbarThumb, VerticalScrollbarThumbStyle);
+            SaveStyle(Style.verticalScrollbar, VerticalScrollbarStyle);
+            SaveStyle(Style.verticalScrollbarDownButton, VerticalScrollbarDownButtonStyle);
+            SaveStyle(Style.horizontalSlider, HorizontalSliderStyle);
+            SaveStyle(Style.label, LabelStyle);
+            SaveStyle(Style.list, ListStyle);
+            SaveStyle(Style.verticalSlider, VerticalSliderStyle);
+            SaveStyle(Style.verticalSliderThumb, VerticalSliderThumbStyle);
+            SaveStyle(Style.blankbox, BlankBackgroundStyle);
+            SaveStyle(Style.tooltip, ToolTipStyle);
         }
 
-        private Texture2D GetColor(string key)
+        private Texture2D GetColor(ColorNames key)
         {
             return Editor.TexturesClass.GetColor(key);
         }
 
-        private void StyleTextAndSave(string key, Color color, Color? active = null, TextAnchor? anchor = null, FontStyle? fontStyle = null)
+        private void StyleTextAndSave(Style key, Color color, Color? active = null, TextAnchor? anchor = null, FontStyle? fontStyle = null)
         {
             GUIStyle style = GetStyle(key);
             if (anchor != null)
@@ -282,18 +280,18 @@ namespace SAIN.Editor
         private void SetTextSettings()
         {
             var white = Color.white;
-            StyleTextAndSave(box, white, white, TextAnchor.MiddleCenter, FontStyle.Bold);
-            StyleTextAndSave(label, white, white, TextAnchor.MiddleLeft, FontStyle.Normal);
+            StyleTextAndSave(Style.box, white, white, TextAnchor.MiddleCenter, FontStyle.Bold);
+            StyleTextAndSave(Style.label, white, white, TextAnchor.MiddleLeft, FontStyle.Normal);
 
-            Color ColorGold = Editor.Colors.GetColor(Gold);
-            StyleTextAndSave(list, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
-            StyleTextAndSave(button, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);
-            StyleTextAndSave(toggle, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);
-            StyleTextAndSave(textField, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
-            StyleTextAndSave(textArea, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
-            StyleTextAndSave(selectionGrid, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Bold);
+            Color ColorGold = Editor.Colors.GetColor(ColorNames.Gold);
+            StyleTextAndSave(Style.list, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
+            StyleTextAndSave(Style.button, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);
+            StyleTextAndSave(Style.toggle, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);
+            StyleTextAndSave(Style.textField, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
+            StyleTextAndSave(Style.textArea, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
+            StyleTextAndSave(Style.selectionGrid, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Bold);
 
-            StyleTextAndSave(window, white);
+            StyleTextAndSave(Style.window, white);
         }
     }
 }

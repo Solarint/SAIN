@@ -232,6 +232,8 @@
     <Compile Include="SAINPreset\GlobalSettings\Categories\GeneralSettings.cs" />
     <Compile Include="SAINPreset\GlobalSettings\Categories\HearingSettings.cs" />
     <Compile Include="SAINPreset\GlobalSettings\GlobalSettingsClass.cs" />
+    <Compile Include="SAINPreset\Personalities\PersonalitiesClass.cs" />
+    <Compile Include="SAINPreset\Personalities\PersonalityHandler.cs" />
     <Compile Include="SAINPreset\SAINPresetClass.cs" />
     <Compile Include="SAINPreset\GlobalSettings\Categories\PersonalitySettings.cs" />
     <Compile Include="SAINPreset\BotSettings\BotSettingsClass.cs" />
@@ -263,8 +265,6 @@
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\FrameWait.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
     <Compile Include="SAINPreset\BotSettings\BotSettingsManager.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\PersonalityClass.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\BotPresetClass.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Info\SAINInfoAbstract.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firerate.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firemode.cs" />

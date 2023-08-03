@@ -39,8 +39,8 @@ namespace SAIN.Components
         {
             // Must be first, other classes use it
             Squad = bot.GetOrAddComponent<SquadClass>();
-            Equipment = bot.GetOrAddComponent<BotEquipmentClass>();
 
+            Equipment = new BotEquipmentClass(this);
             Info = new SAINBotInfo(this);
 
             BotStuck = bot.GetOrAddComponent<SAINBotUnstuck>();
@@ -86,12 +86,12 @@ namespace SAIN.Components
                 UpdatePatrolData();
                 UpdateHealth();
 
-                Vision.Update();
-                Info.Update();
-                FriendlyFireClass.Update();
+                Vision.ManualUpdate();
+                Info.ManualUpdate();
+                FriendlyFireClass.ManualUpdate();
                 BotOwner.DoorOpener.Update();
 
-                Enemy?.Update();
+                Enemy?.ManualUpdate();
 
                 if (Enemy == null && BotOwner.BotLight?.IsEnable == false)
                 {
@@ -196,7 +196,6 @@ namespace SAIN.Components
                 Cover?.Dispose();
 
                 Destroy(Squad);
-                Destroy(Equipment);
                 Destroy(BotStuck);
                 Destroy(Hearing);
                 Destroy(Talk);

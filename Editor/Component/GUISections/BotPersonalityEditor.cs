@@ -42,7 +42,7 @@ namespace SAIN.Editor.GUISections
             Builder.Space(25f);
             PersonScroll = Builder.BeginScrollView(PersonScroll);
 
-            foreach (var personality in PersonalityManager.Personalities.Values)
+            foreach (var personality in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
             {
                 string name = personality.Name;
                 if (!OpenPersMenus.ContainsKey(name))

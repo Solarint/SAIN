@@ -28,7 +28,7 @@ namespace SAIN.Classes
             TimeEnemyCreated = Time.time;
         }
 
-        public void Update()
+        public void ManualUpdate()
         {
             if (!SAIN.HasEnemy)
             {

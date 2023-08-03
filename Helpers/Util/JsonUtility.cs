@@ -14,6 +14,7 @@ using System.IO;
 using System.Reflection;
 using SAIN.BotSettings;
 using SAIN.SAINPreset;
+using SAIN.SAINPreset.Personalities;
 
 namespace SAIN.Helpers
 {
@@ -59,14 +60,6 @@ namespace SAIN.Helpers
                 streamWriter.Close();
             }
 
-            public static void SavePersonalities(Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities)
-            {
-                foreach (var pers in Personalities)
-                {
-                    SaveJson(pers.Value, pers.Key.ToString(), "Personalities");
-                }
-            }
-
             public static void SaveJson(object objectToSave, string fileName, params string[] folders)
             {
                 if (CheckNull(objectToSave)) return;
@@ -87,30 +80,6 @@ namespace SAIN.Helpers
 
         public static class Load
         {
-            public static BaseColorSchemeClass LoadColorScheme()
-            {
-                BaseColorSchemeClass result;
-                if (LoadJsonFile( out string schemeJson , ColorScheme, UIFolder, ColorsFolder ))
-                {
-                    result = DeserializeObject<BaseColorSchemeClass>( schemeJson );
-                }
-                else
-                {
-                    result = new BaseColorSchemeClass(nameof(SAIN));
-                    //Save.Export(result, ColorScheme, UIFolder, ColorsFolder);
-                }
-                if (LoadJsonFile(out string namesJson, ColorNames, UIFolder, ColorsFolder))
-                {
-                    DeserializeObject<ColorNames>(namesJson);
-                }
-                else
-                {
-                    var names = new ColorNames(nameof(SAIN));
-                    Save.SaveJson(names, ColorNames, UIFolder, ColorsFolder);
-                }
-                return result;
-            }
-
             public static List<T> LoadAllJsonFiles<T>(params string[] folders)
             {
                 return LoadAllFiles<T>(JSONSearch, folders);
@@ -169,22 +138,6 @@ namespace SAIN.Helpers
                     return File.ReadAllText(filePath);
                 }
                 return null;
-            }
-
-            public static Dictionary<SAINPersonality, PersonalitySettingsClass> LoadPersonalityClasses()
-            {
-                var Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
-
-                var array = (SAINPersonality[])Enum.GetValues(typeof(SAINPersonality));
-                foreach (var item in array)
-                {
-                    if (LoadJsonFile(out string json, item.ToString(), "Personalities"))
-                    {
-                        var persClass = DeserializeObject<PersonalitySettingsClass>(json);
-                        Personalities.Add(item, persClass);
-                    }
-                }
-                return Personalities;
             }
 
             public static bool LoadJsonFile(out string json, string fileName, params string[] folders)

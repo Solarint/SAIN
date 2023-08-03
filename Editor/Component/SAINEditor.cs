@@ -11,7 +11,6 @@ using static SAIN.Editor.Sounds;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
 using ColorsClass = SAIN.Editor.Util.ColorsClass;
-using static SAIN.Editor.Names.StyleNames;
 using EFT;
 using System.Reflection;
 using BepInEx;
@@ -205,8 +204,8 @@ namespace SAIN.Editor
 
                     TexturesClass.Init();
                     Fonts.Init();
-                    DragBackgroundTexture = TexturesClass.GetColor(Names.ColorNames.MidGray);
-                    TooltipBg = TexturesClass.GetColor(Names.ColorNames.VeryDarkGray);
+                    DragBackgroundTexture = TexturesClass.GetColor(ColorNames.MidGray);
+                    TooltipBg = TexturesClass.GetColor(ColorNames.VeryDarkGray);
                     OpenTabRect = new Rect(0, 85, MainWindow.width, 1000f);
                 }
 
@@ -216,7 +215,7 @@ namespace SAIN.Editor
 
                 GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
 
-                MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", StyleOptions.GetStyle(window));
+                MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", StyleOptions.GetStyle(Style.window));
 
                 if (PresetEditor.OpenAdjustmentWindow)
                 {
@@ -311,18 +310,18 @@ namespace SAIN.Editor
 
         private void MainWindowFunc(int TWCWindowID)
         {
-            var dragStyle = Builder.GetStyle(blankbox);
+            var dragStyle = Builder.GetStyle(Style.blankbox);
             dragStyle.alignment = TextAnchor.MiddleLeft;
             dragStyle.padding = new RectOffset(10, 10, 0, 0);
             GUI.DrawTexture(DragRect, DragBackgroundTexture, ScaleMode.StretchToFill, true, 0);
             GUI.Box(DragRect, "SAIN GUI Editor", dragStyle);
             GUI.DragWindow(DragRect);
-            if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", StyleOptions.GetStyle(button)))
+            if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", StyleOptions.GetStyle(Style.button)))
             {
                 MenuClickSound();
                 TogglePause();
             }
-            if (GUI.Button(ExitRect, "X", StyleOptions.GetStyle(button)))
+            if (GUI.Button(ExitRect, "X", StyleOptions.GetStyle(Style.button)))
             {
                 ResetClickSound();
                 CloseEditor();
@@ -432,7 +431,7 @@ namespace SAIN.Editor
             }
         }
 
-        private GUIStyle ToolTipStyle => StyleOptions.GetStyle(tooltip);
+        private GUIStyle ToolTipStyle => StyleOptions.GetStyle(Style.tooltip);
 
         bool NoTabSelected()
         {

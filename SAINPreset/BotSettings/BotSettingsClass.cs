@@ -1,15 +1,8 @@
 ﻿using EFT;
-using HarmonyLib;
 using SAIN.BotPresets;
-using SAIN.BotSettings.Categories.Util;
 using SAIN.Helpers;
 using SAIN.SAINPreset;
-using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Windows.Forms.VisualStyles;
-using static HBAO_Core;
-using static Mono.Security.X509.X520;
 using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.BotSettings
@@ -19,8 +12,7 @@ namespace SAIN.BotSettings
         public BotSettingsClass(SAINPresetDefinition Preset)
         {
             BotDifficulty[] Difficulties = EnumValues.Difficulties;
-            BotType[] BotTypes = BotTypeDefinitions.BotTypes;
-            foreach (var BotType in BotTypes)
+            foreach (var BotType in BotTypeDefinitions.BotTypesList)
             {
                 string name = BotType.Name;
                 WildSpawnType wildSpawnType = BotType.WildSpawnType;

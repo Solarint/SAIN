@@ -3,28 +3,28 @@ using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components;
+using SAIN.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class BotEquipmentClass : MonoBehaviour
+    public class BotEquipmentClass : SAINBot
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public BotEquipmentClass(SAINComponent sain) : base(sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            if (Logger == null)
+            {
+                Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            }
             Inventory = (InventoryClass)AccessTools.Property(typeof(Player), "Inventory").GetValue(BotOwner.GetPlayer);
-            InventoryController = (InventoryControllerClass)AccessTools.Property(typeof(Player), "GClass2659_0").GetValue(BotOwner.GetPlayer);
+            InventoryController = HelpersGClass.GetInventoryController(BotOwner.GetPlayer);
         }
 
         public InventoryControllerClass InventoryController { get; private set; }
 
-        protected ManualLogSource Logger;
+        private static ManualLogSource Logger;
 
         public InventoryClass Inventory { get; private set; }
         public Weapon CurrentWeapon => BotOwner.WeaponManager.CurrentWeapon;
@@ -34,9 +34,8 @@ namespace SAIN.Classes
 
         public float InventorySpaceFilled { get; private set; }
 
-        private void Update()
+        public void ManualUpdate()
         {
-            if (SAIN == null) return;
             if (UpdateEquipmentTimer < Time.time)
             {
                 UpdateEquipmentTimer = Time.time + 30f;

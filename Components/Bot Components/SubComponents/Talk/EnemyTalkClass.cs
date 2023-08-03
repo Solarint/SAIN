@@ -4,6 +4,7 @@ using EFT;
 using SAIN.BotPresets;
 using SAIN.BotSettings;
 using SAIN.Components;
+using SAIN.SAINPreset.Personalities;
 using UnityEngine;
 using static SAIN.Editor.EditorSettings;
 
@@ -40,7 +41,7 @@ namespace SAIN.Classes
         private float TauntDist = 0f;
         private float TauntFreq = 0f;
 
-        PersonalitySettingsClass PersonalitySettings => SAIN?.Info?.PersonalityClass?.PersonalitySettings;
+        PersonalitySettingsClass PersonalitySettings => SAIN?.Info?.PersonalitySettings;
         SAINSettings FileSettings => SAIN?.Info?.FileSettings;
 
         public void Update()

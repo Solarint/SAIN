@@ -14,7 +14,7 @@ namespace SAIN.Classes.Sense
             FlashLightDazzle = new FlashLightDazzle(component);
         }
 
-        public void Update()
+        public void ManualUpdate()
         {
             var Enemy = SAIN.Enemy;
             if (Enemy?.Person != null && Enemy?.IsVisible == true)

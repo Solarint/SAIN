@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using static SAIN.Editor.Names.ColorNames;
 
 namespace SAIN.Editor.Util
 {
@@ -16,23 +15,23 @@ namespace SAIN.Editor.Util
             BaseColorScheme = new BaseColorSchemeClass(nameof(SAIN));
         }
 
-        public Dictionary<string, ColorWrapper> ColorScheme => BaseColorScheme.ColorSchemeDictionary;
+        public Dictionary<ColorNames, Color> ColorScheme => BaseColorScheme.ColorSchemeDictionary;
 
         private readonly BaseColorSchemeClass BaseColorScheme;
 
-        public Color GetColor(string name)
+        public Color GetColor(ColorNames name)
         {
             return BaseColorScheme.GetColor(name);
         }
 
-        public void AddorUpdateColorScheme(string name, float R, float G, float B)
+        public void AddorUpdateColorScheme(ColorNames name, float R, float G, float B)
         {
             AddorUpdateColorScheme(name, new Color(R, G, B));
         }
 
-        public void AddorUpdateColorScheme(string name, Color color, bool overwrite = false)
+        public void AddorUpdateColorScheme(ColorNames name, Color color)
         {
-            BaseColorScheme.AddorUpdateColorScheme(name, color, overwrite);
+            BaseColorScheme.AddorUpdateColorScheme(name, color);
         }
     }
 
@@ -47,28 +46,24 @@ namespace SAIN.Editor.Util
         public BaseColorSchemeClass(string schemeName)
         {
             SchemeName = schemeName;
-            ColorSchemeDictionary = new Dictionary<string, ColorWrapper>();
-            CustomColorsDictionary = new Dictionary<string, ColorWrapper>();
+            ColorSchemeDictionary = new Dictionary<ColorNames, Color>();
+            CustomColorsDictionary = new Dictionary<ColorNames, Color>();
 
-            AddorUpdateColorScheme(LightRed, new Color(0.8f, 0.35f, 0.35f));
-            AddorUpdateColorScheme(MidRed, new Color(0.7f, 0.25f, 0.25f));
-            AddorUpdateColorScheme(DarkRed, new Color(0.6f, 0.15f, 0.15f));
-            AddorUpdateColorScheme(VeryDarkRed, new Color(0.8f, 0.35f, 0.35f));
-
-            AddorUpdateColorScheme(LightGray, Gray(0.3f));
-            AddorUpdateColorScheme(MidGray, Gray(0.2f));
-            AddorUpdateColorScheme(DarkGray, Gray(0.1f));
-            AddorUpdateColorScheme(VeryDarkGray, Gray(0.05f));
-            AddorUpdateColorScheme(VeryVeryDarkGray, Gray(0.025f));
-
-            AddorUpdateColorScheme(Black, Color.black);
-
-            AddorUpdateColorScheme(LightBlue, new Color(0.4f, 0.4f, 0.9f));
-            AddorUpdateColorScheme(MidBlue, new Color(0.3f, 0.3f, 0.8f));
-            AddorUpdateColorScheme(DarkBlue, new Color(0.2f, 0.2f, 0.6f));
-            AddorUpdateColorScheme(VeryDarkBlue, new Color(0.1f, 0.1f, 0.5f));
-
-            AddorUpdateColorScheme(Gold, new Color(1f, 0.85f, 0f));
+            AddorUpdateColorScheme(ColorNames.LightRed, new Color(0.8f, 0.35f, 0.35f));
+            AddorUpdateColorScheme(ColorNames.MidRed, new Color(0.7f, 0.25f, 0.25f));
+            AddorUpdateColorScheme(ColorNames.DarkRed, new Color(0.6f, 0.15f, 0.15f));
+            AddorUpdateColorScheme(ColorNames.VeryDarkRed, new Color(0.8f, 0.35f, 0.35f));
+            AddorUpdateColorScheme(ColorNames.LightGray, Gray(0.3f));
+            AddorUpdateColorScheme(ColorNames.MidGray, Gray(0.2f));
+            AddorUpdateColorScheme(ColorNames.DarkGray, Gray(0.1f));
+            AddorUpdateColorScheme(ColorNames.VeryDarkGray, Gray(0.05f));
+            AddorUpdateColorScheme(ColorNames.VeryVeryDarkGray, Gray(0.025f));
+            AddorUpdateColorScheme(ColorNames.Black, Color.black);
+            AddorUpdateColorScheme(ColorNames.LightBlue, new Color(0.4f, 0.4f, 0.9f));
+            AddorUpdateColorScheme(ColorNames.MidBlue, new Color(0.3f, 0.3f, 0.8f));
+            AddorUpdateColorScheme(ColorNames.DarkBlue, new Color(0.2f, 0.2f, 0.6f));
+            AddorUpdateColorScheme(ColorNames.VeryDarkBlue, new Color(0.1f, 0.1f, 0.5f));
+            AddorUpdateColorScheme(ColorNames.Gold, new Color(1f, 0.85f, 0f));
 
             BaseColorSchemeDictionary = ColorSchemeDictionary;
         }
@@ -77,181 +72,69 @@ namespace SAIN.Editor.Util
         public readonly string SchemeName;
 
         [JsonProperty]
-        public readonly Dictionary<string, ColorWrapper> ColorSchemeDictionary;
+        public readonly Dictionary<ColorNames, Color> ColorSchemeDictionary;
 
         [JsonProperty]
-        public readonly Dictionary<string, ColorWrapper> CustomColorsDictionary;
+        public readonly Dictionary<ColorNames, Color> CustomColorsDictionary;
 
-        public readonly Dictionary<string, ColorWrapper> BaseColorSchemeDictionary;
+        public readonly Dictionary<ColorNames, Color> BaseColorSchemeDictionary;
 
-        public Color GetColor(string name)
+        public Color GetColor(ColorNames name)
         {
             return GetColorFromDictionary(name, ColorSchemeDictionary);
         }
 
-        public Color GetBaseColor(string name)
+        public Color GetBaseColor(ColorNames name)
         {
             return GetColorFromDictionary(name, BaseColorSchemeDictionary);
         }
 
-        public Color GetCustom(string name)
+        public Color GetCustom(ColorNames name)
         {
             return GetColorFromDictionary(name, CustomColorsDictionary);
         }
 
-        private Color GetColorFromDictionary(string name, Dictionary<string, ColorWrapper> dictionary)
+        private Color GetColorFromDictionary(ColorNames name, Dictionary<ColorNames, Color> dictionary)
         {
             bool dictNull = dictionary == null;
             bool inDict = dictionary?.ContainsKey(name) == true;
             if (!dictNull && inDict)
             {
-                return dictionary[name].Color;
+                return dictionary[name];
             }
-            Logger.LogWarning($"Color Key Exists?: [{inDict}] || Dictionary == null?: [{dictNull}]", GetType(), true);
             return Color.green;
         }
 
-        public void AddorUpdateDictionary(string name, Color color, Dictionary<string, ColorWrapper> dictionary, bool overwrite = false)
+        public void AddorUpdateDictionary(ColorNames name, Color color, Dictionary<ColorNames, Color> dictionary)
         {
             if (!dictionary.ContainsKey(name))
             {
-                dictionary.Add(name, new ColorWrapper(name, color));
-            }
-            else if (overwrite)
-            {
-                dictionary[name] = new ColorWrapper(name, color);
+                dictionary.Add(name, color);
             }
             else
             {
-                name += Guid.NewGuid().ToString();
-                Log("Color Key already Exists");
-                if (!dictionary.ContainsKey(name))
-                {
-                    Log("Adding: " + name);
-                    dictionary.Add(name, new ColorWrapper(name, color));
-                }
+                dictionary[name] = color;
             }
         }
 
-        public void AddorUpdateColorScheme(string name, Color color, bool overwrite = false)
+        public void AddorUpdateColorScheme(ColorNames name, Color color)
         {
-            AddorUpdateDictionary(name, color, ColorSchemeDictionary, overwrite);
+            AddorUpdateDictionary(name, color, ColorSchemeDictionary);
         }
 
-        public void AddorUpdateCustom(string name, Color color, bool overwrite = false)
+        public void AddorUpdateCustom(ColorNames name, Color color)
         {
-            AddorUpdateDictionary(name, color, CustomColorsDictionary, overwrite);
+            AddorUpdateDictionary(name, color, CustomColorsDictionary);
         }
 
-        public void AddorUpdateColorScheme(string name, float R, float G, float B, bool overwrite = false)
+        public void AddorUpdateColorScheme(ColorNames name, float R, float G, float B)
         {
-            AddorUpdateColorScheme(name, new Color(R, G, B), overwrite);
-        }
-
-        private static void Log(string message)
-        {
-            Logger.LogDebug(message, typeof(BaseColorSchemeClass));
+            AddorUpdateColorScheme(name, new Color(R, G, B));
         }
 
         private static Color Gray(float brightness)
         {
             return new Color(brightness, brightness, brightness);
         }
-    }
-
-    [Serializable]
-    public class ColorWrapper
-    {
-        public float r;
-        public float g;
-        public float b;
-        public float a;
-
-        public ColorWrapper(string name, Color color)
-        {
-            Name = name;
-            r = color.r;
-            g = color.g;
-            b = color.b;
-            a = color.a;
-            Color = color;
-        }
-
-        public string Name { get; private set; }
-
-        [JsonConstructor]
-        public ColorWrapper()
-        {
-            Color = new Color(r, g, b, a);
-        }
-
-        public Color Color { get; private set; }
-    }
-
-    public class ColorNames
-    {
-        [JsonConstructor]
-        public ColorNames()
-        {
-        }
-
-        public ColorNames(string schemeName)
-        {
-            SchemeName = schemeName;
-            SetNames();
-        }
-
-        private void SetNames()
-        {
-            LightRed = nameof(LightRed);
-            MidRed = nameof(MidRed);
-            DarkRed = nameof(DarkRed);
-            VeryDarkRed = nameof(VeryDarkRed);
-            LightGray = nameof(LightGray);
-            MidGray = nameof(MidGray);
-            DarkGray = nameof(DarkGray);
-            VeryDarkGray = nameof(VeryDarkGray);
-            VeryVeryDarkGray = nameof(VeryVeryDarkGray);
-            Black = nameof(Black);
-            LightBlue = nameof(LightBlue);
-            MidBlue = nameof(MidBlue);
-            DarkBlue = nameof(DarkBlue);
-            VeryDarkBlue = nameof(VeryDarkBlue);
-            Gold = nameof(Gold);
-        }
-
-        [JsonProperty]
-        public readonly string SchemeName;
-
-        [JsonProperty]
-        public static string LightRed { get; private set; }
-        [JsonProperty]
-        public static string MidRed { get; private set; }
-        [JsonProperty]
-        public static string DarkRed { get; private set; }
-        [JsonProperty]
-        public static string VeryDarkRed { get; private set; }
-        [JsonProperty]
-        public static string LightGray { get; private set; }
-        [JsonProperty]
-        public static string MidGray { get; private set; }
-        [JsonProperty]
-        public static string DarkGray { get; private set; }
-        [JsonProperty]
-        public static string VeryDarkGray { get; private set; }
-        [JsonProperty]
-        public static string VeryVeryDarkGray { get; private set; }
-        [JsonProperty]
-        public static string Black { get; private set; }
-        [JsonProperty]
-        public static string LightBlue { get; private set; }
-        [JsonProperty]
-        public static string MidBlue { get; private set; }
-        [JsonProperty]
-        public static string DarkBlue { get; private set; }
-        [JsonProperty]
-        public static string VeryDarkBlue { get; private set; }
-        [JsonProperty]
-        public static string Gold { get; private set; }
     }
 }

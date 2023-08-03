@@ -5,9 +5,9 @@ using SAIN.Plugin;
 using SAIN.SAINPreset;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.Editor.Names;
 
 namespace SAIN.Editor
 {
@@ -24,7 +24,7 @@ namespace SAIN.Editor
         public PresetEditor(SAINEditor editor) : base(editor)
         {
             List<string> sections = new List<string>();
-            foreach (var type in BotTypeDefinitions.BotTypes)
+            foreach (var type in BotTypeDefinitions.BotTypes.Values)
             {
                 if (!sections.Contains(type.Section))
                 {
@@ -301,7 +301,7 @@ namespace SAIN.Editor
             for (int i = 0; i < SelectedSections.Count; i++)
             {
                 string section = SelectedSections[i];
-                GUIStyle style = new GUIStyle(GetStyle(StyleNames.label))
+                GUIStyle style = new GUIStyle(GetStyle(Style.label))
                 {
                     fontStyle = FontStyle.Normal,
                     alignment = TextAnchor.MiddleLeft
@@ -317,12 +317,13 @@ namespace SAIN.Editor
 
                 Space(Rect2OptionSpacing);
 
-                for (int j = 0; j < BotTypeDefinitions.BotTypes.Length; j++)
+                var botTypes = BotTypeDefinitions.BotTypes.Values.ToArray();
+                for (int j = 0; j < botTypes.Length; j++)
                 {
-                    BotType type = BotTypeDefinitions.BotTypes[j];
+                    BotType type = botTypes[j];
                     if (type.Section == section)
                     {
-                        GUIStyle style2 = new GUIStyle(GetStyle(StyleNames.toggle))
+                        GUIStyle style2 = new GUIStyle(GetStyle(Style.toggle))
                         {
                             fontStyle = FontStyle.Normal,
                             alignment = TextAnchor.LowerCenter

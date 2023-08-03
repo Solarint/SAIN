@@ -12,7 +12,7 @@ namespace SAIN.Editor
         {
         }
 
-        public Texture2D GetColor(string name)
+        public Texture2D GetColor(ColorNames name)
         {
             if (ColorTextures.ContainsKey(name))
             {
@@ -21,7 +21,7 @@ namespace SAIN.Editor
             return Texture2D.redTexture;
         }
 
-        public Texture2D GetCustom(string name)
+        public Texture2D GetCustom(ColorNames name)
         {
             if (CustomTextures.ContainsKey(name))
             {
@@ -38,19 +38,18 @@ namespace SAIN.Editor
         private const int BackGroundCount = 4;
         //private readonly Recolor BackgroundRecolor = new Recolor(-0.08f, -0.18f, -0.18f);
 
-        public readonly Dictionary<string, Texture2D> ColorTextures = new Dictionary<string, Texture2D>();
+        public readonly Dictionary<ColorNames, Texture2D> ColorTextures = new Dictionary<ColorNames, Texture2D>();
 
-        public readonly Dictionary<string, Texture2D> CustomTextures = new Dictionary<string, Texture2D>();
+        public readonly Dictionary<ColorNames, Texture2D> CustomTextures = new Dictionary<ColorNames, Texture2D>();
 
         private void CreateTextures()
         {
             var dictionary = Editor.Colors.ColorScheme;
-            foreach (var wrapper in dictionary.Values)
+            foreach (var color in dictionary)
             {
-                Color colorValue = wrapper.Color;
+                Color colorValue = color.Value;
                 Texture2D texture = NewTexture(colorValue);
-                ColorTextures.Add(wrapper.Name, texture);
-                //AddTexture(wrapper.Key, wrapper.Value, ColorTextures);
+                ColorTextures.Add(color.Key, texture);
             }
         }
 

@@ -1,15 +1,7 @@
-﻿using Comfort.Common;
-using SAIN.Editor;
-using SAIN.Helpers;
+﻿using SAIN.Editor;
 using SAIN.SAINPreset;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static EFT.SpeedTree.TreeWind;
 using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.Plugin
