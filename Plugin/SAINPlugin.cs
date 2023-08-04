@@ -7,7 +7,6 @@ using SAIN.Editor;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.SAINPreset;
-using SAIN.UserSettings;
 using System;
 using UnityEngine;
 using static SAIN.PluginInfo;
@@ -28,20 +27,11 @@ namespace SAIN
                 throw new Exception("Invalid EFT Version");
             }
 
-            // If BigBrain isn't loaded, we need to exit too. Normally this would be handled via
-            // the BepInDependency, but due to remapping between 3.5.7 and 3.5.8 we also have to/
-            // manually check for now
-            if (!Chainloader.PluginInfos.ContainsKey(BigBrain.GUID))
-            {
-                throw new Exception($"Missing {BigBrain.Name}");
-            }
-
-            SAINConfig = Config;
+            OpenEditorButton = Config.Bind("SAIN Editor", "Open Editor", false, "Opens the Editor on press");
+            OpenEditorConfigEntry = Config.Bind("SAIN Editor", "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
+            PauseConfigEntry = Config.Bind("SAIN Editor", "PauseButton", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
 
             PresetHandler.Init();
-            EditorSettings.Init();
-            CoverConfig.Init(Config);
-            DazzleConfig.Init(Config);
 
             new Patches.Generic.KickPatch().Enable();
             new Patches.Generic.GetBotController().Enable();
@@ -78,6 +68,10 @@ namespace SAIN
             BigBrainSAIN.Init();
             VectorHelpers.Init();
         }
+
+        public static ConfigEntry<bool> OpenEditorButton;
+        public static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry;
+        public static ConfigEntry<KeyboardShortcut> PauseConfigEntry;
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 

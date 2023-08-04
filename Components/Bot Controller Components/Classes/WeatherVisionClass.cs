@@ -1,6 +1,5 @@
 ﻿using EFT;
 using EFT.Weather;
-using SAIN.UserSettings;
 using System;
 using System.Collections.Generic;
 using System.Linq;

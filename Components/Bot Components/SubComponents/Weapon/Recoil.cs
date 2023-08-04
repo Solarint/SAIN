@@ -3,7 +3,6 @@ using EFT.InventoryLogic;
 using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
-using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {
@@ -24,10 +23,10 @@ namespace SAIN.Classes
             float weaponhorizrecoil = CalcRecoil(RecoilForceUp);
             float weaponvertrecoil = CalcRecoil(RecoilForceBack);
 
-            float horizRecoil = (1f * weaponhorizrecoil + AddRecoil.Value) * distance;
-            float vertRecoil = (1f * weaponvertrecoil + AddRecoil.Value) * distance;
+            float horizRecoil = (1f * weaponhorizrecoil + SAINPlugin.LoadedPreset.GlobalSettings.Shoot.AddRecoil) * distance;
+            float vertRecoil = (1f * weaponvertrecoil + SAINPlugin.LoadedPreset.GlobalSettings.Shoot.AddRecoil) * distance;
 
-            float maxrecoil = MaxRecoil.Value * distance;
+            float maxrecoil = SAINPlugin.LoadedPreset.GlobalSettings.Shoot.MaxRecoil * distance;
 
             float randomHorizRecoil = Random.Range(-horizRecoil, horizRecoil);
             float randomvertRecoil = Random.Range(-vertRecoil, vertRecoil);
@@ -59,7 +58,7 @@ namespace SAIN.Classes
             {
                 rate = Time.time + (SemiAutoTimePerShot / 3f);
             }
-            return Vector3.Lerp(Vector3.zero, oldVector, RecoilDecay.Value);
+            return Vector3.Lerp(Vector3.zero, oldVector, SAINPlugin.LoadedPreset.GlobalSettings.Shoot.RecoilDecay);
         }
 
         public float RecoilTimeWait

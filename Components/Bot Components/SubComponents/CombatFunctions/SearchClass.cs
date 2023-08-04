@@ -26,7 +26,6 @@ namespace SAIN.Classes
         private bool FirstCheck = false;
         private bool SecondCheck = false;
         private bool ThirdCheck = false;
-        private float DebugDrawTimer = 0f;
 
         public void Update(bool shallLean, bool shallSprint, float reachDist = -1f)
         {

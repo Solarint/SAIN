@@ -5,7 +5,6 @@ using EFT.UI;
 using UnityEngine;
 using System;
 using SAIN.BotSettings.Categories;
-using static SAIN.Editor.EditorSettings;
 using static SAIN.Editor.RectLayout;
 using static SAIN.Editor.Sounds;
 using SAIN.Editor.GUISections;
@@ -16,48 +15,21 @@ using System.Reflection;
 using BepInEx;
 using SAIN.BotSettings;
 using static SAIN.Helpers.Reflection;
+using SAIN.SAINPreset.GlobalSettings;
 
 namespace SAIN.Editor
 {
     public class SAINEditor
     {
-        public SAINEditor() { }
-
-        public void Init()
-        {
-            InitBinds();
-            InitCursor();
-            InitClasses();
-        }
-
-        void InitBinds()
+        public SAINEditor()
         {
             ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(OpenEditor));
             ConsoleScreen.Processor.RegisterCommand("pausegame", new Action(TogglePause));
-
-            OpenEditorButton = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor", false, "Opens the Editor on press");
-            OpenEditorConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
-            PauseConfigEntry = SAINPlugin.SAINConfig.Bind("SAIN Editor", "PauseButton", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
         }
 
-        void InitCursor()
+        public void Init()
         {
-            // Use reflection to keep compatibility with unity 4.x since it doesn't have Cursor
-            var tCursor = typeof(Cursor);
-            _curLockState = tCursor.GetProperty("lockState", BindingFlags.Static | BindingFlags.Public);
-            _curVisible = tCursor.GetProperty("visible", BindingFlags.Static | BindingFlags.Public);
-
-            if (_curLockState == null && _curVisible == null)
-            {
-                _obsoleteCursor = true;
-
-                _curLockState = typeof(Screen).GetProperty("lockCursor", BindingFlags.Static | BindingFlags.Public);
-                _curVisible = typeof(Screen).GetProperty("showCursor", BindingFlags.Static | BindingFlags.Public);
-            }
-        }
-
-        void InitClasses()
-        {
+            CursorSettings.InitCursor();
             TexturesClass = new TexturesClass(this);
             Colors = new ColorsClass(this);
             StyleOptions = new StyleOptions(this);
@@ -72,16 +44,6 @@ namespace SAIN.Editor
 
         internal static Texture2D TooltipBg { get; private set; }
 
-        internal static ConfigEntry<bool> OpenEditorButton;
-        internal static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry;
-        internal static ConfigEntry<KeyboardShortcut> PauseConfigEntry;
-
-        private PropertyInfo _curLockState;
-        private PropertyInfo _curVisible;
-        private int _previousCursorLockState;
-        private bool _previousCursorVisible;
-        private bool _obsoleteCursor;
-
         public BotPersonalityEditor BotPersonalityEditor { get; private set; }
         public BotSettingsEditor BotSettingsEditor { get; private set; }
         public WindowLayoutCreator WindowLayoutCreator { get; private set; }
@@ -92,10 +54,11 @@ namespace SAIN.Editor
         public StyleOptions StyleOptions { get; private set; }
         public ColorsClass Colors { get; private set; }
         public TexturesClass TexturesClass { get; private set; }
+
         public bool GameIsPaused { get; private set; }
+        public bool AdvancedOptionsEnabled { get; private set; }
 
         [ConsoleCommand("Open SAIN GUI Editor")]
-
         private void OpenEditor()
         {
             if (!DisplayingWindow)
@@ -141,50 +104,36 @@ namespace SAIN.Editor
         public bool ShiftKeyPressed { get; private set; }
         public bool CtrlKeyPressed { get; private set; }
 
-        public readonly FieldsCache SAINSettingsCache = new FieldsCache(typeof(SAINSettings));
+        public readonly FieldsCache SAINBotSettingsCache = new FieldsCache(typeof(SAINSettings));
+        public readonly FieldsCache GlobalSettingsCache = new FieldsCache(typeof(GlobalSettingsClass));
 
         public void Update()
         {
             ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
             CtrlKeyPressed = Input.GetKey(KeyCode.LeftControl);
 
-            if (DisplayingWindow) SetUnlockCursor(0, true);
+            if (DisplayingWindow) CursorSettings.SetUnlockCursor(0, true);
 
-            if (PauseConfigEntry.Value.IsDown())
+            if (SAINPlugin.PauseConfigEntry.Value.IsDown())
             {
                 TogglePause();
             }
-            if (OpenEditorConfigEntry.Value.IsDown() || (Input.GetKeyDown(KeyCode.Escape) && DisplayingWindow) || OpenEditorButton.Value)
+            if (SAINPlugin.OpenEditorConfigEntry.Value.IsDown() || (Input.GetKeyDown(KeyCode.Escape) && DisplayingWindow) || SAINPlugin.OpenEditorButton.Value)
             {
-                if (OpenEditorButton.Value)
+                if (SAINPlugin.OpenEditorButton.Value)
                 {
-                    OpenEditorButton.Value = false;
+                    SAINPlugin.OpenEditorButton.BoxedValue = false;
+                    SAINPlugin.OpenEditorButton.Value = false;
                 }
                 GUIToggle();
             }
 
-            SAINSettingsCache.CacheHandler(DisplayingWindow);
-        }
-
-        private void SetUnlockCursor(int lockState, bool cursorVisible)
-        {
-            if (_curLockState != null)
-            {
-                // Do through reflection for unity 4 compat
-                //Cursor.lockState = CursorLockMode.None;
-                //Cursor.visible = true;
-                if (_obsoleteCursor)
-                    _curLockState.SetValue(null, Convert.ToBoolean(lockState), null);
-                else
-                    _curLockState.SetValue(null, lockState, null);
-
-                _curVisible.SetValue(null, cursorVisible, null);
-            }
+            SAINBotSettingsCache.CacheHandler(DisplayingWindow);
         }
 
         public void LateUpdate()
         {
-            if (DisplayingWindow) SetUnlockCursor(0, true);
+            if (DisplayingWindow) CursorSettings.SetUnlockCursor(0, true);
         }
 
         private void GUIToggle()
@@ -209,7 +158,7 @@ namespace SAIN.Editor
 
                 StyleOptions.CustomStyle.Cache(true);
 
-                SetUnlockCursor(0, true);
+                CursorSettings.SetUnlockCursor(0, true);
 
                 GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
 
@@ -228,35 +177,10 @@ namespace SAIN.Editor
             }
         }
 
-        private bool _displayingWindow;
-
         public bool DisplayingWindow
         {
-            get => _displayingWindow;
-            set
-            {
-                if (_displayingWindow == value) return;
-                _displayingWindow = value;
-
-                if (_displayingWindow)
-                {
-                    // Do through reflection for unity 4 compat
-                    if (_curLockState != null)
-                    {
-                        _previousCursorLockState = _obsoleteCursor ? Convert.ToInt32((bool)_curLockState.GetValue(null, null)) : (int)_curLockState.GetValue(null, null);
-                        _previousCursorVisible = (bool)_curVisible.GetValue(null, null);
-                    }
-                }
-                else
-                {
-                    if (!_previousCursorVisible || _previousCursorLockState != 0) // 0 = CursorLockMode.None
-                    {
-                        SetUnlockCursor(_previousCursorLockState, _previousCursorVisible);
-                    }
-
-                    PresetEditor.OpenAdjustmentWindow = false;
-                }
-            }
+            get => CursorSettings.DisplayingWindow;
+            set { CursorSettings.DisplayingWindow = value; }
         }
 
         public Rect AdjustmentRect = new Rect(500, 50, 600f, 500f);
@@ -304,8 +228,6 @@ namespace SAIN.Editor
 
         string OpenTab = None;
 
-        private static bool OpenFontMenu = false;
-
         private void MainWindowFunc(int TWCWindowID)
         {
             var dragStyle = Builder.GetStyle(Style.blankbox);
@@ -345,9 +267,6 @@ namespace SAIN.Editor
 
                 if (TabSelected(Home, out tabRect, 1000f))
                 {
-                    Builder.CreateButtonOption(NoBushESPToggle);
-                    Builder.CreateButtonOption(HeadShotProtection);
-
                     Builder.Box("Mod Detection");
 
                     Builder.BeginHorizontal();
@@ -365,22 +284,12 @@ namespace SAIN.Editor
                 }
                 else if (TabSelected(Hearing, out tabRect, 1000f))
                 {
-                    Builder.HorizSlider(SuppressorModifier, 100f);
-                    Builder.HorizSlider(SubsonicModifier, 100f);
-                    Builder.HorizSlider(AudioRangePistol, 1f);
-                    Builder.HorizSlider(AudioRangeRifle, 1f);
-                    Builder.HorizSlider(AudioRangeMidRifle, 1f);
-                    Builder.HorizSlider(AudioRangeLargeCal, 1f);
-                    Builder.HorizSlider(AudioRangeShotgun, 1f);
-                    Builder.HorizSlider(AudioRangeOther, 1f);
                 }
                 else if (TabSelected(Advanced, out tabRect, 1000f))
                 {
                     Builder.Box("Advanced Settings. Edit at your own risk.");
 
-                    Builder.HorizSlider(MaxRecoil, 100f);
-                    Builder.HorizSlider(AddRecoil, 100f);
-                    Builder.HorizSlider(RecoilDecay, 1000f);
+                    AdvancedOptionsEnabled = Builder.Toggle(AdvancedOptionsEnabled, "Advanced Bot Configs");
 
                     Builder.BeginHorizontal();
                     if (Builder.Button("Mysterious Button"))

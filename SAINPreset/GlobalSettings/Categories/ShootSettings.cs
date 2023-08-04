@@ -1,17 +1,44 @@
 ﻿using BepInEx.Configuration;
+using SAIN.SAINPreset.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Mono.Security.X509.X520;
+using static System.Collections.Specialized.BitVector32;
 
 namespace SAIN.SAINPreset.Settings
 {
     public class ShootSettings
     {
-        public float MaxRecoil;
-        public float AddRecoil;
-        public float RecoilDecay;
+        [Name("Max Recoil Per Shot")]
+        [Description("Maximum Impulse force from a single shot for a bot.")]
+        [DefaultValue(2f)]
+        [Minimum(0.1f)]
+        [Maximum(10f)]
+        [Rounding(100f)]
+        [IsAdvanced(true)]
+        public float MaxRecoil = 2f;
+
+        [Name("Add or Subtract Recoil")]
+        [Description("Linearly add or subtract from the final recoil result")]
+        [DefaultValue(0f)]
+        [Minimum(0.1f)]
+        [Maximum(5f)]
+        [Rounding(100f)]
+        [IsAdvanced(true)]
+        public float AddRecoil = 0f;
+
+        [Name("Recoil Decay p/frame")]
+        [Description("How much to decay the recoil impulse per frame. 0.8 means 20% of the recoil will be removed per frame.")]
+        [DefaultValue(0.8f)]
+        [Minimum(0.1f)]
+        [Maximum(0.99f)]
+        [Rounding(100f)]
+        [IsAdvanced(true)]
+        public float RecoilDecay = 0.8f;
 
         public AmmoSettingDictionary AmmoShootability =
             new AmmoSettingDictionary(

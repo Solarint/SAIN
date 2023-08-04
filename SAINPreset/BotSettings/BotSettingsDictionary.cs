@@ -9,12 +9,3 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SAIN.BotSettings
-{
-    public static class BotSettingsDictionary
-    {
-        public static void Add(SettingsWrapper value)
-        {
-        }
-    }
-}

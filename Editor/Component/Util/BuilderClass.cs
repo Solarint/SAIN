@@ -1,7 +1,5 @@
 ﻿using BepInEx.Configuration;
 using UnityEngine;
-using static SAIN.Editor.EditorParameters;
-using static SAIN.Editor.ConfigValues;
 using static SAIN.Editor.StyleOptions;
 using SAIN.BotPresets;
 using System.Collections.Generic;
@@ -17,10 +15,6 @@ namespace SAIN.Editor
         public BuilderClass(SAINEditor editor) : base(editor) { }
 
         private static float ExpandMenuWidth => 150f;
-        private static float MinMaxWidth => SliderMinMaxWidth.Value;
-        private static float SlWidth => SliderWidth.Value;
-        private static float ResultWidth => SliderResultWidth.Value;
-        private static float LabelWidth => SliderLabelWidth.Value;
 
         CustomStyleClass CustomStyle => Editor.StyleOptions.CustomStyle;
 
@@ -239,113 +233,6 @@ namespace SAIN.Editor
 
             EndHorizontal();
 
-            return value;
-        }
-
-        public bool CreateButtonOption(ConfigEntry<bool> entry)
-        {
-            bool value = false;
-            BeginHorizontal();
-            if (ButtonsClass.ButtonConfigEntry(entry))
-            {
-                value = true;
-            }
-            EndHorizontal();
-            return value;
-        }
-
-
-        public void HorizSlider<T>(ConfigEntry<T> entry, float rounding)
-        {
-            BeginHorizontal();
-
-            ButtonsClass.InfoBox(entry.Description.Description, 35f);
-            Box(entry.Definition.Key, Width(LabelWidth), Height(35));
-
-            object min = MinMax(entry, out object max);
-
-            if (min != null)
-            {
-                BlankBox(min.ToString(), "Minimum", Width(MinMaxWidth), Height(35));
-                CheckMouse("Min");
-            }
-
-            if (ReturnFloat(entry, out float sliderValue))
-            {
-                sliderValue = CreateSlider(sliderValue, min, max, rounding, 35f);
-                AssignValue(entry, sliderValue);
-            }
-            else
-            {
-                bool boolValue = (bool)(object)entry.Value;
-                boolValue = Toggle((bool)(object)entry.Value, boolValue ? "On" : "Off", Height(35));
-                AssignValue((ConfigEntry<bool>)(object)entry, boolValue);
-            }
-
-            if (max != null)
-            {
-                BlankBox(max.ToString(), "Maximum", Width(MinMaxWidth), Height(35));
-                CheckMouse("Max");
-            }
-
-            Box(entry.Value.ToString(), "Set Value", Width(ResultWidth), Height(35));
-            FlexibleSpace();
-            ButtonsClass.ResetButton(entry, 35f);
-            EndHorizontal();
-        }
-
-        private object MinMax<T>(ConfigEntry<T> entry, out object max)
-        {
-            if (entry?.Description?.AcceptableValues == null || entry.SettingType == typeof(bool))
-            {
-                max = null;
-                return null;
-            }
-            if (entry.SettingType == typeof(float))
-            {
-                max = entry.Description.AcceptableValues.Clamp(float.MaxValue);
-                return entry.Description.AcceptableValues.Clamp(float.MinValue);
-            }
-            else
-            {
-                max = entry.Description.AcceptableValues.Clamp(int.MaxValue);
-                return entry.Description.AcceptableValues.Clamp(int.MinValue);
-            }
-        }
-
-        public float HorizSlider(string name, float value, float min, float max, float rounding = 1f, string description = null)
-        {
-            BeginHorizontal();
-
-            ButtonsClass.InfoBox(description, 35f);
-            Box(name, Width(LabelWidth), Height(35));
-
-            Box(min.ToString(), "Minimum", Width(MinMaxWidth), Height(35));
-
-            float result = CreateSlider(value, min, max, rounding, 35f);
-
-            Box(max.ToString(), "Maximum", Width(MinMaxWidth), Height(35));
-
-            Box(value.ToString(), Width(ResultWidth), Height(35));
-
-            EndHorizontal();
-            return result;
-        }
-
-        public float CreateSlider(float value, object min, object max, float rounding = 1f, float? height = null)
-        {
-            float progress = (value - (float)min) / ((float)max - (float)min);
-            if (height != null)
-            {
-                value = HorizontalSlider(value, (float)min, (float)max, SlWidth, height.Value);
-            }
-            else
-            {
-                value = HorizontalSlider(value, (float)min, (float)max, SlWidth);
-            }
-            TexturesClass.DrawSliderBackGrounds(progress);
-
-            value = Mathf.Round(value * rounding) / rounding;
             return value;
         }
 

@@ -6,7 +6,6 @@ using SAIN.Helpers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.UserSettings.CoverConfig;
 
 namespace SAIN.Components
 {
@@ -33,7 +32,7 @@ namespace SAIN.Components
                 Dispose();
                 return;
             }
-            if (DebugCoverFinder.Value)
+            if (DebugCoverFinder)
             {
                 if (CoverPoints.Count > 0)
                 {
@@ -41,6 +40,7 @@ namespace SAIN.Components
                 }
             }
         }
+        static bool DebugCoverFinder => SAINPlugin.LoadedPreset.GlobalSettings.Cover.DebugCoverFinder;
 
         public void LookForCover(Vector3 targetPosition, Vector3 originPoint)
         {
@@ -54,8 +54,8 @@ namespace SAIN.Components
             }
             else
             {
-                MinObstacleHeight = CoverMinHeight.Value;
-                MinEnemyDist = CoverMinEnemyDistance.Value;
+                MinObstacleHeight = CoverMinHeight;
+                MinEnemyDist = CoverMinEnemyDistance;
             }
 
             if (TakeCoverCoroutine == null)
@@ -64,6 +64,8 @@ namespace SAIN.Components
             }
         }
 
+        static float CoverMinHeight => SAINPlugin.LoadedPreset.GlobalSettings.Cover.CoverMinHeight;
+        static float CoverMinEnemyDistance => SAINPlugin.LoadedPreset.GlobalSettings.Cover.CoverMinEnemyDistance;
         public float MinEnemyDist { get; private set; }
 
         public void StopLooking()
@@ -149,7 +151,7 @@ namespace SAIN.Components
                 {
                     FindFallback();
 
-                    if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
+                    if (DebugLogTimer < Time.time && DebugCoverFinder)
                     {
                         DebugLogTimer = Time.time + 1f;
                         Logger.LogInfo($"[{BotOwner.name}] - Found [{CoverPoints.Count}] CoverPoints. Colliders checked: [{totalChecked}] Collider Array Size = [{hits}]");
@@ -157,15 +159,17 @@ namespace SAIN.Components
                 }
                 else
                 {
-                    if (DebugLogTimer < Time.time && DebugCoverFinder.Value)
+                    if (DebugLogTimer < Time.time && DebugCoverFinder)
                     {
                         DebugLogTimer = Time.time + 1f;
                         Logger.LogWarning($"[{BotOwner.name}] - No Cover Found! Valid Colliders checked: [{totalChecked}] Collider Array Size = [{hits}]");
                     }
                 }
-                yield return new WaitForSeconds(CoverUpdateFrequency.Value);
+                yield return new WaitForSeconds(CoverUpdateFrequency);
             }
         }
+
+        static float CoverUpdateFrequency => SAINPlugin.LoadedPreset.GlobalSettings.Cover.CoverUpdateFrequency;
 
         private void FindFallback()
         {

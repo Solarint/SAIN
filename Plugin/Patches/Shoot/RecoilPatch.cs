@@ -7,7 +7,6 @@ using UnityEngine;
 using System;
 using Aki.Reflection.Utils;
 using System.Linq;
-using static SAIN.Editor.EditorSettings;
 using SAIN.Helpers;
 
 namespace SAIN.Patches.Shoot
@@ -32,7 +31,7 @@ namespace SAIN.Patches.Shoot
                 * (___vector3_4
                 + ___botOwner_0.RecoilData.RecoilOffset);
 
-            if (HeadShotProtection.Value)
+            if (SAINPlugin.LoadedPreset.GlobalSettings.General.HeadShotProtection)
             {
                 IAIDetails person = ___botOwner_0.Memory.GoalEnemy?.Person;
                 if (person != null)

@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static SAIN.Editor.EditorSettings;
 using static SAIN.Helpers.Reflection;
 using static SAIN.SAINPreset.Attributes.GetAttributeValue.AttributesGUI;
 
@@ -31,20 +30,20 @@ namespace SAIN.Editor.GUISections
             pers.AllGigaChads = EditValue(pers.AllGigaChads, GetField(type, nameof(pers.AllGigaChads)));
             if (pers.AllGigaChads)
             {
-                AllChads.Value = false;
-                AllRats.Value = false;
+                pers.AllChads = false;
+                pers.AllRats = false;
             }
             pers.AllChads = EditValue(pers.AllChads, GetField(type, nameof(pers.AllChads)));
             if (pers.AllChads)
             {
-                AllGigaChads.Value = false;
-                AllRats.Value = false;
+                pers.AllGigaChads = false;
+                pers.AllRats = false;
             }
             pers.AllRats = EditValue(pers.AllRats, GetField(type, nameof(pers.AllRats)));
             if (pers.AllRats)
             {
-                AllGigaChads.Value = false;
-                AllChads.Value = false;
+                pers.AllGigaChads = false;
+                pers.AllChads = false;
             }
 
             Builder.Space(25f);

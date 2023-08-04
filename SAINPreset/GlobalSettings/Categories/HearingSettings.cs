@@ -1,13 +1,30 @@
 ﻿using BepInEx.Configuration;
 using EFT.InventoryLogic;
+using SAIN.Editor;
+using SAIN.SAINPreset.Attributes;
 using System.Collections.Generic;
+using System.ComponentModel;
+using static Mono.Security.X509.X520;
 
 namespace SAIN.SAINPreset.Settings
 {
     public class HearingSettings
     {
-        public float AudibleRangeMultiplier;
-        public float MaxFootstepAudioDistance;
+        [Name("Suppressed Sound Modifier")]
+        [Description("Audible Gun Range is multiplied by this number when using a suppressor")]
+        [DefaultValue(0.6f)]
+        [Minimum(0.1f)]
+        [Maximum(0.95f)]
+        [Rounding(100f)]
+        public float SuppressorModifier = 0.6f;
+
+        [Name("Subsonic Sound Modifier")]
+        [Description("Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo")]
+        [DefaultValue(0.25f)]
+        [Minimum(0.1f)]
+        [Maximum(0.95f)]
+        [Rounding(100f)]
+        public float SubsonicModifier = 0.25f;
 
         public AmmoSettingDictionary AudibleRanges =
             new AmmoSettingDictionary(

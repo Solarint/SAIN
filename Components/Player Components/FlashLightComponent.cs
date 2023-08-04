@@ -6,7 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.UserSettings.DazzleConfig;
 
 namespace SAIN.Components
 {
@@ -116,29 +115,30 @@ namespace SAIN.Components
 
                 if (CheckWhiteLight(tacticalModes))
                 {
-                    if (DebugFlash.Value) Logger.LogDebug("Found Light!");
+                    if (DebugFlash) Logger.LogDebug("Found Light!");
                     WhiteLight = true;
                 }
 
                 if (CheckVisibleLaser(tacticalModes))
                 {
-                    if (DebugFlash.Value) Logger.LogDebug("Found Visible Laser!");
+                    if (DebugFlash) Logger.LogDebug("Found Visible Laser!");
                     Laser = true;
                 }
 
                 if (CheckIRLight(tacticalModes))
                 {
-                    if (DebugFlash.Value) Logger.LogDebug("Found IR Light!");
+                    if (DebugFlash) Logger.LogDebug("Found IR Light!");
                     IRLight = true;
                 }
 
                 if (CheckIRLaser(tacticalModes))
                 {
-                    if (DebugFlash.Value) Logger.LogDebug("Found IR Laser!");
+                    if (DebugFlash) Logger.LogDebug("Found IR Laser!");
                     IRLaser = true;
                 }
             }
         }
+        static bool DebugFlash => SAINPlugin.LoadedPreset.GlobalSettings.Flashlight.DebugFlash;
 
         private bool CheckVisibleLaser(List<Transform> tacticalModes)
         {

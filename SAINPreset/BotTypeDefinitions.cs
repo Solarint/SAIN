@@ -59,31 +59,6 @@ namespace SAIN.BotPresets
             {
                 BotTypes.Add(BotTypesList[i].WildSpawnType, BotTypesList[i]);
             }
-            return;
-            string fileName = "Bot Types";
-            if (Load.LoadObject(out BotTypeClassWrapper wrapper, fileName))
-            {
-                Wrapper = wrapper;
-                foreach (BotType botType in BotTypes.Values)
-                {
-                    BotTypesList.Add(botType);
-                }
-            }
-            else
-            {
-                Wrapper = new BotTypeClassWrapper
-                {
-                    BotTypesList = CreateBotTypes(),
-                    BotTypes = new Dictionary<WildSpawnType, BotType>()
-                };
-
-                for (int i = 0; i < BotTypesList.Count; i++)
-                {
-                    BotTypes.Add(BotTypesList[i].WildSpawnType, BotTypesList[i]);
-                }
-
-                Save.SaveJson(Wrapper, fileName);
-            }
         }
 
         static List<BotType> CreateBotTypes()

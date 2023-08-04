@@ -3,7 +3,6 @@ using EFT;
 using SAIN.Components;
 using UnityEngine;
 using static SAIN.Helpers.HelpersGClass;
-using static SAIN.UserSettings.DazzleConfig;
 
 namespace SAIN.Helpers
 {
@@ -65,7 +64,7 @@ namespace SAIN.Helpers
 
                         float dazzlemodifier = 1f;
 
-                        if (enemyDist < MaxDazzleRange.Value)
+                        if (enemyDist < MaxDazzleRange)
                             dazzlemodifier = GetDazzleModifier(person);
 
                         ApplyDazzle(dazzlemodifier, gainSight);
@@ -92,7 +91,7 @@ namespace SAIN.Helpers
                         float gainSight = GetGainSightModifier(enemyDist);
 
                         float dazzlemodifier = 1f;
-                        if (enemyDist < MaxDazzleRange.Value)
+                        if (enemyDist < MaxDazzleRange)
                         {
                             dazzlemodifier = GetDazzleModifier(person);
                         }
@@ -103,12 +102,15 @@ namespace SAIN.Helpers
             }
         }
 
+        static float MaxDazzleRange => SAINPlugin.LoadedPreset.GlobalSettings.Flashlight.MaxDazzleRange;
+        static float Effectiveness => SAINPlugin.LoadedPreset.GlobalSettings.Flashlight.DazzleEffectiveness;
+
         private void ApplyDazzle(float dazzleModif, float gainSightModif)
         {
-            float PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value;
-            float AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness.Value;
-            float ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value;
-            float PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness.Value;
+            float PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness;
+            float AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness;
+            float ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness;
+            float PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness;
 
             BotStatModifiers Modifiers = new BotStatModifiers
                 (
@@ -168,7 +170,7 @@ namespace SAIN.Helpers
             Vector3 weaponRoot = person.WeaponRoot.position;
             float enemyDist = (position - weaponRoot).magnitude;
 
-            float dazzlemodifier = 1f - (enemyDist / MaxDazzleRange.Value);
+            float dazzlemodifier = 1f - (enemyDist / MaxDazzleRange);
             dazzlemodifier = (2 * dazzlemodifier) + 1f;
 
             if (BotOwner.NightVision.UsingNow)

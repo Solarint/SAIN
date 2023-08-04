@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using static SAIN.Editor.Sounds;
-using static SAIN.Editor.ConfigValues;
 using Colors = SAIN.Editor.Util.ColorsClass;
 using BepInEx.Configuration;
 using SAIN.BotPresets;
@@ -28,78 +27,6 @@ namespace SAIN.Editor
             Box("?", description, options);
         }
 
-        public bool ButtonConfigEntry(ConfigEntry<bool> entry)
-        {
-            InfoBox(entry.Description.Description);
-
-            Box(entry.Definition.Key, Width(200f));
-
-            Space(25);
-
-            entry.BoxedValue = CustomToggle((bool)entry.BoxedValue);
-
-            Space(25);
-
-            ResetButton(entry);
-
-            return entry.Value;
-        }
-
-        private const float ResetWidth = 60f;
-
-        public void ResetButton<T>(ConfigEntry<T> entry, float height)
-        {
-            if (Button("Reset", Width(ResetWidth), Height(height)))
-            {
-                MenuClickSound();
-                DefaultValue(entry);
-            }
-        }
-        public void ResetButton<T>(ConfigEntry<T> entry)
-        {
-            if (Button("Reset", Width(ResetWidth)))
-            {
-                MenuClickSound();
-                DefaultValue(entry);
-            }
-        }
-
-        public bool CustomToggle(bool value, string name = null, float? height = null, float? width = null)
-        {
-            bool oldValue = value;
-            name = name ?? ToggleOnOff(value);
-
-            if (width != null)
-            {
-                value = Toggle(value, name, Width(width.Value));
-            }
-            else
-            {
-                value = Toggle(value, name);
-            }
-            if (oldValue != value)
-            {
-                MenuClickSound();
-            }
-            return value;
-        }
-
-        public string ToggleOnOff(bool value)
-        {
-            return Toggle(value, "On", "Off");
-        }
-        public string ToggleSelected(bool value)
-        {
-            return Toggle(value, "Selected", " ");
-        }
-        public string ToggleEnabledDisabled(bool value)
-        {
-            return Toggle(value, "Enabled", "Disabled");
-        }
-        public string ToggleTrueFalse(bool value)
-        {
-            return Toggle(value, "True", "False");
-        }
         public string Toggle(bool value, string on, string off)
         {
             return value ? on : off;

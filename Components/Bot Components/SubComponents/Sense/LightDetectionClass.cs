@@ -5,7 +5,6 @@ using SAIN.Helpers;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.DazzleConfig;
 
 namespace SAIN.Components
 {
@@ -53,12 +52,14 @@ namespace SAIN.Components
                 PlayerPosition = player.Transform.position;
                 ExpirePlayerPoint(0.1f);
 
-                if (DebugFlash.Value)
+                if (DebugFlash)
                 {
                     DebugGizmos.SingleObjects.Sphere(hit.point, 0.1f, Color.red, true, 0.25f);
                 }
             }
         }
+
+        static bool DebugFlash => SAINPlugin.LoadedPreset.GlobalSettings.Flashlight.DebugFlash;
 
         public void DetectAndInvestigateFlashlight(Player player)
         {
@@ -125,7 +126,7 @@ namespace SAIN.Components
                     SetSearchTimer(1f);
                     SetRayCastTimer(1f);
 
-                    if (DebugFlash.Value)
+                    if (DebugFlash)
                         Logger.LogDebug($"Path Invalid");
                 }
                 else

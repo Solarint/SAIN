@@ -114,7 +114,7 @@ namespace SAIN.Classes
                     range *= 1.25f;
                 }
 
-                range *= SAIN.Info.FileSettings.Hearing.AudibleRangeMultiplier;
+                range *= SAIN.Info.FileSettings.Core.HearingSense;
 
                 range = Mathf.Round(range * 10f) / 10f;
 
@@ -262,7 +262,7 @@ namespace SAIN.Classes
         {
             //Modify the close hearing and far hearing variables
             float closehearing = 10f;
-            float farhearing = SAIN.Info.FileSettings.Hearing.AudibleRangeMultiplier;
+            float farhearing = SAIN.Info.FileSettings.Hearing.MaxFootstepAudioDistance;
 
             //Check if the Distance is less than or equal to the close hearing
             if (d <= closehearing)

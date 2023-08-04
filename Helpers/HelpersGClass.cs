@@ -19,14 +19,48 @@ namespace SAIN.Helpers
     {
         static HelpersGClass()
         {
-            _InventoryControllerProp = AccessTools.Property(typeof(Player), "GClass2659_0");
+            InventoryControllerProp = AccessTools.Property(typeof(Player), "GClass2659_0");
+            EFTBotSettingsProp = AccessTools.Property(typeof(BotDifficultySettingsClass), "FileSettings");
         }
 
-        static readonly PropertyInfo _InventoryControllerProp;
+        public static readonly PropertyInfo EFTBotSettingsProp;
+        public static readonly PropertyInfo InventoryControllerProp;
+
+        public static void SetBotSetting(string categoryName, string fieldName, object value, object FileSettings)
+        {
+            FieldInfo categoryField = EFTBotSettingsProp.PropertyType.GetField(categoryName);
+            if (categoryField == null)
+            {
+                object settingObject = categoryField.GetValue(FileSettings);
+                if (settingObject != null)
+                {
+                    FieldInfo settingField = AccessTools.Field(categoryField.FieldType, fieldName);
+                    settingField?.SetValue(settingObject, value);
+                }
+            }
+        }
+
+        public static object GetBotSetting(string categoryName, string fieldName, object FileSettings)
+        {
+            FieldInfo categoryField = EFTBotSettingsProp.PropertyType.GetField(categoryName);
+            if (categoryField == null)
+            {
+                object settingObject = categoryField.GetValue(FileSettings);
+                if (settingObject != null)
+                {
+                    FieldInfo settingField = AccessTools.Field(categoryField.FieldType, fieldName);
+                    return settingField?.GetValue(settingObject);
+                }
+            }
+            return null;
+        }
+
+
+        public static Type EFTBotSettingsType => EFTBotSettingsProp.PropertyType;
 
         public static InventoryControllerClass GetInventoryController(Player player)
         {
-            return (InventoryControllerClass)_InventoryControllerProp.GetValue(player);
+            return (InventoryControllerClass)InventoryControllerProp.GetValue(player);
         }
 
         public static void LoadSettings()
@@ -37,10 +71,10 @@ namespace SAIN.Helpers
         public static GClass570<BotDifficulty, WildSpawnType, GClass566> AllSettings => GClass564.AllSettings;
 
         public DateTime UTCNow => GClass1292.UtcNow;
-        public static GClass563 Core => GClass564.Core;
-        public static float LAY_DOWN_ANG_SHOOT => Core.LAY_DOWN_ANG_SHOOT;
-        public static float Gravity => Core.G;
-        public static float SMOKE_GRENADE_RADIUS_COEF => Core.SMOKE_GRENADE_RADIUS_COEF;
+        public static EFTCoreSettings EFTCore => SAINPlugin.LoadedPreset.GlobalSettings.EFTCoreSettings;
+        public static float LAY_DOWN_ANG_SHOOT => EFTCore.Core.LAY_DOWN_ANG_SHOOT;
+        public static float Gravity => EFTCore.Core.G;
+        public static float SMOKE_GRENADE_RADIUS_COEF => EFTCore.Core.SMOKE_GRENADE_RADIUS_COEF;
 
         public static GClass635 SoundPlayer => Singleton<GClass635>.Instance;
 

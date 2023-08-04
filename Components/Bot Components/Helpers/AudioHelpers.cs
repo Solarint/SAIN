@@ -3,7 +3,6 @@ using EFT;
 using EFT.InventoryLogic;
 using EFT.Weather;
 using UnityEngine;
-using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Helpers
 {
@@ -40,11 +39,11 @@ namespace SAIN.Helpers
 
             if (suppressed && subsonic)
             {
-                supmod *= SubsonicModifier.Value;
+                supmod *= SAINPlugin.LoadedPreset.GlobalSettings.Hearing.SubsonicModifier;
             }
             else if (suppressed)
             {
-                supmod *= SuppressorModifier.Value;
+                supmod *= SAINPlugin.LoadedPreset.GlobalSettings.Hearing.SuppressorModifier;
             }
 
             range *= supmod;

@@ -6,7 +6,6 @@ using SAIN.BotSettings;
 using SAIN.Components;
 using SAIN.SAINPreset.Personalities;
 using UnityEngine;
-using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {

@@ -3,7 +3,6 @@ using EFT;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {
@@ -25,7 +24,7 @@ namespace SAIN.Classes
         {
             if (SAIN == null) return;
 
-            if (!NoBushESPToggle.Value)
+            if (!SAINPlugin.LoadedPreset.GlobalSettings.General.NoBushESPToggle)
             {
                 NoBushESPActive = false;
                 return;

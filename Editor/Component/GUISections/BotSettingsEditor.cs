@@ -86,6 +86,6 @@ namespace SAIN.Editor.GUISections
         readonly GetAttributeValue.GUIEntryConfig EntryConfig = new GetAttributeValue.GUIEntryConfig();
         bool[] OpenCategories;
 
-        FieldInfo[] GetFields(Type type) => Editor.SAINSettingsCache.GetFields(type);
+        FieldInfo[] GetFields(Type type) => Editor.SAINBotSettingsCache.GetFields(type);
     }
 }

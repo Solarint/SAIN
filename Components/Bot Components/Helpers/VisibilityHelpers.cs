@@ -1,8 +1,6 @@
 ﻿using EFT.Weather;
 using System;
 using UnityEngine;
-using SAIN.UserSettings;
-
 namespace SAIN.Helpers
 {
     public class Modifiers

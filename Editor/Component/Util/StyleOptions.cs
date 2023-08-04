@@ -16,58 +16,10 @@ namespace SAIN.Editor
         public Font CustomFont { get; private set; }
         public CustomStyleClass CustomStyle { get; private set; }
 
-        public void ColorEditorMenu()
-        {
-            GUILayout.BeginVertical();
-            Red = Builder.HorizSlider("Red", Red, 0f, 1f, 100f);
-            Green = Builder.HorizSlider("Blue", Green, 0f, 1f, 100f);
-            Blue = Builder.HorizSlider("Blue", Blue, 0f, 1f, 100f);
-            Alpha = Builder.HorizSlider("Alpha", Alpha, 0f, 1f, 100f);
-
-            if (Button("Save"))
-            {
-                CreateColor(Red, Green, Blue, Alpha);
-            }
-            if (AvailableColors.Count > 0)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.FlexibleSpace();
-                int count = 0;
-                for (int i = 0; i < AvailableColors.Count; i++)
-                {
-                    count++;
-                    if (count == 2)
-                    {
-                        GUILayout.FlexibleSpace();
-                        GUILayout.EndHorizontal();
-                        GUILayout.BeginHorizontal();
-                        GUILayout.FlexibleSpace();
-                        count = 0;
-                    }
-                    Color color = AvailableColors[i];
-                    var texture = Helpers.Textures.ModifyTexture.CreateTextureWithBorder(2, 2, 0, color);
-                    GUIStyle style = new GUIStyle(GUI.skin.box);
-                    style.normal.background = texture;
-                    style.onNormal.background = texture;
-                    style.onHover.background = texture;
-                    style.hover.background = texture;
-                    GUILayout.Box(color.ToString(), style, GUILayout.Width(50));
-                }
-                GUILayout.FlexibleSpace();
-                GUILayout.EndHorizontal();
-            }
-            GUILayout.EndVertical();
-        }
-
         public GUIStyle GetFontStyleDynamic(Style key, bool active)
         {
             return CustomStyle.GetFontStyleDynamic(key, active);
         }
-
-        private static float Red = 0;
-        private static float Green = 0;
-        private static float Blue = 0;
-        private static float Alpha = 1f;
 
         public static void CreateColor(float r, float g, float b, float a = 1f)
         {

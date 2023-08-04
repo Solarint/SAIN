@@ -5,7 +5,6 @@ using SAIN.Components;
 using System.Linq;
 using UnityEngine;
 using static EFT.InventoryLogic.Weapon;
-using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Classes
 {

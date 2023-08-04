@@ -28,9 +28,9 @@ namespace SAIN.BotSettings
                 SAINSettings.Add(wildSpawnType, settings);
                 /*
                 string[] eftFolders = Folders(Preset.Name, "EFT");
-                if (!Load.LoadObject(out EFTBotSettings eftSettings, name, eftFolders))
+                if (!Load.LoadObject(out EFTBotSettingsEnum eftSettings, name, eftFolders))
                 {
-                    eftSettings = new EFTBotSettings(name, wildSpawnType, Difficulties);
+                    eftSettings = new EFTBotSettingsEnum(name, wildSpawnType, Difficulties);
                     Save.SaveJson(eftSettings, name, eftFolders);
                 }
 

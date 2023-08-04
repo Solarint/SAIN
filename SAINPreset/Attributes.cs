@@ -110,6 +110,10 @@ namespace SAIN.SAINPreset.Attributes
                 {
                     return value;
                 }
+                if (attributes.IsAdvanced && SAINPlugin.SAINEditor.AdvancedOptionsEnabled == false)
+                {
+                    return value;
+                }
                 if (entryConfig == null)
                 {
                     entryConfig = new GUIEntryConfig();
@@ -202,6 +206,7 @@ namespace SAIN.SAINPreset.Attributes
                 Max = field.GetCustomAttribute<MaximumAttribute>()?.Max;
                 Rounding = field.GetCustomAttribute<RoundingAttribute>()?.Rounding;
                 IsHidden = field.GetCustomAttribute<IsHiddenAttribute>()?.Value == true;
+                IsAdvanced = field.GetCustomAttribute<IsAdvancedAttribute>()?.Value == true;
             }
 
             public readonly string Name;
@@ -211,6 +216,7 @@ namespace SAIN.SAINPreset.Attributes
             public readonly float? Max;
             public readonly float? Rounding;
             public readonly bool IsHidden = false;
+            public readonly bool IsAdvanced = false;
         }
     }
 
@@ -282,6 +288,22 @@ namespace SAIN.SAINPreset.Attributes
     public sealed class IsHiddenAttribute : Attribute
     {
         public IsHiddenAttribute(bool value)
+        {
+            this.value = value;
+        }
+
+        public bool Value
+        {
+            get { return value; }
+        }
+
+        readonly bool value;
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class IsAdvancedAttribute : Attribute
+    {
+        public IsAdvancedAttribute(bool value)
         {
             this.value = value;
         }

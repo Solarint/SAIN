@@ -5,11 +5,9 @@ using SAIN.BotPresets;
 using SAIN.BotSettings;
 using SAIN.Components;
 using SAIN.Plugin;
-using SAIN.UserSettings;
 using System;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.Editor.EditorSettings;
 
 namespace SAIN.Patches.Vision
 {

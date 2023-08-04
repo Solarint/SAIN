@@ -3,7 +3,6 @@ using EFT;
 using SAIN.Classes;
 using UnityEngine;
 using UnityEngine.AI;
-using static SAIN.UserSettings.CoverConfig;
 
 namespace SAIN.Components
 {
@@ -134,6 +133,7 @@ namespace SAIN.Components
 
         private readonly NavMeshPath Path;
 
+        static bool DebugCoverFinder => SAINPlugin.LoadedPreset.GlobalSettings.Cover.DebugCoverFinder;
         private bool PathToEnemy(NavMeshPath path)
         {
             for (int i = 1; i < path.corners.Length - 1; i++)
@@ -145,7 +145,7 @@ namespace SAIN.Components
 
                 if (cornerToTarget.magnitude < 0.5f)
                 {
-                    if (DebugCoverFinder.Value)
+                    if (DebugCoverFinder)
                     {
                         //DebugGizmos.SingleObjects.Ray(OriginPoint, corner - OriginPoint, Color.red, (corner - OriginPoint).magnitude, 0.05f, true, 30f);
                     }
@@ -157,7 +157,7 @@ namespace SAIN.Components
                 {
                     if (Vector3.Dot(botToCorner.normalized, botToTarget.normalized) > 0.75f)
                     {
-                        if (DebugCoverFinder.Value)
+                        if (DebugCoverFinder)
                         {
                             //DebugGizmos.SingleObjects.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
                         }
@@ -173,7 +173,7 @@ namespace SAIN.Components
                     {
                         if (directionToNextCorner.magnitude > cornerToTarget.magnitude)
                         {
-                            if (DebugCoverFinder.Value)
+                            if (DebugCoverFinder)
                             {
                                 //DebugGizmos.SingleObjects.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
                             }

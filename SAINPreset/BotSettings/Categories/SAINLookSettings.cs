@@ -6,65 +6,42 @@ namespace SAIN.BotSettings.Categories
 {
     public class SAINLookSettings
     {
-        static void InitVision()
-        {
-            string name = "Max Visible Distance";
-            string desc = "The Maximum Vision Distance for this bot";
-            string section = "Vision";
-            float defaultVal = 150f;
-            float min = 50f;
-            float max = 500f;
-            float rounding = 1f;
-
-            name = "Visible Angle";
-            desc = "The Maximum Vision Cone for a bot";
-            section = "Vision";
-            defaultVal = 160f;
-            min = 45;
-            max = 180f;
-            rounding = 1f;
-
-            name = "Base Speed Multiplier";
-            desc = "The Base vision speed multiplier, affects all ranges to enemy. " +
+        [Name("Base Vision Speed Multiplier")]
+        [Description("The Base vision speed multiplier, affects all ranges to enemy. " +
                 "Bots will see this much faster, or slower, at any range. " +
-                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
-            section = "Vision";
-            defaultVal = 1f;
-            min = 0.25f;
-            max = 3f;
-            rounding = 100f;
-
-            name = "Close Multiplier";
-            desc = "Vision speed multiplier at close range. " +
-                "Bots will see this much faster, or slower, at close range. " +
-                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
-            section = "Vision";
-            defaultVal = 1f;
-            min = 0.25f;
-            max = 3f;
-            rounding = 100f;
-
-            name = "Far Multiplier";
-            desc = "Vision speed multiplier at Far range, the range is defined by (Close/Far Threshold Property). " +
-                "Bots will see this much faster, or slower, at Far range. " +
-                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy";
-            section = "Vision";
-            defaultVal = 1f;
-            min = 0.25f;
-            max = 3f;
-            rounding = 100f;
-
-            name = "Close/Far Threshold";
-            desc = "The Distance that defines what is close or far for the Close Speed and Far Speed properties.";
-            section = "Vision";
-            defaultVal = 50f;
-            min = 5f;
-            max = 100f;
-            rounding = 1f;
-        }
+                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy")]
+        [DefaultValue(1f)]
+        [Minimum(0.1f)]
+        [Maximum(3f)]
+        [Rounding(10)]
         public float VisionSpeedModifier = 1;
+
+        [Name("Far Vision Speed Multiplier")]
+        [Description("Vision speed multiplier at close range. " +
+                "Bots will see this much faster, or slower, at close range. " +
+                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy")]
+        [DefaultValue(1f)]
+        [Minimum(0.1f)]
+        [Maximum(3f)]
+        [Rounding(10)]
         public float CloseVisionSpeed = 1;
+
+        [Name("Far Vision Speed Multiplier")]
+        [Description("Vision speed multiplier at Far range, the range is defined by (Close/Far Threshold Property). " +
+                "Bots will see this much faster, or slower, at Far range. " +
+                "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy")]
+        [DefaultValue(1f)]
+        [Minimum(0.1f)]
+        [Maximum(3f)]
+        [Rounding(10)]
         public float FarVisionSpeed = 1;
+
+        [Name("Close/Far Threshold")]
+        [Description("The Distance that defines what is close or far for the Close Speed and Far Speed properties.")]
+        [DefaultValue(50)]
+        [Minimum(5)]
+        [Maximum(150)]
+        [Rounding(1)]
         public float CloseFarThresh = 50;
 
         [Name("Can Use Flashlights")]
@@ -73,6 +50,7 @@ namespace SAIN.BotSettings.Categories
 
         [Name("Full 360 Vision Cheat Vision")]
         [DefaultValue(false)]
+        [IsAdvanced(true)]
         public bool FULL_SECTOR_VIEW = false;
 
         [Name("Vision Speed Distance Clamp")]
@@ -81,6 +59,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(50)]
         [Maximum(500f)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float MAX_DIST_CLAMP_TO_SEEN_SPEED = 500f;
 
         [Name("NightVision On Distance")]
@@ -89,6 +68,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10f)]
         [Maximum(250f)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float NIGHT_VISION_ON = 75f;
 
         [Name("NightVision Off Distance")]
@@ -97,6 +77,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10f)]
         [Maximum(250f)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float NIGHT_VISION_OFF = 125f;
 
         [Name("NightVision Visible Distance")]
@@ -105,6 +86,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10f)]
         [Maximum(250f)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float NIGHT_VISION_DIST = 125f;
 
         [Name("NightVision Visible Angle")]
@@ -113,10 +95,12 @@ namespace SAIN.BotSettings.Categories
         [Minimum(25)]
         [Maximum(180)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float VISIBLE_ANG_NIGHTVISION = 90f;
 
         [IsHidden(true)]
         [DefaultValue(0.0f)]
+        [IsAdvanced(true)]
         public float LOOK_THROUGH_PERIOD_BY_HIT = 0f;
 
         [Name("FlashLight On Distance")]
@@ -125,6 +109,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10)]
         [Maximum(180)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float LightOnVisionDistance = 40f;
 
         [Name("FlashLight Visible Angle")]
@@ -133,6 +118,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10)]
         [Maximum(180)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float VISIBLE_ANG_LIGHT = 30f;
 
         [Name("FlashLight Visible Distance")]
@@ -141,6 +127,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10)]
         [Maximum(180)]
         [Rounding(1)]
+        [IsAdvanced(true)]
         public float VISIBLE_DISNACE_WITH_LIGHT = 50f;
 
         [Name("Lose Vision Ability Time")]
@@ -149,6 +136,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(0.01f)]
         [Maximum(3f)]
         [Rounding(100)]
+        [IsAdvanced(true)]
         public float GOAL_TO_FULL_DISSAPEAR = 0.25f;
 
         [Name("Lose Vision Ability Foliage Time")]
@@ -157,6 +145,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(0.01f)]
         [Maximum(3f)]
         [Rounding(100)]
+        [IsAdvanced(true)]
         public float GOAL_TO_FULL_DISSAPEAR_GREEN = 0.15f;
 
         [Name("Lose Shoot Ability Time")]
@@ -165,6 +154,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(0.01f)]
         [Maximum(3f)]
         [Rounding(100)]
+        [IsAdvanced(true)]
         public float GOAL_TO_FULL_DISSAPEAR_SHOOT = 0.01f;
 
         [Name("Lose Shoot Ability Time")]
@@ -173,18 +163,22 @@ namespace SAIN.BotSettings.Categories
         [Minimum(0.0f)]
         [Maximum(1f)]
         [Rounding(100)]
+        [IsAdvanced(true)]
         public float MAX_VISION_GRASS_METERS = 1f;
 
         [DefaultValue(1f)]
         [IsHidden(true)]
+        [IsAdvanced(true)]
         public float MAX_VISION_GRASS_METERS_OPT = 1f;
 
         [DefaultValue(4f)]
         [IsHidden(true)]
+        [IsAdvanced(true)]
         public float MAX_VISION_GRASS_METERS_FLARE = 4f;
 
         [DefaultValue(0.25f)]
         [IsHidden(true)]
+        [IsAdvanced(true)]
         public float MAX_VISION_GRASS_METERS_FLARE_OPT = 0.25f;
 
         [Name("Vision Distance No Foliage")]
@@ -193,6 +187,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10f)]
         [Maximum(1f)]
         [Rounding(10)]
+        [IsAdvanced(true)]
         public float NO_GREEN_DIST = 3f;
 
         [Name("Vision Distance No Grass")]
@@ -201,6 +196,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(10f)]
         [Maximum(1f)]
         [Rounding(10)]
+        [IsAdvanced(true)]
         public float NO_GRASS_DIST = 3f;
     }
 }

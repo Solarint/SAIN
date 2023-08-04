@@ -339,12 +339,9 @@
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverFinderComponent.cs" />
     <Compile Include="Editor\Util\AssignConfig.cs" />
-    <Compile Include="Plugin\Config\EditorSettings.cs" />
     <Compile Include="Editor\Component\Util\BuilderClass.cs" />
     <Compile Include="Editor\Component\Util\RectLayout.cs" />
     <Compile Include="Editor\Component\Util\StyleOptions.cs" />
-    <Compile Include="Plugin\Config\ConfigAbstract.cs" />
-    <Compile Include="Plugin\Config\DazzleConfig.cs" />
     <Compile Include="Components\Bot Components\Helpers\AudioHelpers.cs" />
     <Compile Include="Components\Bot Components\Helpers\CoverPointHelpers.cs" />
     <Compile Include="Helpers\DebugGizmos.cs" />
@@ -387,7 +384,6 @@
     <Compile Include="Plugin\Patches\Shoot\GrenadeSound.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Grenade\BotGrenadeClass.cs" />
     <Compile Include="Components\Bot Components\SAINComponent.cs" />
-    <Compile Include="Plugin\Config\CoverConfig.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\SAINSolo.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\ShootAction.cs" />
     <Compile Include="Components\Bot Components\SubComponents\SteeringClass.cs" />
