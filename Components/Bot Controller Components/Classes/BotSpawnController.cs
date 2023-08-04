@@ -1,6 +1,9 @@
 ﻿using EFT;
+using SAIN.Classes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace SAIN.Components.BotController
 {
@@ -10,6 +13,12 @@ namespace SAIN.Components.BotController
 
         public Dictionary<string, SAINComponent> SAINBotDictionary = new Dictionary<string, SAINComponent>();
         private BotSpawnerClass BotSpawnerClass => BotController?.BotSpawnerClass;
+
+        private static readonly WildSpawnType[] ExclusionList =
+        {
+            WildSpawnType.bossZryachiy,
+            WildSpawnType.followerZryachiy
+        };
 
         public void Update()
         {
@@ -42,22 +51,38 @@ namespace SAIN.Components.BotController
         {
             try
             {
-                if (bot != null && bot.GetPlayer != null)
+                if (bot != null)
                 {
-                    var role = bot.Profile.Info.Settings.Role;
-                    if (role == WildSpawnType.bossZryachiy || role == WildSpawnType.followerZryachiy)
+                    var settings = bot.Profile?.Info?.Settings;
+                    if (settings == null)
                     {
                         return;
                     }
-                    string profileId = bot.ProfileId;
-                    if (!SAINBotDictionary.ContainsKey(profileId))
+
+                    bot.LeaveData.OnLeave += RemoveBot;
+                    var role = settings.Role;
+                    if (ExclusionList.Contains(role))
                     {
-                        bot.LeaveData.OnLeave += RemoveBot;
-                        SAINBotDictionary.Add(profileId, bot.GetOrAddComponent<SAINComponent>());
+                        bot.GetOrAddComponent<NoBushESP>().Init(bot);
+                        return;
+                    }
+
+                    SAINComponent component = SAINComponentHandler.AddComponent(bot);
+                    if (component != null)
+                    {
+                        string profileId = bot.ProfileId;
+                        if (!SAINBotDictionary.ContainsKey(profileId))
+                        {
+                            SAINBotDictionary.Add(profileId, component);
+                        }
+                        else
+                        {
+                            Logger.LogError("bot is already in dictionary. cannot add components");
+                        }
                     }
                     else
                     {
-                        Logger.LogError("bot is already in dictionary. cannot add components");
+                        Logger.LogError("Component could not be attached. Aborting");
                     }
                 }
                 else
@@ -81,6 +106,10 @@ namespace SAIN.Components.BotController
                     if (bot.TryGetComponent<SAINComponent>(out var component))
                     {
                         component.Dispose();
+                    }
+                    if (bot.TryGetComponent<NoBushESP>(out var noBush))
+                    {
+                        UnityEngine.Object.Destroy(noBush);
                     }
                 }
                 else

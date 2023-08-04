@@ -46,17 +46,16 @@ namespace SAIN.Components
     {
         public bool Init(Player player, BotOwner botOwner)
         {
-            if (InitClassesAndComponents(botOwner, player))
+            Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component [{botOwner?.name}]");
+            Player = player;
+            BotOwner = botOwner;
+            bool initSuccess = InitClassesAndComponents();
+            if (initSuccess == false)
             {
-                Player = player;
-                BotOwner = botOwner;
-                return true;
-            }
-            else
-            {
+                Logger.LogError("Init SAIN ERROR, disposing.");
                 Dispose();
-                return false;
             }
+            return initSuccess;
         }
 
         private T AddComponent<T>() where T : Component
@@ -64,7 +63,7 @@ namespace SAIN.Components
             return this.GetOrAddComponent<T>();
         }
 
-        private bool InitClassesAndComponents(BotOwner botOwner, Player player)
+        private bool InitClassesAndComponents()
         {
             // Must be first, other classes use it
             Squad = AddComponent<SquadClass>();
@@ -88,7 +87,7 @@ namespace SAIN.Components
             Cover = AddComponent<CoverClass>();
             if (Cover == null) return false;
 
-            FlashLight = player.gameObject?.AddComponent<FlashLightComponent>();
+            FlashLight = Player?.gameObject?.AddComponent<FlashLightComponent>();
             if (FlashLight == null) return false;
 
             SelfActions = AddComponent<SelfActionClass>();
@@ -105,6 +104,7 @@ namespace SAIN.Components
 
             NoBushESP = AddComponent<NoBushESP>();
             if (NoBushESP == null) return false;
+            NoBushESP.Init(BotOwner, this);
 
             EnemyController = AddComponent<EnemyController>();
             if (EnemyController == null) return false;
@@ -114,8 +114,6 @@ namespace SAIN.Components
 
             FriendlyFireClass = new FriendlyFireClass(this);
             Vision = new VisionClass(this);
-            Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component [{botOwner?.name}]");
-
             return true;
         }
 
