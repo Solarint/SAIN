@@ -48,6 +48,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(1f)]
         [Maximum(5f)]
         [Rounding(10)]
+        [UseEFTBotDefault(true)]
         public float AUTOMATIC_FIRE_SCATTERING_COEF = 1.5f;
 
         [DefaultValue(0.5f)]
@@ -55,6 +56,7 @@ namespace SAIN.BotSettings.Categories
         [Maximum(2f)]
         [Rounding(10)]
         [IsAdvanced(true)]
+        [UseEFTBotDefault(true)]
         public float BASE_AUTOMATIC_TIME = 0.5f;
 
         [IsHidden(true)]

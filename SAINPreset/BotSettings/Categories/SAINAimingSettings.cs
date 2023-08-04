@@ -43,6 +43,7 @@ namespace SAIN.BotSettings.Categories
         [Maximum(0.95f)]
         [Rounding(100)]
         [IsAdvanced(true)]
+        [UseEFTBotDefault(true)]
         public float MAX_AIMING_UPGRADE_BY_TIME = 0.8f;
 
         [Name("Max Aim Time")]
@@ -52,6 +53,7 @@ namespace SAIN.BotSettings.Categories
         [Maximum(5f)]
         [Rounding(10)]
         [IsAdvanced(true)]
+        [UseEFTBotDefault(true)]
         public float MAX_AIM_TIME = 2f;
 
         [Name("Aim Type")]

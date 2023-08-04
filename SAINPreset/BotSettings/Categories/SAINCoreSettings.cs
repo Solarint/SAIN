@@ -18,6 +18,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(50f)]
         [Maximum(500f)]
         [Rounding(1)]
+        [UseEFTBotDefault(true)]
         public float VisibleDistance = 150f;
 
         [DefaultValue(0.2f)]
@@ -25,6 +26,7 @@ namespace SAIN.BotSettings.Categories
         [Maximum(0.95f)]
         [Rounding(100)]
         [IsAdvanced(true)]
+        [UseEFTBotDefault(true)]
         public float GainSightCoef = 0.2f;
 
         [DefaultValue(0.08f)]
@@ -32,6 +34,7 @@ namespace SAIN.BotSettings.Categories
         [Maximum(0.5f)]
         [Rounding(100)]
         [IsAdvanced(true)]
+        [UseEFTBotDefault(true)]
         public float ScatteringPerMeter = 0.08f;
 
         [DefaultValue(0.12f)]
@@ -39,6 +42,7 @@ namespace SAIN.BotSettings.Categories
         [Maximum(0.5f)]
         [Rounding(100)]
         [IsAdvanced(true)]
+        [UseEFTBotDefault(true)]
         public float ScatteringClosePerMeter = 0.12f;
 
         [DefaultValue(1.2f)]
@@ -46,6 +50,7 @@ namespace SAIN.BotSettings.Categories
         [Maximum(2f)]
         [Rounding(100)]
         [IsAdvanced(true)]
+        [UseEFTBotDefault(true)]
         public float DamageCoeff = 1.2f;
 
         [Name("Audible Range Multiplier")]
@@ -54,6 +59,7 @@ namespace SAIN.BotSettings.Categories
         [Minimum(0.1f)]
         [Maximum(3f)]
         [Rounding(100)]
+        [UseEFTBotDefault(true)]
         public float HearingSense = 1f;
 
         [DefaultValue(true)]

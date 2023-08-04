@@ -315,4 +315,20 @@ namespace SAIN.SAINPreset.Attributes
 
         readonly bool value;
     }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public sealed class UseEFTBotDefaultAttribute : Attribute
+    {
+        public UseEFTBotDefaultAttribute(bool value)
+        {
+            this.value = value;
+        }
+
+        public bool Value
+        {
+            get { return value; }
+        }
+
+        readonly bool value;
+    }
 }

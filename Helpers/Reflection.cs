@@ -10,6 +10,30 @@ namespace SAIN.Helpers
 {
     internal class Reflection
     {
+        public static PropertyInfo EFTFileSettings = AccessTools.Property(typeof(BotDifficultySettingsClass), "FileSettings");
+        public static FieldInfo[] EFTSettingsCategories => GetFieldsInType(EFTFileSettings.PropertyType);
+        public static FieldInfo[] SAINSettingsCategories => GetFieldsInType<SAINSettings>();
+
+        public static FieldInfo[] GetFieldsInType<T>(BindingFlags flags = BindingFlags.Instance | BindingFlags.Public) where T : class
+        {
+            return typeof(T).GetFields(flags);
+        }
+        public static FieldInfo[] GetFieldsInType(Type type, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public)
+        {
+            return type.GetFields(flags);
+        }
+
+        public static FieldInfo FindFieldByName(string name, FieldInfo[] fields)
+        {
+            foreach (FieldInfo field in fields)
+            {
+                if (field.Name == name)
+                {
+                    return field;
+                }
+            }
+            return null;
+        }
         public static T GetValue<T>(object obj, FieldInfo field)
         {
             return (T)field.GetValue(obj);

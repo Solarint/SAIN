@@ -11,6 +11,7 @@ using UnityEngine;
 using System;
 using Random = UnityEngine.Random;
 using System.Collections;
+using SAIN.Helpers;
 
 namespace SAIN.Classes
 {
@@ -31,7 +32,7 @@ namespace SAIN.Classes
 
         public void GetFileSettings()
         {
-            FileSettings = SAINPlugin.LoadedPreset.BotSettings.Get(WildSpawnType, BotDifficulty);
+            FileSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(WildSpawnType, BotDifficulty);
             SAIN.StartCoroutine(SetConfigValuesCoroutine(FileSettings));
         }
 
@@ -68,7 +69,7 @@ namespace SAIN.Classes
 
             foreach (FieldInfo sainCategoryField in SAINSettingsCategories)
             {
-                FieldInfo eftCategoryField = FindFieldByName(sainCategoryField.Name, EFTSettingsCategories);
+                FieldInfo eftCategoryField = Reflection.FindFieldByName(sainCategoryField.Name, EFTSettingsCategories);
                 if (eftCategoryField != null)
                 {
                     object sainCategory = sainCategoryField.GetValue(sainFileSettings);
@@ -78,7 +79,7 @@ namespace SAIN.Classes
                     FieldInfo[] eftFields = EFTSettingsFields[eftCategoryField];
                     foreach (FieldInfo sainVarField in sainFields)
                     {
-                        FieldInfo eftVarField = FindFieldByName(sainVarField.Name, eftFields);
+                        FieldInfo eftVarField = Reflection.FindFieldByName(sainVarField.Name, eftFields);
                         if (eftVarField != null)
                         {
                             object sainValue = sainVarField.GetValue(sainCategory);
@@ -90,18 +91,6 @@ namespace SAIN.Classes
             }
 
             CalculateSettings();
-        }
-
-        static FieldInfo FindFieldByName(string name, FieldInfo[] fields)
-        {
-            foreach (FieldInfo field in fields)
-            {
-                if (field.Name == name)
-                {
-                    return field;
-                }
-            }
-            return null;
         }
 
         public SAINSettings FileSettings { get; private set; }

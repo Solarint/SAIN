@@ -165,8 +165,8 @@ namespace SAIN.Helpers
             }
         }
 
-        public readonly string Name;
-        public readonly WildSpawnType WildSpawnType;
-        public readonly Dictionary<BotDifficulty, GClass566> Settings = new Dictionary<BotDifficulty, GClass566>();
+        public string Name;
+        public WildSpawnType WildSpawnType;
+        public Dictionary<BotDifficulty, GClass566> Settings = new Dictionary<BotDifficulty, GClass566>();
     }
 }
