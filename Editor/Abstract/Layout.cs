@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using SAIN.Editor.Util;
-using BepInEx;
 
 namespace SAIN.Editor.Abstract
 {
@@ -67,6 +65,7 @@ namespace SAIN.Editor.Abstract
         {
             Label(new GUIContent(text, tooltip), GetStyle(Style.label), options);
         }
+
         public void Label(GUIContent content, params GUILayoutOption[] options)
         {
             Label(content, GetStyle(Style.label), options);
@@ -160,22 +159,27 @@ namespace SAIN.Editor.Abstract
         {
             GUILayout.BeginHorizontal();
         }
+
         public void EndHorizontal()
         {
             GUILayout.EndHorizontal();
         }
+
         public void BeginVertical()
         {
             GUILayout.BeginVertical();
         }
+
         public void EndVertical()
         {
             GUILayout.EndVertical();
         }
+
         public void BeginArea(Rect rect)
         {
             GUILayout.BeginArea(rect);
         }
+
         public void EndArea()
         {
             GUILayout.EndArea();
@@ -200,6 +204,7 @@ namespace SAIN.Editor.Abstract
         {
             return GUILayout.ExpandHeight(value);
         }
+
         public GUILayoutOption ExpandWidth(bool value)
         {
             return GUILayout.ExpandWidth(value);
@@ -214,14 +219,17 @@ namespace SAIN.Editor.Abstract
         {
             return GUILayout.BeginScrollView(scrollPos, GetStyle(Style.scrollView));
         }
+
         public Vector2 BeginScrollView(Rect rect, Vector2 scrollPos, Rect viewRect)
         {
             return GUI.BeginScrollView(rect, scrollPos, viewRect, GetStyle(Style.horizontalScrollbar), GetStyle(Style.verticalScrollbar));
         }
+
         public void EndScrollView()
         {
             GUILayout.EndScrollView();
         }
+
         public void EndScrollView(bool handleScrollWheel)
         {
             GUI.EndScrollView(handleScrollWheel);
@@ -241,6 +249,7 @@ namespace SAIN.Editor.Abstract
         {
             return GUILayout.Height(height);
         }
+
         public GUILayoutOption Width(float width)
         {
             return GUILayout.Width(width);

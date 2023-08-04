@@ -1,33 +1,32 @@
-﻿using BepInEx.Configuration;
-using UnityEngine;
-using static SAIN.Editor.StyleOptions;
-using SAIN.BotPresets;
-using System.Collections.Generic;
-using SAIN.Editor.Abstract;
+﻿using SAIN.Editor.Abstract;
 using SAIN.Editor.Util;
-using System;
-using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SAIN.Editor
 {
     public class BuilderClass : EditorAbstract
     {
-        public BuilderClass(SAINEditor editor) : base(editor) { }
+        public BuilderClass(SAINEditor editor) : base(editor)
+        {
+        }
 
         private static float ExpandMenuWidth => 150f;
 
-        CustomStyleClass CustomStyle => Editor.StyleOptions.CustomStyle;
+        private CustomStyleClass CustomStyle => Editor.StyleOptions.CustomStyle;
 
         public void MinValueBox(object value, params GUILayoutOption[] options)
         {
-            if (value  == null) return;
+            if (value == null) return;
             Box(value.ToString(), "Minimum", options);
         }
+
         public void MaxValueBox(object value, params GUILayoutOption[] options)
         {
             if (value == null) return;
             Box(value.ToString(), "Maximum", options);
         }
+
         public void ResultBox(object value, params GUILayoutOption[] options)
         {
             if (value == null) return;
@@ -69,7 +68,7 @@ namespace SAIN.Editor
             return selectedOption;
         }
 
-        GUIStyle StyleHandler(bool selected, bool hovering)
+        private GUIStyle StyleHandler(bool selected, bool hovering)
         {
             var style = CustomStyle.GetFontStyleDynamic(Style.selectionGrid, selected);
             Texture2D texture;
@@ -242,6 +241,7 @@ namespace SAIN.Editor
             Backgrounds(value, min, max);
             return value;
         }
+
         public float CreateSlider(float value, float min, float max, params GUILayoutOption[] options)
         {
             value = HorizontalSlider(value, min, max, options);
@@ -249,7 +249,7 @@ namespace SAIN.Editor
             return value;
         }
 
-        void Backgrounds(float value, float min, float max)
+        private void Backgrounds(float value, float min, float max)
         {
             float progress = (value - min) / (max - min);
             TexturesClass.DrawSliderBackGrounds(progress);

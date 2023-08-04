@@ -1,8 +1,4 @@
-﻿using Aki.Reflection.Utils;
-using EFT.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Reflection;
 using UnityEngine;
 
@@ -40,6 +36,7 @@ namespace SAIN.Editor
                 }
             }
         }
+
         public static void InitCursor()
         {
             // Use reflection to keep compatibility with unity 4.x since it doesn't have Cursor

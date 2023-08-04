@@ -282,23 +282,20 @@
     <Compile Include="Components\Bot Components\SubComponents\HeardSoundsComponent.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotExtractManager.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\BotSpawnController.cs" />
-    <Compile Include="Editor\Component\GUISections\BotPersonalityEditor.cs" />
-    <Compile Include="Editor\Component\GUISections\BotSettingsEditor.cs" />
-    <Compile Include="Editor\Component\GUISections\WindowLayoutCreator.cs" />
-    <Compile Include="Editor\Component\Names.cs" />
-    <Compile Include="Editor\Component\Util\ApplyToStyle.cs" />
-    <Compile Include="Editor\Component\Util\ColorsClass.cs" />
-    <Compile Include="Editor\Component\Abstract\EditorAbstract.cs" />
-    <Compile Include="Editor\Component\SAINEditor.cs" />
-    <Compile Include="Editor\Component\TexturesClass.cs" />
-    <Compile Include="Editor\Component\Abstract\Layout.cs" />
-    <Compile Include="Editor\Component\Util\MouseFunctions.cs" />
-    <Compile Include="Editor\Component\GUISections\FontEditMenu.cs" />
-    <Compile Include="Editor\Component\Util\ButtonsClass.cs" />
+    <Compile Include="Editor\GUISections\BotPersonalityEditor.cs" />
+    <Compile Include="Editor\GUISections\BotSettingsEditor.cs" />
+    <Compile Include="Editor\GUISections\WindowLayoutCreator.cs" />
+    <Compile Include="Editor\Util\EditorEnum.cs" />
+    <Compile Include="Editor\Util\ApplyToStyle.cs" />
+    <Compile Include="Editor\Util\ColorsClass.cs" />
+    <Compile Include="Editor\Abstract\EditorAbstract.cs" />
+    <Compile Include="Editor\SAINEditor.cs" />
+    <Compile Include="Editor\Util\TexturesClass.cs" />
+    <Compile Include="Editor\Abstract\Layout.cs" />
+    <Compile Include="Editor\Util\MouseFunctions.cs" />
+    <Compile Include="Editor\Util\ButtonsClass.cs" />
     <Compile Include="Editor\Util\CursorSettings.cs" />
-    <Compile Include="Editor\Component\GUISections\PresetEditor.cs" />
-    <Compile Include="Editor\Util\Fonts.cs" />
-    <Compile Include="Editor\Util\InputField.cs" />
+    <Compile Include="Editor\GUISections\PresetEditor.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
     <Compile Include="Helpers\EFTInfo.cs" />
     <Compile Include="Helpers\SAINDictionary.cs" />
@@ -338,10 +335,9 @@
     <Compile Include="Components\Bot Components\SubComponents\Talk\SquadLeaderClass.cs" />
     <Compile Include="Components\Bot Controller Components\Classes\CoverManager.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\CoverFinderComponent.cs" />
-    <Compile Include="Editor\Util\AssignConfig.cs" />
-    <Compile Include="Editor\Component\Util\BuilderClass.cs" />
-    <Compile Include="Editor\Component\Util\RectLayout.cs" />
-    <Compile Include="Editor\Component\Util\StyleOptions.cs" />
+    <Compile Include="Editor\Util\BuilderClass.cs" />
+    <Compile Include="Editor\Util\RectLayout.cs" />
+    <Compile Include="Editor\Util\StyleOptions.cs" />
     <Compile Include="Components\Bot Components\Helpers\AudioHelpers.cs" />
     <Compile Include="Components\Bot Components\Helpers\CoverPointHelpers.cs" />
     <Compile Include="Helpers\DebugGizmos.cs" />
@@ -407,9 +403,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Editor\Component\Layout\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />

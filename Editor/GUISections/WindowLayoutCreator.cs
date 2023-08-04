@@ -1,10 +1,4 @@
 ﻿using SAIN.Editor.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SAIN.Editor.GUISections
@@ -48,9 +42,9 @@ namespace SAIN.Editor.GUISections
         public bool FinishedAnimation { get; private set; } = false;
         private float GraduationSteps = 40f;
 
-        readonly Rect[] Windows;
+        private readonly Rect[] Windows;
 
-        static float WindowYStart = 100f;
+        private static float WindowYStart = 100f;
         public float FinalWindowWidth => RectLayout.MainWindow.width;
         public float FinalWindowHeight { get; private set; } = 400f;
 

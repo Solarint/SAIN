@@ -29,22 +29,49 @@ namespace SAIN
 
         public static void Init()
         {
-            CombineBigBrainLists();
+            string PMCRaider = "PMC";
+            string Cultist = "SectantWarrior";
+            string GoonsKnight = "Knight";
+            string Rogue = "ExUsec";
+            var Scavs = new List<string> 
+            { 
+                "Assault", 
+                "CursAssault" 
+            };
+            var GoonsFollowers = new List<string> 
+            { 
+                "BigPipe", 
+                "BirdEye" 
+            };
+            var TagillaKilla = new List<string> 
+            { 
+                "Tagilla", 
+                "Killa" 
+            };
+            var NormalBosses = new List<string> 
+            { 
+                "BossBully",
+                "BossSanitar", 
+                "Tagilla", 
+                "BossGluhar", 
+                "BossKojaniy", 
+                "SectantPriest" 
+            };
+            var NormalFollowers = new List<string> 
+            { 
+                "FollowerBully", 
+                "FollowerSanitar", 
+                "TagillaFollower", 
+                "FollowerGluharAssault", 
+                "FollowerGluharProtect", 
+                "FollowerGluharScout" 
+            };
 
-            BrainManager.AddCustomLayer(typeof(SAINSquad), AllBots, 24);
-            SAINLayers.Add(SAINSquad.Name);
+            var AllBots = new List<string>();
+            var AllBosses = new List<string>();
+            var AllFollowers = new List<string>();
+            var AllNormalBots = new List<string>();
 
-            BrainManager.AddCustomLayer(typeof(SAINExtractLayer), AllBots, 22);
-            SAINLayers.Add(SAINExtractLayer.Name);
-
-            BrainManager.AddCustomLayer(typeof(SAINSolo), AllBots, 20);
-            SAINLayers.Add(SAINSolo.Name);
-
-            BrainManager.RemoveLayers(LayersToRemove, new List<string>(AllBots));
-        }
-
-        private static void CombineBigBrainLists()
-        {
             AllNormalBots.AddRange(Scavs);
             AllNormalBots.Add(PMCRaider);
             AllNormalBots.Add(Rogue);
@@ -59,26 +86,28 @@ namespace SAIN
 
             AllBots.AddRange(AllNormalBots);
             AllBots.AddRange(AllFollowers);
-            AllBots.AddRange(AllBosses);
+
+            BrainManager.AddCustomLayer(typeof(SAINSquad), AllBots, 24);
+            SAINLayers.Add(SAINSquad.Name);
+
+            BrainManager.AddCustomLayer(typeof(SAINExtractLayer), AllBots, 22);
+            SAINLayers.Add(SAINExtractLayer.Name);
+
+            BrainManager.AddCustomLayer(typeof(SAINSolo), AllBots, 20);
+            SAINLayers.Add(SAINSolo.Name);
+
+            var LayersToRemove = new List<string> 
+            { 
+                "Help", 
+                "AdvAssaultTarget", 
+                "Hit", 
+                "Pmc", 
+                "AssaultHaveEnemy", 
+                "Request" 
+            };
+            BrainManager.RemoveLayers(LayersToRemove, AllBots);
         }
 
-        public static string PMCRaider = "PMC";
-        public static string Cultist = "SectantWarrior";
-        public static string GoonsKnight = "Knight";
-        public static string Rogue = "ExUsec";
-
-        public static List<string> Scavs = new List<string> { "Assault", "CursAssault" };
-        public static List<string> GoonsFollowers = new List<string> { "BigPipe", "BirdEye" };
-        public static List<string> TagillaKilla = new List<string> { "Tagilla", "Killa" };
-        public static List<string> NormalBosses = new List<string> { "BossBully", "BossSanitar", "Tagilla", "BossGluhar", "BossKojaniy", "SectantPriest" };
-        public static List<string> NormalFollowers = new List<string> { "FollowerBully", "FollowerSanitar", "TagillaFollower", "FollowerGluharAssault", "FollowerGluharProtect", "FollowerGluharScout" };
-
-        public static List<string> AllBots = new List<string>();
-        public static List<string> AllBosses = new List<string>();
-        public static List<string> AllFollowers = new List<string>();
-        public static List<string> AllNormalBots = new List<string>();
-
         public static List<string> SAINLayers { get; private set; } = new List<string>();
-        public static List<string> LayersToRemove = new List<string> { "Help", "AdvAssaultTarget", "Hit", "Pmc", "AssaultHaveEnemy", "Request" };
     }
 }

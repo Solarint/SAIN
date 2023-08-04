@@ -1,8 +1,6 @@
-﻿using UnityEngine;
-using System.IO;
+﻿using SAIN.Editor.Abstract;
 using System.Collections.Generic;
-using SAIN.Helpers.Textures;
-using SAIN.Editor.Abstract;
+using UnityEngine;
 
 namespace SAIN.Editor
 {

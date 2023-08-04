@@ -1,6 +1,5 @@
 ﻿using SAIN.BotPresets;
 using SAIN.Editor.Abstract;
-using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.SAINPreset;
 using System.Collections.Generic;
@@ -44,7 +43,7 @@ namespace SAIN.Editor
 
         private float RecheckOptionsTimer;
 
-        void LoadPresetOptions(bool refresh = false)
+        private void LoadPresetOptions(bool refresh = false)
         {
             if (RecheckOptionsTimer < Time.time || refresh)
             {
@@ -166,7 +165,7 @@ namespace SAIN.Editor
             }
         }
 
-        bool OpenAdvanced = false;
+        private bool OpenAdvanced = false;
         private bool OpenFirstMenu = false;
         private bool OpenPropEdit = false;
         private Rect PresetWindow;

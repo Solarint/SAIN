@@ -1,21 +1,18 @@
-﻿using BepInEx.Configuration;
+﻿using BepInEx;
 using Comfort.Common;
+using EFT;
 using EFT.Console.Core;
 using EFT.UI;
-using UnityEngine;
-using System;
+using SAIN.BotSettings;
 using SAIN.BotSettings.Categories;
-using static SAIN.Editor.RectLayout;
-using static SAIN.Editor.Sounds;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
-using ColorsClass = SAIN.Editor.Util.ColorsClass;
-using EFT;
-using System.Reflection;
-using BepInEx;
-using SAIN.BotSettings;
-using static SAIN.Helpers.Reflection;
 using SAIN.SAINPreset.GlobalSettings;
+using System;
+using UnityEngine;
+using static SAIN.Editor.RectLayout;
+using static SAIN.Editor.Sounds;
+using ColorsClass = SAIN.Editor.Util.ColorsClass;
 
 namespace SAIN.Editor
 {
@@ -150,7 +147,6 @@ namespace SAIN.Editor
                     Inited = true;
 
                     TexturesClass.Init();
-                    Fonts.Init();
                     DragBackgroundTexture = TexturesClass.GetColor(ColorNames.MidGray);
                     TooltipBg = TexturesClass.GetColor(ColorNames.VeryDarkGray);
                     OpenTabRect = new Rect(0, 85, MainWindow.width, 1000f);
@@ -195,8 +191,8 @@ namespace SAIN.Editor
 
         private static bool Inited = false;
 
-        float TabMenuHeight = 50f;
-        float TabMenuVerticalMargin = 5f;
+        private float TabMenuHeight = 50f;
+        private float TabMenuVerticalMargin = 5f;
 
         private void CreateNewTabMenuRects()
         {
@@ -214,9 +210,9 @@ namespace SAIN.Editor
             OpenTab = Builder.SelectionGridExpandHeight(TabMenuRect, Tabs, OpenTab, TabRects, minHeight, speed, closeSpeedMulti);
         }
 
-        Rect[] TabRects;
-        Rect TabMenuRect;
-        Rect OpenTabRect;
+        private Rect[] TabRects;
+        private Rect TabMenuRect;
+        private Rect OpenTabRect;
 
         private bool TabSelected(string tab, out Rect tabRect, float targetHeight)
         {
@@ -224,9 +220,9 @@ namespace SAIN.Editor
             return OpenTab == tab;
         }
 
-        Texture2D DragBackgroundTexture;
+        private Texture2D DragBackgroundTexture;
 
-        string OpenTab = None;
+        private string OpenTab = None;
 
         private void MainWindowFunc(int TWCWindowID)
         {
@@ -329,7 +325,7 @@ namespace SAIN.Editor
 
         private GUIStyle ToolTipStyle => StyleOptions.GetStyle(Style.tooltip);
 
-        bool NoTabSelected()
+        private bool NoTabSelected()
         {
             return OpenTab == None;
         }

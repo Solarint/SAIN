@@ -1,11 +1,6 @@
-﻿using SAIN.Classes;
-using SAIN.Editor.Abstract;
+﻿using SAIN.Editor.Abstract;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using static SAIN.Helpers.Reflection;
 using static SAIN.SAINPreset.Attributes.GetAttributeValue.AttributesGUI;
@@ -76,8 +71,7 @@ namespace SAIN.Editor.GUISections
             Builder.EndScrollView();
         }
 
-        Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
-        Vector2 PersonScroll = Vector2.zero;
-
+        private Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
+        private Vector2 PersonScroll = Vector2.zero;
     }
 }

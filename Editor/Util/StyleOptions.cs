@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using SAIN.Editor.Abstract;
+using System.Collections.Generic;
 using UnityEngine;
-using Color = UnityEngine.Color;
 using static SAIN.Editor.Util.ApplyToStyle;
-using SAIN.Editor.Abstract;
+using Color = UnityEngine.Color;
 
 namespace SAIN.Editor
 {
@@ -40,7 +40,7 @@ namespace SAIN.Editor
             Editor = editor;
         }
 
-        bool CacheCleared = true;
+        private bool CacheCleared = true;
 
         public void Cache(bool value)
         {
@@ -54,7 +54,7 @@ namespace SAIN.Editor
             }
         }
 
-        void ClearCache()
+        private void ClearCache()
         {
             if (!CacheCleared)
             {
@@ -63,7 +63,7 @@ namespace SAIN.Editor
             }
         }
 
-        void CreateCache()
+        private void CreateCache()
         {
             if (CacheCleared)
             {

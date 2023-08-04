@@ -13,14 +13,6 @@ namespace SAIN.Editor.Abstract
         public ColorsClass ColorsClass => Editor.Colors;
         public MouseFunctions MouseFunctions => Editor.MouseFunctions;
 
-        public void CheckMouse(string text)
-        {
-            //Editor.ToolTips.CheckMouseTT(text);
-        }
-        public void CheckMouse()
-        {
-            //Editor.ToolTips.CheckMouseTT(text);
-        }
         public bool CheckDragLayout()
         {
             return MouseFunctions.CheckMouseDrag();

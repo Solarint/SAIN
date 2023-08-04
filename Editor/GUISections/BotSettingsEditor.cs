@@ -1,15 +1,10 @@
-﻿using EFT;
-using SAIN.BotPresets;
-using SAIN.Classes;
-using SAIN.BotSettings;
+﻿using SAIN.BotSettings;
 using SAIN.Editor.Abstract;
+using SAIN.SAINPreset.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
-using SAIN.BotSettings.Categories;
-using SAIN.SAINPreset.Attributes;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace SAIN.Editor.GUISections
 {
@@ -33,11 +28,10 @@ namespace SAIN.Editor.GUISections
             }
             else
             {
-
             }
         }
 
-        static List<object> GetCategories(object settingsObject)
+        private static List<object> GetCategories(object settingsObject)
         {
             List<object> categories = new List<object>();
             foreach (FieldInfo field in settingsObject.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
@@ -47,7 +41,7 @@ namespace SAIN.Editor.GUISections
             return categories;
         }
 
-        void CategoryOpenable(List<object> categories)
+        private void CategoryOpenable(List<object> categories)
         {
             if (OpenCategories == null)
             {
@@ -83,9 +77,9 @@ namespace SAIN.Editor.GUISections
             }
         }
 
-        readonly GetAttributeValue.GUIEntryConfig EntryConfig = new GetAttributeValue.GUIEntryConfig();
-        bool[] OpenCategories;
+        private readonly GetAttributeValue.GUIEntryConfig EntryConfig = new GetAttributeValue.GUIEntryConfig();
+        private bool[] OpenCategories;
 
-        FieldInfo[] GetFields(Type type) => Editor.SAINBotSettingsCache.GetFields(type);
+        private FieldInfo[] GetFields(Type type) => Editor.SAINBotSettingsCache.GetFields(type);
     }
 }
