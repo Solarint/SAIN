@@ -14,27 +14,30 @@ using SAIN.Components;
 
 namespace SAIN.Classes
 {
-    public class MoverClass : MonoBehaviour
+    public class MoverClass : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
 
-            BlindFire = new BlindFireClass(SAIN);
-            SideStep = new SideStepClass(SAIN);
-            Lean = new LeanClass(SAIN);
-            Prone = new ProneClass(SAIN);
-            Pose = new PoseClass(SAIN);
+            BlindFire = new BlindFireClass(sain);
+            SideStep = new SideStepClass(sain);
+            Lean = new LeanClass(sain);
+            Prone = new ProneClass(sain);
+            Pose = new PoseClass(sain);
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         private void Update()
         {
             if (BotOwner == null) return;
-            if (BotOwner.GetPlayer == null) return;
 
             SetStamina();
 
@@ -240,7 +243,5 @@ namespace SAIN.Classes
         public bool CanJump => BotOwner.GetPlayer.MovementContext.CanJump;
 
         private float JumpTimer = 0f;
-
-        private ManualLogSource Logger;
     }
 }

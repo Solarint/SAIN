@@ -1,20 +1,26 @@
-﻿using EFT;
+﻿using BepInEx.Logging;
+using EFT;
+using SAIN.Classes.Mover;
 using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class BotGrenadeClass : MonoBehaviour
+    public class BotGrenadeClass : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
         }
 
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         private void Update()
         {

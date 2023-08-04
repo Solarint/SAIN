@@ -219,6 +219,7 @@
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Interfaces.cs" />
     <Compile Include="SAINPreset\BotTypeDefinitions.cs" />
     <Compile Include="Helpers\EnumValues.cs" />
     <Compile Include="Plugin\PresetHandler.cs" />

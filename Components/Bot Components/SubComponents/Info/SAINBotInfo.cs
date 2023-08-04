@@ -5,7 +5,12 @@ using SAIN.BotSettings;
 using SAIN.Components;
 using SAIN.Plugin;
 using SAIN.SAINPreset.Personalities;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
+using System;
+using Random = UnityEngine.Random;
+using System.Collections;
 
 namespace SAIN.Classes
 {
@@ -18,16 +23,85 @@ namespace SAIN.Classes
             PresetHandler.PresetsUpdated += GetFileSettings;
         }
 
+        static FieldInfo[] EFTSettingsCategories;
+        static FieldInfo[] SAINSettingsCategories;
+
+        static readonly Dictionary<FieldInfo, FieldInfo[]> EFTSettingsFields = new Dictionary<FieldInfo, FieldInfo[]>();
+        static readonly Dictionary<FieldInfo, FieldInfo[]> SAINSettingsFields = new Dictionary<FieldInfo, FieldInfo[]>();
+
         public void GetFileSettings()
         {
-            FileSettings = SAINPlugin.LoadedPreset.BotSettings.SAINSettings[WildSpawnType].Settings[BotDifficulty];
+            FileSettings = SAINPlugin.LoadedPreset.BotSettings.Get(WildSpawnType, BotDifficulty);
+            SAIN.StartCoroutine(SetConfigValuesCoroutine(FileSettings));
+        }
 
+        private void CalculateSettings()
+        {
             Personality = GetPersonality();
             PersonalitySettings = SAINPlugin.LoadedPreset.PersonalityManager.Personalities[Personality];
 
             UpdateExtractTime();
             CalcTimeBeforeSearch();
             CalcHoldGroundDelay();
+        }
+
+        public IEnumerator SetConfigValuesCoroutine(SAINSettings sainFileSettings)
+        {
+            var eftFileSettings = BotOwner.Settings.FileSettings;
+            if (EFTSettingsCategories == null)
+            {
+                var flags = BindingFlags.Instance | BindingFlags.Public;
+
+                EFTSettingsCategories = eftFileSettings.GetType().GetFields(flags);
+                foreach (FieldInfo field in EFTSettingsCategories)
+                {
+                    EFTSettingsFields.Add(field, field.FieldType.GetFields(flags));
+                }
+
+                SAINSettingsCategories = sainFileSettings.GetType().GetFields(flags);
+                foreach (FieldInfo field in SAINSettingsCategories)
+                {
+                    SAINSettingsFields.Add(field, field.FieldType.GetFields(flags));
+                }
+                yield return null;
+            }
+
+            foreach (FieldInfo sainCategoryField in SAINSettingsCategories)
+            {
+                FieldInfo eftCategoryField = FindFieldByName(sainCategoryField.Name, EFTSettingsCategories);
+                if (eftCategoryField != null)
+                {
+                    object sainCategory = sainCategoryField.GetValue(sainFileSettings);
+                    object eftCategory = eftCategoryField.GetValue(eftFileSettings);
+
+                    FieldInfo[] sainFields = SAINSettingsFields[sainCategoryField];
+                    FieldInfo[] eftFields = EFTSettingsFields[eftCategoryField];
+                    foreach (FieldInfo sainVarField in sainFields)
+                    {
+                        FieldInfo eftVarField = FindFieldByName(sainVarField.Name, eftFields);
+                        if (eftVarField != null)
+                        {
+                            object sainValue = sainVarField.GetValue(sainCategory);
+                            eftVarField.SetValue(eftCategory, sainValue);
+                        }
+                    }
+                }
+                yield return null;
+            }
+
+            CalculateSettings();
+        }
+
+        static FieldInfo FindFieldByName(string name, FieldInfo[] fields)
+        {
+            foreach (FieldInfo field in fields)
+            {
+                if (field.Name == name)
+                {
+                    return field;
+                }
+            }
+            return null;
         }
 
         public SAINSettings FileSettings { get; private set; }

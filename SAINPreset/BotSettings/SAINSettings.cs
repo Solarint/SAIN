@@ -26,9 +26,12 @@ namespace SAIN.BotSettings
             }
         }
 
-        public readonly string Name;
-        public readonly WildSpawnType WildSpawnType;
-        public readonly Dictionary<BotDifficulty, SAINSettings> Settings = new Dictionary<BotDifficulty, SAINSettings>();
+        [JsonProperty]
+        public string Name;
+        [JsonProperty]
+        public WildSpawnType WildSpawnType;
+        [JsonProperty]
+        public Dictionary<BotDifficulty, SAINSettings> Settings = new Dictionary<BotDifficulty, SAINSettings>();
     }
 
     public class SAINSettings

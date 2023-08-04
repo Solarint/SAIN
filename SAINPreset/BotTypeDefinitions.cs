@@ -15,27 +15,15 @@ namespace SAIN.BotPresets
         public WildSpawnType WildSpawnType;
     }
 
-    public class BotTypeClassWrapper
-    {
-        public Dictionary<WildSpawnType, BotType> BotTypes = new Dictionary<WildSpawnType, BotType>();
-
-        [JsonIgnore]
-        public List<BotType> BotTypesList = new List<BotType>();
-    }
-
     public class BotTypeDefinitions
     {
-        private static readonly BotTypeClassWrapper Wrapper;
-        public static Dictionary<WildSpawnType, BotType> BotTypes => Wrapper.BotTypes;
-        public static List<BotType> BotTypesList => Wrapper.BotTypesList;
+        public static Dictionary<WildSpawnType, BotType> BotTypes;
+        public static List<BotType> BotTypesList;
 
         static BotTypeDefinitions()
         {
-            Wrapper = new BotTypeClassWrapper
-            {
-                BotTypesList = CreateBotTypes(),
-                BotTypes = new Dictionary<WildSpawnType, BotType>()
-            };
+            BotTypesList = CreateBotTypes();
+            BotTypes = new Dictionary<WildSpawnType, BotType>();
 
             for (int i = 0; i < BotTypesList.Count; i++)
             {

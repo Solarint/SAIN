@@ -10,16 +10,20 @@ using static UISoundsWrapper;
 
 namespace SAIN.Classes
 {
-    public class SoundsController : MonoBehaviour
+    public class SoundsController : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         private void Update()
         {
@@ -70,8 +74,6 @@ namespace SAIN.Classes
 
         public List<HeardSound> VisibleSounds { get; } = new List<HeardSound>();
         public List<HeardSound> HeardSounds { get; } = new List<HeardSound>();
-
-        protected ManualLogSource Logger;
     }
 
     public class HeardSound

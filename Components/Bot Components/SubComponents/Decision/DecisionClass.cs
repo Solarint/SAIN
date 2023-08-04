@@ -9,20 +9,25 @@ using UnityEngine.UIElements;
 
 namespace SAIN.Classes
 {
-    public class DecisionClass : MonoBehaviour
+    public class DecisionClass : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SelfActionDecisions = new SelfActionDecisionClass(SAIN);
-            EnemyDecisions = new EnemyDecisionClass(SAIN);
-            GoalTargetDecisions = new TargetDecisionClass(SAIN);
-            SquadDecisions = new SquadDecisionClass(SAIN);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
+
+            SelfActionDecisions = new SelfActionDecisionClass(sain);
+            EnemyDecisions = new EnemyDecisionClass(sain);
+            GoalTargetDecisions = new TargetDecisionClass(sain);
+            SquadDecisions = new SquadDecisionClass(sain);
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         public SAINEnemyPathEnum EnemyDistance { get; private set; }
 
@@ -196,6 +201,5 @@ namespace SAIN.Classes
         private float BotUnstuckTimerDecision = 0f;
         private float FinalBotUnstuckTimer = 0f;
         private float DecisionTimer = 0f;
-        public ManualLogSource Logger;
     }
 }

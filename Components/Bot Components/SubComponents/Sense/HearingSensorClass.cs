@@ -7,10 +7,21 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class HearingSensorClass : MonoBehaviour
+    public class HearingSensorClass : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
+        public void Init(SAINComponent sain)
+        {
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
+        }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
+
 
         private void Awake()
         {
@@ -407,8 +418,6 @@ namespace SAIN.Classes
 
             return occlusionmodifier;
         }
-
-        private ManualLogSource Logger;
 
         private float occlusionmodifier = 1f;
 

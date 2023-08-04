@@ -55,7 +55,7 @@ namespace SAIN.Components.BotController
                 int i = SAINCompCount;
                 var component = BotController.Bots.ElementAt(i).Value;
                 Vector3[] exits = FindExits(component.Position);
-                component.UpdateExitsToLoc(exits);
+                //component.UpdateExitsToLoc(exits);
                 SAINCompCount++;
             }
         }

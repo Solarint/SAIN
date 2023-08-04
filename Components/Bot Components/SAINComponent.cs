@@ -42,20 +42,76 @@ namespace SAIN.Components
             return component?.Init(player, botOwner) == true;
         }
     }
-    public class SAINComponent : MonoBehaviour
+    public class SAINComponent : MonoBehaviour, ISAINComponent
     {
         public bool Init(Player player, BotOwner botOwner)
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component [{botOwner?.name}]");
+
             Player = player;
             BotOwner = botOwner;
-            bool initSuccess = InitClassesAndComponents();
-            if (initSuccess == false)
+
+            try
             {
-                Logger.LogError("Init SAIN ERROR, disposing.");
-                Dispose();
+                NoBushESP = AddComponent<NoBushESP>();
+                NoBushESP.Init(BotOwner, this);
+                Components.Add(NoBushESP);
+
+
+                // Must be first, other classes use it
+                Squad = AddSubComponent<SquadClass>();
+                Components.Add(Squad);
+
+                Equipment = new BotEquipmentClass(this);
+                Info = new SAINBotInfo(this);
+
+                BotStuck = AddSubComponent<SAINBotUnstuck>();
+                Components.Add(BotStuck);
+
+                Hearing = AddSubComponent<HearingSensorClass>();
+                Components.Add(Hearing);
+
+                Talk = AddSubComponent<BotTalkClass>();
+                Components.Add(Talk);
+
+                Decision = AddSubComponent<DecisionClass>();
+                Components.Add(Decision);
+
+                Cover = AddSubComponent<CoverClass>();
+                Components.Add(Cover);
+
+                FlashLight = player?.gameObject?.AddComponent<FlashLightComponent>();
+                Components.Add(FlashLight);
+
+                SelfActions = AddSubComponent<SelfActionClass>();
+                Components.Add(SelfActions);
+
+                Steering = AddSubComponent<SteeringClass>();
+                Components.Add(Steering);
+
+                Grenade = AddSubComponent<BotGrenadeClass>();
+                Components.Add(Grenade);
+
+                Mover = AddSubComponent<MoverClass>();
+                Components.Add(Mover);
+
+                EnemyController = AddSubComponent<EnemyController>();
+                Components.Add(EnemyController);
+
+                Sounds = AddSubComponent<SoundsController>();
+                Components.Add(Sounds);
+
+                FriendlyFireClass = new FriendlyFireClass(this);
+                Vision = new VisionClass(this);
             }
-            return initSuccess;
+            catch (Exception ex)
+            {
+                Logger.LogError("Init SAIN ERROR, Disposing.");
+                Logger.LogError(ex);
+                Dispose();
+                return false;
+            }
+            return true;
         }
 
         private T AddComponent<T>() where T : Component
@@ -63,74 +119,18 @@ namespace SAIN.Components
             return this.GetOrAddComponent<T>();
         }
 
-        private bool InitClassesAndComponents()
+        private T AddSubComponent<T>() where T : Component, ISAINSubComponent
         {
-            // Must be first, other classes use it
-            Squad = AddComponent<SquadClass>();
-            if (Squad == null) return false;
-
-            Equipment = new BotEquipmentClass(this);
-            Info = new SAINBotInfo(this);
-
-            BotStuck = AddComponent<SAINBotUnstuck>();
-            if (BotStuck == null) return false;
-
-            Hearing = AddComponent<HearingSensorClass>();
-            if (Hearing == null) return false;
-
-            Talk = AddComponent<BotTalkClass>();
-            if (Talk == null) return false;
-
-            Decision = AddComponent<DecisionClass>();
-            if (Decision == null) return false;
-
-            Cover = AddComponent<CoverClass>();
-            if (Cover == null) return false;
-
-            FlashLight = Player?.gameObject?.AddComponent<FlashLightComponent>();
-            if (FlashLight == null) return false;
-
-            SelfActions = AddComponent<SelfActionClass>();
-            if (SelfActions == null) return false;
-
-            Steering = AddComponent<SteeringClass>();
-            if (Steering == null) return false;
-
-            Grenade = AddComponent<BotGrenadeClass>();
-            if (Grenade == null) return false;
-
-            Mover = AddComponent<MoverClass>();
-            if (Mover == null) return false;
-
-            NoBushESP = AddComponent<NoBushESP>();
-            if (NoBushESP == null) return false;
-            NoBushESP.Init(BotOwner, this);
-
-            EnemyController = AddComponent<EnemyController>();
-            if (EnemyController == null) return false;
-
-            Sounds = AddComponent<SoundsController>();
-            if (Sounds == null) return false;
-
-            FriendlyFireClass = new FriendlyFireClass(this);
-            Vision = new VisionClass(this);
-            return true;
+            var comp = this.GetOrAddComponent<T>();
+            comp.Init(this);
+            return comp;
         }
 
         public Collider BotZoneCollider => BotZone?.Collider;
-
         public AIPlaceInfo BotZone => BotOwner.AIData.PlaceInfo;
-
-        public string ProfileId => BotOwner.ProfileId;
-
+        public string ProfileId => BotOwner?.ProfileId;
         public string SquadId => Squad.SquadID;
-
-        public EnemyController EnemyController { get; private set; }
-
-        public NoBushESP NoBushESP { get; private set; }
-
         public bool NoBushESPActive => NoBushESP.NoBushESPActive;
-
         public SAINBotController BotController => SAINPlugin.BotController;
 
         public List<Player> VisiblePlayers = new List<Player>();
@@ -166,7 +166,7 @@ namespace SAIN.Components
 
                 if (Enemy == null && BotOwner.BotLight?.IsEnable == false)
                 {
-                    BotOwner.BotLight.TurnOn();
+                    BotOwner.BotLight?.TurnOn();
                 }
             }
         }
@@ -256,6 +256,7 @@ namespace SAIN.Components
 
         public bool HasEnemy => EnemyController.HasEnemy;
         public SAINEnemy Enemy => HasEnemy ? EnemyController.Enemy : null;
+        private readonly List<Component> Components = new List<Component>();
 
         public void Dispose()
         {
@@ -266,19 +267,32 @@ namespace SAIN.Components
                 Info?.Dispose();
                 Cover?.Dispose();
 
-                Destroy(Squad);
-                Destroy(BotStuck);
-                Destroy(Hearing);
-                Destroy(Talk);
-                Destroy(Decision);
-                Destroy(FlashLight);
-                Destroy(SelfActions);
-                Destroy(Steering);
-                Destroy(Grenade);
-                Destroy(Mover);
-                Destroy(NoBushESP);
-                Destroy(EnemyController);
-                Destroy(Sounds);
+                foreach (var component in Components)
+                {
+                    Destroy(component);
+                }
+                if (Squad != null)
+                {
+                    Logger.LogDebug("Component List Destruction Fail");
+
+                    Destroy(Squad);
+                    Destroy(BotStuck);
+                    Destroy(Hearing);
+                    Destroy(Talk);
+                    Destroy(Decision);
+                    Destroy(FlashLight);
+                    Destroy(SelfActions);
+                    Destroy(Steering);
+                    Destroy(Grenade);
+                    Destroy(Mover);
+                    Destroy(NoBushESP);
+                    Destroy(EnemyController);
+                    Destroy(Sounds);
+                }
+                else
+                {
+                    Logger.LogDebug("Component List Destruction Sucess");
+                }
 
                 Destroy(this);
             }
@@ -323,16 +337,18 @@ namespace SAIN.Components
                         return Target.Position;
                     }
                 }
-                //if (Time.time - botOwner.Memory.LastTimeHit < 20f && !botOwner.Memory.IsPeace)
-                //{
-                //    return botOwner.Memory.LastHitPos;
-                //}
+                if (Time.time - BotOwner.Memory.LastTimeHit < 3f)
+                {
+                    return BotOwner.Memory.LastHitPos;
+                }
                 return null;
             }
         }
 
         public Vector3 UnderFireFromPosition { get; set; }
 
+        public EnemyController EnemyController { get; private set; }
+        public NoBushESP NoBushESP { get; private set; }
         public FriendlyFireClass FriendlyFireClass { get; private set; }
         public SoundsController Sounds { get; private set; }
         public VisionClass Vision { get; private set; }
@@ -363,6 +379,6 @@ namespace SAIN.Components
 
         public BotOwner BotOwner { get; private set; }
 
-        private ManualLogSource Logger;
+        public ManualLogSource Logger { get; private set; }
     }
 }

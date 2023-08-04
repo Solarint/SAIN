@@ -6,16 +6,20 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class SAINBotUnstuck : MonoBehaviour
+    public class SAINBotUnstuck : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         private RaycastHit StuckHit = new RaycastHit();
         private float DebugStuckTimer = 0f;
@@ -26,8 +30,6 @@ namespace SAIN.Classes
         private float CheckMoveTimer = 0f;
 
         private Vector3 LastPos = Vector3.zero;
-
-        private ManualLogSource Logger;
 
         public float TimeSpentNotMoving => Time.time - TimeStartNotMoving;
         public float TimeStartNotMoving { get; private set; }

@@ -7,36 +7,30 @@ using SAIN.Helpers;
 
 namespace SAIN.Classes
 {
-    public class BotTalkClass : MonoBehaviour
+    public class BotTalkClass : MonoBehaviour, ISAINSubComponent
     {
         static BotTalkClass()
         {
-            string filename = "BotTalkConfigs";
-            if (JsonUtility.Load.LoadJsonFile(out string json, filename))
-            {
-                //GlobalPhraseDictionary = JsonUtility.Load.DeserializeObject<Dictionary<EPhraseTrigger, PhraseInfo>>(json);
-                GlobalPhraseDictionary = new Dictionary<EPhraseTrigger, PhraseInfo>();
-                PhraseObjectsAdd();
-            }
-            else
-            {
-                GlobalPhraseDictionary = new Dictionary<EPhraseTrigger, PhraseInfo>();
-                PhraseObjectsAdd();
-                //JsonUtility.Save.Export(GlobalPhraseDictionary, filename);
-            }
+            GlobalPhraseDictionary = new Dictionary<EPhraseTrigger, PhraseInfo>();
+            PhraseObjectsAdd();
         }
 
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
+
             PersonalPhraseDict = new Dictionary<EPhraseTrigger, PhraseInfo>(GlobalPhraseDictionary);
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            GroupTalk = new GroupTalk(SAIN);
-            EnemyTalk = new EnemyTalk(SAIN);
+            GroupTalk = new GroupTalk(sain);
+            EnemyTalk = new EnemyTalk(sain);
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         public bool CanTalk => SAIN.Info.FileSettings.Mind.CanTalk;
 
@@ -340,8 +334,6 @@ namespace SAIN.Classes
 
         public static readonly Dictionary<EPhraseTrigger, PhraseInfo> GlobalPhraseDictionary = new Dictionary<EPhraseTrigger, PhraseInfo>();
         private Dictionary<EPhraseTrigger, PhraseInfo> PersonalPhraseDict;
-
-        private ManualLogSource Logger;
     }
 
     public class BotTalkPackage

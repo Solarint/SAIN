@@ -13,36 +13,53 @@ namespace SAIN.Classes
     public class PropertyNames
     {
         public static string PlayerSpirit = "PlayerSpiritAura";
-        public static string Memory = nameof(BotOwner.Memory);
-        public static string GoalEnemy = nameof(BotOwner.Memory.GoalEnemy);
-        public static string ShootData = nameof(BotOwner.ShootData);
-        public static string CanShootByState = nameof(BotOwner.ShootData.CanShootByState);
-        public static string IsVisible = nameof(BotOwner.Memory.GoalEnemy.IsVisible);
+        public static string Memory = "Memory";
+        public static string GoalEnemy = "GoalEnemy";
+        public static string ShootData = "ShootData";
+        public static string CanShootByState = "CanShootByState";
+        public static string IsVisible = "IsVisible";
     }
 
     public class NoBushESP : MonoBehaviour
     {
         static NoBushESP()
         {
-            NoBushMask = LayerMaskClass.HighPolyWithTerrainMaskAI | (1 << LayerMask.NameToLayer(PropertyNames.PlayerSpirit));
             Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(NoBushESP));
 
-            Type botType = typeof(BotOwner);
+            try
+            {
+                NoBushMask = LayerMaskClass.HighPolyWithTerrainMaskAI | (1 << LayerMask.NameToLayer(PropertyNames.PlayerSpirit));
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e);
+                return;
+            }
 
-            Type memoryType = AccessTools.Property(
-                botType, PropertyNames.Memory).PropertyType;
+            try
+            {
+                Type botType = typeof(BotOwner);
 
-            GoalEnemyProp = AccessTools.Property(
-                memoryType, PropertyNames.GoalEnemy);
+                Type memoryType = AccessTools.Field(
+                    botType, PropertyNames.Memory).FieldType;
 
-            IsVisibleProp = AccessTools.Property(
-                GoalEnemyProp.PropertyType, PropertyNames.IsVisible);
+                GoalEnemyProp = AccessTools.Property(
+                    memoryType, PropertyNames.GoalEnemy);
 
-            Type shootDataType = AccessTools.Property(
-                botType, PropertyNames.ShootData).PropertyType;
+                IsVisibleProp = AccessTools.Property(
+                    GoalEnemyProp.PropertyType, PropertyNames.IsVisible);
 
-            CanShootByState = AccessTools.PropertySetter(
-                shootDataType, PropertyNames.CanShootByState);
+                Type shootDataType = AccessTools.Property(
+                    botType, PropertyNames.ShootData).PropertyType;
+
+                CanShootByState = AccessTools.PropertySetter(
+                    shootDataType, PropertyNames.CanShootByState);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e);
+                return;
+            }
         }
 
         private static readonly PropertyInfo GoalEnemyProp;

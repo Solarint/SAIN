@@ -15,26 +15,24 @@ namespace SAIN.Helpers
                 return 0.001f;
             }
 
-            float modifier = component.Info.WeaponInfo.FinalModifier;
-            float BurstMulti = component.Info.FileSettings.Shoot.BurstMulti;
+            //float k = 0.08f; // How fast for the burst length to falloff with Distance
+            //float scaledDistance = InverseScaleWithLogisticFunction(distance, k, 20f);
 
-            float k = 0.08f * modifier; // How fast for the burst length to falloff with Distance
-            k /= BurstMulti;
-            k = Mathf.Round(k * 100f) / 100f;
-            float scaledDistance = InverseScaleWithLogisticFunction(distance, k, 20f);
+            float scaledBurstLength = 1f - (Mathf.Clamp(distance, 0f, 50f) / 50f);
+            scaledBurstLength /= component.Info.WeaponInfo.FinalModifier;
+            scaledBurstLength *= component.Info.FileSettings.Shoot.BurstMulti;
+            scaledBurstLength = Mathf.Clamp(scaledBurstLength, 0.001f, 1f);
 
-            scaledDistance = Mathf.Clamp(scaledDistance, 0.001f, 1f);
-
-            if (distance > 80f)
+            if (distance > 50f)
             {
-                scaledDistance = 0.001f;
+                scaledBurstLength = 0.001f;
             }
-            else if (distance < 8f)
+            else if (distance < 5f)
             {
-                scaledDistance = 1f;
+                scaledBurstLength = 1f;
             }
 
-            return scaledDistance;
+            return scaledBurstLength;
         }
 
         public static float FullAutoTimePerShot(int bFirerate)

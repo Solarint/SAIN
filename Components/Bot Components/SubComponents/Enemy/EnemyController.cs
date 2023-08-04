@@ -6,21 +6,25 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class EnemyController : MonoBehaviour
+    public class EnemyController : MonoBehaviour, ISAINSubComponent
     {
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.GetPlayer != null;
 
         public SAINEnemy Enemy { get; private set; }
 
-        private SAINComponent SAIN;
-
-        private BotOwner BotOwner => SAIN?.BotOwner;
 
         private void Update()
         {
@@ -34,21 +38,28 @@ namespace SAIN.Classes
             var goalEnemy = BotOwner.Memory.GoalEnemy;
             bool addEnemy = true;
 
-            if (goalEnemy?.Person == null)
+            if (goalEnemy == null)
             {
                 addEnemy = false;
             }
-            if (goalEnemy.Person.IsAI && (goalEnemy.Person.AIData?.BotOwner == null || goalEnemy.Person.AIData.BotOwner.BotState != EBotState.Active))
+            else if (goalEnemy?.Person == null)
             {
                 addEnemy = false;
             }
-            if (goalEnemy.Person.IsAI && goalEnemy.Person.AIData.BotOwner.ProfileId == BotOwner.ProfileId)
+            else
             {
-                addEnemy = false;
-            }
-            if (!goalEnemy.Person.HealthController.IsAlive)
-            {
-                addEnemy = false;
+                if (goalEnemy.Person.IsAI && (goalEnemy.Person.AIData?.BotOwner == null || goalEnemy.Person.AIData.BotOwner.BotState != EBotState.Active))
+                {
+                    addEnemy = false;
+                }
+                if (goalEnemy.Person.IsAI && goalEnemy.Person.AIData.BotOwner.ProfileId == BotOwner.ProfileId)
+                {
+                    addEnemy = false;
+                }
+                if (!goalEnemy.Person.HealthController.IsAlive)
+                {
+                    addEnemy = false;
+                }
             }
 
             if (addEnemy)
@@ -130,7 +141,5 @@ namespace SAIN.Classes
         public List<Player> VisiblePlayers = new List<Player>();
         public List<string> VisiblePlayerIds = new List<string>();
         private readonly List<string> EnemyIDsToRemove = new List<string>();
-
-        private ManualLogSource Logger;
     }
 }

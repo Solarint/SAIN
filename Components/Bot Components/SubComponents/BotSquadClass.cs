@@ -7,16 +7,20 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class SquadClass : MonoBehaviour
+    public class SquadClass : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         public string SquadID { get; private set; } = "None";
 
@@ -191,7 +195,5 @@ namespace SAIN.Classes
         public bool MemberIsFallingBack { get; private set; }
 
         public Vector3[] SquadLocations { get; private set; }
-
-        protected ManualLogSource Logger;
     }
 }

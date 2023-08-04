@@ -29,12 +29,9 @@ namespace SAIN.Classes
             float minTime = 0.1f; // minimum time per shot
             float maxTime = 4f; // maximum time per shot
             float EnemyDistance = (BotOwner.AimingData.RealTargetPoint - BotOwner.WeaponRoot.position).magnitude;
-            float permeter = EnemyDistance / PerMeter;
-            if (WeaponInfo != null)
-            {
-                permeter *= WeaponInfo.FinalModifier;
-            }
-            float final = Mathf.Clamp(permeter, minTime, maxTime);
+
+            float rate = EnemyDistance / (PerMeter / WeaponInfo.FinalModifier);
+            float final = Mathf.Clamp(rate, minTime, maxTime);
 
             // Sets a different time between shots if a weapon is full auto or burst and the enemy isn't close
             if (IsSetFullAuto() || IsSetBurst())

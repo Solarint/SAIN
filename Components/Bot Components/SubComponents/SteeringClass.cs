@@ -7,16 +7,21 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class SteeringClass : MonoBehaviour
+    public class SteeringClass : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
+
 
         private void Update()
         {
@@ -144,15 +149,16 @@ namespace SAIN.Classes
             if (RandomLookExitsTimer < Time.time)
             {
                 RandomLookExitsTimer = Time.time + 3f;
-                var exits = SAIN.ExitsToLocation;
-                if (exits != null && exits.Count > 0)
-                {
-                    Vector3 corner = exits.PickRandom();
-                    corner += Vector3.up * 1f;
-                    LookToPoint(corner);
-                }
+                //var exits = SAIN.ExitsToLocation;
+                //if (exits != null && exits.Count > 0)
+                //{
+                //    Vector3 corner = exits.PickRandom();
+                //    corner += Vector3.up * 1f;
+                //    LookToPoint(corner);
+                //}
             }
         }
+
         private float RandomLookExitsTimer;
 
         public Vector3 RealSteerTarget { get; private set; }
@@ -348,7 +354,5 @@ namespace SAIN.Classes
         }
 
         private float RandomLookTimer = 0f;
-
-        protected ManualLogSource Logger;
     }
 }

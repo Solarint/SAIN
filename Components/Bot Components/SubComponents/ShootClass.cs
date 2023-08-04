@@ -1,5 +1,6 @@
 ﻿using EFT;
 using SAIN.Components;
+using SAIN.Helpers;
 using UnityEngine;
 
 namespace SAIN.Classes.CombatFunctions
@@ -9,10 +10,10 @@ namespace SAIN.Classes.CombatFunctions
         public ShootClass(BotOwner owner, SAINComponent sain) : base(owner)
         {
             SAIN = sain;
-            BotShoot = new GClass182(owner);
+            BotShoot = new BotShoot(owner);
         }
 
-        private readonly GClass182 BotShoot;
+        private readonly BotShoot BotShoot;
         private BotOwner BotOwner => botOwner_0;
 
         private readonly SAINComponent SAIN;
@@ -22,9 +23,9 @@ namespace SAIN.Classes.CombatFunctions
             var enemy = SAIN.Enemy;
             if (enemy != null && enemy.CanShoot && enemy.IsVisible)
             {
-                if (AimingData == null)
+                if (BotAimingData.AimingData == null)
                 {
-                    AimingData = BotOwner.AimingData;
+                    BotAimingData.AimingData = BotOwner.AimingData;
                 }
 
                 Vector3? pointToShoot = GetPointToShoot();
@@ -35,10 +36,10 @@ namespace SAIN.Classes.CombatFunctions
                         BotOwner.BotLight?.TurnOn(true);
                     }
                     Target = pointToShoot.Value;
-                    if (AimingData.IsReady && !SAIN.NoBushESPActive && FriendlyFire.ClearShot)
+                    if (BotAimingData.AimingData.IsReady && !SAIN.NoBushESPActive && FriendlyFire.ClearShot)
                     {
                         ReadyToShoot();
-                        BotShoot.Update();
+                        BotShoot.Shoot.Update();
                     }
                 }
             }
@@ -65,6 +66,11 @@ namespace SAIN.Classes.CombatFunctions
                 else
                 {
                     value = enemy.GetPartToShoot();
+                    if (enemy.Person != null && (value - enemy.Person.MainParts[BodyPartType.head].Position).magnitude < 0.1f)
+                    {
+                        BodyPartType aimPart = EFTMath.RandomBool() ? BodyPartType.leftLeg : BodyPartType.rightLeg;
+                        value = enemy.Person.MainParts[aimPart].Position;
+                    }
                 }
                 return new Vector3?(value);
             }
@@ -82,16 +88,16 @@ namespace SAIN.Classes.CombatFunctions
             if (target != null)
             {
                 Target = target.Value;
-                AimingData.SetTarget(Target);
-                AimingData.NodeUpdate();
+                BotAimingData.AimingData.SetTarget(Target);
+                BotAimingData.AimingData.NodeUpdate();
                 return new Vector3?(Target);
             }
             return null;
         }
 
         protected Vector3 Target;
-        private GInterface5 AimingData;
 
+        private readonly BotAimingData BotAimingData = new BotAimingData();
         public FriendlyFireClass FriendlyFire => SAIN.FriendlyFireClass;
     }
 }

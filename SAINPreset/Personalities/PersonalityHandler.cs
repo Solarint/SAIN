@@ -17,7 +17,7 @@ namespace SAIN.SAINPreset.Personalities
             AllTypes = new List<WildSpawnType>();
             foreach (BotType type in BotTypeDefinitions.BotTypesList)
             {
-                PMCTypes.Add(type.WildSpawnType);
+                AllTypes.Add(type.WildSpawnType);
             }
             PMCTypes = new List<WildSpawnType>
             {
@@ -213,6 +213,6 @@ namespace SAIN.SAINPreset.Personalities
             }
         }
 
-        public readonly Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities;
+        public Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities;
     }
 }

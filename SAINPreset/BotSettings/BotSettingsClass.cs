@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using BepInEx.Logging;
+using EFT;
 using SAIN.BotPresets;
 using SAIN.Helpers;
 using SAIN.SAINPreset;
@@ -9,6 +10,8 @@ namespace SAIN.BotSettings
 {
     public class BotSettingsClass
     {
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(BotSettingsClass));
+
         public BotSettingsClass(SAINPresetDefinition Preset)
         {
             BotDifficulty[] Difficulties = EnumValues.Difficulties;
@@ -40,6 +43,26 @@ namespace SAIN.BotSettings
             }
         }
 
+        public SAINSettings Get(WildSpawnType type, BotDifficulty difficulty)
+        {
+            if (SAINSettings.TryGetValue(type, out var settingsGroup))
+            {
+                if (settingsGroup.Settings.TryGetValue(difficulty, out var settings))
+                {
+                    return settings;
+                }
+                else
+                {
+                    Logger.LogError($"[{difficulty}] does not exist in [{type}] Settings Group!");
+                }
+            }
+            else
+            {
+                Logger.LogError($"[{type}] does not exist in SAINSettings Dictionary!");
+            }
+            return null;
+        }
+
         public void SaveSettings(SAINPresetDefinition preset)
         {
             string[] sainFolders = Folders(preset.Name, "SAIN");
@@ -59,7 +82,7 @@ namespace SAIN.BotSettings
 
         private static string[] Folders(string presetKey, string subfolder) => new string[] { "Presets", presetKey, "BotSettings", subfolder };
 
-        public readonly Dictionary<WildSpawnType, SAINSettingsGroup> SAINSettings = new Dictionary<WildSpawnType, SAINSettingsGroup>();
-        public readonly Dictionary<WildSpawnType, EFTBotSettings> EFTSettings = new Dictionary<WildSpawnType, EFTBotSettings>();
+        public Dictionary<WildSpawnType, SAINSettingsGroup> SAINSettings = new Dictionary<WildSpawnType, SAINSettingsGroup>();
+        public Dictionary<WildSpawnType, EFTBotSettings> EFTSettings = new Dictionary<WildSpawnType, EFTBotSettings>();
     }
 }

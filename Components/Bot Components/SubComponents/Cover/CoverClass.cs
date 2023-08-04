@@ -8,21 +8,23 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class CoverClass : MonoBehaviour
+    public class CoverClass : MonoBehaviour, ISAINSubComponent
     {
-        private SAINComponent SAIN;
-        private BotOwner BotOwner => SAIN?.BotOwner;
-
-        private Player Player;
-
-        private void Awake()
+        public void Init(SAINComponent sain)
         {
-            SAIN = GetComponent<SAINComponent>();
-            Player = SAIN.Player;
-            CoverFinder = BotOwner.GetOrAddComponent<CoverFinderComponent>();
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
+            SAIN = sain;
+            BotOwner = sain.BotOwner;
+            Logger = sain.Logger;
+            Player = sain.Player;
+
+            CoverFinder = this.GetOrAddComponent<CoverFinderComponent>();
             Player.HealthController.ApplyDamageEvent += OnBeingHit;
         }
+
+        public SAINComponent SAIN { get; private set; }
+        public BotOwner BotOwner { get; private set; }
+        public ManualLogSource Logger { get; private set; }
+        public Player Player { get; private set; }
 
         private void OnBeingHit(EBodyPart part, float unused,DamageInfo damage)
         {
@@ -234,7 +236,5 @@ namespace SAIN.Classes
         public CoverFinderComponent CoverFinder { get; private set; }
         public CoverPoint CurrentCoverPoint => ClosestPoint;
         public CoverPoint FallBackPoint => CoverFinder.FallBackPoint;
-
-        protected ManualLogSource Logger;
     }
 }
