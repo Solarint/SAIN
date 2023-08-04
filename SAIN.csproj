@@ -265,7 +265,6 @@
     <Compile Include="Components\Bot Components\SubComponents\Cover\CoverFinder\FrameWait.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Enemy\EnemyController.cs" />
     <Compile Include="SAINPreset\BotSettings\BotSettingsManager.cs" />
-    <Compile Include="Components\Bot Components\SubComponents\Info\SAINInfoAbstract.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firerate.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Firemode.cs" />
     <Compile Include="Components\Bot Components\SubComponents\Weapon\Recoil.cs" />

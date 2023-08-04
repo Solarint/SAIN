@@ -16,6 +16,6 @@ namespace SAIN.SAINPreset.Settings
         [Minimum(0.1f)]
         [Maximum(5f)]
         [Rounding(10f)]
-        public float AccuracySpreadMulti = 1f;
+        public float AccuracySpreadMultiGlobal = 1f;
     }
 }

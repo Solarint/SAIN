@@ -59,7 +59,6 @@ namespace SAIN.Components
             }
         }
 
-
         private T AddComponent<T>() where T : Component
         {
             return this.GetOrAddComponent<T>();

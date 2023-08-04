@@ -34,6 +34,19 @@ namespace SAIN
         public GlobalSettingsClass GlobalSAINSettings => SAINPlugin.LoadedPreset?.GlobalSettings;
         public SAINSettings BotSAINSettings => SAIN.Info.FileSettings;
     }
+    public abstract class SAINBaseAbst
+    {
+        public SAINBaseAbst(SAINComponent bot)
+        {
+            SAIN = bot;
+            Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component for [{bot?.BotOwner?.name}]");
+        }
+
+        public BotOwner BotOwner => SAIN?.BotOwner;
+        public SAINComponent SAIN { get; private set; }
+
+        public ManualLogSource Logger;
+    }
 
     public abstract class SAINInfoAbst : SAINBotAbst
     {
