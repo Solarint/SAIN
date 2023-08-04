@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SAIN.Classes.Mover
 {
-    public class BlindFireClass : SAINBot
+    public class BlindFireClass : SAINBotAbst
     {
         public BlindFireClass(SAINComponent bot) : base(bot)
         {

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SAIN.Classes.Sense
 {
-    public class VisionClass : SAINBot
+    public class VisionClass : SAINBotAbst
     {
         public VisionClass(SAINComponent component) : base(component)
         {

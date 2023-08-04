@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SAIN.Classes.Mover
 {
-    public class SideStepClass : SAINBot
+    public class SideStepClass : SAINBotAbst
     {
         public SideStepSetting SideStepSetting { get; private set; }
 

@@ -6,7 +6,7 @@ using static SAIN.Helpers.HelpersGClass;
 
 namespace SAIN.Helpers
 {
-    public class FlashLightDazzle : SAINBot
+    public class FlashLightDazzle : SAINBotAbst
     {
         public FlashLightDazzle(SAINComponent owner) : base(owner)
         {

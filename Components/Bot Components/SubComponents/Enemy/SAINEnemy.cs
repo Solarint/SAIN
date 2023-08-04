@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 namespace SAIN.Classes
 {
-    public class SAINEnemy : SAINBot
+    public class SAINEnemy : SAINBotAbst
     {
         static SAINEnemy()
         {

@@ -15,7 +15,7 @@ namespace SAIN.SAINPreset
             Definition = preset;
             GlobalSettings = LoadGlobalSettings(preset);
             BotSettings = new BotSettings.BotSettingsClass(preset);
-            PersonalityManager = new PersonalityManager(preset);
+            PersonalityManager = new PersonalityManagerClass(preset);
         }
 
         private static GlobalSettingsClass LoadGlobalSettings(SAINPresetDefinition Preset)
@@ -51,27 +51,15 @@ namespace SAIN.SAINPreset
         public SAINPresetDefinition Definition;
         public GlobalSettingsClass GlobalSettings;
         public BotSettings.BotSettingsClass BotSettings;
-        public PersonalityManager PersonalityManager;
+        public PersonalityManagerClass PersonalityManager;
     }
 
     public sealed class SAINPresetDefinition
     {
-        [JsonConstructor]
-        public SAINPresetDefinition() { }
-
-        public SAINPresetDefinition(string name, string description, string creator)
-        {
-            Name = name;
-            Description = description;
-            Creator = creator;
-            SAINVersion = PluginInfo.Version;
-            DateCreated = DateTime.UtcNow.Date.ToShortDateString();
-        }
-
         public string Name;
         public string Description;
         public string Creator;
-        public string SAINVersion;
-        public string DateCreated;
+        public readonly string SAINVersion = PluginInfo.Version;
+        public readonly string DateCreated = DateTime.Today.ToString();
     }
 }

@@ -2,6 +2,7 @@
 using EFT;
 using EFT.InventoryLogic;
 using EFT.Weather;
+using SAIN.SAINPreset.Settings;
 using UnityEngine;
 
 namespace SAIN.Helpers
@@ -59,94 +60,16 @@ namespace SAIN.Helpers
         /// <returns>The audible range of the given ammunition caliber.</returns>
         private static float AudibleRange(string ammocaliber)
         {
-            float range;
-            switch (ammocaliber)
+            Caliber caliber = EnumValues.Parse<Caliber>(ammocaliber);
+            var Ranges = SAINPlugin.LoadedPreset?.GlobalSettings?.Hearing?.AudibleRanges;
+            if (Ranges != null)
             {
-                case "Caliber9x18PM":
-                    range = 125f;
-                    break;
-                case "Caliber9x19PARA":
-                    range = 125f;
-                    break;
-                case "Caliber46x30":
-                    range = 135;
-                    break;
-                case "Caliber9x21":
-                    range = 130;
-                    break;
-                case "Caliber57x28":
-                    range = 140;
-                    break;
-                case "Caliber762x25TT":
-                    range = 140;
-                    break;
-                case "Caliber1143x23ACP":
-                    range = 140;
-                    break;
-                case "Caliber9x33R":
-                    range = 130;
-                    break;
-
-                case "Caliber545x39":
-                    range = 180;
-                    break;
-                case "Caliber556x45NATO":
-                    range = 180;
-                    break;
-                case "Caliber9x39":
-                    range = 180;
-                    break;
-                case "Caliber762x35":
-                    range = 180;
-                    break;
-
-                case "Caliber762x39":
-                    range = 200;
-                    break;
-                case "Caliber366TKM":
-                    range = 200;
-                    break;
-                case "Caliber762x51":
-                    range = 225;
-                    break;
-                case "Caliber127x55":
-                    range = 225;
-                    break;
-                case "Caliber762x54R":
-                    range = 300;
-                    break;
-                case "Caliber86x70":
-                    range = 400;
-                    break;
-
-                case "Caliber20g":
-                    range = 180;
-                    break;
-                case "Caliber12g":
-                    range = 200;
-                    break;
-                case "Caliber23x75":
-                    range = 210;
-                    break;
-
-                case "Caliber26x75":
-                    range = 50;
-                    break;
-                case "Caliber30x29":
-                    range = 50;
-                    break;
-                case "Caliber40x46":
-                    range = 50;
-                    break;
-                case "Caliber40mmRU":
-                    range = 50;
-                    break;
-
-                default:
-                    range = 180;
-                    break;
+                return Ranges.Get(caliber);
             }
-            return range;
+            else
+            {
+                return 150f;
+            }
         }
 
         /// <summary>

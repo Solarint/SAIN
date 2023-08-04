@@ -3,70 +3,144 @@ using Comfort.Common;
 using EFT;
 using SAIN.Classes;
 using SAIN.Classes.Sense;
+using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SAIN.Components
 {
+    public class SAINComponentHandler
+    {
+        public static SAINComponent AddComponent(BotOwner botOwner)
+        {
+            Player player = EFTInfo.GetPlayer(botOwner?.ProfileId);
+
+            if (botOwner?.gameObject != null && player != null
+                && AddSAIN(player, botOwner, out var component))
+            {
+                return component;
+            }
+            return null;
+        }
+
+        public static SAINComponent AddComponent(Player player)
+        {
+            BotOwner botOwner = player?.AIData?.BotOwner;
+
+            if (player?.gameObject != null && botOwner != null 
+                && AddSAIN(player, botOwner, out var component))
+            {
+                return component;
+            }
+            return null;
+        }
+
+        static bool AddSAIN(Player player, BotOwner botOwner, out SAINComponent component)
+        {
+            component = botOwner.GetOrAddComponent<SAINComponent>();
+            return component?.Init(player, botOwner) == true;
+        }
+    }
     public class SAINComponent : MonoBehaviour
     {
-        public List<Player> VisiblePlayers = new List<Player>();
-        public List<string> VisiblePlayerIds = new List<string>();
-
-        private void Awake()
+        public bool Init(Player player, BotOwner botOwner)
         {
-            BotOwner = GetComponent<BotOwner>();
-            AddComponents(BotOwner);
+            if (InitClassesAndComponents(botOwner, player))
+            {
+                Player = player;
+                BotOwner = botOwner;
+                return true;
+            }
+            else
+            {
+                Dispose();
+                return false;
+            }
         }
 
-        public Collider BotZoneCollider => BotZone?.Collider;
-        public AIPlaceInfo BotZone => BotOwner.AIData.PlaceInfo;
 
-        public List<Vector3> ExitsToLocation { get; private set; } = new List<Vector3>();
-
-        public void UpdateExitsToLoc(Vector3[] exits)
+        private T AddComponent<T>() where T : Component
         {
-            //ExitsToLocation.Clear();
-            //ExitsToLocation.AddRange(exits);
+            return this.GetOrAddComponent<T>();
         }
 
-        public string ProfileId => BotOwner.ProfileId;
-        public string SquadId => Squad.SquadID;
-        public Player Player => BotOwner.GetPlayer;
-
-        private void AddComponents(BotOwner bot)
+        private bool InitClassesAndComponents(BotOwner botOwner, Player player)
         {
             // Must be first, other classes use it
-            Squad = bot.GetOrAddComponent<SquadClass>();
+            Squad = AddComponent<SquadClass>();
+            if (Squad == null) return false;
 
             Equipment = new BotEquipmentClass(this);
             Info = new SAINBotInfo(this);
 
-            BotStuck = bot.GetOrAddComponent<SAINBotUnstuck>();
-            Hearing = bot.GetOrAddComponent<HearingSensorClass>();
-            Talk = bot.GetOrAddComponent<BotTalkClass>();
-            Decision = bot.GetOrAddComponent<DecisionClass>();
-            Cover = bot.GetOrAddComponent<CoverClass>();
-            FlashLight = bot.GetPlayer.gameObject.AddComponent<FlashLightComponent>();
-            SelfActions = bot.GetOrAddComponent<SelfActionClass>();
-            Steering = bot.GetOrAddComponent<SteeringClass>();
-            Grenade = bot.GetOrAddComponent<BotGrenadeClass>();
-            Mover = bot.GetOrAddComponent<MoverClass>();
-            NoBushESP = bot.GetOrAddComponent<NoBushESP>();
-            EnemyController = bot.GetOrAddComponent<EnemyController>();
-            Sounds = bot.GetOrAddComponent<SoundsController>();
+            BotStuck = AddComponent<SAINBotUnstuck>();
+            if (BotStuck == null) return false;
+
+            Hearing = AddComponent<HearingSensorClass>();
+            if (Hearing == null) return false;
+
+            Talk = AddComponent<BotTalkClass>();
+            if (Talk == null) return false;
+
+            Decision = AddComponent<DecisionClass>();
+            if (Decision == null) return false;
+
+            Cover = AddComponent<CoverClass>();
+            if (Cover == null) return false;
+
+            FlashLight = player.gameObject?.AddComponent<FlashLightComponent>();
+            if (FlashLight == null) return false;
+
+            SelfActions = AddComponent<SelfActionClass>();
+            if (SelfActions == null) return false;
+
+            Steering = AddComponent<SteeringClass>();
+            if (Steering == null) return false;
+
+            Grenade = AddComponent<BotGrenadeClass>();
+            if (Grenade == null) return false;
+
+            Mover = AddComponent<MoverClass>();
+            if (Mover == null) return false;
+
+            NoBushESP = AddComponent<NoBushESP>();
+            if (NoBushESP == null) return false;
+
+            EnemyController = AddComponent<EnemyController>();
+            if (EnemyController == null) return false;
+
+            Sounds = AddComponent<SoundsController>();
+            if (Sounds == null) return false;
 
             FriendlyFireClass = new FriendlyFireClass(this);
             Vision = new VisionClass(this);
+            Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component [{botOwner?.name}]");
 
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
+            return true;
         }
 
+        public Collider BotZoneCollider => BotZone?.Collider;
+
+        public AIPlaceInfo BotZone => BotOwner.AIData.PlaceInfo;
+
+        public string ProfileId => BotOwner.ProfileId;
+
+        public string SquadId => Squad.SquadID;
+
         public EnemyController EnemyController { get; private set; }
+
         public NoBushESP NoBushESP { get; private set; }
+
         public bool NoBushESPActive => NoBushESP.NoBushESPActive;
+
         public SAINBotController BotController => SAINPlugin.BotController;
+
+        public List<Player> VisiblePlayers = new List<Player>();
+
+        public List<string> VisiblePlayerIds = new List<string>();
+
+        public Player Player { get; private set; }
 
         private void Update()
         {
@@ -252,9 +326,9 @@ namespace SAIN.Components
                         return Target.Position;
                     }
                 }
-                //if (Time.time - BotOwner.Memory.LastTimeHit < 20f && !BotOwner.Memory.IsPeace)
+                //if (Time.time - botOwner.Memory.LastTimeHit < 20f && !botOwner.Memory.IsPeace)
                 //{
-                //    return BotOwner.Memory.LastHitPos;
+                //    return botOwner.Memory.LastHitPos;
                 //}
                 return null;
             }

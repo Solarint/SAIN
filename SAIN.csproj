@@ -344,7 +344,6 @@
     <Compile Include="Helpers\Util\JsonUtility.cs" />
     <Compile Include="Components\Bot Components\Helpers\ShootHelpers.cs" />
     <Compile Include="Helpers\VectorHelpers.cs" />
-    <Compile Include="Components\Bot Components\Helpers\VisibilityHelpers.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Squad Actions\RegroupAction.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\StandAndShoot.cs" />
     <Compile Include="Components\Bot Components\Layers\SAIN Combat\Solo Actions\Cover\WalkToCover.cs" />

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class SelfActionDecisionClass : SAINBot
+    public class SelfActionDecisionClass : SAINBotAbst
     {
         public SelfActionDecisionClass(SAINComponent bot) : base(bot) { }
 

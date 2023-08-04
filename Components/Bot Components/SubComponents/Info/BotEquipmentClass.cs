@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class BotEquipmentClass : SAINBot
+    public class BotEquipmentClass : SAINBotAbst
     {
         static BotEquipmentClass()
         {

@@ -1,5 +1,6 @@
 ﻿using EFT;
 using Newtonsoft.Json;
+using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
 using static SAIN.Helpers.JsonUtility;
@@ -8,29 +9,10 @@ namespace SAIN.BotPresets
 {
     public sealed class BotType
     {
-        [JsonConstructor]
-        public BotType() { }
-
-        public BotType(WildSpawnType type, string name, string section, string description)
-        {
-            Name = name;
-            Description = description;
-            Section = section;
-            WildSpawnType = type;
-        }
-
-        public BotType(string wildSpawnType, string name, string section, string description)
-        {
-            Name = name;
-            Description = description;
-            Section = section;
-            WildSpawnType = (WildSpawnType)Enum.Parse(typeof(WildSpawnType), wildSpawnType);
-        }
-
-        public readonly string Name;
-        public readonly string Description;
-        public readonly string Section;
-        public readonly WildSpawnType WildSpawnType;
+        public string Name;
+        public string Description;
+        public string Section;
+        public WildSpawnType WildSpawnType;
     }
 
     public class BotTypeClassWrapper
@@ -65,47 +47,36 @@ namespace SAIN.BotPresets
         {
             return new List<BotType>
             {
-            new BotType( WildSpawnType.assault,                 "Scav",                     "Scavs" ,       "Scavs!" ),
-
-            new BotType( "sptUsec",                             "Usec",                     "PMCs" ,        "A PMC of the Usec Faction" ),
-            new BotType( "sptBear",                             "Bear",                     "PMCs" ,        "A PMC of the Bear Faction" ),
-
-            new BotType( WildSpawnType.marksman,                "Scav Sniper",              "Scavs" ,       "The Scav Snipers that spawn on rooftops on certain maps" ),
-            new BotType( WildSpawnType.cursedAssault,           "Tagged and Cursed Scav",   "Scavs" ,       "The type a scav is assigned when the player is marked as Tagged and Cursed" ),
-
-            new BotType( WildSpawnType.bossKnight,              "Knight",                   "Goons" ,       "Goons leader. Close proximity to the goons has been noted to cause smashed keyboards" ),
-            new BotType( WildSpawnType.followerBigPipe,         "BigPipe" ,                 "Goons" ,       "Goons follower. Close proximity to the goons has been noted to cause smashed keyboards\"" ),
-            new BotType( WildSpawnType.followerBirdEye,         "BirdEye",                  "Goons" ,       "Goons follower. Close proximity to the goons has been noted to cause smashed keyboards\"" ),
-
-            new BotType( WildSpawnType.exUsec,                  "Rogue",                    "Other" ,       "Ex Usec Personel on Lighthouse usually found around the water treatment plant" ),
-            new BotType( WildSpawnType.pmcBot,                  "Raider",                   "Other" ,       "Heavily armed scavs typically found on reserve and Labs by default" ),
-            new BotType( WildSpawnType.arenaFighterEvent,       "Bloodhound",               "Other" ,       "From the Live Event, nearly identical to raiders except with different voicelines and better gear. Found in" ),
-
-            new BotType( WildSpawnType.sectantPriest,           "Cultist Priest",           "Other" ,       "Found on Customs, Woods, Factory, Shoreline at night" ),
-            new BotType( WildSpawnType.sectantWarrior,          "Cultist",                  "Other" ,       "Found on Customs, Woods, Factory, Shoreline at night" ),
-
-            new BotType( WildSpawnType.bossKilla,               "Killa",                    "Bosses" ,      "He shoot. Found on Interchange and Streets" ),
-
-            new BotType( WildSpawnType.bossBully,               "Rashala",                  "Bosses" ,      "Customs Boss" ),
-            new BotType( WildSpawnType.followerBully,           "Rashala Guard",            "Followers" ,   "Customs Boss Follower" ),
-
-            new BotType( WildSpawnType.bossKojaniy,             "Shturman",                 "Bosses" ,      "Woods Boss" ),
-            new BotType( WildSpawnType.followerKojaniy,         "Shturman Guard",           "Followers" ,   "Woods Boss Follower" ),
-
-            new BotType( WildSpawnType.bossTagilla,             "Tagilla",                  "Bosses" ,      "He Smash" ),
-            new BotType( WildSpawnType.followerTagilla,         "Tagilla Guard",            "Followers" ,   "They Smash Too?" ),
-
-            new BotType( WildSpawnType.bossSanitar,             "Sanitar",                  "Bosses" ,      "Shoreline Boss" ),
-            new BotType( WildSpawnType.followerSanitar,         "Sanitar Guard",            "Followers" ,   "Shoreline Boss Follower" ),
-
-            new BotType( WildSpawnType.bossGluhar,              "Gluhar",                   "Bosses" ,      "Reserve Boss. Also can be found on Streets." ),
-            new BotType( WildSpawnType.followerGluharSnipe,     "Gluhar Guard Snipe",       "Followers" ,   "Reserve Boss Follower" ),
-            new BotType( WildSpawnType.followerGluharScout,     "Gluhar Guard Scout",       "Followers" ,   "Reserve Boss Follower" ),
-            new BotType( WildSpawnType.followerGluharSecurity,  "Gluhar Guard Security",    "Followers" ,   "Reserve Boss Follower" ),
-            new BotType( WildSpawnType.followerGluharAssault,   "Gluhar Guard Assault",     "Followers" ,   "Reserve Boss Follower" ),
-
-            new BotType( WildSpawnType.bossZryachiy,            "Zryachiy",                 "Bosses" ,      "Lighthouse Island Sniper Boss" ),
-            new BotType( WildSpawnType.followerZryachiy,        "Zryachiy Guard",           "Followers" ,   "Lighthouse Island Sniper Boss Follower" )
+            new BotType{ WildSpawnType = WildSpawnType.assault,                 Name = "Scav",                     Section = "Scavs" ,       Description = "Scavs!" },
+            new BotType{ WildSpawnType = WildSpawnType.crazyAssaultEvent,       Name = "Scary Scav Event",         Section = "Scavs" ,       Description = "Scavs!" },
+            new BotType{ WildSpawnType = EnumValues.WildSpawn.Usec,             Name = "Usec",                     Section = "PMCs" ,        Description = "A PMC of the Usec Faction" },
+            new BotType{ WildSpawnType = EnumValues.WildSpawn.Bear,             Name = "Bear",                     Section = "PMCs" ,        Description = "A PMC of the Bear Faction" },
+            new BotType{ WildSpawnType = WildSpawnType.marksman,                Name = "Scav Sniper",              Section = "Scavs" ,       Description = "The Scav Snipers that spawn on rooftops on certain maps" },
+            new BotType{ WildSpawnType = WildSpawnType.cursedAssault,           Name = "Tagged and Cursed Scav",   Section = "Scavs" ,       Description = "The type a scav is assigned when the player is marked as Tagged and Cursed" },
+            new BotType{ WildSpawnType = WildSpawnType.bossKnight,              Name = "Knight",                   Section = "Goons" ,       Description = "Goons leader. Close proximity to the goons has been noted to cause smashed keyboards" },
+            new BotType{ WildSpawnType = WildSpawnType.followerBigPipe,         Name = "BigPipe" ,                 Section = "Goons" ,       Description = "Goons follower. Close proximity to the goons has been noted to cause smashed keyboards\"" },
+            new BotType{ WildSpawnType = WildSpawnType.followerBirdEye,         Name = "BirdEye",                  Section = "Goons" ,       Description = "Goons follower. Close proximity to the goons has been noted to cause smashed keyboards\"" },
+            new BotType{ WildSpawnType = WildSpawnType.exUsec,                  Name = "Rogue",                    Section = "Other" ,       Description = "Ex Usec Personel on Lighthouse usually found around the water treatment plant" },
+            new BotType{ WildSpawnType = WildSpawnType.pmcBot,                  Name = "Raider",                   Section = "Other" ,       Description = "Heavily armed scavs typically found on reserve and Labs by default" },
+            new BotType{ WildSpawnType = WildSpawnType.arenaFighterEvent,       Name = "Bloodhound",               Section = "Other" ,       Description = "From the Live Event, nearly identical to raiders except with different voicelines and better gear. Found in" },
+            new BotType{ WildSpawnType = WildSpawnType.sectantPriest,           Name = "Cultist Priest",           Section = "Other" ,       Description = "Found on Customs, Woods, Factory, Shoreline at night" },
+            new BotType{ WildSpawnType = WildSpawnType.sectantWarrior,          Name = "Cultist",                  Section = "Other" ,       Description = "Found on Customs, Woods, Factory, Shoreline at night" },
+            new BotType{ WildSpawnType = WildSpawnType.bossKilla,               Name = "Killa",                    Section = "Bosses" ,      Description = "He shoot. Found on Interchange and Streets" },
+            new BotType{ WildSpawnType = WildSpawnType.bossBully,               Name = "Rashala",                  Section = "Bosses" ,      Description = "Customs Boss" },
+            new BotType{ WildSpawnType = WildSpawnType.followerBully,           Name = "Rashala Guard",            Section = "Followers" ,   Description = "Customs Boss Follower" },
+            new BotType{ WildSpawnType = WildSpawnType.bossKojaniy,             Name = "Shturman",                 Section = "Bosses" ,      Description = "Woods Boss" },
+            new BotType{ WildSpawnType = WildSpawnType.followerKojaniy,         Name = "Shturman Guard",           Section = "Followers" ,   Description = "Woods Boss Follower" },
+            new BotType{ WildSpawnType = WildSpawnType.bossTagilla,             Name = "Tagilla",                  Section = "Bosses" ,      Description = "He Smash" },
+            new BotType{ WildSpawnType = WildSpawnType.followerTagilla,         Name = "Tagilla Guard",            Section = "Followers" ,   Description = "They Smash Too?" },
+            new BotType{ WildSpawnType = WildSpawnType.bossSanitar,             Name = "Sanitar",                  Section = "Bosses" ,      Description = "Shoreline Boss" },
+            new BotType{ WildSpawnType = WildSpawnType.followerSanitar,         Name = "Sanitar Guard",            Section = "Followers" ,   Description = "Shoreline Boss Follower" },
+            new BotType{ WildSpawnType = WildSpawnType.bossGluhar,              Name = "Gluhar",                   Section = "Bosses" ,      Description = "Reserve Boss. Also can be found on Streets." },
+            new BotType{ WildSpawnType = WildSpawnType.followerGluharSnipe,     Name = "Gluhar Guard Snipe",       Section = "Followers" ,   Description = "Reserve Boss Follower" },
+            new BotType{ WildSpawnType = WildSpawnType.followerGluharScout,     Name = "Gluhar Guard Scout",       Section = "Followers" ,   Description = "Reserve Boss Follower" },
+            new BotType{ WildSpawnType = WildSpawnType.followerGluharSecurity,  Name = "Gluhar Guard Security",    Section = "Followers" ,   Description = "Reserve Boss Follower" },
+            new BotType{ WildSpawnType = WildSpawnType.followerGluharAssault,   Name = "Gluhar Guard Assault",     Section = "Followers" ,   Description = "Reserve Boss Follower" },
+            new BotType{ WildSpawnType = WildSpawnType.bossZryachiy,            Name = "Zryachiy",                 Section = "Bosses" ,      Description = "Lighthouse Island Sniper Boss" },
+            new BotType{ WildSpawnType = WildSpawnType.followerZryachiy,        Name = "Zryachiy Guard",           Section = "Followers" ,   Description = "Lighthouse Island Sniper Boss Follower" }
             };
         }
     }

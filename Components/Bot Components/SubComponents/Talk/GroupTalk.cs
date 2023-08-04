@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class GroupTalk : SAINBot
+    public class GroupTalk : SAINBotAbst
     {
         private BotTalkClass Talk => SAIN.Talk;
 

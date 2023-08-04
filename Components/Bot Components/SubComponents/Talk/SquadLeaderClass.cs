@@ -11,7 +11,7 @@ using BepInEx.Logging;
 
 namespace SAIN.Classes
 {
-    public class SquadLeaderClass : SAINBot
+    public class SquadLeaderClass : SAINBotAbst
     {
         public SquadLeaderClass(SAINComponent owner) : base(owner)
         {

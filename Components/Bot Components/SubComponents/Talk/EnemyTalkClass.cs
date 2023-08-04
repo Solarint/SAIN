@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class EnemyTalk : SAINBot
+    public class EnemyTalk : SAINBotAbst
     {
         public EnemyTalk(SAINComponent bot) : base(bot)
         {

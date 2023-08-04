@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 namespace SAIN.Classes
 {
-    public class SearchClass : SAINBot
+    public class SearchClass : SAINBotAbst
     {
         public bool PeekingCorner { get; private set; }
         public MoveDangerPoint SearchMovePoint { get; private set; }

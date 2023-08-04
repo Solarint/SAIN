@@ -11,7 +11,7 @@ using SAIN.Components;
 
 namespace SAIN.Classes
 {
-    public class JumpClass : SAINBot
+    public class JumpClass : SAINBotAbst
     {
         public JumpClass(SAINComponent owner) : base(owner)
         {

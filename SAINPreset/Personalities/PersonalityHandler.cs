@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace SAIN.SAINPreset.Personalities
 {
-    public class PersonalityManager
+    public class PersonalityManagerClass
     {
-        static PersonalityManager()
+        static PersonalityManagerClass()
         {
             AllTypes = new List<WildSpawnType>();
             foreach (BotType type in BotTypeDefinitions.BotTypesList)
@@ -28,7 +28,7 @@ namespace SAIN.SAINPreset.Personalities
         public static List<WildSpawnType> AllTypes;
         public static List<WildSpawnType> PMCTypes;
 
-        public PersonalityManager(SAINPresetDefinition preset)
+        public PersonalityManagerClass(SAINPresetDefinition preset)
         {
             Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
 

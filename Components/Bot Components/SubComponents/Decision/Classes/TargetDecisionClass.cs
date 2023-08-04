@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class TargetDecisionClass : SAINBot
+    public class TargetDecisionClass : SAINBotAbst
     {
         public TargetDecisionClass(SAINComponent bot) : base(bot) { }
         public float FoundTargetTimer { get; private set; }

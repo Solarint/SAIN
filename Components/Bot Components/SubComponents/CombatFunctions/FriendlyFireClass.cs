@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class FriendlyFireClass : SAINBot
+    public class FriendlyFireClass : SAINBotAbst
     {
         public FriendlyFireClass(SAINComponent owner) : base(owner) { }
 

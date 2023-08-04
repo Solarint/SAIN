@@ -49,12 +49,14 @@ namespace SAIN.Helpers
                 WildSpawnType.marksman
             };
 
-            public static readonly WildSpawnType Usec = (WildSpawnType)Enum.Parse(typeof(WildSpawnType), "sptUsec");
-            public static readonly WildSpawnType Bear = (WildSpawnType)Enum.Parse(typeof(WildSpawnType), "sptBear");
+            public static readonly WildSpawnType Usec = Parse<WildSpawnType>("sptUsec");
+            public static readonly WildSpawnType Bear = Parse<WildSpawnType>("sptBear");
 
             public static List<WildSpawnType> Bosses;
             public static List<WildSpawnType> Followers;
         }
+
+        public static T Parse<T>(string value) => (T)Enum.Parse(typeof(T), value);
 
         public static BotDifficulty[] Difficulties => GetEnum<BotDifficulty>();
         public static WildSpawnType[] WildSpawnTypes => GetEnum<WildSpawnType>();

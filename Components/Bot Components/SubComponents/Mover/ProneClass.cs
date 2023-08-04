@@ -14,7 +14,7 @@ using SAIN.Helpers;
 
 namespace SAIN.Classes.Mover
 {
-    public class ProneClass : SAINBot
+    public class ProneClass : SAINBotAbst
     {
         static ProneClass()
         {

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class SAINBotInfo : SAINInfoAbstract
+    public class SAINBotInfo : SAINInfoAbst
     {
         public SAINBotInfo(SAINComponent sain) : base(sain)
         {

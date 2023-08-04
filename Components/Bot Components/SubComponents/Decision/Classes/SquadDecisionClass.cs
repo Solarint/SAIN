@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SAIN.Classes
 {
-    public class SquadDecisionClass : SAINBot
+    public class SquadDecisionClass : SAINBotAbst
     {
         public SquadDecisionClass(SAINComponent bot) : base(bot) { }
 

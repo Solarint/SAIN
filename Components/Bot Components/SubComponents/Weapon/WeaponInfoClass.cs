@@ -19,18 +19,33 @@ namespace SAIN.Classes
             Firemode = new Firemode(bot);
         }
 
-        private readonly float DefaultAccuracy;
+        private float? DefaultAccuracy;
+        private float AssignedSpread = 1f;
+        private float AccuracySpreadMulti => SAIN.Info.FileSettings.Aiming.AccuracySpreadMulti * SAINPlugin.LoadedPreset.GlobalSettings.Aiming.AccuracySpreadMultiGlobal;
 
         public void ManualUpdate()
         {
-            BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = DefaultAccuracy * SAIN.Info.FileSettings.Aiming.AccuracySpreadMulti;
-
-            if (BotOwner.WeaponManager?.Selector?.IsWeaponReady == true)
+            var preset = BotOwner?.WeaponManager?.WeaponAIPreset;
+            if (preset != null)
+            {
+                if (DefaultAccuracy == null)
+                {
+                    DefaultAccuracy = preset.XZ_COEF;
+                }
+                if (DefaultAccuracy != null && AssignedSpread != AccuracySpreadMulti)
+                {
+                    AssignedSpread = AccuracySpreadMulti;
+                    preset.XZ_COEF = DefaultAccuracy.Value * AccuracySpreadMulti;
+                }
+            }
+            var manager = BotOwner?.WeaponManager;
+            if (manager.Selector?.IsWeaponReady == true)
             {
                 Firemode.CheckSwap();
-                if (BotOwner.WeaponManager.CurrentWeapon?.Template != LastCheckedWeapon)
+                Weapon weapon = manager.CurrentWeapon;
+                if (weapon != null && weapon.Template != LastCheckedWeapon)
                 {
-                    LastCheckedWeapon = CurrentWeapon.Template;
+                    LastCheckedWeapon = weapon.Template;
                     FinalModifier = Mathf.Round(Modifiers.FinalModifier * 100f) / 100f;
                 }
             }
@@ -407,7 +422,7 @@ namespace SAIN.Classes
         }
     }
 
-    public abstract class SAINWeaponInfoAbstract : SAINInfoAbstract
+    public abstract class SAINWeaponInfoAbstract : SAINInfoAbst
     {
         public SAINWeaponInfoAbstract(SAINComponent owner) : base(owner) {}
 

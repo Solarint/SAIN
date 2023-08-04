@@ -29,7 +29,13 @@ namespace SAIN.Plugin
             {
                 if (!LoadPresetDefinition(DefaultPreset, out presetDefinition))
                 {
-                    presetDefinition = new SAINPresetDefinition(DefaultPreset, "The Default SAIN Preset", "Solarint");
+                    presetDefinition = new SAINPresetDefinition
+                    {
+                        Name = DefaultPreset, 
+                        Description = "The Default SAIN Preset", 
+                        Creator = "Solarint" 
+                    };
+                    SavePresetDefinition(presetDefinition);
                 }
             }
             SavePresetDefinition(presetDefinition);

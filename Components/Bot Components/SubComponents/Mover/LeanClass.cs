@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SAIN.Classes.Mover
 {
-    public class LeanClass : SAINBot
+    public class LeanClass : SAINBotAbst
     {
         public LeanSetting LeanDirection { get; private set; }
 

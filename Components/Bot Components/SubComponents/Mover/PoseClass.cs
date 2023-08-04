@@ -15,7 +15,7 @@ using SAIN.Components;
 
 namespace SAIN.Classes.Mover
 {
-    public class PoseClass : SAINBot
+    public class PoseClass : SAINBotAbst
     {
         public PoseClass(SAINComponent owner) : base(owner)
         {
