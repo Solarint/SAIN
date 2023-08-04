@@ -21,7 +21,7 @@ namespace SAIN.Classes
         public ManualLogSource Logger { get; private set; }
         public Player Player { get; private set; }
 
-        public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.GetPlayer != null;
+        public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.EnemyPlayer != null && (!Enemy.Person.IsAI || Enemy.Person.AIData.BotOwner.BotState == EBotState.Active);
 
         public SAINEnemy Enemy { get; private set; }
 

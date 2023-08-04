@@ -10,10 +10,6 @@ namespace SAIN.Classes
 {
     public class SAINEnemy : SAINBotAbst
     {
-        static SAINEnemy()
-        {
-        }
-
         public SAINEnemy(SAINComponent bot, IAIDetails person) : base(bot)
         {
             Person = person;

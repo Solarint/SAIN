@@ -55,51 +55,25 @@ namespace SAIN.Components
             {
                 NoBushESP = AddComponent<NoBushESP>();
                 NoBushESP.Init(BotOwner, this);
-                Components.Add(NoBushESP);
-
 
                 // Must be first, other classes use it
                 Squad = AddSubComponent<SquadClass>();
-                Components.Add(Squad);
 
                 Equipment = new BotEquipmentClass(this);
                 Info = new SAINBotInfo(this);
 
                 BotStuck = AddSubComponent<SAINBotUnstuck>();
-                Components.Add(BotStuck);
-
                 Hearing = AddSubComponent<HearingSensorClass>();
-                Components.Add(Hearing);
-
                 Talk = AddSubComponent<BotTalkClass>();
-                Components.Add(Talk);
-
                 Decision = AddSubComponent<DecisionClass>();
-                Components.Add(Decision);
-
                 Cover = AddSubComponent<CoverClass>();
-                Components.Add(Cover);
-
                 FlashLight = player?.gameObject?.AddComponent<FlashLightComponent>();
-                Components.Add(FlashLight);
-
                 SelfActions = AddSubComponent<SelfActionClass>();
-                Components.Add(SelfActions);
-
                 Steering = AddSubComponent<SteeringClass>();
-                Components.Add(Steering);
-
                 Grenade = AddSubComponent<BotGrenadeClass>();
-                Components.Add(Grenade);
-
                 Mover = AddSubComponent<MoverClass>();
-                Components.Add(Mover);
-
                 EnemyController = AddSubComponent<EnemyController>();
-                Components.Add(EnemyController);
-
                 Sounds = AddSubComponent<SoundsController>();
-                Components.Add(Sounds);
 
                 FriendlyFireClass = new FriendlyFireClass(this);
                 Vision = new VisionClass(this);
@@ -256,7 +230,6 @@ namespace SAIN.Components
 
         public bool HasEnemy => EnemyController.HasEnemy;
         public SAINEnemy Enemy => HasEnemy ? EnemyController.Enemy : null;
-        private readonly List<Component> Components = new List<Component>();
 
         public void Dispose()
         {
@@ -267,32 +240,19 @@ namespace SAIN.Components
                 Info?.Dispose();
                 Cover?.Dispose();
 
-                foreach (var component in Components)
-                {
-                    Destroy(component);
-                }
-                if (Squad != null)
-                {
-                    Logger.LogDebug("Component List Destruction Fail");
-
-                    Destroy(Squad);
-                    Destroy(BotStuck);
-                    Destroy(Hearing);
-                    Destroy(Talk);
-                    Destroy(Decision);
-                    Destroy(FlashLight);
-                    Destroy(SelfActions);
-                    Destroy(Steering);
-                    Destroy(Grenade);
-                    Destroy(Mover);
-                    Destroy(NoBushESP);
-                    Destroy(EnemyController);
-                    Destroy(Sounds);
-                }
-                else
-                {
-                    Logger.LogDebug("Component List Destruction Sucess");
-                }
+                Destroy(Squad);
+                Destroy(BotStuck);
+                Destroy(Hearing);
+                Destroy(Talk);
+                Destroy(Decision);
+                Destroy(FlashLight);
+                Destroy(SelfActions);
+                Destroy(Steering);
+                Destroy(Grenade);
+                Destroy(Mover);
+                Destroy(NoBushESP);
+                Destroy(EnemyController);
+                Destroy(Sounds);
 
                 Destroy(this);
             }
