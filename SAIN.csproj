@@ -298,8 +298,6 @@
     <Compile Include="Editor\GUISections\PresetEditor.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
     <Compile Include="Helpers\EFTInfo.cs" />
-    <Compile Include="Helpers\SAINDictionary.cs" />
-    <Compile Include="Helpers\ServerBotSettings.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Helpers\Util\Textures\ModifyTexture.cs" />
     <Compile Include="Helpers\Util\Textures\SaveTexture.cs" />

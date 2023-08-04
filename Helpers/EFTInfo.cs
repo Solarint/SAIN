@@ -35,11 +35,6 @@ namespace SAIN.Helpers
             return player != null && Compare(player, MainPlayer);
         }
 
-        public static string ProfileId(DamageInfo damage) => damage.Player?.iPlayer?.ProfileId;
-        public static string ProfileId(IAIDetails player) => player?.ProfileId;
-        public static string ProfileId(Player player) => player?.ProfileId;
-        public static string ProfileId(BotOwner bot) => bot?.ProfileId;
-
         public static Player GetPlayer(SAINComponent bot) => GetPlayer(bot?.ProfileId);
         public static Player GetPlayer(BotOwner bot) => GetPlayer(bot?.ProfileId);
         public static Player GetPlayer(IAIDetails person) => GetPlayer(person?.ProfileId);
@@ -52,17 +47,6 @@ namespace SAIN.Helpers
         public static bool Compare(Player A, Player B) => Compare(A?.ProfileId, B?.ProfileId);
         public static bool Compare(Player A, string B) => Compare(A?.ProfileId, B);
         public static bool Compare(string A, Player B) => Compare(A, B);
-
-        public static bool Compare(SAINComponent A, SAINComponent B) => Compare(A?.ProfileId, B?.ProfileId);
-        public static bool Compare(SAINComponent A, BotOwner B) => Compare(A?.ProfileId, B?.ProfileId);
-        public static bool Compare(BotOwner A, SAINComponent B) => Compare(A?.ProfileId, B?.ProfileId);
-
-        public static bool Compare(SAINComponent A, Player B) => Compare(A?.ProfileId, B?.ProfileId);
-        public static bool Compare(Player A, SAINComponent B) => Compare(A?.ProfileId, B?.ProfileId);
-
-        public static bool Compare(BotOwner A, BotOwner B) => Compare(A?.ProfileId, B?.ProfileId);
-        public static bool Compare(BotOwner A, Player B) => Compare(A?.ProfileId, B?.ProfileId);
-        public static bool Compare(Player A, BotOwner B) => Compare(A?.ProfileId, B?.ProfileId);
 
         public static bool Compare(string A, string B) => A == B;
 

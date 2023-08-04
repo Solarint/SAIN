@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SAIN
+﻿namespace SAIN
 {
     public static class PluginInfo
     {
@@ -19,6 +13,7 @@ namespace SAIN
             public const string Version = "3.6.0";
             public const string Creator = "SPT-AKI Team";
         }
+
         public static class BigBrain
         {
             public const string GUID = "xyz.drakia.bigbrain";
@@ -26,6 +21,7 @@ namespace SAIN
             public const string Version = "0.2.0";
             public const string Creator = "DrakiaXYZ";
         }
+
         public static class Waypoints
         {
             public const string GUID = "xyz.drakia.waypoints";
@@ -42,6 +38,7 @@ namespace SAIN
             public const string Creator = "Skwizzy";
             public static bool Loaded = false;
         }
+
         public static class RealismMod
         {
             public const string GUID = "RealismMod";
