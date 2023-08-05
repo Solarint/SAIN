@@ -12,28 +12,22 @@ namespace SAIN.SAINPreset.Settings
     public class CoverSettings
     {
         [DefaultValue(0.75f)]
-        [Minimum(0.5f)]
-        [Maximum(1.5f)]
-        [Rounding(100f)]
-        [IsAdvanced(true)]
+        [MinMaxRound(0.5f, 1.5f, 100f)]
+        [AdvancedOptions(true)]
         public float CoverMinHeight = 0.75f;
 
         [DefaultValue(8f)]
-        [Minimum(0f)]
-        [Maximum(30f)]
-        [Rounding(1f)]
-        [IsAdvanced(true)]
+        [MinMaxRound(0f, 30f, 1f)]
+        [AdvancedOptions(true)]
         public float CoverMinEnemyDistance = 8f;
 
         [DefaultValue(0.33f)]
-        [Minimum(0.01f)]
-        [Maximum(1f)]
-        [Rounding(100f)]
-        [IsAdvanced(true)]
+        [MinMaxRound(0.01f, 1f, 100f)]
+        [AdvancedOptions(true)]
         public float CoverUpdateFrequency = 0.33f;
 
         [DefaultValue(false)]
-        [IsAdvanced(true)]
+        [AdvancedOptions(true)]
         public bool DebugCoverFinder = false;
     }
 }

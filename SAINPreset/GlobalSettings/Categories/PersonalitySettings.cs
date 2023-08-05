@@ -9,8 +9,8 @@ namespace SAIN.SAINPreset.Settings
 {
     public class PersonalitySettings
     {
-        public bool AllChads;
-        public bool AllGigaChads;
-        public bool AllRats;
+        public bool AllChads = false;
+        public bool AllGigaChads = false;
+        public bool AllRats = false;
     }
 }

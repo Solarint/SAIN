@@ -9,62 +9,44 @@ namespace SAIN.BotSettings.Categories
     public class SAINCoreSettings
     {
         [DefaultValue(160f)]
-        [Minimum(45f)]
-        [Maximum(180f)]
-        [Rounding(1)]
+        [MinMaxRound(45f, 180f)]
         public float VisibleAngle = 160f;
 
         [DefaultValue(150f)]
-        [Minimum(50f)]
-        [Maximum(500f)]
-        [Rounding(1)]
-        [UseEFTBotDefault(true)]
+        [MinMaxRound(50f, 500f)]
+        [AdvancedOptions(false, false, true)]
         public float VisibleDistance = 150f;
 
         [DefaultValue(0.2f)]
-        [Minimum(0.05f)]
-        [Maximum(0.95f)]
-        [Rounding(100)]
-        [IsAdvanced(true)]
-        [UseEFTBotDefault(true)]
+        [MinMaxRound(0.05f, 0.95f, 100f)]
+        [AdvancedOptions(true, false, true)]
         public float GainSightCoef = 0.2f;
 
         [DefaultValue(0.08f)]
-        [Minimum(0.01f)]
-        [Maximum(0.5f)]
-        [Rounding(100)]
-        [IsAdvanced(true)]
-        [UseEFTBotDefault(true)]
+        [MinMaxRound(0.01f, 0.5f, 100f)]
+        [AdvancedOptions(true, false, true)]
         public float ScatteringPerMeter = 0.08f;
 
         [DefaultValue(0.12f)]
-        [Minimum(0.01f)]
-        [Maximum(0.5f)]
-        [Rounding(100)]
-        [IsAdvanced(true)]
-        [UseEFTBotDefault(true)]
+        [MinMaxRound(0.01f, 0.5f, 100f)]
+        [AdvancedOptions(true, false, true)]
         public float ScatteringClosePerMeter = 0.12f;
 
-        [DefaultValue(1.2f)]
-        [Minimum(1f)]
-        [Maximum(2f)]
-        [Rounding(100)]
-        [IsAdvanced(true)]
-        [UseEFTBotDefault(true)]
-        public float DamageCoeff = 1.2f;
+        [DefaultValue(1.33f)]
+        [MinMaxRound(1f, 2f, 100f)]
+        [AdvancedOptions(true)]
+        public float DamageCoeff = 1.33f;
 
-        [Name("Audible Range Multiplier")]
-        [Description("Modifies the distance that this bot can hear sounds")]
+        [NameAndDescription(
+            "Audible Range Multiplier",
+            "Modifies the distance that this bot can hear sounds")]
         [DefaultValue(1f)]
-        [Minimum(0.1f)]
-        [Maximum(3f)]
-        [Rounding(100)]
-        [UseEFTBotDefault(true)]
+        [MinMaxRound(0.1f, 3f, 100f)]
+        [AdvancedOptions(false, false, true)]
         public float HearingSense = 1f;
 
         [DefaultValue(true)]
-        [IsAdvanced(true)]
-        [IsHidden(true)]
+        [AdvancedOptions(true, true)]
         public bool CanRun = true;
 
         [DefaultValue(true)]

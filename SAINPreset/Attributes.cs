@@ -199,14 +199,21 @@ namespace SAIN.SAINPreset.Attributes
         {
             public AttributesClass(FieldInfo field)
             {
-                Name = field.GetCustomAttribute<NameAttribute>()?.Name ?? field.Name;
-                Description = field.GetCustomAttribute<DescriptionAttribute>()?.Description;
+                var nameDescription = field.GetCustomAttribute<NameAndDescriptionAttribute>();
+                Name = nameDescription?.Name ?? field.Name;
+                Description = nameDescription?.Description;
+
                 Default = field.GetCustomAttribute<DefaultValueAttribute>()?.Value;
-                Min = field.GetCustomAttribute<MinimumAttribute>()?.Min;
-                Max = field.GetCustomAttribute<MaximumAttribute>()?.Max;
-                Rounding = field.GetCustomAttribute<RoundingAttribute>()?.Rounding;
-                IsHidden = field.GetCustomAttribute<IsHiddenAttribute>()?.Value == true;
-                IsAdvanced = field.GetCustomAttribute<IsAdvancedAttribute>()?.Value == true;
+
+                var minMax = field.GetCustomAttribute<MinMaxRoundAttribute>();
+                Min = minMax?.Min;
+                Max = minMax?.Max;
+                Rounding = minMax?.Rounding;
+
+                var custom = field.GetCustomAttribute<AdvancedOptionsAttribute>();
+                IsHidden = custom?.IsHidden == true;
+                IsAdvanced = custom?.IsAdvanced == true;
+                GetDefaultFromEFT = custom?.CopyValueFromEFT == true;
             }
 
             public readonly string Name;
@@ -217,55 +224,58 @@ namespace SAIN.SAINPreset.Attributes
             public readonly float? Rounding;
             public readonly bool IsHidden = false;
             public readonly bool IsAdvanced = false;
+            public readonly bool GetDefaultFromEFT = false;
         }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public sealed class NameAttribute : Attribute
+    public sealed class NameAndDescriptionAttribute : Attribute
     {
-        public NameAttribute(string name)
+        public NameAndDescriptionAttribute(string name, string description = null)
         {
             this.name = name;
+            this.description = description;
         }
 
         public string Name
         {
             get { return name; }
         }
+        public string Description
+        {
+            get { return description; }
+        }
 
         readonly string name;
+        readonly string description;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public sealed class MinimumAttribute : Attribute
+    public sealed class MinMaxRoundAttribute : Attribute
     {
-        public MinimumAttribute(float min)
+        public MinMaxRoundAttribute(float min, float max, float rounding = 1f)
         {
             this.min = min;
+            this.max = max;
+            this.rounding = rounding;
         }
 
         public float Min
         {
             get { return min; }
         }
-
-        readonly float min;
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class MaximumAttribute : Attribute
-    {
-        public MaximumAttribute(float max)
-        {
-            this.max = max;
-        }
-
         public float Max
         {
             get { return max; }
         }
+        public float Rounding
+        {
+            get { return rounding; }
+        }
 
+        readonly float min;
         readonly float max;
+        readonly float rounding;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -284,51 +294,32 @@ namespace SAIN.SAINPreset.Attributes
         readonly float rounding;
     }
 
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class IsHiddenAttribute : Attribute
-    {
-        public IsHiddenAttribute(bool value)
-        {
-            this.value = value;
-        }
-
-        public bool Value
-        {
-            get { return value; }
-        }
-
-        readonly bool value;
-    }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public sealed class IsAdvancedAttribute : Attribute
+    public sealed class AdvancedOptionsAttribute : Attribute
     {
-        public IsAdvancedAttribute(bool value)
+        public AdvancedOptionsAttribute(bool isAdvanced = false, bool isHidden = false, bool copyValueFromEFT = false)
         {
-            this.value = value;
+            this.isAdvanced = isAdvanced;
+            this.isHidden = isHidden;
+            this.copyValueFromEFT = copyValueFromEFT;
         }
 
-        public bool Value
+        public bool IsAdvanced
         {
-            get { return value; }
+            get { return isAdvanced; }
+        }
+        public bool IsHidden
+        {
+            get { return isHidden; }
+        }
+        public bool CopyValueFromEFT
+        {
+            get { return copyValueFromEFT; }
         }
 
-        readonly bool value;
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public sealed class UseEFTBotDefaultAttribute : Attribute
-    {
-        public UseEFTBotDefaultAttribute(bool value)
-        {
-            this.value = value;
-        }
-
-        public bool Value
-        {
-            get { return value; }
-        }
-
-        readonly bool value;
+        readonly bool isAdvanced;
+        readonly bool isHidden;
+        readonly bool copyValueFromEFT;
     }
 }

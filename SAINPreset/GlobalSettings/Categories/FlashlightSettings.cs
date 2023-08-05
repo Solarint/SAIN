@@ -12,19 +12,16 @@ namespace SAIN.SAINPreset.Settings
     public class FlashlightSettings
     {
         [DefaultValue(3f)]
-        [Minimum(0.25f)]
-        [Maximum(10f)]
-        [Rounding(100f)]
+        [MinMaxRound(0.25f, 10f, 100f)]
         public float DazzleEffectiveness = 3f;
 
         [DefaultValue(30f)]
-        [Minimum(0f)]
-        [Maximum(60f)]
+        [MinMaxRound(0f, 60f)]
         [Rounding(1f)]
         public float MaxDazzleRange = 30f;
 
         [DefaultValue(false)]
-        [IsAdvanced(true)]
+        [AdvancedOptions(true)]
         public bool DebugFlash = false;
 
         [DefaultValue(false)]

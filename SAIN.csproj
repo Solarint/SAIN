@@ -220,6 +220,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Interfaces.cs" />
+    <Compile Include="Editor\GUISections\PresetSelection.cs" />
     <Compile Include="SAINPreset\BotTypeDefinitions.cs" />
     <Compile Include="Helpers\EnumValues.cs" />
     <Compile Include="Plugin\PresetHandler.cs" />

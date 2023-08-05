@@ -263,13 +263,13 @@ namespace SAIN.Editor.Abstract
         public void CreateGUIAdjustmentSliders()
         {
             BaseHeight = HorizontalSliderNoStyle(nameof(BaseHeight), BaseHeight, 5f, 50f);
-            BaseHeight = Editor.PresetEditor.Round(BaseHeight);
+            BaseHeight = Editor.BotSelectionClass.Round(BaseHeight);
 
             TallHeight = HorizontalSliderNoStyle(nameof(TallHeight), TallHeight, 5f, 80f);
-            TallHeight = Editor.PresetEditor.Round(TallHeight);
+            TallHeight = Editor.BotSelectionClass.Round(TallHeight);
 
             BaseLabelWidth = HorizontalSliderNoStyle(nameof(BaseLabelWidth), BaseLabelWidth, 50f, 250f);
-            BaseLabelWidth = Editor.PresetEditor.Round(BaseLabelWidth);
+            BaseLabelWidth = Editor.BotSelectionClass.Round(BaseLabelWidth);
         }
 
         public GUILayoutOption StandardHeight => Height(BaseHeight);

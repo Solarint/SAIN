@@ -115,7 +115,7 @@ namespace SAIN.BotSettings
             }
         }
 
-        private bool ShallUseEFTBotDefault(FieldInfo field) => field.GetCustomAttribute<UseEFTBotDefaultAttribute>()?.Value == true;
+        private bool ShallUseEFTBotDefault(FieldInfo field) => field.GetCustomAttribute<AdvancedOptionsAttribute>()?.CopyValueFromEFT == true;
 
         public void LoadEFTSettings()
         {

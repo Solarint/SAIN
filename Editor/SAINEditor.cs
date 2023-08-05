@@ -7,6 +7,8 @@ using SAIN.BotSettings;
 using SAIN.BotSettings.Categories;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
+using SAIN.Plugin;
+using SAIN.SAINPreset;
 using SAIN.SAINPreset.GlobalSettings;
 using System;
 using UnityEngine;
@@ -30,24 +32,26 @@ namespace SAIN.Editor
             TexturesClass = new TexturesClass(this);
             Colors = new ColorsClass(this);
             StyleOptions = new StyleOptions(this);
-            PresetEditor = new PresetEditor(this);
+            BotSelectionClass = new PresetEditor(this);
             Builder = new BuilderClass(this);
             Buttons = new ButtonsClass(this);
             MouseFunctions = new MouseFunctions(this);
             WindowLayoutCreator = new WindowLayoutCreator(this);
             BotSettingsEditor = new BotSettingsEditor(this);
             BotPersonalityEditor = new BotPersonalityEditor(this);
+            PresetSelection = new PresetSelection(this);
         }
 
         internal static Texture2D TooltipBg { get; private set; }
 
+        public PresetSelection PresetSelection { get; private set; }
         public BotPersonalityEditor BotPersonalityEditor { get; private set; }
         public BotSettingsEditor BotSettingsEditor { get; private set; }
         public WindowLayoutCreator WindowLayoutCreator { get; private set; }
         public MouseFunctions MouseFunctions { get; private set; }
         public ButtonsClass Buttons { get; private set; }
         public BuilderClass Builder { get; private set; }
-        public PresetEditor PresetEditor { get; private set; }
+        public PresetEditor BotSelectionClass { get; private set; }
         public StyleOptions StyleOptions { get; private set; }
         public ColorsClass Colors { get; private set; }
         public TexturesClass TexturesClass { get; private set; }
@@ -160,9 +164,9 @@ namespace SAIN.Editor
 
                 MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", StyleOptions.GetStyle(Style.window));
 
-                if (PresetEditor.OpenAdjustmentWindow)
+                if (BotSelectionClass.OpenAdjustmentWindow)
                 {
-                    AdjustmentRect = Builder.NewWindow(1, AdjustmentRect, PresetEditor.GUIAdjustment, "GUI Adjustment");
+                    AdjustmentRect = Builder.NewWindow(1, AdjustmentRect, BotSelectionClass.GUIAdjustment, "GUI Adjustment");
                 }
 
                 UnityInput.Current.ResetInputAxes();
@@ -183,11 +187,11 @@ namespace SAIN.Editor
 
         public static readonly string None = nameof(None);
         public static readonly string Home = nameof(Home);
-        public static readonly string BotPresets = nameof(BotPresets);
-        public static readonly string Hearing = nameof(Hearing);
-        public static readonly string Personalities = nameof(Personalities);
+        public static readonly string Global = "Global Settings";
+        public static readonly string BotSettings = "Bot Settings";
+        public static readonly string Personalities = "Personality Settings";
         public static readonly string Advanced = nameof(Advanced);
-        public static readonly string[] Tabs = { Home, BotPresets, Hearing, Personalities, Advanced };
+        public static readonly string[] Tabs = { Home, Global, BotSettings, Personalities, Advanced };
 
         private static bool Inited = false;
 
@@ -251,10 +255,11 @@ namespace SAIN.Editor
             }
             float spacing = DragRect.height + TabMenuRect.height + 5;
             Builder.Space(spacing);
-            if (TabSelected(BotPresets, out Rect tabRect, 1000f))
+            if (TabSelected(BotSettings, out Rect tabRect, 1000f))
             {
                 Builder.BeginArea(tabRect);
-                PresetEditor.OpenPresetWindow(tabRect);
+                BotSelectionClass.Menu(tabRect);
+                BotSettingsEditor.EditMenu(new SAINSettings());
                 Builder.EndArea();
             }
             else
@@ -263,37 +268,19 @@ namespace SAIN.Editor
 
                 if (TabSelected(Home, out tabRect, 1000f))
                 {
-                    Builder.Box("Mod Detection");
+                    ModDetection.ModDetectionGUI();
 
-                    Builder.BeginHorizontal();
+                    Builder.Space(10f);
 
-                    Buttons.SingleTextBool("Looting Bots", PluginInfo.LootingBots.Loaded);
-                    Buttons.SingleTextBool("Realism Mod", PluginInfo.RealismMod.Loaded);
-
-                    Builder.EndHorizontal();
-
-                    BotSettingsEditor.EditMenu();
+                    PresetSelection.Menu();
                 }
                 else if (TabSelected(Personalities, out tabRect, 1000f))
                 {
                     BotPersonalityEditor.PersonalityMenu();
                 }
-                else if (TabSelected(Hearing, out tabRect, 1000f))
-                {
-                }
                 else if (TabSelected(Advanced, out tabRect, 1000f))
                 {
-                    Builder.Box("Advanced Settings. Edit at your own risk.");
-
-                    AdvancedOptionsEnabled = Builder.Toggle(AdvancedOptionsEnabled, "Advanced Bot Configs");
-
-                    Builder.BeginHorizontal();
-                    if (Builder.Button("Mysterious Button"))
-                    {
-                        Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.PlayerIsDead);
-                        Singleton<GUISounds>.Instance.PlayUISound(EUISoundType.QuestFailed);
-                    }
-                    Builder.EndHorizontal();
+                    AdvancedOptionsEnabled = Builder.Toggle(AdvancedOptionsEnabled, "Advanced Bot Configs", "Edit at your own risk.", Builder.Height(40f));
                 }
 
                 Builder.EndVertical();

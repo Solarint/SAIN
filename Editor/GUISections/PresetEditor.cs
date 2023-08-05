@@ -51,58 +51,15 @@ namespace SAIN.Editor
             }
         }
 
-        public void OpenPresetWindow(Rect windowRect)
+        public void Menu(Rect windowRect)
         {
             PresetWindow = windowRect;
             Rect12Height = windowRect.height;
 
-            BeginVertical();
-
-            BeginHorizontal();
-            const float LabelHeight = 25f;
-            Box("Installed Presets", Height(LabelHeight));
-            Box("Select an installed preset for SAIN Settings", Height(LabelHeight));
-            bool refresh = Button("Refresh", "Refresh installed Presets", Height(LabelHeight));
-            LoadPresetOptions(refresh);
-            EndHorizontal();
-
-            BeginHorizontal();
-            const float InstalledHeight = 30;
-            float endHeight = InstalledHeight + LabelHeight;
-
-            int presetSpacing = 0;
-            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Definition;
-            for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
-            {
-                var preset = PresetHandler.PresetOptions[i];
-                bool selected = selectedPreset.Name == preset.Name;
-                if (Toggle(selected, preset.Name, preset.Description, Height(InstalledHeight)))
-                {
-                    selectedPreset = preset;
-                }
-                if (presetSpacing >= 6)
-                {
-                    endHeight += InstalledHeight;
-                    presetSpacing = 0;
-                    EndHorizontal();
-                    BeginHorizontal();
-                }
-                presetSpacing++;
-            }
-            EndHorizontal();
-
-            EndVertical();
-
-            if (selectedPreset != SAINPlugin.LoadedPreset.Definition)
-            {
-                PresetHandler.InitPresetFromDefinition(selectedPreset);
-                Reset();
-            }
-
             OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
             if (OpenFirstMenu)
             {
-                float startHeight = endHeight + 25;
+                float startHeight = 25;
                 SectionRectangle = new Rect(0, startHeight, SectionRectWidth, FinalWindowHeight);
                 BeginArea(SectionRectangle);
                 SelectSection(SectionRectangle);

@@ -1,4 +1,7 @@
-﻿namespace SAIN
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+namespace SAIN
 {
     public static class PluginInfo
     {
@@ -20,6 +23,14 @@
             public const string Name = nameof(BigBrain);
             public const string Version = "0.2.0";
             public const string Creator = "DrakiaXYZ";
+
+            public static readonly PluginInfoClass Plugin = new PluginInfoClass
+            {
+                Name = Name,
+                Version = Version,
+                Creator = Creator,
+                GUID = GUID
+            };
         }
 
         public static class Waypoints
@@ -28,6 +39,14 @@
             public const string Name = nameof(Waypoints);
             public const string Version = "1.2.0";
             public const string Creator = "DrakiaXYZ";
+
+            public static readonly PluginInfoClass Plugin = new PluginInfoClass
+            {
+                Name = Name,
+                Version = Version,
+                Creator = Creator,
+                GUID = GUID
+            };
         }
 
         public static class LootingBots
@@ -36,7 +55,14 @@
             public const string Name = nameof(LootingBots);
             public const string Version = "1.0.0";
             public const string Creator = "Skwizzy";
-            public static bool Loaded = false;
+
+            public static readonly PluginInfoClass Plugin = new PluginInfoClass
+            {
+                Name = Name,
+                Version = Version,
+                Creator = Creator,
+                GUID = GUID
+            };
         }
 
         public static class RealismMod
@@ -45,8 +71,32 @@
             public const string Name = nameof(RealismMod);
             public const string Version = "1.0.0";
             public const string Creator = "Fontaine";
-            public static bool Loaded = false;
+
+            public static readonly PluginInfoClass Plugin = new PluginInfoClass
+            {
+                Name = Name,
+                Version = Version,
+                Creator = Creator,
+                GUID = GUID
+            };
         }
+
+        public static readonly Dictionary<string, PluginInfoClass> Plugins = new Dictionary<string, PluginInfoClass>
+        {
+            { BigBrain.Name, BigBrain.Plugin },
+            { Waypoints.Name, Waypoints.Plugin },
+            { RealismMod.Name, RealismMod.Plugin },
+            { LootingBots.Name, LootingBots.Plugin },
+        };
+    }
+
+    public sealed class PluginInfoClass
+    {
+        public string GUID;
+        public string Name;
+        public string Version;
+        public string Creator;
+        public bool Loaded;
     }
 
     public static class AssemblyInfo

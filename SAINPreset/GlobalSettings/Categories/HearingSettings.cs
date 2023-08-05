@@ -10,20 +10,18 @@ namespace SAIN.SAINPreset.Settings
 {
     public class HearingSettings
     {
-        [Name("Suppressed Sound Modifier")]
-        [Description("Audible Gun Range is multiplied by this number when using a suppressor")]
+        [NameAndDescription(
+            "Suppressed Sound Modifier",
+            "Audible Gun Range is multiplied by this number when using a suppressor")]
         [DefaultValue(0.6f)]
-        [Minimum(0.1f)]
-        [Maximum(0.95f)]
-        [Rounding(100f)]
+        [MinMaxRound(0.1f, 0.95f, 100f)]
         public float SuppressorModifier = 0.6f;
 
-        [Name("Subsonic Sound Modifier")]
-        [Description("Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo")]
+        [NameAndDescription(
+            "Subsonic Sound Modifier",
+            "Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo")]
         [DefaultValue(0.25f)]
-        [Minimum(0.1f)]
-        [Maximum(0.95f)]
-        [Rounding(100f)]
+        [MinMaxRound(0.1f, 0.95f, 100f)]
         public float SubsonicModifier = 0.25f;
 
         public AmmoSettingDictionary AudibleRanges =

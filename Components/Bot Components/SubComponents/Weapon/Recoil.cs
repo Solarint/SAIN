@@ -113,7 +113,7 @@ namespace SAIN.Classes
         {
             get
             {
-                if (!PluginInfo.RealismMod.Loaded)
+                if (!PluginInfo.Plugins[PluginInfo.RealismMod.Name].Loaded)
                 {
                     return 250f;
                 }

@@ -14,21 +14,14 @@ namespace SAIN.Editor.GUISections
         {
         }
 
-        public void EditMenu(bool open = true)
+        public void EditMenu(SAINSettings settings)
         {
-            if (open)
-            {
-                BeginVertical();
+            BeginVertical();
 
-                SAINSettings testSettings = new SAINSettings();
-                List<object> categories = GetCategories(testSettings);
-                CategoryOpenable(categories);
+            List<object> categories = GetCategories(settings);
+            CategoryOpenable(categories);
 
-                EndVertical();
-            }
-            else
-            {
-            }
+            EndVertical();
         }
 
         private static List<object> GetCategories(object settingsObject)
@@ -58,13 +51,14 @@ namespace SAIN.Editor.GUISections
 
                 if (categoryFields.Length > 0)
                 {
-                    string name = categoryType.GetCustomAttribute<NameAttribute>()?.Name ?? categoryType.Name;
-                    string description = categoryType.GetCustomAttribute<DescriptionAttribute>()?.Description;
-
-                    open = Builder.ExpandableMenu(name, open, description, EntryConfig.EntryHeight, EntryConfig.InfoWidth);
-                    if (open)
+                    foreach (FieldInfo field in categoryFields)
                     {
-                        foreach (FieldInfo field in categoryFields)
+                        var nameDesc = field.GetCustomAttribute<NameAndDescriptionAttribute>();
+                        string name = nameDesc?.Name ?? field.Name;
+                        string description = nameDesc?.Description;
+
+                        open = Builder.ExpandableMenu(name, open, description, EntryConfig.EntryHeight, EntryConfig.InfoWidth);
+                        if (open)
                         {
                             object value = field.GetValue(category);
                             value = GetAttributeValue.AttributesGUI.EditValue(value, field, EntryConfig);

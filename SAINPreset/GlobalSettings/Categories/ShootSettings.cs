@@ -13,31 +13,28 @@ namespace SAIN.SAINPreset.Settings
 {
     public class ShootSettings
     {
-        [Name("Max Recoil Per Shot")]
-        [Description("Maximum Impulse force from a single shot for a bot.")]
+        [NameAndDescription(
+            "Max Recoil Per Shot", 
+            "Maximum Impulse force from a single shot for a bot.")]
         [DefaultValue(2f)]
-        [Minimum(0.1f)]
-        [Maximum(10f)]
-        [Rounding(100f)]
-        [IsAdvanced(true)]
+        [MinMaxRound(0.1f,10f,100f)]
+        [AdvancedOptions(true)]
         public float MaxRecoil = 2f;
 
-        [Name("Add or Subtract Recoil")]
-        [Description("Linearly add or subtract from the final recoil result")]
+        [NameAndDescription(
+            "Add or Subtract Recoil",
+            "Linearly add or subtract from the final recoil result")]
         [DefaultValue(0f)]
-        [Minimum(0.1f)]
-        [Maximum(5f)]
-        [Rounding(100f)]
-        [IsAdvanced(true)]
+        [MinMaxRound(0.1f,5f,100f)]
+        [AdvancedOptions(true)]
         public float AddRecoil = 0f;
 
-        [Name("Recoil Decay p/frame")]
-        [Description("How much to decay the recoil impulse per frame. 0.8 means 20% of the recoil will be removed per frame.")]
+        [NameAndDescription(
+            "Recoil Decay p/frame",
+            "How much to decay the recoil impulse per frame. 0.8 means 20% of the recoil will be removed per frame.")]
         [DefaultValue(0.8f)]
-        [Minimum(0.1f)]
-        [Maximum(0.99f)]
-        [Rounding(100f)]
-        [IsAdvanced(true)]
+        [MinMaxRound(0.1f, 0.99f, 100f)]
+        [AdvancedOptions(true)]
         public float RecoilDecay = 0.8f;
 
         public AmmoSettingDictionary AmmoShootability =

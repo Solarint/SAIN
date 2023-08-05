@@ -31,10 +31,10 @@ namespace SAIN.Editor
             return value ? on : off;
         }
 
-        public void SingleTextBool(string text, bool value)
+        public void SingleTextBool(string text, bool value, params GUILayoutOption[] options)
         {
             string status = value ? ": Detected" : ": Not Detected";
-            Box(text + status);
+            Box(text + status, options);
         }
     }
 }

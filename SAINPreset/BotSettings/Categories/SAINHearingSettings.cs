@@ -8,12 +8,11 @@ namespace SAIN.BotSettings.Categories
 {
     public class SAINHearingSettings
     {
-        [Name("Max Footstep Audio Distance")]
-        [Description("The Maximum Range that a bot can hear footsteps, in meters.")]
+        [NameAndDescription(
+            "Max Footstep Audio Distance",
+            "The Maximum Range that a bot can hear footsteps, in meters.")]
         [DefaultValue(50f)]
-        [Minimum(5f)]
-        [Maximum(100f)]
-        [Rounding(1)]
+        [MinMaxRound(5f, 100f, 1f)]
         public float MaxFootstepAudioDistance = 50f;
     }
 }

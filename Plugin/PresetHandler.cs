@@ -12,10 +12,16 @@ namespace SAIN.Plugin
         public static List<SAINPresetDefinition> PresetOptions = new List<SAINPresetDefinition>();
         public static SAINPresetClass LoadedPreset;
 
+        public static void LoadPresetOptions()
+        {
+            PresetOptions = Load.GetPresetOptions(PresetOptions);
+        }
+
         const string Settings = "Settings";
         public static void Init()
         {
-            PresetOptions = Load.GetPresetOptions(PresetOptions);
+            LoadPresetOptions();
+
             if (!Load.LoadObject(out PresetEditorDefaults presetDefaults, Settings, PresetsFolder))
             {
                 presetDefaults = new PresetEditorDefaults

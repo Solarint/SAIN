@@ -2,12 +2,15 @@
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using DrakiaXYZ.VersionChecker;
+using EFT;
 using SAIN.Components;
 using SAIN.Editor;
+using SAIN.Editor.GUISections;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.SAINPreset;
 using System;
+using System.Reflection;
 using UnityEngine;
 using static SAIN.PluginInfo;
 
@@ -81,7 +84,7 @@ namespace SAIN
 
         private void Update()
         {
-            CheckMods.Update();
+            ModDetection.Update();
             SAINEditor.Update();
             BotControllerHandler.Update();
         }
@@ -93,9 +96,9 @@ namespace SAIN
         public static SAINBotController BotController => BotControllerHandler.BotController;
     }
 
-    public static class CheckMods
+    public static class ModDetection
     {
-        static CheckMods()
+        static ModDetection()
         {
             ModsCheckTimer = Time.time + 5f;
         }
@@ -104,22 +107,53 @@ namespace SAIN
         {
             if (!ModsChecked && ModsCheckTimer < Time.time && ModsCheckTimer > 0)
             {
-                ModsChecked = true;
+                ModsChecked = true; 
+                CheckPlugins();
+            }
+        }
 
-                if (Chainloader.PluginInfos.ContainsKey(RealismMod.GUID))
+        public static void CheckPlugins()
+        {
+            foreach (var keyPair in Plugins)
+            {
+                if (Chainloader.PluginInfos.ContainsKey(keyPair.Value.GUID))
                 {
-                    RealismMod.Loaded = true;
-                    Logger.LogInfo($"SAIN: {RealismMod.Name} Detected. Auto-Adjusting Recoil for Bots...");
-                }
-                if (Chainloader.PluginInfos.ContainsKey(LootingBots.GUID))
-                {
-                    LootingBots.Loaded = true;
-                    Logger.LogInfo($"SAIN: {LootingBots.Name} Detected.");
+                    keyPair.Value.Loaded = true;
+                    Logger.LogInfo($"SAIN: {keyPair.Key} Detected.", typeof(ModDetection));
                 }
             }
         }
 
-        private static float ModsCheckTimer = -1f;
+        public static void ModDetectionGUI()
+        {
+            var Builder = SAINPlugin.SAINEditor.Builder;
+            var Buttons = SAINPlugin.SAINEditor.Buttons;
+
+            Builder.BeginVertical();
+            Builder.BeginHorizontal();
+
+            foreach (var keyPair in Plugins)
+            {
+                var plugin = keyPair.Value;
+                Builder.Space(10);
+
+                string toolTip = $"Version: {plugin.Version} Creator: {plugin.Creator} ID: {plugin.GUID}";
+                Builder.Label(plugin.Name, toolTip, 
+                    Builder.Width(300), Builder.Height(30));
+
+                Builder.Space(5);
+
+                Buttons.Box(plugin.Loaded ? "Installed" : "Not Installed", 
+                    Builder.Width(150), Builder.Height(30));
+
+                Builder.Space(10);
+            }
+
+            Builder.EndHorizontal();
+            Builder.EndVertical();
+        }
+
+        private static readonly float ModsCheckTimer = -1f;
         private static bool ModsChecked = false;
         public static bool RealismLoaded = false;
         public static bool LootingBotsLoaded = false;
