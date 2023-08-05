@@ -117,7 +117,7 @@ internal sealed class ConfigurationManagerAttributes
     public string Description;
 
     /// <summary>
-    /// Name of the setting.
+    /// SAINName of the setting.
     /// </summary>
     public string DispName;
 

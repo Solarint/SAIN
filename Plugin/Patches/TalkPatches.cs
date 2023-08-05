@@ -5,6 +5,13 @@ using SAIN.Components;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SAIN.SAINComponent;
+using SAIN.SAINComponent.Classes.Decision;
+using SAIN.SAINComponent.Classes.Talk;
+using SAIN.SAINComponent.Classes.WeaponFunction;
+using SAIN.SAINComponent.Classes.Mover;
+using SAIN.SAINComponent.Classes;
+using SAIN.SAINComponent.SubComponents;
 
 namespace SAIN.Patches.Talk
 {
@@ -133,7 +140,7 @@ namespace SAIN.Patches.Talk
 
         public static bool AllowDefaultBotTalk(BotOwner botOwner, EPhraseTrigger trigger, ETagStatus? mask)
         {
-            var component = botOwner.GetComponent<SAINComponent>();
+            var component = botOwner.GetComponent<SAINComponentClass>();
             if (component == null)
             {
                 return true;

@@ -16,4 +16,4 @@ using SAIN;
 [assembly: Guid("d08f8f91-95cf-4aa5-b7d8-f5d58f2feabb")]
 [assembly: AssemblyVersion(SAINVersion)]
 [assembly: AssemblyFileVersion(SAINVersion)]
-[assembly: TarkovVersion(AssemblyInfo.TarkovVersion)]
+[assembly: VersionChecker(AssemblyInfo.TarkovVersion)]

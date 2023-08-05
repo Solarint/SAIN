@@ -1,12 +1,16 @@
 ﻿using Comfort.Common;
 using EFT;
-using SAIN.Classes;
+
 using SAIN.Components;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SAIN.SAINComponent;
+using SAIN.SAINComponent.Classes.Decision;
+using SAIN.SAINComponent.Classes.Talk;
+using SAIN.SAINComponent.Classes.WeaponFunction;
+using SAIN.SAINComponent.Classes.Mover;
+using SAIN.SAINComponent.Classes;
+using SAIN.SAINComponent.SubComponents;
 
 namespace SAIN.Helpers
 {
@@ -22,7 +26,7 @@ namespace SAIN.Helpers
             Player player = enemy?.EnemyPlayer;
             return IsPlayerMainPlayer(player);
         }
-        public static bool IsEnemyMainPlayer(SAINComponent bot)
+        public static bool IsEnemyMainPlayer(SAINComponentClass bot)
         {
             return IsEnemyMainPlayer(bot?.Enemy);
         }
@@ -35,7 +39,7 @@ namespace SAIN.Helpers
             return player != null && Compare(player, MainPlayer);
         }
 
-        public static Player GetPlayer(SAINComponent bot) => GetPlayer(bot?.ProfileId);
+        public static Player GetPlayer(SAINComponentClass bot) => GetPlayer(bot?.ProfileId);
         public static Player GetPlayer(BotOwner bot) => GetPlayer(bot?.ProfileId);
         public static Player GetPlayer(IAIDetails person) => GetPlayer(person?.ProfileId);
         public static Player GetPlayer(string profileID) => GameWorld?.GetAlivePlayerByProfileID(profileID);

@@ -1,13 +1,20 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN.Classes;
+
 using System.Reflection;
 using UnityEngine;
 using System;
 using Aki.Reflection.Utils;
 using System.Linq;
 using SAIN.Helpers;
+using SAIN.SAINComponent;
+using SAIN.SAINComponent.Classes.Decision;
+using SAIN.SAINComponent.Classes.Talk;
+using SAIN.SAINComponent.Classes.WeaponFunction;
+using SAIN.SAINComponent.Classes.Mover;
+using SAIN.SAINComponent.Classes;
+using SAIN.SAINComponent.SubComponents;
 
 namespace SAIN.Patches.Shoot
 {

@@ -59,7 +59,7 @@ namespace SAIN.SAINPreset
         public string Name;
         public string Description;
         public string Creator;
-        public readonly string SAINVersion = PluginInfo.Version;
+        public readonly string SAINVersion = AssemblyInfo.SAINVersion;
         public readonly string DateCreated = DateTime.Today.ToString();
     }
 }
