@@ -30,7 +30,7 @@ namespace SAIN.SAINComponent.Classes
                 return;
             }
 
-            var CurrentDecision = SAIN.CurrentDecision;
+            var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
             if (CurrentDecision == SoloDecision.UnstuckMoveToCover || CurrentDecision == SoloDecision.Retreat || CurrentDecision == SoloDecision.RunToCover || CurrentDecision == SoloDecision.WalkToCover)
             {
                 ActivateCoverFinder(true);

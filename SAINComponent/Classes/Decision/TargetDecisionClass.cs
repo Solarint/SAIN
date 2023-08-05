@@ -97,9 +97,9 @@ namespace SAIN.SAINComponent.Classes.Decision
         public bool ShallNotSearch()
         {
             Vector3? target = SAIN.CurrentTargetPosition;
-            if (target != null && !SAIN.Info.Profile.IsPMC && SAIN.BotZoneCollider != null)
+            if (target != null && !SAIN.Info.Profile.IsPMC && SAIN.Memory.BotZoneCollider != null)
             {
-                Vector3 closestPointInZone = SAIN.BotZoneCollider.ClosestPointOnBounds(target.Value);
+                Vector3 closestPointInZone = SAIN.Memory.BotZoneCollider.ClosestPointOnBounds(target.Value);
                 float distance = (target.Value - closestPointInZone).magnitude;
                 if (distance > 50f)
                 {

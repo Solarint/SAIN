@@ -160,7 +160,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         private bool CheckOffSetRay(Vector3 targetPos, float angle, float dist, out Vector3 Point)
         {
             Vector3 startPos = BotOwner.Position;
-            startPos.y = SAIN.HeadPosition.y;
+            startPos.y = SAIN.Transform.HeadPosition.y;
 
             if (dist > 0f)
             {

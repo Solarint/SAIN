@@ -119,7 +119,7 @@ namespace SAIN.Layers
         }
 
         private SoloDecision LastActionDecision = SoloDecision.None;
-        public SoloDecision CurrentDecision => SAIN.CurrentDecision;
+        public SoloDecision CurrentDecision => SAIN.Memory.Decisions.Main.Current;
 
         private readonly SAINComponentClass SAIN;
         protected ManualLogSource Logger; 
@@ -128,7 +128,7 @@ namespace SAIN.Layers
         {
             stringBuilder.AppendLine($"SAIN Info:");
             var info = SAIN.Info;
-            stringBuilder.AppendLabeledValue("Decisions", $"Base: {SAIN.CurrentDecision} Self: {SAIN.Decision.CurrentSelfDecision} Squad: {SAIN.Decision.CurrentSquadDecision}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Decisions", $"Base: {SAIN.Memory.Decisions.Main.Current} Self: {SAIN.Decision.CurrentSelfDecision} Squad: {SAIN.Decision.CurrentSquadDecision}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Personality", $"{info.Personality} {info.Profile.WildSpawnType}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Power of Equipment", $"{info.Profile.PowerLevel}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Start Search + Hold Ground Time", $"{info.TimeBeforeSearch} + {info.HoldGroundDelay}", Color.white, Color.yellow, true);

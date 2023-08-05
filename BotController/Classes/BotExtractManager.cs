@@ -76,15 +76,15 @@ namespace SAIN.Components.BotController
                     {
                         continue;
                     }
-                    if (bot.Value.CannotExfil)
+                    if (bot.Value.Memory.CannotExfil)
                     {
-                        if (bot.Value.Squad.LeaderComponent?.ExfilPosition != null)
+                        if (bot.Value.Squad.LeaderComponent?.Memory.ExfilPosition != null)
                         {
-                            bot.Value.ExfilPosition = bot.Value.Squad.LeaderComponent?.ExfilPosition;
+                            bot.Value.Memory.ExfilPosition = bot.Value.Squad.LeaderComponent?.Memory.ExfilPosition;
                         }
                         continue;
                     }
-                    if (bot.Value.ExfilPosition == null)
+                    if (bot.Value.Memory.ExfilPosition == null)
                     {
                         FindExfils(bot.Value);
                         if (bot.Value.Squad.BotInGroup)
@@ -96,9 +96,9 @@ namespace SAIN.Components.BotController
                             AssignExfil(bot.Value);
                         }
                     }
-                    if (bot.Value.ExfilPosition == null)
+                    if (bot.Value.Memory.ExfilPosition == null)
                     {
-                        bot.Value.CannotExfil = true;
+                        bot.Value.Memory.CannotExfil = true;
                     }
                 }
                 return ValidExfils.Count > 0 || ValidScavExfils.Count > 0;
@@ -155,14 +155,14 @@ namespace SAIN.Components.BotController
             {
                 if (ValidScavExfils.Count > 0)
                 {
-                    bot.ExfilPosition = ValidScavExfils.PickRandom().Value;
+                    bot.Memory.ExfilPosition = ValidScavExfils.PickRandom().Value;
                 }
             }
             if (bot?.Info?.Profile.IsPMC == true)
             {
                 if (ValidExfils.Count > 0)
                 {
-                    bot.ExfilPosition = ValidExfils.PickRandom().Value;
+                    bot.Memory.ExfilPosition = ValidExfils.PickRandom().Value;
                 }
             }
         }
@@ -172,28 +172,28 @@ namespace SAIN.Components.BotController
             var squad = bot.Squad;
             if (squad.IAmLeader)
             {
-                if (bot.ExfilPosition == null)
+                if (bot.Memory.ExfilPosition == null)
                 {
                     AssignExfil(bot);
                 }
-                if (bot.ExfilPosition != null)
+                if (bot.Memory.ExfilPosition != null)
                 {
                     if (squad.SquadMembers != null && squad.SquadMembers.Count > 0)
                     {
                         foreach (var member in squad.SquadMembers)
                         {
-                            if (member.Value.ExfilPosition == null && member.Value.ProfileId != bot.ProfileId)
+                            if (member.Value.Memory.ExfilPosition == null && member.Value.ProfileId != bot.ProfileId)
                             {
                                 Vector3 random = UnityEngine.Random.onUnitSphere * 2f;
                                 random.y = 0f;
-                                Vector3 point = bot.ExfilPosition.Value + random;
+                                Vector3 point = bot.Memory.ExfilPosition.Value + random;
                                 if (NavMesh.SamplePosition(point, out var navHit, 1f, -1))
                                 {
-                                    member.Value.ExfilPosition = navHit.position;
+                                    member.Value.Memory.ExfilPosition = navHit.position;
                                 }
                                 else
                                 {
-                                    member.Value.ExfilPosition = bot.ExfilPosition;
+                                    member.Value.Memory.ExfilPosition = bot.Memory.ExfilPosition;
                                 }
                             }
                         }
@@ -202,7 +202,7 @@ namespace SAIN.Components.BotController
             }
             else
             {
-                bot.ExfilPosition = squad.LeaderComponent?.ExfilPosition;
+                bot.Memory.ExfilPosition = squad.LeaderComponent?.Memory.ExfilPosition;
             }
 
         }

@@ -99,8 +99,8 @@ namespace SAIN.Components
 
             for (int i = 0; i < TempBotList.Count; i++)
             {
-                var visPlayers = TempBotList[i].VisiblePlayers;
-                var idList = TempBotList[i].VisiblePlayerIds;
+                var visPlayers = TempBotList[i].Memory.VisiblePlayers;
+                var idList = TempBotList[i].Memory.VisiblePlayerIds;
                 visPlayers.Clear();
                 for (int j = 0; j < Players.Count; j++)
                 {

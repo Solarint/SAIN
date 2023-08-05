@@ -65,9 +65,9 @@ namespace SAIN.Layers
                 }
 
                 corner.y += 1f;
-                var direction = corner - SAIN.HeadPosition;
+                var direction = corner - SAIN.Transform.HeadPosition;
 
-                if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                if (!Physics.Raycast(SAIN.Transform.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
                     pos = corner + Random.onUnitSphere * 0.15f;
                     return true;

@@ -99,7 +99,7 @@ namespace SAIN.SAINComponent.Classes
                 {
                     range *= 0.66f;
                 }
-                if (SAIN.HealthStatus == ETagStatus.Dying)
+                if (SAIN.Memory.HealthStatus == ETagStatus.Dying)
                 {
                     range *= 0.55f;
                 }
@@ -169,7 +169,7 @@ namespace SAIN.SAINComponent.Classes
                     {
                         try
                         {
-                            SAIN.UnderFireFromPosition = vector;
+                            SAIN.Memory.UnderFireFromPosition = vector;
                             BotOwner.Memory.SetUnderFire();
                         }
                         catch (System.Exception) { }
@@ -200,7 +200,7 @@ namespace SAIN.SAINComponent.Classes
                 {
                     var estimate = GetEstimatedPoint(vector);
 
-                    SAIN.UnderFireFromPosition = estimate;
+                    SAIN.Memory.UnderFireFromPosition = estimate;
 
                     try
                     {

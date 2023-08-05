@@ -4,7 +4,7 @@ using EFT;
 using SAIN.Components;
 using UnityEngine;
 
-namespace SAIN.SAINComponent.Classes
+namespace SAIN.SAINComponent.SubComponents
 {
     public class SAINBotUnstuck : SAINBase, ISAINClass
     {
@@ -53,7 +53,7 @@ namespace SAIN.SAINComponent.Classes
                     if (DebugStuckTimer < Time.time && TimeSinceStuck > 1f)
                     {
                         DebugStuckTimer = Time.time + 3f;
-                        Logger.LogWarning($"[{BotOwner.name}] has been stuck for [{TimeSinceStuck}] seconds on [{StuckHit.transform.name}] object at [{StuckHit.transform.position}] with Current Decision as [{SAIN.CurrentDecision}]");
+                        Logger.LogWarning($"[{BotOwner.name}] has been stuck for [{TimeSinceStuck}] seconds on [{StuckHit.transform.name}] object at [{StuckHit.transform.position}] with Current Decision as [{SAIN.Memory.Decisions.Main.Current}]");
                     }
                     if (JumpTimer < Time.time && TimeSinceStuck > 1f)
                     {
@@ -91,7 +91,7 @@ namespace SAIN.SAINComponent.Classes
 
         public bool BotStuckOnPlayer()
         {
-            var decision = SAIN.CurrentDecision;
+            var decision = SAIN.Memory.Decisions.Main.Current;
             if (!BotIsMoving && CanBeStuckDecisions(decision))
             {
                 if (BotOwner.Mover == null)
@@ -136,7 +136,7 @@ namespace SAIN.SAINComponent.Classes
 
         public bool BotStuckOnObject()
         {
-            if (CanBeStuckDecisions(SAIN.CurrentDecision) && !BotIsMoving && !BotOwner.DoorOpener.Interacting && SAIN.Decision.TimeSinceChangeDecision > 0.5f)
+            if (CanBeStuckDecisions(SAIN.Memory.Decisions.Main.Current) && !BotIsMoving && !BotOwner.DoorOpener.Interacting && SAIN.Decision.TimeSinceChangeDecision > 0.5f)
             {
                 if (BotOwner.Mover == null)
                 {

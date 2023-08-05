@@ -305,7 +305,7 @@ namespace SAIN.SAINComponent.Classes
 
                         for (int i = 1; i < Path.corners.Length - 2; i++)
                         {
-                            Vector3 Start = SAIN.WeaponRoot;
+                            Vector3 Start = SAIN.Transform.WeaponRoot;
                             Vector3 dirNext = Path.corners[i + 1] - Start;
                             if (Physics.Raycast(Start, dirNext, dirNext.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                             {

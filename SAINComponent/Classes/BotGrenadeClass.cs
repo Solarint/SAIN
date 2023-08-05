@@ -107,7 +107,7 @@ namespace SAIN.SAINComponent.Classes
                 return false;
             }
 
-            var botPos = SAIN.HeadPosition;
+            var botPos = SAIN.Transform.HeadPosition;
 
             var direction = SAIN.Enemy.EnemyHeadPosition - botPos;
 
@@ -144,7 +144,7 @@ namespace SAIN.SAINComponent.Classes
             }
 
             var enemyHead = SAIN.Enemy.EnemyHeadPosition;
-            var botHead = SAIN.HeadPosition;
+            var botHead = SAIN.Transform.HeadPosition;
             var direction = enemyHead - botHead;
             float distance = direction.magnitude;
 

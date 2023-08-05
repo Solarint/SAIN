@@ -103,7 +103,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             {
                 if (enemy != null && enemy.PathDistance < 30f)
                 {
-                    if (!SAIN.Decision.SelfActionDecisions.LowOnAmmo(0.5f) && SAIN.HealthStatus != ETagStatus.Dying && BotOwner.CanSprintPlayer)
+                    if (!SAIN.Decision.SelfActionDecisions.LowOnAmmo(0.5f) && SAIN.Memory.HealthStatus != ETagStatus.Dying && BotOwner.CanSprintPlayer)
                     {
                         var enemyStatus = enemy.EnemyStatus;
                         if (enemyStatus.EnemyIsReloading || enemyStatus.EnemyIsHealing || enemyStatus.EnemyHasGrenadeOut)

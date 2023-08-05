@@ -60,7 +60,7 @@ namespace SAIN.SAINComponent
 
             try
             {
-                NoBushESP = AddComponent<NoBushESP>();
+                NoBushESP = this.GetOrAddComponent<NoBushESP>();
                 NoBushESP.Init(BotOwner, this);
                 FlashLight = player?.gameObject?.AddComponent<FlashLightComponent>();
 
@@ -91,31 +91,32 @@ namespace SAIN.SAINComponent
                 Dispose();
                 return false;
             }
+
+            Transform.Init();
+            Memory.Init();
+            EnemyController.Init();
+            FriendlyFireClass.Init();
+            Sounds.Init();
+            Vision.Init();
+            Equipment.Init();
+            Mover.Init();
+            BotStuck.Init();
+            Hearing.Init();
+            Talk.Init();
+            Decision.Init();
+            Cover.Init();
+            Info.Init();
+            Squad.Init();
+            SelfActions.Init();
+            Grenade.Init();
+            Steering.Init();
+
             return true;
         }
 
-        private T AddComponent<T>() where T : Component
-        {
-            return this.GetOrAddComponent<T>();
-        }
-
-        private T AddSubComponent<T>() where T : Component, ISAINSubComponent
-        {
-            var comp = this.GetOrAddComponent<T>();
-            comp.Init(this);
-            return comp;
-        }
-
-        public Collider BotZoneCollider => BotZone?.Collider;
-        public AIPlaceInfo BotZone => BotOwner.AIData.PlaceInfo;
         public string ProfileId => BotOwner?.ProfileId;
-        public string SquadId => Squad.SquadID;
         public bool NoBushESPActive => NoBushESP.NoBushESPActive;
         public SAINBotController BotController => SAINPlugin.BotController;
-
-        public List<Player> VisiblePlayers = new List<Player>();
-
-        public List<string> VisiblePlayerIds = new List<string>();
 
         public Player Player { get; private set; }
 
@@ -134,8 +135,14 @@ namespace SAIN.SAINComponent
 
             if (BotActive)
             {
-                UpdatePatrolData();
-                UpdateHealth();
+                if (LayersActive)
+                {
+                    BotOwner.PatrollingData?.Pause();
+                }
+                else if (Enemy == null)
+                {
+                    BotOwner.PatrollingData?.Unpause();
+                }
 
                 Transform.Update();
                 Memory.Update();
@@ -182,21 +189,6 @@ namespace SAIN.SAINComponent
             }
         }
 
-        private void UpdatePatrolData()
-        {
-            if (LayersActive)
-            {
-                BotOwner.PatrollingData?.Pause();
-            }
-            else
-            {
-                if (Enemy == null)
-                {
-                    BotOwner.PatrollingData?.Unpause();
-                }
-            }
-        }
-
         public void Shoot(bool noBush = true, bool checkFF = true)
         {
             if ((noBush && NoBushESPActive) || (checkFF && !FriendlyFireClass.ClearShot))
@@ -234,21 +226,6 @@ namespace SAIN.SAINComponent
         private bool Active;
         private float RecheckTimer = 0f;
 
-        public Vector3? ExfilPosition { get; set; }
-        public bool CannotExfil { get; set; }
-
-        private void UpdateHealth()
-        {
-            if (UpdateHealthTimer < Time.time)
-            {
-                UpdateHealthTimer = Time.time + 0.33f;
-                HealthStatus = Player.HealthStatus;
-            }
-        }
-
-        public FriendlyFireStatus FriendlyFireStatus { get; private set; }
-        private float UpdateHealthTimer = 0f;
-
         public bool HasEnemy => EnemyController.HasEnemy;
         public SAINEnemy Enemy => HasEnemy ? EnemyController.Enemy : null;
 
@@ -282,12 +259,6 @@ namespace SAIN.SAINComponent
             }
             catch { }
         }
-
-        public SoloDecision CurrentDecision => Decision.CurrentSoloDecision;
-        public Vector3 Position => BotOwner.Position;
-        public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
-        public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
-        public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
 
         public Vector3? CurrentTargetPosition
         {
@@ -329,8 +300,6 @@ namespace SAIN.SAINComponent
             }
         }
 
-        public Vector3 UnderFireFromPosition { get; set; }
-
         public TransformClass Transform { get; private set; }
         public MemoryClass Memory { get; private set; }
         public EnemyController EnemyController { get; private set; }
@@ -356,12 +325,6 @@ namespace SAIN.SAINComponent
         public bool BotActive => IsDead == false && BotOwner.enabled && Player.enabled && BotOwner.BotState == EBotState.Active;
         public bool GameIsEnding => Singleton<IBotGame>.Instance == null || Singleton<IBotGame>.Instance.Status == GameStatus.Stopping;
 
-        public bool Healthy => HealthStatus == ETagStatus.Healthy;
-        public bool Injured => HealthStatus == ETagStatus.Injured;
-        public bool BadlyInjured => HealthStatus == ETagStatus.BadlyInjured;
-        public bool Dying => HealthStatus == ETagStatus.Dying;
-
-        public ETagStatus HealthStatus { get; private set; }
 
         public BotOwner BotOwner { get; private set; }
 

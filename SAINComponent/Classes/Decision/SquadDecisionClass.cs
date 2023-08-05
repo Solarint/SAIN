@@ -62,7 +62,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 {
                     continue;
                 }
-                if (!HasRadioComms && (SAIN.Position - member.Position).sqrMagnitude > 1200f)
+                if (!HasRadioComms && (SAIN.Transform.Position - member.Transform.Position).sqrMagnitude > 1200f)
                 {
                     continue;
                 }
@@ -100,8 +100,8 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         private bool StartSuppression(SAINComponentClass member)
         {
-            bool memberRetreat = member.CurrentDecision == SoloDecision.Retreat;
-            float memberDistance = (member.Position - BotOwner.Position).magnitude;
+            bool memberRetreat = member.Memory.Decisions.Main.Current == SoloDecision.Retreat;
+            float memberDistance = (member.Transform.Position - BotOwner.Position).magnitude;
             float ammo = SAIN.Decision.SelfActionDecisions.AmmoRatio;
             if (memberRetreat && memberDistance < 30f && ammo > 0.5f)
             {
@@ -125,7 +125,7 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         private bool StartGroupSearch(SAINComponentClass member)
         {
-            bool squadSearching = member.CurrentDecision == SoloDecision.Search || member.Decision.CurrentSquadDecision == SquadDecision.Search;
+            bool squadSearching = member.Memory.Decisions.Main.Current == SoloDecision.Search || member.Decision.CurrentSquadDecision == SquadDecision.Search;
             if (squadSearching)
             {
                 return true;
@@ -183,7 +183,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             if (lead != null)
             {
                 Vector3 BotPos = BotOwner.Position;
-                Vector3 leadPos = lead.Position;
+                Vector3 leadPos = lead.Transform.Position;
                 Vector3 directionToLead = leadPos - BotPos;
                 float leadDistance = directionToLead.magnitude;
                 if (enemy != null)

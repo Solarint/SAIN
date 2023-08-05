@@ -48,7 +48,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 }
                 else
                 {
-                    if (LastHealCheckTime < Time.time && !SAIN.Healthy)
+                    if (LastHealCheckTime < Time.time && !SAIN.Memory.Healthy)
                     {
                         LastHealCheckTime = Time.time + 1f;
                         if (StartUseStims())
@@ -79,7 +79,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             {
                 Vector3 botPos = SAIN.Transform.Position;
                 Vector3 direction = grenadePos.Value - botPos;
-                if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                if (!Physics.Raycast(SAIN.Transform.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
                     return true;
                 }
@@ -153,7 +153,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             get
             {
                 var stims = BotOwner.Medecine.Stimulators;
-                return stims.HaveSmt && Time.time - stims.LastEndUseTime > 3f && stims.CanUseNow() && !SAIN.Healthy;
+                return stims.HaveSmt && Time.time - stims.LastEndUseTime > 3f && stims.CanUseNow() && !SAIN.Memory.Healthy;
             }
         }
         public bool CanUseFirstAid => BotOwner.Medecine.FirstAid.ShallStartUse();
@@ -168,7 +168,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 var enemy = SAIN.Enemy;
                 if (enemy == null)
                 {
-                    if (SAIN.Dying || SAIN.BadlyInjured)
+                    if (SAIN.Memory.Dying || SAIN.Memory.BadlyInjured)
                     {
                         takeStims = true;
                     }
@@ -205,14 +205,14 @@ namespace SAIN.SAINComponent.Classes.Decision
                     var pathStatus = EnemyDistance;
                     bool SeenRecent = enemy.TimeSinceSeen < 4f;
                     var status = SAIN;
-                    if (status.Injured)
+                    if (status.Memory.Injured)
                     {
                         if (!enemy.InLineOfSight && !SeenRecent && pathStatus != SAINEnemyPathEnum.VeryClose && pathStatus != SAINEnemyPathEnum.Close)
                         {
                             useFirstAid = true;
                         }
                     }
-                    else if (status.BadlyInjured)
+                    else if (status.Memory.BadlyInjured)
                     {
                         if (!enemy.InLineOfSight && pathStatus != SAINEnemyPathEnum.VeryClose && enemy.TimeSinceSeen < 2f)
                         {
@@ -224,7 +224,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                             useFirstAid = true;
                         }
                     }
-                    else if (status.Dying)
+                    else if (status.Memory.Dying)
                     {
                         if (!enemy.InLineOfSight && enemy.TimeSinceSeen < 1f)
                         {

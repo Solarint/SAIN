@@ -48,7 +48,7 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
-            if (SAIN.ExfilPosition == null || !EnableExtracts)
+            if (SAIN.Memory.ExfilPosition == null || !EnableExtracts)
             {
                 return false;
             }
@@ -75,7 +75,7 @@ namespace SAIN.Layers
                     return true;
                 }
             }
-            if (SAIN.Dying && !BotOwner.Medecine.FirstAid.HaveSmth2Use)
+            if (SAIN.Memory.Dying && !BotOwner.Medecine.FirstAid.HaveSmth2Use)
             {
                 if (!Logged)
                 {
@@ -103,7 +103,7 @@ namespace SAIN.Layers
 
         private SAINBotController BotController => SAINPlugin.BotController;
         public SoloDecision LastDecision => SAIN.Decision.OldMainDecision;
-        public SoloDecision CurrentDecision => SAIN.CurrentDecision;
+        public SoloDecision CurrentDecision => SAIN.Memory.Decisions.Main.Current;
 
         private readonly SAINComponentClass SAIN;
         protected ManualLogSource Logger;

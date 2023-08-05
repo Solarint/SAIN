@@ -48,8 +48,8 @@ namespace SAIN.Layers
             if ((BotOwner.Position - SearchPoint.Position).sqrMagnitude < 10f)
             {
                 Vector3 searchPoint = SearchPoint.Position;
-                Vector3 direction = searchPoint - SAIN.HeadPosition;
-                if (!Physics.SphereCast(SAIN.HeadPosition, 0.1f, direction, out var hit, LayerMaskClass.HighPolyWithTerrainMaskAI))
+                Vector3 direction = searchPoint - SAIN.Transform.HeadPosition;
+                if (!Physics.SphereCast(SAIN.Transform.HeadPosition, 0.1f, direction, out var hit, LayerMaskClass.HighPolyWithTerrainMaskAI))
                 {
                     SearchPoint.IsCome = true;
                     SearchPoint = null;

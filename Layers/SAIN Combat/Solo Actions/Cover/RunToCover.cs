@@ -71,7 +71,7 @@ namespace SAIN.Layers
         private CoverPoint SelectPoint()
         {
             CoverPoint fallback = SAIN.Cover.FallBackPoint;
-            if (SAIN.CurrentDecision == SoloDecision.Retreat && fallback != null)
+            if (SAIN.Memory.Decisions.Main.Current == SoloDecision.Retreat && fallback != null)
             {
                 return fallback;
             }

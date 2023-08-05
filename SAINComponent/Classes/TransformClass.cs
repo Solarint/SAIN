@@ -51,6 +51,10 @@ namespace SAIN.SAINComponent.Classes
         public Vector3 Position => Transform.position;
         public Vector3 MoveDirection => BotOwner.Mover.DirCurPoint;
 
+        public Vector3 WeaponRoot => BotOwner.WeaponRoot.position;
+        public Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
+        public Vector3 BodyPosition => BotOwner.MainParts[BodyPartType.body].Position;
+
         public Vector3 Forward => BotOwner.LookDirection;
         public Vector3 Right => Transform.right;
         public Vector3 Left => -Right;

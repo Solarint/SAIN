@@ -27,7 +27,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             }
             if (BlindFireActive)
             {
-                DebugGizmos.SingleObjects.Line(SAIN.WeaponRoot, BlindFireTargetPos, Color.magenta, 0.025f, true, 0.1f, true);
+                DebugGizmos.SingleObjects.Line(SAIN.Transform.WeaponRoot, BlindFireTargetPos, Color.magenta, 0.025f, true, 0.1f, true);
             }
             if (BlindFireTimer > Time.time)
             {
@@ -102,7 +102,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             Vector3 direction = targetPos - rayShoot;
             if (Physics.Raycast(rayShoot, direction, direction.magnitude, mask))
             {
-                rayShoot = SAIN.HeadPosition + Vector3.up * 0.1f;
+                rayShoot = SAIN.Transform.HeadPosition + Vector3.up * 0.1f;
                 direction = targetPos - rayShoot;
                 if (!Physics.Raycast(rayShoot, direction, direction.magnitude, mask))
                 {

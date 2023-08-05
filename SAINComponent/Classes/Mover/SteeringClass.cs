@@ -37,11 +37,11 @@ namespace SAIN.SAINComponent.Classes.Mover
         private void AimSway(Vector3 point)
         {
             RealSteerTarget = point;
-            Vector3 targetDirection = (point - SAIN.HeadPosition).normalized * 5f;
+            Vector3 targetDirection = (point - SAIN.Transform.HeadPosition).normalized * 5f;
             Vector3 random = Random.insideUnitSphere * 0.033f;
             Quaternion randomRotation = Quaternion.Euler(random.x, random.y, random.z);
             Vector3 randomDirection = randomRotation * targetDirection;
-            SwaySteerPoint = randomDirection + SAIN.HeadPosition;
+            SwaySteerPoint = randomDirection + SAIN.Transform.HeadPosition;
         }
 
         private float AimSwayTimer = 0f;
@@ -91,7 +91,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             }
             else
             {
-                if (SAIN.CurrentDecision == SoloDecision.Search || SAIN.CurrentDecision == SoloDecision.Investigate)
+                if (SAIN.Memory.Decisions.Main.Current == SoloDecision.Search || SAIN.Memory.Decisions.Main.Current == SoloDecision.Investigate)
                 {
                     LookToMovingDirection();
                     return false;
@@ -159,9 +159,9 @@ namespace SAIN.SAINComponent.Classes.Mover
         public Vector3 RealSteerTarget { get; private set; }
         public Vector3 CurrentSteerPoint { get; private set; }
         public Vector3 SwaySteerPoint { get; private set; }
-        public Vector3 CurrentSteerDirection => CurrentSteerPoint - SAIN.HeadPosition;
-        public Vector3 SwaySteerDirection => SwaySteerPoint - SAIN.HeadPosition;
-        public Vector3 RealSteerDirection => RealSteerTarget - SAIN.HeadPosition;
+        public Vector3 CurrentSteerDirection => CurrentSteerPoint - SAIN.Transform.HeadPosition;
+        public Vector3 SwaySteerDirection => SwaySteerPoint - SAIN.Transform.HeadPosition;
+        public Vector3 RealSteerDirection => RealSteerTarget - SAIN.Transform.HeadPosition;
 
         private void UpdateSmoothLook()
         {
@@ -188,7 +188,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             {
                 direction.y = 0f;
             }
-            Vector3 pos = SAIN.HeadPosition + direction;
+            Vector3 pos = SAIN.Transform.HeadPosition + direction;
             LookToPoint(pos);
         }
 
@@ -243,7 +243,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public void LookToUnderFirePos()
         {
-            var pos = SAIN.UnderFireFromPosition;
+            var pos = SAIN.Memory.UnderFireFromPosition;
             pos.y += 1f;
             LookToPoint(pos);
         }
@@ -253,9 +253,9 @@ namespace SAIN.SAINComponent.Classes.Mover
             if (visionCheck)
             {
                 soundPos.y += 0.1f;
-                var direction = soundPos - SAIN.HeadPosition;
+                var direction = soundPos - SAIN.Transform.HeadPosition;
 
-                if (!Physics.Raycast(SAIN.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                if (!Physics.Raycast(SAIN.Transform.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
                     LookToPoint(soundPos);
                 }
@@ -284,7 +284,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 {
                     LookRandom = false;
                     var Mask = LayerMaskClass.HighPolyWithTerrainMask;
-                    var Start = SAIN.HeadPosition;
+                    var Start = SAIN.Transform.HeadPosition;
                     float pointDistance = 0f;
                     for (int i = 0; i < 10; i++)
                     {
@@ -292,7 +292,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                         random.y = 0f;
                         if (!Physics.Raycast(Start, random, out var hit, 15f, Mask))
                         {
-                            pointToLook = random + SAIN.HeadPosition;
+                            pointToLook = random + SAIN.Transform.HeadPosition;
                             break;
                         }
                         else

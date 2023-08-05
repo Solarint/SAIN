@@ -309,7 +309,7 @@ namespace SAIN.Components
             var danger = VectorHelpers.DangerPoint(position, force, mass);
             foreach (var bot in Bots.Values)
             {
-                if (bot != null && (danger - bot.Position).sqrMagnitude < 200f * 200f)
+                if (bot != null && (danger - bot.Transform.Position).sqrMagnitude < 200f * 200f)
                 {
                     bot.Grenade.EnemyGrenadeThrown(grenade, danger);
                 }

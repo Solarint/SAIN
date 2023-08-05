@@ -67,7 +67,7 @@ namespace SAIN.SAINComponent.Classes
         {
             Vector3 randomPos = UnityEngine.Random.onUnitSphere * 3f;
             randomPos.y = BotOwner.Position.y;
-            Vector3 head = SAIN.HeadPosition;
+            Vector3 head = SAIN.Transform.HeadPosition;
             Vector3 direction = randomPos - head;
             var Ray = new Ray(head, direction);
             if (!Physics.SphereCast(Ray, 0.1f, direction.magnitude))
@@ -97,7 +97,7 @@ namespace SAIN.SAINComponent.Classes
 
         private bool CanJumpOffLedge(Vector3 direction, out Vector3 result)
         {
-            Vector3 start = SAIN.BodyPosition;
+            Vector3 start = SAIN.Transform.BodyPosition;
             var Mask = LayerMaskClass.HighPolyCollider;
             var Ray = new Ray(start, direction);
             result = Vector3.zero;

@@ -93,7 +93,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
-                if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
+                if (NavMesh.CalculatePath(SAIN.Transform.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
                 {
                     Way = Path.corners;
                 }
@@ -107,7 +107,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             if (NavMesh.SamplePosition(point, out var navHit, navSampleRange, -1))
             {
                 NavMeshPath Path = new NavMeshPath();
-                if (NavMesh.CalculatePath(SAIN.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
+                if (NavMesh.CalculatePath(SAIN.Transform.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
                 {
                     if (mustHaveCompletePath && Path.status != NavMeshPathStatus.PathComplete)
                     {
@@ -186,7 +186,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
             Vector3 botPos = BotOwner.Position;
             Vector3 direction = target - botPos;
-            botPos.y = SAIN.WeaponRoot.y;
+            botPos.y = SAIN.Transform.WeaponRoot.y;
             return Physics.Raycast(BotOwner.Position, direction, out rayHit, checkDist, LayerMaskClass.HighPolyWithTerrainMask);
         }
 

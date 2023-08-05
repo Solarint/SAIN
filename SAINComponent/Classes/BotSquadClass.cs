@@ -60,7 +60,7 @@ namespace SAIN.SAINComponent.Classes
             VisibleMembers.Clear();
             foreach (var member in SAIN.Squad.SquadMembers.Values)
             {
-                if (member != null && SAIN.VisiblePlayers.Contains(member.Player))
+                if (member != null && SAIN.Memory.VisiblePlayers.Contains(member.Player))
                 {
                     VisibleMembers.Add(member);
                 }
@@ -155,7 +155,7 @@ namespace SAIN.SAINComponent.Classes
                         if (SAINPlugin.BotController.GetBot(member.ProfileId, out var component))
                         {
                             dictionary.Add(member, component);
-                            decisions.Add(component.CurrentDecision);
+                            decisions.Add(component.Memory.Decisions.Main.Current);
                             squadDecisions.Add(component.Decision.CurrentSquadDecision);
                             locations.Add(member.Position);
                         }

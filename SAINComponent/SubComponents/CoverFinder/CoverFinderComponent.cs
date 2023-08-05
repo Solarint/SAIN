@@ -45,7 +45,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
             {
                 if (CoverPoints.Count > 0)
                 {
-                    DebugGizmos.SingleObjects.Line(CoverPoints.PickRandom().Position, SAIN.HeadPosition, Color.yellow, 0.035f, true, 0.1f);
+                    DebugGizmos.SingleObjects.Line(CoverPoints.PickRandom().Position, SAIN.Transform.HeadPosition, Color.yellow, 0.035f, true, 0.1f);
                 }
             }
         }

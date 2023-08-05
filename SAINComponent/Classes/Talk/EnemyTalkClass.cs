@@ -90,7 +90,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                     if (FakeTimer < Time.time)
                     {
                         FakeTimer = Time.time + 10f;
-                        var health = SAIN.HealthStatus;
+                        var health = SAIN.Memory.HealthStatus;
                         if (health != ETagStatus.Healthy && health != ETagStatus.Injured)
                         {
                             float dist = (SAIN.Enemy.CurrPosition - BotOwner.Position).magnitude;
@@ -123,7 +123,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                 var personality = SAIN.Info.Personality;
                 if (personality == SAINPersonality.Timmy || personality == SAINPersonality.Coward)
                 {
-                    var health = SAIN.HealthStatus;
+                    var health = SAIN.Memory.HealthStatus;
                     if (health != ETagStatus.Healthy)
                     {
                         float dist = (SAIN.Enemy.CurrPosition - BotOwner.Position).magnitude;

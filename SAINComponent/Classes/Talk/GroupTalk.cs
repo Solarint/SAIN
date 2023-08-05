@@ -176,7 +176,7 @@ namespace SAIN.SAINComponent.Classes.Talk
             {
                 if (member != null && !member.BotOwner.IsDead)
                 {
-                    if (Vector3.Distance(member.Position, SAIN.Squad.Leader.Position) < 20f)
+                    if (Vector3.Distance(member.Transform.Position, SAIN.Squad.Leader.Position) < 20f)
                     {
                         if (EFTMath.RandomBool(chance))
                         {
@@ -223,7 +223,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                     return false;
                 }
 
-                var health = SAIN.HealthStatus;
+                var health = SAIN.Memory.HealthStatus;
                 switch (health)
                 {
                     case ETagStatus.Injured:
@@ -250,7 +250,7 @@ namespace SAIN.SAINComponent.Classes.Talk
             return false;
         }
 
-        public bool TalkRetreat => SAIN.Enemy?.IsVisible == true && SAIN.Decision.RetreatDecisions.Contains(SAIN.CurrentDecision);
+        public bool TalkRetreat => SAIN.Enemy?.IsVisible == true && SAIN.Decision.RetreatDecisions.Contains(SAIN.Memory.Decisions.Main.Current);
 
         public bool TalkCurrentAction()
         {
@@ -365,7 +365,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                     commandTrigger = EPhraseTrigger.OpenDoor;
                     trigger = EPhraseTrigger.Roger;
                 }
-                else if (SAIN.CurrentDecision == SoloDecision.RunAway)
+                else if (SAIN.Memory.Decisions.Main.Current == SoloDecision.RunAway)
                 {
                     commandTrigger = EPhraseTrigger.OnYourOwn;
                     trigger = EFTMath.RandomBool() ? EPhraseTrigger.Repeat : EPhraseTrigger.Stop;
@@ -423,7 +423,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                     if (enemy.EnemyLookingAtMe)
                     {
                         mask = ETagStatus.Combat;
-                        bool injured = !SAIN.Healthy && !SAIN.Injured;
+                        bool injured = !SAIN.Memory.Healthy && !SAIN.Memory.Injured;
                         trigger = injured ? EPhraseTrigger.NeedHelp : EPhraseTrigger.OnRepeatedContact;
                     }
                     else
