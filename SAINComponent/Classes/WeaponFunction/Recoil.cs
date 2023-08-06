@@ -39,8 +39,9 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             float weaponhorizrecoil = CalcRecoil(SAIN.Info.WeaponInfo.RecoilForceUp);
             float weaponvertrecoil = CalcRecoil(SAIN.Info.WeaponInfo.RecoilForceBack);
 
-            float horizRecoil = (1f * weaponhorizrecoil + SAINPlugin.LoadedPreset.GlobalSettings.Shoot.AddRecoil) * distance;
-            float vertRecoil = (1f * weaponvertrecoil + SAINPlugin.LoadedPreset.GlobalSettings.Shoot.AddRecoil) * distance;
+            float addRecoil = SAINPlugin.LoadedPreset.GlobalSettings.Shoot.AddRecoil;
+            float horizRecoil = (1f * weaponhorizrecoil + addRecoil) * distance;
+            float vertRecoil = (1f * weaponvertrecoil + addRecoil) * distance;
 
             float maxrecoil = SAINPlugin.LoadedPreset.GlobalSettings.Shoot.MaxRecoil * distance;
 
@@ -48,9 +49,11 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             float randomvertRecoil = Random.Range(-vertRecoil, vertRecoil);
 
             Vector3 vector = new Vector3(targetpoint.x + randomHorizRecoil, targetpoint.y + randomvertRecoil, targetpoint.z + randomHorizRecoil);
-            vector = MathHelpers.VectorClamp(vector, -maxrecoil, maxrecoil) * SAIN.Info.FileSettings.Shoot.RecoilMultiplier;
+            vector = MathHelpers.VectorClamp(vector, -maxrecoil, maxrecoil) * RecoilMultiplier;
             return vector;
         }
+
+        private float RecoilMultiplier => Mathf.Round(SAIN.Info.FileSettings.Shoot.RecoilMultiplier * GlobalSAINSettings.Shoot.GlobalRecoilMultiplier * 100f) / 100f;
 
         float CalcRecoil(float recoilVal)
         {
@@ -64,7 +67,6 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             var mode = SAIN.Info.WeaponInfo.CurrentWeapon.SelectedFireMode;
             if (mode == EFireMode.fullauto || mode == EFireMode.burst)
             {
-                
                 rate = Time.time + (FullAutoTimePerShot / 3f);
             }
             else

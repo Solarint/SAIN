@@ -86,20 +86,13 @@ namespace SAIN.SAINComponent.Classes
                 Enemies.Add(id, new EnemyClass(SAIN, person));
             }
 
-            if (Enemy != null)
+            var newEnemy = Enemies[id];
+            if (Enemy != null && Enemy != newEnemy)
             {
-                string oldID = Enemy.EnemyProfileID;
-                if (oldID == id)
-                {
-                    return;
-                }
-                else
-                {
-                    Enemy.EnemyVision.LoseSight();
-                    Enemies[oldID] = Enemy;
-                }
+                Enemy?.EnemyVision?.LoseSight();
+                Logger.LogWarning("LoseSight");
             }
-            Enemy = Enemies[id];
+            Enemy = newEnemy;
         }
 
         private float ClearEnemyTimer;

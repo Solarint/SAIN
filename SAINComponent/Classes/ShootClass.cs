@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using BepInEx.Logging;
+using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
 using UnityEngine;
@@ -7,6 +8,8 @@ namespace SAIN.SAINComponent.Classes
 {
     public class ShootClass : BaseNodeClass
     {
+        private static ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(ShootClass));
+
         public ShootClass(BotOwner owner, SAINComponentClass sain) : base(owner)
         {
             SAIN = sain;
@@ -20,14 +23,21 @@ namespace SAIN.SAINComponent.Classes
 
         public override void Update()
         {
+            var goalEnemy = BotOwner.Memory.GoalEnemy;
             var enemy = SAIN.Enemy;
-            if (enemy != null && enemy.CanShoot && enemy.IsVisible)
-            {
-                if (BotAimingData.AimingData == null)
-                {
-                    BotAimingData.AimingData = BotOwner.AimingData;
-                }
 
+            bool canShootSAIN = enemy != null && enemy.CanShoot;
+            bool canShootEFT = goalEnemy != null && goalEnemy.CanShoot;
+
+            if (canShootSAIN != canShootEFT)
+            {
+                Logger.LogWarning($"canShootSAIN {canShootSAIN} canShootEFT {canShootEFT}");
+            }
+
+            bool canShoot = canShootEFT || canShootSAIN;
+
+            if (enemy != null && enemy.IsVisible && canShoot)
+            {
                 Vector3? pointToShoot = GetPointToShoot();
                 if (pointToShoot != null)
                 {
@@ -36,10 +46,10 @@ namespace SAIN.SAINComponent.Classes
                         BotOwner.BotLight?.TurnOn(true);
                     }
                     Target = pointToShoot.Value;
-                    if (BotAimingData.AimingData.IsReady && !SAIN.NoBushESPActive && FriendlyFire.ClearShot)
+                    if (BotOwner.AimingData.IsReady && !SAIN.NoBushESPActive && FriendlyFire.ClearShot)
                     {
                         ReadyToShoot();
-                        BotShoot.Shoot.Update();
+                        BotShoot.Update();
                     }
                 }
             }
@@ -88,8 +98,8 @@ namespace SAIN.SAINComponent.Classes
             if (target != null)
             {
                 Target = target.Value;
-                BotAimingData.AimingData.SetTarget(Target);
-                BotAimingData.AimingData.NodeUpdate();
+                BotOwner.AimingData.SetTarget(Target);
+                BotOwner.AimingData.NodeUpdate();
                 return new Vector3?(Target);
             }
             return null;
@@ -97,7 +107,6 @@ namespace SAIN.SAINComponent.Classes
 
         protected Vector3 Target;
 
-        private readonly BotAimingData BotAimingData = new BotAimingData();
         public FriendlyFireClass FriendlyFire => SAIN.FriendlyFireClass;
     }
 }

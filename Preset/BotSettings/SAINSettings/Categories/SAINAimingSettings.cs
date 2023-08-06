@@ -53,7 +53,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [MinMaxRound(1, 6)]
         public int AIMING_TYPE = 4;
 
-        [NameAndDescription("Frieldly Fire Spherecast Size")]
+        [NameAndDescription("Friendly Fire Spherecast Size")]
         [Description(null)]
         [DefaultValue(0.15f)]
         [MinMaxRound(0f, 0.5f, 100f)]

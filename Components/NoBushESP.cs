@@ -200,7 +200,7 @@ namespace SAIN.Components
                     var shoot = BotOwner.ShootData;
                     if (shoot != null)
                     {
-                        CanShootByState.Invoke(shoot, new object[] { false });
+                        //CanShootByState.Invoke(shoot, new object[] { false });
                     }
                     var vision = SAIN?.Enemy?.EnemyVision;
                     if (vision != null)

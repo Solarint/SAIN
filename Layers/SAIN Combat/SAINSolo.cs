@@ -128,22 +128,31 @@ namespace SAIN.Layers
         {
             stringBuilder.AppendLine($"SAIN Info:");
             var info = SAIN.Info;
-            stringBuilder.AppendLabeledValue("Decisions", $"Base: {SAIN.Memory.Decisions.Main.Current} Self: {SAIN.Decision.CurrentSelfDecision} Squad: {SAIN.Decision.CurrentSquadDecision}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("Personality", $"{info.Personality} {info.Profile.WildSpawnType}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Personality and Type", $"{info.Personality} {info.Profile.WildSpawnType}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Power of Equipment", $"{info.Profile.PowerLevel}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Start Search + Hold Ground Time", $"{info.TimeBeforeSearch} + {info.HoldGroundDelay}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Difficulty + Modifier", $"{info.Profile.BotDifficulty} + {info.Profile.DifficultyModifier}", Color.white, Color.yellow, true);
-
-            var weapon = info.WeaponInfo;
-            var modif = weapon.Modifiers;
-            stringBuilder.AppendLabeledValue("WeaponClass + Modifier", $"{weapon.WeaponClass} + {modif.WeaponClassModifier}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("AmmoCaliber + Modifier", $"{weapon.AmmoCaliber} + {modif.AmmoCaliberModifier}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("Final Shoot Modifier", $"{weapon.FinalModifier}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("Recoil, Ergo, Role Modifiers", $"{modif.RecoilModifier}, {modif.ErgoModifier}, {modif.ProficiencyModifier}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Shoot Modifier", $"{info.WeaponInfo.FinalModifier}", Color.white, Color.yellow, true);
 
             if (SAIN.Enemy != null)
             {
-                stringBuilder.AppendLabeledValue("Enemy Time Since Seen", $"{SAIN.Enemy.TimeSinceSeen}", Color.red, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("SAIN: Enemy Time Since Seen", $"{SAIN.Enemy.TimeSinceSeen}", Color.red, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("SAIN: Can Shoot", $"{SAIN.Enemy.CanShoot}", Color.red, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("SAIN: Is Visible", $"{SAIN.Enemy.IsVisible}", Color.red, Color.yellow, true);
+            }
+            var goalEnemy = BotOwner.Memory.GoalEnemy;
+            if (goalEnemy != null)
+            {
+                stringBuilder.AppendLabeledValue("EFT: Can Shoot", $"{goalEnemy.CanShoot}", Color.red, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("EFT: Is Visible", $"{goalEnemy.IsVisible}", Color.red, Color.yellow, true);
+            }
+            var aimData = BotOwner.AimingData;
+            if (aimData != null)
+            {
+                stringBuilder.AppendLabeledValue("Aim: AimComplete?", $"{aimData.IsReady}", Color.red, Color.yellow, true);
+                var shoot = BotOwner.ShootData;
+                stringBuilder.AppendLabeledValue("Shoot: CanShootByState", $"{shoot?.CanShootByState}", Color.red, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Shoot: Shooting", $"{shoot?.Shooting}", Color.red, Color.yellow, true);
             }
         }
     }

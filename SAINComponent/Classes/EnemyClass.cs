@@ -15,7 +15,7 @@ namespace SAIN.SAINComponent.Classes
         {
             Person = person;
             EnemyProfileID = person.ProfileId;
-            EnemyPlayer = EFTInfo.GetPlayer(person);
+            EnemyPlayer = person as Player;
 
             EnemyStatus = new SAINEnemyStatus(this);
             EnemyVision = new SAINEnemyVision(this);
@@ -145,17 +145,18 @@ namespace SAIN.SAINComponent.Classes
 
         private bool CheckInVisionCone()
         {
+            return true;
             Vector3 enemyDir = CurrPosition - BotOwner.Position;
             Vector3 lookDir = BotOwner.LookDirection;
             float angle = Vector3.Angle(lookDir, enemyDir);
-            float maxVisionCone = BotOwner.Settings.FileSettings.Core.VisibleAngle;
+            float maxVisionCone = BotOwner.Settings.FileSettings.Core.VisibleAngle / 2f;
             return angle <= maxVisionCone;
         }
 
-        public void UpdateVisible(bool inLineOfSight)
+        public void UpdateVisible(bool visible)
         {
             bool wasVisible = IsVisible;
-            IsVisible = inLineOfSight;
+            IsVisible = visible;
 
             if (IsVisible)
             {

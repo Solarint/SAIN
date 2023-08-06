@@ -101,13 +101,11 @@ namespace SAIN.Helpers
         public GClass561 Modifiers;
     }
 
-    public class BotShoot
+    public class BotShoot : GClass182
     {
-        public BotShoot(BotOwner owner)
+        public BotShoot(BotOwner owner) : base (owner)
         {
-            Shoot = new GClass182(owner);
         }
-        public readonly GClass182 Shoot;
     }
 
     public class BotAimingData

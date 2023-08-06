@@ -14,7 +14,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [MinMaxRound(0.1f, 3f, 10f)]
         public float VisionSpeedModifier = 1;
 
-        [NameAndDescription("Far Vision Speed Multiplier",
+        [NameAndDescription("Close Vision Speed Multiplier",
             "Vision speed multiplier at close range. " +
                 "Bots will see this much faster, or slower, at close range. " +
                 "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy")]

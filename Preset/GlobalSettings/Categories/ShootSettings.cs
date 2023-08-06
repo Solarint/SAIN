@@ -6,6 +6,12 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class ShootSettings
     {
+        [NameAndDescription("Global Recoil Multiplier")]
+        [DefaultValue(1f)]
+        [MinMaxRound(0.1f, 3f, 100f)]
+        [AdvancedOptions(true)]
+        public float GlobalRecoilMultiplier = 1f;
+
         [NameAndDescription(
             "Max Recoil Per Shot",
             "Maximum Impulse force from a single shot for a bot.")]
