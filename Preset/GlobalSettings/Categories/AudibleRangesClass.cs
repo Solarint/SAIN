@@ -9,11 +9,14 @@ namespace SAIN.Preset.GlobalSettings
     {
         public AudibleRangesClass() : base(nameof(AmmoShootabilityClass))
         {
-            UpdateValues();
         }
 
         public float Get(Caliber key)
         {
+            if (Values.Count == 0)
+            {
+                UpdateValues();
+            }
             if (Values.ContainsKey(key))
             {
                 return (float)Values[key];

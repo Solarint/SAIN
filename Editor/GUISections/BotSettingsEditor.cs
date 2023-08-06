@@ -1,9 +1,8 @@
 ﻿using SAIN.Attributes;
 using SAIN.Editor.Abstract;
-using SAIN.Preset.BotSettings.SAINSettings;
+using SAIN.Preset.BotSettings.SAINSettings.Categories;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 
 namespace SAIN.Editor.GUISections
@@ -14,66 +13,80 @@ namespace SAIN.Editor.GUISections
         {
         }
 
-        public void EditMenu(SAINSettingsClass settings)
+        public object SettingsMenu(object settings, FieldsCache fieldCache)
         {
             BeginVertical();
 
-            List<object> categories = GetCategories(settings);
-            CategoryOpenable(categories);
+            Type type = settings.GetType();
+            if (!Categories.ContainsKey(type))
+            {
+                Categories.Add(type, GetCategories(settings));
+            }
+
+            Categories[type] = CategoryOpenable(Categories[type], fieldCache, settings, out object modifiedObject);
 
             EndVertical();
+
+            return modifiedObject;
         }
 
-        private static List<object> GetCategories(object settingsObject)
+        private static List<Category> GetCategories(object settingsObject)
         {
-            List<object> categories = new List<object>();
-            foreach (FieldInfo field in settingsObject.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance))
+            List<Category> result = new List<Category>();
+            var fields = settingsObject.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
+            foreach (FieldInfo field in fields)
             {
-                categories.Add(field.GetValue(settingsObject));
+                result.Add(new Category
+                {
+                    Field = field,
+                });
             }
+            return result;
+        }
+
+        private readonly Dictionary<Type, List<Category>> Categories = new Dictionary<Type, List<Category>>();
+
+        public sealed class Category
+        {
+            public FieldInfo Field;
+            public object Value(object settingsObject) => Field.GetValue(settingsObject);
+            public void SetValue(object categoryObject, object settingsObject) => Field.SetValue(settingsObject, categoryObject);
+            public bool Open = false;
+        }
+
+        private Dictionary<Type, bool[]> CategoriesOpenableValues = new Dictionary<Type, bool[]>();
+
+        private List<Category> CategoryOpenable(List<Category> categories, FieldsCache fieldCache, object settingsObject, out object modifiedSettingsObject)
+        {
+            foreach (var categoryClass in categories)
+            {
+                FieldInfo categoryField = categoryClass.Field;
+                object categoryObject = categoryClass.Value(settingsObject);
+
+                var nameDesc = categoryField.GetCustomAttribute<NameAndDescriptionAttribute>();
+                string name = nameDesc?.Name ?? categoryField.Name;
+                string description = nameDesc?.Description;
+
+                FieldInfo[] variableFields = fieldCache.GetFields(categoryObject.GetType());
+                if (variableFields.Length > 0)
+                {
+                    categoryClass.Open = Builder.ExpandableMenu(name, categoryClass.Open, description, EntryConfig.EntryHeight, EntryConfig.InfoWidth);
+                    if (categoryClass.Open)
+                    {
+                        foreach (FieldInfo field in variableFields)
+                        {
+                            object value = field.GetValue(categoryObject);
+                            value = AttributesGUI.EditValue(value, field, EntryConfig);
+                            field.SetValue(categoryObject, value);
+                        }
+                        categoryClass.SetValue(categoryObject, settingsObject);
+                    }
+                }
+            }
+            modifiedSettingsObject = settingsObject;
             return categories;
         }
 
-        private void CategoryOpenable(List<object> categories)
-        {
-            if (OpenCategories == null)
-            {
-                OpenCategories = new bool[categories.Count];
-            }
-
-            for (int i = 0; i < categories.Count; i++)
-            {
-                object category = categories[i];
-                bool open = OpenCategories[i];
-
-                Type categoryType = category.GetType();
-                FieldInfo[] categoryFields = GetFields(categoryType);
-
-                if (categoryFields.Length > 0)
-                {
-                    foreach (FieldInfo field in categoryFields)
-                    {
-                        var nameDesc = field.GetCustomAttribute<NameAndDescriptionAttribute>();
-                        string name = nameDesc?.Name ?? field.Name;
-                        string description = nameDesc?.Description;
-
-                        open = Builder.ExpandableMenu(name, open, description, EntryConfig.EntryHeight, EntryConfig.InfoWidth);
-                        if (open)
-                        {
-                            object value = field.GetValue(category);
-                            value = AttributesGUI.EditValue(value, field, EntryConfig);
-                            field.SetValue(category, value);
-                        }
-                    }
-                }
-
-                OpenCategories[i] = open;
-            }
-        }
-
         private readonly GUIEntryConfig EntryConfig = new GUIEntryConfig();
-        private bool[] OpenCategories;
-
-        private FieldInfo[] GetFields(Type type) => Editor.SAINBotSettingsCache.GetFields(type);
     }
 }

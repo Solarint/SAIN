@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using SAIN.Helpers;
-using SAIN.Preset.GlobalSettings;
+﻿using SAIN.Preset.GlobalSettings;
 using SAIN.Preset.Personalities;
 using static SAIN.Helpers.JsonUtility;
 
@@ -10,44 +8,22 @@ namespace SAIN.Preset
     {
         public SAINPresetClass(SAINPresetDefinition preset)
         {
-            //HelpersGClass.LoadSettings();
-            Definition = preset;
-            GlobalSettings = LoadGlobalSettings(preset);
+            Info = preset;
+            GlobalSettings = GlobalSettingsClass.LoadGlobalSettings(preset);
             BotSettings = new BotSettings.BotSettingsClass(preset);
             PersonalityManager = new PersonalityManagerClass(preset);
         }
 
-        private static GlobalSettingsClass LoadGlobalSettings(SAINPresetDefinition Preset)
-        {
-            string fileName = "GlobalSettings"; 
-            string presetsFolder = "Presets";
-            string presetNameFolder = Preset.Name;
-            if (!Load.LoadObject(out GlobalSettingsClass result, fileName, presetsFolder, presetNameFolder))
-            {
-                result = new GlobalSettingsClass
-                {
-                    EFTCoreSettings = EFTCoreSettings.GetCore()
-                };
-
-                Save.SaveJson(result, fileName, presetsFolder, presetNameFolder);
-            }
-            else
-            {
-                EFTCoreSettings.UpdateCoreSettings(result.EFTCoreSettings);
-            }
-
-            return result;
-        }
-
         public void SavePreset()
         {
-            string[] folders = new string[] { PresetsFolder, Definition.Name };
-            Save.SaveJson(Definition, "Info", folders);
+            string[] folders = new string[] { PresetsFolder, Info.Name };
+
+            Save.SaveJson(Info, nameof(Info), folders);
             Save.SaveJson(GlobalSettings, nameof(GlobalSettings), folders);
-            BotSettings.SaveSettings(Definition);
+            BotSettings.SaveSettings(Info);
         }
 
-        public SAINPresetDefinition Definition;
+        public SAINPresetDefinition Info;
         public GlobalSettingsClass GlobalSettings;
         public BotSettings.BotSettingsClass BotSettings;
         public PersonalityManagerClass PersonalityManager;

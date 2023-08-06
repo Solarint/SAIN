@@ -26,7 +26,7 @@ namespace SAIN.Editor.GUISections
             float endHeight = InstalledHeight + LabelHeight;
 
             int presetSpacing = 0;
-            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Definition;
+            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
             for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
             {
                 presetSpacing++;
@@ -48,7 +48,7 @@ namespace SAIN.Editor.GUISections
 
             EndVertical();
 
-            if (selectedPreset != SAINPlugin.LoadedPreset.Definition)
+            if (selectedPreset != SAINPlugin.LoadedPreset.Info)
             {
                 PresetHandler.InitPresetFromDefinition(selectedPreset);
                 return true;

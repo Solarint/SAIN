@@ -130,6 +130,7 @@ namespace SAIN.Editor
             }
 
             SAINBotSettingsCache.CacheHandler(DisplayingWindow);
+            GlobalSettingsCache.CacheHandler(DisplayingWindow);
         }
 
         public void LateUpdate()
@@ -259,7 +260,6 @@ namespace SAIN.Editor
             {
                 Builder.BeginArea(tabRect);
                 BotSelectionClass.Menu(tabRect);
-                BotSettingsEditor.EditMenu(new SAINSettingsClass());
                 Builder.EndArea();
             }
             else
@@ -273,6 +273,15 @@ namespace SAIN.Editor
                     Builder.Space(10f);
 
                     PresetSelection.Menu();
+                }
+                else if (TabSelected(Global, out tabRect, 1000f))
+                {
+                    if (Builder.Button("Save"))
+                    {
+                        PresetHandler.UpdateExistingBots();
+                        PresetHandler.SaveLoadedPreset();
+                    }
+                    BotSettingsEditor.SettingsMenu(SAINPlugin.LoadedPreset.GlobalSettings, GlobalSettingsCache);
                 }
                 else if (TabSelected(Personalities, out tabRect, 1000f))
                 {

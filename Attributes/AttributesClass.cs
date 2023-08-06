@@ -24,6 +24,8 @@ namespace SAIN.Attributes
             IsHidden = custom?.IsHidden == true;
             IsAdvanced = custom?.IsAdvanced == true;
             GetDefaultFromEFT = custom?.CopyValueFromEFT == true;
+
+            IsList = field.GetCustomAttribute<ListAttribute>()?.Value == true;
         }
 
         public readonly string Name;
@@ -35,6 +37,7 @@ namespace SAIN.Attributes
         public readonly bool IsHidden = false;
         public readonly bool IsAdvanced = false;
         public readonly bool GetDefaultFromEFT = false;
+        public readonly bool IsList = false;
     }
 
     [AttributeUsage(AttributeTargets.Field)]

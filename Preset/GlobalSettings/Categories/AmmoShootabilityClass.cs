@@ -10,7 +10,6 @@ namespace SAIN.Preset.GlobalSettings
     {
         public AmmoShootabilityClass() : base(nameof(AmmoShootabilityClass))
         {
-            UpdateValues();
         }
 
         public void UpdateValues()
@@ -20,6 +19,10 @@ namespace SAIN.Preset.GlobalSettings
 
         public float Get(Caliber key)
         {
+            if (Values.Count == 0)
+            {
+                UpdateValues();
+            }
             if (Values.ContainsKey(key))
             {
                 return (float)Values[key];
@@ -28,8 +31,7 @@ namespace SAIN.Preset.GlobalSettings
             return Default;
         }
 
-        [JsonIgnore]
-        public Dictionary<object, object> Values = new Dictionary<object, object>();
+        public static Dictionary<object, object> Values = new Dictionary<object, object>();
 
         private const string Description = "Lower is BETTER. How Shootable this ammo type is, affects semi auto firerate and full auto burst length";
 

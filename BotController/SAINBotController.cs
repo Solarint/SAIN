@@ -47,7 +47,6 @@ namespace SAIN.Components
         private bool ComponentAdded { get; set; }
         private float UpdatePositionTimer { get; set; }
 
-
         private void Awake()
         {
             GameWorld.OnDispose += Dispose;
@@ -319,6 +318,10 @@ namespace SAIN.Components
         public List<string> Groups = new List<string>();
         public PathManager PathManager { get; private set; } = new PathManager();
 
+        private void OnDestroy()
+        {
+            Dispose();
+        }
         private void Dispose()
         {
             try

@@ -9,16 +9,19 @@ namespace SAIN.Preset.GlobalSettings
     {
         public WeaponShootabilityClass() : base(nameof(AmmoShootabilityClass))
         {
-            UpdateValues();
         }
 
         public void UpdateValues()
         {
-            Values = GetValuesFromClass.UpdateValues(Caliber.Default, Default, this, Values);
+            Values = GetValuesFromClass.UpdateValues(WeaponClass.Default, Default, this, Values);
         }
 
-        public float Get(Caliber key)
+        public float Get(WeaponClass key)
         {
+            if (Values.Count == 0)
+            {
+                UpdateValues();
+            }
             if (Values.ContainsKey(key))
             {
                 return (float)Values[key];

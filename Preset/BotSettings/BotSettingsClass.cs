@@ -23,7 +23,6 @@ namespace SAIN.Preset.BotSettings
             Preset = preset;
             BotDifficulty[] Difficulties = EnumValues.Difficulties;
 
-            string[] eftFolders = Folders(preset.Name, "EFT");
             string[] sainFolders = Folders(preset.Name, "SAIN");
 
             foreach (var BotType in BotTypeDefinitions.BotTypesList)
@@ -33,7 +32,7 @@ namespace SAIN.Preset.BotSettings
 
                 if (!EFTSettings.ContainsKey(wildSpawnType))
                 {
-                    if (Load.LoadObject(out EFTBotSettings eftSettings, name, eftFolders))
+                    if (Load.LoadObject(out EFTBotSettings eftSettings, name, "EFT Bot Settings - DO NOT TOUCH"))
                     {
                         EFTSettings.Add(wildSpawnType, eftSettings);
                     }
@@ -135,7 +134,7 @@ namespace SAIN.Preset.BotSettings
                 {
                     string[] eftFolders = Folders(Preset.Name, "EFT");
 
-                    if (!Load.LoadObject(out EFTBotSettings eftSettings, name, eftFolders))
+                    if (!Load.LoadObject(out EFTBotSettings eftSettings, name, "EFT Bot Settings - DO NOT TOUCH"))
                     {
                         eftSettings = new EFTBotSettings(name, wildSpawnType, Difficulties);
                         Save.SaveJson(eftSettings, name, eftFolders);

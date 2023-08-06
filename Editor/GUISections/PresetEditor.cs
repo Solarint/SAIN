@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using SAIN.Preset.BotSettings.SAINSettings;
+using EFT;
 
 namespace SAIN.Editor
 {
@@ -103,21 +105,10 @@ namespace SAIN.Editor
 
             EndHorizontal();
 
-            OpenPropSelect = Builder.ExpandableMenu("Properties List", OpenPropSelect, "Select which properties you wish to modify.");
-            if (OpenPropSelect)
-            {
-                PropSelectionMenu(4, 25, 150);
-            }
-
-            OpenPropEdit = Builder.ExpandableMenu("Selected Properties", OpenPropEdit, "Modify selected properties here");
+            OpenPropEdit = Builder.ExpandableMenu("Edit Settings", OpenPropEdit, "Modify settings for bots here");
             if (OpenPropEdit)
             {
                 PropEditMenu();
-            }
-
-            OpenAdvanced = Builder.ExpandableMenu("Advanced", OpenAdvanced, "Modify internal bot configs");
-            if (OpenAdvanced)
-            {
             }
         }
 
@@ -351,11 +342,6 @@ namespace SAIN.Editor
                 Box("No Difficulties Selected");
                 returnToStart = true;
             }
-            if (SelectedProperties.Count == 0)
-            {
-                Box("No Properties Selected");
-                returnToStart = true;
-            }
 
             EndHorizontal();
 
@@ -378,14 +364,14 @@ namespace SAIN.Editor
 
             FlexibleSpace();
 
-            if (Button("Save", "Apply Values set below to all selected bot types for all selected difficulties", Height(35f), Width(200f)))
+            if (Button("Save", "Apply Values set below to all selected bot types for all selected difficulties. Saves edited values to SAIN/Presets folder", Height(35f), Width(200f)))
             {
-                return;
+                SAINPlugin.LoadedPreset.SavePreset();
+                PresetHandler.UpdateExistingBots();
             }
-            if (Button("Discard", "Clear all selected bots, difficulties, and properties", Height(35f), Width(200f)))
+            if (Button("Discard", "Clear all selected bots, difficulties", Height(35f), Width(200f)))
             {
                 Reset();
-                return;
             }
 
             EndHorizontal();
@@ -399,11 +385,24 @@ namespace SAIN.Editor
             FlexibleSpace();
             EndHorizontal();
 
-            for (int i = 0; i < SelectedProperties.Count; i++)
+            Scroll = BeginScrollView(Scroll);
+
+            if (EditingSettings == null || EditingType != typeInEdit.WildSpawnType || EditingDifficulty != EditDifficulty)
             {
-                CreatePropertyOption(SelectedProperties[i], typeInEdit);
+                EditingType = typeInEdit.WildSpawnType;
+                EditingDifficulty = EditDifficulty;
+                EditingSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(EditingType, EditingDifficulty);
             }
+
+            Editor.BotSettingsEditor.SettingsMenu(EditingSettings, Editor.SAINBotSettingsCache);
+
+            EndScrollView();
         }
+
+        private WildSpawnType EditingType;
+        private BotDifficulty EditingDifficulty;
+        private SAINSettingsClass EditingSettings;
+        private Vector2 Scroll = Vector2.zero;
 
         private string ConvertBotTypeListToString()
         {

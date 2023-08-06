@@ -61,37 +61,55 @@ namespace SAIN.Attributes
             Buttons.Box(new GUIContent(attributes.Name), style);
 
             Type type = value.GetType();
-            if (type == typeof(bool))
+
+            if (attributes.IsList)
             {
-                bool boolVal = (bool)value;
-                value = Builder.Toggle(boolVal, boolVal ? "On" : "Off", entryConfig.Slider);
+                Builder.EndHorizontal();
+                Builder.BeginVertical();
+
+                FieldInfo[] valueListFields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+                for (int i = 0; i < valueListFields.Length; i++)
+                {
+                    FieldInfo valueListField = valueListFields[i];
+                    object listValue = valueListField.GetValue(value);
+                    listValue = EditValue(listValue, valueListField, entryConfig);
+                    valueListField.SetValue(value, listValue);
+                }
+
+                Builder.EndVertical();
             }
             else
             {
-                float min = attributes.Min == null ? 0f : attributes.Min.Value;
-                float max = attributes.Max == null ? 1000f : attributes.Max.Value;
-
-                Builder.MinValueBox(min, entryConfig.Info);
-                if (type == typeof(float))
+                if (type == typeof(bool))
                 {
-                    float flValue = Builder.CreateSlider((float)value, min, max, entryConfig.Slider);
-                    float rounding = attributes.Rounding == null ? 10f : attributes.Rounding.Value;
-                    value = Mathf.Round(flValue * rounding) / rounding;
+                    bool boolVal = (bool)value;
+                    value = Builder.Toggle(boolVal, boolVal ? "On" : "Off", entryConfig.Slider);
                 }
-                else if (type == typeof(int))
+                else
                 {
-                    float floatvalue = Builder.CreateSlider((int)value, min, max, entryConfig.Slider);
-                    value = Mathf.RoundToInt(floatvalue);
+                    float min = attributes.Min == null ? 0f : attributes.Min.Value;
+                    float max = attributes.Max == null ? 1000f : attributes.Max.Value;
+
+                    Builder.MinValueBox(min, entryConfig.Info);
+                    if (type == typeof(float))
+                    {
+                        float flValue = Builder.CreateSlider((float)value, min, max, entryConfig.Slider);
+                        float rounding = attributes.Rounding == null ? 10f : attributes.Rounding.Value;
+                        value = Mathf.Round(flValue * rounding) / rounding;
+                    }
+                    else if (type == typeof(int))
+                    {
+                        float floatvalue = Builder.CreateSlider((int)value, min, max, entryConfig.Slider);
+                        value = Mathf.RoundToInt(floatvalue);
+                    }
+
+                    Builder.MaxValueBox(max, entryConfig.Info);
                 }
 
-                Builder.MaxValueBox(max, entryConfig.Info);
+                Builder.ResultBox(value, entryConfig.Result);
+                value = Builder.Reset(value, attributes.Default, entryConfig.Reset);
+                Builder.EndHorizontal();
             }
-
-            Builder.ResultBox(value, entryConfig.Result);
-            value = Builder.Reset(value, attributes.Default, entryConfig.Reset);
-
-            Builder.EndHorizontal();
-
             return value;
         }
 

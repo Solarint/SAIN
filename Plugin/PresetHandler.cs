@@ -68,7 +68,16 @@ namespace SAIN.Plugin
                 SelectedPreset = def.Name,
                 DefaultPreset = DefaultPreset
             };
-            Save.SaveJson(defaults, Settings, PresetsFolder);
+            Save.SaveJson(defaults, Settings, PresetsFolder); 
+            UpdateExistingBots();
+        }
+
+        public static void UpdateExistingBots()
+        {
+            LoadedPreset.GlobalSettings.Shoot.AmmoShootability.UpdateValues();
+            LoadedPreset.GlobalSettings.Shoot.WeaponShootability.UpdateValues();
+            LoadedPreset.GlobalSettings.Hearing.AudibleRanges.UpdateValues();
+
             if (SAINPlugin.BotController?.Bots != null && SAINPlugin.BotController.Bots.Count > 0)
             {
                 PresetsUpdated();

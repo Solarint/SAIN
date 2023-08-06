@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using SAIN.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -23,12 +24,12 @@ namespace SAIN.Preset.GlobalSettings
                 object value = field.GetValue(classObject);
                 if (isCaliber)
                 {
-                    AddCaliberValue<Caliber>(field, value, Values);
+                    AddCaliberValue(field, value, Values);
                     added = true;
                 }
                 if (isWeapon)
                 {
-                    AddWeaponClassValue<WeaponClass>(field, value, Values);
+                    AddWeaponClassValue(field, value, Values);
                     added = true;
                 }
                 if (!added)
@@ -39,31 +40,41 @@ namespace SAIN.Preset.GlobalSettings
             return Values;
         }
 
-        private static void AddCaliberValue<T>(FieldInfo field, object value, Dictionary<object, object> Values)
+        private static void AddCaliberValue(FieldInfo field, object value, Dictionary<object, object> Values)
         {
-            var attritbute = field.GetCustomAttribute<AmmoCaliberAttribute>();
-            Caliber enumValue = attritbute.AmmoCaliber;
-            if (attritbute != null && !Values.ContainsKey((T)(object)enumValue))
+            var attribute = field.GetCustomAttribute<AmmoCaliberAttribute>();
+            if (attribute == null)
             {
-                Values.Add((T)(object)enumValue, value);
+                Log("attribute is null", field.Name);
+                return;
+            }
+            Caliber enumValue = attribute.AmmoCaliber;
+            if (!Values.ContainsKey(enumValue))
+            {
+                Values.Add(enumValue, value);
             }
             else
             {
-                Log("Does Not Exist", enumValue);
+                Log("Already Exists", enumValue);
             }
         }
 
-        private static void AddWeaponClassValue<T>(FieldInfo field, object value, Dictionary<object, object> Values)
+        private static void AddWeaponClassValue(FieldInfo field, object value, Dictionary<object, object> Values)
         {
-            var attritbute = field.GetCustomAttribute<WeaponClassAttribute>();
-            WeaponClass enumValue = attritbute.WeaponClass;
-            if (attritbute != null && !Values.ContainsKey((T)(object)enumValue))
+            var attribute = field.GetCustomAttribute<WeaponClassAttribute>();
+            if (attribute == null)
             {
-                Values.Add((T)(object)enumValue, value);
+                //Log("attribute is null", field.Name);
+                return;
+            }
+            WeaponClass enumValue = attribute.WeaponClass;
+            if (!Values.ContainsKey(enumValue))
+            {
+                Values.Add(enumValue, value);
             }
             else
             {
-                Log("Does Not Exist", enumValue);
+                Log("Already Exists", enumValue);
             }
         }
 

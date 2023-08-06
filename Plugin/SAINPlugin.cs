@@ -8,6 +8,7 @@ using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset;
 using System;
+using System.Reflection;
 using UnityEngine;
 using static SAIN.AssemblyInfo;
 
@@ -59,12 +60,11 @@ namespace SAIN
             if (!VersionChecker.CheckEftVersion(Logger, Info, Config))
                 throw new Exception("Invalid EFT Version");
 
-            BindConfigs();
             PresetHandler.Init();
+            BindConfigs();
             Patches();
             BigBrainHandler.Init();
             VectorHelpers.Init();
-            SAINEditor = new SAINEditor();
         }
 
         private void BindConfigs()
@@ -115,7 +115,7 @@ namespace SAIN
 
         public static ConfigEntry<KeyboardShortcut> PauseConfigEntry { get; private set; }
 
-        public static SAINEditor SAINEditor { get; private set; }
+        public static readonly SAINEditor SAINEditor = new SAINEditor();
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 
@@ -164,31 +164,30 @@ namespace SAIN
             }
             if (Chainloader.PluginInfos.ContainsKey(Realism))
             {
-                LootingBotsLoaded = true;
+                RealismLoaded = true;
                 Logger.LogInfo($"SAIN: Realism Detected.", typeof(ModDetection));
             }
         }
 
         public static void ModDetectionGUI()
         {
-            var Builder = SAINPlugin.SAINEditor.Builder;
-            var Buttons = SAINPlugin.SAINEditor.Buttons;
-
             Builder.BeginVertical();
+
             Builder.BeginHorizontal();
-            foreach (var plugin in Chainloader.PluginInfos)
-            {
-                string name = plugin.Value.Metadata.Name.ToLower();
-                if (name.Contains("looting bots"))
-                {
-
-                }
-            }
-
+            IsDetected(LootingBotsLoaded, "Looting Bots");
+            IsDetected(RealismLoaded, "Realism Mod");
             Builder.EndHorizontal();
+
             Builder.EndVertical();
         }
 
+        private static void IsDetected(bool value, string name)
+        {
+            Builder.Label(name);
+            Builder.Box(value ? "Detected" : "Not Detected");
+        }
+
+        private static BuilderClass Builder => SAINPlugin.SAINEditor.Builder;
         private static readonly float ModsCheckTimer = -1f;
         private static bool ModsChecked = false;
     }
