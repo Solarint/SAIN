@@ -56,7 +56,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [NameAndDescription("Frieldly Fire Spherecast Size")]
         [Description(null)]
         [DefaultValue(0.15f)]
-        [MinMaxRound(0f, 0.05f, 100f)]
+        [MinMaxRound(0f, 0.5f, 100f)]
         [AdvancedOptions(true)]
         public float SHPERE_FRIENDY_FIRE_SIZE = 0.15f;
 

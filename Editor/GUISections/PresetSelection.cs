@@ -13,8 +13,13 @@ namespace SAIN.Editor.GUISections
         {
             BeginVertical();
 
-            BeginHorizontal();
             const float LabelHeight = 25f;
+            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
+            if (selectedPreset.SAINVersion != AssemblyInfo.SAINVersion)
+            {
+                Box($"Selected Preset was made for SAIN Version {selectedPreset.SAINVersion} but you are running {AssemblyInfo.SAINVersion}, you may experience issues.", Height(LabelHeight));
+            }
+            BeginHorizontal();
             Box("Installed Presets", Height(LabelHeight));
             Box("Select an installed preset for SAIN Settings", Height(LabelHeight));
             bool refresh = Button("Refresh", "Refresh installed Presets", Height(LabelHeight));
@@ -26,7 +31,6 @@ namespace SAIN.Editor.GUISections
             float endHeight = InstalledHeight + LabelHeight;
 
             int presetSpacing = 0;
-            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
             for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
             {
                 presetSpacing++;

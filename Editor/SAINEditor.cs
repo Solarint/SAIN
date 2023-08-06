@@ -12,6 +12,7 @@ using SAIN.Preset.BotSettings.SAINSettings.Categories;
 using SAIN.Preset.GlobalSettings;
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static SAIN.Editor.RectLayout;
 using static SAIN.Editor.Sounds;
 using ColorsClass = SAIN.Editor.Util.ColorsClass;
@@ -57,7 +58,7 @@ namespace SAIN.Editor
         public TexturesClass TexturesClass { get; private set; }
 
         public bool GameIsPaused { get; private set; }
-        public bool AdvancedOptionsEnabled { get; private set; }
+        public bool AdvancedOptionsEnabled;
 
         [ConsoleCommand("Open SAIN GUI Editor")]
         private void OpenEditor()
@@ -229,13 +230,15 @@ namespace SAIN.Editor
 
         private string OpenTab = None;
 
+        private Vector2 Scroll = Vector2.zero;
+
         private void MainWindowFunc(int TWCWindowID)
         {
             var dragStyle = Builder.GetStyle(Style.blankbox);
             dragStyle.alignment = TextAnchor.MiddleLeft;
             dragStyle.padding = new RectOffset(10, 10, 0, 0);
             GUI.DrawTexture(DragRect, DragBackgroundTexture, ScaleMode.StretchToFill, true, 0);
-            GUI.Box(DragRect, "SAIN GUI Editor", dragStyle);
+            GUI.Box(DragRect, $"SAIN GUI Editor | Preset: {SAINPlugin.LoadedPreset.Info.Name}", dragStyle);
             GUI.DragWindow(DragRect);
             if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", StyleOptions.GetStyle(Style.button)))
             {
@@ -281,7 +284,10 @@ namespace SAIN.Editor
                         PresetHandler.UpdateExistingBots();
                         PresetHandler.SaveLoadedPreset();
                     }
+
+                    Scroll = Builder.BeginScrollView(Scroll);
                     BotSettingsEditor.SettingsMenu(SAINPlugin.LoadedPreset.GlobalSettings, GlobalSettingsCache);
+                    Builder.EndScrollView();
                 }
                 else if (TabSelected(Personalities, out tabRect, 1000f))
                 {

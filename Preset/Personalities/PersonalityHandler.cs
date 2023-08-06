@@ -134,7 +134,11 @@ namespace SAIN.Preset.Personalities
                     HoldGroundMaxRandom = 2f,
                     HoldGroundMinRandom = 0.25f,
                     SearchBaseTime = SearchBaseTime(pers),
-                    PowerLevelMin = 115f
+                    PowerLevelMin = 115f,
+                    SprintWhileSearch = true,
+                    FrequentSprintWhileSearch = true,
+                    CanRushEnemyReloadHeal = true,
+                    ConstantTaunt = true,
                 };
                 Personalities.Add(pers, settings);
             }
@@ -158,7 +162,10 @@ namespace SAIN.Preset.Personalities
                     HoldGroundMaxRandom = 2f,
                     HoldGroundMinRandom = 0.5f,
                     SearchBaseTime = SearchBaseTime(pers),
-                    PowerLevelMin = 85f
+                    PowerLevelMin = 85f,
+                    SprintWhileSearch = true,
+                    CanRushEnemyReloadHeal = true,
+                    FrequentTaunt = true,
                 };
                 Personalities.Add(pers, settings);
             }

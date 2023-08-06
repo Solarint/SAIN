@@ -32,6 +32,9 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [AdvancedOptions(true, false, true)]
         public float ScatteringClosePerMeter = 0.12f;
 
+        [NameAndDescription(
+            "Injury Scatter Multiplier",
+            "Increase scatter when a bots arms are injured.")]
         [DefaultValue(1.33f)]
         [MinMaxRound(1f, 2f, 100f)]
         [AdvancedOptions(true)]
@@ -42,7 +45,6 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
             "Modifies the distance that this bot can hear sounds")]
         [DefaultValue(1f)]
         [MinMaxRound(0.1f, 3f, 100f)]
-        [AdvancedOptions(false, false, true)]
         public float HearingSense = 1f;
 
         [DefaultValue(true)]

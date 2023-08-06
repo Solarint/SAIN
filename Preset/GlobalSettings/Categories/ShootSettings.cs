@@ -18,7 +18,7 @@ namespace SAIN.Preset.GlobalSettings
             "Add or Subtract Recoil",
             "Linearly add or subtract from the final recoil result")]
         [DefaultValue(0f)]
-        [MinMaxRound(0.1f, 5f, 100f)]
+        [MinMaxRound(-5f, 5f, 100f)]
         [AdvancedOptions(true)]
         public float AddRecoil = 0f;
 
@@ -37,5 +37,19 @@ namespace SAIN.Preset.GlobalSettings
         [List]
         [AdvancedOptions(true)]
         public WeaponShootabilityClass WeaponShootability = new WeaponShootabilityClass();
+
+
+        [AdvancedOptions(true, true)]
+        public float WeaponClassScaling = 0.3f;
+        [AdvancedOptions(true, true)]
+        public float RecoilScaling = 0.2f;
+        [AdvancedOptions(true, true)]
+        public float ErgoScaling = 0.1f;
+        [AdvancedOptions(true, true)]
+        public float AmmoCaliberScaling = 0.2f;
+        [AdvancedOptions(true, true)]
+        public float WeaponProficiencyScaling = 0.3f;
+        [AdvancedOptions(true, true)]
+        public float DifficultyScaling = 0.5f;
     }
 }

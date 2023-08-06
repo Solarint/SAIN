@@ -2,6 +2,7 @@
 using SAIN.Preset;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.Plugin
@@ -17,6 +18,8 @@ namespace SAIN.Plugin
             PresetOptions = Load.GetPresetOptions(PresetOptions);
         }
 
+        public static bool PresetVersionMismatch = false;
+
         const string Settings = "Settings";
         public static void Init()
         {
@@ -30,22 +33,54 @@ namespace SAIN.Plugin
                 };
             }
             presetDefaults.DefaultPreset = DefaultPreset;
+            SAINPlugin.SAINEditor.AdvancedOptionsEnabled = presetDefaults.Advanced;
 
             if (!LoadPresetDefinition(presetDefaults.SelectedPreset, out SAINPresetDefinition presetDefinition))
             {
                 if (!LoadPresetDefinition(DefaultPreset, out presetDefinition))
                 {
-                    presetDefinition = new SAINPresetDefinition
-                    {
-                        Name = DefaultPreset, 
-                        Description = "The Default SAIN Preset", 
-                        Creator = "Solarint" 
-                    };
-                    SavePresetDefinition(presetDefinition);
+                    presetDefinition = CreateDefaultPresets();
                 }
             }
-            SavePresetDefinition(presetDefinition);
             InitPresetFromDefinition(presetDefinition);
+        }
+
+        private static SAINPresetDefinition CreateDefaultPresets()
+        {
+            var easy = new SAINPresetDefinition
+            {
+                Name = "SAIN Easy",
+                Description = "The Default SAIN Preset",
+                Creator = "Solarint"
+            };
+            SavePresetDefinition(easy);
+            new SAINPresetClass(easy);
+            var normal = new SAINPresetDefinition
+            {
+                Name = "SAIN Normal",
+                Description = "The Default SAIN Preset",
+                Creator = "Solarint"
+            };
+            SavePresetDefinition(normal);
+            new SAINPresetClass(normal);
+            var hard = new SAINPresetDefinition
+            {
+                Name = "SAIN Hard",
+                Description = "The Default SAIN Preset",
+                Creator = "Solarint"
+            };
+            SavePresetDefinition(hard);
+            new SAINPresetClass(hard);
+            var impossible = new SAINPresetDefinition
+            {
+                Name = "SAIN Impossible",
+                Description = "The Default SAIN Preset",
+                Creator = "Solarint"
+            };
+            SavePresetDefinition(impossible);
+            new SAINPresetClass(impossible);
+
+            return hard;
         }
 
         static readonly string DefaultPreset = "SAIN Hard";
@@ -66,7 +101,8 @@ namespace SAIN.Plugin
             var defaults = new PresetEditorDefaults
             {
                 SelectedPreset = def.Name,
-                DefaultPreset = DefaultPreset
+                DefaultPreset = DefaultPreset,
+                Advanced = SAINPlugin.SAINEditor?.AdvancedOptionsEnabled == true
             };
             Save.SaveJson(defaults, Settings, PresetsFolder); 
             UpdateExistingBots();

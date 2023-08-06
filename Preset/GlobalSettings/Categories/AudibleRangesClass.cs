@@ -11,6 +11,21 @@ namespace SAIN.Preset.GlobalSettings
         {
         }
 
+        public float Get(string caliber)
+        {
+            float modifier;
+            if (System.Enum.TryParse(caliber, out Caliber result))
+            {
+                modifier = Get(result);
+            }
+            else
+            {
+                Logger.LogError($"{caliber} could not parse");
+                modifier = Default;
+            }
+            return modifier;
+        }
+
         public float Get(Caliber key)
         {
             if (Values.Count == 0)
@@ -31,8 +46,10 @@ namespace SAIN.Preset.GlobalSettings
         }
 
         [JsonIgnore]
+        [AdvancedOptions(false, true)]
         public Dictionary<object, object> Values = new Dictionary<object, object>();
 
+        [AdvancedOptions(false, true)]
         private const string Description = "The Distance this bullet caliber can be heard by AI";
 
         [DefaultValue(125f)]

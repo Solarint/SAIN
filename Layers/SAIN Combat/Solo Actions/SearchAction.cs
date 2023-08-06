@@ -122,7 +122,7 @@ namespace SAIN.Layers
             }
 
             var pers = SAIN.Info.Personality;
-            if (RandomSprintTimer < Time.time && (pers == SAINPersonality.GigaChad || pers == SAINPersonality.Chad))
+            if (RandomSprintTimer < Time.time && SAIN.Info.PersonalitySettings.SprintWhileSearch)
             {
                 RandomSprintTimer = Time.time + 3f * Random.Range(0.5f, 2f);
                 float chance = pers == SAINPersonality.GigaChad ? 40f : 20f;

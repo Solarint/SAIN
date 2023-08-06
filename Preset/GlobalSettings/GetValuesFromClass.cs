@@ -45,7 +45,7 @@ namespace SAIN.Preset.GlobalSettings
             var attribute = field.GetCustomAttribute<AmmoCaliberAttribute>();
             if (attribute == null)
             {
-                Log("attribute is null", field.Name);
+                //Log("attribute is null", field.Name);
                 return;
             }
             Caliber enumValue = attribute.AmmoCaliber;

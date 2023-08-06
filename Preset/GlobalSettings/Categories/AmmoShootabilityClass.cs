@@ -17,6 +17,21 @@ namespace SAIN.Preset.GlobalSettings
             Values = GetValuesFromClass.UpdateValues(Caliber.Default, Default, this, Values);
         }
 
+        public float Get(string caliber)
+        {
+            float modifier;
+            if (System.Enum.TryParse(caliber, out Caliber result))
+            {
+                modifier = Get(result);
+            }
+            else
+            {
+                Logger.LogError($"{caliber} could not parse");
+                modifier = Default;
+            }
+            return modifier;
+        }
+
         public float Get(Caliber key)
         {
             if (Values.Count == 0)

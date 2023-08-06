@@ -33,9 +33,15 @@ namespace SAIN.Preset.Personalities
         public float SearchBaseTime = 45;
         public bool CanJumpCorners = false;
         public bool CanTaunt = false;
+        public bool FrequentTaunt = false;
+        public bool ConstantTaunt = false;
         public bool CanRespondToVoice = false;
         public float TauntFrequency = 20f;
         public float TauntMaxDistance = 20f;
+        public bool SprintWhileSearch = false;
+        public bool FrequentSprintWhileSearch = false;
+        public bool CanRushEnemyReloadHeal = false;
+        public bool CanFakeDeathRare = false;
 
         public List<WildSpawnType> AllowedBotTypes = new List<WildSpawnType>();
 

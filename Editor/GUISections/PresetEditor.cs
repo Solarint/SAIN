@@ -15,6 +15,7 @@ namespace SAIN.Editor
     {
         public string SelectedPreset;
         public string DefaultPreset;
+        public bool Advanced;
     }
 
     public class PresetEditor : EditorAbstract
@@ -54,7 +55,6 @@ namespace SAIN.Editor
 
         public void Menu(Rect windowRect)
         {
-            PresetWindow = windowRect;
             Rect12Height = windowRect.height;
 
             OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for");
@@ -112,10 +112,8 @@ namespace SAIN.Editor
             }
         }
 
-        private bool OpenAdvanced = false;
         private bool OpenFirstMenu = false;
         private bool OpenPropEdit = false;
-        private Rect PresetWindow;
 
         private float FinalWindowWidth => Editor.WindowLayoutCreator.FinalWindowWidth;
 
@@ -322,7 +320,6 @@ namespace SAIN.Editor
             EndScrollView();
         }
 
-        private bool OpenPropSelect = false;
         private readonly List<PropertyInfo> SelectedProperties = new List<PropertyInfo>();
         private static Vector2 PropertyScroll = Vector2.zero;
 

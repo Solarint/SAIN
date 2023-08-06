@@ -84,8 +84,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         {
             if (SAIN.Enemy != null && !SAIN.Squad.BotInGroup)
             {
-                var personality = SAIN.Info.Personality;
-                if (personality == SAINPersonality.GigaChad || personality == SAINPersonality.Chad)
+                if (SAIN.Info.PersonalitySettings.CanFakeDeathRare)
                 {
                     if (FakeTimer < Time.time)
                     {
@@ -157,9 +156,9 @@ namespace SAIN.SAINComponent.Classes.Talk
             {
                 if (sainEnemy.CanShoot && sainEnemy.IsVisible)
                 {
-                    tauntEnemy = sainEnemy.EnemyLookingAtMe || type == SAINPersonality.Chad;
+                    tauntEnemy = sainEnemy.EnemyLookingAtMe || SAIN.Info.PersonalitySettings.FrequentTaunt;
                 }
-                if (type == SAINPersonality.GigaChad)
+                if (SAIN.Info.PersonalitySettings.ConstantTaunt)
                 {
                     tauntEnemy = true;
                 }

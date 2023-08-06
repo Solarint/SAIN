@@ -32,35 +32,26 @@ namespace SAIN.Components
         static NoBushESP()
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(NoBushESP));
+            NoBushMask = LayerMaskClass.HighPolyWithTerrainMaskAI | (1 << LayerMask.NameToLayer(PropertyNames.PlayerSpirit));
 
+            Type botType = typeof(BotOwner);
+
+            Type memoryType = AccessTools.Field(
+                botType, PropertyNames.Memory).FieldType;
+
+            GoalEnemyProp = AccessTools.Property(
+                memoryType, PropertyNames.GoalEnemy);
+
+            IsVisibleProp = AccessTools.Property(
+                GoalEnemyProp.PropertyType, PropertyNames.IsVisible);
+
+            Type shootDataType = AccessTools.Property(
+                botType, PropertyNames.ShootData).PropertyType;
+
+            CanShootByState = AccessTools.PropertySetter(
+                shootDataType, PropertyNames.CanShootByState);
             try
             {
-                NoBushMask = LayerMaskClass.HighPolyWithTerrainMaskAI | (1 << LayerMask.NameToLayer(PropertyNames.PlayerSpirit));
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e);
-                return;
-            }
-
-            try
-            {
-                Type botType = typeof(BotOwner);
-
-                Type memoryType = AccessTools.Field(
-                    botType, PropertyNames.Memory).FieldType;
-
-                GoalEnemyProp = AccessTools.Property(
-                    memoryType, PropertyNames.GoalEnemy);
-
-                IsVisibleProp = AccessTools.Property(
-                    GoalEnemyProp.PropertyType, PropertyNames.IsVisible);
-
-                Type shootDataType = AccessTools.Property(
-                    botType, PropertyNames.ShootData).PropertyType;
-
-                CanShootByState = AccessTools.PropertySetter(
-                    shootDataType, PropertyNames.CanShootByState);
             }
             catch (Exception e)
             {
@@ -165,16 +156,20 @@ namespace SAIN.Components
             Vector3 direction = end - start;
             if (Physics.Raycast(start, direction.normalized, out var hit, direction.magnitude, NoBushMask))
             {
-                string hitName = hit.transform?.parent?.gameObject?.name.ToLower();
-                foreach (string exclusion in ExclusionList)
+                GameObject hitObject = hit.transform?.parent?.gameObject;
+                if (hitObject != null)
                 {
-                    if (hitName.Contains(exclusion))
+                    string hitName = hitObject?.name?.ToLower();
+                    foreach (string exclusion in ExclusionList)
                     {
-                        if (DebugMode)
+                        if (hitName.Contains(exclusion))
                         {
-                            Logger.LogDebug(exclusion);
+                            if (DebugMode)
+                            {
+                                Logger.LogDebug(exclusion);
+                            }
+                            return true;
                         }
-                        return true;
                     }
                 }
             }

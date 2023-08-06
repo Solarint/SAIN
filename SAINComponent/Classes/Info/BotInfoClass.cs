@@ -31,16 +31,21 @@ namespace SAIN.SAINComponent.Classes.Info
         {
             GetFileSettings();
             PresetHandler.PresetsUpdated += GetFileSettings;
+            WeaponInfo.Init();
+            Profile.Init();
         }
 
         public void Update()
         {
             WeaponInfo.Update();
+            Profile.Update();
         }
 
         public void Dispose()
         {
             PresetHandler.PresetsUpdated -= GetFileSettings;
+            WeaponInfo.Dispose();
+            Profile.Dispose();
         }
 
         public ProfileClass Profile { get; private set; }
@@ -53,7 +58,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public void GetFileSettings()
         {
-            FileSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(SAIN.Info.Profile.WildSpawnType, SAIN.Info.Profile.BotDifficulty);
+            FileSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(WildSpawnType, BotDifficulty);
             SAIN.StartCoroutine(SetConfigValuesCoroutine(FileSettings));
         }
 
@@ -125,28 +130,29 @@ namespace SAIN.SAINComponent.Classes.Info
             var settings = PersonalitySettings;
 
             float baseTime = settings.HoldGroundBaseTime;
+            baseTime *= AggressionMultiplier;
             float min = settings.HoldGroundMinRandom;
             float max = settings.HoldGroundMaxRandom;
 
-            HoldGroundDelay = baseTime * Random.Range(min, max);
+            float result = baseTime * Random.Range(min, max);
+            HoldGroundDelay = Mathf.Round(result * 100f) / 100f;
         }
+
+        private float AggressionMultiplier => FileSettings.Mind.Aggression * GlobalSAINSettings.Mind.GlobalAggression;
 
         public void CalcTimeBeforeSearch()
         {
             float searchTime;
-            if (SAIN.Info.Profile.IsFollower && SAIN.Squad.BotInGroup)
+            if (Profile.IsFollower && SAIN.Squad.BotInGroup)
             {
                 searchTime = 6f;
-            }
-            else if (SAIN.Info.Profile.IsBoss && SAIN.Squad.BotInGroup)
-            {
-                searchTime = 60f;
             }
             else
             {
                 searchTime = PersonalitySettings.SearchBaseTime;
             }
 
+            searchTime /= AggressionMultiplier;
             searchTime *= Random.Range(1f - SearchRandomize, 1f + SearchRandomize);
             searchTime = Mathf.Round(searchTime * 10f) / 10f;
             if (searchTime < 0.25f)
@@ -159,7 +165,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
         void UpdateExtractTime()
         {
-            float percentage = Random.Range(FileSettings.Mind.MinExtractPercentage, FileSettings.Mind.MaxExtractPercentage) / 100f;
+            float percentage = Random.Range(FileSettings.Mind.MinExtractPercentage, FileSettings.Mind.MaxExtractPercentage);
 
             var squad = SAIN?.Squad;
             var members = squad?.SquadMembers;
@@ -207,6 +213,28 @@ namespace SAIN.SAINComponent.Classes.Info
             {
                 return SAINPersonality.Rat;
             }
+
+            if (CanBePersonality(SAINPersonality.Custom1))
+            {
+                return SAINPersonality.Custom1;
+            }
+            if (CanBePersonality(SAINPersonality.Custom2))
+            {
+                return SAINPersonality.Custom2;
+            }
+            if (CanBePersonality(SAINPersonality.Custom3))
+            {
+                return SAINPersonality.Custom3;
+            }
+            if (CanBePersonality(SAINPersonality.Custom4))
+            {
+                return SAINPersonality.Custom4;
+            }
+            if (CanBePersonality(SAINPersonality.Custom5))
+            {
+                return SAINPersonality.Custom5;
+            }
+
             if (CanBePersonality(SAINPersonality.Timmy))
             {
                 return SAINPersonality.Timmy;
@@ -225,8 +253,13 @@ namespace SAIN.SAINComponent.Classes.Info
             {
                 return false;
             }
-            return Personalities[personality].CanBePersonality(SAIN.Info.Profile.WildSpawnType, SAIN.Info.Profile.PowerLevel, SAIN.Info.Profile.PlayerLevel);
+            return Personalities[personality].CanBePersonality(WildSpawnType, PowerLevel, PlayerLevel);
         }
+
+        public WildSpawnType WildSpawnType => Profile.WildSpawnType;
+        public float PowerLevel => Profile.PowerLevel;
+        public int PlayerLevel => Profile.PlayerLevel;
+        public BotDifficulty BotDifficulty => Profile.BotDifficulty;
 
         public SAINPersonality Personality { get; private set; }
         public PersonalitySettingsClass PersonalitySettings { get; private set; }

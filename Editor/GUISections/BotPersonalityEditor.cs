@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static SAIN.Helpers.Reflection;
 using static SAIN.Attributes.AttributesGUI;
+using SAIN.Preset.Personalities;
 
 namespace SAIN.Editor.GUISections
 {
@@ -44,6 +45,7 @@ namespace SAIN.Editor.GUISections
             Builder.Space(25f);
             PersonScroll = Builder.BeginScrollView(PersonScroll);
 
+            type = typeof(PersonalitySettingsClass);
             foreach (var personality in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
             {
                 string name = personality.Name;
@@ -59,6 +61,12 @@ namespace SAIN.Editor.GUISections
 
                 personality.CanJumpCorners = EditValue(personality.CanJumpCorners, GetField(type, nameof(personality.CanJumpCorners)));
                 personality.CanTaunt = EditValue(personality.CanTaunt, GetField(type, nameof(personality.CanTaunt)));
+                personality.FrequentTaunt = EditValue(personality.FrequentTaunt, GetField(type, nameof(personality.FrequentTaunt)));
+                personality.ConstantTaunt = EditValue(personality.ConstantTaunt, GetField(type, nameof(personality.ConstantTaunt)));
+                personality.SprintWhileSearch = EditValue(personality.SprintWhileSearch, GetField(type, nameof(personality.SprintWhileSearch)));
+                personality.FrequentSprintWhileSearch = EditValue(personality.FrequentSprintWhileSearch, GetField(type, nameof(personality.FrequentSprintWhileSearch)));
+                personality.CanRushEnemyReloadHeal = EditValue(personality.CanRushEnemyReloadHeal, GetField(type, nameof(personality.CanRushEnemyReloadHeal)));
+                personality.CanFakeDeathRare = EditValue(personality.CanFakeDeathRare, GetField(type, nameof(personality.CanFakeDeathRare)));
                 personality.TauntFrequency = EditValue(personality.TauntFrequency, GetField(type, nameof(personality.TauntFrequency)));
                 personality.TauntMaxDistance = EditValue(personality.TauntMaxDistance, GetField(type, nameof(personality.TauntMaxDistance)));
                 personality.HoldGroundBaseTime = EditValue(personality.HoldGroundBaseTime, GetField(type, nameof(personality.HoldGroundBaseTime)));

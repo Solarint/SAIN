@@ -1,4 +1,5 @@
 ﻿using SAIN.Helpers;
+using SAIN.Preset.GlobalSettings.Categories;
 using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.Preset.GlobalSettings
@@ -38,6 +39,8 @@ namespace SAIN.Preset.GlobalSettings
         public GeneralSettings General = new GeneralSettings();
 
         public PersonalitySettings Personality = new PersonalitySettings();
+
+        public MindSettings Mind = new MindSettings();
 
         public HearingSettings Hearing = new HearingSettings();
 

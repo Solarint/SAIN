@@ -5,6 +5,10 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class GeneralSettings
     {
+        [DefaultValue(1f)]
+        [MinMaxRound(0.25f, 3f, 100f)]
+        public float GlobalDifficultyModifier = 1f;
+
         [NameAndDescription(
             "No Bush ESP",
             "Adds extra vision check for bots to help prevent bots seeing or shooting through foliage.")]

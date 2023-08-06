@@ -93,9 +93,9 @@ namespace SAIN.Layers
             var weapon = info.WeaponInfo;
             var modif = weapon.Modifiers;
             stringBuilder.AppendLabeledValue("WeaponClass + Modifier", $"{weapon.WeaponClass} + {modif.WeaponClassModifier}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("AmmoCaliber + Modifier", $"{weapon.AmmoCaliber} + {modif.AmmoTypeModifier}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("AmmoCaliber + Modifier", $"{weapon.AmmoCaliber} + {modif.AmmoCaliberModifier}", Color.white, Color.yellow, true);
             stringBuilder.AppendLabeledValue("Final Shoot Modifier", $"{weapon.FinalModifier}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("Recoil, Ergo, Role Modifiers", $"{modif.RecoilModifier}, {modif.ErgoModifier}, {modif.BotRoleModifier}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Recoil, Ergo, Role Modifiers", $"{modif.RecoilModifier}, {modif.ErgoModifier}, {modif.ProficiencyModifier}", Color.white, Color.yellow, true);
 
             if (SAIN.Enemy != null)
             {

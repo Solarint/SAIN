@@ -99,7 +99,7 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         private bool StartRushEnemy(EnemyClass enemy)
         {
-            if (SAIN.Info.Personality == SAINPersonality.Chad || SAIN.Info.Personality == SAINPersonality.GigaChad)
+            if (SAIN.Info.PersonalitySettings.CanRushEnemyReloadHeal)
             {
                 if (enemy != null && enemy.PathDistance < 30f)
                 {

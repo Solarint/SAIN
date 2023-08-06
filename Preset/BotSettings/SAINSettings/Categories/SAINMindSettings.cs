@@ -61,7 +61,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [MinMaxRound(30f, 1200f)]
         public float TIME_TO_FORGOR_ABOUT_ENEMY_SEC = 240f;
 
-        [NameAndDescription("Midlle Finger Chance", "Chance this bot will flick you off when spotted")]
+        [NameAndDescription("Middle Finger Chance", "Chance this bot will flick you off when spotted")]
         [DefaultValue(0f)]
         [MinMaxRound(0f, 100f)]
         [AdvancedOptions(true)]

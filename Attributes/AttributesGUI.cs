@@ -31,6 +31,7 @@ namespace SAIN.Attributes
             AttributesClasses.Clear();
         }
 
+        private static GUIStyle LabelStyle;
         static readonly Dictionary<FieldInfo, AttributesClass> AttributesClasses = new Dictionary<FieldInfo, AttributesClass>();
 
         public static object EditValue(object value, AttributesClass attributes, GUIEntryConfig entryConfig = null)
@@ -55,16 +56,26 @@ namespace SAIN.Attributes
             Builder.BeginHorizontal();
 
             Buttons.InfoBox(attributes.Description, entryConfig.Info);
-            GUIStyle style = Buttons.GetStyle(Style.label);
-            style.alignment = TextAnchor.MiddleLeft;
-            style.margin = new RectOffset(3, 3, 3, 3);
-            Buttons.Box(new GUIContent(attributes.Name), style);
+
+            if (LabelStyle == null)
+            {
+                LabelStyle = Buttons.GetStyle(Style.label);
+                GUIStyle boxstyle = Buttons.GetStyle(Style.box);
+                LabelStyle.alignment = TextAnchor.MiddleLeft;
+                LabelStyle.margin = boxstyle.margin;
+                LabelStyle.padding = boxstyle.padding;
+            }
+
+            var labelHeight = Builder.Height(entryConfig.EntryHeight);
+            Buttons.Box(new GUIContent(attributes.Name), LabelStyle, labelHeight);
 
             Type type = value.GetType();
 
             if (attributes.IsList)
             {
+                Buttons.Box(new GUIContent("List"), LabelStyle, labelHeight);
                 Builder.EndHorizontal();
+
                 Builder.BeginVertical();
 
                 FieldInfo[] valueListFields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
@@ -80,13 +91,16 @@ namespace SAIN.Attributes
             }
             else
             {
+                bool edited = false;
                 if (type == typeof(bool))
                 {
+                    edited = true;
                     bool boolVal = (bool)value;
                     value = Builder.Toggle(boolVal, boolVal ? "On" : "Off", entryConfig.Slider);
                 }
-                else
+                else if (type == typeof(int) || type == typeof(float))
                 {
+                    edited = true;
                     float min = attributes.Min == null ? 0f : attributes.Min.Value;
                     float max = attributes.Max == null ? 1000f : attributes.Max.Value;
 
@@ -105,9 +119,11 @@ namespace SAIN.Attributes
 
                     Builder.MaxValueBox(max, entryConfig.Info);
                 }
-
-                Builder.ResultBox(value, entryConfig.Result);
-                value = Builder.Reset(value, attributes.Default, entryConfig.Reset);
+                if (edited)
+                {
+                    Builder.ResultBox(value, entryConfig.Result);
+                    value = Builder.Reset(value, attributes.Default, entryConfig.Reset);
+                }
                 Builder.EndHorizontal();
             }
             return value;

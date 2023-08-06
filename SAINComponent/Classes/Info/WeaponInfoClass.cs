@@ -25,11 +25,17 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public void Init()
         {
-            DefaultAccuracy = BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF;
+            Recoil.Init();
+            Firerate.Init();
+            Firemode.Init();
         }
 
         public void Update()
         {
+            Recoil.Update();
+            Firerate.Update();
+            Firemode.Update();
+
             var preset = BotOwner?.WeaponManager?.WeaponAIPreset;
             if (preset != null)
             {
@@ -40,7 +46,10 @@ namespace SAIN.SAINComponent.Classes.Info
                 if (DefaultAccuracy != null && AssignedSpread != AccuracySpreadMulti)
                 {
                     AssignedSpread = AccuracySpreadMulti;
-                    preset.XZ_COEF = DefaultAccuracy.Value * AccuracySpreadMulti;
+
+                    float accuracy = DefaultAccuracy.Value * AccuracySpreadMulti;
+                    accuracy = Mathf.Round(accuracy * 100f) / 100f;
+                    preset.XZ_COEF = accuracy;
                 }
             }
             var manager = BotOwner?.WeaponManager;
@@ -51,19 +60,22 @@ namespace SAIN.SAINComponent.Classes.Info
                 if (weapon != null && weapon.Template != LastCheckedWeapon)
                 {
                     LastCheckedWeapon = weapon.Template;
-                    FinalModifier = Mathf.Round(Modifiers.FinalModifier * 100f) / 100f;
+                    FinalModifier = Modifiers.GetFinalModifier();
                 }
             }
         }
 
         public void Dispose()
         {
+            Recoil.Dispose();
+            Firerate.Dispose();
+            Firemode.Dispose();
         }
 
         private float? DefaultAccuracy;
+
         private float AssignedSpread = 1f;
         private float AccuracySpreadMulti => SAIN.Info.FileSettings.Aiming.AccuracySpreadMulti * SAINPlugin.LoadedPreset.GlobalSettings.Aiming.AccuracySpreadMultiGlobal;
-
 
         public Recoil Recoil { get; private set; }
         public Firerate Firerate { get; private set; }

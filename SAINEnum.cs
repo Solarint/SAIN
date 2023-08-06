@@ -47,16 +47,16 @@ namespace SAIN
     public enum WeaponClass
     {
         Default,
-        AssaultRifle,
-        AssaultCarbine,
-        Machinegun,
-        SMG,
-        Pistol,
-        MarksmanRifle,
-        SniperRifle,
-        Shotgun,
-        GrenadeLauncher,
-        SpecialWeapon
+        assaultRifle,
+        assaultCarbine,
+        machinegun,
+        smg,
+        pistol,
+        marksmanRifle,
+        sniperRifle,
+        shotgun,
+        grenadeLauncher,
+        specialWeapon
     }
 
     public enum Caliber
@@ -129,7 +129,12 @@ namespace SAIN
         Rat,
         SweatLord,
         Chad,
-        GigaChad
+        GigaChad,
+        Custom1,
+        Custom2,
+        Custom3,
+        Custom4,
+        Custom5,
     }
 
     public enum BotAggression

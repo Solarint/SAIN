@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using SAIN.Attributes;
 using SAIN.SAINComponent;
 using System.Collections.Generic;
 
@@ -22,6 +23,7 @@ namespace SAIN
             }
         }
 
+        [AdvancedOptions(false, true)]
         public readonly ManualLogSource Logger;
     }
 

@@ -20,6 +20,7 @@ namespace SAIN.SAINComponent.Classes
 
         public void Init()
         {
+            CoverFinder.Init(SAIN);
         }
 
         public void Update()

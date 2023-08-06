@@ -1,5 +1,6 @@
 ﻿using EFT;
 using SAIN.Helpers;
+using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Info
 {
@@ -47,27 +48,17 @@ namespace SAIN.SAINComponent.Classes.Info
         {
             float modifier = 1f;
 
-            if (IsBoss)
+            var sainSettings = SAINPlugin.LoadedPreset.BotSettings.SAINSettings;
+            if (sainSettings.ContainsKey(WildSpawnType))
             {
-                modifier = 0.85f;
+                modifier = sainSettings[WildSpawnType].DifficultyModifier;
             }
-            if (IsFollower)
-            {
-                modifier = 0.95f;
-            }
-            if (IsScav)
-            {
-                modifier = 1.25f;
-            }
-            if (IsPMC)
-            {
-                modifier = 0.75f;
-            }
+            modifier *= SAINPlugin.LoadedPreset.GlobalSettings.General.GlobalDifficultyModifier;
 
             switch (difficulty)
             {
                 case BotDifficulty.easy:
-                    modifier *= 1.25f;
+                    modifier *= 0.75f;
                     break;
 
                 case BotDifficulty.normal:
@@ -75,19 +66,18 @@ namespace SAIN.SAINComponent.Classes.Info
                     break;
 
                 case BotDifficulty.hard:
-                    modifier *= 0.85f;
+                    modifier *= 1.25f;
                     break;
 
                 case BotDifficulty.impossible:
-                    modifier *= 0.75f;
+                    modifier *= 1.5f;
                     break;
 
                 default:
-                    modifier *= 1f;
                     break;
             }
 
-            DifficultyModifier = modifier;
+            DifficultyModifier = Mathf.Round(modifier * 100f) / 100f;
         }
     }
 }
