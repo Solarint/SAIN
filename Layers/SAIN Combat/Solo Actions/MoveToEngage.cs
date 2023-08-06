@@ -23,7 +23,7 @@ namespace SAIN.Layers
 
         public override void Update()
         {
-            SAINEnemy enemy = SAIN.Enemy;
+            EnemyClass enemy = SAIN.Enemy;
             if (enemy == null)
             {
                 return;
@@ -75,7 +75,7 @@ namespace SAIN.Layers
             }
         }
 
-        private bool CheckShoot(SAINEnemy enemy)
+        private bool CheckShoot(EnemyClass enemy)
         {
             float distance = enemy.RealDistance;
             bool enemyLookAtMe = enemy.EnemyLookingAtMe;

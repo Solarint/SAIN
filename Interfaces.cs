@@ -1,9 +1,30 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.SAINComponent;
+using System.Collections.Generic;
 
 namespace SAIN
 {
+    public abstract class Logging
+    {
+        public static readonly Dictionary<string, ManualLogSource> LogSources = new Dictionary<string, ManualLogSource>();
+
+        public Logging(string name)
+        {
+            if (LogSources.ContainsKey(name))
+            {
+                Logger = LogSources[name];
+            }
+            else
+            {
+                Logger = BepInEx.Logging.Logger.CreateLogSource(name);
+                LogSources.Add(name, Logger);
+            }
+        }
+
+        public readonly ManualLogSource Logger;
+    }
+
     public interface ISAINSubComponent
     {
         void Init(SAINComponentClass sain);

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using System;
-using SAIN.SAINPreset.Settings;
+using SAIN.Preset.GlobalSettings;
 using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.Decision;
 using SAIN.SAINComponent.Classes.Talk;

@@ -26,7 +26,7 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public bool GetDecision(out SoloDecision Decision)
         {
-            SAINEnemy enemy = SAIN.Enemy;
+            EnemyClass enemy = SAIN.Enemy;
             if (enemy == null)
             {
                 Decision = SoloDecision.None;
@@ -97,7 +97,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return true;
         }
 
-        private bool StartRushEnemy(SAINEnemy enemy)
+        private bool StartRushEnemy(EnemyClass enemy)
         {
             if (SAIN.Info.Personality == SAINPersonality.Chad || SAIN.Info.Personality == SAINPersonality.GigaChad)
             {
@@ -116,7 +116,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return false;
         }
 
-        private bool StartShiftCover(SAINEnemy enemy)
+        private bool StartShiftCover(EnemyClass enemy)
         {
             if (ContinueShiftCover())
             {
@@ -179,13 +179,13 @@ namespace SAIN.SAINComponent.Classes.Decision
         private float ShiftResetTimer;
         public bool ShiftCoverComplete { get; set; }
 
-        private bool StartDogFightAction(SAINEnemy enemy)
+        private bool StartDogFightAction(EnemyClass enemy)
         {
             var pathStatus = enemy.CheckPathDistance();
             return (pathStatus == SAINEnemyPathEnum.VeryClose && SAIN.Enemy.IsVisible) || SAIN.Cover.CoverInUse?.Spotted == true;
         }
 
-        private bool StartThrowNade(SAINEnemy enemy)
+        private bool StartThrowNade(EnemyClass enemy)
         {
             if (ContinueThrow())
             {
@@ -216,7 +216,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return false;
         }
 
-        private bool StartMoveToEngage(SAINEnemy enemy)
+        private bool StartMoveToEngage(EnemyClass enemy)
         {
             if (!enemy.Seen)
             {
@@ -273,7 +273,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             }
         }
 
-        private bool StartSearch(SAINEnemy enemy)
+        private bool StartSearch(EnemyClass enemy)
         {
             if (enemy.IsVisible == true)
             {
@@ -302,7 +302,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return false;
         }
 
-        private bool StartStandAndShoot(SAINEnemy enemy)
+        private bool StartStandAndShoot(EnemyClass enemy)
         {
             if (enemy.IsVisible && enemy.CanShoot)
             {

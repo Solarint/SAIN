@@ -203,7 +203,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool EnemyVisible()
         {
-            SAINEnemy enemy = SAIN.Enemy;
+            EnemyClass enemy = SAIN.Enemy;
             if (enemy != null && enemy.IsVisible)
             {
                 LookToEnemy(enemy);
@@ -212,7 +212,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             return false;
         }
 
-        public void LookToEnemy(SAINEnemy enemy)
+        public void LookToEnemy(EnemyClass enemy)
         {
             if (enemy != null)
             {
@@ -222,13 +222,13 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public void LookToEnemy()
         {
-            SAINEnemy enemy = SAIN.Enemy;
+            EnemyClass enemy = SAIN.Enemy;
             LookToEnemy(enemy);
         }
 
         private bool LookToCloseEnemyHear()
         {
-            SAINEnemy enemy = SAIN.Enemy;
+            EnemyClass enemy = SAIN.Enemy;
             if (enemy != null)
             {
                 var player = enemy.Person as Player;

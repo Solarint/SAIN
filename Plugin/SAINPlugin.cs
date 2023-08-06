@@ -6,7 +6,7 @@ using SAIN.Components;
 using SAIN.Editor;
 using SAIN.Helpers;
 using SAIN.Plugin;
-using SAIN.SAINPreset;
+using SAIN.Preset;
 using System;
 using UnityEngine;
 using static SAIN.AssemblyInfo;
@@ -52,6 +52,8 @@ namespace SAIN
     [BepInProcess(EscapeFromTarkov)]
     public class SAINPlugin : BaseUnityPlugin
     {
+        public static bool DebugModeEnabled = true;
+
         private void Awake()
         {
             if (!VersionChecker.CheckEftVersion(Logger, Info, Config))

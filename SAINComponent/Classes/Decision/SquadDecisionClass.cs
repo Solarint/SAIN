@@ -3,6 +3,7 @@ using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
 using SAIN.SAINComponent;
+using SAIN.SAINComponent.Classes.Info;
 using System.Collections.Generic;
 using UnityEngine;
 

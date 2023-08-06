@@ -4,17 +4,14 @@ using Comfort.Common;
 using EFT;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using SAIN.BotPresets;
-
+using SAIN.Preset;
 using SAIN.Editor;
 using SAIN.Editor.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using SAIN.BotSettings;
-using SAIN.SAINPreset;
-using SAIN.SAINPreset.Personalities;
+using SAIN.Preset.Personalities;
 
 namespace SAIN.Helpers
 {

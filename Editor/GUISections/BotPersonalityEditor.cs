@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static SAIN.Helpers.Reflection;
-using static SAIN.SAINPreset.Attributes.GetAttributeValue.AttributesGUI;
+using static SAIN.Attributes.AttributesGUI;
 
 namespace SAIN.Editor.GUISections
 {

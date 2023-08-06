@@ -1,10 +1,10 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using SAIN.BotPresets;
-using SAIN.BotSettings;
+using SAIN.Preset;
 using SAIN.Components;
-using SAIN.SAINPreset.Personalities;
+using SAIN.Preset.BotSettings.SAINSettings;
+using SAIN.Preset.Personalities;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Talk
@@ -78,7 +78,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         private float TauntFreq = 0f;
 
         PersonalitySettingsClass PersonalitySettings => SAIN?.Info?.PersonalitySettings;
-        SAINSettings FileSettings => SAIN?.Info?.FileSettings;
+        SAINSettingsClass FileSettings => SAIN?.Info?.FileSettings;
 
         private bool FakeDeath()
         {

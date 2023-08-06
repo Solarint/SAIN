@@ -44,6 +44,51 @@ namespace SAIN
         Clear,
     }
 
+    public enum WeaponClass
+    {
+        Default,
+        AssaultRifle,
+        AssaultCarbine,
+        Machinegun,
+        SMG,
+        Pistol,
+        MarksmanRifle,
+        SniperRifle,
+        Shotgun,
+        GrenadeLauncher,
+        SpecialWeapon
+    }
+
+    public enum Caliber
+    {
+        Default,
+        Caliber9x18PM,
+        Caliber9x19PARA,
+        Caliber46x30,
+        Caliber9x21,
+        Caliber57x28,
+        Caliber762x25TT,
+        Caliber1143x23ACP,
+        Caliber9x33R,
+        Caliber545x39,
+        Caliber556x45NATO,
+        Caliber9x39,
+        Caliber762x35,
+        Caliber762x39,
+        Caliber366TKM,
+        Caliber762x51,
+        Caliber127x55,
+        Caliber762x54R,
+        Caliber86x70,
+        Caliber20g,
+        Caliber12g,
+        Caliber23x75,
+        Caliber26x75,
+        Caliber30x29,
+        Caliber40x46,
+        Caliber40mmRU
+    }
+
     public enum CoverStatus
     {
         None = 0,

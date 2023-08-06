@@ -60,7 +60,7 @@ namespace SAIN.SAINComponent.Classes
             CoverPoint activePoint = CoverInUse;
             if (activePoint != null && activePoint.CoverStatus == CoverStatus.InCover)
             {
-                SAINEnemy enemy = SAIN.Enemy;
+                EnemyClass enemy = SAIN.Enemy;
                 if (enemy != null && damage.Player != null && enemy.EnemyPlayer.ProfileId == damage.Player.iPlayer.ProfileId)
                 {
                     activePoint.HitInCoverCount++;

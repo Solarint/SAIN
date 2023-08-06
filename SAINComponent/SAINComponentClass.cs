@@ -6,13 +6,14 @@ using SAIN.SAINComponent.Classes.Talk;
 using SAIN.SAINComponent.Classes.WeaponFunction;
 using SAIN.SAINComponent.Classes.Mover;
 using SAIN.SAINComponent.Classes;
-using SAIN.SAINComponent.SubComponents;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SAIN.Components;
 using System.Threading.Tasks;
+using SAIN.SAINComponent.Classes.Debug;
+using SAIN.SAINComponent.Classes.Info;
 
 namespace SAIN.SAINComponent
 {
@@ -67,10 +68,10 @@ namespace SAIN.SAINComponent
                 // Must be first, other classes use it
                 Squad = new SquadClass(this);
                 Equipment = new BotEquipmentClass(this);
-                Info = new SAINBotInfo(this);
+                Info = new BotInfoClass(this);
                 Memory = new MemoryClass(this);
                 Transform = new TransformClass(this);
-                BotStuck = new SAINBotUnstuck(this);
+                BotStuck = new BotUnstuckClass(this);
                 Hearing = new HearingSensorClass(this);
                 Talk = new BotTalkClass(this);
                 Decision = new DecisionClass(this);
@@ -227,7 +228,7 @@ namespace SAIN.SAINComponent
         private float RecheckTimer = 0f;
 
         public bool HasEnemy => EnemyController.HasEnemy;
-        public SAINEnemy Enemy => HasEnemy ? EnemyController.Enemy : null;
+        public EnemyClass Enemy => HasEnemy ? EnemyController.Enemy : null;
 
         public void Dispose()
         {
@@ -309,13 +310,13 @@ namespace SAIN.SAINComponent
         public VisionClass Vision { get; private set; }
         public BotEquipmentClass Equipment { get; private set; }
         public MoverClass Mover { get; private set; }
-        public SAINBotUnstuck BotStuck { get; private set; }
+        public BotUnstuckClass BotStuck { get; private set; }
         public FlashLightComponent FlashLight { get; private set; }
         public HearingSensorClass Hearing { get; private set; }
         public BotTalkClass Talk { get; private set; }
         public DecisionClass Decision { get; private set; }
         public CoverClass Cover { get; private set; }
-        public SAINBotInfo Info { get; private set; }
+        public Classes.Info.BotInfoClass Info { get; private set; }
         public SquadClass Squad { get; private set; }
         public SelfActionClass SelfActions { get; private set; }
         public BotGrenadeClass Grenade { get; private set; }

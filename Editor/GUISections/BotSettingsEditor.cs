@@ -1,6 +1,6 @@
-﻿using SAIN.BotSettings;
+﻿using SAIN.Attributes;
 using SAIN.Editor.Abstract;
-using SAIN.SAINPreset.Attributes;
+using SAIN.Preset.BotSettings.SAINSettings;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,7 +14,7 @@ namespace SAIN.Editor.GUISections
         {
         }
 
-        public void EditMenu(SAINSettings settings)
+        public void EditMenu(SAINSettingsClass settings)
         {
             BeginVertical();
 
@@ -61,7 +61,7 @@ namespace SAIN.Editor.GUISections
                         if (open)
                         {
                             object value = field.GetValue(category);
-                            value = GetAttributeValue.AttributesGUI.EditValue(value, field, EntryConfig);
+                            value = AttributesGUI.EditValue(value, field, EntryConfig);
                             field.SetValue(category, value);
                         }
                     }
@@ -71,7 +71,7 @@ namespace SAIN.Editor.GUISections
             }
         }
 
-        private readonly GetAttributeValue.GUIEntryConfig EntryConfig = new GetAttributeValue.GUIEntryConfig();
+        private readonly GUIEntryConfig EntryConfig = new GUIEntryConfig();
         private bool[] OpenCategories;
 
         private FieldInfo[] GetFields(Type type) => Editor.SAINBotSettingsCache.GetFields(type);

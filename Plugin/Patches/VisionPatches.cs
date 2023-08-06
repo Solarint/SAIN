@@ -1,10 +1,10 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-using SAIN.BotPresets;
-using SAIN.BotSettings;
+using SAIN.Preset;
 using SAIN.Components;
 using SAIN.Plugin;
+using SAIN.Preset.BotSettings.SAINSettings;
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -13,7 +13,7 @@ namespace SAIN.Patches.Vision
 {
     public class Math
     {
-        public static float CalcVisSpeed(float dist, SAINSettings preset)
+        public static float CalcVisSpeed(float dist, SAINSettingsClass preset)
         {
             float result = 1f;
             if (dist >= preset.Look.CloseFarThresh)

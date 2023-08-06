@@ -2,7 +2,6 @@
 using EFT;
 using EFT.InventoryLogic;
 using EFT.Weather;
-using SAIN.SAINPreset.Settings;
 using UnityEngine;
 
 namespace SAIN.Helpers

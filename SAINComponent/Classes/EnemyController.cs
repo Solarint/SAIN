@@ -69,7 +69,7 @@ namespace SAIN.SAINComponent.Classes
 
         public bool HasEnemy => Enemy != null && Enemy.Person != null && Enemy.EnemyPlayer != null && (!Enemy.Person.IsAI || Enemy.Person.AIData.BotOwner.BotState == EBotState.Active);
 
-        public SAINEnemy Enemy { get; private set; }
+        public EnemyClass Enemy { get; private set; }
 
         public void ClearEnemy()
         {
@@ -83,7 +83,7 @@ namespace SAIN.SAINComponent.Classes
             // Check if the dictionary contains a previous SAINEnemy
             if (!Enemies.ContainsKey(id))
             {
-                Enemies.Add(id, new SAINEnemy(SAIN, person));
+                Enemies.Add(id, new EnemyClass(SAIN, person));
             }
 
             if (Enemy != null)
@@ -111,7 +111,7 @@ namespace SAIN.SAINComponent.Classes
                 foreach (var keyPair in Enemies)
                 {
                     string id = keyPair.Key;
-                    SAINEnemy enemy = keyPair.Value;
+                    EnemyClass enemy = keyPair.Value;
                     // Common checks between PMC and bots
                     if (enemy == null || enemy.EnemyPlayer == null || enemy.EnemyPlayer.HealthController?.IsAlive == false)
                     {
@@ -136,7 +136,7 @@ namespace SAIN.SAINComponent.Classes
             }
         }
 
-        public Dictionary<string, SAINEnemy> Enemies { get; private set; } = new Dictionary<string, SAINEnemy>();
+        public Dictionary<string, EnemyClass> Enemies { get; private set; } = new Dictionary<string, EnemyClass>();
         public List<Player> VisiblePlayers = new List<Player>();
         public List<string> VisiblePlayerIds = new List<string>();
         private readonly List<string> EnemyIDsToRemove = new List<string>();

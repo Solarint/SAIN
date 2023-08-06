@@ -3,13 +3,13 @@ using Comfort.Common;
 using EFT;
 using EFT.Console.Core;
 using EFT.UI;
-using SAIN.BotSettings;
-using SAIN.BotSettings.Categories;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
 using SAIN.Plugin;
-using SAIN.SAINPreset;
-using SAIN.SAINPreset.GlobalSettings;
+using SAIN.Preset;
+using SAIN.Preset.BotSettings.SAINSettings;
+using SAIN.Preset.BotSettings.SAINSettings.Categories;
+using SAIN.Preset.GlobalSettings;
 using System;
 using UnityEngine;
 using static SAIN.Editor.RectLayout;
@@ -105,7 +105,7 @@ namespace SAIN.Editor
         public bool ShiftKeyPressed { get; private set; }
         public bool CtrlKeyPressed { get; private set; }
 
-        public readonly FieldsCache SAINBotSettingsCache = new FieldsCache(typeof(SAINSettings));
+        public readonly FieldsCache SAINBotSettingsCache = new FieldsCache(typeof(SAINSettingsClass));
         public readonly FieldsCache GlobalSettingsCache = new FieldsCache(typeof(GlobalSettingsClass));
 
         public void Update()
@@ -259,7 +259,7 @@ namespace SAIN.Editor
             {
                 Builder.BeginArea(tabRect);
                 BotSelectionClass.Menu(tabRect);
-                BotSettingsEditor.EditMenu(new SAINSettings());
+                BotSettingsEditor.EditMenu(new SAINSettingsClass());
                 Builder.EndArea();
             }
             else
