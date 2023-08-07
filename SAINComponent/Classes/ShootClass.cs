@@ -10,33 +10,22 @@ namespace SAIN.SAINComponent.Classes
     {
         private static ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(ShootClass));
 
-        public ShootClass(BotOwner owner) : base(owner)
+        public ShootClass(BotOwner owner) 
+            : base(owner)
         {
             SAIN = owner.GetComponent<SAINComponentClass>();
-            BotShoot = new BotShoot(owner);
+            Shoot = new BotShoot(owner);
         }
 
-        private readonly BotShoot BotShoot;
+        private readonly BotShoot Shoot;
         private BotOwner BotOwner => botOwner_0;
 
         private readonly SAINComponentClass SAIN;
 
         public override void Update()
         {
-            var goalEnemy = BotOwner.Memory.GoalEnemy;
             var enemy = SAIN.Enemy;
-
-            bool canShootSAIN = enemy != null && enemy.CanShoot;
-            bool canShootEFT = goalEnemy != null && goalEnemy.CanShoot;
-
-            if (canShootSAIN != canShootEFT)
-            {
-                Logger.LogWarning($"canShootSAIN {canShootSAIN} canShootEFT {canShootEFT}");
-            }
-
-            bool canShoot = canShootEFT || canShootSAIN;
-
-            if (enemy != null && enemy.IsVisible && canShoot)
+            if (enemy != null && enemy.IsVisible && enemy.CanShoot)
             {
                 Vector3? pointToShoot = GetPointToShoot();
                 if (pointToShoot != null)
@@ -46,11 +35,10 @@ namespace SAIN.SAINComponent.Classes
                         BotOwner.BotLight?.TurnOn(true);
                     }
                     Target = pointToShoot.Value;
-                    if (BotOwner.AimingData.IsReady)
+                    if (BotOwner.AimingData.IsReady && !SAIN.NoBushESP.NoBushESPActive && FriendlyFire.ClearShot)
                     {
-                        //  && !SAIN.NoBushESP.NoBushESPActive && FriendlyFire.ClearShot
                         ReadyToShoot();
-                        BotShoot.Update();
+                        Shoot.Update();
                     }
                 }
             }
@@ -77,10 +65,10 @@ namespace SAIN.SAINComponent.Classes
                 else
                 {
                     value = enemy.GetPartToShoot();
-                    if (enemy.Person != null && (value - enemy.Person.MainParts[BodyPartType.head].Position).magnitude < 0.1f)
+                    var transform = SAIN?.Enemy?.EnemyPerson?.Transform;
+                    if (transform != null && (value - transform.Head).magnitude < 0.1f)
                     {
-                        //BodyPartType aimPart = EFTMath.RandomBool() ? BodyPartType.leftLeg : BodyPartType.rightLeg;
-                        //value = enemy.Person.MainParts[aimPart].Position;
+                        value = transform.Stomach;
                     }
                 }
                 return new Vector3?(value);
@@ -109,5 +97,46 @@ namespace SAIN.SAINComponent.Classes
         protected Vector3 Target;
 
         public SAINFriendlyFireClass FriendlyFire => SAIN.FriendlyFireClass;
+    }
+
+    public class BotShoot : BaseNodeClass
+    {
+        public BotShoot(BotOwner bot)
+            : base(bot)
+        {
+        }
+
+        public override void Update()
+        {
+            if (!this.botOwner_0.WeaponManager.HaveBullets)
+            {
+                return;
+            }
+            Vector3 position = this.botOwner_0.GetPlayer.PlayerBones.WeaponRoot.position;
+            Vector3 realTargetPoint = this.botOwner_0.AimingData.RealTargetPoint;
+            if (this.botOwner_0.ShootData.ChecFriendlyFire(position, realTargetPoint))
+            {
+                return;
+            }
+            if (this.botOwner_0.ShootData.Shoot() && this.int_0 > this.botOwner_0.WeaponManager.Reload.BulletCount)
+            {
+                this.int_0 = this.botOwner_0.WeaponManager.Reload.BulletCount;
+            }
+        }
+
+        private int int_0;
+    }
+
+    public class SAINBaseNodeClass : BaseNodeClass
+    {
+        public SAINBaseNodeClass(BotOwner bot)
+            : base(bot)
+        {
+        }
+
+        public override void Update()
+        {
+
+        }
     }
 }

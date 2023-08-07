@@ -15,10 +15,8 @@ namespace SAIN.Layers
         private static readonly string Name = typeof(ExtractAction).Name;
         public ExtractAction(BotOwner bot) : base(bot, Name)
         {
-            Shoot = new ShootClass(bot);
         }
 
-        private readonly ShootClass Shoot;
         private Vector3? Exfil => SAIN.Memory.ExfilPosition;
 
         public override void Start()

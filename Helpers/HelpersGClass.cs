@@ -101,18 +101,6 @@ namespace SAIN.Helpers
         public GClass561 Modifiers;
     }
 
-    public class BotShoot : GClass182
-    {
-        public BotShoot(BotOwner owner) : base (owner)
-        {
-        }
-    }
-
-    public class BotAimingData
-    {
-        public GInterface5 AimingData;
-    }
-
     public class EFTCoreSettings
     {
         public static EFTCoreSettings GetCore()
