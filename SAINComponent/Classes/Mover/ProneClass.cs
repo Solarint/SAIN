@@ -58,12 +58,12 @@ namespace SAIN.SAINComponent.Classes.Mover
                     var enemy = SAIN.Enemy;
                     if (enemy != null)
                     {
-                        float distance = (enemy.CurrPosition - SAIN.Transform.Position).magnitude;
+                        float distance = (enemy.EnemyPosition - SAIN.Transform.Position).magnitude;
                         if (distance > 30f)
                         {
                             if (withShoot)
                             {
-                                return CanShootFromProne(enemy.CurrPosition);
+                                return CanShootFromProne(enemy.EnemyPosition);
                             }
                             return true;
                         }
@@ -80,12 +80,12 @@ namespace SAIN.SAINComponent.Classes.Mover
                 var enemy = SAIN.Enemy;
                 if (enemy != null)
                 {
-                    float distance = (enemy.CurrPosition - SAIN.Transform.Position).magnitude;
+                    float distance = (enemy.EnemyPosition - SAIN.Transform.Position).magnitude;
                     if (distance > mindist)
                     {
                         if (withShoot)
                         {
-                            return CanShootFromProne(enemy.CurrPosition);
+                            return CanShootFromProne(enemy.EnemyPosition);
                         }
                         return true;
                     }
@@ -101,10 +101,10 @@ namespace SAIN.SAINComponent.Classes.Mover
                 var enemy = SAIN.Enemy;
                 if (enemy != null)
                 {
-                    float distance = (enemy.CurrPosition - SAIN.Transform.Position).magnitude;
+                    float distance = (enemy.EnemyPosition - SAIN.Transform.Position).magnitude;
                     if (distance > mindist)
                     {
-                        return !CanShootFromProne(enemy.CurrPosition);
+                        return !CanShootFromProne(enemy.EnemyPosition);
                     }
                 }
             }
@@ -120,7 +120,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 {
                     return true;
                 }
-                float distance = (enemy.CurrPosition - SAIN.Transform.Position).magnitude;
+                float distance = (enemy.EnemyPosition - SAIN.Transform.Position).magnitude;
                 if (distance > mindist)
                 {
                     return !IsChestPosVisible(enemy.EnemyHeadPosition);
@@ -145,7 +145,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             from.y = vector.y;
             float num = Vector3.Angle(from, vector2);
             float lay_DOWN_ANG_SHOOT = HelpersGClass.LAY_DOWN_ANG_SHOOT;
-            return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && VectorHelpers.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
+            return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && Vector.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
         }
 
         public BotLayClass BotLay => BotOwner.BotLay;

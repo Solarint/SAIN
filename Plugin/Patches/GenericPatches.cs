@@ -53,7 +53,7 @@ namespace SAIN.Patches.Generic
         [PatchPrefix]
         public static bool PatchPrefix(BotControllerClass __instance, Grenade grenade, Vector3 position, Vector3 force, float mass)
         {
-            Vector3 danger = VectorHelpers.DangerPoint(position, force, mass);
+            Vector3 danger = Vector.DangerPoint(position, force, mass);
             foreach (BotOwner bot in __instance.Bots.BotOwners)
             {
                 if (SAINPlugin.BotController.Bots.ContainsKey(bot.ProfileId))

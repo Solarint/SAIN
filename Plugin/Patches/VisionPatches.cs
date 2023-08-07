@@ -151,7 +151,7 @@ namespace SAIN.Patches.Vision
         [PatchPostfix]
         public static void PatchPostfix(ref Player ____player)
         {
-            if (____player.gameObject.TryGetComponent<FlashLightComponent>(out var component))
+            if (____player.gameObject.TryGetComponent<SAINFlashLightComponent>(out var component))
             {
                 component.CheckDevice(____player, _tacticalModesField);
                 if (!component.WhiteLight && !component.Laser)

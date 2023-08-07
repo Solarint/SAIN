@@ -10,9 +10,9 @@ namespace SAIN.SAINComponent.Classes
     {
         private static ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(ShootClass));
 
-        public ShootClass(BotOwner owner, SAINComponentClass sain) : base(owner)
+        public ShootClass(BotOwner owner) : base(owner)
         {
-            SAIN = sain;
+            SAIN = owner.GetComponent<SAINComponentClass>();
             BotShoot = new BotShoot(owner);
         }
 
@@ -46,7 +46,7 @@ namespace SAIN.SAINComponent.Classes
                         BotOwner.BotLight?.TurnOn(true);
                     }
                     Target = pointToShoot.Value;
-                    if (BotOwner.AimingData.IsReady && !SAIN.NoBushESPActive && FriendlyFire.ClearShot)
+                    if (BotOwner.AimingData.IsReady && !SAIN.NoBushESP.NoBushESPActive && FriendlyFire.ClearShot)
                     {
                         ReadyToShoot();
                         BotShoot.Update();
@@ -107,6 +107,6 @@ namespace SAIN.SAINComponent.Classes
 
         protected Vector3 Target;
 
-        public FriendlyFireClass FriendlyFire => SAIN.FriendlyFireClass;
+        public SAINFriendlyFireClass FriendlyFire => SAIN.FriendlyFireClass;
     }
 }

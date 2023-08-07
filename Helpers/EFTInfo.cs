@@ -21,7 +21,7 @@ namespace SAIN.Helpers
             Player player = GetPlayer(bot?.Memory?.GoalEnemy?.Person);
             return IsPlayerMainPlayer(player);
         }
-        public static bool IsEnemyMainPlayer(EnemyClass enemy)
+        public static bool IsEnemyMainPlayer(SAINEnemyClass enemy)
         {
             Player player = enemy?.EnemyPlayer;
             return IsPlayerMainPlayer(player);

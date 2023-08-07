@@ -1,6 +1,8 @@
 ﻿using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Layers;
+using SAIN.Layers.Combat.Solo;
+using SAIN.Layers.Combat.Squad;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,14 +89,14 @@ namespace SAIN
             AllBots.AddRange(AllNormalBots);
             AllBots.AddRange(AllFollowers);
 
-            BrainManager.AddCustomLayer(typeof(SAINSquad), AllBots, 24);
-            SAINLayers.Add(SAINSquad.Name);
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), AllBots, 24);
+            SAINLayers.Add(CombatSquadLayer.Name);
 
-            BrainManager.AddCustomLayer(typeof(SAINExtractLayer), AllBots, 22);
-            SAINLayers.Add(SAINExtractLayer.Name);
+            BrainManager.AddCustomLayer(typeof(ExtractLayer), AllBots, 22);
+            SAINLayers.Add(ExtractLayer.Name);
 
-            BrainManager.AddCustomLayer(typeof(SAINSolo), AllBots, 20);
-            SAINLayers.Add(SAINSolo.Name);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), AllBots, 20);
+            SAINLayers.Add(CombatSoloLayer.Name);
 
             var LayersToRemove = new List<string> 
             { 

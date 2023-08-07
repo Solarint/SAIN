@@ -149,7 +149,7 @@ namespace SAIN.SAINComponent.Classes.Sense
             Vector3 weaponRoot = person.WeaponRoot.position;
 
             float flashAngle = Mathf.Clamp(0.9770526f, 0.8f, 1f);
-            bool enemylookatme = VectorHelpers.IsAngLessNormalized(VectorHelpers.NormalizeFastSelf(position - weaponRoot), person.LookDirection, flashAngle);
+            bool enemylookatme = Vector.IsAngLessNormalized(Vector.NormalizeFastSelf(position - weaponRoot), person.LookDirection, flashAngle);
 
             return enemylookatme;
         }
@@ -166,16 +166,16 @@ namespace SAIN.SAINComponent.Classes.Sense
             Vector3 weaponRoot = person.WeaponRoot.position;
 
             float laserAngle = 0.990f;
-            bool enemylookatme = VectorHelpers.IsAngLessNormalized(VectorHelpers.NormalizeFastSelf(position - weaponRoot), person.LookDirection, laserAngle);
+            bool enemylookatme = Vector.IsAngLessNormalized(Vector.NormalizeFastSelf(position - weaponRoot), person.LookDirection, laserAngle);
 
             return enemylookatme;
         }
 
         /// <summary>
-        /// Calculates the dazzle modifier for a given BotOwner and Enemy.
+        /// Calculates the dazzle modifier for a given BotOwner and ActiveEnemy.
         /// </summary>
         /// <param name="___botOwner_0">The BotOwner to calculate the dazzle modifier for.</param>
-        /// <param name="person">The Enemy Shining the flashlight</param>
+        /// <param name="person">The ActiveEnemy Shining the flashlight</param>
         /// <returns>The calculated dazzle modifier.</returns>
         private float GetDazzleModifier(IAIDetails person)
         {

@@ -8,14 +8,11 @@ namespace SAIN.SAINComponent
     {
         public SAINBase(SAINComponentClass sain) : base (sain)
         {
-            BotOwner = sain.BotOwner;
-            Player = sain.Player;
-            Logger = sain.Logger;
         }
 
-        public BotOwner BotOwner { get; private set; }
-        public Player Player { get; private set; }
-        public ManualLogSource Logger { get; private set; }
+        public BotOwner BotOwner => SAIN.BotOwner;
+        public Player Player => SAIN.Player;
+        public ManualLogSource Logger => SAIN.Logger;
         public GlobalSettingsClass GlobalSAINSettings => SAINPlugin.LoadedPreset?.GlobalSettings;
     }
 

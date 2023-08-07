@@ -52,47 +52,35 @@ namespace SAIN.Components.BotController
         private bool GameEnding = false;
         private bool Subscribed = false;
 
-        public void AddBot(BotOwner bot)
+        public void AddBot(BotOwner botOwner)
         {
             try
             {
-                if (bot != null)
+                if (botOwner != null)
                 {
-                    var settings = bot.Profile?.Info?.Settings;
+                    var settings = botOwner.Profile?.Info?.Settings;
                     if (settings == null)
                     {
                         return;
                     }
 
-                    bot.LeaveData.OnLeave += RemoveBot;
+                    botOwner.LeaveData.OnLeave += RemoveBot;
                     var role = settings.Role;
                     if (ExclusionList.Contains(role))
                     {
-                        bot.GetOrAddComponent<NoBushESP>().Init(bot);
+                        botOwner.GetOrAddComponent<SAINNoBushESP>().Init(botOwner);
                         return;
                     }
 
-                    SAINComponentClass component = SAINComponentHandler.AddComponent(bot);
-                    if (component != null)
+                    if (SAINComponentClass.TryAddSAINToBot(botOwner, out SAINComponentClass component))
                     {
-                        string profileId = bot.ProfileId;
-                        if (!SAINBotDictionary.ContainsKey(profileId))
+                        string profileId = component.ProfileId;
+                        if (SAINBotDictionary.ContainsKey(profileId))
                         {
-                            SAINBotDictionary.Add(profileId, component);
+                            SAINBotDictionary.Remove(profileId);
                         }
-                        else
-                        {
-                            Logger.LogError("bot is already in dictionary. cannot add components");
-                        }
+                        SAINBotDictionary.Add(profileId, component);
                     }
-                    else
-                    {
-                        Logger.LogError("Component could not be attached. Aborting");
-                    }
-                }
-                else
-                {
-                    Logger.LogError("Botowner is null. cannot add components");
                 }
             }
             catch (Exception ex)
@@ -101,18 +89,18 @@ namespace SAIN.Components.BotController
             }
         }
 
-        public void RemoveBot(BotOwner bot)
+        public void RemoveBot(BotOwner botOwner)
         {
             try
             {
-                if (bot != null)
+                if (botOwner != null)
                 {
-                    SAINBotDictionary.Remove(bot.ProfileId);
-                    if (bot.TryGetComponent<SAINComponentClass>(out var component))
+                    SAINBotDictionary.Remove(botOwner.ProfileId);
+                    if (botOwner.TryGetComponent(out SAINComponentClass component))
                     {
                         component.Dispose();
                     }
-                    if (bot.TryGetComponent<NoBushESP>(out var noBush))
+                    if (botOwner.TryGetComponent(out SAINNoBushESP noBush))
                     {
                         UnityEngine.Object.Destroy(noBush);
                     }

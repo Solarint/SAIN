@@ -2,6 +2,7 @@
 using EFT;
 using SAIN.Attributes;
 using SAIN.SAINComponent;
+using SAIN.SAINComponent.BaseClasses;
 using System.Collections.Generic;
 
 namespace SAIN
@@ -37,7 +38,8 @@ namespace SAIN
 
     public interface IBotComponent
     {
-        bool Init(Player player, BotOwner botOwner);
+        bool Init(SAINPersonClass person);
+        SAINPersonClass Person { get; }
         BotOwner BotOwner { get; }
         Player Player { get; }
         ManualLogSource Logger { get; }

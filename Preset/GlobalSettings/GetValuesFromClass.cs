@@ -45,7 +45,7 @@ namespace SAIN.Preset.GlobalSettings
             var attribute = field.GetCustomAttribute<AmmoCaliberAttribute>();
             if (attribute == null)
             {
-                //Log("attribute is null", field.Name);
+                //Log("attribute is null", field.LayerName);
                 return;
             }
             Caliber enumValue = attribute.AmmoCaliber;
@@ -64,7 +64,7 @@ namespace SAIN.Preset.GlobalSettings
             var attribute = field.GetCustomAttribute<WeaponClassAttribute>();
             if (attribute == null)
             {
-                //Log("attribute is null", field.Name);
+                //Log("attribute is null", field.LayerName);
                 return;
             }
             WeaponClass enumValue = attribute.WeaponClass;

@@ -27,7 +27,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         {
         }
 
-        private SquadClass Squad => SAIN.Squad;
+        private SAINSquadClass Squad => SAIN.Squad;
 
         public bool GetDecision(out SquadDecision Decision)
         {
@@ -70,7 +70,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 var myEnemy = SAIN.Enemy;
                 if (myEnemy != null && member.HasEnemy)
                 {
-                    if (myEnemy.Person == member.Enemy.Person)
+                    if (myEnemy.EnemyIAIDetails == member.Enemy.EnemyIAIDetails)
                     {
                         if (StartSuppression(member))
                         {
@@ -189,7 +189,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 float leadDistance = directionToLead.magnitude;
                 if (enemy != null)
                 {
-                    Vector3 EnemyPos = enemy.CurrPosition;
+                    Vector3 EnemyPos = enemy.EnemyPosition;
                     Vector3 directionToEnemy = EnemyPos - BotPos;
                     float EnemyDistance = directionToEnemy.magnitude;
                     if (EnemyDistance < leadDistance)

@@ -429,7 +429,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                     }
                     else
                     {
-                        EnemyDirectionCheck(enemy.CurrPosition, out trigger, out mask);
+                        EnemyDirectionCheck(enemy.EnemyPosition, out trigger, out mask);
                     }
                 }
 
@@ -565,9 +565,9 @@ namespace SAIN.SAINComponent.Classes.Talk
 
         public SoloDecision[] SoloDecisions => BotSquad.SquadSoloDecisions;
         public SquadDecision[] SquadDecisions => BotSquad.SquadDecisions;
-        public BotTalkClass LeaderComponent => SAIN.Squad.LeaderComponent?.Talk;
+        public SAINBotTalkClass LeaderComponent => SAIN.Squad.LeaderComponent?.Talk;
         private float Randomized => Random.Range(0.75f, 1.25f);
-        private SquadClass BotSquad => SAIN.Squad;
+        private SAINSquadClass BotSquad => SAIN.Squad;
 
         private float CommandSayTimer = 0f;
         private float LeaderTimer = 0f;

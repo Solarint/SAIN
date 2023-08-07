@@ -97,21 +97,23 @@ namespace SAIN.SAINComponent.Classes
 
         public Vector3 SearchMovePos()
         {
-            if (SAIN.Enemy != null && SAIN.Enemy.Seen)
+            var enemy = SAIN.Enemy;
+            if (enemy != null && enemy.Seen)
             {
-                if (SAIN.Enemy.IsVisible)
+                if (enemy.IsVisible)
                 {
-                    return SAIN.Enemy.CurrPosition;
+                    return SAIN.Enemy.EnemyPosition;
                 }
                 else
                 {
-                    if (SAIN.Enemy.ArrivedAtLastSeenPosition)
+                    var lastSeenPos = enemy.LastSeenPosition;
+                    if (lastSeenPos == null)
                     {
                         return RandomSearch();
                     }
                     else
                     {
-                        return SAIN.Enemy.LastSeenPosition;
+                        return lastSeenPos.Value;
                     }
                 }
             }
@@ -305,7 +307,7 @@ namespace SAIN.SAINComponent.Classes
 
                         for (int i = 1; i < Path.corners.Length - 2; i++)
                         {
-                            Vector3 Start = SAIN.Transform.WeaponRoot;
+                            Vector3 Start = SAIN.Transform.WeaponRootPosition;
                             Vector3 dirNext = Path.corners[i + 1] - Start;
                             if (Physics.Raycast(Start, dirNext, dirNext.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                             {

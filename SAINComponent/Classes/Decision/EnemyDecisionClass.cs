@@ -26,7 +26,7 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public bool GetDecision(out SoloDecision Decision)
         {
-            EnemyClass enemy = SAIN.Enemy;
+            SAINEnemyClass enemy = SAIN.Enemy;
             if (enemy == null)
             {
                 Decision = SoloDecision.None;
@@ -97,7 +97,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return true;
         }
 
-        private bool StartRushEnemy(EnemyClass enemy)
+        private bool StartRushEnemy(SAINEnemyClass enemy)
         {
             if (SAIN.Info.PersonalitySettings.CanRushEnemyReloadHeal)
             {
@@ -116,7 +116,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return false;
         }
 
-        private bool StartShiftCover(EnemyClass enemy)
+        private bool StartShiftCover(SAINEnemyClass enemy)
         {
             if (ContinueShiftCover())
             {
@@ -179,13 +179,13 @@ namespace SAIN.SAINComponent.Classes.Decision
         private float ShiftResetTimer;
         public bool ShiftCoverComplete { get; set; }
 
-        private bool StartDogFightAction(EnemyClass enemy)
+        private bool StartDogFightAction(SAINEnemyClass enemy)
         {
             var pathStatus = enemy.CheckPathDistance();
-            return (pathStatus == SAINEnemyPathEnum.VeryClose && SAIN.Enemy.IsVisible) || SAIN.Cover.CoverInUse?.Spotted == true;
+            return (pathStatus == EnemyPathDistance.VeryClose && SAIN.Enemy.IsVisible) || SAIN.Cover.CoverInUse?.Spotted == true;
         }
 
-        private bool StartThrowNade(EnemyClass enemy)
+        private bool StartThrowNade(SAINEnemyClass enemy)
         {
             if (ContinueThrow())
             {
@@ -206,7 +206,7 @@ namespace SAIN.SAINComponent.Classes.Decision
 
             if (enemy.TimeSinceSeen > 3f && enemy.TimeSinceSeen < 15f && enemy.Seen)
             {
-                //if (SAIN.Grenade.EFTBotGrenade.CanThrowGrenade(enemy.CurrPosition))
+                //if (SAIN.Grenade.EFTBotGrenade.CanThrowGrenade(enemy.EnemyPosition))
                 //{
                 //    EndThrowTimer = Time.time;
                 //    return true;
@@ -216,7 +216,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return false;
         }
 
-        private bool StartMoveToEngage(EnemyClass enemy)
+        private bool StartMoveToEngage(SAINEnemyClass enemy)
         {
             if (!enemy.Seen)
             {
@@ -246,7 +246,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             //{
             //    return false;
             //}
-            //return CurrentDecision == SoloDecision.ThrowGrenade && SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData?.ThrowComplete == false;
+            //return CurrentDecision == SoloDecision.ThrowGrenadeAction && SAIN.Grenade.EFTBotGrenade.AIGreanageThrowData?.ThrowComplete == false;
         }
 
         private bool StartRunForCover()
@@ -273,7 +273,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             }
         }
 
-        private bool StartSearch(EnemyClass enemy)
+        private bool StartSearch(SAINEnemyClass enemy)
         {
             if (enemy.IsVisible == true)
             {
@@ -302,7 +302,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return false;
         }
 
-        private bool StartStandAndShoot(EnemyClass enemy)
+        private bool StartStandAndShoot(SAINEnemyClass enemy)
         {
             if (enemy.IsVisible && enemy.CanShoot)
             {

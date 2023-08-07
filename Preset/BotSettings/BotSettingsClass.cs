@@ -108,7 +108,7 @@ namespace SAIN.Preset.BotSettings
                                     // Get the final Value of the variable from EFT group, and set the SAIN Setting variable to that multiplier
                                     object AValue = AVariableField.GetValue(ACatObject);
                                     BVariableField.SetValue(BCatObject, AValue);
-                                    //Logger.LogWarning($"Set [{BVariableField.Name}] to [{AValue}]");
+                                    //Logger.LogWarning($"Set [{BVariableField.LayerName}] to [{AValue}]");
                                 }
                             }
                         }

@@ -6,9 +6,9 @@ using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes
 {
-    public class SoundsController : SAINBase, ISAINClass
+    public class SAINSoundsController : SAINBase, ISAINClass
     {
-        public SoundsController(SAINComponentClass sain) : base(sain)
+        public SAINSoundsController(SAINComponentClass sain) : base(sain)
         {
         }
 

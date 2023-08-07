@@ -14,76 +14,69 @@ using SAIN.Components;
 using System.Threading.Tasks;
 using SAIN.SAINComponent.Classes.Debug;
 using SAIN.SAINComponent.Classes.Info;
+using SAIN.SAINComponent.BaseClasses;
 
 namespace SAIN.SAINComponent
 {
-    public class SAINComponentHandler
-    {
-        public static SAINComponentClass AddComponent(BotOwner botOwner)
-        {
-            Player player = EFTInfo.GetPlayer(botOwner?.ProfileId);
-
-            if (botOwner?.gameObject != null && player != null
-                && AddSAIN(player, botOwner, out var component))
-            {
-                return component;
-            }
-            return null;
-        }
-
-        public static SAINComponentClass AddComponent(Player player)
-        {
-            BotOwner botOwner = player?.AIData?.BotOwner;
-
-            if (player?.gameObject != null && botOwner != null 
-                && AddSAIN(player, botOwner, out var component))
-            {
-                return component;
-            }
-            return null;
-        }
-
-        static bool AddSAIN(Player player, BotOwner botOwner, out SAINComponentClass component)
-        {
-            component = botOwner.GetOrAddComponent<SAINComponentClass>();
-            return component?.Init(player, botOwner) == true;
-        }
-    }
-
     public class SAINComponentClass : MonoBehaviour, IBotComponent
     {
-        public bool Init(Player player, BotOwner botOwner)
+        public static bool TryAddSAINToBot(BotOwner botOwner, out SAINComponentClass component)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component [{botOwner?.name}]");
+            Player player = EFTInfo.GetPlayer(botOwner?.ProfileId);
+            GameObject gameObject = botOwner?.gameObject;
 
-            Player = player;
-            BotOwner = botOwner;
+            if (gameObject != null && player != null)
+            {
+                // If Somehow this bot already has SAIN attached, destroy it.
+                if (gameObject.TryGetComponent(out component))
+                {
+                    component.Dispose();
+                }
+
+                // Create a new Component
+                component = gameObject.AddComponent<SAINComponentClass>();
+
+                // Check is component is successfully initialized
+                if (component?.Init(new SAINPersonClass(player)) == true)
+                {
+                    return true;
+                }
+            }
+            component = null;
+            return false;
+        }
+
+        public SAINPersonClass Person { get; private set; }
+
+        public bool Init(SAINPersonClass person)
+        {
+            Person = person;
+            Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component [{person.Name}]");
 
             try
             {
-                NoBushESP = this.GetOrAddComponent<NoBushESP>();
-                NoBushESP.Init(BotOwner, this);
-                FlashLight = player?.gameObject?.AddComponent<FlashLightComponent>();
+                NoBushESP = this.GetOrAddComponent<SAINNoBushESP>();
+                NoBushESP.Init(person.BotOwner, this);
+                FlashLight = person.Player?.gameObject?.AddComponent<SAINFlashLightComponent>();
 
                 // Must be first, other classes use it
-                Squad = new SquadClass(this);
-                Equipment = new BotEquipmentClass(this);
-                Info = new BotInfoClass(this);
-                Memory = new MemoryClass(this);
-                Transform = new TransformClass(this);
-                BotStuck = new BotUnstuckClass(this);
-                Hearing = new HearingSensorClass(this);
-                Talk = new BotTalkClass(this);
-                Decision = new DecisionClass(this);
-                Cover = new CoverClass(this);
-                SelfActions = new SelfActionClass(this);
-                Steering = new SteeringClass(this);
-                Grenade = new BotGrenadeClass(this);
-                Mover = new MoverClass(this);
-                EnemyController = new EnemyController(this);
-                Sounds = new SoundsController(this);
-                FriendlyFireClass = new FriendlyFireClass(this);
-                Vision = new VisionClass(this);
+                Squad = new SAINSquadClass(this);
+                Equipment = new SAINBotEquipmentClass(this);
+                Info = new SAINBotInfoClass(this);
+                Memory = new SAINMemoryClass(this);
+                BotStuck = new SAINBotUnstuckClass(this);
+                Hearing = new SAINHearingSensorClass(this);
+                Talk = new SAINBotTalkClass(this);
+                Decision = new SAINDecisionClass(this);
+                Cover = new SAINCoverClass(this);
+                SelfActions = new SAINSelfActionClass(this);
+                Steering = new SAINSteeringClass(this);
+                Grenade = new SAINBotGrenadeClass(this);
+                Mover = new SAINMoverClass(this);
+                EnemyController = new SAINEnemyController(this);
+                Sounds = new SAINSoundsController(this);
+                FriendlyFireClass = new SAINFriendlyFireClass(this);
+                Vision = new SAINVisionClass(this);
             }
             catch (Exception ex)
             {
@@ -93,7 +86,6 @@ namespace SAIN.SAINComponent
                 return false;
             }
 
-            Transform.Init();
             Memory.Init();
             EnemyController.Init();
             FriendlyFireClass.Init();
@@ -115,15 +107,10 @@ namespace SAIN.SAINComponent
             return true;
         }
 
-        public string ProfileId => BotOwner?.ProfileId;
-        public bool NoBushESPActive => NoBushESP.NoBushESPActive;
-        public SAINBotController BotController => SAINPlugin.BotController;
-
-        public Player Player { get; private set; }
 
         private void Update()
         {
-            if (this == null || IsDead || Singleton<GameWorld>.Instance == null || Singleton<IBotGame>.Instance == null)
+            if (IsDead || Singleton<GameWorld>.Instance == null)
             {
                 Dispose();
                 return;
@@ -145,7 +132,8 @@ namespace SAIN.SAINComponent
                     BotOwner.PatrollingData?.Unpause();
                 }
 
-                Transform.Update();
+                Person.Update();
+
                 Memory.Update();
                 EnemyController.Update();
                 FriendlyFireClass.Update();
@@ -164,8 +152,6 @@ namespace SAIN.SAINComponent
                 Grenade.Update();
                 Steering.Update();
                 BotOwner.DoorOpener.Update();
-
-                Enemy?.Update();
 
                 if (Enemy == null && BotOwner.BotLight?.IsEnable == false)
                 {
@@ -190,9 +176,9 @@ namespace SAIN.SAINComponent
             }
         }
 
-        public void Shoot(bool noBush = true, bool checkFF = true)
+        public void Shoot(bool checkFF = true)
         {
-            if ((noBush && NoBushESPActive) || (checkFF && !FriendlyFireClass.ClearShot))
+            if (checkFF && !FriendlyFireClass.ClearShot)
             {
                 BotOwner.ShootData.EndShoot();
                 return;
@@ -227,16 +213,12 @@ namespace SAIN.SAINComponent
         private bool Active;
         private float RecheckTimer = 0f;
 
-        public bool HasEnemy => EnemyController.HasEnemy;
-        public EnemyClass Enemy => HasEnemy ? EnemyController.Enemy : null;
-
         public void Dispose()
         {
             try
             {
                 StopAllCoroutines();
 
-                Transform.Dispose();
                 Memory.Dispose();
                 EnemyController.Dispose();
                 FriendlyFireClass.Dispose();
@@ -267,7 +249,7 @@ namespace SAIN.SAINComponent
             {
                 if (HasEnemy)
                 {
-                    return Enemy.CurrPosition;
+                    return Enemy.EnemyPosition;
                 }
                 var Target = BotOwner.Memory.GoalTarget;
                 if (Target != null && Target?.Position != null)
@@ -284,7 +266,7 @@ namespace SAIN.SAINComponent
                 var sound = BotOwner.BotsGroup.YoungestPlace(BotOwner, 200f, true);
                 if (sound != null && !sound.IsCome)
                 {
-                    if ((sound.Position - BotOwner.Position).sqrMagnitude < 2f)
+                    if ((sound.Position - Position).sqrMagnitude < 2f)
                     {
                         sound.IsCome = true;
                     }
@@ -301,34 +283,37 @@ namespace SAIN.SAINComponent
             }
         }
 
-        public TransformClass Transform { get; private set; }
-        public MemoryClass Memory { get; private set; }
-        public EnemyController EnemyController { get; private set; }
-        public NoBushESP NoBushESP { get; private set; }
-        public FriendlyFireClass FriendlyFireClass { get; private set; }
-        public SoundsController Sounds { get; private set; }
-        public VisionClass Vision { get; private set; }
-        public BotEquipmentClass Equipment { get; private set; }
-        public MoverClass Mover { get; private set; }
-        public BotUnstuckClass BotStuck { get; private set; }
-        public FlashLightComponent FlashLight { get; private set; }
-        public HearingSensorClass Hearing { get; private set; }
-        public BotTalkClass Talk { get; private set; }
-        public DecisionClass Decision { get; private set; }
-        public CoverClass Cover { get; private set; }
-        public Classes.Info.BotInfoClass Info { get; private set; }
-        public SquadClass Squad { get; private set; }
-        public SelfActionClass SelfActions { get; private set; }
-        public BotGrenadeClass Grenade { get; private set; }
-        public SteeringClass Steering { get; private set; }
+        public SAINEnemyClass Enemy => HasEnemy ? EnemyController.ActiveEnemy : null;
+        public SAINPersonTransformClass Transform => Person.Transform;
+        public SAINMemoryClass Memory { get; private set; }
+        public SAINEnemyController EnemyController { get; private set; }
+        public SAINNoBushESP NoBushESP { get; private set; }
+        public SAINFriendlyFireClass FriendlyFireClass { get; private set; }
+        public SAINSoundsController Sounds { get; private set; }
+        public SAINVisionClass Vision { get; private set; }
+        public SAINBotEquipmentClass Equipment { get; private set; }
+        public SAINMoverClass Mover { get; private set; }
+        public SAINBotUnstuckClass BotStuck { get; private set; }
+        public SAINFlashLightComponent FlashLight { get; private set; }
+        public SAINHearingSensorClass Hearing { get; private set; }
+        public SAINBotTalkClass Talk { get; private set; }
+        public SAINDecisionClass Decision { get; private set; }
+        public SAINCoverClass Cover { get; private set; }
+        public SAINBotInfoClass Info { get; private set; }
+        public SAINSquadClass Squad { get; private set; }
+        public SAINSelfActionClass SelfActions { get; private set; }
+        public SAINBotGrenadeClass Grenade { get; private set; }
+        public SAINSteeringClass Steering { get; private set; }
 
         public bool IsDead => BotOwner == null || BotOwner.IsDead == true || Player == null || Player.HealthController.IsAlive == false;
         public bool BotActive => IsDead == false && BotOwner.enabled && Player.enabled && BotOwner.BotState == EBotState.Active;
         public bool GameIsEnding => Singleton<IBotGame>.Instance == null || Singleton<IBotGame>.Instance.Status == GameStatus.Stopping;
 
-
-        public BotOwner BotOwner { get; private set; }
-
+        public Vector3 Position => Person.Position;
+        public BotOwner BotOwner => Person.BotOwner;
         public ManualLogSource Logger { get; private set; }
+        public string ProfileId => Person.ProfileId;
+        public Player Player => Person.Player;
+        public bool HasEnemy => EnemyController.HasEnemy;
     }
 }

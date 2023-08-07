@@ -64,7 +64,7 @@ namespace SAIN
             BindConfigs();
             Patches();
             BigBrainHandler.Init();
-            VectorHelpers.Init();
+            Vector.Init();
         }
 
         private void BindConfigs()

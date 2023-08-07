@@ -25,7 +25,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         }
 
         public SelfDecision CurrentSelfAction => SAIN.Decision.CurrentSelfDecision;
-        private SAINEnemyPathEnum EnemyDistance => SAIN.Decision.EnemyDistance;
+        private EnemyPathDistance EnemyDistance => SAIN.Decision.EnemyDistance;
 
         public bool GetDecision(out SelfDecision Decision)
         {
@@ -77,9 +77,9 @@ namespace SAIN.SAINComponent.Classes.Decision
             var grenadePos = SAIN.Grenade.GrenadeDangerPoint; 
             if (grenadePos != null)
             {
-                Vector3 botPos = SAIN.Transform.Position;
-                Vector3 direction = grenadePos.Value - botPos;
-                if (!Physics.Raycast(SAIN.Transform.HeadPosition, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                Vector3 headPos = SAIN.Transform.Head;
+                Vector3 direction = grenadePos.Value - headPos;
+                if (!Physics.Raycast(headPos, direction.normalized, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
                     return true;
                 }
@@ -181,7 +181,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                     {
                         takeStims = true;
                     }
-                    else if (pathStatus == SAINEnemyPathEnum.Far || pathStatus == SAINEnemyPathEnum.VeryFar)
+                    else if (pathStatus == EnemyPathDistance.Far || pathStatus == EnemyPathDistance.VeryFar)
                     {
                         takeStims = true;
                     }
@@ -207,19 +207,19 @@ namespace SAIN.SAINComponent.Classes.Decision
                     var status = SAIN;
                     if (status.Memory.Injured)
                     {
-                        if (!enemy.InLineOfSight && !SeenRecent && pathStatus != SAINEnemyPathEnum.VeryClose && pathStatus != SAINEnemyPathEnum.Close)
+                        if (!enemy.InLineOfSight && !SeenRecent && pathStatus != EnemyPathDistance.VeryClose && pathStatus != EnemyPathDistance.Close)
                         {
                             useFirstAid = true;
                         }
                     }
                     else if (status.Memory.BadlyInjured)
                     {
-                        if (!enemy.InLineOfSight && pathStatus != SAINEnemyPathEnum.VeryClose && enemy.TimeSinceSeen < 2f)
+                        if (!enemy.InLineOfSight && pathStatus != EnemyPathDistance.VeryClose && enemy.TimeSinceSeen < 2f)
                         {
                             useFirstAid = true;
                         }
 
-                        if (pathStatus == SAINEnemyPathEnum.VeryFar)
+                        if (pathStatus == EnemyPathDistance.VeryFar)
                         {
                             useFirstAid = true;
                         }
@@ -230,7 +230,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                         {
                             useFirstAid = true;
                         }
-                        if (pathStatus == SAINEnemyPathEnum.VeryFar || pathStatus == SAINEnemyPathEnum.Far)
+                        if (pathStatus == EnemyPathDistance.VeryFar || pathStatus == EnemyPathDistance.Far)
                         {
                             useFirstAid = true;
                         }
@@ -254,7 +254,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 var pathStatus = enemy.CheckPathDistance();
                 bool SeenRecent = Time.time - enemy.TimeSinceSeen > 3f;
 
-                if (SeenRecent && Vector3.Distance(BotOwner.Position, enemy.Person.Position) < 8f)
+                if (SeenRecent && Vector3.Distance(BotOwner.Position, enemy.EnemyIAIDetails.Position) < 8f)
                 {
                     return true;
                 }
@@ -263,11 +263,11 @@ namespace SAIN.SAINComponent.Classes.Decision
                 {
                     return true;
                 }
-                if (pathStatus == SAINEnemyPathEnum.VeryClose)
+                if (pathStatus == EnemyPathDistance.VeryClose)
                 {
                     return true;
                 }
-                if (BotOwner.WeaponManager.Reload.BulletCount > 1 && pathStatus == SAINEnemyPathEnum.Close)
+                if (BotOwner.WeaponManager.Reload.BulletCount > 1 && pathStatus == EnemyPathDistance.Close)
                 {
                     return true;
                 }
@@ -296,7 +296,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                     {
                         needToReload = true;
                     }
-                    else if (EnemyDistance != SAINEnemyPathEnum.VeryClose && !enemy.IsVisible)
+                    else if (EnemyDistance != EnemyPathDistance.VeryClose && !enemy.IsVisible)
                     {
                         needToReload = true;
                     }
@@ -322,7 +322,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                     var pathStatus = enemy.CheckPathDistance();
                     bool SeenRecent = enemy.TimeSinceSeen < 10f;
 
-                    if (!SeenRecent && pathStatus != SAINEnemyPathEnum.VeryClose && pathStatus != SAINEnemyPathEnum.Close)
+                    if (!SeenRecent && pathStatus != EnemyPathDistance.VeryClose && pathStatus != EnemyPathDistance.Close)
                     {
                         useSurgery = true;
                     }

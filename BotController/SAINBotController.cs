@@ -206,7 +206,7 @@ namespace SAIN.Components
                     continue;
                 }
                 var Enemy = bot.Enemy;
-                if (Enemy?.Person != null && Enemy.Person.ProfileId == player.ProfileId)
+                if (Enemy?.EnemyIAIDetails != null && Enemy.EnemyIAIDetails.ProfileId == player.ProfileId)
                 {
                     if (Enemy.RealDistance <= range)
                     {
@@ -241,7 +241,7 @@ namespace SAIN.Components
             // AddorUpdateColorScheme Components to main player
             if (!ComponentAdded)
             {
-                MainPlayer.GetOrAddComponent<FlashLightComponent>();
+                MainPlayer.GetOrAddComponent<SAINFlashLightComponent>();
                 ComponentAdded = true;
             }
 
@@ -305,7 +305,7 @@ namespace SAIN.Components
             {
                 return;
             }
-            var danger = VectorHelpers.DangerPoint(position, force, mass);
+            var danger = Vector.DangerPoint(position, force, mass);
             foreach (var bot in Bots.Values)
             {
                 if (bot != null && (danger - bot.Transform.Position).sqrMagnitude < 200f * 200f)

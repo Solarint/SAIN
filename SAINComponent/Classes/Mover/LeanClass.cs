@@ -28,7 +28,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             if (LeanTimer < Time.time)
             {
                 LeanTimer = Time.time + 0.5f;
-                FindLeanDirectionRayCast(enemy.CurrPosition);
+                FindLeanDirectionRayCast(enemy.EnemyPosition);
             }
         }
 
@@ -160,7 +160,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         private bool CheckOffSetRay(Vector3 targetPos, float angle, float dist, out Vector3 Point)
         {
             Vector3 startPos = BotOwner.Position;
-            startPos.y = SAIN.Transform.HeadPosition.y;
+            startPos.y = SAIN.Transform.Head.y;
 
             if (dist > 0f)
             {

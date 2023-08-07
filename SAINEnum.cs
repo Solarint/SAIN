@@ -199,7 +199,7 @@ namespace SAIN
         FarGun,
         FarStep,
     }
-    public enum SAINEnemyPathEnum
+    public enum EnemyPathDistance
     {
         VeryClose,
         Close,

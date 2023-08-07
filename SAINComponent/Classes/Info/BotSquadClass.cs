@@ -7,9 +7,9 @@ using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Info
 {
-    public class SquadClass : SAINBase, ISAINClass
+    public class SAINSquadClass : SAINBase, ISAINClass
     {
-        public SquadClass(SAINComponentClass sain) : base(sain)
+        public SAINSquadClass(SAINComponentClass sain) : base(sain)
         {
         }
 
