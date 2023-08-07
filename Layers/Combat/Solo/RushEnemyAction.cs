@@ -13,12 +13,8 @@ namespace SAIN.Layers.Combat.Solo
     {
         public RushEnemyAction(BotOwner bot) : base(bot, nameof(RushEnemyAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
 
-        private readonly ShootClass Shoot;
         private float TryJumpTimer;
 
         public override void Update()
@@ -119,10 +115,6 @@ namespace SAIN.Layers.Combat.Solo
 
         private float NewDestTimer = 0f;
         private Vector3? PushDestination;
-
-        private readonly SAINComponentClass SAIN;
-
-        public ManualLogSource Logger;
 
         public override void Start()
         {

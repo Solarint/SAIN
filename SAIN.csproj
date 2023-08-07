@@ -221,7 +221,7 @@
   <ItemGroup>
     <Compile Include="Attributes\AttributesGUI.cs" />
     <Compile Include="Attributes\GUIEntryConfig.cs" />
-    <Compile Include="Layers\Combat\Solo\AppendStringBuilder.cs" />
+    <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AmmoShootabilityClass.cs" />
@@ -241,7 +241,6 @@
     <Compile Include="SAINComponent\Classes\SAINMemoryClass.cs" />
     <Compile Include="SAINComponent\Classes\Info\ProfileClass.cs" />
     <Compile Include="SAINComponent\PersonBase\PersonBaseClass.cs" />
-    <Compile Include="SAINComponent\Classes\Sense\asdasd.cs" />
     <Compile Include="SAINComponent\Classes\OldTransformClass.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\SAINSettingsGroupClass.cs" />
     <Compile Include="Preset\BotTypeDefinitions.cs" />
@@ -293,8 +292,8 @@
     <Compile Include="SAINComponent\Classes\Mover\PoseClass.cs" />
     <Compile Include="SAINComponent\Classes\Mover\ProneClass.cs" />
     <Compile Include="Helpers\SAINSoundTypeHandler.cs" />
-    <Compile Include="Layers\Combat\Solo\Cover\RunToCover.cs" />
-    <Compile Include="Layers\Combat\Solo\Cover\ShiftCover.cs" />
+    <Compile Include="Layers\Combat\Solo\Cover\RunToCoverAction.cs" />
+    <Compile Include="Layers\Combat\Solo\Cover\ShiftCoverAction.cs" />
     <Compile Include="Layers\Combat\Solo\RushEnemyAction.cs" />
     <Compile Include="Layers\Combat\Solo\ThrowGrenadeAction.cs" />
     <Compile Include="SAINComponent\Classes\Sense\HeardSoundsClass.cs" />
@@ -364,7 +363,7 @@
     <Compile Include="Helpers\Vector.cs" />
     <Compile Include="Layers\Combat\Squad\RegroupAction.cs" />
     <Compile Include="Layers\Combat\Solo\StandAndShootAction.cs" />
-    <Compile Include="Layers\Combat\Solo\Cover\WalkToCover.cs" />
+    <Compile Include="Layers\Combat\Solo\Cover\WalkToCoverAction.cs" />
     <Compile Include="Layers\Combat\Squad\CombatSquadLayer.cs" />
     <Compile Include="Layers\Extract\ExtractAction.cs" />
     <Compile Include="Layers\Extract\ExtractLayer.cs" />
@@ -390,7 +389,7 @@
     <Compile Include="SAINComponent\SubComponents\GrenadeTrackerComponent.cs" />
     <Compile Include="SAINComponent\Classes\Mover\LeanClass.cs" />
     <Compile Include="Layers\Combat\Solo\SearchAction.cs" />
-    <Compile Include="Layers\Combat\Solo\Cover\HoldinCover.cs" />
+    <Compile Include="Layers\Combat\Solo\Cover\HoldinCoverAction.cs" />
     <Compile Include="Layers\Combat\Squad\SuppressAction.cs" />
     <Compile Include="Plugin\Patches\Shoot\GrenadeSound.cs" />
     <Compile Include="SAINComponent\Classes\SAINBotGrenadeClass.cs" />

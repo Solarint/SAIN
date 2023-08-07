@@ -3,6 +3,7 @@ using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using System.Text;
 using SAIN.SAINComponent;
+using SAIN.Layers.Combat.Solo.Cover;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -31,17 +32,17 @@ namespace SAIN.Layers.Combat.Solo
                     return new Action(typeof(ThrowGrenadeAction), $"{Decision}");
 
                 case SoloDecision.ShiftCover:
-                    return new Action(typeof(ShiftCover), $"{Decision}");
+                    return new Action(typeof(ShiftCoverAction), $"{Decision}");
 
                 case SoloDecision.RunToCover:
-                    return new Action(typeof(RunToCover), $"{Decision}");
+                    return new Action(typeof(RunToCoverAction), $"{Decision}");
 
                 case SoloDecision.Retreat:
-                    return new Action(typeof(RunToCover), $"{Decision} + {SelfDecision}");
+                    return new Action(typeof(RunToCoverAction), $"{Decision} + {SelfDecision}");
 
                 case SoloDecision.WalkToCover:
                 case SoloDecision.UnstuckMoveToCover:
-                    return new Action(typeof(WalkToCover), $"{Decision}");
+                    return new Action(typeof(WalkToCoverAction), $"{Decision}");
 
                 case SoloDecision.DogFight:
                 case SoloDecision.UnstuckDogFight:
@@ -51,7 +52,7 @@ namespace SAIN.Layers.Combat.Solo
                     return new Action(typeof(StandAndShootAction), $"{Decision}");
 
                 case SoloDecision.HoldInCover:
-                    return new Action(typeof(HoldinCover), $"{Decision}");
+                    return new Action(typeof(HoldinCoverAction), $"{Decision}");
 
                 case SoloDecision.Shoot:
                     return new Action(typeof(ShootAction), $"{Decision}");
@@ -64,7 +65,7 @@ namespace SAIN.Layers.Combat.Solo
                     return new Action(typeof(InvestigateAction), $"{Decision}");
 
                 default:
-                    return new Action(typeof(WalkToCover), $"DEFAULT!");
+                    return new Action(typeof(WalkToCoverAction), $"DEFAULT!");
             }
         }
 

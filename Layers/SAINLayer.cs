@@ -35,7 +35,7 @@ namespace SAIN.Layers
 
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
-            AppendStringBuilder.AddBaseInfo(SAIN, BotOwner, stringBuilder);
+            DebugOverlay.AddBaseInfo(SAIN, BotOwner, stringBuilder);
         }
     }
 }

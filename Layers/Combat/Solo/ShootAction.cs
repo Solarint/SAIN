@@ -11,14 +11,8 @@ namespace SAIN.Layers.Combat.Solo
     {
         public ShootAction(BotOwner bot) : base(bot, nameof(ShootAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
 
-        private ShootClass Shoot;
-
-        private SAINComponentClass SAIN;
 
         public override void Start()
         {
@@ -33,7 +27,5 @@ namespace SAIN.Layers.Combat.Solo
             SAIN.Steering.SteerByPriority();
             Shoot.Update();
         }
-
-        public ManualLogSource Logger;
     }
 }

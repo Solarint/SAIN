@@ -11,19 +11,15 @@ using SAIN.SAINComponent;
 using System.Text;
 using UnityEngine;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
+using SAIN.Layers.Combat.Solo;
 
-namespace SAIN.Layers
+namespace SAIN.Layers.Combat.Solo.Cover
 {
-    internal class WalkToCover : CustomLogic
+    internal class WalkToCoverAction : SAINAction
     {
-        public WalkToCover(BotOwner bot) : base(bot)
+        public WalkToCoverAction(BotOwner bot) : base(bot, nameof(WalkToCoverAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
-
-        private readonly ManualLogSource Logger;
 
         public override void Update()
         {
@@ -131,7 +127,6 @@ namespace SAIN.Layers
             }
         }
 
-        private readonly ShootClass Shoot;
 
         public override void Start()
         {
@@ -142,26 +137,10 @@ namespace SAIN.Layers
         {
             CoverDestination = null;
         }
+
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
-            stringBuilder.AppendLine($"SAIN Info:");
-            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.Personality}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.Profile.WildSpawnType}", Color.white, Color.yellow, true);
-            CoverPoint cover = SAIN.Cover.CoverInUse;
-            if (cover != null)
-            {
-                stringBuilder.AppendLine($"SAIN Cover Info:");
-                stringBuilder.AppendLabeledValue("Cover Position", $"{cover.Position}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Distance", $"{cover.Distance}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Spotted?", $"{cover.Spotted}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Path Length", $"{cover.Distance}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover ID", $"{cover.Id}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Status", $"{cover.CoverStatus}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{cover.HitInCoverCount}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover HitInCoverUnknownCount", $"{cover.HitInCoverUnknownCount}", Color.white, Color.yellow, true);
-            }
+            DebugOverlay.AddCoverInfo(SAIN, stringBuilder);
         }
-
-        private readonly SAINComponentClass SAIN;
     }
 }

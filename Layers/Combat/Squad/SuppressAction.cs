@@ -1,20 +1,18 @@
 ﻿using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Layers.Combat.Solo;
 using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes;
 using UnityEngine;
 
 namespace SAIN.Layers.Combat.Squad
 {
-    internal class SuppressAction : CustomLogic
+    internal class SuppressAction : SAINAction
     {
-        public SuppressAction(BotOwner bot) : base(bot)
+        public SuppressAction(BotOwner bot) : base(bot, nameof(SuppressAction))
         {
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
 
-        // Token: 0x060008C4 RID: 2244 RVA: 0x0002AE8C File Offset: 0x0002908C
         public override void Update()
         {
             var enemy = SAIN.Enemy;
@@ -69,10 +67,6 @@ namespace SAIN.Layers.Combat.Squad
             }
             return false;
         }
-
-        private readonly ShootClass Shoot;
-
-        private readonly SAINComponentClass SAIN;
 
         public override void Start()
         {

@@ -13,19 +13,15 @@ using UnityEngine.AI;
 using System.Collections.Generic;
 using System.Text;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
+using SAIN.Layers.Combat.Solo;
 
-namespace SAIN.Layers
+namespace SAIN.Layers.Combat.Solo.Cover
 {
-    internal class ShiftCover : CustomLogic
+    internal class ShiftCoverAction : SAINAction
     {
-        public ShiftCover(BotOwner bot) : base(bot)
+        public ShiftCoverAction(BotOwner bot) : base(bot, nameof(ShiftCoverAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(this.GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
-
-        private ShootClass Shoot;
 
         public override void Update()
         {
@@ -48,10 +44,6 @@ namespace SAIN.Layers
                 }
             }
         }
-
-        private readonly SAINComponentClass SAIN;
-
-        public ManualLogSource Logger;
 
         private bool FindPointToGo()
         {
@@ -103,29 +95,12 @@ namespace SAIN.Layers
         public override void Stop()
         {
             NewPoint = null;
-            if (UsedPoints.Count > 5)
-            {
-                UsedPoints.Clear();
-            }
+            UsedPoints.Clear();
         }
 
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
-            stringBuilder.AppendLine($"SAIN Info:");
-            stringBuilder.AppendLabeledValue("Personality", $"{SAIN.Info.Personality}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("BotType", $"{SAIN.Info.Profile.WildSpawnType}", Color.white, Color.yellow, true);
-            if (NewPoint != null)
-            {
-                stringBuilder.AppendLine($"SAIN Cover Info:");
-                stringBuilder.AppendLabeledValue("Cover Position", $"{NewPoint.Position}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Distance", $"{NewPoint.Distance}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Spotted?", $"{NewPoint.Spotted}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Path Length", $"{NewPoint.Distance}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover ID", $"{NewPoint.Id}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover Status", $"{NewPoint.CoverStatus}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover HitInCoverCount", $"{NewPoint.HitInCoverCount}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Cover HitInCoverUnknownCount", $"{NewPoint.HitInCoverUnknownCount}", Color.white, Color.yellow, true);
-            }
+            DebugOverlay.AddCoverInfo(SAIN, stringBuilder);
         }
     }
 }

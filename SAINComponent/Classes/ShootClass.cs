@@ -46,8 +46,9 @@ namespace SAIN.SAINComponent.Classes
                         BotOwner.BotLight?.TurnOn(true);
                     }
                     Target = pointToShoot.Value;
-                    if (BotOwner.AimingData.IsReady && !SAIN.NoBushESP.NoBushESPActive && FriendlyFire.ClearShot)
+                    if (BotOwner.AimingData.IsReady)
                     {
+                        //  && !SAIN.NoBushESP.NoBushESPActive && FriendlyFire.ClearShot
                         ReadyToShoot();
                         BotShoot.Update();
                     }
@@ -78,8 +79,8 @@ namespace SAIN.SAINComponent.Classes
                     value = enemy.GetPartToShoot();
                     if (enemy.Person != null && (value - enemy.Person.MainParts[BodyPartType.head].Position).magnitude < 0.1f)
                     {
-                        BodyPartType aimPart = EFTMath.RandomBool() ? BodyPartType.leftLeg : BodyPartType.rightLeg;
-                        value = enemy.Person.MainParts[aimPart].Position;
+                        //BodyPartType aimPart = EFTMath.RandomBool() ? BodyPartType.leftLeg : BodyPartType.rightLeg;
+                        //value = enemy.Person.MainParts[aimPart].Position;
                     }
                 }
                 return new Vector3?(value);

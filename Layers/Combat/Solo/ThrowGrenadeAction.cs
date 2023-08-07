@@ -10,8 +10,6 @@ namespace SAIN.Layers.Combat.Solo
     {
         public ThrowGrenadeAction(BotOwner bot) : base(bot, nameof(ThrowGrenadeAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
         }
 
         public override void Update()
@@ -41,9 +39,6 @@ namespace SAIN.Layers.Combat.Solo
             SAIN.Talk.Say(EPhraseTrigger.OnGrenade);
         }
 
-        private readonly SAINComponentClass SAIN;
-
-        public ManualLogSource Logger;
         private float StartTime = 0f;
         private bool Stopped = false;
 

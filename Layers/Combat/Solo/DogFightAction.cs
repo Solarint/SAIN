@@ -18,12 +18,7 @@ namespace SAIN.Layers.Combat.Solo
     {
         public DogFightAction(BotOwner bot) : base(bot, nameof(DogFightAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
-
-        private readonly ShootClass Shoot;
 
         public override void Update()
         {
@@ -88,12 +83,7 @@ namespace SAIN.Layers.Combat.Solo
             return path.CalculatePathLength() < straighDist * 1.2f;
         }
 
-        // Token: 0x04000C27 RID: 3111
         private readonly NavMeshPath navMeshPath_0 = new NavMeshPath();
-
-        private readonly SAINComponentClass SAIN;
-
-        public ManualLogSource Logger;
 
         public override void Start()
         {

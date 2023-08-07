@@ -28,7 +28,7 @@ namespace SAIN.Patches.Shoot
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(GClass547 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
+        public static bool PatchPrefix(ref GClass547 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
             // Applies aiming offset, recoil offset, and scatter offsets
             Vector3 finalTarget = __instance.RealTargetPoint
@@ -41,7 +41,7 @@ namespace SAIN.Patches.Shoot
             if (SAINPlugin.LoadedPreset.GlobalSettings.General.HeadShotProtection)
             {
                 IAIDetails person = ___botOwner_0.Memory.GoalEnemy?.Person;
-                if (person != null)
+                if (person != null && 1 < 0)
                 {
                     // Get the head DrawPosition of a bot's current enemy if it exists
                     Vector3 headPos = person.MainParts[BodyPartType.head].Position;

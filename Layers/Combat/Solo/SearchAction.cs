@@ -18,11 +18,7 @@ namespace SAIN.Layers.Combat.Solo
     {
         public SearchAction(BotOwner bot) : base(bot, nameof(SearchAction))
         {
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
-
-        private ShootClass Shoot;
 
         private SearchClass Search;
 
@@ -161,7 +157,6 @@ namespace SAIN.Layers.Combat.Solo
             }
         }
 
-        private readonly SAINComponentClass SAIN;
         public NavMeshPath Path = new NavMeshPath();
     }
 }

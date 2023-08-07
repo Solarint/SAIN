@@ -5,6 +5,7 @@ using DrakiaXYZ.VersionChecker;
 using SAIN.Components;
 using SAIN.Editor;
 using SAIN.Helpers;
+using SAIN.Layers;
 using SAIN.Plugin;
 using SAIN.Preset;
 using System;
@@ -69,10 +70,22 @@ namespace SAIN
 
         private void BindConfigs()
         {
-            OpenEditorButton = Config.Bind("SAIN Editor", "Open Editor", false, "Opens the Editor on press");
-            OpenEditorConfigEntry = Config.Bind("SAIN Editor", "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
-            PauseConfigEntry = Config.Bind("SAIN Editor", "PauseButton", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
+            string category = "SAIN Editor";
+
+            NextDebugOverlay = Config.Bind(category, "Next Debug Overlay", new KeyboardShortcut(KeyCode.LeftBracket), "Change The Debug Overlay with DrakiaXYZs Debug Overlay");
+            PreviousDebugOverlay = Config.Bind(category, "Previous Debug Overlay", new KeyboardShortcut(KeyCode.RightBracket), "Change The Debug Overlay with DrakiaXYZs Debug Overlay");
+
+            OpenEditorButton = Config.Bind(category, "Open Editor", false, "Opens the Editor on press");
+            OpenEditorConfigEntry = Config.Bind(category, "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
+
+            PauseConfigEntry = Config.Bind(category, "Pause Button", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
         }
+
+        public static ConfigEntry<KeyboardShortcut> NextDebugOverlay { get; private set; }
+        public static ConfigEntry<KeyboardShortcut> PreviousDebugOverlay { get; private set; }
+        public static ConfigEntry<bool> OpenEditorButton { get; private set; }
+        public static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry { get; private set; }
+        public static ConfigEntry<KeyboardShortcut> PauseConfigEntry { get; private set; }
 
         private void Patches()
         {
@@ -109,11 +122,6 @@ namespace SAIN
             new Patches.Shoot.SemiAutoPatch().Enable();
         }
 
-        public static ConfigEntry<bool> OpenEditorButton { get; private set; }
-
-        public static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry { get; private set; }
-
-        public static ConfigEntry<KeyboardShortcut> PauseConfigEntry { get; private set; }
 
         public static readonly SAINEditor SAINEditor = new SAINEditor();
 
@@ -124,6 +132,7 @@ namespace SAIN
 
         private void Update()
         {
+            DebugOverlay.Update();
             ModDetection.Update();
             SAINEditor.Update();
             BotControllerHandler.Update();

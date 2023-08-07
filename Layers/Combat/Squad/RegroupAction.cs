@@ -1,17 +1,16 @@
 ﻿using BepInEx.Logging;
 using DrakiaXYZ.BigBrain.Brains;
 using EFT;
+using SAIN.Layers.Combat.Solo;
 using SAIN.SAINComponent;
 using UnityEngine;
 
 namespace SAIN.Layers.Combat.Squad
 {
-    internal class RegroupAction : CustomLogic
+    internal class RegroupAction : SAINAction
     {
-        public RegroupAction(BotOwner bot) : base(bot)
+        public RegroupAction(BotOwner bot) : base(bot, nameof(RegroupAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
         }
 
         public override void Update()
@@ -36,8 +35,6 @@ namespace SAIN.Layers.Combat.Squad
                 MoveToLead();
             }
         }
-
-        private readonly SAINComponentClass SAIN;
 
         public override void Start()
         {
@@ -85,7 +82,5 @@ namespace SAIN.Layers.Combat.Squad
         public override void Stop()
         {
         }
-
-        public ManualLogSource Logger;
     }
 }

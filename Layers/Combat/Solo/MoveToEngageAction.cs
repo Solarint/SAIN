@@ -13,12 +13,8 @@ namespace SAIN.Layers.Combat.Solo
     {
         public MoveToEngageAction(BotOwner bot) : base(bot, nameof(MoveToEngageAction))
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
         }
 
-        private readonly ShootClass Shoot;
         private float RecalcPathTimer;
 
         public override void Update()
@@ -105,11 +101,6 @@ namespace SAIN.Layers.Combat.Solo
             }
             return false;
         }
-
-
-        private readonly SAINComponentClass SAIN;
-
-        public ManualLogSource Logger;
 
         public override void Start()
         {

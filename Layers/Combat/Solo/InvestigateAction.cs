@@ -12,13 +12,8 @@ namespace SAIN.Layers.Combat.Solo
     internal class InvestigateAction : SAINAction
     {
         public InvestigateAction(BotOwner bot) : base(bot, nameof(InvestigateAction))
-    {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(GetType().Name);
-            SAIN = bot.GetComponent<SAINComponentClass>();
-            Shoot = new ShootClass(bot);
+        {
         }
-
-        private readonly ShootClass Shoot;
 
         public override void Update()
         {
@@ -61,9 +56,6 @@ namespace SAIN.Layers.Combat.Solo
 
         private float RecalcPathtimer = 0f;
 
-        private readonly SAINComponentClass SAIN;
-
-        public ManualLogSource Logger;
         private GClass273 SearchPoint;
 
         public override void Start()

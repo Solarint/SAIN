@@ -3,6 +3,7 @@ using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.Components;
 using SAIN.SAINComponent;
+using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.Classes.Decision;
 using System.Text;
 
@@ -14,6 +15,7 @@ namespace SAIN.Layers
         {
             Logger = BepInEx.Logging.Logger.CreateLogSource(name);
             SAIN = botOwner.GetComponent<SAINComponentClass>();
+            Shoot = new ShootClass(botOwner);
         }
 
         public SAINBotController BotController => SAINPlugin.BotController;
@@ -23,9 +25,11 @@ namespace SAIN.Layers
 
         public readonly ManualLogSource Logger;
 
+        public readonly ShootClass Shoot;
+
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
-            AppendStringBuilder.AddBaseInfo(SAIN, BotOwner, stringBuilder);
+            DebugOverlay.AddBaseInfo(SAIN, BotOwner, stringBuilder);
         }
     }
 }
