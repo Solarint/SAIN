@@ -5,9 +5,9 @@ using System.ComponentModel;
 
 namespace SAIN.Preset.GlobalSettings
 {
-    public class AudibleRangesClass : Logging
+    public class AudibleRangesClass
     {
-        public AudibleRangesClass() : base(nameof(AmmoShootabilityClass))
+        public AudibleRangesClass()
         {
         }
 

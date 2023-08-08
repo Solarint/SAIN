@@ -237,6 +237,7 @@
     <Compile Include="Layers\Extract\LootingBotsIntegration.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="Editor\GUISections\PresetSelection.cs" />
+    <Compile Include="SAINComponent\Classes\SAINBotUnstuckClass.cs" />
     <Compile Include="SAINComponent\PersonBase\AIInfoClass.cs" />
     <Compile Include="SAINComponent\PersonBase\ISAINPerson.cs" />
     <Compile Include="SAINComponent\PersonBase\SAINPersonClass.cs" />
@@ -337,7 +338,6 @@
     <Compile Include="BotController\Classes\DecisionManager.cs" />
     <Compile Include="BotController\Classes\PathManager.cs" />
     <Compile Include="BotController\Classes\LineOfSightManager.cs" />
-    <Compile Include="SAINComponent\Classes\Debug\SAINBotUnstuckClass.cs" />
     <Compile Include="SAINComponent\Classes\SAINCoverClass.cs" />
     <Compile Include="SAINComponent\Classes\Decision\EnemyDecisionClass.cs" />
     <Compile Include="SAINComponent\Classes\Decision\TargetDecisionClass.cs" />

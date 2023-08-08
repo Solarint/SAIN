@@ -6,9 +6,9 @@ using System.ComponentModel;
 namespace SAIN.Preset.GlobalSettings
 {
 
-    public class AmmoShootabilityClass : Logging
+    public class AmmoShootabilityClass
     {
-        public AmmoShootabilityClass() : base(nameof(AmmoShootabilityClass))
+        public AmmoShootabilityClass()
         {
         }
 
