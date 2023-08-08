@@ -137,14 +137,6 @@ namespace SAIN
         Custom5,
     }
 
-    public enum BotAggression
-    {
-        Low,
-        Normal,
-        High,
-        VeryHigh
-    }
-
     public enum GrenadeThrowDirection
     {
         None,
@@ -192,13 +184,6 @@ namespace SAIN
         Heal,
     }
 
-    public enum SoundDistanceType
-    {
-        CloseGun,
-        CloseStep,
-        FarGun,
-        FarStep,
-    }
     public enum EnemyPathDistance
     {
         VeryClose,

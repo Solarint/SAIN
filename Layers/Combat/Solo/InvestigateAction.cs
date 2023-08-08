@@ -6,6 +6,7 @@ using SAIN.SAINComponent.SubComponents;
 using SAIN.SAINComponent;
 using UnityEngine;
 using UnityEngine.AI;
+using SAIN.Helpers;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -38,17 +39,17 @@ namespace SAIN.Layers.Combat.Solo
             if (RecalcPathtimer < Time.time)
             {
                 RecalcPathtimer = Time.time + 4f;
-                SAIN.Mover.GoToPoint(SearchPoint.Position);
+                SAIN.Mover.GoToPoint(SearchPoint.Point.Position);
             }
-            if ((BotOwner.Position - SearchPoint.Position).sqrMagnitude < 10f)
+            if ((BotOwner.Position - SearchPoint.Point.Position).sqrMagnitude < 10f)
             {
                 Vector3 headPos = SAIN.Transform.Head;
-                Vector3 searchPoint = SearchPoint.Position;
+                Vector3 searchPoint = SearchPoint.Point.Position;
                 Vector3 direction = searchPoint - headPos;
                 if (!Physics.SphereCast(headPos, 0.1f, direction, out var hit, LayerMaskClass.HighPolyWithTerrainMaskAI))
                 {
-                    SearchPoint.IsCome = true;
-                    SearchPoint = null;
+                    SearchPoint.Point.IsCome = true;
+                    SearchPoint.Point = null;
                     return;
                 }
             }
@@ -56,11 +57,11 @@ namespace SAIN.Layers.Combat.Solo
 
         private float RecalcPathtimer = 0f;
 
-        private GClass273 SearchPoint;
+        private readonly SearchPoint SearchPoint = new SearchPoint();
 
         public override void Start()
         {
-            SearchPoint = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 200f, 60f);
+            SearchPoint.Point = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 200f, 60f);
         }
 
         public override void Stop()

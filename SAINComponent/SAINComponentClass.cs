@@ -107,7 +107,6 @@ namespace SAIN.SAINComponent
             return true;
         }
 
-
         private void Update()
         {
             if (IsDead || Singleton<GameWorld>.Instance == null)

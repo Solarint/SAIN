@@ -28,6 +28,7 @@ namespace SAIN.SAINComponent.Classes
         public void Dispose()
         {
         }
+
         public Collider BotZoneCollider => BotZone?.Collider;
         public AIPlaceInfo BotZone => BotOwner.AIData.PlaceInfo;
 

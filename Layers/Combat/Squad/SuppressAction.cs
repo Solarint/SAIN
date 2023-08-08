@@ -29,8 +29,9 @@ namespace SAIN.Layers.Combat.Squad
 
                     SAIN.Steering.LookToPoint(pos.Value);
 
-                    if (BotOwner.WeaponManager.HaveBullets)
+                    if (WaitShootTimer < Time.time && BotOwner.WeaponManager.HaveBullets)
                     {
+                        WaitShootTimer = Time.time + 0.5f * Random.Range(0.66f, 1.33f);
                         SAIN.Shoot();
                     }
                 }
@@ -42,30 +43,12 @@ namespace SAIN.Layers.Combat.Squad
             }
         }
 
+        private float WaitShootTimer;
+
         private bool CanSeeLastCorner(out Vector3? pos)
         {
-            pos = null;
-            var pathCorners = SAIN.Enemy.NavMeshPath.corners;
-            if (pathCorners.Length > 2)
-            {
-                var corner = pathCorners[pathCorners.Length - 2];
-
-                if ((corner - BotOwner.Position).magnitude > 5f)
-                {
-                    return false;
-                }
-
-                corner.y += 1f;
-                Vector3 headPos = SAIN.Transform.Head;
-                var direction = corner - headPos;
-
-                if (!Physics.Raycast(headPos, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                {
-                    pos = corner + Random.onUnitSphere * 0.15f;
-                    return true;
-                }
-            }
-            return false;
+            pos = SAIN.Enemy?.Path.LastCornerToEnemy;
+            return SAIN.Enemy?.Path.CanSeeLastCornerToEnemy == true;
         }
 
         public override void Start()

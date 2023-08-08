@@ -8,8 +8,6 @@ namespace SAIN.SAINComponent.Classes
 {
     public class ShootClass : BaseNodeClass
     {
-        private static ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(ShootClass));
-
         public ShootClass(BotOwner owner) 
             : base(owner)
         {
@@ -125,18 +123,5 @@ namespace SAIN.SAINComponent.Classes
         }
 
         private int int_0;
-    }
-
-    public class SAINBaseNodeClass : BaseNodeClass
-    {
-        public SAINBaseNodeClass(BotOwner bot)
-            : base(bot)
-        {
-        }
-
-        public override void Update()
-        {
-
-        }
     }
 }

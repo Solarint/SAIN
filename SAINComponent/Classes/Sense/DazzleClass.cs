@@ -125,7 +125,7 @@ namespace SAIN.SAINComponent.Classes.Sense
             float ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness;
             float PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness;
 
-            BotStatModifiers Modifiers = new BotStatModifiers
+            TemporaryStatModifiers Modifiers = new TemporaryStatModifiers
                 (
                     PrecicingSpeedCoef,
                     AccuratySpeedCoef,

@@ -4,6 +4,7 @@ using SAIN.Attributes;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using static SAIN.Helpers.EnumValues;
 
@@ -60,6 +61,7 @@ namespace SAIN.Preset.GlobalSettings.Categories
                 "FollowerGluharScout"
             };
 
+        public Dictionary<Brain, BigBrainConfigClass> BrainSettings = new Dictionary<Brain, BigBrainConfigClass>();
         /*
         GClass219 BotBaseBrainClass     return "ArenaFighter";
         GClass220 BotBaseBrainClass     return "BossBully";
@@ -99,14 +101,17 @@ namespace SAIN.Preset.GlobalSettings.Categories
         public string BrainName;
 
         [AdvancedOptions(true)]
+        [DefaultValue(24)]
         [MinMaxRound(0, 100)]
         public int SquadLayerPriority = 24;
 
         [AdvancedOptions(true)]
+        [DefaultValue(22)]
         [MinMaxRound(0, 100)]
         public int ExtractLayerPriority = 22;
 
         [AdvancedOptions(true)]
+        [DefaultValue(20)]
         [MinMaxRound(0, 100)]
         public int CombatSoloLayerPriority = 20;
 

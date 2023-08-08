@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 namespace SAIN.Helpers
 {
@@ -103,6 +104,59 @@ namespace SAIN.Helpers
                 }
             }
             return flag;
+        }
+
+        public static Vector3 Rotate(Vector3 direction, float degX, float degY, float degZ)
+        {
+            return Quaternion.Euler(degX, degY, degZ) * direction;
+        }
+
+        public static Vector3 Offset(Vector3 targetDirection, Vector3 offsetDirection, float magnitude)
+        {
+            return targetDirection + offsetDirection.normalized * magnitude;
+        }
+
+        public static List<Vector3> NavMeshPointsFromSampledPoint(Vector3 point, Vector3 start, List<Vector3> list, int count = 5, float magnitude = 4f, float sampleDistance = 0.25f, int maxIterations = 15)
+        {
+            if (list == null)
+            {
+                return null;
+            }
+            list.Clear();
+            for (int i = 0; i < maxIterations; i++)
+            {
+                Vector3 randomDirection = RandomVector3(1, 0, 1).normalized * magnitude;
+                if (NavMesh.SamplePosition(randomDirection + point, out var hit, sampleDistance, -1))
+                {
+                    NavMeshPath Path = new NavMeshPath();
+                    if (NavMesh.CalculatePath(point, hit.position, -1, Path))
+                    {
+                        if (Path.status == NavMeshPathStatus.PathPartial)
+                        {
+                            list.Add(Path.corners[Path.corners.Length - 1]);
+                        }
+                        else
+                        {
+                            list.Add(hit.position);
+                        }
+                    }
+                }
+                if (list.Count >= count)
+                {
+                    break;
+                }
+            }
+            return list;
+        }
+
+        public static Vector3 RandomVector3(float x, float y, float z)
+        {
+            return new Vector3(RandomRange(x), RandomRange(y), RandomRange(z));
+        }
+
+        public static float RandomRange(float magnitude)
+        {
+            return Random.Range(-magnitude, magnitude);
         }
 
         public static Vector3 RotateAroundPivot(this Vector3 Point, Vector3 Pivot, Quaternion Angle)

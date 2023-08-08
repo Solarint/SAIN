@@ -192,13 +192,6 @@ namespace SAIN.SAINComponent.Classes
             CanShoot = value;
         }
 
-        public void LoseSight()
-        {
-            CanShoot = false;
-            InLineOfSight = false;
-            IsVisible = false;
-        }
-
         public bool InLineOfSight { get; private set; }
         public bool IsVisible { get; private set; }
         public bool CanShoot { get; private set; }

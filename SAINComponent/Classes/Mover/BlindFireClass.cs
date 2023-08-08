@@ -25,54 +25,53 @@ namespace SAIN.SAINComponent.Classes.Mover
                 ResetBlindFire();
                 return;
             }
-            if (BlindFireActive)
-            {
-                DebugGizmos.SingleObjects.Line(SAIN.Transform.WeaponRootPosition, BlindFireTargetPos, Color.magenta, 0.025f, true, 0.1f, true);
-            }
-            if (BlindFireTimer > Time.time)
-            {
-                return;
-            }
 
             if (CurrentBlindFireSetting == 0)
             {
                 WeaponPosOffset = BotOwner.WeaponRoot.position - SAIN.Transform.Position;
             }
 
+            Vector3 targetPos;
             if (enemy.IsVisible)
             {
-                BlindFireTargetPos = enemy.EnemyChestPosition;
+                targetPos = enemy.EnemyChestPosition;
             }
             else if (enemy.LastSeenPosition != null)
             {
-                BlindFireTargetPos = enemy.LastSeenPosition.Value + Vector3.up * 1f;
+                targetPos = enemy.LastSeenPosition.Value + Vector3.up * 1f;
             }
             else
             {
                 ResetBlindFire();
-                BlindFireTimer = Time.time + 0.33f;
+                BlindFireTimer = Time.time + 0.5f;
                 return;
             }
 
-            int blindfire = CheckOverHeadBlindFire(BlindFireTargetPos);
+            int blindfire = CheckOverHeadBlindFire(targetPos);
 
             if (blindfire == 0)
             {
-                blindfire = CheckSideBlindFire(BlindFireTargetPos);
+                blindfire = CheckSideBlindFire(targetPos);
             }
 
             if (blindfire == 0)
             {
                 ResetBlindFire();
-                BlindFireTimer = Time.time + 0.33f;
+                BlindFireTimer = Time.time + 0.5f;
             }
             else if (!SAIN.NoBushESP.NoBushESPActive && SAIN.FriendlyFireClass.ClearShot)
             {
-                SetBlindFire(blindfire);
-                SAIN.Steering.LookToPoint(BlindFireTargetPos + Random.insideUnitSphere * 1.5f);
-                SAIN.Shoot();
+                if (BlindFireTimer < Time.time)
+                {
+                    BlindFireTimer = Time.time + 1f;
+                    SetBlindFire(blindfire);
+                }
 
-                BlindFireTimer = Time.time + 1f;
+                Vector3 start = SAIN.Position;
+                Vector3 blindFireDirection = Vector.Rotate(targetPos - start, Vector.RandomRange(5), Vector.RandomRange(5), 0);
+                BlindFireTargetPos = blindFireDirection + start;
+                SAIN.Steering.LookToPoint(BlindFireTargetPos);
+                SAIN.Shoot();
             }
         }
 
@@ -91,7 +90,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private Vector3 WeaponPosOffset;
 
-        public Vector3 BlindFireTargetPos { get; private set; }
+        private Vector3 BlindFireTargetPos;
 
         public bool BlindFireActive => CurrentBlindFireSetting != 0;
 
