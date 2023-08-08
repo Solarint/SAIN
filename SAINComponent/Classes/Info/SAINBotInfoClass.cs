@@ -16,6 +16,7 @@ using Random = UnityEngine.Random;
 using System.Collections;
 using SAIN.Helpers;
 using SAIN.Preset.BotSettings.SAINSettings;
+using static SAIN.Preset.Personalities.PersonalitySettingsClass;
 
 namespace SAIN.SAINComponent.Classes.Info
 {
@@ -65,7 +66,7 @@ namespace SAIN.SAINComponent.Classes.Info
         private void CalculateSettings()
         {
             Personality = GetPersonality();
-            PersonalitySettings = SAINPlugin.LoadedPreset.PersonalityManager.Personalities[Personality];
+            PersonalitySettingsClass = SAINPlugin.LoadedPreset.PersonalityManager.Personalities[Personality];
 
             UpdateExtractTime();
             CalcTimeBeforeSearch();
@@ -200,50 +201,18 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public SAINPersonality GetPersonality()
         {
-            var persSettings = SAINPlugin.LoadedPreset.GlobalSettings.Personality;
-            if (persSettings.AllGigaChads || CanBePersonality(SAINPersonality.GigaChad))
+            if (!SAINPlugin.LoadedPreset.GlobalSettings.Personality.CheckForForceAllPers(out SAINPersonality result))
             {
-                return SAINPersonality.GigaChad;
+                foreach (PersonalitySettingsClass setting in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
+                {
+                    if (setting.CanBePersonality(WildSpawnType, PowerLevel, PlayerLevel))
+                    {
+                        result = Personality;
+                        break;
+                    }
+                }
             }
-            if (persSettings.AllChads || CanBePersonality(SAINPersonality.Chad))
-            {
-                return SAINPersonality.Chad;
-            }
-            if (persSettings.AllRats || CanBePersonality(SAINPersonality.Rat))
-            {
-                return SAINPersonality.Rat;
-            }
-
-            if (CanBePersonality(SAINPersonality.Custom1))
-            {
-                return SAINPersonality.Custom1;
-            }
-            if (CanBePersonality(SAINPersonality.Custom2))
-            {
-                return SAINPersonality.Custom2;
-            }
-            if (CanBePersonality(SAINPersonality.Custom3))
-            {
-                return SAINPersonality.Custom3;
-            }
-            if (CanBePersonality(SAINPersonality.Custom4))
-            {
-                return SAINPersonality.Custom4;
-            }
-            if (CanBePersonality(SAINPersonality.Custom5))
-            {
-                return SAINPersonality.Custom5;
-            }
-
-            if (CanBePersonality(SAINPersonality.Timmy))
-            {
-                return SAINPersonality.Timmy;
-            }
-            if (CanBePersonality(SAINPersonality.Coward))
-            {
-                return SAINPersonality.Coward;
-            }
-            return SAINPersonality.Normal;
+            return result;
         }
 
         private bool CanBePersonality(SAINPersonality personality)
@@ -262,7 +231,8 @@ namespace SAIN.SAINComponent.Classes.Info
         public BotDifficulty BotDifficulty => Profile.BotDifficulty;
 
         public SAINPersonality Personality { get; private set; }
-        public PersonalitySettingsClass PersonalitySettings { get; private set; }
+        public PersonalityVariablesClass PersonalitySettings => PersonalitySettingsClass.Variables;
+        public PersonalitySettingsClass PersonalitySettingsClass { get; private set; }
 
         public float PercentageBeforeExtract { get; set; } = -1f;
 

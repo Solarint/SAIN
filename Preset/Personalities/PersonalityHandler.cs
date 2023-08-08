@@ -6,22 +6,35 @@ namespace SAIN.Preset.Personalities
 {
     public class PersonalityManagerClass
     {
-        static PersonalityManagerClass()
+        private static Dictionary<WildSpawnType, BotType> AddAllBotTypes(Dictionary<WildSpawnType, BotType> botTypes)
         {
-            AllTypes = new List<WildSpawnType>();
-            foreach (BotType type in BotTypeDefinitions.BotTypesList)
-            {
-                AllTypes.Add(type.WildSpawnType);
-            }
-            PMCTypes = new List<WildSpawnType>
-            {
-                EnumValues.WildSpawn.Usec,
-                EnumValues.WildSpawn.Bear
-            };
+            botTypes.AddRange(BotTypeDefinitions.BotTypes);
+            return botTypes;
         }
 
-        public static List<WildSpawnType> AllTypes;
-        public static List<WildSpawnType> PMCTypes;
+        private static Dictionary<WildSpawnType, BotType> AddPMCTypes(Dictionary<WildSpawnType, BotType> botTypes)
+        {
+            AddWildSpawn(botTypes, EnumValues.WildSpawn.Usec, EnumValues.WildSpawn.Bear);
+            return botTypes;
+        }
+
+        private static Dictionary<WildSpawnType, BotType> AddWildSpawn(Dictionary<WildSpawnType, BotType> botTypes, params WildSpawnType[] types)
+        {
+            foreach (var type in types)
+            {
+                botTypes.Add(type, BotTypeDefinitions.BotTypes[type]);
+            }
+            return botTypes;
+        }
+
+        private static Dictionary<WildSpawnType, BotType> AddBotType(Dictionary<WildSpawnType, BotType> botTypes, params BotType[] types)
+        {
+            foreach (var type in types)
+            {
+                botTypes.Add(type.WildSpawnType, type);
+            }
+            return botTypes;
+        }
 
         public PersonalityManagerClass(SAINPresetDefinition preset)
         {
@@ -58,13 +71,17 @@ namespace SAIN.Preset.Personalities
                 string description = "Scum of Tarkov. Rarely Seeks out enemies, and will hide and ambush.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    RandomChanceIfMeetRequirements = 60,
-                    TrueRandomChance = 30,
-                    HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                    SearchBaseTime = SearchBaseTime(pers),
-                    PowerLevelMax = 50f,
-                    AllowedBotTypes = AllTypes
+                    Variables =
+                    {
+                        RandomChanceIfMeetRequirements = 60,
+                        TrueRandomChance = 30,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers),
+                        PowerLevelMax = 50f,
+                    }
                 };
+
+                AddAllBotTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
             }
 
@@ -73,15 +90,20 @@ namespace SAIN.Preset.Personalities
             {
                 string name = pers.ToString();
                 string description = "A New Player, terrified of everything.";
+
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    TrueRandomChance = 50,
-                    HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                    SearchBaseTime = SearchBaseTime(pers),
-                    PowerLevelMax = 40f,
-                    MaxLevel = 10,
-                    AllowedBotTypes = AllTypes
+                    Variables =
+                    {
+                        TrueRandomChance = 50,
+                        PowerLevelMax = 40f,
+                        MaxLevel = 10,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers),
+                    }
                 };
+
+                AddPMCTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
             }
 
@@ -92,11 +114,14 @@ namespace SAIN.Preset.Personalities
                 string description = "A player who is more passive and afraid than usual.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    TrueRandomChance = 30,
-                    HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                    SearchBaseTime = SearchBaseTime(pers),
-                    AllowedBotTypes = AllTypes
+                    Variables =
+                    {
+                        TrueRandomChance = 30,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers)
+                    }
                 };
+                AddAllBotTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
             }
 
@@ -107,11 +132,15 @@ namespace SAIN.Preset.Personalities
                 string description = "An Average Tarkov Enjoyer";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                    SearchBaseTime = SearchBaseTime(pers),
-                    CanRespondToVoice = true,
-                    AllowedBotTypes = AllTypes
+                    Variables =
+                    {
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers),
+                        CanRespondToVoice = true,
+                    }
                 };
+
+                AddAllBotTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
             }
 
@@ -122,24 +151,28 @@ namespace SAIN.Preset.Personalities
                 string description = "A true alpha threat. Hyper Aggressive and typically wearing high tier equipment.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    CanJumpCorners = true,
-                    RandomChanceIfMeetRequirements = 60,
-                    TrueRandomChance = 3,
-                    AllowedBotTypes = PMCTypes,
-                    CanTaunt = true,
-                    CanRespondToVoice = true,
-                    TauntFrequency = 8,
-                    TauntMaxDistance = 50f,
-                    HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                    HoldGroundMaxRandom = 2f,
-                    HoldGroundMinRandom = 0.25f,
-                    SearchBaseTime = SearchBaseTime(pers),
-                    PowerLevelMin = 115f,
-                    SprintWhileSearch = true,
-                    FrequentSprintWhileSearch = true,
-                    CanRushEnemyReloadHeal = true,
-                    ConstantTaunt = true,
+                    Variables =
+                    {
+                        CanJumpCorners = true,
+                        RandomChanceIfMeetRequirements = 60,
+                        TrueRandomChance = 3,
+                        CanTaunt = true,
+                        CanRespondToVoice = true,
+                        TauntFrequency = 8,
+                        TauntMaxDistance = 50f,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        HoldGroundMaxRandom = 2f,
+                        HoldGroundMinRandom = 0.25f,
+                        SearchBaseTime = SearchBaseTime(pers),
+                        PowerLevelMin = 115f,
+                        SprintWhileSearch = true,
+                        FrequentSprintWhileSearch = true,
+                        CanRushEnemyReloadHeal = true,
+                        ConstantTaunt = true,
+                    }
                 };
+
+                AddPMCTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
             }
 
@@ -150,23 +183,27 @@ namespace SAIN.Preset.Personalities
                 string description = "An aggressive player. Typically wearing high tier equipment, and is more aggressive than usual.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    CanJumpCorners = true,
-                    RandomChanceIfMeetRequirements = 60,
-                    TrueRandomChance = 3,
-                    AllowedBotTypes = PMCTypes,
-                    CanTaunt = true,
-                    CanRespondToVoice = true,
-                    TauntFrequency = 8,
-                    TauntMaxDistance = 50f,
-                    HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                    HoldGroundMaxRandom = 2f,
-                    HoldGroundMinRandom = 0.5f,
-                    SearchBaseTime = SearchBaseTime(pers),
-                    PowerLevelMin = 85f,
-                    SprintWhileSearch = true,
-                    CanRushEnemyReloadHeal = true,
-                    FrequentTaunt = true,
+                    Variables =
+                    {
+                        CanJumpCorners = true,
+                        RandomChanceIfMeetRequirements = 60,
+                        TrueRandomChance = 3,
+                        CanTaunt = true,
+                        CanRespondToVoice = true,
+                        TauntFrequency = 8,
+                        TauntMaxDistance = 50f,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        HoldGroundMaxRandom = 2f,
+                        HoldGroundMinRandom = 0.5f,
+                        SearchBaseTime = SearchBaseTime(pers),
+                        PowerLevelMin = 85f,
+                        SprintWhileSearch = true,
+                        CanRushEnemyReloadHeal = true,
+                        FrequentTaunt = true,
+                    }
                 };
+
+                AddPMCTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
             }
         }

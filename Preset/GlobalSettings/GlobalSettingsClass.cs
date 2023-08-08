@@ -30,6 +30,8 @@ namespace SAIN.Preset.GlobalSettings
 
         public AimSettings Aiming = new AimSettings();
 
+        public BigBrainSettings BigBrain = new BigBrainSettings();
+
         public CoverSettings Cover = new CoverSettings();
 
         public ExtractSettings Extract = new ExtractSettings();

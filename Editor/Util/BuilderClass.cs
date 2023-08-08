@@ -1,7 +1,14 @@
-﻿using SAIN.Editor.Abstract;
+﻿using EFT;
+using EFT.UI;
+using SAIN.Editor.Abstract;
 using SAIN.Editor.Util;
+using SAIN.Preset;
+using SAIN.Preset.GlobalSettings;
+using SAIN.Preset.GlobalSettings.Categories;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SAIN.Editor
 {
@@ -9,7 +16,10 @@ namespace SAIN.Editor
     {
         public BuilderClass(SAINEditor editor) : base(editor)
         {
+            ModifyLists = new ModifyLists(editor);
         }
+
+        public ModifyLists ModifyLists { get; private set; }
 
         private static float ExpandMenuWidth => 150f;
 
@@ -27,15 +37,69 @@ namespace SAIN.Editor
             Box(value.ToString(), "Maximum", options);
         }
 
-        public void ResultBox(object value, params GUILayoutOption[] options)
+        public object ResultBox(object value, params GUILayoutOption[] options)
         {
-            if (value == null) return;
-            Box(value.ToString(), "The Value this option is set to", options);
+            if (value != null)
+            {
+                Box(value.ToString(), "The Value this option is set to. Click to edit directly", options);
+                string dirtyString = TextField(value.ToString(), null, options);
+                object newvalue = CleanString(dirtyString, value);
+                if (newvalue != value)
+                {
+                    value = newvalue;
+                    Sounds.PlaySound(EUISoundType.MenuDropdownSelect);
+                }
+            }
+            return value;
+        }
+
+        public static object CleanString(string input, object currentValue)
+        {
+            if (currentValue is float floatValue)
+            {
+                currentValue = CleanString(input, floatValue);
+            }
+            if (currentValue is int intValue)
+            {
+                currentValue = CleanString(input, intValue);
+            }
+            if (currentValue is bool boolValue)
+            {
+                currentValue = CleanString(input, boolValue);
+            }
+            return currentValue;
+        }
+
+        public static float CleanString(string input, float currentValue)
+        {
+            if (Regex.Match(input, @"^-?[0-9]*(?:\.[0-9]*)?$").Success)
+            {
+                currentValue = float.Parse(input);
+            }
+            return currentValue;
+        }
+
+        public static int CleanString(string input, int currentValue)
+        {
+            if (Regex.Match(input, "([-+]?[0-9]+)").Success)
+            {
+                currentValue = int.Parse(input);
+            }
+            return currentValue;
+        }
+
+        public static bool CleanString(string input, bool currentValue)
+        {
+            if (input == true.ToString() || input == false.ToString())
+            {
+                currentValue = bool.Parse(input);
+            }
+            return currentValue;
         }
 
         public object Reset(object value, object defaultValue, params GUILayoutOption[] options)
         {
-            if (Button("Reset", "Reset To Default Value", options))
+            if (Button("Reset", "Reset To Default Value", null, options))
             {
                 value = defaultValue;
             }
@@ -57,10 +121,12 @@ namespace SAIN.Editor
                 bool toggleActivated = GUI.Button(optionRects[i], option, style);
                 if (toggleActivated && selected)
                 {
+                    Sounds.PlaySound(EUISoundType.ButtonClick);
                     selectedOption = "None";
                 }
                 if (toggleActivated && !selected)
                 {
+                    Sounds.PlaySound(EUISoundType.ButtonClick);
                     selectedOption = option;
                 }
             }
@@ -104,10 +170,12 @@ namespace SAIN.Editor
                 bool toggleActivated = GUI.Button(optionRects[i], option, style);
                 if (toggleActivated && selected)
                 {
+                    Sounds.PlaySound(EUISoundType.ButtonClick);
                     selectedOption = "None";
                 }
                 if (toggleActivated && !selected)
                 {
+                    Sounds.PlaySound(EUISoundType.ButtonClick);
                     selectedOption = option;
                 }
             }
@@ -132,6 +200,7 @@ namespace SAIN.Editor
                 {
                     if (selectedList.Contains(option))
                     {
+                        Sounds.PlaySound(EUISoundType.ButtonClick);
                         selectedList.Remove(option);
                     }
                 }
@@ -139,6 +208,7 @@ namespace SAIN.Editor
                 {
                     if (!selectedList.Contains(option))
                     {
+                        Sounds.PlaySound(EUISoundType.ButtonClick);
                         selectedList.Add(option);
                     }
                 }
@@ -220,31 +290,38 @@ namespace SAIN.Editor
             return current;
         }
 
-        public bool ExpandableMenu(string name, bool value, string description = null, float height = 25f, float infoWidth = 30f)
+        public bool ExpandableMenu(string name, bool value, string description = null, float height = 25f, float infoWidth = 30f, bool beginHoriz = true)
         {
-            BeginHorizontal();
+            if (beginHoriz)
+                BeginHorizontal();
 
             ButtonsClass.InfoBox(description, height, infoWidth);
 
             Label(name, Height(height), Width(ExpandMenuWidth));
+            string text = value ? "Collapse" : "Expand";
 
-            value = Toggle(value, value ? "[Close]" : "[Open]", Height(height));
+            bool newvalue = Toggle(value, text, null, Height(height));
+            if (newvalue != value)
+            {
+                Sounds.PlaySound(EFT.UI.EUISoundType.MenuDropdown);
+            }
 
-            EndHorizontal();
+            if (beginHoriz)
+                EndHorizontal();
 
-            return value;
+            return newvalue;
         }
 
         public int CreateSlider(int value, int min, int max, params GUILayoutOption[] options)
         {
-            value = Mathf.RoundToInt(HorizontalSlider(value, min, max, options));
+            value = Mathf.RoundToInt(HorizontalSlider(value, min, max, null, options));
             Backgrounds(value, min, max);
             return value;
         }
 
         public float CreateSlider(float value, float min, float max, params GUILayoutOption[] options)
         {
-            value = HorizontalSlider(value, min, max, options);
+            value = HorizontalSlider(value, min, max, null, options);
             Backgrounds(value, min, max);
             return value;
         }

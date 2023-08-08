@@ -3,11 +3,7 @@ using EFT;
 using SAIN.Layers;
 using SAIN.Layers.Combat.Solo;
 using SAIN.Layers.Combat.Squad;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAIN
 {
@@ -31,85 +27,21 @@ namespace SAIN
 
         public static void Init()
         {
-            string PMCRaider = "PMC";
-            string Cultist = "SectantWarrior";
-            string GoonsKnight = "Knight";
-            string Rogue = "ExUsec";
-            var Scavs = new List<string> 
-            { 
-                "Assault", 
-                "CursAssault" 
-            };
-            var GoonsFollowers = new List<string> 
-            { 
-                "BigPipe", 
-                "BirdEye" 
-            };
-            var TagillaKilla = new List<string> 
-            { 
-                "Tagilla", 
-                "Killa" 
-            };
-            var NormalBosses = new List<string> 
-            { 
-                "BossBully",
-                "BossSanitar", 
-                "Tagilla", 
-                "BossGluhar", 
-                "BossKojaniy", 
-                "SectantPriest" 
-            };
-            var NormalFollowers = new List<string> 
-            { 
-                "FollowerBully", 
-                "FollowerSanitar", 
-                "TagillaFollower", 
-                "FollowerGluharAssault", 
-                "FollowerGluharProtect", 
-                "FollowerGluharScout" 
-            };
+            var bigBrainSetting = SAINPlugin.LoadedPreset.GlobalSettings.BigBrain;
 
-            var AllBots = new List<string>();
-            var AllBosses = new List<string>();
-            var AllFollowers = new List<string>();
-            var AllNormalBots = new List<string>();
+            var bots = bigBrainSetting.BotsWhoGetSAINLayers;
+            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), bots, bigBrainSetting.SquadLayerPriority);
+            BrainManager.AddCustomLayer(typeof(ExtractLayer), bots, bigBrainSetting.ExtractLayerPriority);
+            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), bots, bigBrainSetting.CombatSoloLayerPriority);
 
-            AllNormalBots.AddRange(Scavs);
-            AllNormalBots.Add(PMCRaider);
-            AllNormalBots.Add(Rogue);
-            AllNormalBots.Add(Cultist);
-
-            AllBosses.Add(GoonsKnight);
-            AllBosses.AddRange(NormalBosses);
-            AllBosses.AddRange(TagillaKilla);
-
-            AllFollowers.AddRange(NormalFollowers);
-            AllFollowers.AddRange(GoonsFollowers);
-
-            AllBots.AddRange(AllNormalBots);
-            AllBots.AddRange(AllFollowers);
-
-            BrainManager.AddCustomLayer(typeof(CombatSquadLayer), AllBots, 24);
-            SAINLayers.Add(CombatSquadLayer.Name);
-
-            BrainManager.AddCustomLayer(typeof(ExtractLayer), AllBots, 22);
-            SAINLayers.Add(ExtractLayer.Name);
-
-            BrainManager.AddCustomLayer(typeof(CombatSoloLayer), AllBots, 20);
-            SAINLayers.Add(CombatSoloLayer.Name);
-
-            var LayersToRemove = new List<string> 
-            { 
-                "Help", 
-                "AdvAssaultTarget", 
-                "Hit", 
-                "Pmc", 
-                "AssaultHaveEnemy", 
-                "Request" 
-            };
-            BrainManager.RemoveLayers(LayersToRemove, AllBots);
+            BrainManager.RemoveLayers(bigBrainSetting.LayersToRemove, bots);
         }
 
-        public static List<string> SAINLayers { get; private set; } = new List<string>();
+        public static readonly List<string> SAINLayers = new List<string>
+        {
+            CombatSquadLayer.Name,
+            ExtractLayer.Name,
+            CombatSoloLayer.Name,
+        };
     }
 }

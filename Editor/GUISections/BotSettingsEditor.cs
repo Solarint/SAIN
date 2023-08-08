@@ -13,7 +13,7 @@ namespace SAIN.Editor.GUISections
         {
         }
 
-        public object SettingsMenu(object settings, FieldsCache fieldCache)
+        public void SettingsMenu(object settings, FieldsCache fieldCache = null)
         {
             BeginVertical();
 
@@ -23,11 +23,14 @@ namespace SAIN.Editor.GUISections
                 Categories.Add(type, GetCategories(settings));
             }
 
-            Categories[type] = CategoryOpenable(Categories[type], fieldCache, settings, out object modifiedObject);
+            if (fieldCache == null)
+            {
+                fieldCache = new FieldsCache(type);
+            }
+
+            CategoryOpenable(Categories[type], fieldCache, settings);
 
             EndVertical();
-
-            return modifiedObject;
         }
 
         private static List<Category> GetCategories(object settingsObject)
@@ -49,14 +52,16 @@ namespace SAIN.Editor.GUISections
         public sealed class Category
         {
             public FieldInfo Field;
-            public object Value(object settingsObject) => Field.GetValue(settingsObject);
-            public void SetValue(object categoryObject, object settingsObject) => Field.SetValue(settingsObject, categoryObject);
             public bool Open = false;
+            public int OptionsCount = 0;
+
+            public object Value(object settingsObject) => Field.GetValue(settingsObject);
+
+            public void SetValue(object categoryObject, object settingsObject) => Field.SetValue(settingsObject, categoryObject);
+
         }
 
-        private Dictionary<Type, bool[]> CategoriesOpenableValues = new Dictionary<Type, bool[]>();
-
-        private List<Category> CategoryOpenable(List<Category> categories, FieldsCache fieldCache, object settingsObject, out object modifiedSettingsObject)
+        private void CategoryOpenable(List<Category> categories, FieldsCache fieldCache, object settingsObject)
         {
             foreach (var categoryClass in categories)
             {
@@ -70,21 +75,22 @@ namespace SAIN.Editor.GUISections
                 FieldInfo[] variableFields = fieldCache.GetFields(categoryObject.GetType());
                 if (variableFields.Length > 0)
                 {
-                    categoryClass.Open = Builder.ExpandableMenu(name, categoryClass.Open, description, EntryConfig.EntryHeight, EntryConfig.InfoWidth);
-                    if (categoryClass.Open)
-                    {
-                        foreach (FieldInfo field in variableFields)
-                        {
-                            object value = field.GetValue(categoryObject);
-                            value = AttributesGUI.EditValue(value, field, EntryConfig);
-                            field.SetValue(categoryObject, value);
-                        }
-                        categoryClass.SetValue(categoryObject, settingsObject);
-                    }
+                    BeginHorizontal();
+
+                    categoryClass.Open = Builder.ExpandableMenu(name, categoryClass.Open, description, EntryConfig.EntryHeight, EntryConfig.InfoWidth, false);
+                    string labelText = $"Options Count: [{categoryClass.OptionsCount}]";
+                    string advanced = Editor.AdvancedOptionsEnabled ?
+                        " Advanced Options are on, so the reason for this section being empty is that the values are hidden because they SHOULD NOT be changed under any circumstance."
+                        : " Advanced Options in the Advanced Tab may show more options.";
+                    string toolTip = $"The Number of Options available in this section. {advanced}";
+                    Label(labelText, toolTip, Height(EntryConfig.EntryHeight), Width(150));
+
+                    EndHorizontal();
+
+                    AttributesGUI.EditAllValuesInObj(categoryObject, out int count, categoryClass.Open);
+                    categoryClass.OptionsCount = count;
                 }
             }
-            modifiedSettingsObject = settingsObject;
-            return categories;
         }
 
         private readonly GUIEntryConfig EntryConfig = new GUIEntryConfig();

@@ -32,7 +32,7 @@ namespace SAIN.Editor
                         SetUnlockCursor(_previousCursorLockState, _previousCursorVisible);
                     }
 
-                    SAINPlugin.SAINEditor.BotSelectionClass.OpenAdjustmentWindow = false;
+                    SAINPlugin.Editor.BotSelectionClass.OpenAdjustmentWindow = false;
                 }
             }
         }

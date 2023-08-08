@@ -9,6 +9,8 @@ namespace SAIN.Attributes
     {
         public AttributesClass(FieldInfo field)
         {
+            Field = field;
+
             var nameDescription = field.GetCustomAttribute<NameAndDescriptionAttribute>();
             Name = nameDescription?.Name ?? field.Name;
             Description = nameDescription?.Description;
@@ -25,9 +27,10 @@ namespace SAIN.Attributes
             IsAdvanced = custom?.IsAdvanced == true;
             GetDefaultFromEFT = custom?.CopyValueFromEFT == true;
 
-            IsList = field.GetCustomAttribute<ListAttribute>()?.Value == true;
+            IsListObject = field.GetCustomAttribute<ListAttribute>()?.Value == true;
         }
 
+        public readonly FieldInfo Field;
         public readonly string Name;
         public readonly string Description;
         public readonly object Default;
@@ -37,7 +40,7 @@ namespace SAIN.Attributes
         public readonly bool IsHidden = false;
         public readonly bool IsAdvanced = false;
         public readonly bool GetDefaultFromEFT = false;
-        public readonly bool IsList = false;
+        public readonly bool IsListObject = false;
     }
 
     [AttributeUsage(AttributeTargets.Field)]

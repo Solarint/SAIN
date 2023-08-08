@@ -221,11 +221,15 @@
   <ItemGroup>
     <Compile Include="Attributes\AttributesGUI.cs" />
     <Compile Include="Attributes\GUIEntryConfig.cs" />
+    <Compile Include="Editor\EditTabsClass.cs" />
+    <Compile Include="Editor\GUITabs.cs" />
+    <Compile Include="Editor\Util\ModifyLists.cs" />
     <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AmmoShootabilityClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AudibleRangesClass.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrainSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\WeaponShootabilityClass.cs" />
     <Compile Include="Preset\GlobalSettings\GetValuesFromClass.cs" />
     <Compile Include="Preset\SAINPresetDefinition.cs" />

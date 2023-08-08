@@ -1,11 +1,7 @@
-using BepInEx.Logging;
-using Comfort.Common;
 using EFT;
-using SAIN.Preset;
-using SAIN.Components;
 using SAIN.Preset.BotSettings.SAINSettings;
-using SAIN.Preset.Personalities;
 using UnityEngine;
+using static SAIN.Preset.Personalities.PersonalitySettingsClass;
 
 namespace SAIN.SAINComponent.Classes.Talk
 {
@@ -77,8 +73,8 @@ namespace SAIN.SAINComponent.Classes.Talk
         private float TauntDist = 0f;
         private float TauntFreq = 0f;
 
-        PersonalitySettingsClass PersonalitySettings => SAIN?.Info?.PersonalitySettings;
-        SAINSettingsClass FileSettings => SAIN?.Info?.FileSettings;
+        private PersonalityVariablesClass PersonalitySettings => SAIN?.Info?.PersonalitySettings;
+        private SAINSettingsClass FileSettings => SAIN?.Info?.FileSettings;
 
         private bool FakeDeath()
         {
@@ -141,7 +137,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         }
 
         private float BegTimer = 0f;
-        readonly EPhraseTrigger[] BegPhrases = { EPhraseTrigger.Stop, EPhraseTrigger.OnBeingHurtDissapoinment, EPhraseTrigger.NeedHelp, EPhraseTrigger.HoldFire };
+        private readonly EPhraseTrigger[] BegPhrases = { EPhraseTrigger.Stop, EPhraseTrigger.OnBeingHurtDissapoinment, EPhraseTrigger.NeedHelp, EPhraseTrigger.HoldFire };
 
         private bool TauntEnemy()
         {
