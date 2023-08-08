@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using Aki.Reflection.Utils;
+using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using DrakiaXYZ.VersionChecker;
@@ -8,7 +9,10 @@ using SAIN.Helpers;
 using SAIN.Layers;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.Preset.GlobalSettings.Categories;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.AssemblyInfo;
@@ -54,12 +58,14 @@ namespace SAIN
     [BepInProcess(EscapeFromTarkov)]
     public class SAINPlugin : BaseUnityPlugin
     {
-        public static bool DebugModeEnabled = true;
+        public static bool DebugModeEnabled = false;
 
         private void Awake()
         {
             if (!VersionChecker.CheckEftVersion(Logger, Info, Config))
                 throw new Exception("Invalid EFT Version");
+
+            new DefaultBrainsClass();
 
             PresetHandler.Init();
             BindConfigs();
@@ -123,7 +129,7 @@ namespace SAIN
         }
 
 
-        public static readonly SAINEditor SAINEditor = new SAINEditor();
+        public static readonly SAINEditor Editor = new SAINEditor();
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 
@@ -134,15 +140,17 @@ namespace SAIN
         {
             DebugOverlay.Update();
             ModDetection.Update();
-            SAINEditor.Update();
+            Editor.Update();
             BotControllerHandler.Update();
+
+            LoadedPreset.GlobalSettings.Personality.Update();
         }
 
-        private void Start() => SAINEditor.Init();
+        private void Start() => Editor.Init();
 
-        private void LateUpdate() => SAINEditor.LateUpdate();
+        private void LateUpdate() => Editor.LateUpdate();
 
-        private void OnGUI() => SAINEditor.OnGUI();
+        private void OnGUI() => Editor.OnGUI();
     }
 
     public static class ModDetection
@@ -196,7 +204,7 @@ namespace SAIN
             Builder.Box(value ? "Detected" : "Not Detected");
         }
 
-        private static BuilderClass Builder => SAINPlugin.SAINEditor.Builder;
+        private static BuilderClass Builder => SAINPlugin.Editor.Builder;
         private static readonly float ModsCheckTimer = -1f;
         private static bool ModsChecked = false;
     }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using BepInEx.Logging;
+using EFT.UI;
+using UnityEngine;
 
 namespace SAIN.Editor.Abstract
 {
@@ -8,6 +10,8 @@ namespace SAIN.Editor.Abstract
         {
             Editor = editor;
         }
+
+        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(LayoutAbstract));
 
         public SAINEditor Editor { get; private set; }
 
@@ -71,83 +75,124 @@ namespace SAIN.Editor.Abstract
             Label(content, GetStyle(Style.label), options);
         }
 
-        public string TextField(string text, params GUILayoutOption[] options)
+        public string TextField(string value, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return GUILayout.TextField(text, GetStyle(Style.textField), options);
+            string newvalue = GUILayout.TextField(value, GetStyle(Style.textField), options);
+            bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
+            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            {
+                Logger.LogDebug($"Toggle {sound.Value}");
+            }
+            return newvalue;
         }
 
-        public string TextArea(string text, params GUILayoutOption[] options)
+        public string TextArea(string value, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return GUILayout.TextArea(text, GetStyle(Style.textArea), options);
+            string newvalue = GUILayout.TextArea(value, GetStyle(Style.textField), options);
+            bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
+            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            {
+                Logger.LogDebug($"Toggle {sound.Value}");
+            }
+            return newvalue;
         }
 
-        public bool Button(string text, params GUILayoutOption[] options)
+        public bool Button(string text, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return Button(new GUIContent(text), options);
+            return Button(new GUIContent(text), sound, options);
         }
 
-        public bool Button(string text, string tooltip, params GUILayoutOption[] options)
+        public bool Button(string text, string tooltip, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return Button(new GUIContent(text, tooltip), options);
+            return Button(new GUIContent(text, tooltip), sound, options);
         }
 
-        public bool Button(GUIContent content, params GUILayoutOption[] options)
+        public bool Button(GUIContent content, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return GUILayout.Button(content, GetStyle(Style.button), options);
+            bool newvalue = GUILayout.Button(content, GetStyle(Style.button), options);
+            bool soundPlayed = CompareValuePlaySound(true, newvalue, sound);
+            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            {
+                Logger.LogDebug($"Toggle {sound.Value}");
+            }
+            return newvalue;
         }
 
-        public bool Toggle(bool value, string text, params GUILayoutOption[] options)
+        public bool Toggle(bool value, string text, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return Toggle(value, new GUIContent(text), options);
+            return Toggle(value, new GUIContent(text), sound, options);
         }
 
-        public bool Toggle(bool value, string text, string tooltip, params GUILayoutOption[] options)
+        public bool Toggle(bool value, string text, string tooltip, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return Toggle(value, new GUIContent(text, tooltip), options);
+            return Toggle(value, new GUIContent(text, tooltip), sound, options);
         }
 
-        public bool Toggle(bool value, GUIContent content, params GUILayoutOption[] options)
+        public bool Toggle(bool value, GUIContent content, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return Toggle(value, content, GetStyle(Style.toggle), options);
+            return Toggle(value, content, GetStyle(Style.toggle), sound, options);
         }
 
-        public bool Toggle(bool value, GUIContent content, GUIStyle style, params GUILayoutOption[] options)
+        public bool Toggle(bool value, GUIContent content, GUIStyle style, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            return GUILayout.Toggle(value, content, style, options);
+            bool newvalue = GUILayout.Toggle(value, content, style, options);
+            bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
+            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            {
+                Logger.LogDebug($"Toggle {sound.Value}");
+            }
+            return newvalue;
         }
 
-        public float HorizontalSlider(float value, float min, float max)
+        private bool CompareValuePlaySound(object oldValue, object newValue, EUISoundType? sound = null)
         {
-            return HorizontalSlider(value, min, max, StandardHeight);
+            if (oldValue.ToString() != newValue.ToString() && sound != null)
+            {
+                Sounds.PlaySound(sound.Value);
+                return true;
+            }
+            return false;
         }
 
-        public float HorizontalSlider(float value, float min, float max, float width)
+        public float HorizontalSlider(float value, float min, float max, EUISoundType? sound = null)
         {
-            return HorizontalSlider(value, min, max, StandardHeight, Width(width));
+            return HorizontalSlider(value, min, max, sound, StandardHeight);
         }
 
-        public float HorizontalSlider(float value, float min, float max, float width, float height)
+        public float HorizontalSlider(float value, float min, float max, float width, EUISoundType? sound = null)
         {
-            return HorizontalSlider(value, min, max, Height(height), Width(width));
+            return HorizontalSlider(value, min, max, sound, StandardHeight, Width(width));
         }
 
-        public float HorizontalSlider(float value, float min, float max, params GUILayoutOption[] options)
+        public float HorizontalSlider(float value, float min, float max, float width, float height, EUISoundType? sound = null)
         {
-            return GUILayout.HorizontalSlider(value, min, max, GetStyle(Style.horizontalSlider), GetStyle(Style.horizontalSliderThumb), options);
+            return HorizontalSlider(value, min, max, sound, Height(height), Width(width));
         }
 
-        public float HorizontalSlider(Rect rect, float value, float min, float max)
+        public float HorizontalSlider(float value, float min, float max, EUISoundType? sound = null, params GUILayoutOption[] options)
+        {
+            float newvalue = GUILayout.HorizontalSlider(value, min, max, GetStyle(Style.horizontalSlider), GetStyle(Style.horizontalSliderThumb), options);
+            sound = sound ?? EUISoundType.MenuEscape;
+            bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
+            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            {
+                Logger.LogDebug($"Toggle {sound.Value}");
+            }
+            return newvalue;
+        }
+
+        public float HorizontalSlider(Rect rect, float value, float min, float max, EUISoundType? sound = null)
         {
             return GUI.HorizontalSlider(rect, value, min, max, GetStyle(Style.horizontalSlider), GetStyle(Style.horizontalSliderThumb));
         }
 
-        public float HorizontalSliderNoStyle(string label, float value, float min, float max, float LabelWidth = 150f, float ValueWidth = 100f)
+        public float HorizontalSliderNoStyle(string label, float value, float min, float max, float LabelWidth = 150f, float ValueWidth = 100f, EUISoundType? sound = null)
         {
             GUILayout.BeginHorizontal();
 
             Label(label, Width(LabelWidth), StandardHeight);
 
-            value = HorizontalSlider(value, min, max, StandardHeight);
+            value = HorizontalSlider(value, min, max, sound, StandardHeight);
 
             Box(value.ToString(), Width(ValueWidth), StandardHeight);
 

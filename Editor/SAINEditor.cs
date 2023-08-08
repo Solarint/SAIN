@@ -3,14 +3,17 @@ using Comfort.Common;
 using EFT;
 using EFT.Console.Core;
 using EFT.UI;
+using SAIN.Attributes;
 using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
+using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset;
 using SAIN.Preset.BotSettings.SAINSettings;
 using SAIN.Preset.BotSettings.SAINSettings.Categories;
 using SAIN.Preset.GlobalSettings;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static SAIN.Editor.RectLayout;
@@ -38,7 +41,7 @@ namespace SAIN.Editor
             Buttons = new ButtonsClass(this);
             MouseFunctions = new MouseFunctions(this);
             WindowLayoutCreator = new WindowLayoutCreator(this);
-            BotSettingsEditor = new BotSettingsEditor(this);
+            SettingsEditor = new BotSettingsEditor(this);
             BotPersonalityEditor = new BotPersonalityEditor(this);
             PresetSelection = new PresetSelection(this);
         }
@@ -47,7 +50,7 @@ namespace SAIN.Editor
 
         public PresetSelection PresetSelection { get; private set; }
         public BotPersonalityEditor BotPersonalityEditor { get; private set; }
-        public BotSettingsEditor BotSettingsEditor { get; private set; }
+        public BotSettingsEditor SettingsEditor { get; private set; }
         public WindowLayoutCreator WindowLayoutCreator { get; private set; }
         public MouseFunctions MouseFunctions { get; private set; }
         public ButtonsClass Buttons { get; private set; }
@@ -169,6 +172,7 @@ namespace SAIN.Editor
                 if (BotSelectionClass.OpenAdjustmentWindow)
                 {
                     AdjustmentRect = Builder.NewWindow(1, AdjustmentRect, BotSelectionClass.GUIAdjustment, "GUI Adjustment");
+                    GUI.FocusWindow(1);
                 }
 
                 UnityInput.Current.ResetInputAxes();
@@ -194,6 +198,7 @@ namespace SAIN.Editor
         public static readonly string Personalities = "Personality Settings";
         public static readonly string Advanced = nameof(Advanced);
         public static readonly string[] Tabs = { Home, Global, BotSettings, Personalities, Advanced };
+        private static readonly Dictionary<string, Vector2> ScrollViews = new Dictionary<string, Vector2>();
 
         private static bool Inited = false;
 
@@ -242,12 +247,12 @@ namespace SAIN.Editor
             GUI.DragWindow(DragRect);
             if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", StyleOptions.GetStyle(Style.button)))
             {
-                MenuClickSound();
+                PlaySound(EUISoundType.ButtonClick);
                 TogglePause();
             }
             if (GUI.Button(ExitRect, "X", StyleOptions.GetStyle(Style.button)))
             {
-                ResetClickSound();
+                PlaySound(EUISoundType.MenuEscape);
                 CloseEditor();
             }
 
@@ -286,16 +291,40 @@ namespace SAIN.Editor
                     }
 
                     Scroll = Builder.BeginScrollView(Scroll);
-                    BotSettingsEditor.SettingsMenu(SAINPlugin.LoadedPreset.GlobalSettings, GlobalSettingsCache);
+                    SettingsEditor.SettingsMenu(SAINPlugin.LoadedPreset.GlobalSettings, GlobalSettingsCache);
                     Builder.EndScrollView();
                 }
                 else if (TabSelected(Personalities, out tabRect, 1000f))
                 {
-                    BotPersonalityEditor.PersonalityMenu();
+                    PersonScroll = Builder.BeginScrollView(PersonScroll);
+
+                    Builder.EndScrollView();
                 }
                 else if (TabSelected(Advanced, out tabRect, 1000f))
                 {
-                    AdvancedOptionsEnabled = Builder.Toggle(AdvancedOptionsEnabled, "Advanced Bot Configs", "Edit at your own risk.", Builder.Height(40f));
+                    AdvancedOptionsEnabled = Builder.Toggle(AdvancedOptionsEnabled, "Advanced Bot Configs", "Edit at your own risk.", null, Builder.Height(30f));
+                    SAINPlugin.DebugModeEnabled = Builder.Toggle(SAINPlugin.DebugModeEnabled, "Global Debug Mode", null, Builder.Height(30f));
+                    Builder.Space(5);
+
+                    Builder.Label("GUI Sounds Test");
+                    int count = 0;
+
+                    Builder.BeginHorizontal();
+                    foreach (var sound in EnumValues.GetEnum<EUISoundType>())
+                    {
+                        count++;
+                        if (Builder.Button(sound.ToString()))
+                        {
+                            PlaySound(sound);
+                        }
+                        if (count == 3)
+                        {
+                            count = 0;
+                            Builder.EndHorizontal();
+                            Builder.BeginHorizontal();
+                        }
+                    }
+                    Builder.EndHorizontal();
                 }
 
                 Builder.EndVertical();
@@ -303,6 +332,9 @@ namespace SAIN.Editor
 
             DrawTooltip();
         }
+
+        private readonly Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
+        private Vector2 PersonScroll = Vector2.zero;
 
         public Rect ToolTipRect = Rect.zero;
         public GUIContent ToolTipContent;

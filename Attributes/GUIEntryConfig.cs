@@ -56,6 +56,7 @@ namespace SAIN.Attributes
         public GUILayoutOption[] Label => Params(LabelWidth);
         public GUILayoutOption[] MinMax => Params(MinMaxWidth);
         public GUILayoutOption[] Slider => Params(SliderWidth);
+        public GUILayoutOption[] Toggle => Params(SliderWidth + MinMaxWidth);
         public GUILayoutOption[] Result => Params(ResultWidth);
         public GUILayoutOption[] Reset => Params(ResetWidth);
 

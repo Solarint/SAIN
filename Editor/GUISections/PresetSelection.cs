@@ -22,7 +22,7 @@ namespace SAIN.Editor.GUISections
             BeginHorizontal();
             Box("Installed Presets", Height(LabelHeight));
             Box("Select an installed preset for SAIN Settings", Height(LabelHeight));
-            bool refresh = Button("Refresh", "Refresh installed Presets", Height(LabelHeight));
+            bool refresh = Button("Refresh", "Refresh installed Presets", null, Height(LabelHeight));
             LoadPresetOptions(refresh);
             EndHorizontal();
 
@@ -36,7 +36,7 @@ namespace SAIN.Editor.GUISections
                 presetSpacing++;
                 var preset = PresetHandler.PresetOptions[i];
                 bool selected = selectedPreset.Name == preset.Name;
-                if (Toggle(selected, preset.Name, preset.Description, Height(InstalledHeight)))
+                if (Toggle(selected, preset.Name, preset.Description, null, Height(InstalledHeight)))
                 {
                     selectedPreset = preset;
                 }

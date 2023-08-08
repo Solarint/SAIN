@@ -78,7 +78,7 @@ namespace SAIN.Editor
 
                 Space(SectionRectangle.height);
 
-                if (Button("Clear", Width(150)))
+                if (Button("Clear", null, Width(150)))
                 {
                     SelectedSections.Clear();
                     SelectedWildSpawnTypes.Clear();
@@ -277,7 +277,7 @@ namespace SAIN.Editor
                         BeginHorizontal();
                         Space(Rect2OptionSpacing);
 
-                        bool AddToList = Toggle(typeSelected, new GUIContent(type.Name, type.Description), style2, Height(TypeOptOptionHeight));
+                        bool AddToList = Toggle(typeSelected, new GUIContent(type.Name, type.Description), style2, null, Height(TypeOptOptionHeight));
 
                         Rect? lastRect = RelativeRectLastRectMainWindow(TypeRectangle);
                         if (lastRect != null && CheckDrag(lastRect.Value))
@@ -361,12 +361,12 @@ namespace SAIN.Editor
 
             FlexibleSpace();
 
-            if (Button("Save", "Apply Values set below to all selected bot types for all selected difficulties. Saves edited values to SAIN/Presets folder", Height(35f), Width(200f)))
+            if (Button("Save", "Apply Values set below to all selected bot types for all selected difficulties. Saves edited values to SAIN/Presets folder", null, Height(35f), Width(200f)))
             {
                 SAINPlugin.LoadedPreset.SavePreset();
                 PresetHandler.UpdateExistingBots();
             }
-            if (Button("Discard", "Clear all selected bots, difficulties", Height(35f), Width(200f)))
+            if (Button("Discard", "Clear all selected bots, difficulties", null, Height(35f), Width(200f)))
             {
                 Reset();
             }
@@ -391,7 +391,7 @@ namespace SAIN.Editor
                 EditingSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(EditingType, EditingDifficulty);
             }
 
-            Editor.BotSettingsEditor.SettingsMenu(EditingSettings, Editor.SAINBotSettingsCache);
+            Editor.SettingsEditor.SettingsMenu(EditingSettings, Editor.SAINBotSettingsCache);
 
             EndScrollView();
         }
@@ -450,7 +450,7 @@ namespace SAIN.Editor
             tooltip = tooltip ?? string.Empty;
 
             bool selected = list.Contains(item);
-            if (Toggle(selected, optionName, tooltip, Height(optionHeight), Width(RectLayout.MainWindow.width / optionPerLine - 20f)))
+            if (Toggle(selected, optionName, tooltip, null, Height(optionHeight), Width(RectLayout.MainWindow.width / optionPerLine - 20f)))
             {
                 if (!list.Contains(item))
                 {

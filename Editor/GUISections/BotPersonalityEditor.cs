@@ -16,36 +16,8 @@ namespace SAIN.Editor.GUISections
 
         public void PersonalityMenu()
         {
-            Box("Personality Settings");
-            Box("For The Memes. Recommended not to use these during normal gameplay!");
-            Box("Bots will be more predictable and exploitable.");
-
-            var pers = SAINPlugin.LoadedPreset.GlobalSettings.Personality;
-            Type type = pers.GetType();
-
-            pers.AllGigaChads = EditValue(pers.AllGigaChads, GetField(type, nameof(pers.AllGigaChads)));
-            if (pers.AllGigaChads)
-            {
-                pers.AllChads = false;
-                pers.AllRats = false;
-            }
-            pers.AllChads = EditValue(pers.AllChads, GetField(type, nameof(pers.AllChads)));
-            if (pers.AllChads)
-            {
-                pers.AllGigaChads = false;
-                pers.AllRats = false;
-            }
-            pers.AllRats = EditValue(pers.AllRats, GetField(type, nameof(pers.AllRats)));
-            if (pers.AllRats)
-            {
-                pers.AllGigaChads = false;
-                pers.AllChads = false;
-            }
-
-            Builder.Space(25f);
             PersonScroll = Builder.BeginScrollView(PersonScroll);
 
-            type = typeof(PersonalitySettingsClass);
             foreach (var personality in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
             {
                 string name = personality.Name;
@@ -58,28 +30,12 @@ namespace SAIN.Editor.GUISections
                 {
                     continue;
                 }
-
-                personality.CanJumpCorners = EditValue(personality.CanJumpCorners, GetField(type, nameof(personality.CanJumpCorners)));
-                personality.CanTaunt = EditValue(personality.CanTaunt, GetField(type, nameof(personality.CanTaunt)));
-                personality.FrequentTaunt = EditValue(personality.FrequentTaunt, GetField(type, nameof(personality.FrequentTaunt)));
-                personality.ConstantTaunt = EditValue(personality.ConstantTaunt, GetField(type, nameof(personality.ConstantTaunt)));
-                personality.SprintWhileSearch = EditValue(personality.SprintWhileSearch, GetField(type, nameof(personality.SprintWhileSearch)));
-                personality.FrequentSprintWhileSearch = EditValue(personality.FrequentSprintWhileSearch, GetField(type, nameof(personality.FrequentSprintWhileSearch)));
-                personality.CanRushEnemyReloadHeal = EditValue(personality.CanRushEnemyReloadHeal, GetField(type, nameof(personality.CanRushEnemyReloadHeal)));
-                personality.CanFakeDeathRare = EditValue(personality.CanFakeDeathRare, GetField(type, nameof(personality.CanFakeDeathRare)));
-                personality.TauntFrequency = EditValue(personality.TauntFrequency, GetField(type, nameof(personality.TauntFrequency)));
-                personality.TauntMaxDistance = EditValue(personality.TauntMaxDistance, GetField(type, nameof(personality.TauntMaxDistance)));
-                personality.HoldGroundBaseTime = EditValue(personality.HoldGroundBaseTime, GetField(type, nameof(personality.HoldGroundBaseTime)));
-                personality.SearchBaseTime = EditValue(personality.SearchBaseTime, GetField(type, nameof(personality.SearchBaseTime)));
-                personality.PowerLevelMin = EditValue(personality.PowerLevelMin, GetField(type, nameof(personality.PowerLevelMin)));
-                personality.PowerLevelMax = EditValue(personality.PowerLevelMax, GetField(type, nameof(personality.PowerLevelMax)));
-                personality.TrueRandomChance = EditValue(personality.TrueRandomChance, GetField(type, nameof(personality.TrueRandomChance)));
-                personality.RandomChanceIfMeetRequirements = EditValue(personality.RandomChanceIfMeetRequirements, GetField(type, nameof(personality.RandomChanceIfMeetRequirements)));
+                EditAllValuesInObj(personality.Variables, out int optionsCount, true);
             }
             Builder.EndScrollView();
         }
 
-        private Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
         private Vector2 PersonScroll = Vector2.zero;
     }
 }

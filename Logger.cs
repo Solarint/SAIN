@@ -8,78 +8,69 @@ namespace SAIN
 {
     internal static class Logger
     {
-        static Logger()
-        {   
-            DefaultLogger = BepInEx.Logging.Logger.CreateLogSource("SAIN");
-            LogSources.Add(nameof(DefaultLogger), DefaultLogger);
+        public static void LogInfo(object data, Type sourceClass = null, bool getMethodInfo = false)
+        {
+            data = BuildMessage(data, getMethodInfo);
+            SelectLogSource(sourceClass).LogInfo(data);
         }
 
-        private static Action<string> LogInfoAction => LogSources[SelectedLogger].LogInfo;
-        private static Action<string> LogDebugAction => LogSources[SelectedLogger].LogDebug;
-        private static Action<string> LogWarningAction => LogSources[SelectedLogger].LogWarning;
-        private static Action<string> LogErrorAction => LogSources[SelectedLogger].LogError;
-
-        public static void LogInfo(string message, Type source = null, bool methodInfo = false)
+        public static void LogDebug(object data, Type sourceClass = null, bool getMethodInfo = false)
         {
-            SelectLogSource(source);
-            Log(LogInfoAction, message, methodInfo);
+            data = BuildMessage(data, getMethodInfo);
+            SelectLogSource(sourceClass).LogDebug(data);
         }
 
-        public static void LogDebug(string message, Type source = null, bool methodInfo = false)
+        public static void LogWarning(object data, Type sourceClass = null, bool getMethodInfo = false)
         {
-            SelectLogSource(source);
-            Log(LogDebugAction, message, methodInfo);
+            data = BuildMessage(data, getMethodInfo);
+            SelectLogSource(sourceClass).LogWarning(data);
         }
 
-        public static void LogWarning(string message, Type source = null, bool methodInfo = false)
+        public static void LogError(object data, Type sourceClass = null, bool getMethodInfo = false)
         {
-            SelectLogSource(source);
-            Log(LogWarningAction, message, methodInfo);
+            data = BuildMessage(data, getMethodInfo);
+            SelectLogSource(sourceClass).LogError(data);
         }
 
-        public static void LogError(string message, Type source = null, bool methodInfo = false)
+        private static ManualLogSource SelectLogSource(Type type = null)
         {
-            SelectLogSource(source);
-            Log(LogErrorAction, message, methodInfo);
-        }
-
-        private static void SelectLogSource(Type type)
-        {
-            if (type == null)
+            string name = type?.Name ?? "SAIN";
+            if (!LogSourcesDictionary.ContainsKey(name))
             {
-                SelectedLogger = nameof(DefaultLogger);
+                LogSourcesDictionary.Add(name, BepInEx.Logging.Logger.CreateLogSource(name));
             }
-            string name = type.Name;
-            if (!LogSources.ContainsKey(name))
-            {
-                LogSources.Add(name, BepInEx.Logging.Logger.CreateLogSource(name));
-            }
-            SelectedLogger = name;
+            return LogSourcesDictionary[name];
         }
 
+        public static Dictionary<string, ManualLogSource> LogSourcesDictionary = new Dictionary<string, ManualLogSource>();
 
-        private static string SelectedLogger = nameof(DefaultLogger);
-        public static Dictionary<string, ManualLogSource> LogSources = new Dictionary<string, ManualLogSource>();
-        private static readonly ManualLogSource DefaultLogger;
-
-        public static void Log(Action<string> logAction, string message, bool methodInfo = false)
+        public static object BuildMessage(object data, bool methodInfo = false)
         {
             if (methodInfo)
             {
                 StackTrace stackTrace = new StackTrace();
-                StackFrame stackFrame = stackTrace.GetFrame(2);
-                MethodBase method = stackFrame.GetMethod();
-                message = CreateMessage(method, message);
+                data = CreateMessageString
+                (
+                    data,
+                    stackTrace.GetFrame(2).GetMethod(),
+                    stackTrace.GetFrame(3).GetMethod(),
+                    stackTrace.GetFrame(4).GetMethod()
+                );
             }
-            logAction(message);
+            return data;
         }
 
-        private static string CreateMessage(MethodBase method, string message)
+        private static object CreateMessageString(object message, params MethodBase[] methods)
         {
-            string methodName = method.Name;
-            string className = method.DeclaringType.Name;
+            string methodName = null;
+            string className = null;
+            foreach (MethodBase method in methods)
+            {
+                methodName = methodName == null ? method.Name : $"{methodName} {method.Name}";
+                className = className ?? method.DeclaringType.Name;
+            }
 
-            string output = "[" + className + "." + methodName + "] " + message;
+            string output = $"[{className}] [{methodName}] [{message}]";
             return output;
         }
     }
