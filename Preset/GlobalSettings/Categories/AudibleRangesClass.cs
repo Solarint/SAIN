@@ -45,11 +45,9 @@ namespace SAIN.Preset.GlobalSettings
             Values = GetValuesFromClass.UpdateValues(Caliber.Default, Default, this, Values);
         }
 
-        [JsonIgnore]
-        [AdvancedOptions(false, true)]
-        public Dictionary<object, object> Values = new Dictionary<object, object>();
+        [JsonIgnore][Advanced(AdvancedEnum.Hidden)] public Dictionary<object, object> Values = new Dictionary<object, object>();
 
-        [AdvancedOptions(false, true)]
+        [Advanced(AdvancedEnum.Hidden)]
         private const string Description = "The Distance this bullet caliber can be heard by AI";
 
         [DefaultValue(125f)]
@@ -201,6 +199,12 @@ namespace SAIN.Preset.GlobalSettings
         [NameAndDescription(nameof(Caliber40mmRU), Description)]
         [MinMaxRound(30f, 500f, 1f)]
         public float Caliber40mmRU = 50;
+
+        [DefaultValue(300)]
+        [AmmoCaliber(Caliber.Caliber127x108)]
+        [NameAndDescription(nameof(Caliber127x108), Description)]
+        [MinMaxRound(30f, 500f, 1f)]
+        public float Caliber127x108 = 300;
 
         public static readonly float Default = 150f;
     }

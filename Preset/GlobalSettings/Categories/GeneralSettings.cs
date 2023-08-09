@@ -39,7 +39,7 @@ namespace SAIN.Preset.GlobalSettings
         [NameAndDescription(
             "No Bush ESP Debug")]
         [DefaultValue(false)]
-        [AdvancedOptions(true)]
+        [Advanced(AdvancedEnum.IsAdvanced)]
         public bool NoBushESPDebugMode = false;
 
         [NameAndDescription(
@@ -49,7 +49,7 @@ namespace SAIN.Preset.GlobalSettings
         public bool HeadShotProtection = false;
 
         [DefaultValue(false)]
-        [AdvancedOptions(true)]
+        [Advanced(AdvancedEnum.IsAdvanced)]
         public bool DrawDebugGizmos = false;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Comfort.Common;
 using EFT.UI;
 using System.Diagnostics;
+using UnityEngine;
 
 namespace SAIN.Editor
 {
@@ -18,11 +19,16 @@ namespace SAIN.Editor
 
         public static void PlaySound(EUISoundType soundType)
         {
-            Singleton<GUISounds>.Instance.PlayUISound(soundType);
-            if (SAINPlugin.DebugModeEnabled)
+            if (SoundLimiter < Time.time)
             {
-                Logger.LogDebug(soundType, typeof(Sounds), true);
+                SoundLimiter = Time.time + 0.1f;
+                Singleton<GUISounds>.Instance.PlayUISound(soundType);
+                if (SAINPlugin.DebugModeEnabled)
+                {
+                    Logger.LogDebug(soundType, typeof(Sounds), true);
+                }
             }
         }
+        private static float SoundLimiter;
     }
 }

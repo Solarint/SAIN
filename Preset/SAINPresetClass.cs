@@ -9,7 +9,7 @@ namespace SAIN.Preset
         public SAINPresetClass(SAINPresetDefinition preset)
         {
             Info = preset;
-            GlobalSettings = GlobalSettingsClass.LoadGlobalSettings(preset);
+            GlobalSettings = GlobalSettingsClass.LoadGlobal(preset);
             BotSettings = new BotSettings.BotSettingsClass(preset);
             PersonalityManager = new PersonalityManagerClass(preset);
         }
@@ -18,8 +18,8 @@ namespace SAIN.Preset
         {
             string[] folders = new string[] { PresetsFolder, Info.Name };
 
-            Save.SaveJson(Info, nameof(Info), folders);
-            Save.SaveJson(GlobalSettings, nameof(GlobalSettings), folders);
+            SaveObjectToJson(Info, nameof(Info), folders);
+            SaveObjectToJson(GlobalSettings, nameof(GlobalSettings), folders);
             BotSettings.SaveSettings(Info);
         }
 

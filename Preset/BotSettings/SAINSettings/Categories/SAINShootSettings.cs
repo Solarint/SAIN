@@ -27,26 +27,26 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         public float FireratMulti = 1.35f;
 
         [DefaultValue(true)]
-        [AdvancedOptions(true)]
+        [Advanced(AdvancedEnum.IsAdvanced)]
         public bool CAN_STOP_SHOOT_CAUSE_ANIMATOR = true;
 
         [DefaultValue(100f)]
         [MinMaxRound(0f, 100f)]
-        [AdvancedOptions(true)]
+        [Advanced(AdvancedEnum.IsAdvanced)]
         public float CHANCE_TO_CHANGE_TO_AUTOMATIC_FIRE_100 = 100f;
 
         [DefaultValue(1.5f)]
         [MinMaxRound(1f, 5f, 10f)]
-        [AdvancedOptions(true, false, true)]
+        [Advanced(AdvancedEnum.IsAdvanced, AdvancedEnum.CopyValueFromEFT)]
         public float AUTOMATIC_FIRE_SCATTERING_COEF = 1.5f;
 
         [DefaultValue(0.5f)]
         [MinMaxRound(0.1f, 2f, 10f)]
-        [AdvancedOptions(true, false, true)]
+        [Advanced(AdvancedEnum.IsAdvanced, AdvancedEnum.CopyValueFromEFT)]
         public float BASE_AUTOMATIC_TIME = 0.5f;
 
         [DefaultValue(0.0f)]
-        [AdvancedOptions(true, true)]
+        [Advanced(AdvancedEnum.Hidden)]
         public float RECOIL_DELTA_PRESS = 0.0f;
     }
 }

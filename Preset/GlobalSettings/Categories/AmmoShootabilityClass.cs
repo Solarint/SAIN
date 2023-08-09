@@ -200,6 +200,12 @@ namespace SAIN.Preset.GlobalSettings
         [MinMaxRound(0.01f, 1f, 100f)]
         public float Caliber40mmRU = 1f;
 
+        [DefaultValue(0.25f)]
+        [AmmoCaliber(Caliber.Caliber127x108)]
+        [NameAndDescription(nameof(Caliber127x108), Description)]
+        [MinMaxRound(0.01f, 1f, 100f)]
+        public float Caliber127x108 = 0.25f;
+
         public static readonly float Default = 0.5f;
     }
 }

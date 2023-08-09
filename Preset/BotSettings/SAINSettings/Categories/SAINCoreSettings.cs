@@ -14,22 +14,22 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
 
         [DefaultValue(150f)]
         [MinMaxRound(50f, 500f)]
-        [AdvancedOptions(false, false, true)]
+        [Advanced(AdvancedEnum.CopyValueFromEFT)]
         public float VisibleDistance = 150f;
 
         [DefaultValue(0.2f)]
         [MinMaxRound(0.05f, 0.95f, 100f)]
-        [AdvancedOptions(true, false, true)]
+        [Advanced(AdvancedEnum.IsAdvanced, AdvancedEnum.CopyValueFromEFT)]
         public float GainSightCoef = 0.2f;
 
         [DefaultValue(0.08f)]
         [MinMaxRound(0.01f, 0.5f, 100f)]
-        [AdvancedOptions(true, false, true)]
+        [Advanced(AdvancedEnum.IsAdvanced, AdvancedEnum.CopyValueFromEFT)]
         public float ScatteringPerMeter = 0.08f;
 
         [DefaultValue(0.12f)]
         [MinMaxRound(0.01f, 0.5f, 100f)]
-        [AdvancedOptions(true, false, true)]
+        [Advanced(AdvancedEnum.IsAdvanced, AdvancedEnum.CopyValueFromEFT)]
         public float ScatteringClosePerMeter = 0.12f;
 
         [NameAndDescription(
@@ -37,7 +37,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
             "Increase scatter when a bots arms are injured.")]
         [DefaultValue(1.33f)]
         [MinMaxRound(1f, 2f, 100f)]
-        [AdvancedOptions(true)]
+        [Advanced(AdvancedEnum.IsAdvanced)]
         public float DamageCoeff = 1.33f;
 
         [NameAndDescription(
@@ -48,7 +48,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         public float HearingSense = 1f;
 
         [DefaultValue(true)]
-        [AdvancedOptions(true, true)]
+        [Advanced(AdvancedEnum.Hidden)]
         public bool CanRun = true;
 
         [DefaultValue(true)]

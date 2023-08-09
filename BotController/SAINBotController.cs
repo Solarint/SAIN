@@ -238,7 +238,7 @@ namespace SAIN.Components
                 return;
             }
 
-            // AddorUpdateColorScheme Components to main player
+            // AddColor Components to main player
             if (!ComponentAdded)
             {
                 MainPlayer.GetOrAddComponent<SAINFlashLightComponent>();

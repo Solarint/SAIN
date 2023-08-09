@@ -38,7 +38,7 @@ namespace SAIN.Components
             float randomYawAngle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
             float randomPitchAngle = Random.Range(-coneAngle * 0.5f, coneAngle * 0.5f);
 
-            // AddorUpdateColorScheme a Quaternion rotation based on the random yaw and pitch angles
+            // AddColor a Quaternion rotation based on the random yaw and pitch angles
             Quaternion randomRotation = Quaternion.Euler(randomPitchAngle, randomYawAngle, 0);
 
             // Rotate the player's look direction by the Quaternion rotation
@@ -142,7 +142,7 @@ namespace SAIN.Components
         }
 
         /// <summary>
-        /// Estimates a search DrawPosition based on the player, flash, and bot positions, and a dispersion value.
+        /// Estimates a search DrawPosition based on the player, flash, and bot positions, and a dispersion rounding.
         /// </summary>
         /// <param name="playerPos">The DrawPosition of the player.</param>
         /// <param name="flashPos">The DrawPosition of the flashlight point.</param>

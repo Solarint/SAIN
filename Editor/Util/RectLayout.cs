@@ -41,8 +41,6 @@ namespace SAIN.Editor
 
         public static float ScalingFactor { get; private set; }
 
-        public static int SelectedTab { get; set; } = 0;
-        public static int TabCount { get; } = SAINEditor.Tabs.Length;
 
         public static Rect MainWindow = new Rect(0, 0, 1920, 1080);
          

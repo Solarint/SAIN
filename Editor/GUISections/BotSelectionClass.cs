@@ -11,18 +11,9 @@ using EFT;
 
 namespace SAIN.Editor
 {
-    public class PresetEditorDefaults
+    public class BotSelectionClass : EditorAbstract
     {
-        public string SelectedPreset;
-        public string DefaultPreset;
-        public bool Advanced;
-    }
-
-    public class PresetEditor : EditorAbstract
-    {
-        public PresetEditorDefaults PresetEditorSettings { get; private set; }
-
-        public PresetEditor(SAINEditor editor) : base(editor)
+        public BotSelectionClass(SAINEditor editor) : base(editor)
         {
             List<string> sections = new List<string>();
             foreach (var type in BotTypeDefinitions.BotTypes.Values)
@@ -45,14 +36,6 @@ namespace SAIN.Editor
 
         private float RecheckOptionsTimer;
 
-        private void LoadPresetOptions(bool refresh = false)
-        {
-            if (RecheckOptionsTimer < Time.time || refresh)
-            {
-                RecheckOptionsTimer = Time.time + 30f;
-            }
-        }
-
         public void Menu(Rect windowRect)
         {
             Rect12Height = windowRect.height;
@@ -63,19 +46,18 @@ namespace SAIN.Editor
                 float startHeight = 25;
                 SectionRectangle = new Rect(0, startHeight, SectionRectWidth, FinalWindowHeight);
                 BeginArea(SectionRectangle);
+
                 SelectSection(SectionRectangle);
-                EndArea();
 
+                EndArea();
                 TypeRectangle = new Rect(TypeRectX, startHeight, TypeRectWidth, FinalWindowHeight);
-
                 BeginArea(TypeRectangle);
-
                 FirstMenuScroll = BeginScrollView(FirstMenuScroll);
+
                 SelectType();
+
                 EndScrollView();
-
                 EndArea();
-
                 Space(SectionRectangle.height);
 
                 if (Button("Clear", null, Width(150)))
@@ -115,20 +97,16 @@ namespace SAIN.Editor
         private bool OpenFirstMenu = false;
         private bool OpenPropEdit = false;
 
-        private float FinalWindowWidth => Editor.WindowLayoutCreator.FinalWindowWidth;
-
         private float FinalWindowHeight => 300f;
 
         private float Rect1OptionSpacing = 2f;
         private float Rect2OptionSpacing = 2f;
-        private float SectionSelOptionHeight => (Rect12Height / Sections.Length) - (Rect1OptionSpacing);
         private float SectionRectX => BothRectGap;
         private float SectionRectWidth = 150f;
         private float BothRectGap = 6f;
         private float TypeRectWidth => RectLayout.MainWindow.width - SectionRectWidth - BothRectGap * 2f;
         private float TypeRectX => SectionRectX + SectionRectWidth + BothRectGap;
         private float Rect12Height = 285f;
-        private float Rect12HeightMinusMargin => Rect12Height - ScrollMargin;
 
         private float ScrollMargin = 0f;
 
@@ -138,7 +116,6 @@ namespace SAIN.Editor
 
         private float YWithGenClose = 160f;
         private float YWithGenOpen = 270f;
-        private float MenuStartHeight => Editor.ExpandGeneral ? YWithGenOpen : YWithGenClose;
 
         private Rect SectionRectangle;
         private Rect TypeRectangle;
@@ -157,13 +134,6 @@ namespace SAIN.Editor
             return RelativeRect(RectLayout.MainWindow, insideRect, lastRect);
         }
 
-        private Rect RelativeRectMainWindow(Rect lastRect)
-        {
-            float X = lastRect.x + RectLayout.MainWindow.x;
-            float Y = lastRect.y + RectLayout.MainWindow.y;
-            return new Rect(X, Y, lastRect.width, lastRect.height);
-        }
-
         private Rect? RelativeRectLastRectMainWindow(Rect insideRect)
         {
             if (Event.current.type != EventType.Repaint)
@@ -173,55 +143,7 @@ namespace SAIN.Editor
             return RelativeRectMainWindow(insideRect, GUILayoutUtility.GetLastRect());
         }
 
-        public bool OpenAdjustmentWindow = false;
         private Rect AdjustmentRect => Editor.AdjustmentRect;
-
-        public void GUIAdjustment(int wini)
-        {
-            GUI.DragWindow(new Rect(0, 0, AdjustmentRect.width, 20f));
-
-            Space(25f);
-
-            BeginVertical();
-
-            YWithGenClose = HorizontalSliderNoStyle(nameof(YWithGenClose), YWithGenClose, 100f, 500f);
-            YWithGenClose = Round(YWithGenClose);
-            YWithGenOpen = HorizontalSliderNoStyle(nameof(YWithGenOpen), YWithGenOpen, 100f, 500f);
-            YWithGenOpen = Round(YWithGenOpen);
-
-            Space(10f);
-
-            SectionRectWidth = HorizontalSliderNoStyle(nameof(SectionRectWidth), SectionRectWidth, 100f, 500f);
-            SectionRectWidth = Round(SectionRectWidth);
-            BothRectGap = HorizontalSliderNoStyle(nameof(BothRectGap), BothRectGap, 0f, 50f);
-            BothRectGap = Round(BothRectGap);
-            Rect12Height = HorizontalSliderNoStyle(nameof(Rect12Height), Rect12Height, 100f, 500f);
-            Rect12Height = Round(Rect12Height);
-
-            Space(10f);
-
-            ScrollMargin = HorizontalSliderNoStyle(nameof(ScrollMargin), ScrollMargin, 0, 50f);
-            ScrollMargin = Round(ScrollMargin);
-            Rect1OptionSpacing = HorizontalSliderNoStyle(nameof(Rect1OptionSpacing), Rect1OptionSpacing, 0f, 50f);
-            Rect1OptionSpacing = Round(Rect1OptionSpacing);
-            Rect2OptionSpacing = HorizontalSliderNoStyle(nameof(Rect2OptionSpacing), Rect2OptionSpacing, 0, 50f);
-            Rect2OptionSpacing = Round(Rect2OptionSpacing, 1);
-
-            Space(10f);
-
-            TypeOptLabelHeight = HorizontalSliderNoStyle(nameof(TypeOptLabelHeight), TypeOptLabelHeight, 5, 25f);
-            TypeOptLabelHeight = Round(TypeOptLabelHeight, 1);
-            TypeOptOptionHeight = HorizontalSliderNoStyle(nameof(TypeOptOptionHeight), TypeOptOptionHeight, 5, 50f);
-            TypeOptOptionHeight = Round(TypeOptOptionHeight);
-            SectOptFontSizeInc = HorizontalSliderNoStyle(nameof(SectOptFontSizeInc), SectOptFontSizeInc, 0, 50f);
-            SectOptFontSizeInc = Round(SectOptFontSizeInc);
-
-            Space(10f);
-
-            CreateGUIAdjustmentSliders();
-
-            EndVertical();
-        }
 
         public float Round(float value, float dec = 10f)
         {
@@ -262,6 +184,14 @@ namespace SAIN.Editor
                 Space(Rect2OptionSpacing);
 
                 var botTypes = BotTypeDefinitions.BotTypes.Values.ToArray();
+
+                foreach (BotType botType in BotTypeDefinitions.BotTypes.Values)
+                {
+                    if (botType.Section == section)
+                    {
+
+                    }
+                }
                 for (int j = 0; j < botTypes.Length; j++)
                 {
                     BotType type = botTypes[j];
@@ -304,24 +234,9 @@ namespace SAIN.Editor
 
         public readonly string[] Sections;
         private readonly List<string> SelectedSections = new List<string>();
-
         private readonly List<BotType> SelectedWildSpawnTypes = new List<BotType>();
-
         public readonly BotDifficulty[] BotDifficultyOptions = { BotDifficulty.easy, BotDifficulty.normal, BotDifficulty.hard, BotDifficulty.impossible };
         public readonly List<BotDifficulty> SelectedDifficulties = new List<BotDifficulty>();
-
-        private void PropSelectionMenu(int optionsPerLine = 3, float optionHeight = 25f, float scrollHeight = 200f)
-        {
-            PropertyScroll = BeginScrollView(PropertyScroll, Height(scrollHeight));
-
-            BeginHorizontal();
-
-            EndHorizontal();
-            EndScrollView();
-        }
-
-        private readonly List<PropertyInfo> SelectedProperties = new List<PropertyInfo>();
-        private static Vector2 PropertyScroll = Vector2.zero;
 
         private void PropEditMenu()
         {
@@ -391,7 +306,7 @@ namespace SAIN.Editor
                 EditingSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(EditingType, EditingDifficulty);
             }
 
-            Editor.SettingsEditor.SettingsMenu(EditingSettings, Editor.SAINBotSettingsCache);
+            Editor.GUITabs.SettingsEditor.SettingsMenu(EditingSettings);
 
             EndScrollView();
         }
@@ -436,11 +351,6 @@ namespace SAIN.Editor
             SelectedDifficulties.Clear();
             SelectedSections.Clear();
             SelectedWildSpawnTypes.Clear();
-            SelectedProperties.Clear();
-        }
-
-        private void CreatePropertyOption(PropertyInfo property, BotType botType)
-        {
         }
 
         private int SelectionGridOption<T>(int spacing, string optionName, List<T> list, T item, float optionPerLine = 3f, float optionHeight = 25f, string tooltip = null)

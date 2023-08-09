@@ -58,7 +58,7 @@ namespace SAIN.Preset.Personalities
 
             foreach (var pers in Personalities)
             {
-                JsonUtility.Save.SaveJson(pers.Value, pers.Key.ToString(), folders);
+                JsonUtility.SaveObjectToJson(pers.Value, pers.Key.ToString(), folders);
             }
         }
 
@@ -71,10 +71,11 @@ namespace SAIN.Preset.Personalities
                 string description = "Scum of Tarkov. Rarely Seeks out enemies, and will hide and ambush.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
+                    Enabled = true,
                     Variables =
                     {
                         RandomChanceIfMeetRequirements = 60,
-                        TrueRandomChance = 30,
+                        RandomlyAssignedChance = 30,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
                         SearchBaseTime = SearchBaseTime(pers),
                         PowerLevelMax = 50f,
@@ -93,9 +94,10 @@ namespace SAIN.Preset.Personalities
 
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
+                    Enabled = true,
                     Variables =
                     {
-                        TrueRandomChance = 50,
+                        RandomlyAssignedChance = 50,
                         PowerLevelMax = 40f,
                         MaxLevel = 10,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
@@ -114,9 +116,10 @@ namespace SAIN.Preset.Personalities
                 string description = "A player who is more passive and afraid than usual.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
+                    Enabled = true,
                     Variables =
                     {
-                        TrueRandomChance = 30,
+                        RandomlyAssignedChance = 30,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
                         SearchBaseTime = SearchBaseTime(pers)
                     }
@@ -132,6 +135,7 @@ namespace SAIN.Preset.Personalities
                 string description = "An Average Tarkov Enjoyer";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
+                    Enabled = true,
                     Variables =
                     {
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
@@ -151,11 +155,12 @@ namespace SAIN.Preset.Personalities
                 string description = "A true alpha threat. Hyper Aggressive and typically wearing high tier equipment.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
+                    Enabled = true,
                     Variables =
                     {
                         CanJumpCorners = true,
                         RandomChanceIfMeetRequirements = 60,
-                        TrueRandomChance = 3,
+                        RandomlyAssignedChance = 3,
                         CanTaunt = true,
                         CanRespondToVoice = true,
                         TauntFrequency = 8,
@@ -183,11 +188,12 @@ namespace SAIN.Preset.Personalities
                 string description = "An aggressive player. Typically wearing high tier equipment, and is more aggressive than usual.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
+                    Enabled = true,
                     Variables =
                     {
                         CanJumpCorners = true,
                         RandomChanceIfMeetRequirements = 60,
-                        TrueRandomChance = 3,
+                        RandomlyAssignedChance = 3,
                         CanTaunt = true,
                         CanRespondToVoice = true,
                         TauntFrequency = 8,

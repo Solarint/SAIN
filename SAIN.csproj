@@ -220,16 +220,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\AttributesGUI.cs" />
+    <Compile Include="Attributes\AttributesInfoClass.cs" />
     <Compile Include="Attributes\GUIEntryConfig.cs" />
     <Compile Include="Editor\EditTabsClass.cs" />
+    <Compile Include="Editor\GUISections\PresetEditorDefaults.cs" />
     <Compile Include="Editor\GUITabs.cs" />
+    <Compile Include="Editor\IEditorCache.cs" />
     <Compile Include="Editor\Util\ModifyLists.cs" />
     <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AmmoShootabilityClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AudibleRangesClass.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrainConfigClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrainSettings.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrain\BotBrains.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrain\Brain.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrain\BrainInfoClass.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrain\DefaultBrainsClass.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrain\Layer.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BigBrain\LayerInfoClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\WeaponShootabilityClass.cs" />
     <Compile Include="Preset\GlobalSettings\GetValuesFromClass.cs" />
     <Compile Include="Preset\SAINPresetDefinition.cs" />
@@ -254,7 +264,7 @@
     <Compile Include="Preset\BotSettings\SAINSettings\Categories\FieldsCache.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\SAINSettingsClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AimSettings.cs" />
-    <Compile Include="Attributes\AttributesClass.cs" />
+    <Compile Include="Attributes\ConfigAttributes.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\CoverSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\ExtractSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\FlashlightSettings.cs" />
@@ -317,7 +327,7 @@
     <Compile Include="Editor\Util\MouseFunctions.cs" />
     <Compile Include="Editor\Util\ButtonsClass.cs" />
     <Compile Include="Editor\Util\CursorSettings.cs" />
-    <Compile Include="Editor\GUISections\PresetEditor.cs" />
+    <Compile Include="Editor\GUISections\BotSelectionClass.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
     <Compile Include="Helpers\EFTInfo.cs" />
     <Compile Include="Logger.cs" />
@@ -356,7 +366,7 @@
     <Compile Include="SAINComponent\SubComponents\CoverFinder\CoverFinderComponent.cs" />
     <Compile Include="Editor\Util\BuilderClass.cs" />
     <Compile Include="Editor\Util\RectLayout.cs" />
-    <Compile Include="Editor\Util\StyleOptions.cs" />
+    <Compile Include="Editor\Util\EditorStyleClass.cs" />
     <Compile Include="Helpers\AudioHelpers.cs" />
     <Compile Include="Helpers\CoverPointHelpers.cs" />
     <Compile Include="Helpers\DebugGizmos.cs" />

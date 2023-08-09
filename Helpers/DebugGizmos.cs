@@ -261,7 +261,7 @@ namespace SAIN.Helpers
                 lineRenderer.SetPosition(0, startObject.transform.position);
                 lineRenderer.SetPosition(1, endObject.transform.position);
 
-                // AddorUpdateColorScheme a script to update the line's DrawPosition and color every frame
+                // AddColor a script to update the line's DrawPosition and color every frame
                 var followLineScript = lineObject.AddComponent<FollowLineScript>();
                 followLineScript.startObject = startObject;
                 followLineScript.endObject = endObject;

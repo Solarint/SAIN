@@ -4,11 +4,39 @@ using UnityEngine;
 
 namespace SAIN.Editor
 {
-    public class TexturesClass : EditorAbstract
+    public class TexturesClass : EditorAbstract, IEditorCache
     {
         public TexturesClass(SAINEditor editor) : base(editor)
         {
         }
+
+        public void CreateCache()
+        {
+            if (ColorTextures.Count == 0)
+            {
+                var dictionary = Editor.Colors.ColorSchemeDictionary;
+                foreach (var color in dictionary)
+                {
+                    if (color.Key == ColorNames.Clear)
+                    {
+                        ColorTextures.Add(color.Key, null);
+                    }
+                    else
+                    {
+                        ColorTextures.Add(color.Key, NewTexture(color.Value));
+                    }
+                }
+            }
+        }
+
+        public void ClearCache()
+        {
+            if (ColorTextures.Count > 0)
+            {
+                ColorTextures.Clear();
+            }
+        }
+
 
         public Texture2D GetColor(ColorNames name)
         {
@@ -28,28 +56,9 @@ namespace SAIN.Editor
             return Texture2D.redTexture;
         }
 
-        public void Init()
-        {
-            CreateTextures();
-        }
-
-        private const int BackGroundCount = 4;
-        //private readonly Recolor BackgroundRecolor = new Recolor(-0.08f, -0.18f, -0.18f);
-
         public readonly Dictionary<ColorNames, Texture2D> ColorTextures = new Dictionary<ColorNames, Texture2D>();
 
         public readonly Dictionary<ColorNames, Texture2D> CustomTextures = new Dictionary<ColorNames, Texture2D>();
-
-        private void CreateTextures()
-        {
-            var dictionary = Editor.Colors.ColorScheme;
-            foreach (var color in dictionary)
-            {
-                Color colorValue = color.Value;
-                Texture2D texture = NewTexture(colorValue);
-                ColorTextures.Add(color.Key, texture);
-            }
-        }
 
         public Texture2D NewTexture(Color color)
         {
@@ -77,13 +86,6 @@ namespace SAIN.Editor
             GUI.DrawTexture(Filled, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(1f, 0.25f, 0.25f), 0, 0);
             return lastRect;
         }
-
-        //private const string TexturesPath = "BepInEx/plugins/SAIN/UI/Textures/";
-        //private const string UIElementsFolder = TexturesPath + "UIElements";
-        //private const string ColorTexturesFolder = TexturesPath + "Colors";
-        //private const string CustomTexturesFolder = TexturesPath + "Custom";
-        //private const string BackgroundsPath = TexturesPath + "Backgrounds/Custom";
-        //private const string OriginalBackgroundPath = TexturesPath + "Backgrounds/original.png";
     }
 
     public sealed class Recolor

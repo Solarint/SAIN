@@ -15,35 +15,59 @@ using SAIN.Preset.Personalities;
 
 namespace SAIN.Helpers
 {
+    public enum JsonUtilityEnum
+    {
+        Json,
+        JsonSearch,
+        Presets,
+        BigBrain,
+        BigBrainBrains,
+        BigBrainLayers,
+        BigBrainLayerNames,
+        GlobalSettings,
+        EFTBotSettings,
+        SAINBotSettings,
+        DefaultEditorSettings,
+        PresetDefinition,
+        Personalities,
+    }
+
     public static class JsonUtility
     {
-        private static ManualLogSource Logger => Utility.Logger;
+        public static readonly Dictionary<JsonUtilityEnum, string> FileAndFolderNames = new Dictionary<JsonUtilityEnum, string> 
+        {
+            { JsonUtilityEnum.Json, ".json" },
+            { JsonUtilityEnum.JsonSearch, "*.json" },
+            { JsonUtilityEnum.Presets, "Presets" },
+            { JsonUtilityEnum.BigBrain, "BigBrain - DO NOT TOUCH" },
+            { JsonUtilityEnum.EFTBotSettings, "EFT Bot Settings - DO NOT TOUCH" },
+            { JsonUtilityEnum.BigBrainBrains, "BrainInfos" },
+            { JsonUtilityEnum.BigBrainLayers, "LayerInfos" },
+            { JsonUtilityEnum.BigBrainLayerNames, "LayerNames" },
+            { JsonUtilityEnum.GlobalSettings, "GlobalSettings" },
+            { JsonUtilityEnum.SAINBotSettings, "BotSettings" },
+            { JsonUtilityEnum.DefaultEditorSettings, "*.json" },
+            { JsonUtilityEnum.PresetDefinition, "*Info" },
+            { JsonUtilityEnum.Personalities, "*.json" },
+        };
 
-        public const string EditorName = "Editor";
-        public const string SAINName = "SAIN";
         public const string PresetsFolder = "Presets";
-        public const string SAINConfigPresetFolder = "SAINConfig";
-        public const string BotConfigFolder = "EFTBotConfig";
-        public const string UIFolder = "UI";
-        public const string TextureFolder = "Textures";
-        public const string ColorsFolder = "Colors";
-        public const string ColorScheme = nameof(ColorScheme);
-        public const string ColorNames = nameof(ColorNames);
-        public const string SettingsFolder = "BotSettings";
         public const string JSON = ".json";
         public const string JSONSearch = "*" + JSON;
-        public const string Settings = "Settings";
         public const string Info = "Info";
 
-        public static class Save
+        public static void SaveObjectToJson(object objectToSave, string fileName, params string[] folders)
         {
-            public static void SaveObject(object objectToSave, string fileExtension, string fileName, params string[] folders)
+            if (objectToSave == null)
             {
-                if (CheckNull(objectToSave)) return;
+                return;
+            }
 
+            try
+            {
                 string foldersPath = GetFoldersPath(folders);
                 string filePath = Path.Combine(foldersPath, fileName);
-                filePath += fileExtension;
+                filePath += ".json";
 
                 string jsonString = JsonConvert.SerializeObject(objectToSave, Formatting.Indented);
                 File.Create(filePath).Dispose();
@@ -52,30 +76,17 @@ namespace SAIN.Helpers
                 streamWriter.Flush();
                 streamWriter.Close();
             }
-
-            public static void SaveJson(object objectToSave, string fileName, params string[] folders)
+            catch (Exception e)
             {
-                if (CheckNull(objectToSave)) return;
-
-                SaveObject(objectToSave, ".json", fileName, folders);
-            }
-
-            static bool CheckNull(object obj)
-            {
-                bool isNull = obj == null;
-                if (isNull)
-                {
-                    LogError("Object is Null, cannot save.");
-                }
-                return isNull;
+                Logger.LogError(e);
             }
         }
 
         public static class Load
         {
-            public static List<T> LoadAllJsonFiles<T>(params string[] folders)
+            public static void LoadAllJsonFiles<T>(List<T> list, params string[] folders)
             {
-                return LoadAllFiles<T>(JSONSearch, folders);
+                LoadAllFiles(list, "*.json", folders);
             }
 
             public static List<SAINPresetDefinition> GetPresetOptions(List<SAINPresetDefinition> list)
@@ -100,18 +111,29 @@ namespace SAIN.Helpers
                 return list;
             }
 
-            public static List<T> LoadAllFiles<T>(string searchPattern , params string[] folders)
+            public static void LoadAllFiles<T>(List<T> list, string searchPattern = null , params string[] folders)
             {
                 string foldersPath = GetFoldersPath(folders);
-                var files = Directory.GetFiles(foldersPath, searchPattern);
-                var result = new List<T>();
+
+                string[] files;
+                if (searchPattern != null)
+                {
+                    files = Directory.GetFiles(foldersPath, searchPattern);
+                }
+                else
+                {
+                    files = Directory.GetFiles(foldersPath);
+                }
+
+                if (list == null)
+                {
+                    list = new List<T>();
+                }
                 foreach (var file in files)
                 {
                     string jsonContent = File.ReadAllText(file);
-                    var loaded = JsonConvert.DeserializeObject<T>(jsonContent);
-                    result.Add(loaded);
+                    list.Add(JsonConvert.DeserializeObject<T>(jsonContent));
                 }
-                return result;
             }
 
             public static T DeserializeObject<T>(string file)

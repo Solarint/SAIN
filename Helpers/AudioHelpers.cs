@@ -83,7 +83,7 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Calculates the rain sound modifier based on the current rain value.
+        /// Calculates the rain sound modifier based on the current rain rounding.
         /// </summary>
         /// <returns>
         /// The rain sound modifier.
@@ -96,7 +96,7 @@ namespace SAIN.Helpers
             if (RainCheckTimer < Time.time)
             {
                 RainCheckTimer = Time.time + 10f;
-                // Grabs the current rain value
+                // Grabs the current rain rounding
                 float Rain = WeatherController.Instance.WeatherCurve.Rain;
                 RainModifier = 1f;
                 float max = 1f;
@@ -111,12 +111,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Calculates the inverse scaling of a given value between a minimum and maximum value.
+        /// Calculates the inverse scaling of a given rounding between a minimum and maximum rounding.
         /// </summary>
-        /// <param name="value">The value to be scaled.</param>
-        /// <param name="min">The minimum value.</param>
-        /// <param name="max">The maximum value.</param>
-        /// <returns>The scaled value.</returns>
+        /// <param name="value">The rounding to be scaled.</param>
+        /// <param name="min">The minimum rounding.</param>
+        /// <param name="max">The maximum rounding.</param>
+        /// <returns>The scaled rounding.</returns>
         public static float InverseScaling(float value, float min, float max)
         {
             // Inverse

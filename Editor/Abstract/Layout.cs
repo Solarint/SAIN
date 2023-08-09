@@ -109,13 +109,12 @@ namespace SAIN.Editor.Abstract
 
         public bool Button(GUIContent content, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
-            bool newvalue = GUILayout.Button(content, GetStyle(Style.button), options);
-            bool soundPlayed = CompareValuePlaySound(true, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            if (GUILayout.Button(content, GetStyle(Style.button), options))
             {
-                Logger.LogDebug($"Toggle {sound.Value}");
+                CompareValuePlaySound(true, false, sound);
+                return true;
             }
-            return newvalue;
+            return false;
         }
 
         public bool Toggle(bool value, string text, EUISoundType? sound = null, params GUILayoutOption[] options)
@@ -303,18 +302,6 @@ namespace SAIN.Editor.Abstract
         public Rect NewWindow(int id, Rect viewRect, GUI.WindowFunction func, string title)
         {
             return GUI.Window(id, viewRect, func, title, GetStyle(Style.window));
-        }
-
-        public void CreateGUIAdjustmentSliders()
-        {
-            BaseHeight = HorizontalSliderNoStyle(nameof(BaseHeight), BaseHeight, 5f, 50f);
-            BaseHeight = Editor.BotSelectionClass.Round(BaseHeight);
-
-            TallHeight = HorizontalSliderNoStyle(nameof(TallHeight), TallHeight, 5f, 80f);
-            TallHeight = Editor.BotSelectionClass.Round(TallHeight);
-
-            BaseLabelWidth = HorizontalSliderNoStyle(nameof(BaseLabelWidth), BaseLabelWidth, 50f, 250f);
-            BaseLabelWidth = Editor.BotSelectionClass.Round(BaseLabelWidth);
         }
 
         public GUILayoutOption StandardHeight => Height(BaseHeight);

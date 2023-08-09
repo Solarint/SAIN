@@ -41,19 +41,14 @@ namespace SAIN.Editor
         {
             if (value != null)
             {
-                Box(value.ToString(), "The Value this option is set to. Click to edit directly", options);
+                Box(value.ToString(), "The Rounding this option is set to", options);
                 string dirtyString = TextField(value.ToString(), null, options);
-                object newvalue = CleanString(dirtyString, value);
-                if (newvalue != value)
-                {
-                    value = newvalue;
-                    Sounds.PlaySound(EUISoundType.MenuDropdownSelect);
-                }
+                value = CleanString(dirtyString, value);
             }
             return value;
         }
 
-        public static object CleanString(string input, object currentValue)
+        public object CleanString(string input, object currentValue)
         {
             if (currentValue is float floatValue)
             {
@@ -72,18 +67,22 @@ namespace SAIN.Editor
 
         public static float CleanString(string input, float currentValue)
         {
-            if (Regex.Match(input, @"^-?[0-9]*(?:\.[0-9]*)?$").Success)
+            if (float.TryParse(input, out float result))
             {
-                currentValue = float.Parse(input);
+                return result;
             }
             return currentValue;
         }
 
         public static int CleanString(string input, int currentValue)
         {
-            if (Regex.Match(input, "([-+]?[0-9]+)").Success)
+            if (int.TryParse(input, out int result))
             {
-                currentValue = int.Parse(input);
+                return result;
+            }
+            else if (float.TryParse(input, out float floatResult))
+            {
+                return Mathf.RoundToInt(floatResult);
             }
             return currentValue;
         }
@@ -106,11 +105,19 @@ namespace SAIN.Editor
             return value;
         }
 
-        public string SelectionGridExpandHeight(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
+        public string SelectionGridExpandHeight(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f, string[] toolTips = null)
         {
             BeginGroup(menuRect);
+
+            string tooltip = string.Empty;
+
             for (int i = 0; i < options.Length; i++)
             {
+                if (toolTips != null)
+                {
+                    tooltip = toolTips[i];
+                }
+
                 string option = options[i];
                 bool selected = selectedOption == option;
 
@@ -118,7 +125,7 @@ namespace SAIN.Editor
 
                 GUIStyle style = StyleHandler(selected, hovering);
 
-                bool toggleActivated = GUI.Button(optionRects[i], option, style);
+                bool toggleActivated = GUI.Button(optionRects[i], new GUIContent(option, tooltip), style);
                 if (toggleActivated && selected)
                 {
                     Sounds.PlaySound(EUISoundType.ButtonClick);
@@ -140,7 +147,7 @@ namespace SAIN.Editor
             Texture2D texture;
             if (selected)
             {
-                //Color ColorGold = Editor.Colors.GetColor(Names.ColorNames.Gold);
+                //Color ColorGold = Editor.Colors.GetTexture(Names.ColorNames.Gold);
                 texture = Editor.TexturesClass.GetColor(ColorNames.DarkRed);
                 //ApplyToStyle.ApplyTextColorAllStates(style, ColorGold);
             }

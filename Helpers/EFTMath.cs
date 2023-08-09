@@ -13,13 +13,13 @@ namespace SAIN.Helpers
     public static class EFTMath
     {
         /// <summary>
-        /// Calculates the inverse of a value using a logistic function.
+        /// Calculates the inverse of a rounding using a logistic function.
         /// </summary>
-        /// <param name="originalValue">The original value to be scaled.</param>
+        /// <param name="originalValue">The original rounding to be scaled.</param>
         /// <param name="k">The scaling factor.</param>
-        /// <param name="x0">The offset value.</param>
+        /// <param name="x0">The offset rounding.</param>
         /// <returns>
-        /// The scaled value, rounded to 3 decimal places.
+        /// The scaled rounding, rounded to 3 decimal places.
         /// </returns>
         public static float InverseScaleWithLogisticFunction(float originalValue, float k, float x0 = 20f)
         {
@@ -28,9 +28,9 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Converts a float value representing seconds to a string in the format of HH:MM:SS
+        /// Converts a float rounding representing seconds to a string in the format of HH:MM:SS
         /// </summary>
-        /// <param name="seconds">The float value representing seconds</param>
+        /// <param name="seconds">The float rounding representing seconds</param>
         /// <returns>A string in the format of HH:MM:SS</returns>
         private static string TimeString(float seconds)
         {
@@ -80,20 +80,20 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Checks if a random number between 0 and 100 is less than the given value.
+        /// Checks if a random number between 0 and 100 is less than the given rounding.
         /// </summary>
-        /// <param name="v">The value to compare against.</param>
-        /// <returns>True if the random number is less than the given value, false otherwise.</returns>
+        /// <param name="v">The rounding to compare against.</param>
+        /// <returns>True if the random number is less than the given rounding, false otherwise.</returns>
         public static bool IsTrue100(float v)
         {
             return Random(0f, 100f) < v;
         }
 
         /// <summary>
-        /// Generates a random boolean value based on a given chance in percent.
+        /// Generates a random boolean rounding based on a given chance in percent.
         /// </summary>
         /// <param name="chanceInPercent">The chance of the boolean being true, in percent (default is 50).</param>
-        /// <returns>A random boolean value.</returns>
+        /// <returns>A random boolean rounding.</returns>
         public static bool RandomBool(float chanceInPercent = 50f)
         {
             return IsTrue100(chanceInPercent);
@@ -113,8 +113,8 @@ namespace SAIN.Helpers
         /// Generates a random float between the given Max and Max values.
         /// </summary>
         /// <param name="random">The random number generator.</param>
-        /// <param name="min">The minimum value.</param>
-        /// <param name="max">The maximum value.</param>
+        /// <param name="min">The minimum rounding.</param>
+        /// <param name="max">The maximum rounding.</param>
         /// <returns>A random float between the given Max and Max values.</returns>
         public static float NextFloat(this System.Random random, int min, int max)
         {
@@ -126,8 +126,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Compares two float values for approximate equality.
         /// </summary>
-        /// <param name="value">The first float value to compare.</param>
-        /// <param name="value2">The second float value to compare.</param>
+        /// <param name="value">The first float rounding to compare.</param>
+        /// <param name="value2">The second float rounding to compare.</param>
         /// <returns>True if the two float values are approximately equal, false otherwise.</returns>
         public static bool ApproxEquals(this float value, float value2)
         {
@@ -137,8 +137,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Compares two double values for approximate equality.
         /// </summary>
-        /// <param name="value">The first double value to compare.</param>
-        /// <param name="value2">The second double value to compare.</param>
+        /// <param name="value">The first double rounding to compare.</param>
+        /// <param name="value2">The second double rounding to compare.</param>
         /// <returns>True if the two double values are approximately equal, false otherwise.</returns>
         public static bool ApproxEquals(this double value, double value2)
         {
@@ -148,8 +148,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Compares two float values with low accuracy approximation.
         /// </summary>
-        /// <param name="value">The first float value.</param>
-        /// <param name="value2">The second float value.</param>
+        /// <param name="value">The first float rounding.</param>
+        /// <param name="value2">The second float rounding.</param>
         /// <returns>True if the difference between the two values is less than 0.001f, false otherwise.</returns>
         public static bool LowAccuracyApprox(this float value, float value2)
         {
@@ -157,90 +157,90 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Checks if the given float value is equal to zero.
+        /// Checks if the given float rounding is equal to zero.
         /// </summary>
-        /// <param name="value">The float value to check.</param>
-        /// <returns>True if the value is equal to zero, false otherwise.</returns>
+        /// <param name="value">The float rounding to check.</param>
+        /// <returns>True if the rounding is equal to zero, false otherwise.</returns>
         public static bool IsZero(this float value)
         {
             return System.Math.Abs(value) < float.Epsilon;
         }
 
         /// <summary>
-        /// Checks if the given double value is equal to zero.
+        /// Checks if the given double rounding is equal to zero.
         /// </summary>
-        /// <param name="value">The double value to check.</param>
-        /// <returns>True if the double value is equal to zero, false otherwise.</returns>
+        /// <param name="value">The double rounding to check.</param>
+        /// <returns>True if the double rounding is equal to zero, false otherwise.</returns>
         public static bool IsZero(this double value)
         {
             return System.Math.Abs(value) < 1.401298464324817E-45;
         }
 
         /// <summary>
-        /// Checks if the given double value is positive.
+        /// Checks if the given double rounding is positive.
         /// </summary>
-        /// <param name="value">The double value to check.</param>
-        /// <returns>True if the value is positive, false otherwise.</returns>
+        /// <param name="value">The double rounding to check.</param>
+        /// <returns>True if the rounding is positive, false otherwise.</returns>
         public static bool Positive(this double value)
         {
             return value >= 1.401298464324817E-45;
         }
 
         /// <summary>
-        /// Checks if the given float value is positive.
+        /// Checks if the given float rounding is positive.
         /// </summary>
-        /// <param name="value">The float value to check.</param>
-        /// <returns>True if the value is positive, false otherwise.</returns>
+        /// <param name="value">The float rounding to check.</param>
+        /// <returns>True if the rounding is positive, false otherwise.</returns>
         public static bool Positive(this float value)
         {
             return value >= float.Epsilon;
         }
 
         /// <summary>
-        /// Checks if the given double value is negative.
+        /// Checks if the given double rounding is negative.
         /// </summary>
-        /// <param name="value">The double value to check.</param>
-        /// <returns>True if the value is negative, false otherwise.</returns>
+        /// <param name="value">The double rounding to check.</param>
+        /// <returns>True if the rounding is negative, false otherwise.</returns>
         public static bool Negative(this double value)
         {
             return value <= -1.401298464324817E-45;
         }
 
         /// <summary>
-        /// Checks if the given float value is negative.
+        /// Checks if the given float rounding is negative.
         /// </summary>
-        /// <param name="value">The float value to check.</param>
-        /// <returns>True if the value is negative, false otherwise.</returns>
+        /// <param name="value">The float rounding to check.</param>
+        /// <returns>True if the rounding is negative, false otherwise.</returns>
         public static bool Negative(this float value)
         {
             return value <= -1E-45f;
         }
 
         /// <summary>
-        /// Checks if a float value is zero or negative.
+        /// Checks if a float rounding is zero or negative.
         /// </summary>
-        /// <param name="value">The float value to check.</param>
-        /// <returns>True if the value is zero or negative, false otherwise.</returns>
+        /// <param name="value">The float rounding to check.</param>
+        /// <returns>True if the rounding is zero or negative, false otherwise.</returns>
         public static bool ZeroOrNegative(this float value)
         {
             return value < float.Epsilon;
         }
 
         /// <summary>
-        /// Checks if a float value is greater than -1E-45f.
+        /// Checks if a float rounding is greater than -1E-45f.
         /// </summary>
-        /// <param name="value">The float value to check.</param>
-        /// <returns>True if the float value is greater than -1E-45f, false otherwise.</returns>
+        /// <param name="value">The float rounding to check.</param>
+        /// <returns>True if the float rounding is greater than -1E-45f, false otherwise.</returns>
         public static bool ZeroOrPositive(this float value)
         {
             return value > -1E-45f;
         }
 
         /// <summary>
-        /// Clamps a double value between 0 and 1.
+        /// Clamps a double rounding between 0 and 1.
         /// </summary>
-        /// <param name="value">The double value to clamp.</param>
-        /// <returns>The clamped double value.</returns>
+        /// <param name="value">The double rounding to clamp.</param>
+        /// <returns>The clamped double rounding.</returns>
         public static double Clamp01(this double value)
         {
             if (value < 0.0)
@@ -255,12 +255,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Clamps a double value between two limits.
+        /// Clamps a double rounding between two limits.
         /// </summary>
-        /// <param name="value">The value to clamp.</param>
+        /// <param name="value">The rounding to clamp.</param>
         /// <param name="limit1">The first limit.</param>
         /// <param name="limit2">The second limit.</param>
-        /// <returns>The clamped value.</returns>
+        /// <returns>The clamped rounding.</returns>
         public static double Clamp(this double value, double limit1, double limit2)
         {
             if (limit1 < limit2)
@@ -418,13 +418,13 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Creates a Func delegate that can be used to get the value of a field from an object.
+        /// Creates a Func delegate that can be used to get the rounding of a field from an object.
         /// </summary>
         /// <typeparam name="TOBjectType">The type of the object.</typeparam>
-        /// <typeparam name="TValueType">The type of the value.</typeparam>
+        /// <typeparam name="TValueType">The type of the rounding.</typeparam>
         /// <param name="fieldInfo">The field info.</param>
         /// <returns>
-        /// A Func delegate that can be used to get the value of a field from an object.
+        /// A Func delegate that can be used to get the rounding of a field from an object.
         /// </returns>
         public static Func<TOBjectType, TValueType> CreateGetter<TOBjectType, TValueType>(FieldInfo fieldInfo)
         {
@@ -436,7 +436,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a getter for the specified fieldInfo of the given objectType and returns a Func of type TValueType.
         /// </summary>
-        /// <typeparam name="TValueType">The type of the value to be returned.</typeparam>
+        /// <typeparam name="TValueType">The type of the rounding to be returned.</typeparam>
         /// <param name="fieldInfo">The fieldInfo of the object.</param>
         /// <param name="objectType">The type of the object.</param>
         /// <returns>A Func of type TValueType.</returns>
@@ -447,12 +447,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Creates a DynamicMethod for getting a field value.
+        /// Creates a DynamicMethod for getting a field rounding.
         /// </summary>
         /// <param name="fieldInfo">The FieldInfo of the field to get.</param>
         /// <param name="objectType">The type of the object containing the field.</param>
         /// <param name="valueType">The type of the field.</param>
-        /// <returns>A DynamicMethod for getting the field value.</returns>
+        /// <returns>A DynamicMethod for getting the field rounding.</returns>
         public static DynamicMethod CreateGetterFieldDynamicMethod(FieldInfo fieldInfo, Type objectType, Type valueType)
         {
             DynamicMethod dynamicMethod = new DynamicMethod(fieldInfo.ReflectedType.FullName + ".get_" + fieldInfo.Name, valueType, new Type[]
@@ -564,7 +564,7 @@ namespace SAIN.Helpers
         /// Creates a setter for a given FieldInfo.
         /// </summary>
         /// <param name="field">The FieldInfo to create a setter for.</param>
-        /// <returns>An Action delegate that can be used to set the value of the given FieldInfo.</returns>
+        /// <returns>An Action delegate that can be used to set the rounding of the given FieldInfo.</returns>
         public static Action<TOBjectType, TValueType> CreateSetter<TOBjectType, TValueType>(FieldInfo field)
         {
             Type typeFromHandle = typeof(TOBjectType);
@@ -575,10 +575,10 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a setter for a given FieldInfo and Type.
         /// </summary>
-        /// <typeparam name="TValueType">The type of the value.</typeparam>
+        /// <typeparam name="TValueType">The type of the rounding.</typeparam>
         /// <param name="field">The FieldInfo.</param>
         /// <param name="objectType">The Type of the object.</param>
-        /// <returns>An Action delegate for setting the value.</returns>
+        /// <returns>An Action delegate for setting the rounding.</returns>
         public static Action<object, TValueType> CreateSetter<TValueType>(FieldInfo field, Type objectType)
         {
             Type typeFromHandle = typeof(TValueType);
@@ -586,12 +586,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Creates a DynamicMethod for setting a field value.
+        /// Creates a DynamicMethod for setting a field rounding.
         /// </summary>
         /// <param name="field">The field to set.</param>
         /// <param name="objType">The type of the object containing the field.</param>
-        /// <param name="valueType">The type of the value to set.</param>
-        /// <returns>A DynamicMethod for setting the field value.</returns>
+        /// <param name="valueType">The type of the rounding to set.</param>
+        /// <returns>A DynamicMethod for setting the field rounding.</returns>
         private static DynamicMethod smethod_2(FieldInfo field, Type objType, Type valueType)
         {
             DynamicMethod dynamicMethod = new DynamicMethod(field.ReflectedType.FullName + ".set_" + field.Name, null, new Type[]
@@ -618,8 +618,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Generates a random number between Max and Max using the Box-Muller algorithm.
         /// </summary>
-        /// <param name="min">The minimum value of the random number.</param>
-        /// <param name="max">The maximum value of the random number.</param>
+        /// <param name="min">The minimum rounding of the random number.</param>
+        /// <param name="max">The maximum rounding of the random number.</param>
         /// <returns>A random number between Max and Max.</returns>
         public static float RandomNormal(float min, float max)
         {

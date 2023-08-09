@@ -14,113 +14,118 @@ namespace SAIN.Editor
     {
         static EditTabsClass()
         {
-            TabClasses = new Dictionary<EditorTabs, EditorTabClass> 
+            TabClasses = new Dictionary<EditorTabs, TabClass> 
             {
                 {
-                    EditorTabs.None, new EditorTabClass
+                    EditorTabs.None, new TabClass
                     {
                         Name = "None",
                         ToolTip = "",
-                        Enum = EditorTabs.None,
                     } 
                 },
                 {
-                    EditorTabs.Home, new EditorTabClass
+                    EditorTabs.Home, new TabClass
                     {
                         Name = "Home",
                         ToolTip = "Select Presets and check which mods are detected that can affect SAIN.",
-                        Enum = EditorTabs.Home,
                     }
                 }, 
                 {
-                    EditorTabs.GlobalSettings, new EditorTabClass
+                    EditorTabs.GlobalSettings, new TabClass
                     {
                         Name = "Global Settings",
                         ToolTip = "Modify settings that are the same between all bots.",
-                        Enum = EditorTabs.GlobalSettings,
                     }
                 },
                 {
-                    EditorTabs.BotSettings, new EditorTabClass
+                    EditorTabs.BotSettings, new TabClass
                     {
                         Name = "Bot Settings",
                         ToolTip = "Modify Settings that are unique to particular bot types for individual difficulties. Difficulty is determined on spawn by EFT, and is changed by selecting the Difficulty value when starting a raid. As Online is a mix of all difficulties.",
-                        Enum = EditorTabs.BotSettings,
                     }
                 },
                 { 
-                    EditorTabs.Personalities, new EditorTabClass
+                    EditorTabs.Personalities, new TabClass
                     {
                         Name = "Personalities",
                         ToolTip = "Modify Individual Personality settings for how they are assigned to bots, and what each personality does for a bot's behavior.",
-                        Enum = EditorTabs.Personalities,
                     }
                 },
                 { 
-                    EditorTabs.Advanced, new EditorTabClass
+                    EditorTabs.Advanced, new TabClass
                     {
                         Name = "Advanced Options",
                         ToolTip = "Edit at your own risk. Enable additional advanced config options here",
-                        Enum = EditorTabs.Advanced,
                     }
                 },
             };
 
-            List<string> tabs = new List<string>();
-            foreach (var tab in TabClasses.Values)
+            List<string> names = new List<string>();
+            List<string> tooltips = new List<string>();
+            foreach (var tab in TabClasses)
             {
-                tabs.Add(tab.Name);
+                if (tab.Key != EditorTabs.None)
+                {
+                    names.Add(tab.Value.Name);
+                    tooltips.Add(tab.Value.ToolTip);
+                }
             }
-            Tabs = tabs.ToArray();
+            Tabs = names.ToArray();
+            TabTooltips = tooltips.ToArray();
         }
 
         private const float TabMenuHeight = 50f;
         private const float TabMenuVerticalMargin = 5f;
 
-        private static void CreateNewTabMenuRects()
-        {
-            TabMenuRect = new Rect(0, ExitRect.height + TabMenuVerticalMargin, MainWindow.width, TabMenuHeight);
-            TabRects = Builder.HorizontalGridRects(TabMenuRect, Tabs.Length, 15f);
-        }
-
         private static BuilderClass Builder => SAINPlugin.Editor.Builder;
 
-        public static void TabSelectMenu(float minHeight = 15, float speed = 3, float closeSpeedMulti = 0.66f)
+        public static EditorTabs TabSelectMenu(float minHeight = 15, float speed = 3, float closeSpeedMulti = 0.66f)
         {
             if (TabMenuRect == null || TabRects == null)
             {
-                CreateNewTabMenuRects();
+                TabMenuRect = new Rect(0, ExitRect.height + TabMenuVerticalMargin, MainWindow.width, TabMenuHeight);
+                TabRects = Builder.HorizontalGridRects(TabMenuRect, Tabs.Length, 15f);
             }
 
-            string openTabString = Builder.SelectionGridExpandHeight(TabMenuRect, Tabs, SelectedTab.ToString(), TabRects, minHeight, speed, closeSpeedMulti);
-            SelectedTab = (EditorTabs)Enum.Parse(typeof(EditorTabs), openTabString);
+            string openTabString = Builder.SelectionGridExpandHeight(TabMenuRect, Tabs, SelectedTab.ToString(), TabRects, minHeight, speed, closeSpeedMulti, TabTooltips);
+
+            foreach (var tab in TabClasses)
+            {
+                if (tab.Value.Name == openTabString)
+                {
+                    SelectedTab = tab.Key;
+                }
+            }
+            return SelectedTab;
         }
 
         private static Rect[] TabRects;
-        private static Rect TabMenuRect;
-        private static Rect OpenTabRect;
+        public static Rect TabMenuRect;
 
         public static void BeginScrollView()
         {
             TabClasses[SelectedTab].Scroll = GUILayout.BeginScrollView(TabClasses[SelectedTab].Scroll);
+            GUILayout.BeginVertical();
         }
 
         public static void EndScrollView()
         {
+            GUILayout.EndVertical();
             GUILayout.EndScrollView();
         }
 
-        public static bool IsTabSelected(EditorTabs tab, string selected)
+        public static bool IsTabSelected(EditorTabs tab)
         {
-            return TabClasses[tab].Name == selected;
+            return SelectedTab == tab;
         }
 
         public static EditorTabs SelectedTab = EditorTabs.None;
         public static readonly string[] Tabs;
-        public static readonly Dictionary<EditorTabs, EditorTabClass> TabClasses;
+        public static readonly string[] TabTooltips;
+        public static readonly Dictionary<EditorTabs, TabClass> TabClasses;
     }
 
-    public sealed class EditorTabClass
+    public sealed class TabClass
     {
         public string Name;
         public string ToolTip;

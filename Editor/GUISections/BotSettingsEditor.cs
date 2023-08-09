@@ -3,6 +3,7 @@ using SAIN.Editor.Abstract;
 using SAIN.Preset.BotSettings.SAINSettings.Categories;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace SAIN.Editor.GUISections
@@ -11,6 +12,14 @@ namespace SAIN.Editor.GUISections
     {
         public BotSettingsEditor(SAINEditor editor) : base(editor)
         {
+        }
+
+        public void ClearCache()
+        {
+            if (Categories.Count > 0)
+            {
+                Categories.Clear();
+            }
         }
 
         public void SettingsMenu(object settings, FieldsCache fieldCache = null)
@@ -23,12 +32,7 @@ namespace SAIN.Editor.GUISections
                 Categories.Add(type, GetCategories(settings));
             }
 
-            if (fieldCache == null)
-            {
-                fieldCache = new FieldsCache(type);
-            }
-
-            CategoryOpenable(Categories[type], fieldCache, settings);
+            CategoryOpenable(Categories[type], settings);
 
             EndVertical();
         }
@@ -61,18 +65,32 @@ namespace SAIN.Editor.GUISections
 
         }
 
-        private void CategoryOpenable(List<Category> categories, FieldsCache fieldCache, object settingsObject)
+        private void CategoryOpenable(List<Category> categories, object settingsObject)
         {
             foreach (var categoryClass in categories)
             {
                 FieldInfo categoryField = categoryClass.Field;
+                var advancedAtt = categoryField.GetCustomAttribute<AdvancedAttribute>();
+                if (advancedAtt != null)
+                {
+                    var options = advancedAtt.Options;
+                    if (options.Contains(AdvancedEnum.Hidden))
+                    {
+                        continue;
+                    }
+                    if (options.Contains(AdvancedEnum.IsAdvanced) && SAINPlugin.Editor.AdvancedOptionsEnabled == false)
+                    {
+                        continue;
+                    }
+                }
+
                 object categoryObject = categoryClass.Value(settingsObject);
 
                 var nameDesc = categoryField.GetCustomAttribute<NameAndDescriptionAttribute>();
                 string name = nameDesc?.Name ?? categoryField.Name;
                 string description = nameDesc?.Description;
 
-                FieldInfo[] variableFields = fieldCache.GetFields(categoryObject.GetType());
+                FieldInfo[] variableFields = categoryField.FieldType.GetFields(BindingFlags.Instance | BindingFlags.Public);
                 if (variableFields.Length > 0)
                 {
                     BeginHorizontal();

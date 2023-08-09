@@ -1,4 +1,5 @@
-﻿using SAIN.Helpers;
+﻿using SAIN.Attributes;
+using SAIN.Helpers;
 using SAIN.Preset.GlobalSettings.Categories;
 using static SAIN.Helpers.JsonUtility;
 
@@ -6,31 +7,34 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class GlobalSettingsClass
     {
-        public static GlobalSettingsClass LoadGlobalSettings(SAINPresetDefinition Preset)
+        public static GlobalSettingsClass LoadGlobal(SAINPresetDefinition Preset)
         {
-            string fileName = "GlobalSettings";
-            string presetsFolder = "Presets";
-            string presetNameFolder = Preset.Name;
-            if (!Load.LoadObject(out GlobalSettingsClass result, fileName, presetsFolder, presetNameFolder))
+            string fileName = FileAndFolderNames[JsonUtilityEnum.GlobalSettings];
+            string presetsFolder = FileAndFolderNames[JsonUtilityEnum.Presets];
+
+            if (!Load.LoadObject(out GlobalSettingsClass result, fileName, presetsFolder, Preset.Name))
             {
                 result = new GlobalSettingsClass
                 {
-                    EFTCoreSettings = EFTCoreSettings.GetCore()
+                    EFTCoreSettings = EFTCoreSettings.GetCore(),
+                    BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains)
                 };
+            }
 
-                Save.SaveJson(result, fileName, presetsFolder, presetNameFolder);
-            }
-            else
+            EFTCoreSettings.UpdateCoreSettings(result.EFTCoreSettings);
+
+            var brainSettings = result.BigBrain.BrainSettings;
+            if (brainSettings == null || brainSettings.Count == 0)
             {
-                EFTCoreSettings.UpdateCoreSettings(result.EFTCoreSettings);
+                result.BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains);
             }
+
+            SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
 
             return result;
         }
 
         public AimSettings Aiming = new AimSettings();
-
-        public BigBrainSettings BigBrain = new BigBrainSettings();
 
         public CoverSettings Cover = new CoverSettings();
 
@@ -48,8 +52,13 @@ namespace SAIN.Preset.GlobalSettings
 
         public ShootSettings Shoot = new ShootSettings();
 
+        [Advanced(AdvancedEnum.Hidden)]
         public VisionSettings Vision = new VisionSettings();
 
+        [Advanced(AdvancedEnum.Hidden)]
+        public BigBrainSettings BigBrain = new BigBrainSettings();
+
+        [Advanced(AdvancedEnum.Hidden)]
         public EFTCoreSettings EFTCoreSettings = new EFTCoreSettings();
     }
 }

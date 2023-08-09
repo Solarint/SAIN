@@ -6,7 +6,7 @@
 /// make a new instance, assign any fields that you want to override, and pass it as a tag for your setting.
 /// 
 /// If a field is null (default), it will be ignored and won't change how the setting is displayed.
-/// If a field is non-null (you assigned a value to it), it will override default behavior.
+/// If a field is non-null (you assigned a rounding to it), it will override default behavior.
 /// </summary>
 /// 
 /// <example> 
@@ -14,7 +14,7 @@
 /// <code>
 /// // Override IsAdvanced and Order
 /// Config.Bind("X", "1", 1, new ConfigDescription("", null, new ConfigurationManagerAttributes { IsAdvanced = true, Order = 3 }));
-/// // Override only Order, IsAdvanced stays as the default value assigned by ConfigManager
+/// // Override only Order, IsAdvanced stays as the default rounding assigned by ConfigManager
 /// Config.Bind("X", "2", 2, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 1 }));
 /// Config.Bind("X", "3", 3, new ConfigDescription("", null, new ConfigurationManagerAttributes { Order = 2 }));
 /// </code>
@@ -28,7 +28,7 @@
 internal sealed class ConfigurationManagerAttributes
 {
     /// <summary>
-    /// Should the setting be shown as a percentage (only use with value range settings).
+    /// Should the setting be shown as a percentage (only use with rounding range settings).
     /// </summary>
     public bool? ShowRangeAsPercent;
 
@@ -79,7 +79,7 @@ internal sealed class ConfigurationManagerAttributes
     /// </param>
     /// <param name="isCurrentlyAcceptingInput">
     /// Modify this ref parameter to true when you want the current setting drawer to receive Input events.
-    /// The value will persist after being set, use it to see if the current instance is being edited.
+    /// The rounding will persist after being set, use it to see if the current instance is being edited.
     /// Remember to set it to false after you are done!
     /// </param>
     public delegate void CustomHotkeyDrawerFunc(BepInEx.Configuration.ConfigEntryBase setting, ref bool isCurrentlyAcceptingInput);
@@ -128,7 +128,7 @@ internal sealed class ConfigurationManagerAttributes
     public int? Order;
 
     /// <summary>
-    /// Only show the value, don't allow editing it.
+    /// Only show the rounding, don't allow editing it.
     /// </summary>
     public bool? ReadOnly;
 

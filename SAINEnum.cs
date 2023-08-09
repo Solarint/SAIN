@@ -86,7 +86,8 @@ namespace SAIN
         Caliber26x75,
         Caliber30x29,
         Caliber40x46,
-        Caliber40mmRU
+        Caliber40mmRU,
+        Caliber127x108
     }
 
     public enum CoverStatus
@@ -192,5 +193,17 @@ namespace SAIN
         Far,
         VeryFar,
         NoEnemy,
+    }
+
+    public enum StyleStates
+    {
+        normal,
+        onNormal,
+        active,
+        OnActive,
+        hover,
+        onHover,
+        focused,
+        onFocused,
     }
 }

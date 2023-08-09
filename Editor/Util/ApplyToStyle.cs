@@ -13,6 +13,28 @@ namespace SAIN.Editor.Util
             BGFocused(style, normal, normal);
         }
 
+        public static void BGAllStates(Texture2D normal, params GUIStyle[] styles)
+        {
+            foreach (var style in styles)
+            {
+                BGNormal(style, normal, normal);
+                BGActive(style, normal, normal);
+                BGHover(style, normal, normal);
+                BGFocused(style, normal, normal);
+            }
+        }
+
+        public static void BGAllStates(Texture2D normal, Texture2D active, params GUIStyle[] styles)
+        {
+            foreach (var style in styles)
+            {
+                BGNormal(style, normal, active);
+                BGActive(style, normal, active);
+                BGHover(style, normal, active);
+                BGFocused(style, normal, active);
+            }
+        }
+
         public static void BGAllStates(GUIStyle style, GUIStyle style2, Texture2D normal)
         {
             BGAllStates(style, normal);

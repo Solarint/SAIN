@@ -1,0 +1,35 @@
+﻿namespace SAIN.Preset.GlobalSettings.Categories
+{
+    public enum Brain
+    {
+        ArenaFighter,
+        BossBully,
+        BossGluhar,
+        Knight,
+        BossKojaniy,
+        BossSanitar,
+        Tagilla,
+        BossTest,
+        BossZryachiy,
+        Obdolbs,
+        ExUsec,
+        BigPipe,
+        BirdEye,
+        FollowerBully,
+        FollowerGluharAssault,
+        FollowerGluharProtect,
+        FollowerGluharScout,
+        FollowerKojaniy,
+        FollowerSanitar,
+        TagillaFollower,
+        Fl_Zraychiy,
+        Gifter,
+        Killa,
+        Marksman,
+        PMC,
+        SectantPriest,
+        SectantWarrior,
+        CursAssault,
+        Assault,
+    }
+}

@@ -33,7 +33,7 @@ namespace SAIN.Plugin
                 };
             }
             presetDefaults.DefaultPreset = DefaultPreset;
-            SAINPlugin.Editor.AdvancedOptionsEnabled = presetDefaults.Advanced;
+            SAINPlugin.Editor.AdvancedOptionsEnabled = presetDefaults.ShowAdvanced;
 
             if (!LoadPresetDefinition(presetDefaults.SelectedPreset, out SAINPresetDefinition presetDefinition))
             {
@@ -92,7 +92,7 @@ namespace SAIN.Plugin
 
         public static void SavePresetDefinition(SAINPresetDefinition definition)
         {
-            Save.SaveJson(definition, "Info", PresetsFolder, definition.Name);
+            SaveObjectToJson(definition, "Info", PresetsFolder, definition.Name);
         }
 
         public static void InitPresetFromDefinition(SAINPresetDefinition def)
@@ -102,9 +102,9 @@ namespace SAIN.Plugin
             {
                 SelectedPreset = def.Name,
                 DefaultPreset = DefaultPreset,
-                Advanced = SAINPlugin.Editor?.AdvancedOptionsEnabled == true
+                ShowAdvanced = SAINPlugin.Editor?.AdvancedOptionsEnabled == true
             };
-            Save.SaveJson(defaults, Settings, PresetsFolder); 
+            SaveObjectToJson(defaults, Settings, PresetsFolder); 
             UpdateExistingBots();
         }
 

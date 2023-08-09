@@ -21,48 +21,8 @@ namespace SAIN.Preset.GlobalSettings
         [MinMaxRound(0.1f, 0.95f, 100f)]
         public float SubsonicModifier = 0.25f;
 
-        [List]
-        [AdvancedOptions(true)]
+        [Dictionary(typeof(Caliber), typeof(float))]
+        [Advanced(AdvancedEnum.IsAdvanced)]
         public AudibleRangesClass AudibleRanges = new AudibleRangesClass();
-    }
-
-    public class AmmoSettingDictionary
-    {
-        public AmmoSettingDictionary(Dictionary<Caliber, float> valueDictionary)
-        {
-            ValueDictionary = valueDictionary;
-        }
-
-        public void Set(Caliber caliber, float value)
-        {
-            ValueDictionary[caliber] = value;
-        }
-
-        public float Get(Caliber caliber)
-        {
-            return ValueDictionary[caliber];
-        }
-
-        public Dictionary<Caliber, float> ValueDictionary;
-    }
-
-    public class WeaponSettingsDictionary
-    {
-        public WeaponSettingsDictionary(Dictionary<WeaponClass, float> valueDictionary)
-        {
-            ValueDictionary = valueDictionary;
-        }
-
-        public void Set(WeaponClass caliber, float value)
-        {
-            ValueDictionary[caliber] = value;
-        }
-
-        public float Get(WeaponClass caliber)
-        {
-            return ValueDictionary[caliber];
-        }
-
-        public Dictionary<WeaponClass, float> ValueDictionary;
     }
 }

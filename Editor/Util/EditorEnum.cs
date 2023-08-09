@@ -3,6 +3,10 @@ namespace SAIN.Editor
 {
     public enum ColorNames
     {
+        White,
+        Black,
+        Clear,
+
         LightRed,
         MidRed,
         DarkRed,
@@ -12,7 +16,6 @@ namespace SAIN.Editor
         DarkGray,
         VeryDarkGray,
         VeryVeryDarkGray,
-        Black,
         LightBlue,
         MidBlue,
         DarkBlue,
@@ -47,5 +50,7 @@ namespace SAIN.Editor
         blankbox,
         group,
         selectionGrid,
+        dragBar,
+        botTypeGrid,
     }
 }

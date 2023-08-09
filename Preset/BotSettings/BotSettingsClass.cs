@@ -6,6 +6,7 @@ using SAIN.Helpers;
 using SAIN.Preset.BotSettings.SAINSettings;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using static SAIN.Helpers.JsonUtility;
 
@@ -46,7 +47,7 @@ namespace SAIN.Preset.BotSettings
                     };
 
                     UpdateSAINSettingsToEFTDefault(wildSpawnType, settings);
-                    Save.SaveJson(settings, name, sainFolders);
+                    SaveObjectToJson(settings, name, sainFolders);
                 }
 
                 SAINSettings.Add(wildSpawnType, settings);
@@ -105,7 +106,7 @@ namespace SAIN.Preset.BotSettings
                                 FieldInfo AVariableField = AccessTools.Field(ACatObject.GetType(), BVariableField.Name);
                                 if (AVariableField != null)
                                 {
-                                    // Get the final Value of the variable from EFT group, and set the SAIN Setting variable to that multiplier
+                                    // Get the final Rounding of the variable from EFT group, and set the SAIN Setting variable to that multiplier
                                     object AValue = AVariableField.GetValue(ACatObject);
                                     BVariableField.SetValue(BCatObject, AValue);
                                     //Logger.LogWarning($"Set [{BVariableField.LayerName}] to [{AValue}]");
@@ -117,7 +118,7 @@ namespace SAIN.Preset.BotSettings
             }
         }
 
-        private bool ShallUseEFTBotDefault(FieldInfo field) => field.GetCustomAttribute<AdvancedOptionsAttribute>()?.CopyValueFromEFT == true;
+        private bool ShallUseEFTBotDefault(FieldInfo field) => field.GetCustomAttribute<AdvancedAttribute>()?.Options?.Contains(AdvancedEnum.CopyValueFromEFT) == true;
 
         public void LoadEFTSettings()
         {
@@ -132,7 +133,7 @@ namespace SAIN.Preset.BotSettings
                     if (!Load.LoadObject(out EFTBotSettings eftSettings, name, EFTFolderString))
                     {
                         eftSettings = new EFTBotSettings(name, wildSpawnType, Difficulties);
-                        Save.SaveJson(eftSettings, name, EFTFolderString);
+                        SaveObjectToJson(eftSettings, name, EFTFolderString);
                     }
 
                     EFTSettings.Add(wildSpawnType, eftSettings);
@@ -190,12 +191,12 @@ namespace SAIN.Preset.BotSettings
 
             foreach (SAINSettingsGroupClass settings in SAINSettings.Values)
             {
-                Save.SaveJson(settings, settings.Name, sainFolders);
+                SaveObjectToJson(settings, settings.Name, sainFolders);
             }
 
             foreach (EFTBotSettings settings in EFTSettings.Values)
             {
-                Save.SaveJson(settings, settings.Name, EFTFolderString);
+                SaveObjectToJson(settings, settings.Name, EFTFolderString);
             }
         }
 
