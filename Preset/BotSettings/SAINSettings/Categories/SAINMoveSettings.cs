@@ -28,7 +28,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [MinMaxRound(100f, 500f)]
         public float TURN_SPEED_ON_SPRINT = 320f;
 
-        private readonly string DONOTEDIT = "Do not Edit These";
+        const string DONOTEDIT = "Do not Edit These";
         [Advanced(AdvancedEnum.Hidden)] public float RUN_IF_GAOL_FAR_THEN = 0f;
         [Advanced(AdvancedEnum.Hidden)] public float CHANCE_TO_RUN_IF_NO_AMMO_0_100 = 100f;
         [Advanced(AdvancedEnum.Hidden)] public float SEC_TO_CHANGE_TO_RUN = 0f;

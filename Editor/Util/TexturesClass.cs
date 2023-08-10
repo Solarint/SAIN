@@ -1,4 +1,5 @@
 ﻿using SAIN.Editor.Abstract;
+using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,12 +32,8 @@ namespace SAIN.Editor
 
         public void ClearCache()
         {
-            if (ColorTextures.Count > 0)
-            {
-                ColorTextures.Clear();
-            }
+            ListHelpers.ClearCache(ColorTextures);
         }
-
 
         public Texture2D GetColor(ColorNames name)
         {

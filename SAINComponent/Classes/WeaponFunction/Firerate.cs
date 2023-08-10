@@ -63,7 +63,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
 
             finalTime = Mathf.Round(finalTime * 100f) / 100f;
 
-            Logger.LogDebug(finalTime);
+            //Logger.LogDebug(finalTime);
 
             return finalTime;
         }

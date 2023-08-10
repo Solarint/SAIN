@@ -317,7 +317,6 @@ namespace SAIN.SAINComponent.Classes
 
         public readonly NavMeshPath PathToEnemy = new NavMeshPath();
 
-        private float DistanceTimer = 0f;
         private float CheckPathTimer = 0f;
     }
 

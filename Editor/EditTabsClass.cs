@@ -87,7 +87,7 @@ namespace SAIN.Editor
                 TabRects = Builder.HorizontalGridRects(TabMenuRect, Tabs.Length, 15f);
             }
 
-            string openTabString = Builder.SelectionGridExpandHeight(TabMenuRect, Tabs, SelectedTab.ToString(), TabRects, minHeight, speed, closeSpeedMulti, TabTooltips);
+            string openTabString = Builder.SelectionGridExpandHeight(TabMenuRect, Tabs, TabClasses[SelectedTab].Name, TabRects, minHeight, speed, closeSpeedMulti, TabTooltips);
 
             foreach (var tab in TabClasses)
             {

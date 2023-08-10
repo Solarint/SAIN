@@ -36,9 +36,13 @@ namespace SAIN.Editor.GUISections
                 presetSpacing++;
                 var preset = PresetHandler.PresetOptions[i];
                 bool selected = selectedPreset.Name == preset.Name;
-                if (Toggle(selected, preset.Name, preset.Description, null, Height(InstalledHeight)))
+                if (Toggle(selected, $"{preset.Name} for SAIN {preset.SAINVersion}", preset.Description, null, Height(InstalledHeight)))
                 {
                     selectedPreset = preset;
+                }
+                if (preset.SAINVersion != AssemblyInfo.SAINVersion)
+                {
+                    Box("!", $"Selected Preset was made for SAIN Version {preset.SAINVersion} but you are running {AssemblyInfo.SAINVersion}, you may experience issues.", Height(LabelHeight), Width(30));
                 }
                 if (presetSpacing >= 4)
                 {

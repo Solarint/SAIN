@@ -53,19 +53,19 @@ namespace SAIN.Plugin
                 Description = "The Default SAIN Preset",
                 Creator = "Solarint"
             };
-            SavePresetDefinition(easy);
-            new SAINPresetClass(easy);
+            //SavePresetDefinition(easy);
+            //new SAINPresetClass(easy);
             var normal = new SAINPresetDefinition
             {
                 Name = "SAIN Normal",
                 Description = "The Default SAIN Preset",
                 Creator = "Solarint"
             };
-            SavePresetDefinition(normal);
-            new SAINPresetClass(normal);
+            //SavePresetDefinition(normal);
+            //new SAINPresetClass(normal);
             var hard = new SAINPresetDefinition
             {
-                Name = "SAIN Hard",
+                Name = DefaultPreset,
                 Description = "The Default SAIN Preset",
                 Creator = "Solarint"
             };
@@ -77,13 +77,13 @@ namespace SAIN.Plugin
                 Description = "The Default SAIN Preset",
                 Creator = "Solarint"
             };
-            SavePresetDefinition(impossible);
-            new SAINPresetClass(impossible);
+            //SavePresetDefinition(impossible);
+            //new SAINPresetClass(impossible);
 
             return hard;
         }
 
-        static readonly string DefaultPreset = "SAIN Hard";
+        static readonly string DefaultPreset = "SAIN Default";
 
         public static bool LoadPresetDefinition(string presetKey, out SAINPresetDefinition definition)
         {
@@ -97,15 +97,33 @@ namespace SAIN.Plugin
 
         public static void InitPresetFromDefinition(SAINPresetDefinition def)
         {
-            LoadedPreset = new SAINPresetClass(def);
-            var defaults = new PresetEditorDefaults
+            try
             {
-                SelectedPreset = def.Name,
-                DefaultPreset = DefaultPreset,
-                ShowAdvanced = SAINPlugin.Editor?.AdvancedOptionsEnabled == true
-            };
-            SaveObjectToJson(defaults, Settings, PresetsFolder); 
-            UpdateExistingBots();
+                LoadedPreset = new SAINPresetClass(def);
+                var defaults = new PresetEditorDefaults
+                {
+                    SelectedPreset = def.Name,
+                    DefaultPreset = DefaultPreset,
+                    ShowAdvanced = SAINPlugin.Editor?.AdvancedOptionsEnabled == true
+                };
+                SaveObjectToJson(defaults, Settings, PresetsFolder);
+                UpdateExistingBots();
+            }
+            catch (Exception ex)
+            {
+                Sounds.PlaySound(EFT.UI.EUISoundType.ErrorMessage);
+                Logger.LogError(ex);
+                LoadPresetDefinition(DefaultPreset, out def);
+                LoadedPreset = new SAINPresetClass(def);
+                var defaults = new PresetEditorDefaults
+                {
+                    SelectedPreset = def.Name,
+                    DefaultPreset = DefaultPreset,
+                    ShowAdvanced = SAINPlugin.Editor?.AdvancedOptionsEnabled == true
+                };
+                SaveObjectToJson(defaults, Settings, PresetsFolder);
+                UpdateExistingBots();
+            }
         }
 
         public static void UpdateExistingBots()

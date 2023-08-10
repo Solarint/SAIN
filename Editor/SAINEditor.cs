@@ -227,9 +227,7 @@ namespace SAIN.Editor
 
         public Rect AdjustmentRect = new Rect(500, 50, 600f, 500f);
 
-        private static bool Inited = false;
-
-        public Rect OpenTabRect = new Rect(0, 85, MainWindow.width, 1000f);
+        public Rect OpenTabRect = new Rect(0, 0, MainWindow.width, 1000f);
 
         private Texture2D DragBackgroundTexture => TexturesClass.GetColor(ColorNames.MidGray);
     }

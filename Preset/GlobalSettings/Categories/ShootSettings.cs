@@ -45,7 +45,7 @@ namespace SAIN.Preset.GlobalSettings
         public WeaponShootabilityClass WeaponShootability = new WeaponShootabilityClass();
 
 
-        private readonly string DONOTEDIT = "Do not Edit These";
+        const string DONOTEDIT = "Do not Edit These";
         [Advanced(AdvancedEnum.Hidden)] public float WeaponClassScaling = 0.3f;
         [Advanced(AdvancedEnum.Hidden)] public float RecoilScaling = 0.2f;
         [Advanced(AdvancedEnum.Hidden)] public float ErgoScaling = 0.1f;

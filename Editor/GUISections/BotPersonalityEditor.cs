@@ -5,6 +5,7 @@ using UnityEngine;
 using static SAIN.Helpers.Reflection;
 using static SAIN.Attributes.AttributesGUI;
 using SAIN.Preset.Personalities;
+using SAIN.Helpers;
 
 namespace SAIN.Editor.GUISections
 {
@@ -12,6 +13,11 @@ namespace SAIN.Editor.GUISections
     {
         public BotPersonalityEditor(SAINEditor editor) : base(editor)
         {
+        }
+
+        public void ClearCache()
+        {
+            ListHelpers.ClearCache(OpenPersMenus);
         }
 
         public void PersonalityMenu()
@@ -26,11 +32,10 @@ namespace SAIN.Editor.GUISections
                     OpenPersMenus.Add(name, false);
                 }
                 OpenPersMenus[name] = Builder.ExpandableMenu(name, OpenPersMenus[name], personality.Description);
-                if (!OpenPersMenus[name])
+                if (OpenPersMenus[name])
                 {
-                    continue;
+                    EditAllValuesInObj(personality.Variables);
                 }
-                EditAllValuesInObj(personality.Variables, out int optionsCount, true);
             }
             Builder.EndScrollView();
         }

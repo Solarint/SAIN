@@ -59,11 +59,10 @@ namespace SAIN.Helpers
         /// <returns>The audible range of the given ammunition caliber.</returns>
         private static float AudibleRange(string ammocaliber)
         {
-            Caliber caliber = EnumValues.Parse<Caliber>(ammocaliber);
             var Ranges = SAINPlugin.LoadedPreset?.GlobalSettings?.Hearing?.AudibleRanges;
             if (Ranges != null)
             {
-                return Ranges.Get(caliber);
+                return Ranges.Get(ammocaliber);
             }
             else
             {

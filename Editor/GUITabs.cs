@@ -83,7 +83,7 @@ namespace SAIN.Editor
         public void BotSettings()
         {
             BeginArea(Editor.OpenTabRect);
-            BotSelection.Menu(Editor.OpenTabRect);
+            BotSelection.Menu();
             EndArea();
         }
 

@@ -227,6 +227,7 @@
     <Compile Include="Editor\GUITabs.cs" />
     <Compile Include="Editor\IEditorCache.cs" />
     <Compile Include="Editor\Util\ModifyLists.cs" />
+    <Compile Include="Helpers\ListHelpers.cs" />
     <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
@@ -419,7 +420,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SAINComponent\SAINBase.cs" />
     <Compile Include="Plugin\VersionChecker\VersionChecker.cs" />
-    <Compile Include="Plugin\PluginInfo.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\ShootSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\VisionSettings.cs" />
   </ItemGroup>

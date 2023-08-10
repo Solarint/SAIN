@@ -309,6 +309,5 @@ namespace SAIN.Editor.Abstract
 
         private float BaseHeight = 22.5f;
         private float TallHeight = 35f;
-        private float BaseLabelWidth = 100f;
     }
 }

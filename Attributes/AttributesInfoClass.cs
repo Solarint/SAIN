@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -40,7 +41,11 @@ namespace SAIN.Attributes
                 Default = Mathf.Round(newDefault * 100f) / 100f;
             }
 
-            AdvancedOptions = Get<AdvancedAttribute>()?.Options ?? new AdvancedEnum[] { AdvancedEnum.None, };
+            var advanced = Get<AdvancedAttribute>();
+            if (advanced != null)
+            {
+                AdvancedOptions = advanced.Options;
+            }
 
             var listObj = Get<DictionaryAttribute>();
             if (listObj != null)
@@ -86,11 +91,9 @@ namespace SAIN.Attributes
         public float? Max { get; private set; }
         public float? Rounding { get; private set; }
 
-        public bool IsHidden { get; private set; }
-        public bool IsAdvanced { get; private set; }
-        public bool GetDefaultFromEFT { get; private set; }
+        public bool DoNotShowGUI => AdvancedOptions.Contains(AdvancedEnum.Hidden) || SAINPlugin.Editor.AdvancedOptionsEnabled == false && AdvancedOptions.Contains(AdvancedEnum.IsAdvanced);
 
-        public AdvancedEnum[] AdvancedOptions { get; private set; }
+        public AdvancedEnum[] AdvancedOptions { get; private set; } = new AdvancedEnum[0];
 
         public AttributeListType ListTypeEnum { get; private set; } = AttributeListType.None;
         public Type PrimaryListType { get; private set; }

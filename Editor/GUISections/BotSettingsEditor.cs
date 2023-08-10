@@ -1,5 +1,6 @@
 ﻿using SAIN.Attributes;
 using SAIN.Editor.Abstract;
+using SAIN.Helpers;
 using SAIN.Preset.BotSettings.SAINSettings.Categories;
 using System;
 using System.Collections.Generic;
@@ -16,13 +17,10 @@ namespace SAIN.Editor.GUISections
 
         public void ClearCache()
         {
-            if (Categories.Count > 0)
-            {
-                Categories.Clear();
-            }
+            ListHelpers.ClearCache(Categories);
         }
 
-        public void SettingsMenu(object settings, FieldsCache fieldCache = null)
+        public void SettingsMenu(object settings)
         {
             BeginVertical();
 
@@ -43,10 +41,12 @@ namespace SAIN.Editor.GUISections
             var fields = settingsObject.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (FieldInfo field in fields)
             {
-                result.Add(new Category
+                var attInfo = AttributesGUI.GetAttributeInfo(field);
+                if (attInfo.AdvancedOptions.Contains(AdvancedEnum.Hidden))
                 {
-                    Field = field,
-                });
+                    continue;
+                }
+                result.Add(new Category(field));
             }
             return result;
         }
@@ -55,9 +55,24 @@ namespace SAIN.Editor.GUISections
 
         public sealed class Category
         {
-            public FieldInfo Field;
+            public Category(FieldInfo field)
+            {
+                Field = field;
+                foreach (FieldInfo subFields in field.FieldType.GetFields(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    var attInfo = AttributesGUI.GetAttributeInfo(subFields);
+                    if (attInfo.AdvancedOptions.Contains(AdvancedEnum.Hidden))
+                    {
+                        continue;
+                    }
+                    OptionsCount++;
+                }
+            }
+
+            public readonly FieldInfo Field;
+            public readonly int OptionsCount = 0;
+
             public bool Open = false;
-            public int OptionsCount = 0;
 
             public object Value(object settingsObject) => Field.GetValue(settingsObject);
 
@@ -70,32 +85,20 @@ namespace SAIN.Editor.GUISections
             foreach (var categoryClass in categories)
             {
                 FieldInfo categoryField = categoryClass.Field;
-                var advancedAtt = categoryField.GetCustomAttribute<AdvancedAttribute>();
-                if (advancedAtt != null)
+                var attInfo = AttributesGUI.GetAttributeInfo(categoryField);
+                if (attInfo.DoNotShowGUI)
                 {
-                    var options = advancedAtt.Options;
-                    if (options.Contains(AdvancedEnum.Hidden))
-                    {
-                        continue;
-                    }
-                    if (options.Contains(AdvancedEnum.IsAdvanced) && SAINPlugin.Editor.AdvancedOptionsEnabled == false)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 object categoryObject = categoryClass.Value(settingsObject);
-
-                var nameDesc = categoryField.GetCustomAttribute<NameAndDescriptionAttribute>();
-                string name = nameDesc?.Name ?? categoryField.Name;
-                string description = nameDesc?.Description;
 
                 FieldInfo[] variableFields = categoryField.FieldType.GetFields(BindingFlags.Instance | BindingFlags.Public);
                 if (variableFields.Length > 0)
                 {
                     BeginHorizontal();
 
-                    categoryClass.Open = Builder.ExpandableMenu(name, categoryClass.Open, description, EntryConfig.EntryHeight, EntryConfig.InfoWidth, false);
+                    categoryClass.Open = Builder.ExpandableMenu(attInfo.Name, categoryClass.Open, attInfo.Description, EntryConfig.EntryHeight, EntryConfig.InfoWidth, false);
                     string labelText = $"Options Count: [{categoryClass.OptionsCount}]";
                     string advanced = Editor.AdvancedOptionsEnabled ?
                         " Advanced Options are on, so the reason for this section being empty is that the values are hidden because they SHOULD NOT be changed under any circumstance."
@@ -105,8 +108,10 @@ namespace SAIN.Editor.GUISections
 
                     EndHorizontal();
 
-                    AttributesGUI.EditAllValuesInObj(categoryObject, out int count, categoryClass.Open);
-                    categoryClass.OptionsCount = count;
+                    if (categoryClass.Open)
+                    {
+                        AttributesGUI.EditAllValuesInObj(categoryObject);
+                    }
                 }
             }
         }

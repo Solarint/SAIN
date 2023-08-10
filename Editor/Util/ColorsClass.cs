@@ -42,10 +42,7 @@ namespace SAIN.Editor.Util
 
         public void ClearCache()
         {
-            if (ColorSchemeDictionary.Count > 0)
-            {
-                ColorSchemeDictionary.Clear();
-            }
+            ListHelpers.ClearCache(ColorSchemeDictionary);
         }
 
         public readonly string SchemeName;

@@ -1,20 +1,16 @@
-﻿using BepInEx.Logging;
-using Comfort.Common;
+﻿using Comfort.Common;
 using EFT;
-using SAIN.SAINComponent.Classes.Decision;
-using SAIN.SAINComponent.Classes.Talk;
-using SAIN.SAINComponent.Classes.WeaponFunction;
-using SAIN.SAINComponent.Classes.Mover;
-using SAIN.SAINComponent.Classes;
-using SAIN.Helpers;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
 using SAIN.Components;
-using System.Threading.Tasks;
-using SAIN.SAINComponent.Classes.Debug;
-using SAIN.SAINComponent.Classes.Info;
+using SAIN.Helpers;
 using SAIN.SAINComponent.BaseClasses;
+using SAIN.SAINComponent.Classes;
+using SAIN.SAINComponent.Classes.Debug;
+using SAIN.SAINComponent.Classes.Decision;
+using SAIN.SAINComponent.Classes.Info;
+using SAIN.SAINComponent.Classes.Mover;
+using SAIN.SAINComponent.Classes.Talk;
+using System;
+using UnityEngine;
 
 namespace SAIN.SAINComponent
 {
@@ -51,7 +47,6 @@ namespace SAIN.SAINComponent
         public bool Init(SAINPersonClass person)
         {
             Person = person;
-            Logger = BepInEx.Logging.Logger.CreateLogSource($"SAIN Component [{person.Name}]");
 
             try
             {
@@ -310,7 +305,6 @@ namespace SAIN.SAINComponent
 
         public Vector3 Position => Person.Position;
         public BotOwner BotOwner => Person.BotOwner;
-        public ManualLogSource Logger { get; private set; }
         public string ProfileId => Person.ProfileId;
         public Player Player => Person.Player;
         public bool HasEnemy => EnemyController.HasEnemy;

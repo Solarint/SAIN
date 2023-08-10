@@ -56,11 +56,8 @@ namespace SAIN.Editor
 
         public void ClearCache()
         {
-            if (Styles.Count > 0)
-            {
-                Styles.Clear();
-                DynamicStyles.Clear();
-            }
+            ListHelpers.ClearCache(Styles);
+            ListHelpers.ClearCache(DynamicStyles);
         }
 
         public void CreateCache()

@@ -16,7 +16,6 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
             SAIN = sain;
             Player = sain.Player;
             BotOwner = sain.BotOwner;
-            Logger = sain.Logger;
 
             ColliderFinder = new ColliderFinder();
             CoverAnalyzer = new CoverAnalyzer(SAIN, this);
@@ -25,8 +24,6 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
         public SAINComponentClass SAIN { get; private set; }
         public Player Player { get; private set; }
         public BotOwner BotOwner { get; private set; }
-        public ManualLogSource Logger { get; private set; }
-
 
         public List<CoverPoint> CoverPoints { get; private set; } = new List<CoverPoint>();
         public CoverAnalyzer CoverAnalyzer { get; private set; }

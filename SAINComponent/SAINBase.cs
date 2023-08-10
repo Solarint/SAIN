@@ -12,7 +12,6 @@ namespace SAIN.SAINComponent
 
         public BotOwner BotOwner => SAIN.BotOwner;
         public Player Player => SAIN.Player;
-        public ManualLogSource Logger => SAIN.Logger;
         public GlobalSettingsClass GlobalSAINSettings => SAINPlugin.LoadedPreset?.GlobalSettings;
     }
 

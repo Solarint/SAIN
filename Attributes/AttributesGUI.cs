@@ -1,6 +1,7 @@
 ﻿using EFT;
 using EFT.UI;
 using SAIN.Editor;
+using SAIN.Helpers;
 using SAIN.Preset;
 using SAIN.Preset.GlobalSettings.Categories;
 using System;
@@ -14,51 +15,53 @@ namespace SAIN.Attributes
 {
     public class AttributesGUI
     {
-        private static AttributesInfoClass CheckDictionary(FieldInfo field)
+        public static AttributesInfoClass GetAttributeInfo(FieldInfo field)
         {
-            if (!AttributesClasses.ContainsKey(field))
+            string name = field.Name + field.DeclaringType.Name;
+            if (!AttributesClasses.ContainsKey(name))
             {
-                AttributesClasses.Add(field, new AttributesInfoClass(field));
+                AttributesClasses.Add(name, new AttributesInfoClass(field));
             }
-            return AttributesClasses[field];
+            return AttributesClasses[name];
+        }
+
+        public static AttributesInfoClass GetAttributeInfo(PropertyInfo property)
+        {
+            string name = property.Name + property.DeclaringType.Name;
+            if (!AttributesClasses.ContainsKey(name))
+            {
+                AttributesClasses.Add(name, new AttributesInfoClass(property));
+            }
+            return AttributesClasses[name];
         }
 
         public static void ClearCache()
         {
-            if (AttributesClasses.Count > 0)
+            if (ListHelpers.ClearCache(AttributesClasses))
             {
-                AttributesClasses.Clear();
                 LabelStyle = null;
             }
         }
 
-        private static bool AdvancedIsOff => SAINPlugin.Editor.AdvancedOptionsEnabled == false;
+        private static readonly GUIEntryConfig DefaultEntryConfig = new GUIEntryConfig();
+
         private static GUIStyle LabelStyle;
-        private static readonly Dictionary<FieldInfo, AttributesInfoClass> AttributesClasses = new Dictionary<FieldInfo, AttributesInfoClass>();
+        private static readonly Dictionary<string, AttributesInfoClass> AttributesClasses = new Dictionary<string, AttributesInfoClass>();
 
-        public static object EditValue(object value, out bool wasEditable, AttributesInfoClass attributes, GUIEntryConfig entryConfig = null)
+        public static object EditValue(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig = null)
         {
-            wasEditable = false;
-
             if (value == null || attributes == null)
             {
                 return value;
             }
-            var advOptions = attributes.AdvancedOptions;
-            if (advOptions.Contains(AdvancedEnum.Hidden))
+            if (attributes.DoNotShowGUI)
             {
                 return value;
             }
 
-            if (AdvancedIsOff && advOptions.Contains(AdvancedEnum.IsAdvanced))
-            {
-                return value;
-            }
-
-            wasEditable = true;
             if (entryConfig == null)
             {
-                entryConfig = new GUIEntryConfig();
+                entryConfig = DefaultEntryConfig;
             }
 
             Type ValueType = attributes.ValueType;
@@ -98,20 +101,16 @@ namespace SAIN.Attributes
                 case AttributeListType.Dictionary:
                     if (ValueType == typeof(Dictionary<,>))
                     {
+                        break;
                     }
                     else
                     {
-                        try
+                        if (ExpandableList(attributes, entryConfig.EntryHeight))
                         {
-                            bool isOpen = ExpandableList(attributes, entryConfig.EntryHeight);
-                            EditAllValuesInObj(value, out int count, isOpen);
+                            EditAllValuesInObj(value);
                         }
-                        catch (Exception e)
-                        {
-                            Logger.LogError(e);
-                        }
+                        break;
                     }
-                    break;
 
                 default:
                     break;
@@ -147,7 +146,7 @@ namespace SAIN.Attributes
             {
                 showResult = true;
 
-                value = Builder.Toggle((bool)value, (bool)value ? "On" : "Off", null, entryConfig.Toggle);
+                value = Builder.Toggle((bool)value, (bool)value ? "On" : "Off", EUISoundType.MenuCheckBox, entryConfig.Toggle);
             }
             else if (attributes.ValueType == typeof(float))
             {
@@ -290,34 +289,52 @@ namespace SAIN.Attributes
             return false;
         }
 
-        public static object EditValue(object value, out bool wasEditable, FieldInfo field, GUIEntryConfig entryConfig = null)
+        public static object EditValue(object value, FieldInfo field, GUIEntryConfig entryConfig = null)
         {
-            return EditValue(value, out wasEditable, CheckDictionary(field), entryConfig);
+            return EditValue(value, GetAttributeInfo(field), entryConfig);
         }
 
-        public static void EditAllValuesInObj(object obj, out int optionsCount, bool menuIsOpen)
+        public static void EditAllValuesInObj(object obj)
         {
-            optionsCount = 0;
-            if (menuIsOpen)
+            Builder.BeginVertical();
+
+            foreach (var field in obj.GetType().GetFields())
             {
-                Builder.BeginVertical();
-
-                foreach (var field in obj.GetType().GetFields())
+                object value = field.GetValue(obj);
+                object newValue = EditValue(value, field);
+                if (value.ToString() != newValue.ToString())
                 {
-                    object value = field.GetValue(obj);
-                    object newValue = EditValue(value, out bool canEdit, field);
-                    if (canEdit)
-                    {
-                        optionsCount++;
-                    }
-                    if (value.ToString() != newValue.ToString())
-                    {
-                        field.SetValue(obj, newValue);
-                    }
+                    field.SetValue(obj, newValue);
                 }
-
-                Builder.EndVertical();
             }
+
+            Builder.EndVertical();
+        }
+
+        public static bool HideConfigOption(PropertyInfo property)
+        {
+            return HideConfigOption(property.GetCustomAttribute<AdvancedAttribute>());
+        }
+
+        public static bool HideConfigOption(FieldInfo fieldInfo)
+        {
+            return HideConfigOption(fieldInfo.GetCustomAttribute<AdvancedAttribute>());
+        }
+
+        public static bool HideConfigOption(AdvancedAttribute advancedAttribute)
+        {
+            if (advancedAttribute != null)
+            {
+                if (advancedAttribute.Options.Contains(AdvancedEnum.Hidden))
+                {
+                    return true;
+                }
+                if (advancedAttribute.Options.Contains(AdvancedEnum.IsAdvanced) && !SAINPlugin.Editor.AdvancedOptionsEnabled)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static ButtonsClass Buttons => SAINPlugin.Editor.Buttons;

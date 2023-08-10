@@ -12,7 +12,6 @@ namespace SAIN
         void Init(SAINComponentClass sain);
         BotOwner BotOwner { get; }
         Player Player { get; }
-        ManualLogSource Logger { get; }
     }
 
     public interface IBotComponent
@@ -21,14 +20,12 @@ namespace SAIN
         SAINPersonClass Person { get; }
         BotOwner BotOwner { get; }
         Player Player { get; }
-        ManualLogSource Logger { get; }
     }
 
     public interface IPlayerComponent
     {
         void Init(Player player);
         Player Player { get; }
-        ManualLogSource Logger { get; }
     }
 
     public interface ISAINClass
