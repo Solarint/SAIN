@@ -11,5 +11,10 @@ namespace SAIN.Preset.GlobalSettings
         [DefaultValue(1f)]
         [MinMaxRound(0.1f, 5f, 10f)]
         public float AccuracySpreadMultiGlobal = 1f;
+
+        [Name("Global Faster CQB Reactions")]
+        [Description("if this toggle is disabled, all bots will have Faster CQB Reactions turned OFF, so their individual settings will be ignored.")]
+        [DefaultValue(true)]
+        public bool FasterCQBReactionsGlobal = true;
     }
 }

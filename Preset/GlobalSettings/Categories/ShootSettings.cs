@@ -9,7 +9,6 @@ namespace SAIN.Preset.GlobalSettings
         [NameAndDescription("Global Recoil Multiplier")]
         [DefaultValue(1f)]
         [MinMaxRound(0.1f, 3f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
         public float GlobalRecoilMultiplier = 1f;
 
         [NameAndDescription(

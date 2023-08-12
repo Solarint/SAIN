@@ -274,7 +274,7 @@
     <Compile Include="Preset\GlobalSettings\Categories\MindSettings.cs" />
     <Compile Include="Preset\GlobalSettings\GlobalSettingsClass.cs" />
     <Compile Include="Preset\Personalities\PersonalitiesClass.cs" />
-    <Compile Include="Preset\Personalities\PersonalityHandler.cs" />
+    <Compile Include="Preset\Personalities\PersonalityManagerClass.cs" />
     <Compile Include="Preset\SAINPresetClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\PersonalitySettings.cs" />
     <Compile Include="Preset\BotSettings\BotSettingsClass.cs" />

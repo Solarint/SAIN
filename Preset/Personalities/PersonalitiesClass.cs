@@ -37,6 +37,10 @@ namespace SAIN.Preset.Personalities
         }
         public bool CanBePersonality(WildSpawnType wildSpawnType, float PowerLevel, int PlayerLevel)
         {
+            if (Variables.Enabled == false)
+            {
+                return false;
+            }
             if (Variables.CanBeRandomlyAssigned && EFTMath.RandomBool(Variables.RandomlyAssignedChance))
             {
                 return true;

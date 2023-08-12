@@ -231,7 +231,7 @@ namespace SAIN.SAINComponent.Classes.Info
         public BotDifficulty BotDifficulty => Profile.BotDifficulty;
 
         public SAINPersonality Personality { get; private set; }
-        public PersonalityVariablesClass PersonalitySettings => PersonalitySettingsClass.Variables;
+        public PersonalityVariablesClass PersonalitySettings => PersonalitySettingsClass?.Variables;
         public PersonalitySettingsClass PersonalitySettingsClass { get; private set; }
 
         public float PercentageBeforeExtract { get; set; } = -1f;

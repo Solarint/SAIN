@@ -183,12 +183,18 @@ namespace SAIN.Editor
 
         private void CreateTopBarOptions()
         {
-            if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", StyleOptions.GetStyle(Style.button)))
+            var style = StyleOptions.GetStyle(Style.button);
+            if (GUI.Button(SaveAllRect, new GUIContent("Save All Changes", $"Export All Changes to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}"), style))
+            {
+                PlaySound(EUISoundType.InsuranceInsured);
+                SAINPlugin.LoadedPreset.ExportAll();
+            }
+            if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", style))
             {
                 PlaySound(EUISoundType.ButtonClick);
                 TogglePause();
             }
-            if (GUI.Button(ExitRect, "X", StyleOptions.GetStyle(Style.button)))
+            if (GUI.Button(ExitRect, "X", style))
             {
                 PlaySound(EUISoundType.MenuEscape);
                 ToggleGUI();

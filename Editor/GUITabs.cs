@@ -1,4 +1,5 @@
-﻿using EFT.UI;
+﻿using EFT.Interactive;
+using EFT.UI;
 using SAIN.Editor.Abstract;
 using SAIN.Editor.GUISections;
 using SAIN.Helpers;
@@ -72,10 +73,12 @@ namespace SAIN.Editor
 
         public void GlobalSettings()
         {
-            if (Button("Save"))
+            if (Button("Save",
+                $"Apply Values set below to GlobalSettings. Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name} folder",
+                EUISoundType.InsuranceInsured, Height(30)))
             {
+                SAINPlugin.LoadedPreset.ExportGlobalSettings();
                 PresetHandler.UpdateExistingBots();
-                PresetHandler.SaveLoadedPreset();
             }
             SettingsEditor.SettingsMenu(SAINPlugin.LoadedPreset.GlobalSettings);
         }
@@ -89,32 +92,34 @@ namespace SAIN.Editor
 
         public void Personality()
         {
+            if (Button("Save", 
+                $"Apply Values set below to personalities. Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/Personalities folder", 
+                EUISoundType.InsuranceInsured, Height(30)))
+            {
+                SAINPlugin.LoadedPreset.ExportPersonalities();
+                PresetHandler.UpdateExistingBots();
+            }
             BotPersonalityEditor.PersonalityMenu();
         }
 
         public void Advanced()
         {
-            Editor.AdvancedOptionsEnabled = Builder.Toggle(Editor.AdvancedOptionsEnabled, "Advanced Bot Configs", "Edit at your own risk.", null, Builder.Height(30f));
-            SAINPlugin.DebugModeEnabled = Builder.Toggle(SAINPlugin.DebugModeEnabled, "Global Debug Mode", null, Builder.Height(30f));
+            bool wasEnabled = Editor.AdvancedOptionsEnabled;
 
-            Space(5);
+            Editor.AdvancedOptionsEnabled = Builder.Toggle(Editor.AdvancedOptionsEnabled, 
+                "Advanced Bot Configs", "Edit at your own risk.", 
+                EUISoundType.MenuCheckBox, 
+                Builder.Height(40f));
 
-            Label("GUI Sounds Test");
-            int count = 0;
-
-            BeginHorizontal();
-            foreach (var sound in EnumValues.GetEnum<EUISoundType>())
+            if (wasEnabled != Editor.AdvancedOptionsEnabled)
             {
-                count++;
-                Button(sound.ToString(), sound, Width(3 / 1800f));
-                if (count == 3)
-                {
-                    count = 0;
-                    EndHorizontal();
-                    BeginHorizontal();
-                }
+                PresetHandler.SaveEditorDefaults();
             }
-            EndHorizontal();
+
+            SAINPlugin.DebugModeEnabled = Builder.Toggle(SAINPlugin.DebugModeEnabled, 
+                "Global Debug Mode", 
+                EUISoundType.MenuCheckBox, 
+                Builder.Height(40f));
         }
     }
 }

@@ -114,16 +114,21 @@ namespace SAIN.Plugin
                 Sounds.PlaySound(EFT.UI.EUISoundType.ErrorMessage);
                 Logger.LogError(ex);
                 LoadPresetDefinition(DefaultPreset, out def);
-                LoadedPreset = new SAINPresetClass(def);
-                var defaults = new PresetEditorDefaults
-                {
-                    SelectedPreset = def.Name,
-                    DefaultPreset = DefaultPreset,
-                    ShowAdvanced = SAINPlugin.Editor?.AdvancedOptionsEnabled == true
-                };
-                SaveObjectToJson(defaults, Settings, PresetsFolder);
+                LoadedPreset = new SAINPresetClass(def); 
+                SaveEditorDefaults();
                 UpdateExistingBots();
             }
+        }
+
+        public static void SaveEditorDefaults()
+        {
+            var defaults = new PresetEditorDefaults
+            {
+                SelectedPreset = LoadedPreset.Info.Name,
+                DefaultPreset = DefaultPreset,
+                ShowAdvanced = SAINPlugin.Editor.AdvancedOptionsEnabled
+            };
+            SaveObjectToJson(defaults, Settings, PresetsFolder);
         }
 
         public static void UpdateExistingBots()
@@ -136,16 +141,6 @@ namespace SAIN.Plugin
             {
                 PresetsUpdated();
             }
-        }
-
-        public static void SavePreset(SAINPresetClass preset)
-        {
-            preset.SavePreset();
-        }
-
-        public static void SaveLoadedPreset()
-        {
-            SavePreset(LoadedPreset);
         }
     }
 }

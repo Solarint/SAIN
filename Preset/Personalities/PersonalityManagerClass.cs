@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SAIN.Preset.Personalities
 {
-    public class PersonalityManagerClass
+    public class PersonalityManagerClass : BasePreset
     {
         private static Dictionary<WildSpawnType, BotType> AddAllBotTypes(Dictionary<WildSpawnType, BotType> botTypes)
         {
@@ -36,29 +36,46 @@ namespace SAIN.Preset.Personalities
             return botTypes;
         }
 
-        public PersonalityManagerClass(SAINPresetDefinition preset)
+        public PersonalityManagerClass(SAINPresetClass preset) : base(preset)
+        {
+            ImportPersonalities();
+        }
+
+        private void ImportPersonalities()
         {
             Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
 
-            string[] folders = new string[]
-            {
-                "Presets", preset.Name, "Personalities"
-            };
-
             foreach (var item in EnumValues.Personalities)
             {
-                if (JsonUtility.Load.LoadJsonFile(out string json, item.ToString(), folders))
+                if (Preset.Import(out PersonalitySettingsClass personality, item.ToString(), nameof(Personalities)))
                 {
-                    var persClass = JsonUtility.Load.DeserializeObject<PersonalitySettingsClass>(json);
-                    Personalities.Add(item, persClass);
+                    Personalities.Add(item, personality);
                 }
             }
 
             InitDefaults();
+        }
 
+        public void ExportPersonalities()
+        {
             foreach (var pers in Personalities)
             {
-                JsonUtility.SaveObjectToJson(pers.Value, pers.Key.ToString(), folders);
+                if (pers.Value != null && Preset?.Export(pers.Value, pers.Key.ToString(), nameof(Personalities)) == true)
+                {
+                    continue;
+                }
+                else if (pers.Value == null)
+                {
+                    Logger.LogError("Personality Settings Are Null");
+                }
+                else if (Preset == null)
+                {
+                    Logger.LogError("Preset Is Null");
+                }
+                else
+                {
+                    Logger.LogError($"Failed to Export {pers.Key}");
+                }
             }
         }
 
@@ -71,9 +88,9 @@ namespace SAIN.Preset.Personalities
                 string description = "Scum of Tarkov. Rarely Seeks out enemies, and will hide and ambush.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    Enabled = true,
                     Variables =
                     {
+                        Enabled = true,
                         RandomChanceIfMeetRequirements = 60,
                         RandomlyAssignedChance = 30,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
@@ -84,6 +101,7 @@ namespace SAIN.Preset.Personalities
 
                 AddAllBotTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
             pers = SAINPersonality.Timmy;
@@ -94,9 +112,9 @@ namespace SAIN.Preset.Personalities
 
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    Enabled = true,
                     Variables =
                     {
+                        Enabled = true,
                         RandomlyAssignedChance = 50,
                         PowerLevelMax = 40f,
                         MaxLevel = 10,
@@ -107,6 +125,7 @@ namespace SAIN.Preset.Personalities
 
                 AddPMCTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
             pers = SAINPersonality.Coward;
@@ -116,9 +135,9 @@ namespace SAIN.Preset.Personalities
                 string description = "A player who is more passive and afraid than usual.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    Enabled = true,
                     Variables =
                     {
+                        Enabled = true,
                         RandomlyAssignedChance = 30,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
                         SearchBaseTime = SearchBaseTime(pers)
@@ -126,6 +145,7 @@ namespace SAIN.Preset.Personalities
                 };
                 AddAllBotTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
             pers = SAINPersonality.Normal;
@@ -135,9 +155,9 @@ namespace SAIN.Preset.Personalities
                 string description = "An Average Tarkov Enjoyer";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    Enabled = true,
                     Variables =
                     {
+                        Enabled = true,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
                         SearchBaseTime = SearchBaseTime(pers),
                         CanRespondToVoice = true,
@@ -146,6 +166,7 @@ namespace SAIN.Preset.Personalities
 
                 AddAllBotTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
             pers = SAINPersonality.GigaChad;
@@ -155,9 +176,9 @@ namespace SAIN.Preset.Personalities
                 string description = "A true alpha threat. Hyper Aggressive and typically wearing high tier equipment.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    Enabled = true,
                     Variables =
                     {
+                        Enabled = true,
                         CanJumpCorners = true,
                         RandomChanceIfMeetRequirements = 60,
                         RandomlyAssignedChance = 3,
@@ -179,6 +200,7 @@ namespace SAIN.Preset.Personalities
 
                 AddPMCTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
             pers = SAINPersonality.Chad;
@@ -188,9 +210,9 @@ namespace SAIN.Preset.Personalities
                 string description = "An aggressive player. Typically wearing high tier equipment, and is more aggressive than usual.";
                 var settings = new PersonalitySettingsClass(pers, name, description)
                 {
-                    Enabled = true,
                     Variables =
                     {
+                        Enabled = true,
                         CanJumpCorners = true,
                         RandomChanceIfMeetRequirements = 60,
                         RandomlyAssignedChance = 3,
@@ -211,6 +233,7 @@ namespace SAIN.Preset.Personalities
 
                 AddPMCTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
         }
 

@@ -27,6 +27,10 @@ namespace SAIN.Patches.Shoot
         [PatchPostfix]
         public static void PatchPostfix(ref BotOwner ___botOwner_0, float dist, ref float __result)
         {
+            if (!SAINPlugin.LoadedPreset.GlobalSettings.Aiming.FasterCQBReactionsGlobal)
+            {
+                return;
+            }
             if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
             {
                 var settings = component.Info.FileSettings.Aiming;

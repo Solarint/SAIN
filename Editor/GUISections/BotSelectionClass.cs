@@ -8,6 +8,7 @@ using System.Reflection;
 using UnityEngine;
 using SAIN.Preset.BotSettings.SAINSettings;
 using EFT;
+using EFT.UI;
 
 namespace SAIN.Editor
 {
@@ -209,9 +210,12 @@ namespace SAIN.Editor
 
             BotType typeInEdit = SelectedWildSpawnTypes[0];
 
-            if (Button("Save", "Apply Values set below to all selected bot types for all selected difficulties. Saves edited values to SAIN/Presets folder", null, Height(35f), Width(200f)))
+            if (Button("Save", 
+                $"Apply Values set below to selected Bot Type. Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/BotSettings folder", 
+                EUISoundType.InsuranceInsured, 
+                Height(35f), Width(200f)))
             {
-                SAINPlugin.LoadedPreset.SavePreset();
+                SAINPlugin.LoadedPreset.ExportBotSettings();
                 PresetHandler.UpdateExistingBots();
             }
             if (Button("Clear", "Clear all selected bots", null, Height(35f), Width(200f)))

@@ -7,7 +7,7 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class GlobalSettingsClass
     {
-        public static GlobalSettingsClass LoadGlobal(SAINPresetDefinition Preset)
+        public static GlobalSettingsClass ImportGlobalSettings(SAINPresetDefinition Preset)
         {
             string fileName = FileAndFolderNames[JsonUtilityEnum.GlobalSettings];
             string presetsFolder = FileAndFolderNames[JsonUtilityEnum.Presets];
@@ -19,6 +19,7 @@ namespace SAIN.Preset.GlobalSettings
                     EFTCoreSettings = EFTCoreSettings.GetCore(),
                     //BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains)
                 };
+                SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
             }
 
             EFTCoreSettings.UpdateCoreSettings(result.EFTCoreSettings);
@@ -26,7 +27,8 @@ namespace SAIN.Preset.GlobalSettings
             //var brainSettings = result.BigBrain.BrainSettings;
             //if (brainSettings == null || brainSettings.Count == 0)
             //{
-                //result.BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains);
+            //result.BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains);
+            //SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
             //}
 
             SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
@@ -52,7 +54,6 @@ namespace SAIN.Preset.GlobalSettings
 
         public ShootSettings Shoot = new ShootSettings();
 
-        [Advanced(AdvancedEnum.Hidden)]
         public VisionSettings Vision = new VisionSettings();
 
         //[Advanced(AdvancedEnum.Hidden)]

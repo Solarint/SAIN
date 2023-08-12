@@ -130,7 +130,7 @@ namespace SAIN.SAINComponent.Classes
 
         private bool CheckLineOfSight()
         {
-            if (CheckInVisionCone())
+            if (CheckInVisionCone() || (EnemyPlayer.AIData?.UsingLight == true && Enemy.Path.EnemyDistance < 50f))
             {
                 foreach (var part in EnemyPlayer.MainParts.Values)
                 {

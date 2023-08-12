@@ -56,7 +56,7 @@ namespace SAIN.Editor.GUISections
 
             EndVertical();
 
-            if (selectedPreset != SAINPlugin.LoadedPreset.Info)
+            if (selectedPreset.Name != SAINPlugin.LoadedPreset.Info.Name)
             {
                 PresetHandler.InitPresetFromDefinition(selectedPreset);
                 return true;

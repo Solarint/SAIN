@@ -1,6 +1,4 @@
-﻿using SAIN.Helpers;
-using System;
-using System.Windows.Forms;
+﻿using System;
 using UnityEngine;
 
 namespace SAIN.Components.BotController
@@ -25,41 +23,41 @@ namespace SAIN.Components.BotController
         {
             if (BotController.Bots.Count > 0)
             {
+                var nightSettings = SAINPlugin.LoadedPreset.GlobalSettings.Vision;
                 GameDateTime = BotController.Bots.PickRandom().Value.BotOwner.GameDateTime.Calculate();
                 float minutes = GameDateTime.Minute / 59f;
                 float timeofday = GameDateTime.Hour + minutes;
 
                 float timemodifier = 1f;
                 // SeenTime Check
-                if (timeofday >= 20f || timeofday <= 8f)
+                if (timeofday >= nightSettings.HourDuskStart || timeofday <= nightSettings.HourDawnEnd)
                 {
                     // Night
-                    if (timeofday > 22f || timeofday < 6f)
+                    if (timeofday > nightSettings.HourDuskEnd || timeofday < nightSettings.HourDawnStart)
                     {
-                        timemodifier = 0.15f;
+                        timemodifier = nightSettings.NightTimeVisionModifier;
                     }
                     else
                     {
-                        // Dawn
-                        if (timeofday <= 8f)
-                        {
-                            // Turns hour 6 to 8 into 0 to 2 and then scales it to 0 to 1
-                            float dawnHours = (timeofday - 6f) / 2f;
+                        float scalingA = 1f - nightSettings.NightTimeVisionModifier;
+                        float scalingB = nightSettings.NightTimeVisionModifier;
 
-                            // scales to 0.1 to 1
-                            float scaledDawnHours = dawnHours * 0.75f + 0.25f;
+                        // Dawn
+                        if (timeofday <= nightSettings.HourDawnEnd)
+                        {
+                            float dawnDiff = nightSettings.HourDawnEnd - nightSettings.HourDawnStart;
+                            float dawnHours = (timeofday - nightSettings.HourDawnStart) / dawnDiff;
+                            float scaledDawnHours = dawnHours * scalingA + scalingB;
 
                             // assigns modifier to our output
                             timemodifier = scaledDawnHours;
                         }
                         // Dusk
-                        else if (timeofday >= 20f)
+                        else if (timeofday >= nightSettings.HourDuskStart)
                         {
-                            // Turns hour 20 to 22 into 0 to 2 and then scales it to 0 to 1
-                            float duskHours = (timeofday - 20f) / 2f;
-
-                            // scales to 0.1 to 1
-                            float scaledDuskHours = duskHours * 0.75f + 0.25f;
+                            float duskDiff = nightSettings.HourDuskEnd - nightSettings.HourDuskStart;
+                            float duskHours = (timeofday - nightSettings.HourDuskStart) / duskDiff;
+                            float scaledDuskHours = duskHours * scalingA + scalingB;
 
                             // Inverse Scale to reduce modifier as night falls
                             float inverseScaledDuskHours = 1f - scaledDuskHours;
@@ -73,6 +71,10 @@ namespace SAIN.Components.BotController
                 else
                 {
                     timemodifier = 1f;
+                }
+                if (SAINPlugin.DebugModeEnabled)
+                {
+                    Logger.LogInfo($"Time Vision Modifier: [{timemodifier}] at [{timeofday}] with Config Settings VisionModifier: [{nightSettings.NightTimeVisionModifier}]");
                 }
                 return timemodifier;
             }

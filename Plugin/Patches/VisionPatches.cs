@@ -25,6 +25,7 @@ namespace SAIN.Patches.Vision
                 result *= preset.Look.CloseVisionSpeed;
             }
             result *= preset.Look.VisionSpeedModifier;
+            result *= SAINPlugin.LoadedPreset.GlobalSettings.Vision.VisionSpeedModifierGlobal;
 
             return result;
         }

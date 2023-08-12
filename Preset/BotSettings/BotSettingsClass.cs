@@ -1,5 +1,4 @@
-﻿using BepInEx.Logging;
-using EFT;
+﻿using EFT;
 using HarmonyLib;
 using SAIN.Attributes;
 using SAIN.Helpers;
@@ -12,45 +11,49 @@ using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.Preset.BotSettings
 {
-    public class BotSettingsClass
+    public class BotSettingsClass : BasePreset
     {
-        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(BotSettingsClass));
-        private readonly SAINPresetDefinition Preset;
-
-        public BotSettingsClass(SAINPresetDefinition preset)
+        public BotSettingsClass(SAINPresetClass preset) : base(preset)
         {
-            Preset = preset;
+            ImportBotSettings();
+        }
+
+        private void ImportBotSettings()
+        {
+            if (Preset == null)
+            {
+                Logger.LogError($"Preset Is Null in {GetType().Name}");
+                return;
+            }
+
             BotDifficulty[] Difficulties = EnumValues.Difficulties;
-
-            string[] sainFolders = Folders(preset.Name);
-
             foreach (var BotType in BotTypeDefinitions.BotTypesList)
             {
                 string name = BotType.Name;
                 WildSpawnType wildSpawnType = BotType.WildSpawnType;
 
-                if (!EFTSettings.ContainsKey(wildSpawnType))
+                if (Load.LoadObject(out EFTBotSettings eftSettingsGroup, name, EFTFolderString))
                 {
-                    if (Load.LoadObject(out EFTBotSettings eftSettings, name, EFTFolderString))
-                    {
-                        EFTSettings.Add(wildSpawnType, eftSettings);
-                    }
+                    if (!EFTSettings.ContainsKey(wildSpawnType))
+                        EFTSettings.Add(wildSpawnType, eftSettingsGroup);
                 }
-
-                if (!Load.LoadObject(out SAINSettingsGroupClass settings, name, sainFolders))
+                else
                 {
-                    settings = new SAINSettingsGroupClass(Difficulties)
+                    Logger.LogError($"Failed to import EFT Bot Settings for {name}");
+                }
+                if (!Preset.Import(out SAINSettingsGroupClass sainSettingsGroup, name, "BotSettings"))
+                {
+                    sainSettingsGroup = new SAINSettingsGroupClass(Difficulties)
                     {
                         Name = name,
                         WildSpawnType = wildSpawnType,
                         DifficultyModifier = DefaultDifficultyModifier[wildSpawnType]
                     };
 
-                    UpdateSAINSettingsToEFTDefault(wildSpawnType, settings);
-                    SaveObjectToJson(settings, name, sainFolders);
+                    UpdateSAINSettingsToEFTDefault(wildSpawnType, sainSettingsGroup);
+                    Preset.Export(sainSettingsGroup, name, "BotSettings");
                 }
-
-                SAINSettings.Add(wildSpawnType, settings);
+                SAINSettings.Add(wildSpawnType, sainSettingsGroup);
             }
         }
 
@@ -185,22 +188,19 @@ namespace SAIN.Preset.BotSettings
             return null;
         }
 
-        public void SaveSettings(SAINPresetDefinition preset)
+        public void ExportBotSettings()
         {
-            string[] sainFolders = Folders(preset.Name);
+            if (Preset == null)
+            {
+                Logger.LogError($"Preset Is Null in {GetType().Name}");
+                return;
+            }
 
             foreach (SAINSettingsGroupClass settings in SAINSettings.Values)
             {
-                SaveObjectToJson(settings, settings.Name, sainFolders);
-            }
-
-            foreach (EFTBotSettings settings in EFTSettings.Values)
-            {
-                SaveObjectToJson(settings, settings.Name, EFTFolderString);
+                Preset.Export(settings, settings.Name, "BotSettings");
             }
         }
-
-        private static string[] Folders(string presetKey) => new string[] { "Presets", presetKey, "BotSettings" };
 
         public Dictionary<WildSpawnType, SAINSettingsGroupClass> SAINSettings = new Dictionary<WildSpawnType, SAINSettingsGroupClass>();
         public Dictionary<WildSpawnType, EFTBotSettings> EFTSettings = new Dictionary<WildSpawnType, EFTBotSettings>();

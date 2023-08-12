@@ -1,14 +1,8 @@
-﻿using EFT;
-using EFT.UI;
+﻿using EFT.UI;
 using SAIN.Editor.Abstract;
 using SAIN.Editor.Util;
-using SAIN.Preset;
-using SAIN.Preset.GlobalSettings;
-using SAIN.Preset.GlobalSettings.Categories;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace SAIN.Editor
 {
@@ -21,7 +15,7 @@ namespace SAIN.Editor
 
         public ModifyLists ModifyLists { get; private set; }
 
-        private static float ExpandMenuWidth => 150f;
+        private static float ExpandMenuWidth => 250f;
 
         private CustomStyleClass CustomStyle => Editor.StyleOptions.CustomStyle;
 
@@ -310,7 +304,7 @@ namespace SAIN.Editor
             bool newvalue = Toggle(value, text, null, Height(height));
             if (newvalue != value)
             {
-                Sounds.PlaySound(EFT.UI.EUISoundType.MenuDropdown);
+                Sounds.PlaySound(EUISoundType.MenuDropdown);
             }
 
             if (beginHoriz)

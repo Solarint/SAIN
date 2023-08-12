@@ -1,21 +1,13 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
-using System.Collections.Generic;
+using SAIN.Components.BotController;
+using SAIN.Helpers;
+using SAIN.SAINComponent;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using SAIN.Helpers;
-using SAIN.Components.BotController;
-using UnityEngine.UIElements;
-using UnityEngine.Profiling;
-using SAIN.SAINComponent;
-using SAIN.SAINComponent.Classes.Decision;
-using SAIN.SAINComponent.Classes.Talk;
-using SAIN.SAINComponent.Classes.WeaponFunction;
-using SAIN.SAINComponent.Classes.Mover;
-using SAIN.SAINComponent.Classes;
-using SAIN.SAINComponent.SubComponents;
 
 namespace SAIN.Components
 {
@@ -88,7 +80,7 @@ namespace SAIN.Components
             //UpdateObstacles();
         }
 
-        void PlayerTalked(EPhraseTrigger phrase, ETagStatus mask, Player player)
+        private void PlayerTalked(EPhraseTrigger phrase, ETagStatus mask, Player player)
         {
             if (player == null || Bots == null)
             {
@@ -322,6 +314,7 @@ namespace SAIN.Components
         {
             Dispose();
         }
+
         private void Dispose()
         {
             try
