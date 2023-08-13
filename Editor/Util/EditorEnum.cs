@@ -25,6 +25,7 @@ namespace SAIN.Editor
 
     public enum Style
     {
+        alert,
         box,
         label,
         textField,

@@ -63,7 +63,7 @@ namespace SAIN.SAINComponent.Classes
 
         public Vector3 EnemyChestPosition => EnemyTransform.Chest;
 
-        // Vision Properties
+        // Look Properties
         public bool InLineOfSight => Vision.InLineOfSight;
 
         public bool IsVisible => Vision.IsVisible;
@@ -107,15 +107,16 @@ namespace SAIN.SAINComponent.Classes
 
             bool visible = false;
             bool canshoot = false;
+            bool usingLight = EnemyPlayer?.AIData?.UsingLight == true && Enemy?.Path != null && Enemy.EnemyTransform?.TransformNull == false && Enemy.Path.EnemyDistance < 50f;
 
             if (CheckLosTimer < Time.time)
             {
                 CheckLosTimer = Time.time + 0.075f;
-                InLineOfSight = CheckLineOfSight();
+                InLineOfSight = CheckLineOfSight(usingLight);
             }
 
             var goalenemy = BotOwner.Memory.GoalEnemy;
-            if (goalenemy?.IsVisible == true && InLineOfSight)
+            if ((goalenemy?.IsVisible == true || usingLight) && InLineOfSight)
             {
                 visible = true;
             }
@@ -128,17 +129,20 @@ namespace SAIN.SAINComponent.Classes
             UpdateCanShoot(canshoot);
         }
 
-        private bool CheckLineOfSight()
+        private bool CheckLineOfSight(bool usingLight)
         {
-            if (CheckInVisionCone() || (EnemyPlayer.AIData?.UsingLight == true && Enemy.Path.EnemyDistance < 50f))
+            if (Enemy.Path.EnemyDistance <= BotOwner.Settings.Current.CurrentVisibleDistance)
             {
-                foreach (var part in EnemyPlayer.MainParts.Values)
+                if (CheckInVisionCone() || usingLight)
                 {
-                    Vector3 headPos = BotOwner.LookSensor._headPoint;
-                    Vector3 direction = part.Position - headPos;
-                    if (!Physics.Raycast(headPos, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                    foreach (var part in EnemyPlayer.MainParts.Values)
                     {
-                        return true;
+                        Vector3 headPos = BotOwner.LookSensor._headPoint;
+                        Vector3 direction = part.Position - headPos;
+                        if (!Physics.Raycast(headPos, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                        {
+                            return true;
+                        }
                     }
                 }
             }

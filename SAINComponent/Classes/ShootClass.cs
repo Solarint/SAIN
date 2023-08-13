@@ -63,10 +63,13 @@ namespace SAIN.SAINComponent.Classes
                 else
                 {
                     value = enemy.GetPartToShoot();
-                    var transform = SAIN?.Enemy?.EnemyPerson?.Transform;
-                    if (transform != null && (value - transform.Head).magnitude < 0.1f)
+                    if (SAINPlugin.LoadedPreset.GlobalSettings.General.HeadShotProtection)
                     {
-                        value = transform.Stomach;
+                        var transform = SAIN?.Enemy?.EnemyPerson?.Transform;
+                        if (transform != null && (value - transform.Head).magnitude < 0.1f)
+                        {
+                            value = transform.Stomach;
+                        }
                     }
                 }
                 return new Vector3?(value);

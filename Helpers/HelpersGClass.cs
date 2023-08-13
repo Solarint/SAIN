@@ -33,6 +33,11 @@ namespace SAIN.Helpers
             return (InventoryControllerClass)InventoryControllerProp.GetValue(player);
         }
 
+        public static EFTSettingsGroup GetEFTSettings(WildSpawnType type, BotDifficulty difficulty)
+        {
+            return (EFTSettingsGroup)SAINPlugin.LoadedPreset.BotSettings.GetEFTSettings(type, difficulty);
+        }
+
         public DateTime UTCNow => EFTTime.UtcNow;
         public static EFTCoreSettings EFTCore => SAINPlugin.LoadedPreset.GlobalSettings.EFTCoreSettings;
         public static float LAY_DOWN_ANG_SHOOT => EFTCore.Core.LAY_DOWN_ANG_SHOOT;

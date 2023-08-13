@@ -45,8 +45,8 @@ namespace SAIN.SAINComponent.Classes.Talk
             if (TalkTimer < Time.time)
             {
                 TalkTimer = Time.time + 0.1f;
-
-                if (AreFriendsClose())
+                FriendIsClose = AreFriendsClose();
+                if (FriendIsClose)
                 {
                     if (!TalkHurt())
                     {
@@ -94,6 +94,10 @@ namespace SAIN.SAINComponent.Classes.Talk
 
         private void EnemyDown(IAIDetails person)
         {
+            if (!FriendIsClose)
+            {
+                return;
+            }
             if (SAIN.Squad.IAmLeader)
             {
                 SAIN.Talk.Say(EPhraseTrigger.GoodWork);
@@ -104,6 +108,8 @@ namespace SAIN.SAINComponent.Classes.Talk
             }
         }
 
+        private bool FriendIsClose;
+
         private const float LeaderFreq = 1f;
         private const float TalkFreq = 0.5f;
         private const float FriendTooFar = 30f;
@@ -113,6 +119,10 @@ namespace SAIN.SAINComponent.Classes.Talk
         private void FriendlyDown(BotOwner bot)
         {
             if (BotOwner.IsDead || BotOwner.BotState != EBotState.Active)
+            {
+                return;
+            }
+            if (!FriendIsClose)
             {
                 return;
             }
@@ -129,6 +139,10 @@ namespace SAIN.SAINComponent.Classes.Talk
             {
                 return;
             }
+            if (!FriendIsClose)
+            {
+                return;
+            }
 
             if (FirstContactTimer < Time.time)
             {
@@ -138,6 +152,10 @@ namespace SAIN.SAINComponent.Classes.Talk
         private void LootStuff(float num)
         {
             if (BotOwner.IsDead || BotOwner.BotState != EBotState.Active)
+            {
+                return;
+            }
+            if (!FriendIsClose)
             {
                 return;
             }
@@ -156,19 +174,17 @@ namespace SAIN.SAINComponent.Classes.Talk
 
         private bool AreFriendsClose()
         {
-            bool closeFriend = false;
             foreach (var member in SAIN.Squad.SquadMembers.Keys)
             {
                 if (member != null && !member.IsDead)
                 {
                     if (MemberDistance(member) < 20f)
                     {
-                        closeFriend = true;
-                        break;
+                        return true;
                     }
                 }
             }
-            return closeFriend;
+            return false;
         }
 
         private void AllMembersSay(EPhraseTrigger trigger, ETagStatus mask, float delay = 1.5f, float chance = 100f)

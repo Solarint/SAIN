@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace SAIN.Components.BotController
 {
+    public enum TimeOfDayEnum
+    {
+        Night,
+        Day,
+        Dusk,
+        Dawn
+    }
     public class TimeClass : SAINControl
     {
         public void Update()
@@ -16,6 +23,7 @@ namespace SAIN.Components.BotController
 
         public DateTime GameDateTime { get; private set; }
         public float TimeOfDayVisibility { get; private set; }
+        public TimeOfDayEnum TimeOfDay { get; private set; }
 
         private float VisibilityTimer = 0f;
 
@@ -23,18 +31,19 @@ namespace SAIN.Components.BotController
         {
             if (BotController.Bots.Count > 0)
             {
-                var nightSettings = SAINPlugin.LoadedPreset.GlobalSettings.Vision;
+                var nightSettings = SAINPlugin.LoadedPreset.GlobalSettings.Look;
                 GameDateTime = BotController.Bots.PickRandom().Value.BotOwner.GameDateTime.Calculate();
                 float minutes = GameDateTime.Minute / 59f;
-                float timeofday = GameDateTime.Hour + minutes;
+                float time = GameDateTime.Hour + minutes;
 
                 float timemodifier = 1f;
                 // SeenTime Check
-                if (timeofday >= nightSettings.HourDuskStart || timeofday <= nightSettings.HourDawnEnd)
+                if (time >= nightSettings.HourDuskStart || time <= nightSettings.HourDawnEnd)
                 {
                     // Night
-                    if (timeofday > nightSettings.HourDuskEnd || timeofday < nightSettings.HourDawnStart)
+                    if (time > nightSettings.HourDuskEnd || time < nightSettings.HourDawnStart)
                     {
+                        TimeOfDay = TimeOfDayEnum.Night;
                         timemodifier = nightSettings.NightTimeVisionModifier;
                     }
                     else
@@ -43,20 +52,22 @@ namespace SAIN.Components.BotController
                         float scalingB = nightSettings.NightTimeVisionModifier;
 
                         // Dawn
-                        if (timeofday <= nightSettings.HourDawnEnd)
+                        if (time <= nightSettings.HourDawnEnd)
                         {
+                            TimeOfDay = TimeOfDayEnum.Dawn;
                             float dawnDiff = nightSettings.HourDawnEnd - nightSettings.HourDawnStart;
-                            float dawnHours = (timeofday - nightSettings.HourDawnStart) / dawnDiff;
+                            float dawnHours = (time - nightSettings.HourDawnStart) / dawnDiff;
                             float scaledDawnHours = dawnHours * scalingA + scalingB;
 
                             // assigns modifier to our output
                             timemodifier = scaledDawnHours;
                         }
                         // Dusk
-                        else if (timeofday >= nightSettings.HourDuskStart)
+                        else if (time >= nightSettings.HourDuskStart)
                         {
+                            TimeOfDay = TimeOfDayEnum.Dusk;
                             float duskDiff = nightSettings.HourDuskEnd - nightSettings.HourDuskStart;
-                            float duskHours = (timeofday - nightSettings.HourDuskStart) / duskDiff;
+                            float duskHours = (time - nightSettings.HourDuskStart) / duskDiff;
                             float scaledDuskHours = duskHours * scalingA + scalingB;
 
                             // Inverse Scale to reduce modifier as night falls
@@ -70,11 +81,12 @@ namespace SAIN.Components.BotController
                 // Day
                 else
                 {
+                    TimeOfDay = TimeOfDayEnum.Day;
                     timemodifier = 1f;
                 }
                 if (SAINPlugin.DebugModeEnabled)
                 {
-                    Logger.LogInfo($"Time Vision Modifier: [{timemodifier}] at [{timeofday}] with Config Settings VisionModifier: [{nightSettings.NightTimeVisionModifier}]");
+                    Logger.LogInfo($"Time Vision Modifier: [{timemodifier}] at [{time}] with Config Settings VisionModifier: [{nightSettings.NightTimeVisionModifier}]");
                 }
                 return timemodifier;
             }

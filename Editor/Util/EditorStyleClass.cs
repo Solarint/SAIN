@@ -242,6 +242,12 @@ namespace SAIN.Editor
                     alignment = TextAnchor.MiddleCenter,
                     fontStyle = FontStyle.Bold
                 };
+            GUIStyle AlertStyle = 
+                new GUIStyle(GUI.skin.box)
+                {
+                    alignment = TextAnchor.MiddleCenter,
+                    fontStyle = FontStyle.Bold
+                };
 
             BGAllStates(BlankBackgroundStyle,
                 null);
@@ -259,8 +265,12 @@ namespace SAIN.Editor
             Texture2D TexDarkRed = GetTexture(
                 ColorNames.DarkRed);
 
+            Color ColorGold = Editor.Colors.GetColor(ColorNames.Gold);
+
             ApplyTextColorAllStates(ToolTipStyle,
                 Color.white, Color.white);
+            ApplyTextColorAllStates(AlertStyle, ColorGold, ColorGold);
+            BGAllStates(AlertStyle, TexMidRed);
 
             BGAllStates(TexMidGray, TexDarkRed,
                 ListStyle);
@@ -316,7 +326,6 @@ namespace SAIN.Editor
                 Color.white, Color.white,
                 TextAnchor.MiddleLeft, FontStyle.Normal);
 
-            Color ColorGold = Editor.Colors.GetColor(ColorNames.Gold);
 
             StyleText(ListStyle,
                 Color.white, ColorGold,
@@ -359,6 +368,7 @@ namespace SAIN.Editor
                     alignment = TextAnchor.LowerCenter
                 };
 
+            Styles.Add(Style.alert, AlertStyle);
             Styles.Add(Style.botTypeGrid, botTypeGridStyle);
             Styles.Add(Style.dragBar, dragBarStyle);
             Styles.Add(Style.selectionGrid, selectGridStyle);

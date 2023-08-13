@@ -110,6 +110,10 @@ namespace SAIN.SAINComponent.Classes.Talk
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, type);
             Player.Say(type, false, 0f, mask);
             PersonalPhraseDict[type].TimeLastSaid = Time.time;
+            if (SAINPlugin.DebugModeEnabled)
+            {
+                Logger.LogDebug(type, GetType(), true);
+            }
         }
 
         private void SendSayCommand(BotTalkPackage talkPackage)

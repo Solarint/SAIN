@@ -6,9 +6,18 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class ShootSettings
     {
-        [NameAndDescription("Global Recoil Multiplier")]
+        [NameAndDescription(
+            "Global EFT Scatter Multiplier",
+            "Higher = more scattering. Modifies EFT's default scatter feature. 1.5 = 1.5x more scatter")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 3f, 100f)]
+        [MinMaxRound(0.1f, 10f, 100f)]
+        public float GlobalScatterMultiplier = 1f;
+
+        [NameAndDescription(
+            "Global SAIN Recoil Multiplier",
+            "Higher = more recoil. Modifies SAIN's new recoil scatter feature. 1.5 = 1.5x more scatter from recoil")]
+        [DefaultValue(1f)]
+        [MinMaxRound(0.1f, 5f, 100f)]
         public float GlobalRecoilMultiplier = 1f;
 
         [NameAndDescription(
@@ -42,7 +51,6 @@ namespace SAIN.Preset.GlobalSettings
         [Dictionary(typeof(WeaponClass), typeof(float))]
         [Advanced(AdvancedEnum.IsAdvanced)]
         public WeaponShootabilityClass WeaponShootability = new WeaponShootabilityClass();
-
 
         const string DONOTEDIT = "Do not Edit These";
         [Advanced(AdvancedEnum.Hidden)] public float WeaponClassScaling = 0.3f;

@@ -25,7 +25,7 @@ namespace SAIN.Patches.Vision
                 result *= preset.Look.CloseVisionSpeed;
             }
             result *= preset.Look.VisionSpeedModifier;
-            result *= SAINPlugin.LoadedPreset.GlobalSettings.Vision.VisionSpeedModifierGlobal;
+            result *= SAINPlugin.LoadedPreset.GlobalSettings.Look.GlobalVisionSpeedModifier;
 
             return result;
         }
@@ -61,14 +61,14 @@ namespace SAIN.Patches.Vision
                 // Checks to make sure a date and time is present
                 if (___botOwner_0.GameDateTime != null)
                 {
-                    DateTime dateTime = SAINPlugin.BotController.GameDateTime;
-                    timeMod = SAINPlugin.BotController.TimeOfDayVisibility;
+                    DateTime dateTime = SAINPlugin.BotController.TimeVision.GameDateTime;
+                    timeMod = SAINPlugin.BotController.TimeVision.TimeOfDayVisibility;
                     // Modify the rounding of the "HourServer" property to the hour from the DateTime object
                     _HourServerProperty.SetValue(___botOwner_0.LookSensor, (int)((short)dateTime.Hour));
                 }
                 if (SAINPlugin.BotController != null)
                 {
-                    weatherMod = SAINPlugin.BotController.WeatherVisibility;
+                    weatherMod = SAINPlugin.BotController.WeatherVision.WeatherVisibility;
                     weatherMod = Mathf.Clamp(weatherMod, 0.5f, 1f);
                 }
 
@@ -120,7 +120,7 @@ namespace SAIN.Patches.Vision
         public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result, ref BotOwner ___botOwner_0)
         {
             float dist = (BotTransform.position - enemy.position).magnitude;
-            float weatherModifier = SAINPlugin.BotController.WeatherVisibility;
+            float weatherModifier = SAINPlugin.BotController.WeatherVision.WeatherVisibility;
             float inverseWeatherModifier = Mathf.Sqrt(2f - weatherModifier);
 
             WildSpawnType wildSpawnType = ___botOwner_0.Profile.Info.Settings.Role;

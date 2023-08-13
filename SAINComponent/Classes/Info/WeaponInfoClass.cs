@@ -1,14 +1,7 @@
-using BepInEx.Logging;
 using EFT;
 using EFT.InventoryLogic;
-using SAIN.Components;
-using SAIN.SAINComponent.Classes.Decision;
-using SAIN.SAINComponent.Classes.Talk;
 using SAIN.SAINComponent.Classes.WeaponFunction;
-using SAIN.SAINComponent.Classes.Mover;
-using SAIN.SAINComponent.SubComponents;
 using System.Linq;
-using UnityEngine;
 using static EFT.InventoryLogic.Weapon;
 
 namespace SAIN.SAINComponent.Classes.Info
@@ -36,22 +29,6 @@ namespace SAIN.SAINComponent.Classes.Info
             Firerate.Update();
             Firemode.Update();
 
-            var preset = BotOwner?.WeaponManager?.WeaponAIPreset;
-            if (preset != null)
-            {
-                if (DefaultAccuracy == null)
-                {
-                    DefaultAccuracy = preset.XZ_COEF;
-                }
-                if (DefaultAccuracy != null && AssignedSpread != AccuracySpreadMulti)
-                {
-                    AssignedSpread = AccuracySpreadMulti;
-
-                    float accuracy = DefaultAccuracy.Value * AccuracySpreadMulti;
-                    accuracy = Mathf.Round(accuracy * 100f) / 100f;
-                    preset.XZ_COEF = accuracy;
-                }
-            }
             var manager = BotOwner?.WeaponManager;
             if (manager.Selector?.IsWeaponReady == true)
             {
@@ -72,11 +49,6 @@ namespace SAIN.SAINComponent.Classes.Info
             Firemode.Dispose();
         }
 
-        private float? DefaultAccuracy;
-
-        private float AssignedSpread = 1f;
-        private float AccuracySpreadMulti => SAIN.Info.FileSettings.Aiming.AccuracySpreadMulti * SAINPlugin.LoadedPreset.GlobalSettings.Aiming.AccuracySpreadMultiGlobal;
-
         public Recoil Recoil { get; private set; }
         public Firerate Firerate { get; private set; }
         public Firemode Firemode { get; private set; }
@@ -84,6 +56,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
         private WeaponTemplate LastCheckedWeapon;
         public ShootModifierClass Modifiers { get; private set; }
+
         public float EffectiveWeaponDistance
         {
             get
@@ -116,6 +89,7 @@ namespace SAIN.SAINComponent.Classes.Info
                     case "shotgun":
                         PreferedDist = 30f;
                         break;
+
                     case "grenadeLauncher":
                     case "specialWeapon":
                         PreferedDist = 100f;
@@ -132,18 +106,22 @@ namespace SAIN.SAINComponent.Classes.Info
                 return PreferedDist;
             }
         }
+
         public bool IsFireModeSet(EFireMode mode)
         {
             return SelectedFireMode == mode;
         }
+
         public bool IsSetFullAuto()
         {
             return IsFireModeSet(EFireMode.fullauto);
         }
+
         public bool IsSetBurst()
         {
             return IsFireModeSet(EFireMode.burst);
         }
+
         public bool IsSetSemiAuto()
         {
             return IsFireModeSet(EFireMode.single);
@@ -153,14 +131,17 @@ namespace SAIN.SAINComponent.Classes.Info
         {
             return HasFireMode(EFireMode.fullauto);
         }
+
         public bool HasBurst()
         {
             return HasFireMode(EFireMode.burst);
         }
+
         public bool HasSemi()
         {
             return HasFireMode(EFireMode.single);
         }
+
         public bool HasDoubleAction()
         {
             return HasFireMode(EFireMode.doubleaction);

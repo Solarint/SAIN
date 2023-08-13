@@ -17,6 +17,8 @@ using System.Collections;
 using SAIN.Helpers;
 using SAIN.Preset.BotSettings.SAINSettings;
 using static SAIN.Preset.Personalities.PersonalitySettingsClass;
+using Comfort.Common;
+using static Mono.Security.X509.X520;
 
 namespace SAIN.SAINComponent.Classes.Info
 {
@@ -61,6 +63,7 @@ namespace SAIN.SAINComponent.Classes.Info
         {
             FileSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(WildSpawnType, BotDifficulty);
             SAIN.StartCoroutine(SetConfigValuesCoroutine(FileSettings));
+            CalculateSettings();
         }
 
         private void CalculateSettings()
@@ -71,6 +74,80 @@ namespace SAIN.SAINComponent.Classes.Info
             UpdateExtractTime();
             CalcTimeBeforeSearch();
             CalcHoldGroundDelay();
+            ManualSettingsUpdate();
+        }
+
+        private void ManualSettingsUpdate()
+        {
+            var sainSettings = FileSettings;
+            var defaultSettings = HelpersGClass.GetEFTSettings(WildSpawnType, BotDifficulty);
+
+            var botAim = BotOwner.Settings.FileSettings.Aiming;
+            var botScatter = BotOwner.Settings.FileSettings.Scattering;
+
+            float difficultyModifier = GlobalSAINSettings.General.GlobalDifficultyModifier;
+
+            float multiplier = sainSettings.Aiming.AccuracySpreadMulti * GlobalSAINSettings.Aiming.AccuracySpreadMultiGlobal / difficultyModifier;
+            multiplier = Mathf.Round(multiplier * 100f) / 100f;
+
+            botAim.BASE_SHIEF = MultiplySetting(
+                defaultSettings.Aiming.BASE_SHIEF, 
+                multiplier, 
+                "BASE_SHIEF");
+            botAim.BOTTOM_COEF = MultiplySetting(
+                defaultSettings.Aiming.BOTTOM_COEF, 
+                multiplier, 
+                "BOTTOM_COEF");
+
+            multiplier = sainSettings.Scattering.ScatterMultiplier * GlobalSAINSettings.Shoot.GlobalScatterMultiplier / difficultyModifier;
+            multiplier = Mathf.Round(multiplier * 100f) / 100f;
+
+            botAim.XZ_COEF = MultiplySetting(
+                defaultSettings.Aiming.XZ_COEF, 
+                multiplier, 
+                "XZ_COEF");
+            botAim.XZ_COEF_STATIONARY_BULLET = MultiplySetting(
+                defaultSettings.Aiming.XZ_COEF_STATIONARY_BULLET, 
+                multiplier, 
+                "XZ_COEF_STATIONARY_BULLET");
+            botAim.XZ_COEF_STATIONARY_GRENADE = MultiplySetting(
+                defaultSettings.Aiming.XZ_COEF_STATIONARY_GRENADE, 
+                multiplier, 
+                "XZ_COEF_STATIONARY_GRENADE");
+
+            botScatter.MinScatter = MultiplySetting(
+                defaultSettings.Scattering.MinScatter, 
+                multiplier, 
+                "MinScatter");
+            botScatter.MaxScatter = MultiplySetting(
+                defaultSettings.Scattering.MaxScatter, 
+                multiplier, 
+                "MaxScatter");
+            botScatter.WorkingScatter = MultiplySetting(
+                defaultSettings.Scattering.WorkingScatter, 
+                multiplier, 
+                "WorkingScatter");
+
+            if (BotOwner.WeaponManager?.WeaponAIPreset != null)
+            {
+                BotOwner.WeaponManager.WeaponAIPreset.XZ_COEF = botAim.XZ_COEF;
+                BotOwner.WeaponManager.WeaponAIPreset.BaseShift = botAim.BASE_SHIEF;
+            }
+
+            BotOwner.Settings.FileSettings.Core.VisibleDistance = MultiplySetting(
+                defaultSettings.Core.VisibleDistance, 
+                GlobalSAINSettings.Look.GlobalVisionDistanceMultiplier, 
+                "VisibleDistance");
+        }
+
+        private float MultiplySetting(float defaultValue, float multiplier, string name)
+        {
+            float result = Mathf.Round(defaultValue * multiplier * 100f) / 100f;
+            if (SAINPlugin.DebugModeEnabled)
+            {
+                Logger.LogInfo($"{name} Default {defaultValue} Multiplier: {multiplier} Result: {result}");
+            }
+            return result;
         }
 
         public IEnumerator SetConfigValuesCoroutine(SAINSettingsClass sainFileSettings)
@@ -110,14 +187,18 @@ namespace SAIN.SAINComponent.Classes.Info
                         if (eftVarField != null)
                         {
                             object sainValue = sainVarField.GetValue(sainCategory);
+
+                            if (SAINPlugin.DebugModeEnabled)
+                            {
+                                Logger.LogInfo($"{eftVarField.Name} Default {eftVarField.GetValue(eftCategory)} NewValue: {sainValue}");
+                            }
+
                             eftVarField.SetValue(eftCategory, sainValue);
                         }
                     }
                 }
                 yield return null;
             }
-
-            CalculateSettings();
         }
 
         public SAINSettingsClass FileSettings { get; private set; }

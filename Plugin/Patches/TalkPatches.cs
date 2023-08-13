@@ -12,6 +12,7 @@ using SAIN.SAINComponent.Classes.WeaponFunction;
 using SAIN.SAINComponent.Classes.Mover;
 using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.SubComponents;
+using Comfort.Common;
 
 namespace SAIN.Patches.Talk
 {
@@ -37,14 +38,35 @@ namespace SAIN.Patches.Talk
             }
             else
             {
-                if (!Environment.StackTrace.Contains("BotTalk") && PatchHelpers.BadTriggers.Contains(@event))
+                if (SAINPlugin.DebugModeEnabled)
                 {
+                    SAIN.Logger.LogInfo($"Talk: {@event}", typeof(PlayerTalkPatch), true);
+                }
+                var stackTrace = Environment.StackTrace;
+                bool fromSAIN = stackTrace.Contains(nameof(SAINComponentClass.Talk)) || stackTrace.Contains(nameof(SAINBotTalkClass));
+                if (!fromSAIN && PatchHelpers.BadTriggers.Contains(@event))
+                {
+                    if (SAINPlugin.DebugModeEnabled)
+                    {
+                        SAIN.Logger.LogInfo($"Blocked {@event}", typeof(PlayerTalkPatch), true);
+                    }
                     return false;
                 }
+
                 if (PatchHelpers.CheckTalkEvent(__instance, @event))
                 {
+                    if (SAINPlugin.DebugModeEnabled)
+                    {
+                        SAIN.Logger.LogInfo($"Allowed {@event}", typeof(PlayerTalkPatch), true);
+                    }
+
                     SAINPlugin.BotController?.PlayerTalk(@event, mask, __instance);
                     return true;
+                }
+
+                if (SAINPlugin.DebugModeEnabled)
+                {
+                    SAIN.Logger.LogInfo($"Blocked {@event}", typeof(PlayerTalkPatch), true);
                 }
 
                 return false;
@@ -64,7 +86,7 @@ namespace SAIN.Patches.Talk
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(ref BotOwner ___botOwner_0, EPhraseTrigger type, bool sayImmediately = false, ETagStatus? additionalMask = null)
+        public static bool PatchPrefix(ref BotOwner ___botOwner_0, EPhraseTrigger type, ETagStatus? additionalMask = null)
         {
             if (___botOwner_0.HealthController?.IsAlive == false)
             {
@@ -135,7 +157,9 @@ namespace SAIN.Patches.Talk
 
         public static bool CheckTalkEvent(Player player, EPhraseTrigger trigger)
         {
-            return player.IsAI && (BotInGroup(player.AIData.BotOwner) || GoodSoloTriggers.Contains(trigger));
+            bool result = player.IsAI && (BotInGroup(player.AIData.BotOwner) || GoodSoloTriggers.Contains(trigger));
+
+            return result;
         }
 
         public static bool AllowDefaultBotTalk(BotOwner botOwner, EPhraseTrigger trigger, ETagStatus? mask)

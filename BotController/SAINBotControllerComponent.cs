@@ -11,7 +11,7 @@ using UnityEngine.AI;
 
 namespace SAIN.Components
 {
-    public class SAINBotController : MonoBehaviour
+    public class SAINBotControllerComponent : MonoBehaviour
     {
         public Action<SAINSoundType, Player, float> AISoundPlayed { get; private set; }
         public Action<EPhraseTrigger, ETagStatus, Player> PlayerTalk { get; private set; }
@@ -20,20 +20,15 @@ namespace SAIN.Components
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
         public IBotGame BotGame => Singleton<IBotGame>.Instance;
         public Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
-        public BotControllerClass DefaultController { get; set; }
-        public ManualLogSource Logger => LineOfSightManager.Logger;
-        public BotSpawnerClass BotSpawnerClass { get; set; }
 
+        public BotControllerClass DefaultController { get; set; }
+        public BotSpawnerClass BotSpawnerClass { get; set; }
         public CoverManager CoverManager { get; private set; } = new CoverManager();
         public LineOfSightManager LineOfSightManager { get; private set; } = new LineOfSightManager();
         public BotExtractManager BotExtractManager { get; private set; } = new BotExtractManager();
-        private TimeClass TimeClass { get; set; } = new TimeClass();
-        private WeatherVisionClass WeatherClass { get; set; } = new WeatherVisionClass();
+        public TimeClass TimeVision { get; private set; } = new TimeClass();
+        public WeatherVisionClass WeatherVision { get; private set; } = new WeatherVisionClass();
         public BotSpawnController BotSpawnController { get; private set; } = new BotSpawnController();
-
-        public float WeatherVisibility => WeatherClass.WeatherVisibility;
-        public float TimeOfDayVisibility => TimeClass.TimeOfDayVisibility;
-        public DateTime GameDateTime => TimeClass.GameDateTime;
 
         public Vector3 MainPlayerPosition { get; private set; }
         private bool ComponentAdded { get; set; }
@@ -44,7 +39,7 @@ namespace SAIN.Components
             GameWorld.OnDispose += Dispose;
 
             BotSpawnController.Awake();
-            TimeClass.Awake();
+            TimeVision.Awake();
             LineOfSightManager.Awake();
             CoverManager.Awake();
             PathManager.Awake();
@@ -71,8 +66,8 @@ namespace SAIN.Components
             BotSpawnController.Update();
             BotExtractManager.Update();
             UpdateMainPlayer();
-            TimeClass.Update();
-            WeatherClass.Update();
+            TimeVision.Update();
+            WeatherVision.Update();
             LineOfSightManager.Update();
             //CoverManager.Update();
             //PathManager.Update();
@@ -222,6 +217,8 @@ namespace SAIN.Components
             }
         }
 
+        public SAINFlashLightComponent MainPlayerLight { get; private set; }
+
         private void UpdateMainPlayer()
         {
             if (MainPlayer == null)
@@ -233,7 +230,7 @@ namespace SAIN.Components
             // AddColor Components to main player
             if (!ComponentAdded)
             {
-                MainPlayer.GetOrAddComponent<SAINFlashLightComponent>();
+                MainPlayerLight = MainPlayer.GetOrAddComponent<SAINFlashLightComponent>();
                 ComponentAdded = true;
             }
 
@@ -315,11 +312,13 @@ namespace SAIN.Components
             Dispose();
         }
 
-        private void Dispose()
+        public void Dispose()
         {
             try
             {
                 StopAllCoroutines();
+
+                Destroy(MainPlayerLight);
 
                 GameWorld.OnDispose -= Dispose;
 

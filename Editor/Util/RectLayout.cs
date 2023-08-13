@@ -42,7 +42,7 @@ namespace SAIN.Editor
 
         public static Rect MainWindow = new Rect(0, 0, 1920, 1080);
 
-        private static float Height = 25;
+        private static float RectHeight = 25;
         private static float ExitWidth = 25f;
         private static float PauseWidth = 120f;
         private static float SaveAllWidth = 180f;
@@ -51,9 +51,9 @@ namespace SAIN.Editor
         private static float SaveAllStartX = PauseStartX - SaveAllWidth;
         private static float DragWidth = SaveAllStartX;
 
-        public static Rect ExitRect = new Rect(ExitStartX, 0, ExitWidth, Height);
-        public static Rect DragRect = new Rect(0, 0, DragWidth, Height);
-        public static Rect PauseRect = new Rect(PauseStartX, 0, PauseWidth, Height);
-        public static Rect SaveAllRect = new Rect(SaveAllStartX, 0, SaveAllWidth, Height);
+        public static Rect ExitRect = new Rect(ExitStartX, 0, ExitWidth, RectHeight);
+        public static Rect DragRect = new Rect(0, 0, DragWidth, RectHeight);
+        public static Rect PauseRect = new Rect(PauseStartX, 0, PauseWidth, RectHeight);
+        public static Rect SaveAllRect = new Rect(SaveAllStartX, 0, SaveAllWidth, RectHeight);
     }
 }

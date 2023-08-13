@@ -18,16 +18,14 @@ namespace SAIN
     {
         public void Awake()
         {
-            BotController = GameWorld.GetOrAddComponent<SAINBotController>();
+            BotController = GameWorld.GetOrAddComponent<SAINBotControllerComponent>();
         }
 
         public SAINControl()
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource("SAIN Bot Controller");
         }
 
-        public ManualLogSource Logger { get; private set; }
-        public SAINBotController BotController { get; private set; }
+        public SAINBotControllerComponent BotController { get; private set; }
         public Dictionary<string, SAINComponentClass> Bots => BotController?.BotSpawnController?.SAINBotDictionary;
         public GameWorld GameWorld => Singleton<GameWorld>.Instance;
     }

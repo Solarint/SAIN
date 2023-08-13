@@ -222,11 +222,16 @@
     <Compile Include="Attributes\AttributesGUI.cs" />
     <Compile Include="Attributes\AttributesInfoClass.cs" />
     <Compile Include="Attributes\GUIEntryConfig.cs" />
+    <Compile Include="Components\MainPlayer\BaseMainPlayer.cs" />
+    <Compile Include="Components\MainPlayer\SAINCamoClass.cs" />
+    <Compile Include="Components\MainPlayer\SAINMainPlayerComponent.cs" />
+    <Compile Include="Components\SAINGameworldComponent.cs" />
     <Compile Include="Editor\EditTabsClass.cs" />
     <Compile Include="Editor\GUISections\PresetEditorDefaults.cs" />
     <Compile Include="Editor\GUITabs.cs" />
     <Compile Include="Editor\IEditorCache.cs" />
     <Compile Include="Editor\Util\ModifyLists.cs" />
+    <Compile Include="Helpers\ComponentHelpers.cs" />
     <Compile Include="Helpers\ListHelpers.cs" />
     <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
@@ -337,7 +342,7 @@
     <Compile Include="Helpers\Util\Textures\LoadTexture.cs" />
     <Compile Include="Helpers\Util\Utility.cs" />
     <Compile Include="Plugin\BigBrainHandler.cs" />
-    <Compile Include="Plugin\BotControllerHandler.cs" />
+    <Compile Include="Plugin\GameWorldHandler.cs" />
     <Compile Include="SAINComponent\Classes\ShootClass.cs" />
     <Compile Include="SAINComponent\Classes\Info\SAINBotEquipmentClass.cs" />
     <Compile Include="BotController\Classes\WeatherVisionClass.cs" />
@@ -345,7 +350,7 @@
     <Compile Include="SAINComponent\Classes\Sense\SAINVisionClass.cs" />
     <Compile Include="Layers\Combat\Solo\InvestigateAction.cs" />
     <Compile Include="BotController\BotControllerAbstract.cs" />
-    <Compile Include="BotController\SAINBotController.cs" />
+    <Compile Include="BotController\SAINBotControllerComponent.cs" />
     <Compile Include="BotController\Classes\DecisionManager.cs" />
     <Compile Include="BotController\Classes\PathManager.cs" />
     <Compile Include="BotController\Classes\LineOfSightManager.cs" />
@@ -389,7 +394,7 @@
     <Compile Include="Plugin\Patches\Shoot\RecoilPatch.cs" />
     <Compile Include="Plugin\Patches\Audio\StepSoundPatch.cs" />
     <Compile Include="Plugin\Patches\TalkPatches.cs" />
-    <Compile Include="Components\SAINFlashLightComponent.cs" />
+    <Compile Include="Components\MainPlayer\SAINFlashLightComponent.cs" />
     <Compile Include="SAINComponent\Classes\Decision\SAINSelfActionClass.cs" />
     <Compile Include="SAINComponent\Classes\Info\WeaponInfoClass.cs" />
     <Compile Include="Components\LightDetectionClass.cs" />
@@ -421,7 +426,7 @@
     <Compile Include="SAINComponent\SAINBase.cs" />
     <Compile Include="Plugin\VersionChecker\VersionChecker.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\ShootSettings.cs" />
-    <Compile Include="Preset\GlobalSettings\Categories\VisionSettings.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\LookSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

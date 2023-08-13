@@ -36,7 +36,7 @@ namespace SAIN
 
         public const string SAINGUID = "me.sol.sain";
         public const string SAINName = "SAIN";
-        public const string SAINVersion = "3.5.0";
+        public const string SAINVersion = "3.5.2";
 
         public const string SPTGUID = "com.spt-aki.core";
         public const string SPTVersion = "3.6.0";
@@ -136,7 +136,7 @@ namespace SAIN
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 
-        public static SAINBotController BotController => BotControllerHandler.BotController;
+        public static SAINBotControllerComponent BotController => GameWorldHandler.SAINBotController;
 
 
         private void Update()
@@ -144,7 +144,7 @@ namespace SAIN
             DebugOverlay.Update();
             ModDetection.Update();
             Editor.Update();
-            BotControllerHandler.Update();
+            GameWorldHandler.Update();
 
             LoadedPreset.GlobalSettings.Personality.Update();
         }

@@ -9,7 +9,7 @@ namespace SAIN.Preset.GlobalSettings
         [Name("Global Accuracy Spread Multiplier")]
         [Description("Higher = less accurate. Modifies all bots base accuracy and spread. 1.5 = 1.5x higher accuracy spread")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 5f, 10f)]
+        [MinMaxRound(0.1f, 10f, 100f)]
         public float AccuracySpreadMultiGlobal = 1f;
 
         [Name("Global Faster CQB Reactions")]

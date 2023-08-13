@@ -188,6 +188,7 @@ namespace SAIN.Editor
             {
                 PlaySound(EUISoundType.InsuranceInsured);
                 SAINPlugin.LoadedPreset.ExportAll();
+                PresetHandler.UpdateExistingBots();
             }
             if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", style))
             {

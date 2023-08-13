@@ -7,7 +7,7 @@ namespace SAIN.Preset
         public string Name;
         public string Description;
         public string Creator;
-        public readonly string SAINVersion = AssemblyInfo.SAINVersion;
-        public readonly string DateCreated = DateTime.Today.ToString();
+        public string SAINVersion;
+        public string DateCreated;
     }
 }

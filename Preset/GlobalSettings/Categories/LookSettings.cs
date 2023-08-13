@@ -3,8 +3,16 @@ using System.ComponentModel;
 
 namespace SAIN.Preset.GlobalSettings
 {
-    public class VisionSettings
+    public class LookSettings
     {
+        [NameAndDescription(
+            "Global Vision Distance Multiplier",
+            "Multiplies whatever a bot's visible distance is set to. " +
+            "Higher is further visible distance, so 1.5 would result in bots seeing 1.5 times further. Or if their visible distance is set to 100 meters, they will see at 150 meters instead.")]
+        [DefaultValue(1f)]
+        [MinMaxRound(0.1f, 3f, 10f)]
+        public float GlobalVisionDistanceMultiplier = 1;
+
         [NameAndDescription(
             "Global Vision Speed Multiplier",
             "The Base vision speed multiplier, applies to all bots equally, affects all ranges to enemy. " +
@@ -12,7 +20,7 @@ namespace SAIN.Preset.GlobalSettings
             "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy")]
         [DefaultValue(1f)]
         [MinMaxRound(0.1f, 3f, 10f)]
-        public float VisionSpeedModifierGlobal = 1;
+        public float GlobalVisionSpeedModifier = 1;
 
         [NameAndDescription(
             "Nighttime Vision Modifier",

@@ -13,7 +13,7 @@ namespace SAIN.Components.Helpers
     public class SAINSoundTypeHandler
     {
         protected static ManualLogSource Logger;
-        protected static SAINBotController BotController => SAINPlugin.BotController;
+        protected static SAINBotControllerComponent BotController => SAINPlugin.BotController;
 
         public static void AISoundPlayer(string sound, Player player)
         {

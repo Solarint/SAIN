@@ -2,7 +2,6 @@
 using SAIN.Preset;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using static SAIN.Helpers.JsonUtility;
 
 namespace SAIN.Plugin
@@ -20,7 +19,8 @@ namespace SAIN.Plugin
 
         public static bool PresetVersionMismatch = false;
 
-        const string Settings = "Settings";
+        private const string Settings = "Settings";
+
         public static void Init()
         {
             LoadPresetOptions();
@@ -51,7 +51,9 @@ namespace SAIN.Plugin
             {
                 Name = "SAIN Easy",
                 Description = "The Default SAIN Preset",
-                Creator = "Solarint"
+                Creator = "Solarint",
+                SAINVersion = AssemblyInfo.SAINVersion,
+                DateCreated = DateTime.Today.ToString()
             };
             //SavePresetDefinition(easy);
             //new SAINPresetClass(easy);
@@ -59,7 +61,9 @@ namespace SAIN.Plugin
             {
                 Name = "SAIN Normal",
                 Description = "The Default SAIN Preset",
-                Creator = "Solarint"
+                Creator = "Solarint",
+                SAINVersion = AssemblyInfo.SAINVersion,
+                DateCreated = DateTime.Today.ToString()
             };
             //SavePresetDefinition(normal);
             //new SAINPresetClass(normal);
@@ -67,7 +71,9 @@ namespace SAIN.Plugin
             {
                 Name = DefaultPreset,
                 Description = "The Default SAIN Preset",
-                Creator = "Solarint"
+                Creator = "Solarint",
+                SAINVersion = AssemblyInfo.SAINVersion,
+                DateCreated = DateTime.Today.ToString()
             };
             SavePresetDefinition(hard);
             new SAINPresetClass(hard);
@@ -75,7 +81,9 @@ namespace SAIN.Plugin
             {
                 Name = "SAIN Impossible",
                 Description = "The Default SAIN Preset",
-                Creator = "Solarint"
+                Creator = "Solarint",
+                SAINVersion = AssemblyInfo.SAINVersion,
+                DateCreated = DateTime.Today.ToString()
             };
             //SavePresetDefinition(impossible);
             //new SAINPresetClass(impossible);
@@ -83,7 +91,7 @@ namespace SAIN.Plugin
             return hard;
         }
 
-        static readonly string DefaultPreset = "SAIN Default";
+        private static readonly string DefaultPreset = "SAIN Default";
 
         public static bool LoadPresetDefinition(string presetKey, out SAINPresetDefinition definition)
         {
@@ -114,7 +122,7 @@ namespace SAIN.Plugin
                 Sounds.PlaySound(EFT.UI.EUISoundType.ErrorMessage);
                 Logger.LogError(ex);
                 LoadPresetDefinition(DefaultPreset, out def);
-                LoadedPreset = new SAINPresetClass(def); 
+                LoadedPreset = new SAINPresetClass(def);
                 SaveEditorDefaults();
                 UpdateExistingBots();
             }

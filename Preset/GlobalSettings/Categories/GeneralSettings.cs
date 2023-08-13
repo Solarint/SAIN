@@ -5,8 +5,11 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class GeneralSettings
     {
+        [NameAndDescription(
+            "Global Difficulty Modifier",
+            "Higher number = harder bots. Affects bot accuracy, recoil, fire-rate, full auto burst lenght, scatter, reaction-time")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.25f, 3f, 100f)]
+        [MinMaxRound(0.1f, 5f, 100f)]
         public float GlobalDifficultyModifier = 1f;
 
         [NameAndDescription(

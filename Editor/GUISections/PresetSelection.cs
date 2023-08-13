@@ -15,9 +15,13 @@ namespace SAIN.Editor.GUISections
 
             const float LabelHeight = 25f;
             SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
+            var alertStyle = GetStyle(Style.alert);
             if (selectedPreset.SAINVersion != AssemblyInfo.SAINVersion)
             {
-                Box($"Selected Preset was made for SAIN Version {selectedPreset.SAINVersion} but you are running {AssemblyInfo.SAINVersion}, you may experience issues.", Height(LabelHeight));
+                Box(new GUIContent(
+                        $"Selected Preset was made for SAIN Version {selectedPreset.SAINVersion} " +
+                        $"but you are running {AssemblyInfo.SAINVersion}, you may experience issues."), 
+                    alertStyle, Height(LabelHeight));
             }
             BeginHorizontal();
             Box("Installed Presets", Height(LabelHeight));
@@ -42,7 +46,11 @@ namespace SAIN.Editor.GUISections
                 }
                 if (preset.SAINVersion != AssemblyInfo.SAINVersion)
                 {
-                    Box("!", $"Selected Preset was made for SAIN Version {preset.SAINVersion} but you are running {AssemblyInfo.SAINVersion}, you may experience issues.", Height(LabelHeight), Width(30));
+                    Box(new GUIContent(
+                            "!", 
+                            $"Selected Preset was made for SAIN Version {preset.SAINVersion} " +
+                            $"but you are running {AssemblyInfo.SAINVersion}, you may experience issues."), 
+                        alertStyle, Height(InstalledHeight), Width(20));
                 }
                 if (presetSpacing >= 4)
                 {

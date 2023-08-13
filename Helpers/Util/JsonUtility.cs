@@ -15,7 +15,7 @@ using SAIN.Preset.Personalities;
 
 namespace SAIN.Helpers
 {
-    public enum JsonUtilityEnum
+    public enum JsonEnum
     {
         Json,
         JsonSearch,
@@ -30,25 +30,63 @@ namespace SAIN.Helpers
         DefaultEditorSettings,
         PresetDefinition,
         Personalities,
+        LogOutput
     }
 
     public static class JsonUtility
     {
-        public static readonly Dictionary<JsonUtilityEnum, string> FileAndFolderNames = new Dictionary<JsonUtilityEnum, string> 
+        private static readonly string LogOutputPath = Path.Combine(GetSAINPluginPath(), "SAINLogOutput.log");
+        private const float MaxFileSizeInMB = 10.0f;
+
+        public static void AppendSAINLog(object data)
         {
-            { JsonUtilityEnum.Json, ".json" },
-            { JsonUtilityEnum.JsonSearch, "*.json" },
-            { JsonUtilityEnum.Presets, "Presets" },
-            { JsonUtilityEnum.BigBrain, "BigBrain - DO NOT TOUCH" },
-            { JsonUtilityEnum.EFTBotSettings, "EFT Bot Settings - DO NOT TOUCH" },
-            { JsonUtilityEnum.BigBrainBrains, "BrainInfos" },
-            { JsonUtilityEnum.BigBrainLayers, "LayerInfos" },
-            { JsonUtilityEnum.BigBrainLayerNames, "LayerNames" },
-            { JsonUtilityEnum.GlobalSettings, "GlobalSettings" },
-            { JsonUtilityEnum.SAINBotSettings, "BotSettings" },
-            { JsonUtilityEnum.DefaultEditorSettings, "*.json" },
-            { JsonUtilityEnum.PresetDefinition, "*Info" },
-            { JsonUtilityEnum.Personalities, "*.json" },
+            if (!File.Exists(LogOutputPath))
+            {
+                File.Create(LogOutputPath);
+            }
+            FileInfo fileInfo = new FileInfo(LogOutputPath);
+            // If the file size is greater than the maximum allowed size
+            if ((float)fileInfo.Length / (1024 * 1024) >= MaxFileSizeInMB)
+            {
+                // Read the existing content
+                string[] lines = File.ReadAllLines(LogOutputPath);
+
+                // Determine how many lines to skip (for example, skip 25% of the lines)
+                int linesToSkip = lines.Length / 4;
+
+                // Write back the truncated content, skipping the first linesToSkip lines
+                using (StreamWriter writer = new StreamWriter(LogOutputPath, false))
+                {
+                    for (int i = linesToSkip; i < lines.Length; i++)
+                    {
+                        writer.WriteLine(lines[i]);
+                    }
+                }
+            }
+
+            // Append the new log entry
+            using (StreamWriter writer = new StreamWriter(LogOutputPath, true))
+            {
+                writer.WriteLine(data);
+            }
+        }
+
+        public static readonly Dictionary<JsonEnum, string> FileAndFolderNames = new Dictionary<JsonEnum, string> 
+        {
+            { JsonEnum.Json, ".json" },
+            { JsonEnum.JsonSearch, "*.json" },
+            { JsonEnum.Presets, "Presets" },
+            { JsonEnum.BigBrain, "BigBrain - DO NOT TOUCH" },
+            { JsonEnum.EFTBotSettings, "EFT Bot Settings - DO NOT TOUCH" },
+            { JsonEnum.BigBrainBrains, "BrainInfos" },
+            { JsonEnum.BigBrainLayers, "LayerInfos" },
+            { JsonEnum.BigBrainLayerNames, "LayerNames" },
+            { JsonEnum.GlobalSettings, "GlobalSettings" },
+            { JsonEnum.SAINBotSettings, "BotSettings" },
+            { JsonEnum.DefaultEditorSettings, "Settings" },
+            { JsonEnum.PresetDefinition, "Info" },
+            { JsonEnum.Personalities, "Personalities" },
+            { JsonEnum.LogOutput, "SAINLogOutput" },
         };
 
         public const string PresetsFolder = "Presets";
@@ -195,13 +233,11 @@ namespace SAIN.Helpers
 
         private static string GetSAINPluginPath()
         {
-            var path = Path.Combine(PluginFolder, SAINFolder);
+            string pluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var path = Path.Combine(pluginFolder, nameof(SAIN));
             CheckDirectionary(path);
             return path;
         }
-
-        private const string SAINFolder = nameof(SAIN);
-        private static readonly string PluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
         private static void LogInfo(string message)
         {

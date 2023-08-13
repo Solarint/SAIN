@@ -121,6 +121,7 @@ namespace SAIN.Attributes
         private static object EditNormal(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig)
         {
             Builder.BeginHorizontal();
+            Builder.Space(15);
 
             var labelHeight = Builder.Height(entryConfig.EntryHeight);
             Buttons.InfoBox(attributes.Description, entryConfig.Info);
@@ -158,13 +159,13 @@ namespace SAIN.Attributes
                     max = Mathf.Round(((float)value * 5f) * 10f) / 10f;
                 }
 
-                Builder.MinValueBox(min, entryConfig.Info);
+                //Builder.MinValueBox(min, entryConfig.Info);
 
-                float flValue = Builder.CreateSlider((float)value, min, max, entryConfig.Slider);
+                float flValue = Builder.CreateSlider((float)value, min, max, entryConfig.Toggle);
                 float rounding = attributes.Rounding == null ? 10f : attributes.Rounding.Value;
                 value = Mathf.Round(flValue * rounding) / rounding;
 
-                Builder.MaxValueBox(max, entryConfig.Info);
+                //Builder.MaxValueBox(max, entryConfig.Info);
             }
             else if (attributes.ValueType == typeof(int))
             {
@@ -181,12 +182,12 @@ namespace SAIN.Attributes
                     max = intMax;
                 }
 
-                Builder.MinValueBox(min, entryConfig.Info);
+                //Builder.MinValueBox(min, entryConfig.Info);
 
-                float floatvalue = Builder.CreateSlider((int)value, min, max, entryConfig.Slider);
+                float floatvalue = Builder.CreateSlider((int)value, min, max, entryConfig.Toggle);
                 value = Mathf.RoundToInt(floatvalue);
 
-                Builder.MaxValueBox(max, entryConfig.Info);
+                //Builder.MaxValueBox(max, entryConfig.Info);
             }
             if (showResult && value != null)
             {
@@ -205,12 +206,9 @@ namespace SAIN.Attributes
                 }
             }
 
+            Builder.Space(15);
             Builder.EndHorizontal();
 
-            if (attributes.ValueType == typeof(int))
-            {
-                //value = RoundObjectToInt(value);
-            }
             return value;
         }
 
@@ -297,7 +295,7 @@ namespace SAIN.Attributes
         public static void EditAllValuesInObj(object obj)
         {
             Builder.BeginVertical();
-
+            Builder.Space(5);
             foreach (var field in obj.GetType().GetFields())
             {
                 object value = field.GetValue(obj);
@@ -308,6 +306,7 @@ namespace SAIN.Attributes
                 }
             }
 
+            Builder.Space(5);
             Builder.EndVertical();
         }
 

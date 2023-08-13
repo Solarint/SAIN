@@ -23,7 +23,8 @@ namespace SAIN.Editor
 
         public void InfoBox(string description, params GUILayoutOption[] options)
         {
-            Box("?", description, options);
+            var alertStyle = GetStyle(Style.alert);
+            Box(new GUIContent("?", description), alertStyle, options);
         }
 
         public string Toggle(bool value, string on, string off)

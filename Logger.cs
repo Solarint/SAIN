@@ -1,4 +1,5 @@
 ﻿using BepInEx.Logging;
+using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,6 +33,7 @@ namespace SAIN
             SelectLogSource(sourceClass).LogError(data);
         }
 
+
         private static ManualLogSource SelectLogSource(Type type = null)
         {
             string name = type?.Name ?? "SAIN";
@@ -52,11 +54,12 @@ namespace SAIN
                 data = CreateMessageString
                 (
                     data,
-                    stackTrace.GetFrame(2).GetMethod(),
-                    stackTrace.GetFrame(3).GetMethod(),
-                    stackTrace.GetFrame(4).GetMethod()
+                    stackTrace.GetFrame(2)?.GetMethod(),
+                    stackTrace.GetFrame(3)?.GetMethod(),
+                    stackTrace.GetFrame(4)?.GetMethod()
                 );
             }
+            //JsonUtility.AppendSAINLog(data);
             return data;
         }
 
@@ -66,8 +69,11 @@ namespace SAIN
             string className = null;
             foreach (MethodBase method in methods)
             {
-                methodName = methodName == null ? method.Name : $"{methodName} {method.Name}";
-                className = className ?? method.DeclaringType.Name;
+                if (method != null)
+                {
+                    methodName = methodName == null ? method.Name : $"{methodName} {method.Name}";
+                    className = className ?? method.DeclaringType.Name;
+                }
             }
 
             string output = $"[{className}] [{methodName}] [{message}]";

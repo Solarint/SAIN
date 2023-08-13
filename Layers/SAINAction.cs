@@ -18,7 +18,7 @@ namespace SAIN.Layers
             Shoot = new ShootClass(botOwner);
         }
 
-        public SAINBotController BotController => SAINPlugin.BotController;
+        public SAINBotControllerComponent BotController => SAINPlugin.BotController;
         public DecisionWrapper Decisions => SAIN.Memory.Decisions;
 
         public readonly SAINComponentClass SAIN;
