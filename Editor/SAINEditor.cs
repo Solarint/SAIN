@@ -42,8 +42,6 @@ namespace SAIN.Editor
             MouseFunctions = new MouseFunctions(this);
         }
 
-        private Texture2D TooltipBg => TexturesClass.GetColor(ColorNames.VeryDarkGray);
-
         public GUITabs GUITabs { get; private set; }
         public MouseFunctions MouseFunctions { get; private set; }
         public ButtonsClass Buttons { get; private set; }
@@ -62,6 +60,8 @@ namespace SAIN.Editor
         {
             DisplayingWindow = !DisplayingWindow;
         }
+
+        private float CheckKeyLimiter;
 
         private void TogglePause()
         {
@@ -90,19 +90,39 @@ namespace SAIN.Editor
 
         public bool ShiftKeyPressed { get; private set; }
         public bool CtrlKeyPressed { get; private set; }
+        private bool ToggleKeyPressed;
+        private bool PauseKeyPressed;
+        private bool EscapeKeyPressed;
+
+        private void CheckKeys()
+        {
+            if (CheckKeyLimiter < Time.time)
+            {
+                CheckKeyLimiter = Time.time + 0.1f;
+                ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
+                CtrlKeyPressed = Input.GetKey(KeyCode.LeftControl);
+                ToggleKeyPressed = Input.GetKeyDown(SAINPlugin.OpenEditorConfigEntry.Value.MainKey);
+                PauseKeyPressed = Input.GetKeyDown(SAINPlugin.PauseConfigEntry.Value.MainKey);
+                EscapeKeyPressed = Input.GetKeyDown(KeyCode.Escape);
+            }
+        }
 
         public void Update()
         {
-            ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
-            CtrlKeyPressed = Input.GetKey(KeyCode.LeftControl);
-
-            if (DisplayingWindow) CursorSettings.SetUnlockCursor(0, true);
+            if (DisplayingWindow)
+            {
+                CursorSettings.SetUnlockCursor(0, true);
+            }
+            else
+            {
+                CheckKeys();
+            }
 
             if (SAINPlugin.PauseConfigEntry.Value.IsDown())
             {
                 TogglePause();
             }
-            if (SAINPlugin.OpenEditorConfigEntry.Value.IsDown() || SAINPlugin.OpenEditorButton.Value)
+            if ((SAINPlugin.OpenEditorConfigEntry.Value.IsDown() && !DisplayingWindow) || SAINPlugin.OpenEditorButton.Value)
             {
                 if (SAINPlugin.OpenEditorButton.Value)
                 {
@@ -156,7 +176,9 @@ namespace SAIN.Editor
         {
             GUI.FocusWindow(TWCWindowID);
 
-            if ( Event.current.isKey && Event.current.keyCode == KeyCode.Escape )
+            CheckKeys();
+
+            if (ToggleKeyPressed || EscapeKeyPressed)
             {
                 ToggleGUI();
                 return;
@@ -167,7 +189,21 @@ namespace SAIN.Editor
             CreateTopBarOptions();
 
             EditorTabs selectedTab = EditTabsClass.TabSelectMenu(25f, 3f, 0.5f);
-            Builder.Space(DragRect.height + EditTabsClass.TabMenuRect.height + 5);
+
+            float space = DragRect.height + EditTabsClass.TabMenuRect.height + 5;
+            Builder.Space(space);
+
+            if (!string.IsNullOrEmpty(ExceptionString))
+            {
+                Builder.BeginHorizontal();
+                Builder.Alert(ExceptionString, "EXPORT ERROR", 
+                    40f, 1000, ColorNames.MidRed);
+                Builder.Alert(
+                    "LogOutput is located in Bepinex folder in SPT install. GitHub Link is available on the SAIN mod Page, right hand side.",
+                    "Please Report Issue to SAIN Github along with your LogOutput File",
+                    40f, 1000, ColorNames.MidRed);
+                Builder.EndHorizontal();
+            }
 
             GUITabs.CreateTabs(selectedTab);
 
@@ -181,6 +217,8 @@ namespace SAIN.Editor
             GUI.DragWindow(DragRect);
         }
 
+        public string ExceptionString = string.Empty;
+
         private void CreateTopBarOptions()
         {
             var style = StyleOptions.GetStyle(Style.button);
@@ -188,12 +226,11 @@ namespace SAIN.Editor
             {
                 PlaySound(EUISoundType.InsuranceInsured);
                 SAINPlugin.LoadedPreset.ExportAll();
-                PresetHandler.UpdateExistingBots();
             }
-            if (GUI.Toggle(PauseRect, GameIsPaused, "Pause Game", style))
+            if (GUI.Toggle(PauseRect, PauseOnEditorOpen, "Pause When Open", style))
             {
+                PauseOnEditorOpen = !PauseOnEditorOpen;
                 PlaySound(EUISoundType.ButtonClick);
-                TogglePause();
             }
             if (GUI.Button(ExitRect, "X", style))
             {

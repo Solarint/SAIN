@@ -368,6 +368,16 @@ namespace SAIN.Editor
                     alignment = TextAnchor.LowerCenter
                 };
 
+            GUIStyle SelectionListStyle =
+                new GUIStyle(ToggleStyle)
+                {
+                    padding = new RectOffset(1, 1, 1, 1),
+                    border = new RectOffset(1, 1, 1, 1),
+                    fontStyle = FontStyle.Normal,
+                    alignment = TextAnchor.MiddleCenter
+                };
+
+            Styles.Add(Style.selectionList, SelectionListStyle);
             Styles.Add(Style.alert, AlertStyle);
             Styles.Add(Style.botTypeGrid, botTypeGridStyle);
             Styles.Add(Style.dragBar, dragBarStyle);

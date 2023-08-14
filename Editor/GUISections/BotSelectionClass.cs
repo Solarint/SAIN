@@ -1,14 +1,16 @@
-﻿using SAIN.Preset;
+﻿using EFT;
+using EFT.UI;
+using SAIN.Attributes;
 using SAIN.Editor.Abstract;
+using SAIN.Helpers;
 using SAIN.Plugin;
+using SAIN.Preset;
+using SAIN.Preset.BotSettings.SAINSettings;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using SAIN.Preset.BotSettings.SAINSettings;
-using EFT;
-using EFT.UI;
 
 namespace SAIN.Editor
 {
@@ -26,6 +28,10 @@ namespace SAIN.Editor
             }
 
             Sections = sections.ToArray();
+        }
+
+        public void ClearCache()
+        {
         }
 
         public void Menu()
@@ -58,27 +64,20 @@ namespace SAIN.Editor
             }
 
             BeginHorizontal();
-            ButtonsClass.InfoBox("Select which difficulties you wish to modify.");
-            Label("Difficulties", Height(25));
+            FlexibleSpace();
+
+            ButtonsClass.InfoBox("Select which difficulties you wish to modify.", Height(25), Width(30));
+            Label("Difficulties", Height(25), Width(150));
+
+            FlexibleSpace();
             EndHorizontal();
 
-            BeginHorizontal();
-            for (int i = 0; i < BotDifficultyOptions.Length; i++)
-            {
-                var diff = BotDifficultyOptions[i];
-                if (Toggle(diff == EditDifficulty, diff.ToString(), EFT.UI.EUISoundType.MenuCheckBox, Height(25)))
-                {
-                    EditDifficulty = diff;
-                }
-            }
-            EndHorizontal();
+            Builder.ModifyLists.AddOrRemove(SelectedDifficulties, out bool newEdit);
 
-            OpenPropEdit = Builder.ExpandableMenu("Edit Settings", OpenPropEdit, "Modify settings for bots here");
-            if (OpenPropEdit)
-            {
-                PropEditMenu();
-            }
+            SelectProperties();
         }
+
+        public bool WasEdited;
 
         private bool OpenFirstMenu = false;
         private bool OpenPropEdit = false;
@@ -176,7 +175,6 @@ namespace SAIN.Editor
 
                         if (AddToList && !SelectedWildSpawnTypes.Contains(type))
                         {
-                            SelectedWildSpawnTypes.Clear();
                             SelectedWildSpawnTypes.Add(type);
                         }
                         else if (!AddToList && SelectedWildSpawnTypes.Contains(type))
@@ -208,76 +206,127 @@ namespace SAIN.Editor
 
             BeginHorizontal();
 
-            BotType typeInEdit = SelectedWildSpawnTypes[0];
-
-            if (Button("Save", 
-                $"Apply Values set below to selected Bot Type. Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/BotSettings folder", 
-                EUISoundType.InsuranceInsured, 
-                Height(35f), Width(200f)))
+            string toolTip = $"Apply Values set below to selected Bot Type. " +
+                $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/BotSettings folder";
+;
+            if (Builder.SaveChanges(BotSettingsWereEdited, toolTip, 35))
             {
                 SAINPlugin.LoadedPreset.ExportBotSettings();
-                PresetHandler.UpdateExistingBots();
             }
-            if (Button("Clear", "Clear all selected bots", null, Height(35f), Width(200f)))
+            if (Button("Clear All", "Clear all selected bot options", null, Height(35f), Width(200f)))
             {
-                Reset();
+                SelectedDifficulties.Clear();
+                SelectedSections.Clear();
+                SelectedWildSpawnTypes.Clear();
+            }
+
+            EndHorizontal();
+        }
+
+        public bool BotSettingsWereEdited;
+
+        private void SelectProperties()
+        {
+            if (SelectedWildSpawnTypes.Count == 0)
+            {
+                Box("No Bots Selected");
+                return;
+            }
+
+            BeginHorizontal();
+
+            string toolTip = $"Apply Values set below to selected Bot Type. " +
+                $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/BotSettings folder";
+            ;
+            if (Builder.SaveChanges(BotSettingsWereEdited, toolTip, 35))
+            {
+                SAINPlugin.LoadedPreset.ExportBotSettings();
+            }
+            if (Button("Clear All", "Clear all selected bot options", null, Height(35f), Width(200f)))
+            {
+                SelectedDifficulties.Clear();
+                SelectedSections.Clear();
+                SelectedWildSpawnTypes.Clear();
             }
 
             EndHorizontal();
 
-            Label($"Currently Editing: [{typeInEdit.Name}] at difficulty [{EditDifficulty}]", Height(35f));
-
-            if (EditingSettings == null || EditingType != typeInEdit.WildSpawnType || EditingDifficulty != EditDifficulty)
+            GUIEntryConfig entryConfig = new GUIEntryConfig
             {
-                EditingType = typeInEdit.WildSpawnType;
-                EditingDifficulty = EditDifficulty;
-                EditingSettings = SAINPlugin.LoadedPreset.BotSettings.GetSAINSettings(EditingType, EditingDifficulty);
+                MinMaxWidth = 0,
+                ResultWidth = 0.065f,
+                ResetWidth = 0.03f
+            };
+
+            var container = Editor.GUITabs.SettingsEditor.
+                SelectSettingsGUI(
+                typeof(SAINSettingsClass), 
+                "Select Options to Edit", out bool newEdit);
+            if (newEdit)
+            {
+                BotSettingsWereEdited = true;
             }
-            Scroll = BeginScrollView(Scroll);
-            Editor.GUITabs.SettingsEditor.SettingsMenu(EditingSettings);
+
+            container.SecondOpen = Builder.ExpandableMenu("Edit Selected Options", container.SecondOpen);
+            if (!container.SecondOpen)
+            {
+                return;
+            }
+            container.SecondScroll = BeginScrollView(container.SecondScroll, Height(400));
+            foreach (var category in container.SelectedCategories)
+            {
+                FieldInfo CategoryField = category.Field;
+                List<AttributesInfoClass> attributes = category.SelectedList;
+                foreach (var fieldAttribute in category.SelectedList)
+                {
+                    foreach (var bot in SelectedWildSpawnTypes)
+                    {
+                        if (SAINPlugin.LoadedPreset.BotSettings.SAINSettings.TryGetValue(bot.WildSpawnType, out var settings))
+                        {
+                            foreach (var difficulty in SelectedDifficulties)
+                            {
+                                if (settings.Settings.TryGetValue(difficulty, out var SAINSettings))
+                                {
+                                    try
+                                    {
+                                        object categoryValue = CategoryField.GetValue(SAINSettings);
+                                        object value = fieldAttribute.Field.GetValue(categoryValue);
+
+                                        BeginHorizontal();
+
+                                        Label(
+                                            $"{bot.Name} {difficulty}", 
+                                            Height(entryConfig.EntryHeight), Width(150));
+
+                                        value = AttributesGUI.EditValue(value, fieldAttribute, out newEdit, entryConfig);
+                                        if (newEdit)
+                                        {
+                                            WasEdited = true;
+                                        }
+
+                                        EndHorizontal();
+
+                                        fieldAttribute.Field.SetValue(categoryValue, value);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Logger.LogError(ex);
+                                    }
+                                }
+                                else
+                                {
+                                    Logger.LogError(difficulty);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Logger.LogError(bot.WildSpawnType);
+                        }
+                    }
+                }
+            }
             EndScrollView();
-        }
-
-        private WildSpawnType EditingType;
-        private BotDifficulty EditingDifficulty;
-        private SAINSettingsClass EditingSettings;
-        private Vector2 Scroll = Vector2.zero;
-
-        private string ConvertBotTypeListToString()
-        {
-            string result = string.Empty;
-            for (int i = 0; i < SelectedWildSpawnTypes.Count; i++)
-            {
-                result += SelectedWildSpawnTypes[i].Name;
-                if (i != SelectedWildSpawnTypes.Count - 1)
-                {
-                    result += ", ";
-                }
-            }
-            return result;
-        }
-
-        private string ConvertListToString<T>(List<T> list)
-        {
-            string result = string.Empty;
-            for (int i = 0; i < list.Count; i++)
-            {
-                result += list[i].ToString();
-                if (i != list.Count - 1)
-                {
-                    result += ", ";
-                }
-            }
-            return result;
-        }
-
-        private BotDifficulty EditDifficulty;
-
-        private void Reset()
-        {
-            SelectedDifficulties.Clear();
-            SelectedSections.Clear();
-            SelectedWildSpawnTypes.Clear();
         }
     }
 }

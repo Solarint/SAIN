@@ -19,7 +19,7 @@ namespace SAIN.Preset.GlobalSettings
             "Bots will see this much faster, or slower, at any range. " +
             "Higher is slower speed, so 1.5 would result in bots taking 1.5 times longer to spot an enemy")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 3f, 10f)]
+        [MinMaxRound(0.1f, 5f, 10f)]
         public float GlobalVisionSpeedModifier = 1;
 
         [NameAndDescription(

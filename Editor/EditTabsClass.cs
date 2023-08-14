@@ -104,7 +104,7 @@ namespace SAIN.Editor
 
         public static void BeginScrollView()
         {
-            TabClasses[SelectedTab].Scroll = GUILayout.BeginScrollView(TabClasses[SelectedTab].Scroll);
+            TabClasses[SelectedTab].Scroll = GUILayout.BeginScrollView(TabClasses[SelectedTab].Scroll, GUILayout.ExpandHeight(true));
             GUILayout.BeginVertical();
         }
 

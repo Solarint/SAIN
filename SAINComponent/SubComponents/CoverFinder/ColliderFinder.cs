@@ -51,7 +51,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
         }
 
         /// <summary>
-        /// Sorts an array of Colliders by their transform height. 
+        /// Sorts an array of Colliders by their transform optionHeight. 
         /// </summary>
         /// <param name="array">The array of Colliders to be sorted.</param>
         public void SortArrayHeight(Collider[] array)

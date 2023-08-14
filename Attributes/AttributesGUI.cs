@@ -3,13 +3,13 @@ using EFT.UI;
 using SAIN.Editor;
 using SAIN.Helpers;
 using SAIN.Preset;
+using SAIN.Preset.BotSettings.SAINSettings;
 using SAIN.Preset.GlobalSettings.Categories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static Mono.Security.X509.X520;
 
 namespace SAIN.Attributes
 {
@@ -43,83 +43,69 @@ namespace SAIN.Attributes
             }
         }
 
+        private static readonly Type[] FloatBoolInt =
+        {
+            typeof(bool),
+            typeof(float),
+            typeof(int),
+        };
+
         private static readonly GUIEntryConfig DefaultEntryConfig = new GUIEntryConfig();
 
         private static GUIStyle LabelStyle;
         private static readonly Dictionary<string, AttributesInfoClass> AttributesClasses = new Dictionary<string, AttributesInfoClass>();
 
-        public static object EditValue(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig = null)
+        public static object EditValue(object value, AttributesInfoClass attributes, out bool wasEdited, GUIEntryConfig entryConfig = null)
         {
-            if (value == null || attributes == null)
+            wasEdited = false;
+            if (value != null && attributes != null && !attributes.DoNotShowGUI)
             {
-                return value;
-            }
-            if (attributes.DoNotShowGUI)
-            {
-                return value;
-            }
+                entryConfig = entryConfig ?? DefaultEntryConfig;
 
-            if (entryConfig == null)
-            {
-                entryConfig = DefaultEntryConfig;
-            }
+                if (FloatBoolInt.Contains(attributes.ValueType))
+                {
+                    value = EditFloatBoolInt(value, attributes, entryConfig, out wasEdited);
+                }
+                else
+                {
+                    bool isDictionary = attributes.EListType == EListType.Dictionary;
+                    bool isList = attributes.EListType == EListType.List;
 
-            Type ValueType = attributes.ValueType;
-            switch (attributes.ListTypeEnum)
-            {
-                case AttributeListType.None:
-                    value = EditNormal(value, attributes, entryConfig);
-                    break;
-
-                case AttributeListType.List:
-                    if (ExpandableList(attributes, entryConfig.EntryHeight))
+                    if ((isDictionary || isList) && ExpandableList(attributes, entryConfig.EntryHeight))
                     {
-                        if (ValueType == typeof(List<BotType>))
+                        if (isDictionary)
                         {
-                            var list = (List<BotType>)value;
-                            Builder.ModifyLists.AddOrRemove(list);
-                            value = list;
+                            EditAllValuesInObj(value, out wasEdited);
                         }
-                        else if (ValueType == typeof(List<WildSpawnType>))
+                        else if (value is List<WildSpawnType> wildList)
                         {
-                            var list = (List<WildSpawnType>)value;
-                            Builder.ModifyLists.AddOrRemove(list);
-                            value = list;
+                            Builder.ModifyLists.AddOrRemove(wildList, out wasEdited);
+                            value = wildList;
                         }
-                        else if (ValueType == typeof(List<BigBrainConfigClass>))
+                        else if (value is List<BotDifficulty> diffList)
                         {
-                            var list = (List<BigBrainConfigClass>)value;
-                            Builder.ModifyLists.AddOrRemove(list);
-                            value = list;
+                            Builder.ModifyLists.AddOrRemove(diffList, out wasEdited);
+                            value = diffList;
+                        }
+                        else if (value is List<BotType> botList)
+                        {
+                            Builder.ModifyLists.AddOrRemove(botList, out wasEdited);
+                            value = botList;
+                        }
+                        else if (value is List<BigBrainConfigClass> brainList)
+                        {
+                            Builder.ModifyLists.AddOrRemove(brainList, out wasEdited);
+                            value = brainList;
                         }
                     }
-                    break;
-
-                case AttributeListType.Array:
-                    break;
-
-                case AttributeListType.Dictionary:
-                    if (ValueType == typeof(Dictionary<,>))
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        if (ExpandableList(attributes, entryConfig.EntryHeight))
-                        {
-                            EditAllValuesInObj(value);
-                        }
-                        break;
-                    }
-
-                default:
-                    break;
+                }
             }
             return value;
         }
 
-        private static object EditNormal(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig)
+        private static object EditFloatBoolInt(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig, out bool wasEdited)
         {
+            wasEdited = false;
             Builder.BeginHorizontal();
             Builder.Space(15);
 
@@ -142,6 +128,7 @@ namespace SAIN.Attributes
             float min = default;
             float max = default;
             bool showResult = false;
+            object originalValue = value;
 
             if (attributes.ValueType == typeof(bool))
             {
@@ -208,7 +195,7 @@ namespace SAIN.Attributes
 
             Builder.Space(15);
             Builder.EndHorizontal();
-
+            wasEdited = originalValue.ToString() != value.ToString();
             return value;
         }
 
@@ -287,22 +274,33 @@ namespace SAIN.Attributes
             return false;
         }
 
-        public static object EditValue(object value, FieldInfo field, GUIEntryConfig entryConfig = null)
+        public static object EditValue(object value, FieldInfo field, out bool wasEdited, GUIEntryConfig entryConfig = null)
         {
-            return EditValue(value, GetAttributeInfo(field), entryConfig);
+            return EditValue(value, GetAttributeInfo(field), out wasEdited, entryConfig);
         }
 
-        public static void EditAllValuesInObj(object obj)
+        public static void EditAllValuesInObj(object obj, out bool wasEdited, string search = null)
         {
+            wasEdited = false;
             Builder.BeginVertical();
             Builder.Space(5);
             foreach (var field in obj.GetType().GetFields())
             {
-                object value = field.GetValue(obj);
-                object newValue = EditValue(value, field);
-                if (value.ToString() != newValue.ToString())
+                var attributes = GetAttributeInfo(field);
+                if (SkipForSearch(attributes, search))
                 {
+                    continue;
+                }
+                object value = field.GetValue(obj);
+                object newValue = EditValue(value, attributes, out bool newEdit);
+                if (newEdit)
+                {
+                    if (SAINPlugin.DebugModeEnabled)
+                    {
+                        Logger.LogInfo($"{field.Name} was edited");
+                    }
                     field.SetValue(obj, newValue);
+                    wasEdited = true;
                 }
             }
 
@@ -310,30 +308,83 @@ namespace SAIN.Attributes
             Builder.EndVertical();
         }
 
-        public static bool HideConfigOption(PropertyInfo property)
+        public static void EditAllValuesInObj(Category category, object categoryObject, out bool wasEdited, string search = null)
         {
-            return HideConfigOption(property.GetCustomAttribute<AdvancedAttribute>());
-        }
-
-        public static bool HideConfigOption(FieldInfo fieldInfo)
-        {
-            return HideConfigOption(fieldInfo.GetCustomAttribute<AdvancedAttribute>());
-        }
-
-        public static bool HideConfigOption(AdvancedAttribute advancedAttribute)
-        {
-            if (advancedAttribute != null)
+            wasEdited = false;
+            Builder.BeginVertical();
+            Builder.Space(5);
+            foreach (var fieldAtt in category.FieldAttributes)
             {
-                if (advancedAttribute.Options.Contains(AdvancedEnum.Hidden))
+                if (SkipForSearch(fieldAtt, search))
                 {
-                    return true;
+                    continue;
                 }
-                if (advancedAttribute.Options.Contains(AdvancedEnum.IsAdvanced) && !SAINPlugin.Editor.AdvancedOptionsEnabled)
+                object value = fieldAtt.Field.GetValue(categoryObject);
+                object newValue = EditValue(value, fieldAtt, out bool newEdit);
+                if (newEdit)
                 {
-                    return true;
+                    if (SAINPlugin.DebugModeEnabled)
+                    {
+                        Logger.LogInfo($"{fieldAtt.Name} was edited");
+                    }
+                    fieldAtt.Field.SetValue(categoryObject, newValue);
+                    wasEdited = true;
                 }
             }
-            return false;
+
+            Builder.Space(5);
+            Builder.EndVertical();
+        }
+
+        public static bool SkipForSearch(AttributesInfoClass attributes, string search)
+        {
+            return !string.IsNullOrEmpty(search) && 
+                (attributes.Name.ToLower().Contains(search) == false || 
+                attributes.Description?.ToLower().Contains(search) == false);
+        }
+
+        public static void EditFieldInAllObjects(FieldInfo targetField, FieldInfo targetCategory, List<BotDifficulty> difficulties, List<SAINSettingsGroupClass> settings, out bool wasEdited)
+        {
+            wasEdited = false;
+            if (settings.Count == 0)
+            {
+                return;
+            }
+            Builder.BeginVertical();
+            Builder.Space(5);
+
+            foreach (SAINSettingsGroupClass setting in settings)
+            {
+                Builder.Label($"{setting.Name}");
+                Builder.Space(5);
+                foreach (var keyValuePair in setting.Settings)
+                {
+                    if (difficulties.Contains(keyValuePair.Key))
+                    {
+                        if (targetCategory != null)
+                        {
+                            object targetCategoryObject = targetCategory.GetValue(keyValuePair.Value);
+                            object value = targetField.GetValue(targetCategoryObject);
+
+                            Builder.BeginHorizontal();
+                            Builder.Label($"{keyValuePair.Key}");
+                            object newValue = EditValue(value, targetField, out bool newEdit);
+                            if (newEdit)
+                            {
+                                if (SAINPlugin.DebugModeEnabled)
+                                {
+                                    Logger.LogInfo($"{targetField.Name} was edited");
+                                }
+                                targetField.SetValue(setting, newValue);
+                                wasEdited = true;
+                            }
+                            Builder.EndHorizontal();
+                        }
+                    }
+                }
+            }
+            Builder.Space(5);
+            Builder.EndVertical();
         }
 
         private static ButtonsClass Buttons => SAINPlugin.Editor.Buttons;

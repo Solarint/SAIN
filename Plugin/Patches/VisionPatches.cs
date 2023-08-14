@@ -8,6 +8,7 @@ using SAIN.Preset.BotSettings.SAINSettings;
 using System;
 using System.Reflection;
 using UnityEngine;
+using Comfort.Common;
 
 namespace SAIN.Patches.Vision
 {
@@ -25,9 +26,8 @@ namespace SAIN.Patches.Vision
                 result *= preset.Look.CloseVisionSpeed;
             }
             result *= preset.Look.VisionSpeedModifier;
-            result *= SAINPlugin.LoadedPreset.GlobalSettings.Look.GlobalVisionSpeedModifier;
 
-            return result;
+            return Mathf.Round(result * 100f) / 100f;
         }
     }
 
@@ -133,6 +133,7 @@ namespace SAIN.Patches.Vision
             {
                 __result *= inverseWeatherModifier;
             }
+            __result = Mathf.Round(__result * 100f) / 100f; ;
         }
     }
 

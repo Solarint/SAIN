@@ -27,7 +27,7 @@ namespace SAIN.Attributes
 
     }
 
-    public enum AttributeListType
+    public enum EListType
     {
         None,
         List,

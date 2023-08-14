@@ -50,7 +50,7 @@ namespace SAIN.Attributes
             var listObj = Get<DictionaryAttribute>();
             if (listObj != null)
             {
-                ListTypeEnum = AttributeListType.Dictionary;
+                EListType = EListType.Dictionary;
                 PrimaryListType = listObj.TypeA;
                 SecondaryListType = listObj.TypeB;
                 return;
@@ -59,7 +59,7 @@ namespace SAIN.Attributes
             var list = Get<ListAttribute>();
             if (list != null)
             {
-                ListTypeEnum = AttributeListType.List;
+                EListType = EListType.List;
                 PrimaryListType = list.Type;
                 return;
             }
@@ -67,7 +67,7 @@ namespace SAIN.Attributes
             var array = Get<ArrayAttribute>();
             if (array != null)
             {
-                ListTypeEnum = AttributeListType.Array;
+                EListType = EListType.Array;
                 PrimaryListType = array.Type;
                 return;
             }
@@ -95,7 +95,7 @@ namespace SAIN.Attributes
 
         public AdvancedEnum[] AdvancedOptions { get; private set; } = new AdvancedEnum[0];
 
-        public AttributeListType ListTypeEnum { get; private set; } = AttributeListType.None;
+        public EListType EListType { get; private set; } = EListType.None;
         public Type PrimaryListType { get; private set; }
         public Type SecondaryListType { get; private set; }
     }

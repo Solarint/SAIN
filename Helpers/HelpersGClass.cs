@@ -13,9 +13,23 @@ using EFTSoundPlayer = GClass635;
 using EFTStatModifiersClass = GClass561;
 using EFTTime = GClass1292;
 using EFTSearchPoint = GClass273;
+using Aki.Reflection.Patching;
 
 namespace SAIN.Helpers
 {
+    public class UpdateEFTSettingsPatch : ModulePatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(EFTFileSettings), "smethod_1");
+        }
+
+        [PatchPrefix]
+        public static void PatchPrefix(ref EFTSettingsGroup __result, BotDifficulty d, WildSpawnType role)
+        {
+            UpdateSettingClass.ManualSettingsUpdate(role, d, __result);
+        }
+    }
 
     internal class HelpersGClass
     {
@@ -23,7 +37,15 @@ namespace SAIN.Helpers
         {
             InventoryControllerProp = AccessTools.Property(typeof(Player), "GClass2659_0");
             EFTBotSettingsProp = AccessTools.Property(typeof(BotDifficultySettingsClass), "FileSettings");
+            RefreshSettingsMethod = AccessTools.Method(typeof(BotDifficultySettingsClass), "method_0");
         }
+
+        public static void RefreshSettings(BotDifficultySettingsClass settings)
+        {
+            RefreshSettingsMethod.Invoke(settings, null);
+        }
+
+        private static readonly MethodInfo RefreshSettingsMethod;
 
         public static readonly PropertyInfo EFTBotSettingsProp;
         public static readonly PropertyInfo InventoryControllerProp;

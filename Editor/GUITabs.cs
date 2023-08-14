@@ -27,6 +27,7 @@ namespace SAIN.Editor
         public void ClearCache()
         {
             SettingsEditor.ClearCache();
+            BotSelection.ClearCache();
         }
 
         public PresetSelection PresetSelection { get; private set; }
@@ -37,7 +38,6 @@ namespace SAIN.Editor
         public void CreateTabs(EditorTabs selectedTab)
         {
             EditTabsClass.BeginScrollView();
-
             switch (selectedTab)
             {
                 case EditorTabs.None:
@@ -60,7 +60,6 @@ namespace SAIN.Editor
 
                 default: break;
             }
-
             EditTabsClass.EndScrollView();
         }
 
@@ -73,15 +72,21 @@ namespace SAIN.Editor
 
         public void GlobalSettings()
         {
-            if (Button("Save",
-                $"Apply Values set below to GlobalSettings. Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name} folder",
-                EUISoundType.InsuranceInsured, Height(30)))
+            string toolTip = $"Apply Values set below to GlobalSettings. " +
+                $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name} folder";
+            if (Builder.SaveChanges(GlobalSettingsWereEdited, toolTip, 35))
             {
                 SAINPlugin.LoadedPreset.ExportGlobalSettings();
-                PresetHandler.UpdateExistingBots();
             }
-            SettingsEditor.SettingsMenu(SAINPlugin.LoadedPreset.GlobalSettings);
+
+            SettingsEditor.ShowAllSettingsGUI(SAINPlugin.LoadedPreset.GlobalSettings, out bool newEdit);
+            if (newEdit)
+            {
+                GlobalSettingsWereEdited = true;
+            }
         }
+
+        public bool GlobalSettingsWereEdited;
 
         public void BotSettings()
         {
@@ -92,13 +97,6 @@ namespace SAIN.Editor
 
         public void Personality()
         {
-            if (Button("Save", 
-                $"Apply Values set below to personalities. Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/Personalities folder", 
-                EUISoundType.InsuranceInsured, Height(30)))
-            {
-                SAINPlugin.LoadedPreset.ExportPersonalities();
-                PresetHandler.UpdateExistingBots();
-            }
             BotPersonalityEditor.PersonalityMenu();
         }
 
@@ -113,6 +111,8 @@ namespace SAIN.Editor
 
             if (wasEnabled != Editor.AdvancedOptionsEnabled)
             {
+                Builder.ModifyLists.ClearCache();
+                SettingsEditor.ClearCache();
                 PresetHandler.SaveEditorDefaults();
             }
 

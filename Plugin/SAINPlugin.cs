@@ -98,6 +98,8 @@ namespace SAIN
 
         private void Patches()
         {
+            new UpdateEFTSettingsPatch().Enable();
+
             new Patches.Generic.KickPatch().Enable();
             new Patches.Generic.GetBotController().Enable();
             new Patches.Generic.GetBotSpawnerClass().Enable();

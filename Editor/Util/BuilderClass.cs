@@ -1,8 +1,11 @@
 ﻿using EFT.UI;
 using SAIN.Editor.Abstract;
 using SAIN.Editor.Util;
+using SAIN.Plugin;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using static GClass1711;
 
 namespace SAIN.Editor
 {
@@ -13,11 +16,194 @@ namespace SAIN.Editor
             ModifyLists = new ModifyLists(editor);
         }
 
+        public void ClearCache()
+        {
+            ModifyLists.ClearCache();
+        }
+
         public ModifyLists ModifyLists { get; private set; }
 
         private static float ExpandMenuWidth => 250f;
 
         private CustomStyleClass CustomStyle => Editor.StyleOptions.CustomStyle;
+
+        public string SearchBox(SettingsContainer container, SearchParams config = null)
+        {
+            container.SearchPattern = SearchBox(container.SearchPattern, config);
+            return container.SearchPattern;
+        }
+
+        public string SearchBox(string search, SearchParams config = null)
+        {
+            config = config ?? new SearchParams();
+            config.Start();
+
+            Label("Search", config.Label);
+
+            config.Spacing();
+
+            search = TextField(search, null, config.TextField);
+
+            config.Spacing();
+
+            if (Button("Clear", EUISoundType.MenuContextMenu, config.Clear))
+            {
+                search = string.Empty;
+            }
+
+            config.End();
+            return search;
+        }
+
+        public sealed class SearchParams : GUIParams
+        {
+            public SearchParams(float height = 30) : base(height)
+            {
+                Options = new EGUIConfig[]
+                {
+                    EGUIConfig.horizontal,
+                    EGUIConfig.startFlexSpace
+                };
+            }
+
+            public float labelWidth = 150;
+            public GUILayoutOption[] Label => new GUILayoutOption[]
+            {
+                GUILayout.Width(labelWidth),
+                Height
+            };
+
+            public float textFieldWidth = 250;
+            public GUILayoutOption[] TextField => new GUILayoutOption[]
+            {
+                GUILayout.Width(textFieldWidth),
+                Height
+            };
+
+            public float clearWidth = 75;
+            public GUILayoutOption[] Clear => new GUILayoutOption[]
+            {
+                GUILayout.Width(labelWidth),
+                Height
+            };
+        }
+
+        public class GUIParams
+        {
+            public GUIParams(float height)
+            {
+                this.optionHeight = height;
+            }
+
+            public EGUIConfig[] Options =
+            {
+                EGUIConfig.beginHorizontal,
+                EGUIConfig.endHorizontal,
+            };
+
+            public float optionHeight = 30;
+            public float optionSpacing = 5;
+            public void Spacing() => GUILayout.Space(optionSpacing);
+            public GUILayoutOption Height => GUILayout.Height(optionHeight);
+            public bool StartFlexSpace => Options.Contains(EGUIConfig.startFlexSpace);
+            public bool EndFlexSpace => Options.Contains(EGUIConfig.endFlexSpace);
+            public bool Horizontal => Options.Contains(EGUIConfig.horizontal);
+            public bool Vertical => Options.Contains(EGUIConfig.vertical);
+            public bool FixedSpace => Options.Contains(EGUIConfig.fixedSpace);
+            public float FixedSpaceWidth = 10;
+
+            public void Start()
+            {
+                if (Horizontal)
+                {
+                    GUILayout.BeginHorizontal();
+                }
+                else if (Vertical)
+                {
+                    GUILayout.BeginVertical();
+                }
+
+                if (FixedSpace)
+                {
+                    GUILayout.Space(FixedSpaceWidth);
+                }
+                else if (StartFlexSpace)
+                {
+                    GUILayout.FlexibleSpace();
+                }
+            }
+            public void End()
+            {
+                if (FixedSpace)
+                {
+                    GUILayout.Space(FixedSpaceWidth);
+                }
+                else if (EndFlexSpace)
+                {
+                    GUILayout.FlexibleSpace();
+                }
+
+                if (Horizontal)
+                {
+                    GUILayout.EndHorizontal();
+                }
+                else if (Vertical)
+                {
+                    GUILayout.EndVertical();
+                }
+            }
+        }
+
+        public enum EGUIConfig
+        {
+            startFlexSpace,
+            endFlexSpace,
+            beginHorizontal,
+            endHorizontal,
+            fixedSpace,
+            horizontal,
+            vertical,
+        }
+
+        public bool SaveChanges(bool unSaved, string toolTip, float height = 25)
+        {
+            BeginHorizontal();
+            FlexibleSpace();
+
+            bool result = false;
+            if (Button("Save and Export", toolTip, EUISoundType.InsuranceInsured, Height(height), Width(500)))
+            {
+                result = true;
+            }
+
+            const float alertWidth = 75f;
+
+            if (unSaved)
+            {
+                Alert("Click Save to export changes, and send changes to bots if in-game", "YOU HAVE UNSAVED CHANGES", height, alertWidth, ColorNames.MidBlue);
+            }
+            else
+            {
+                Space(alertWidth);
+            }
+
+            FlexibleSpace();
+            EndHorizontal();
+
+            return result;
+        }
+        public void Alert(string toolTip, string text = null, float height = 25, float width = 25, ColorNames? colorName = null)
+        {
+            GUIStyle style = GetStyle(Style.alert);
+            if (colorName != null)
+            {
+                style = new GUIStyle(style);
+                ApplyToStyle.BGAllStates(style, TexturesClass.GetColor(colorName.Value));
+            }
+            text = text ?? "!";
+            var content = new GUIContent(text, toolTip);
+            Box(content, style, Height(height), Width(width));
+        }
 
         public void MinValueBox(object value, params GUILayoutOption[] options)
         {

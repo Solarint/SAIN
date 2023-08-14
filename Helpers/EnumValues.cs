@@ -57,7 +57,7 @@ namespace SAIN.Helpers
 
         public static T Parse<T>(string value) => (T)Enum.Parse(typeof(T), value);
 
-        public static BotDifficulty[] Difficulties => GetEnum<BotDifficulty>();
+        public static readonly BotDifficulty[] Difficulties = { BotDifficulty.easy, BotDifficulty.normal, BotDifficulty.hard, BotDifficulty.impossible };
         public static WildSpawnType[] WildSpawnTypes => GetEnum<WildSpawnType>();
         public static Caliber[] AmmoCalibers => GetEnum<Caliber>();
         public static WeaponClass[] WeaponClasses => GetEnum<WeaponClass>();

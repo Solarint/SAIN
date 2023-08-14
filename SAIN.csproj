@@ -233,9 +233,11 @@
     <Compile Include="Editor\Util\ModifyLists.cs" />
     <Compile Include="Helpers\ComponentHelpers.cs" />
     <Compile Include="Helpers\ListHelpers.cs" />
+    <Compile Include="Helpers\UpdateSettingClass.cs" />
     <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
+    <Compile Include="Preset\BotSettings\SAINSettings\Categories\SAINBossSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AmmoShootabilityClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AudibleRangesClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrainConfigClass.cs" />
@@ -254,6 +256,8 @@
     <Compile Include="Interfaces.cs" />
     <Compile Include="Editor\GUISections\PresetSelection.cs" />
     <Compile Include="SAINComponent\Classes\SAINBotUnstuckClass.cs" />
+    <Compile Include="SAINComponent\Classes\NewSearchClass.cs" />
+    <Compile Include="SAINComponent\GOAP\GOAPTestClassSeekCover.cs" />
     <Compile Include="SAINComponent\PersonBase\AIInfoClass.cs" />
     <Compile Include="SAINComponent\PersonBase\ISAINPerson.cs" />
     <Compile Include="SAINComponent\PersonBase\SAINPersonClass.cs" />
@@ -267,7 +271,6 @@
     <Compile Include="Preset\BotTypeDefinitions.cs" />
     <Compile Include="Helpers\EnumValues.cs" />
     <Compile Include="Plugin\PresetHandler.cs" />
-    <Compile Include="Preset\BotSettings\SAINSettings\Categories\FieldsCache.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\SAINSettingsClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AimSettings.cs" />
     <Compile Include="Attributes\ConfigAttributes.cs" />

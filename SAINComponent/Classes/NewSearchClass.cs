@@ -5,11 +5,24 @@ using UnityEngine.AI;
 
 namespace SAIN.SAINComponent.Classes
 {
-    public class SearchClass : SAINBase, ISAINClass
+    public enum SearchStates
     {
-        public SearchClass(SAINComponentClass sain) : base(sain)
+        None,
+        FindRoute,
+        MoveToCorner,
+        CheckCorners,
+        HoldPosition,
+        Wait,
+        RushEnemy,
+    }
+
+    public class NewSearchClass : SAINBase, ISAINClass
+    {
+        public NewSearchClass(SAINComponentClass sain) : base(sain)
         {
         }
+
+        public SearchStates CurrentSearchState { get; private set; } = SearchStates.None;
 
         public void Init()
         {
@@ -17,6 +30,29 @@ namespace SAIN.SAINComponent.Classes
 
         public void Update()
         {
+            switch (CurrentSearchState)
+            {
+                case SearchStates.None:
+                    break;
+
+                case SearchStates.RushEnemy:
+                    break;
+
+                case SearchStates.FindRoute:
+                    break;
+
+                case SearchStates.MoveToCorner:
+                    break;
+
+                case SearchStates.CheckCorners:
+                    break;
+
+                case SearchStates.HoldPosition:
+                    break;
+
+                case SearchStates.Wait:
+                    break;
+            }
         }
 
         public void Dispose()
@@ -446,37 +482,5 @@ namespace SAIN.SAINComponent.Classes
         }
 
         public float ReachDistance { get; private set; }
-    }
-
-    public class MoveDangerPoint
-    {
-        public MoveDangerPoint(Vector3 start, Vector3 destination, Vector3 dangerPoint, Vector3 corner, float signedAngle)
-        {
-            StartPosition = start;
-            EndPosition = destination;
-            DangerPoint = dangerPoint;
-            Corner = corner;
-            SignedAngle = signedAngle;
-        }
-
-        public Vector3 StartPosition { get; private set; }
-        public Vector3 EndPosition { get; private set; }
-        public Vector3 DangerPoint { get; private set; }
-        public Vector3 Corner { get; private set; }
-        public float SignedAngle { get; private set; }
-
-        private bool CheckIfLeanable(float signAngle, float limit = 1f)
-        {
-            return Mathf.Abs(signAngle) > limit;
-        }
-
-        public LeanSetting GetDirectionToLean(float signAngle)
-        {
-            if (CheckIfLeanable(signAngle))
-            {
-                return signAngle > 0 ? LeanSetting.Right : LeanSetting.Left;
-            }
-            return LeanSetting.None;
-        }
     }
 }

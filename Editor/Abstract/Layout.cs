@@ -199,24 +199,24 @@ namespace SAIN.Editor.Abstract
             return value;
         }
 
-        public void BeginHorizontal()
+        public void BeginHorizontal(bool value = true)
         {
-            GUILayout.BeginHorizontal();
+            if (value) GUILayout.BeginHorizontal();
         }
 
-        public void EndHorizontal()
+        public void EndHorizontal(bool value = true)
         {
-            GUILayout.EndHorizontal();
+            if (value) GUILayout.EndHorizontal();
         }
 
-        public void BeginVertical()
+        public void BeginVertical(bool value = true)
         {
-            GUILayout.BeginVertical();
+            if (value) GUILayout.BeginVertical();
         }
 
-        public void EndVertical()
+        public void EndVertical(bool value = true)
         {
-            GUILayout.EndVertical();
+            if (value) GUILayout.EndVertical();
         }
 
         public void BeginArea(Rect rect)
@@ -229,9 +229,9 @@ namespace SAIN.Editor.Abstract
             GUILayout.EndArea();
         }
 
-        public void Space(float value)
+        public void Space(float value, bool enable = true)
         {
-            GUILayout.Space(value);
+            if (enable) GUILayout.Space(value);
         }
 
         public void BeginGroup(Rect rect)
@@ -254,9 +254,9 @@ namespace SAIN.Editor.Abstract
             return GUILayout.ExpandWidth(value);
         }
 
-        public void FlexibleSpace()
+        public void FlexibleSpace(bool value = true)
         {
-            GUILayout.FlexibleSpace();
+            if (value) GUILayout.FlexibleSpace();
         }
 
         public Vector2 BeginScrollView(Vector2 scrollPos)

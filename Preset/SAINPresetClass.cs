@@ -2,6 +2,7 @@
 using Comfort.Common;
 using Newtonsoft.Json;
 using SAIN.Helpers;
+using SAIN.Plugin;
 using SAIN.Preset.GlobalSettings;
 using SAIN.Preset.Personalities;
 using System;
@@ -22,29 +23,107 @@ namespace SAIN.Preset
         public void ExportAll()
         {
             ExportDefinition();
-            ExportGlobalSettings();
-            ExportPersonalities();
-            ExportBotSettings();
+
+            ExportGlobalSettings(false);
+            ExportPersonalities(false);
+            ExportBotSettings(false);
+
+            try
+            {
+                PresetHandler.UpdateExistingBots();
+            }
+            catch (Exception updateEx)
+            {
+                LogExportError(updateEx);
+            }
         }
 
-        public void ExportDefinition() => Export(Info, "Info");
-        public void ExportGlobalSettings() => Export(GlobalSettings, "GlobalSettings");
-        public void ExportPersonalities() => PersonalityManager.ExportPersonalities();
-        public void ExportBotSettings() => BotSettings.ExportBotSettings();
-
-        public bool Export(object obj, string fileName, string subFolder = null)
+        public void ExportDefinition()
         {
             try
             {
+                Export(Info, "Info");
+            }
+            catch (Exception updateEx)
+            {
+                LogExportError(updateEx);
+            }
+        }
+
+        public bool ExportGlobalSettings(bool sendToBots = true)
+        {
+            bool success = false;
+            try
+            {
+                Export(GlobalSettings, "GlobalSettings");
+                if (sendToBots)
+                {
+                    PresetHandler.UpdateExistingBots();
+                }
+                success = true;
+                SAINPlugin.Editor.GUITabs.GlobalSettingsWereEdited = false;
+            }
+            catch (Exception ex)
+            {
+                LogExportError(ex);
+            }
+            return success;
+        }
+
+        public bool ExportPersonalities(bool sendToBots = true)
+        {
+            bool success = false;
+            try
+            {
+                PersonalityManager.ExportPersonalities();
+                if (sendToBots)
+                {
+                    PresetHandler.UpdateExistingBots();
+                }
+                success = true;
+                SAINPlugin.Editor.GUITabs.BotPersonalityEditor.PersonalitiesWereEdited = false;
+            }
+            catch (Exception ex)
+            {
+                LogExportError(ex);
+            }
+            return success;
+        }
+
+        public bool ExportBotSettings(bool sendToBots = true)
+        {
+            bool success = false;
+            try
+            {
+                BotSettings.ExportBotSettings();
+                if (sendToBots)
+                {
+                    PresetHandler.UpdateExistingBots();
+                }
+                success = true;
+                SAINPlugin.Editor.GUITabs.BotSelection.BotSettingsWereEdited = false;
+            }
+            catch (Exception ex)
+            {
+                LogExportError(ex);
+            }
+            return success;
+        }
+
+        public bool Export(object obj, string fileName, string subFolder = null)
+        {
+            bool success = false;
+            try
+            {
                 SaveObjectToJson(obj, fileName, Folders(subFolder));
-                return true;
+                success = true;
             }
             catch (Exception ex)
             {
                 Logger.LogError($"Could not export Item of Type {obj.GetType().Name}");
-                Logger.LogError(ex);
-                return false;
+                LogExportError(ex);
             }
+            return success;
         }
 
         public bool Import<T>(out T result, string fileName, string subFolder = null)
@@ -59,7 +138,7 @@ namespace SAIN.Preset
                 catch (Exception ex)
                 {
                     Logger.LogError($"Could not import Item of Type {typeof(T)}");
-                    Logger.LogError(ex);
+                    LogExportError(ex);
                 }
             }
             result = default;
@@ -95,6 +174,12 @@ namespace SAIN.Preset
         public GlobalSettingsClass GlobalSettings;
         public BotSettings.BotSettingsClass BotSettings;
         public PersonalityManagerClass PersonalityManager;
+
+        private void LogExportError(Exception ex)
+        {
+            SAINPlugin.Editor.ExceptionString = ex.ToString();
+            Logger.LogError($"Export error: {ex}", GetType(), true);
+        }
     }
 
     public abstract class BasePreset

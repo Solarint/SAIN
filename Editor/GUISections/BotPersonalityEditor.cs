@@ -6,6 +6,8 @@ using static SAIN.Helpers.Reflection;
 using static SAIN.Attributes.AttributesGUI;
 using SAIN.Preset.Personalities;
 using SAIN.Helpers;
+using SAIN.Plugin;
+using EFT.UI;
 
 namespace SAIN.Editor.GUISections
 {
@@ -22,6 +24,14 @@ namespace SAIN.Editor.GUISections
 
         public void PersonalityMenu()
         {
+            string toolTip = $"Apply Values set below to Personalities. " +
+                $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/Personalities folder";
+
+            if (Builder.SaveChanges(PersonalitiesWereEdited, toolTip, 35))
+            {
+                SAINPlugin.LoadedPreset.ExportPersonalities();
+            }
+
             PersonScroll = Builder.BeginScrollView(PersonScroll);
 
             foreach (var personality in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
@@ -34,11 +44,17 @@ namespace SAIN.Editor.GUISections
                 OpenPersMenus[name] = Builder.ExpandableMenu(name, OpenPersMenus[name], personality.Description);
                 if (OpenPersMenus[name])
                 {
-                    EditAllValuesInObj(personality.Variables);
+                    EditAllValuesInObj(personality.Variables, out bool newEdit);
+                    if (newEdit)
+                    {
+                        PersonalitiesWereEdited = true;
+                    }
                 }
             }
             Builder.EndScrollView();
         }
+
+        public bool PersonalitiesWereEdited;
 
         private readonly Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
         private Vector2 PersonScroll = Vector2.zero;

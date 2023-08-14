@@ -9,6 +9,10 @@ namespace SAIN.Preset.BotSettings.SAINSettings
         public SAINAimingSettings Aiming = new SAINAimingSettings();
 
         [Advanced(AdvancedEnum.Hidden)]
+        [NameAndDescription("Bot Aiming Settings", "Anything related to a bot's Aiming settings used by default EFT Code")]
+        public SAINBossSettings Boss = new SAINBossSettings();
+
+        [Advanced(AdvancedEnum.Hidden)]
         [NameAndDescription("Bot Change Settings", "Anything related to a bot's Change settings used by default EFT Code")]
         public SAINChangeSettings Change = new SAINChangeSettings();
 

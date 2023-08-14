@@ -4,9 +4,18 @@ using EFT;
 using System.Text;
 using SAIN.SAINComponent;
 using SAIN.Layers.Combat.Solo.Cover;
+using System.Collections.Generic;
 
 namespace SAIN.Layers.Combat.Solo
 {
+    public enum MoveToCoverStates
+    {
+        MoveSlow,
+        MoveNormal,
+        Run,
+        Panic,
+    }
+
     internal class CombatSoloLayer : SAINLayer
     {
         public CombatSoloLayer(BotOwner bot, int priority) : base(bot, priority, Name)
@@ -14,6 +23,10 @@ namespace SAIN.Layers.Combat.Solo
         }
 
         public static readonly string Name = BuildLayerName<CombatSoloLayer>();
+
+        public void CalculateSearchPlan(SAINComponentClass sain)
+        {
+        }
 
         public override Action GetNextAction()
         {
