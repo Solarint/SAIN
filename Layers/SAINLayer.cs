@@ -18,7 +18,6 @@ namespace SAIN.Layers
         public SAINLayer(BotOwner botOwner, int priority, string layerName) : base(botOwner, priority)
         {
             LayerName = layerName;
-            Logger = BepInEx.Logging.Logger.CreateLogSource(layerName);
             SAIN = botOwner.GetComponent<SAINComponentClass>();
         }
 
@@ -30,8 +29,6 @@ namespace SAIN.Layers
         public DecisionWrapper Decisions => SAIN.Memory.Decisions;
 
         public readonly SAINComponentClass SAIN;
-
-        public readonly ManualLogSource Logger;
 
         public override void BuildDebugText(StringBuilder stringBuilder)
         {

@@ -38,17 +38,13 @@ namespace SAIN.Patches.Talk
             }
             else
             {
-                if (SAINPlugin.DebugModeEnabled)
-                {
-                    SAIN.Logger.LogInfo($"Talk: {@event}", typeof(PlayerTalkPatch), true);
-                }
                 var stackTrace = Environment.StackTrace;
                 bool fromSAIN = stackTrace.Contains(nameof(SAINComponentClass.Talk)) || stackTrace.Contains(nameof(SAINBotTalkClass));
                 if (!fromSAIN && PatchHelpers.BadTriggers.Contains(@event))
                 {
                     if (SAINPlugin.DebugModeEnabled)
                     {
-                        SAIN.Logger.LogInfo($"Blocked {@event}", typeof(PlayerTalkPatch), true);
+                        Logger.LogInfo($"PlayerTalkPatch: Blocked {@event}");
                     }
                     return false;
                 }
@@ -57,7 +53,7 @@ namespace SAIN.Patches.Talk
                 {
                     if (SAINPlugin.DebugModeEnabled)
                     {
-                        SAIN.Logger.LogInfo($"Allowed {@event}", typeof(PlayerTalkPatch), true);
+                        Logger.LogInfo($"PlayerTalkPatch: Allowed {@event}");
                     }
 
                     SAINPlugin.BotController?.PlayerTalk(@event, mask, __instance);
@@ -66,7 +62,7 @@ namespace SAIN.Patches.Talk
 
                 if (SAINPlugin.DebugModeEnabled)
                 {
-                    SAIN.Logger.LogInfo($"Blocked {@event}", typeof(PlayerTalkPatch), true);
+                    Logger.LogInfo($"PlayerTalkPatch: Blocked {@event}");
                 }
 
                 return false;

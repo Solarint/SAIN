@@ -141,7 +141,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             float targetHeight = StartHeight;
             for (int i = 0; i <= max; i++)
             {
-                DebugGizmos.SingleObjects.Ray(start, direction, Color.red, rayLength, 0.05f, true, 0.5f, true);
+                DebugGizmos.Ray(start, direction, Color.red, rayLength, 0.05f, true, 0.5f, true);
                 if (Physics.Raycast(start, direction, rayLength, Mask))
                 {
                     break;

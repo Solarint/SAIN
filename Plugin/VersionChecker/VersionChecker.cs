@@ -50,7 +50,7 @@ namespace DrakiaXYZ.VersionChecker
 
                 if (Config != null)
                 {
-                    // This results in a bogus config entry in the BepInEx config file for the plugin, but it shouldn't hurt anything
+                    // TypeofThis results in a bogus config entry in the BepInEx config file for the plugin, but it shouldn't hurt anything
                     // We leave the "section" parameter empty so there's no section header drawn
                     Config.Bind("", "TarkovVersion", "", new ConfigDescription(
                         errorMessage, null, new ConfigurationManagerAttributes

@@ -227,7 +227,7 @@
     <Compile Include="Components\MainPlayer\SAINMainPlayerComponent.cs" />
     <Compile Include="Components\SAINGameworldComponent.cs" />
     <Compile Include="Editor\EditTabsClass.cs" />
-    <Compile Include="Editor\GUISections\PresetEditorDefaults.cs" />
+    <Compile Include="Editor\PresetEditorDefaults.cs" />
     <Compile Include="Editor\GUITabs.cs" />
     <Compile Include="Editor\IEditorCache.cs" />
     <Compile Include="Editor\Util\ModifyLists.cs" />
@@ -254,9 +254,10 @@
     <Compile Include="SAINComponent\Classes\Decision\DecisionWrapper.cs" />
     <Compile Include="Layers\Extract\LootingBotsIntegration.cs" />
     <Compile Include="Interfaces.cs" />
-    <Compile Include="Editor\GUISections\PresetSelection.cs" />
+    <Compile Include="Editor\PresetSelection.cs" />
+    <Compile Include="SAINComponent\Classes\ESearchMove.cs" />
     <Compile Include="SAINComponent\Classes\SAINBotUnstuckClass.cs" />
-    <Compile Include="SAINComponent\Classes\NewSearchClass.cs" />
+    <Compile Include="SAINComponent\Classes\SAINSearchClass.cs" />
     <Compile Include="SAINComponent\GOAP\GOAPTestClassSeekCover.cs" />
     <Compile Include="SAINComponent\PersonBase\AIInfoClass.cs" />
     <Compile Include="SAINComponent\PersonBase\ISAINPerson.cs" />
@@ -323,9 +324,9 @@
     <Compile Include="SAINComponent\Classes\Sense\HeardSoundsClass.cs" />
     <Compile Include="BotController\Classes\BotExtractManager.cs" />
     <Compile Include="BotController\Classes\BotSpawnController.cs" />
-    <Compile Include="Editor\GUISections\BotPersonalityEditor.cs" />
-    <Compile Include="Editor\GUISections\BotSettingsEditor.cs" />
-    <Compile Include="Editor\GUISections\WindowLayoutCreator.cs" />
+    <Compile Include="Editor\BotPersonalityEditor.cs" />
+    <Compile Include="Editor\BotSettingsEditor.cs" />
+    <Compile Include="Editor\WindowLayoutCreator.cs" />
     <Compile Include="Editor\Util\EditorEnum.cs" />
     <Compile Include="Editor\Util\ApplyToStyle.cs" />
     <Compile Include="Editor\Util\ColorsClass.cs" />
@@ -336,7 +337,7 @@
     <Compile Include="Editor\Util\MouseFunctions.cs" />
     <Compile Include="Editor\Util\ButtonsClass.cs" />
     <Compile Include="Editor\Util\CursorSettings.cs" />
-    <Compile Include="Editor\GUISections\BotSelectionClass.cs" />
+    <Compile Include="Editor\BotSelectionClass.cs" />
     <Compile Include="Editor\Util\Sounds.cs" />
     <Compile Include="Helpers\EFTInfo.cs" />
     <Compile Include="Logger.cs" />
@@ -368,7 +369,7 @@
     <Compile Include="SAINComponent\Classes\Decision\SAINDecisionClass.cs" />
     <Compile Include="SAINComponent\Classes\Sense\SAINHearingSensorClass.cs" />
     <Compile Include="SAINComponent\Classes\Sense\LastHeardSoundClass.cs" />
-    <Compile Include="SAINComponent\Classes\SearchClass.cs" />
+    <Compile Include="SAINComponent\Classes\oldSearchClass.cs" />
     <Compile Include="SAINComponent\Classes\Decision\SquadDecisionClass.cs" />
     <Compile Include="SAINComponent\Classes\Talk\SquadLeaderClass.cs" />
     <Compile Include="BotController\Classes\CoverManager.cs" />

@@ -1,14 +1,6 @@
-﻿using BepInEx.Logging;
-using DrakiaXYZ.BigBrain.Brains;
-using EFT;
-using SAIN.SAINComponent.Classes.Decision;
-using SAIN.SAINComponent.Classes.Talk;
-using SAIN.SAINComponent.Classes.WeaponFunction;
-using SAIN.SAINComponent.Classes.Mover;
-using SAIN.SAINComponent.Classes;
-using SAIN.SAINComponent.SubComponents;
-using SAIN.SAINComponent;
+﻿using EFT;
 using SAIN.Helpers;
+using SAIN.SAINComponent.Classes;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -20,20 +12,17 @@ namespace SAIN.Layers.Combat.Solo
         {
         }
 
-        private SearchClass Search;
-
         public override void Start()
         {
-            Search = new SearchClass(SAIN);
             FindTarget();
         }
 
         private void FindTarget()
         {
             Vector3 pos = Search.SearchMovePos();
-            if (Search?.GoToPoint(pos) != NavMeshPathStatus.PathInvalid)
+            if (Search?.GoToPoint(pos, false) != NavMeshPathStatus.PathInvalid)
             {
-                TargetPosition = pos;
+                TargetPosition = Search.FinalDestination;
             }
         }
 
@@ -41,6 +30,7 @@ namespace SAIN.Layers.Combat.Solo
 
         public override void Stop()
         {
+            Search.Reset();
             TargetPosition = null;
         }
 
@@ -100,28 +90,33 @@ namespace SAIN.Layers.Combat.Solo
             }
             CheckShouldSprint();
             Search.Search(!SprintEnabled, SprintEnabled);
-            if (Search?.ActiveDestination != null)
-            {
-                Steer(Search.ActiveDestination);
-            }
-            else
-            {
-                SAIN.Steering.SteerByPriority();
-            }
+            Steer();
         }
+
+        private SAINSearchClass Search => SAIN.Search;
 
         private void CheckShouldSprint()
         {
-            if (Search.PeekingCorner)
+            if (Search.CurrentState == ESearchMove.MoveToEndPeak)
             {
+                SprintEnabled = false;
                 return;
             }
 
-            var pers = SAIN.Info.Personality;
-            if (RandomSprintTimer < Time.time && SAIN.Info.PersonalitySettings.SprintWhileSearch)
+            var persSettings = SAIN.Info.PersonalitySettings;
+            if (RandomSprintTimer < Time.time && persSettings.SprintWhileSearch)
             {
-                RandomSprintTimer = Time.time + 3f * Random.Range(0.5f, 2f);
-                float chance = pers == SAINPersonality.GigaChad ? 40f : 20f;
+                float timeAdd;
+                if (SprintEnabled)
+                {
+                    timeAdd = 1.5f * Random.Range(0.75f, 1.25f);
+                }
+                else
+                {
+                    timeAdd = 3f * Random.Range(0.5f, 2f);
+                }
+                RandomSprintTimer = Time.time + timeAdd;
+                float chance = persSettings.FrequentSprintWhileSearch ? 40f : 20f;
                 SprintEnabled = EFTMath.RandomBool(chance);
             }
         }
@@ -129,33 +124,53 @@ namespace SAIN.Layers.Combat.Solo
         private bool SprintEnabled = false;
         private float RandomSprintTimer = 0f;
 
-        private void Steer(Vector3 pos)
+        private void Steer()
         {
-            if (Search.PeekingCorner)
-            {
-                SAIN.Mover.SetTargetMoveSpeed(0.25f);
-                SAIN.Mover.SetTargetPose(0.75f);
-            }
-            else if (SprintEnabled)
-            {
-                SAIN.Mover.SetTargetMoveSpeed(1f);
-                SAIN.Mover.SetTargetPose(1f);
-            }
-            else
-            {
-                SAIN.Mover.SetTargetMoveSpeed(0.66f);
-                SAIN.Mover.SetTargetPose(0.85f);
-            }
-
-            if (!SprintEnabled || BotOwner.Memory.IsUnderFire)
+            if (BotOwner.Memory.IsUnderFire)
             {
                 SAIN.Mover.Sprint(false);
-                if (!SAIN.Steering.SteerByPriority(false))
-                {
-                    SAIN.Steering.LookToMovingDirection();
-                }
+                SteerByPriority(true);
+                return;
+            }
+            switch (Search.CurrentState)
+            {
+                case ESearchMove.DangerPoint:
+                    SteerByPriority(true);
+                    break;
+
+                case ESearchMove.MoveToEndPeak:
+                    Vector3? danger = Search.SearchMovePoint?.DangerPoint;
+                    if (danger != null)
+                    {
+                        SAIN.Steering.LookToPoint(danger);
+                        break;
+                    }
+                    SteerByPriority(false);
+                    break;
+
+                case ESearchMove.DirectMove:
+                    if (SprintEnabled)
+                    {
+                        LookToMovingDirection();
+                    }
+                    else
+                    {
+                        SteerByPriority(true);
+                    }
+                    break;
+
+                default:
+                    if (!SteerByPriority(false))
+                    {
+                        LookToMovingDirection();
+                    }
+                    break;
             }
         }
+
+        private bool SteerByPriority(bool value) => SAIN.Steering.SteerByPriority(value);
+
+        private void LookToMovingDirection() => SAIN.Steering.LookToMovingDirection();
 
         public NavMeshPath Path = new NavMeshPath();
     }

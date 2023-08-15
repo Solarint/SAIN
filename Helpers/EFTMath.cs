@@ -100,10 +100,10 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Parses a string to an Enum of type T.
+        /// Parses a string to an EEditorTab of type T.
         /// </summary>
         /// <param name="value">The string to parse.</param>
-        /// <returns>The Enum of type T.</returns>
+        /// <returns>The EEditorTab of type T.</returns>
         public static T ParseEnum<T>(this string value)
         {
             return (T)((object)Enum.Parse(typeof(T), value, true));

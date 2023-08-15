@@ -25,7 +25,7 @@ namespace SAIN.Editor
                 Singleton<GUISounds>.Instance.PlayUISound(soundType);
                 if (SAINPlugin.DebugModeEnabled)
                 {
-                    Logger.LogDebug(soundType, typeof(Sounds), true);
+                    Logger.LogDebug(soundType);
                 }
             }
         }

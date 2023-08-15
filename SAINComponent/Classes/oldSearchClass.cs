@@ -5,9 +5,9 @@ using UnityEngine.AI;
 
 namespace SAIN.SAINComponent.Classes
 {
-    public class SearchClass : SAINBase, ISAINClass
+    public class OldSearchClass : SAINBase, ISAINClass
     {
-        public SearchClass(SAINComponentClass sain) : base(sain)
+        public OldSearchClass(SAINComponentClass sain) : base(sain)
         {
         }
 
@@ -186,8 +186,8 @@ namespace SAIN.SAINComponent.Classes
                 if (!FirstCheck)
                 {
                     FirstCheck = true;
-                    MoveToNextPoint(SearchMovePoint.StartPosition);
-                    ActiveDestination = SearchMovePoint.StartPosition;
+                    MoveToNextPoint(SearchMovePoint.StartPeekPosition);
+                    ActiveDestination = SearchMovePoint.StartPeekPosition;
                 }
                 else if (!SecondCheck)
                 {
@@ -199,8 +199,8 @@ namespace SAIN.SAINComponent.Classes
                     {
                         PeekingCorner = true;
                         SecondCheck = true;
-                        MoveToNextPoint(SearchMovePoint.EndPosition);
-                        ActiveDestination = SearchMovePoint.EndPosition;
+                        MoveToNextPoint(SearchMovePoint.EndPeekPosition);
+                        ActiveDestination = SearchMovePoint.EndPeekPosition;
                     }
                 }
                 else if (!ThirdCheck)
@@ -384,7 +384,7 @@ namespace SAIN.SAINComponent.Classes
             }
             else
             {
-                // Modify the startPeekPos to be the result if no objects are in the way. This is resulting wide peek startPeekPos.
+                // Modify the startPeekPos to be the result if no objects are in the way. TypeofThis is resulting wide peek startPeekPos.
                 PeekEndPosition = result;
             }
 
@@ -450,20 +450,24 @@ namespace SAIN.SAINComponent.Classes
 
     public class MoveDangerPoint
     {
+        public MoveDangerPoint()
+        {
+        }
+
         public MoveDangerPoint(Vector3 start, Vector3 destination, Vector3 dangerPoint, Vector3 corner, float signedAngle)
         {
-            StartPosition = start;
-            EndPosition = destination;
+            StartPeekPosition = start;
+            EndPeekPosition = destination;
             DangerPoint = dangerPoint;
             Corner = corner;
             SignedAngle = signedAngle;
         }
 
-        public Vector3 StartPosition { get; private set; }
-        public Vector3 EndPosition { get; private set; }
-        public Vector3 DangerPoint { get; private set; }
-        public Vector3 Corner { get; private set; }
-        public float SignedAngle { get; private set; }
+        public Vector3 StartPeekPosition = Vector3.zero;
+        public Vector3 EndPeekPosition = Vector3.zero;
+        public Vector3 DangerPoint = Vector3.zero;
+        public Vector3 Corner = Vector3.zero;
+        public float SignedAngle = 0f;
 
         private bool CheckIfLeanable(float signAngle, float limit = 1f)
         {
@@ -477,6 +481,10 @@ namespace SAIN.SAINComponent.Classes
                 return signAngle > 0 ? LeanSetting.Right : LeanSetting.Left;
             }
             return LeanSetting.None;
+        }
+
+        public void DrawDebug()
+        {
         }
     }
 }

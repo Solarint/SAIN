@@ -27,7 +27,7 @@ namespace SAIN.Helpers
         [PatchPrefix]
         public static void PatchPrefix(ref EFTSettingsGroup __result, BotDifficulty d, WildSpawnType role)
         {
-            UpdateSettingClass.ManualSettingsUpdate(role, d, __result);
+            // UpdateSettingClass.ManualSettingsUpdate(role, d, __result);
         }
     }
 

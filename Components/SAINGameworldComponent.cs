@@ -31,7 +31,7 @@ namespace SAIN.Components
             }
             catch
             {
-                Logger.LogError("Dispose Component Error", GetType());
+                Logger.LogError("Dispose Component Error");
             }
         }
 

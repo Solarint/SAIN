@@ -160,7 +160,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
                 {
                     if (DebugCoverFinder)
                     {
-                        //DebugGizmos.SingleObjects.Ray(OriginPoint, corner - OriginPoint, Color.red, (corner - OriginPoint).magnitude, 0.05f, true, 30f);
+                        //DebugGizmos.Ray(OriginPoint, corner - OriginPoint, Color.red, (corner - OriginPoint).magnitude, 0.05f, true, 30f);
                     }
 
                     return false;
@@ -172,7 +172,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
                     {
                         if (DebugCoverFinder)
                         {
-                            //DebugGizmos.SingleObjects.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
+                            //DebugGizmos.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
                         }
                         return false;
                     }
@@ -188,7 +188,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
                         {
                             if (DebugCoverFinder)
                             {
-                                //DebugGizmos.SingleObjects.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
+                                //DebugGizmos.Ray(corner, cornerToTarget, Color.red, cornerToTarget.magnitude, 0.05f, true, 30f);
                             }
                             return false;
                         }

@@ -103,27 +103,32 @@ namespace SAIN.Attributes
             return value;
         }
 
-        private static object EditFloatBoolInt(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig, out bool wasEdited)
+        public static object EditFloatBoolInt(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig, out bool wasEdited, bool showLabel = true, bool beginHoriz = true)
         {
-            wasEdited = false;
-            Builder.BeginHorizontal();
-            Builder.Space(15);
-
-            var labelHeight = Builder.Height(entryConfig.EntryHeight);
-            Buttons.InfoBox(attributes.Description, entryConfig.Info);
-
-            if (LabelStyle == null)
+            if (beginHoriz)
             {
-                GUIStyle boxstyle = Buttons.GetStyle(Style.box);
-                LabelStyle = new GUIStyle(Buttons.GetStyle(Style.label))
-                {
-                    alignment = TextAnchor.MiddleLeft,
-                    margin = boxstyle.margin,
-                    padding = boxstyle.padding
-                };
+                Builder.BeginHorizontal();
+                Builder.Space(15);
             }
 
-            Builder.Box(new GUIContent(attributes.Name), LabelStyle, labelHeight);
+            if (showLabel)
+            {
+                var labelHeight = Builder.Height(entryConfig.EntryHeight);
+                Buttons.InfoBox(attributes.Description, entryConfig.Info);
+
+                if (LabelStyle == null)
+                {
+                    GUIStyle boxstyle = Buttons.GetStyle(Style.box);
+                    LabelStyle = new GUIStyle(Buttons.GetStyle(Style.label))
+                    {
+                        alignment = TextAnchor.MiddleLeft,
+                        margin = boxstyle.margin,
+                        padding = boxstyle.padding
+                    };
+                }
+
+                Builder.Box(new GUIContent(attributes.Name), LabelStyle, labelHeight);
+            }
 
             float min = default;
             float max = default;
@@ -193,8 +198,11 @@ namespace SAIN.Attributes
                 }
             }
 
-            Builder.Space(15);
-            Builder.EndHorizontal();
+            if (beginHoriz)
+            {
+                Builder.Space(15);
+                Builder.EndHorizontal();
+            }
             wasEdited = originalValue.ToString() != value.ToString();
             return value;
         }

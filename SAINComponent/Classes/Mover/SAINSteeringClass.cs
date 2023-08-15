@@ -113,6 +113,12 @@ namespace SAIN.SAINComponent.Classes.Mover
             BotOwner.Steering.LookToPoint(point);
         }
 
+        public void LookToPoint(Vector3? point)
+        {
+            if (point != null)
+                BotOwner.Steering.LookToPoint(point.Value);
+        }
+
         public void LookToDirection(Vector3 direction, bool flat)
         {
             if (flat)

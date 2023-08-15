@@ -42,7 +42,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
             {
                 if (CoverPoints.Count > 0)
                 {
-                    DebugGizmos.SingleObjects.Line(CoverPoints.PickRandom().Position, SAIN.Transform.Head, Color.yellow, 0.035f, true, 0.1f);
+                    DebugGizmos.Line(CoverPoints.PickRandom().Position, SAIN.Transform.Head, Color.yellow, 0.035f, true, 0.1f);
                 }
             }
         }

@@ -13,7 +13,6 @@ namespace SAIN.Layers
     {
         public SAINAction(BotOwner botOwner, string name) : base(botOwner)
         {
-            Logger = BepInEx.Logging.Logger.CreateLogSource(name);
             SAIN = botOwner.GetComponent<SAINComponentClass>();
             Shoot = new ShootClass(botOwner);
         }
@@ -22,8 +21,6 @@ namespace SAIN.Layers
         public DecisionWrapper Decisions => SAIN.Memory.Decisions;
 
         public readonly SAINComponentClass SAIN;
-
-        public readonly ManualLogSource Logger;
 
         public readonly ShootClass Shoot;
 

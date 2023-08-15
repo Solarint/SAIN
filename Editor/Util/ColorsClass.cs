@@ -40,8 +40,28 @@ namespace SAIN.Editor.Util
             }
         }
 
+        public Color GetRandomColor(string key)
+        {
+            if (!Grays.ContainsKey(key))
+            {
+                Grays.Add(key, CreateRandom());
+            }
+            return Grays[key];
+        }
+
+        private Color CreateRandom()
+        {
+            float random = UnityEngine.Random.Range(0.3f, 2.00f) * 0.151f;
+            return new Color(random * Randomize, random, random);
+        }
+
+        private float Randomize => UnityEngine.Random.Range(0.81f, 1.21f);
+
+        private readonly Dictionary<string, Color> Grays = new Dictionary<string, Color>();
+
         public void ClearCache()
         {
+            ListHelpers.ClearCache(Grays);
             ListHelpers.ClearCache(ColorSchemeDictionary);
         }
 

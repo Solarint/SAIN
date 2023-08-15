@@ -57,7 +57,7 @@ namespace SAIN.Editor.GUISections
         public bool CheckIfOpen(SettingsContainer container)
         {
             BeginHorizontal();
-            container.Open = Builder.ExpandableMenu(container.Name, container.Open, null, 25, 30, false);
+            container.Open = Builder.ExpandableMenu(container.Name, container.Open, null, 20, 30, false);
             if (Button("Clear", "Clear Selected Options in this Menu", 
                 EFT.UI.EUISoundType.MenuDropdownSelect, 
                 Width(30), Height(30)))
@@ -80,7 +80,6 @@ namespace SAIN.Editor.GUISections
             if (CheckIfOpen(container))
             {
                 Space(5);
-                container.Scroll = BeginScrollView(container.Scroll, Height(400));
 
                 string search = Builder.SearchBox(container);
                 try
@@ -95,7 +94,6 @@ namespace SAIN.Editor.GUISections
                 {
                     Logger.LogError(ex);
                 }
-                EndScrollView();
             }
             Space(5);
             return container;

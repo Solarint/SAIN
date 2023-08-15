@@ -60,6 +60,24 @@ namespace SAIN.Editor.Abstract
             GUILayout.Label(content, style, options);
         }
 
+        public void Label(Rect rect, GUIContent content, GUIStyle style = null)
+        {
+            if (style == null)
+            {
+                style = GetStyle(Style.label);
+            }
+            GUI.Label(rect, content, style);
+        }
+
+        public void Label(Rect rect, string text, GUIStyle style = null)
+        {
+            if (style == null)
+            {
+                style = GetStyle(Style.label);
+            }
+            GUI.Label(rect, text, style);
+        }
+
         public void Label(string text, params GUILayoutOption[] options)
         {
             Label(new GUIContent(text), GetStyle(Style.label), options);

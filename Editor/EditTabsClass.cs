@@ -14,45 +14,45 @@ namespace SAIN.Editor
     {
         static EditTabsClass()
         {
-            TabClasses = new Dictionary<EditorTabs, TabClass> 
+            TabClasses = new Dictionary<EEditorTab, TabClass> 
             {
                 {
-                    EditorTabs.None, new TabClass
+                    EEditorTab.None, new TabClass
                     {
                         Name = "None",
                         ToolTip = "",
                     } 
                 },
                 {
-                    EditorTabs.Home, new TabClass
+                    EEditorTab.Home, new TabClass
                     {
                         Name = "Home",
                         ToolTip = "Select Presets and check which mods are detected that can affect SAIN.",
                     }
                 }, 
                 {
-                    EditorTabs.GlobalSettings, new TabClass
+                    EEditorTab.GlobalSettings, new TabClass
                     {
                         Name = "Global Settings",
                         ToolTip = "Modify settings that are the same between all bots.",
                     }
                 },
                 {
-                    EditorTabs.BotSettings, new TabClass
+                    EEditorTab.BotSettings, new TabClass
                     {
                         Name = "Bot Settings",
                         ToolTip = "Modify Settings that are unique to particular bot types for individual difficulties. Difficulty is determined on spawn by EFT, and is changed by selecting the Difficulty value when starting a raid. As Online is a mix of all difficulties.",
                     }
                 },
                 { 
-                    EditorTabs.Personalities, new TabClass
+                    EEditorTab.Personalities, new TabClass
                     {
                         Name = "Personalities",
                         ToolTip = "Modify Individual Personality settings for how they are assigned to bots, and what each personality does for a bot's behavior.",
                     }
                 },
                 { 
-                    EditorTabs.Advanced, new TabClass
+                    EEditorTab.Advanced, new TabClass
                     {
                         Name = "Advanced Options",
                         ToolTip = "Edit at your own risk. Enable additional advanced config options here",
@@ -64,7 +64,7 @@ namespace SAIN.Editor
             List<string> tooltips = new List<string>();
             foreach (var tab in TabClasses)
             {
-                if (tab.Key != EditorTabs.None)
+                if (tab.Key != EEditorTab.None)
                 {
                     names.Add(tab.Value.Name);
                     tooltips.Add(tab.Value.ToolTip);
@@ -79,7 +79,7 @@ namespace SAIN.Editor
 
         private static BuilderClass Builder => SAINPlugin.Editor.Builder;
 
-        public static EditorTabs TabSelectMenu(float minHeight = 15, float speed = 3, float closeSpeedMulti = 0.66f)
+        public static EEditorTab TabSelectMenu(float minHeight = 15, float speed = 3, float closeSpeedMulti = 0.66f)
         {
             if (TabMenuRect == null || TabRects == null)
             {
@@ -104,7 +104,7 @@ namespace SAIN.Editor
 
         public static void BeginScrollView()
         {
-            TabClasses[SelectedTab].Scroll = GUILayout.BeginScrollView(TabClasses[SelectedTab].Scroll, GUILayout.ExpandHeight(true));
+            TabClasses[SelectedTab].Scroll = GUILayout.BeginScrollView(TabClasses[SelectedTab].Scroll, Builder.GetStyle(Style.scrollView));
             GUILayout.BeginVertical();
         }
 
@@ -114,15 +114,15 @@ namespace SAIN.Editor
             GUILayout.EndScrollView();
         }
 
-        public static bool IsTabSelected(EditorTabs tab)
+        public static bool IsTabSelected(EEditorTab tab)
         {
             return SelectedTab == tab;
         }
 
-        public static EditorTabs SelectedTab = EditorTabs.None;
+        public static EEditorTab SelectedTab = EEditorTab.None;
         public static readonly string[] Tabs;
         public static readonly string[] TabTooltips;
-        public static readonly Dictionary<EditorTabs, TabClass> TabClasses;
+        public static readonly Dictionary<EEditorTab, TabClass> TabClasses;
     }
 
     public sealed class TabClass
@@ -130,10 +130,9 @@ namespace SAIN.Editor
         public string Name;
         public string ToolTip;
         public Vector2 Scroll = Vector2.zero;
-        public EditorTabs Enum = EditorTabs.None;
     }
 
-    public enum EditorTabs
+    public enum EEditorTab
     {
         None,
         Home,

@@ -178,7 +178,7 @@ namespace SAIN.Preset
         private void LogExportError(Exception ex)
         {
             SAINPlugin.Editor.ExceptionString = ex.ToString();
-            Logger.LogError($"Export error: {ex}", GetType(), true);
+            Logger.LogError($"Export error: {ex}");
         }
     }
 

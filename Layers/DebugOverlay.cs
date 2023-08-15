@@ -88,9 +88,28 @@ namespace SAIN.Layers
                 var info = sain.Info;
                 var decisions = sain.Memory.Decisions;
                 stringBuilder.AppendLine($"Name: [{sain.Person.Name}] Personality: [{info.Personality}] Type: [{info.Profile.WildSpawnType}]");
+
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine("Decisions");
                 stringBuilder.AppendLabeledValue("Main Decision", $"Current: {decisions.Main.Current} Last: {decisions.Main.Last}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Squad Decision", $"Current: {decisions.Squad.Current} Last: {decisions.Squad.Last}", Color.white, Color.yellow, true);
                 stringBuilder.AppendLabeledValue("Self Decision", $"Current: {decisions.Self.Current} Last: {decisions.Self.Last}", Color.white, Color.yellow, true);
+                var state = sain.Search.CurrentState;
+                stringBuilder.AppendLabeledValue("SearchState", $"Current: {sain.Search.CurrentState} Next: {sain.Search.NextState} Last: {sain.Search.LastState}", Color.white, Color.yellow, true);
+
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine("SAIN Info");
+                stringBuilder.AppendLabeledValue("Personality and Type", $"{info.Personality} {info.Profile.WildSpawnType}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Power of Equipment", $"{info.Profile.PowerLevel}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Start Search + Hold Ground Time", $"{info.TimeBeforeSearch} + {info.HoldGroundDelay}", Color.white, Color.yellow, true);
+                stringBuilder.AppendLabeledValue("Difficulty + Modifier", $"{info.Profile.BotDifficulty} + {info.Profile.DifficultyModifier}", Color.white, Color.yellow, true);
+
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine("Aim Info");
+                stringBuilder.AppendLabeledValue("Shoot Modifier", $"{info.WeaponInfo.FinalModifier}", Color.white, Color.yellow, true);
+                AddAimData(botOwner, stringBuilder);
+                return;
+
                 switch (Selected)
                 {
                     case 0:

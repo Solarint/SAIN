@@ -143,7 +143,7 @@ namespace SAIN.Helpers
                     }
                     else
                     {
-                        SAIN.Logger.LogError(path, typeof(JsonUtility), true);
+                        SAIN.Logger.LogError(path);
                     }
                 }
                 return list;
@@ -237,23 +237,6 @@ namespace SAIN.Helpers
             var path = Path.Combine(pluginFolder, nameof(SAIN));
             CheckDirectionary(path);
             return path;
-        }
-
-        private static void LogInfo(string message)
-        {
-            SAIN.Logger.LogInfo(message, typeof(JsonUtility), true);
-        }
-        private static void LogDebug(string message)
-        {
-            SAIN.Logger.LogDebug(message, typeof(JsonUtility), true);
-        }
-        private static void LogWarning(string message)
-        {
-            SAIN.Logger.LogWarning(message, typeof(JsonUtility), true);
-        }
-        private static void LogError(string message)
-        {
-            SAIN.Logger.LogError(message, typeof(JsonUtility), true);
         }
     }
 }

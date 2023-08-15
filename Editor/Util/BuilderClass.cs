@@ -372,7 +372,7 @@ namespace SAIN.Editor
 
         public void SelectionGridExpandWidth(Rect menuRect, string[] options, List<string> selectedList, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
         {
-            //BeginGroup(menuRect);
+            BeginGroup(menuRect);
             for (int i = 0; i < options.Length; i++)
             {
                 string option = options[i];
@@ -400,7 +400,7 @@ namespace SAIN.Editor
                     }
                 }
             }
-            //EndGroup();
+            EndGroup();
         }
 
         public Rect[] VerticalGridRects(Rect MenuRect, int count, float startWidth)

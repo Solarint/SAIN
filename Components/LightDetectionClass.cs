@@ -54,7 +54,7 @@ namespace SAIN.Components
 
                 if (DebugFlash)
                 {
-                    DebugGizmos.SingleObjects.Sphere(hit.point, 0.1f, Color.red, true, 0.25f);
+                    DebugGizmos.Sphere(hit.point, 0.1f, Color.red, true, 0.25f);
                 }
             }
         }

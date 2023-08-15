@@ -10,7 +10,7 @@ namespace SAIN.Helpers.Textures
     {
         private static void LogMessage(string message)
         {
-            LogWarning(message, typeof(LoadTexture), true);
+            LogWarning(message);
         }
 
         public static Texture2D Single(string path)
@@ -63,7 +63,7 @@ namespace SAIN.Helpers.Textures
                 string[] fileNames = Directory.GetFiles(path);
                 if (fileNames.Length == 0)
                 {
-                    LogWarning($"No Files Found", typeof(LoadTexture), true);
+                    LogWarning($"No Files Found");
                     return null;
                 }
 

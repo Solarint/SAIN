@@ -72,6 +72,7 @@ namespace SAIN.SAINComponent
                 Sounds = new SAINSoundsController(this);
                 FriendlyFireClass = new SAINFriendlyFireClass(this);
                 Vision = new SAINVisionClass(this);
+                Search = new SAINSearchClass(this);
             }
             catch (Exception ex)
             {
@@ -81,6 +82,7 @@ namespace SAIN.SAINComponent
                 return false;
             }
 
+            Search.Init();
             Memory.Init();
             EnemyController.Init();
             FriendlyFireClass.Init();
@@ -128,6 +130,7 @@ namespace SAIN.SAINComponent
 
                 Person.Update();
 
+                Search.Update();
                 Memory.Update();
                 EnemyController.Update();
                 FriendlyFireClass.Update();
@@ -213,6 +216,7 @@ namespace SAIN.SAINComponent
             {
                 StopAllCoroutines();
 
+                Search.Dispose();
                 Memory.Dispose();
                 EnemyController.Dispose();
                 FriendlyFireClass.Dispose();
@@ -277,6 +281,7 @@ namespace SAIN.SAINComponent
             }
         }
 
+        public SAINSearchClass Search { get; private set; }
         public SAINEnemyClass Enemy => HasEnemy ? EnemyController.ActiveEnemy : null;
         public SAINPersonTransformClass Transform => Person.Transform;
         public SAINMemoryClass Memory { get; private set; }

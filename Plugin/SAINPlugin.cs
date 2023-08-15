@@ -182,12 +182,12 @@ namespace SAIN
             if (Chainloader.PluginInfos.ContainsKey(LootingBots))
             {
                 LootingBotsLoaded = true;
-                Logger.LogInfo($"SAIN: Looting Bots Detected.", typeof(ModDetection));
+                Logger.LogInfo($"SAIN: Looting Bots Detected.");
             }
             if (Chainloader.PluginInfos.ContainsKey(Realism))
             {
                 RealismLoaded = true;
-                Logger.LogInfo($"SAIN: Realism Detected.", typeof(ModDetection));
+                Logger.LogInfo($"SAIN: Realism Detected.");
             }
         }
 

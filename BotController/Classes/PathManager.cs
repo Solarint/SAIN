@@ -87,7 +87,7 @@ namespace SAIN.Components.BotController
                         if (AddPoint)
                         {
                             exits.Add(exitPoint);
-                            DebugGizmos.SingleObjects.Line(botPos + Vector3.up * 1f, exitPoint, Color.white, 0.06f, true, 1f, true);
+                            DebugGizmos.Line(botPos + Vector3.up * 1f, exitPoint, Color.white, 0.06f, true, 1f, true);
                         }
                     }
                     else
@@ -114,7 +114,7 @@ namespace SAIN.Components.BotController
                                 if (AddPoint)
                                 {
                                     exits.Add(exitPoint);
-                                    DebugGizmos.SingleObjects.Line(botPos + Vector3.up * 1f, exitPoint, Color.white, 0.06f, true, 1f, true);
+                                    DebugGizmos.Line(botPos + Vector3.up * 1f, exitPoint, Color.white, 0.06f, true, 1f, true);
                                 }
                                 break;
                             }

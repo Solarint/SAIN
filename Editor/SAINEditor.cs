@@ -188,7 +188,7 @@ namespace SAIN.Editor
 
             CreateTopBarOptions();
 
-            EditorTabs selectedTab = EditTabsClass.TabSelectMenu(25f, 3f, 0.5f);
+            EEditorTab selectedTab = EditTabsClass.TabSelectMenu(25f, 3f, 0.5f);
 
             float space = DragRect.height + EditTabsClass.TabMenuRect.height + 5;
             Builder.Space(space);

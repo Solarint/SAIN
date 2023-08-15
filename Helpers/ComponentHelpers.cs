@@ -82,12 +82,12 @@ namespace SAIN.Helpers
 
         private static void LogError(Exception ex, string message)
         {
-            Logger.LogError($"{message} Error", typeof(ComponentHelpers), true);
+            Logger.LogError($"{message} Error");
             Logger.LogError(ex);
         }
         private static void LogDebug(string message)
         {
-            Logger.LogDebug(message, typeof(ComponentHelpers), true);
+            Logger.LogDebug(message);
         }
 
         public static void ClearCache()

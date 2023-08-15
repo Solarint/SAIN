@@ -33,7 +33,20 @@ namespace SAIN.Editor
         public void ClearCache()
         {
             ListHelpers.ClearCache(ColorTextures);
+            ListHelpers.ClearCache(RandomColors);
         }
+
+        public Texture2D GetRandomGray(string key)
+        {
+            if (!RandomColors.ContainsKey(key))
+            {
+                var texture = NewTexture(ColorsClass.GetRandomColor(key));
+                RandomColors.Add(key, texture);
+            }
+            return RandomColors[key];
+        }
+
+        private readonly Dictionary<string, Texture2D> RandomColors = new Dictionary<string, Texture2D>();
 
         public Texture2D GetColor(ColorNames name)
         {

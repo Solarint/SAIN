@@ -103,6 +103,7 @@ namespace SAIN.Preset.Personalities
             public float HoldGroundMinRandom = 0.66f;
             public float HoldGroundMaxRandom = 1.5f;
             public float SearchBaseTime = 45;
+            public float SearchAggressionModifier = 1f;
             public bool CanJumpCorners = false;
             public bool CanTaunt = false;
             public bool FrequentTaunt = false;

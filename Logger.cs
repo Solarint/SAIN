@@ -1,5 +1,4 @@
 ﻿using BepInEx.Logging;
-using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,30 +8,56 @@ namespace SAIN
 {
     internal static class Logger
     {
-        public static void LogInfo(object data, Type sourceClass = null, bool getMethodInfo = false)
+        public static void LogInfo(object data) => Log(LogLevel.Info, data);
+        public static void LogDebug(object data) => Log(LogLevel.Debug, data);
+        public static void LogWarning(object data) => Log(LogLevel.Warning, data);
+        public static void LogError(object data) => Log(LogLevel.Error, data);
+
+        private static void Log(LogLevel level, object data)
         {
-            data = BuildMessage(data, getMethodInfo);
-            SelectLogSource(sourceClass).LogInfo(data);
+            string methods = string.Empty;
+            Type declaringType = null;
+
+            if (level != LogLevel.Debug)
+            {
+                int max = GetMaxFrames(level);
+                int count = 0;
+                StackTrace stackTrace = new StackTrace();
+                for (int i = 0; i < stackTrace.FrameCount; i++)
+                {
+                    var method = stackTrace.GetFrame(i).GetMethod();
+                    Type methodType = method.DeclaringType;
+
+                    if (methodType == typeof(Logger)) continue;
+
+                    declaringType = declaringType ?? methodType;
+                    methods += "." + method.Name;
+
+                    if (count >= max) break;
+                    count++;
+                }
+                methods = $"[{methods}]:";
+            }
+
+            LastLogData = data;
+            string result = $"{methods} [{data}]";
+            SelectLogSource(declaringType).Log(level, result);
         }
 
-        public static void LogDebug(object data, Type sourceClass = null, bool getMethodInfo = false)
+        private static int GetMaxFrames(LogLevel level)
         {
-            data = BuildMessage(data, getMethodInfo);
-            SelectLogSource(sourceClass).LogDebug(data);
+            switch (level)
+            {
+                case LogLevel.Debug: return 0;
+                case LogLevel.Info: return 1;
+                case LogLevel.Warning: return 2;
+                case LogLevel.Error: return 3;
+                case LogLevel.Fatal: return 4;
+                default: return 0;
+            }
         }
 
-        public static void LogWarning(object data, Type sourceClass = null, bool getMethodInfo = false)
-        {
-            data = BuildMessage(data, getMethodInfo);
-            SelectLogSource(sourceClass).LogWarning(data);
-        }
-
-        public static void LogError(object data, Type sourceClass = null, bool getMethodInfo = false)
-        {
-            data = BuildMessage(data, getMethodInfo);
-            SelectLogSource(sourceClass).LogError(data);
-        }
-
+        public static object LastLogData { get; private set; }
 
         private static ManualLogSource SelectLogSource(Type type = null)
         {
@@ -46,38 +71,5 @@ namespace SAIN
 
         public static Dictionary<string, ManualLogSource> LogSourcesDictionary = new Dictionary<string, ManualLogSource>();
 
-        public static object BuildMessage(object data, bool methodInfo = false)
-        {
-            if (methodInfo)
-            {
-                StackTrace stackTrace = new StackTrace();
-                data = CreateMessageString
-                (
-                    data,
-                    stackTrace.GetFrame(2)?.GetMethod(),
-                    stackTrace.GetFrame(3)?.GetMethod(),
-                    stackTrace.GetFrame(4)?.GetMethod()
-                );
-            }
-            //JsonUtility.AppendSAINLog(data);
-            return data;
-        }
-
-        private static object CreateMessageString(object message, params MethodBase[] methods)
-        {
-            string methodName = null;
-            string className = null;
-            foreach (MethodBase method in methods)
-            {
-                if (method != null)
-                {
-                    methodName = methodName == null ? method.Name : $"{methodName} {method.Name}";
-                    className = className ?? method.DeclaringType.Name;
-                }
-            }
-
-            string output = $"[{className}] [{methodName}] [{message}]";
-            return output;
-        }
     }
 }

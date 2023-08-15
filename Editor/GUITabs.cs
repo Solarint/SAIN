@@ -35,27 +35,27 @@ namespace SAIN.Editor
         public BotPersonalityEditor BotPersonalityEditor { get; private set; }
         public BotSettingsEditor SettingsEditor { get; private set; }
 
-        public void CreateTabs(EditorTabs selectedTab)
+        public void CreateTabs(EEditorTab selectedTab)
         {
             EditTabsClass.BeginScrollView();
             switch (selectedTab)
             {
-                case EditorTabs.None:
+                case EEditorTab.None:
                     break;
 
-                case EditorTabs.Home:
+                case EEditorTab.Home:
                     Home(); break;
 
-                case EditorTabs.GlobalSettings:
+                case EEditorTab.GlobalSettings:
                     GlobalSettings(); break;
 
-                case EditorTabs.BotSettings:
+                case EEditorTab.BotSettings:
                     BotSettings(); break;
 
-                case EditorTabs.Personalities:
+                case EEditorTab.Personalities:
                     Personality(); break;
 
-                case EditorTabs.Advanced:
+                case EEditorTab.Advanced:
                     Advanced(); break;
 
                 default: break;
