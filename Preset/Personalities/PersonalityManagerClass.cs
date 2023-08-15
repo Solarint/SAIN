@@ -96,6 +96,7 @@ namespace SAIN.Preset.Personalities
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
                         SearchBaseTime = SearchBaseTime(pers),
                         PowerLevelMax = 50f,
+                        SearchAggressionModifier = 0.6f,
                     }
                 };
 
@@ -120,6 +121,7 @@ namespace SAIN.Preset.Personalities
                         MaxLevel = 10,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
                         SearchBaseTime = SearchBaseTime(pers),
+                        SearchAggressionModifier = 0.75f,
                     }
                 };
 
@@ -140,7 +142,8 @@ namespace SAIN.Preset.Personalities
                         Enabled = true,
                         RandomlyAssignedChance = 30,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers)
+                        SearchBaseTime = SearchBaseTime(pers),
+                        SearchAggressionModifier = 0.4f,
                     }
                 };
                 AddAllBotTypes(settings.AllowedBotTypes);
@@ -195,6 +198,7 @@ namespace SAIN.Preset.Personalities
                         FrequentSprintWhileSearch = true,
                         CanRushEnemyReloadHeal = true,
                         ConstantTaunt = true,
+                        SearchAggressionModifier = 2f,
                     }
                 };
 
@@ -228,6 +232,7 @@ namespace SAIN.Preset.Personalities
                         SprintWhileSearch = true,
                         CanRushEnemyReloadHeal = true,
                         FrequentTaunt = true,
+                        SearchAggressionModifier = 4f,
                     }
                 };
 

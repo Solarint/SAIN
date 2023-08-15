@@ -216,13 +216,13 @@ namespace SAIN.SAINComponent.Classes
         {
             if (WaitPointTimer < 0)
             {
-                float baseTime = 6;
+                float baseTime = 5;
                 var personalitySettings = SAIN.Info.PersonalitySettings;
                 if (personalitySettings != null)
                 {
                     baseTime /= personalitySettings.SearchAggressionModifier;
                 }
-                WaitPointTimer = Time.time + baseTime * Random.Range(0.5f, 2f);
+                WaitPointTimer = Time.time + baseTime * Random.Range(0.5f, 1.33f);
             }
             if (WaitPointTimer < Time.time)
             {

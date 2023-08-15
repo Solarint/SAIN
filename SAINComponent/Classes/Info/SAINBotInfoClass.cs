@@ -124,7 +124,16 @@ namespace SAIN.SAINComponent.Classes.Info
                 yield return null;
             }
             UpdateSettingClass.ManualSettingsUpdate(WildSpawnType, BotDifficulty, BotOwner.Settings.FileSettings);
+
+            var mind = BotOwner.Settings.FileSettings.Mind;
+            if (originalForgetTime == -1)
+            {
+                originalForgetTime = mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC;
+            }
+            mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = originalForgetTime / PersonalitySettings.SearchAggressionModifier;
         }
+
+        private float originalForgetTime = 150;
 
         public SAINSettingsClass FileSettings { get; private set; }
 

@@ -83,6 +83,18 @@ namespace SAIN.SAINComponent.Classes
         private bool CheckSoundHeardAfterModifiers(IAIDetails player, Vector3 position, float power, AISoundType type, out float distance)
         {
             float range = power;
+
+            var globalHearing = GlobalSAINSettings.Hearing;
+            if (type == AISoundType.step)
+            {
+                range *= globalHearing.GlobalFootstepAudioMulti;
+            }
+            else
+            {
+                range *= globalHearing.GlobalGunshotAudioMulti;
+            }
+            range = Mathf.Round(range * 10) / 10;
+
             bool wasHeard = DoIHearSound(player, position, range, type, out distance, true);
 
             if (wasHeard)
@@ -122,7 +134,7 @@ namespace SAIN.SAINComponent.Classes
 
                 range = Mathf.Round(range * 10f) / 10f;
 
-                range = Mathf.Clamp(range, power / 3f, power * 1.33f);
+                range = Mathf.Clamp(range, power / 5f, power * 2f);
 
                 return DoIHearSound(player, position, range, type, out distance, false);
             }

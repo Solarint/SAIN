@@ -55,13 +55,13 @@ namespace SAIN.SAINComponent.Classes.Decision
                         {
                             Decision = SelfDecision.Stims;
                         }
-                        else if (StartSurgery())
-                        {
-                            Decision = SelfDecision.Surgery;
-                        }
                         else if (StartFirstAid())
                         {
                             Decision = SelfDecision.FirstAid;
+                        }
+                        else if (StartSurgery())
+                        {
+                            Decision = SelfDecision.Surgery;
                         }
                     }
                 }

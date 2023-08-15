@@ -92,6 +92,7 @@ namespace SAIN.Helpers
                 VisionSpeedMulti(sainSettings),
                 "GainSightCoef");
         }
+
         public static void ManualSettingsUpdate(WildSpawnType WildSpawnType, BotDifficulty botDifficulty, BotOwner BotOwner, SAINSettingsClass sainSettings)
         {
             var eftSettings = BotOwner.Settings.FileSettings;
