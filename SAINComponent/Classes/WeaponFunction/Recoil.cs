@@ -31,7 +31,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             float distance = SAIN.DistanceToAimTarget;
 
             // Reduces scatter recoil at very close range. Clamps Distance between 3 and 20 then scale to 0.25 to 1.
-            // So if a target is 3m or less Distance, their recoil scaling will be 25% its original rounding
+            // So if a target is 3m or less Distance, their recoil scaling will be 25% its original Rounding
             distance = Mathf.Clamp(distance, 3f, 20f);
             distance /= 20f;
             distance = distance * 0.75f + 0.25f;

@@ -55,7 +55,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Calculates the audible range of a given ammunition caliber.
         /// </summary>
-        /// <param name="ammocaliber">The ammunition caliber.</param>
+        /// <param value="ammocaliber">The ammunition caliber.</param>
         /// <returns>The audible range of the given ammunition caliber.</returns>
         private static float AudibleRange(string ammocaliber)
         {
@@ -73,7 +73,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Checks if the given velocity is subsonic.
         /// </summary>
-        /// <param name="velocity">The velocity to check.</param>
+        /// <param value="velocity">The velocity to check.</param>
         /// <returns>True if the velocity is subsonic, false otherwise.</returns>
         private static bool IsSubsonic(float velocity)
         {
@@ -82,7 +82,7 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Calculates the rain sound modifier based on the current rain rounding.
+        /// Calculates the rain sound modifier based on the current rain Rounding.
         /// </summary>
         /// <returns>
         /// The rain sound modifier.
@@ -95,7 +95,7 @@ namespace SAIN.Helpers
             if (RainCheckTimer < Time.time)
             {
                 RainCheckTimer = Time.time + 10f;
-                // Grabs the current rain rounding
+                // Grabs the current rain Rounding
                 float Rain = WeatherController.Instance.WeatherCurve.Rain;
                 RainModifier = 1f;
                 float max = 1f;
@@ -110,12 +110,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Calculates the inverse scaling of a given rounding between a minimum and maximum rounding.
+        /// Calculates the inverse scaling of a given Rounding between a minimum and maximum Rounding.
         /// </summary>
-        /// <param name="value">The rounding to be scaled.</param>
-        /// <param name="min">The minimum rounding.</param>
-        /// <param name="max">The maximum rounding.</param>
-        /// <returns>The scaled rounding.</returns>
+        /// <param value="value">The Rounding to be scaled.</param>
+        /// <param value="Min">The minimum Rounding.</param>
+        /// <param value="Max">The maximum Rounding.</param>
+        /// <returns>The scaled Rounding.</returns>
         public static float InverseScaling(float value, float min, float max)
         {
             // Inverse

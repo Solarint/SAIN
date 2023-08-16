@@ -369,10 +369,10 @@ namespace SAIN.Helpers
             /// <summary>
             /// Creates a line between two game objects and adds a script to update the line's DrawPosition and color every frame.
             /// </summary>
-            /// <param name="startObject">The starting game object.</param>
-            /// <param name="endObject">The ending game object.</param>
-            /// <param name="lineWidth">The width of the line.</param>
-            /// <param name="color">The color of the line.</param>
+            /// <param value="startObject">The starting game object.</param>
+            /// <param value="endObject">The ending game object.</param>
+            /// <param value="lineWidth">The width of the line.</param>
+            /// <param value="color">The color of the line.</param>
             /// <returns>The game object containing the line renderer.</returns>
             public static GameObject FollowLine(GameObject startObject, GameObject endObject, float lineWidth, Color color)
             {
@@ -413,7 +413,7 @@ namespace SAIN.Helpers
                 /// <summary>
                 /// Sets the color of the line renderer material.
                 /// </summary>
-                /// <param name="color">The color to set.</param>
+                /// <param value="color">The color to set.</param>
                 public void SetColor(Color color)
                 {
                     lineRenderer.material.color = color;
@@ -432,8 +432,8 @@ namespace SAIN.Helpers
             /// <summary>
             /// Destroys the specified GameObject after a given delay.
             /// </summary>
-            /// <param name="obj">The GameObject to be destroyed.</param>
-            /// <param name="delay">The delay before the GameObject is destroyed.</param>
+            /// <param value="obj">The GameObject to be destroyed.</param>
+            /// <param value="delay">The delay before the GameObject is destroyed.</param>
             public static void DestroyAfterDelay(GameObject obj, float delay)
             {
                 if (obj != null)
@@ -446,8 +446,8 @@ namespace SAIN.Helpers
             /// <summary>
             /// Runs a coroutine to destroy a GameObject after a delay.
             /// </summary>
-            /// <param name="obj">The GameObject to destroy.</param>
-            /// <param name="delay">The delay before destroying the GameObject.</param>
+            /// <param value="obj">The GameObject to destroy.</param>
+            /// <param value="delay">The delay before destroying the GameObject.</param>
             /// <returns>The coroutine.</returns>
             private static IEnumerator RunDestroyAfterDelay(GameObject obj, float delay)
             {

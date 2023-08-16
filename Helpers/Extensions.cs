@@ -34,7 +34,7 @@ namespace SAIN.Helpers
 
         private static GUIStyle GetStyle(Style style)
         {
-            return SAINPlugin.Editor.StyleOptions.CustomStyle.GetStyle(style);
+            return StylesClass.GetStyle(style);
         }
 
         private static bool CompareValuePlaySound(object oldValue, object newValue, EUISoundType? sound = null)

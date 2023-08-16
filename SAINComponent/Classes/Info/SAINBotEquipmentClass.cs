@@ -1,11 +1,8 @@
-﻿using BepInEx.Logging;
-using EFT;
+﻿using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
-using SAIN.Components;
 using SAIN.Helpers;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -18,7 +15,7 @@ namespace SAIN.SAINComponent.Classes.Info
             _InventoryProp = AccessTools.Property(typeof(Player), "Inventory");
         }
 
-        static readonly PropertyInfo _InventoryProp;
+        private static readonly PropertyInfo _InventoryProp;
 
         public SAINBotEquipmentClass(SAINComponentClass sain) : base(sain)
         {
@@ -44,7 +41,6 @@ namespace SAIN.SAINComponent.Classes.Info
         public void Dispose()
         {
         }
-
 
         public InventoryControllerClass InventoryController { get; private set; }
 

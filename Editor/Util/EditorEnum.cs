@@ -34,6 +34,7 @@ namespace SAIN.Editor
         button,
         toggle,
         window,
+        botTypeSection,
         horizontalSlider,
         horizontalSliderThumb,
         verticalSlider,

@@ -63,7 +63,7 @@ namespace SAIN.Patches.Vision
                 {
                     DateTime dateTime = SAINPlugin.BotController.TimeVision.GameDateTime;
                     timeMod = SAINPlugin.BotController.TimeVision.TimeOfDayVisibility;
-                    // Modify the rounding of the "HourServer" property to the hour from the DateTime object
+                    // Modify the Rounding of the "HourServer" property to the hour from the DateTime object
                     _HourServerProperty.SetValue(___botOwner_0.LookSensor, (int)((short)dateTime.Hour));
                 }
                 if (SAINPlugin.BotController != null)

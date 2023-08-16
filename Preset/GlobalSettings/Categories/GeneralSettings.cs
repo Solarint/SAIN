@@ -9,7 +9,7 @@ namespace SAIN.Preset.GlobalSettings
             "Global Difficulty Modifier",
             "Higher number = harder bots. Affects bot accuracy, recoil, fire-rate, full auto burst lenght, scatter, reaction-time")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 5f, 100f)]
+        [MinMax(0.1f, 5f, 100f)]
         public float GlobalDifficultyModifier = 1f;
 
         [NameAndDescription(
@@ -22,7 +22,7 @@ namespace SAIN.Preset.GlobalSettings
             "No Bush ESP Enhanced Raycast Frequency p/ Second",
             "How often to check for foliage vision blocks")]
         [DefaultValue(0.1f)]
-        [MinMaxRound(0f, 1f, 100f)]
+        [MinMax(0f, 1f, 100f)]
         public float NoBushESPFrequency = 0.1f;
 
         [NameAndDescription(
@@ -36,7 +36,7 @@ namespace SAIN.Preset.GlobalSettings
             "Experimental: Increased Accuracy and extra checks. Sets the ratio of visible to not visible body parts to block vision. " +
             "0.5 means half the body parts of the player must be visible to block vision.")]
         [DefaultValue(0.5f)]
-        [MinMaxRound(0.2f, 1f, 10f)]
+        [MinMax(0.2f, 1f, 10f)]
         public float NoBushESPEnhancedRatio = 0.5f;
 
         [NameAndDescription(

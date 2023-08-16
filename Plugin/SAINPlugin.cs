@@ -134,8 +134,6 @@ namespace SAIN
             new Patches.Shoot.SemiAutoPatch().Enable();
         }
 
-        public static readonly SAINEditor Editor = new SAINEditor();
-
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 
         public static SAINBotControllerComponent BotController => GameWorldHandler.SAINBotController;
@@ -145,17 +143,17 @@ namespace SAIN
             DebugGizmos.Update();
             DebugOverlay.Update();
             ModDetection.Update();
-            Editor.Update();
+            SAINEditor.Update();
             GameWorldHandler.Update();
 
             LoadedPreset.GlobalSettings.Personality.Update();
         }
 
-        private void Start() => Editor.Init();
+        private void Start() => SAINEditor.Init();
 
-        private void LateUpdate() => Editor.LateUpdate();
+        private void LateUpdate() => SAINEditor.LateUpdate();
 
-        private void OnGUI() => Editor.OnGUI();
+        private void OnGUI() => SAINEditor.OnGUI();
     }
 
     public static class ModDetection
@@ -209,7 +207,6 @@ namespace SAIN
             Box(value ? "Detected" : "Not Detected");
         }
 
-        private static BuilderClass Builder => SAINPlugin.Editor.Builder;
         private static readonly float ModsCheckTimer = -1f;
         private static bool ModsChecked = false;
     }

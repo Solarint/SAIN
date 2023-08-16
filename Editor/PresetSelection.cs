@@ -1,16 +1,15 @@
-﻿using SAIN.Editor.Abstract;
-using SAIN.Plugin;
+﻿using SAIN.Plugin;
 using SAIN.Preset;
+using System;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor.GUISections
 {
-    public class PresetSelection : EditorAbstract
+    public static class PresetSelection
     {
-        public PresetSelection(SAINEditor editor) : base(editor) { }
-
-        public bool Menu()
+        public static bool Menu()
         {
             BeginVertical();
 
@@ -27,8 +26,10 @@ namespace SAIN.Editor.GUISections
             BeginHorizontal();
             Box("Installed Presets", Height(LabelHeight));
             Box("Select an installed preset for SAIN Settings", Height(LabelHeight));
-            bool refresh = Button("Refresh", "Refresh installed Presets", null, Height(LabelHeight));
-            LoadPresetOptions(refresh);
+            if (Button("Refresh", "Refresh installed Presets", null, Height(LabelHeight)))
+            {
+                PresetHandler.LoadPresetOptions();
+            }
             EndHorizontal();
 
             BeginHorizontal();
@@ -65,6 +66,52 @@ namespace SAIN.Editor.GUISections
 
             EndVertical();
 
+            Space(10);
+
+            OpenNewPresetMenu = BuilderClass.ExpandableMenu("Create New Preset", OpenNewPresetMenu);
+            if (OpenNewPresetMenu)
+            {
+                Space(5);
+
+                NewName = LabeledTextField(NewName, "Preset Name");
+                NewDescription = LabeledTextField(NewDescription, "Preset Description");
+                NewCreator = LabeledTextField(NewCreator, "Creator Name");
+
+                Space(5);
+
+                Box("Select Preset to Copy From");
+                Space(2);
+                for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
+                {
+                    string optionName = PresetHandler.PresetOptions[i].Name;
+                    bool selected = CopyFrom == optionName;
+                    if (Toggle(selected, optionName, EFT.UI.EUISoundType.MenuCheckBox, Height(25)))
+                    {
+                        if (!selected)
+                        {
+                            CopyFrom = optionName;
+                        }
+                    }
+                }
+
+                Space(5);
+
+                if (Button("Save and Export", EFT.UI.EUISoundType.InsuranceInsured, Height(50f)))
+                {
+                    var definition = new SAINPresetDefinition()
+                    {
+                        Name = NewName,
+                        Description = NewDescription,
+                        Creator = NewCreator,
+                        SAINVersion = AssemblyInfo.SAINVersion,
+                        DateCreated = DateTime.Today.ToString()
+                    };
+                    PresetHandler.PresetOptions.Add(definition);
+                    PresetHandler.SavePresetDefinition(definition);
+                    PresetHandler.InitPresetFromDefinition(definition);
+                }
+            }
+
             if (selectedPreset.Name != SAINPlugin.LoadedPreset.Info.Name)
             {
                 PresetHandler.InitPresetFromDefinition(selectedPreset);
@@ -73,15 +120,22 @@ namespace SAIN.Editor.GUISections
             return false;
         }
 
-        private void LoadPresetOptions(bool refresh = false)
+        private static string LabeledTextField(string value, string label)
         {
-            if (RecheckOptionsTimer < Time.time || refresh)
-            {
-                RecheckOptionsTimer = Time.time + 60f;
-                PresetHandler.LoadPresetOptions();
-            }
+            BeginHorizontal();
+
+            Box(label, Width(225f));
+            value = TextField(value);
+
+            EndHorizontal();
+            return Regex.Replace(value, @"[^\w \-]", "");
         }
 
-        private float RecheckOptionsTimer;
+        private static bool OpenNewPresetMenu;
+
+        private static string NewName = "New Preset Name";
+        private static string NewDescription = "Preset Description";
+        private static string NewCreator = "Your Name Here";
+        private static string CopyFrom = PresetHandler.DefaultPreset;
     }
 }

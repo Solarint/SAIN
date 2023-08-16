@@ -1,5 +1,4 @@
 ﻿using EFT.UI;
-using SAIN.Editor.Abstract;
 using SAIN.Editor.Util;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,26 +7,17 @@ using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor
 {
-    public class BuilderClass : EditorAbstract
+    public static class BuilderClass
     {
-        public BuilderClass(SAINEditor editor) : base(editor)
-        {
-            ModifyLists = new ModifyLists(editor);
-        }
-
-        public ModifyLists ModifyLists { get; private set; }
-
         private static float ExpandMenuWidth => 250f;
 
-        private CustomStyleClass CustomStyle => Editor.StyleOptions.CustomStyle;
-
-        public string SearchBox(SettingsContainer container, SearchParams config = null)
+        public static string SearchBox(SettingsContainer container, SearchParams config = null)
         {
             container.SearchPattern = SearchBox(container.SearchPattern, config);
             return container.SearchPattern;
         }
 
-        public string SearchBox(string search, SearchParams config = null)
+        public static string SearchBox(string search, SearchParams config = null)
         {
             config = config ?? new SearchParams();
             config.Start();
@@ -165,60 +155,54 @@ namespace SAIN.Editor
             vertical,
         }
 
-        public bool SaveChanges(bool unSaved, string toolTip, float height = 25)
+        public static bool SaveChanges(bool unSaved, string toolTip, float height = 25)
         {
             BeginHorizontal();
-            FlexibleSpace();
 
             bool result = false;
-            if (Button("Save and Export", toolTip, EUISoundType.InsuranceInsured, Height(height), Width(500)))
+            if (Button("Save and Export", toolTip, EUISoundType.InsuranceInsured, Height(height)))
             {
                 result = true;
             }
 
-            const float alertWidth = 75f;
+            const float alertWidth = 250f;
 
             if (unSaved)
             {
-                Alert("Click Save to export changes, and send changes to bots if in-game", "YOU HAVE UNSAVED CHANGES", height, alertWidth, ColorNames.MidBlue);
-            }
-            else
-            {
-                Space(alertWidth);
+                Alert("Click Save to export changes, and send changes to bots if in-game", "YOU HAVE UNSAVED CHANGES", height, alertWidth, ColorNames.LightRed);
             }
 
-            FlexibleSpace();
             EndHorizontal();
 
             return result;
         }
 
-        public void Alert(string toolTip, string text = null, float height = 25, float width = 25, ColorNames? colorName = null)
+        public static void Alert(string toolTip, string text = null, float height = 25, float width = 25, ColorNames? colorName = null)
         {
             GUIStyle style = GetStyle(Style.alert);
             if (colorName != null)
             {
                 style = new GUIStyle(style);
-                ApplyToStyle.BGAllStates(style, TexturesClass.GetTexture(colorName.Value));
+                ApplyToStyle.BackgroundAllStates(TexturesClass.GetTexture(colorName.Value), style);
             }
             text = text ?? "!";
             var content = new GUIContent(text, toolTip);
             Box(content, style, Height(height), Width(width));
         }
 
-        public void MinValueBox(object value, params GUILayoutOption[] options)
+        public static void MinValueBox(object value, params GUILayoutOption[] options)
         {
             if (value == null) return;
             Box(value.ToString(), "Minimum", options);
         }
 
-        public void MaxValueBox(object value, params GUILayoutOption[] options)
+        public static void MaxValueBox(object value, params GUILayoutOption[] options)
         {
             if (value == null) return;
             Box(value.ToString(), "Maximum", options);
         }
 
-        public object ResultBox(object value, params GUILayoutOption[] options)
+        public static object ResultBox(object value, params GUILayoutOption[] options)
         {
             if (value != null)
             {
@@ -229,7 +213,7 @@ namespace SAIN.Editor
             return value;
         }
 
-        public object CleanString(string input, object currentValue)
+        public static object CleanString(string input, object currentValue)
         {
             if (currentValue is float floatValue)
             {
@@ -277,7 +261,7 @@ namespace SAIN.Editor
             return currentValue;
         }
 
-        public object Reset(object value, object defaultValue, params GUILayoutOption[] options)
+        public static object Reset(object value, object defaultValue, params GUILayoutOption[] options)
         {
             if (Button("Reset", "Reset To Default Value", null, options))
             {
@@ -286,7 +270,96 @@ namespace SAIN.Editor
             return value;
         }
 
-        public string SelectionGridExpandHeight(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f, string[] toolTips = null)
+
+        public static T SelectionGrid<T>(T value, float height, int optionsPerLine, params T[] valueOptions)
+        {
+            if (valueOptions.Length == 0)
+            {
+                return value;
+            }
+            int count = StartSelection(optionsPerLine, height, out GUILayoutOption[] options);
+            for (var i = 0; i < valueOptions.Length; i++)
+            {
+                value = CheckToggle(value, valueOptions[i], options);
+                count = HorizontalSpacing(count, optionsPerLine);
+            }
+            EndHorizontal();
+            return value;
+        }
+
+        public static T SelectionGrid<T>(T value, params T[] valueOptions)
+        {
+            return SelectionGrid(value, 25, 3, valueOptions);
+        }
+
+        public static T SelectionGrid<T>(T value, List<T> list)
+        {
+            return SelectionGrid(value, 25, 3, list);
+        }
+
+        public static T SelectionGrid<T>(T value, float height, int optionsPerLine, List<T> list)
+        {
+            int count = StartSelection(optionsPerLine, height, out GUILayoutOption[] options);
+            for (var i = 0; i < list.Count; i++)
+            {
+                value = CheckToggle(value, list[i], options);
+                count = HorizontalSpacing(count, optionsPerLine);
+            }
+            EndHorizontal();
+            return value;
+        }
+
+        public static T SelectionGrid<T>(T value, List<T> list, float height = 25, int optionsPerLine = 3)
+        {
+            int count = StartSelection(optionsPerLine, height, out GUILayoutOption[] options);
+            for (var i = 0; i < list.Count; i++)
+            {
+                value = CheckToggle(value, list[i], options);
+                count = HorizontalSpacing(count, optionsPerLine);
+            }
+            EndHorizontal();
+            return value;
+        }
+
+        private static int StartSelection(int optionsCount, float height, out GUILayoutOption[] options)
+        {
+            BeginHorizontalSpace();
+            float width = 1850f / optionsCount;
+            options = new GUILayoutOption[]
+            {
+                Height(height),
+                Width(width),
+            };
+            return 0;
+        }
+
+        private static int HorizontalSpacing(int count, int max)
+        {
+            count++;
+            if (count >= max)
+            {
+                count = 0;
+                EndHorizontal();
+                BeginHorizontalSpace();
+            }
+            return count;
+        }
+
+        private static readonly EUISoundType SelectionSound = EUISoundType.MenuCheckBox;
+
+        private static T CheckToggle<T>(T value, T newValue, params GUILayoutOption[] options)
+        {
+            string listValueString = newValue.ToString();
+            bool selected = listValueString == value.ToString();
+
+            if (Toggle(selected, listValueString, SelectionSound, options))
+            {
+                value = newValue;
+            }
+            return value;
+        }
+
+        public static string SelectionGridExpandHeight(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f, string[] toolTips = null)
         {
             BeginGroup(menuRect);
 
@@ -322,13 +395,13 @@ namespace SAIN.Editor
             return selectedOption;
         }
 
-        private GUIStyle StyleHandler(bool selected, bool hovering)
+        private static GUIStyle StyleHandler(bool selected, bool hovering)
         {
-            var style = CustomStyle.GetFontStyleDynamic(Style.selectionGrid, selected);
+            var style = StylesClass.GetFontStyleDynamic(Style.selectionGrid, selected);
             Texture2D texture;
             if (selected)
             {
-                //Color ColorGold = Editor.Colors.GetTexture(Names.ColorNames.Gold);
+                //Color ColorGold = SAINEditor.Colors.GetTexture(Names.ColorNames.Gold);
                 texture = TexturesClass.GetTexture(ColorNames.DarkRed);
                 //ApplyToStyle.ApplyTextColorAllStates(style, ColorGold);
             }
@@ -340,11 +413,11 @@ namespace SAIN.Editor
             {
                 texture = TexturesClass.GetTexture(ColorNames.MidGray);
             }
-            ApplyToStyle.BGAllStates(style, texture);
+            ApplyToStyle.BackgroundAllStates(texture, style);
             return style;
         }
 
-        public string SelectionGridExpandWidth(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
+        public static string SelectionGridExpandWidth(Rect menuRect, string[] options, string selectedOption, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
         {
             BeginGroup(menuRect);
             for (int i = 0; i < options.Length; i++)
@@ -371,109 +444,8 @@ namespace SAIN.Editor
             return selectedOption;
         }
 
-        public T SelectionGrid<T>(T value, float height, int optionsPerLine, params T[] valueOptions)
+        public static void SelectionGridExpandWidth(Rect menuRect, string[] options, List<string> selectedList, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
         {
-            if (valueOptions.Length == 0)
-            {
-                return value;
-            }
-            int count = StartSelection(optionsPerLine, height, out GUILayoutOption[] options);
-            for (var i = 0; i < valueOptions.Length; i++)
-            {
-                value = CheckToggle(value, valueOptions[i], options);
-                count = HorizontalSpacing(count, optionsPerLine);
-            }
-            EndHorizontal();
-            return value;
-        }
-
-        public T SelectionGrid<T>(T value, params T[] valueOptions)
-        {
-            return SelectionGrid(value, 25, 3, valueOptions);
-        }
-
-        public T SelectionGrid<T>(T value, List<T> list)
-        {
-            return SelectionGrid(value, 25, 3, list);
-        }
-
-        public T SelectionGrid<T>(T value, float height, int optionsPerLine, List<T> list)
-        {
-            int count = StartSelection(optionsPerLine, height, out GUILayoutOption[] options);
-            for (var i = 0; i < list.Count; i++)
-            {
-                value = CheckToggle(value, list[i], options);
-                count = HorizontalSpacing(count, optionsPerLine);
-            }
-            EndHorizontal();
-            return value;
-        }
-
-        public T SelectionGrid<T>(T value, List<T> list, float height = 25, int optionsPerLine = 3)
-        {
-            int count = StartSelection(optionsPerLine, height, out GUILayoutOption[] options);
-            for (var i = 0; i < list.Count; i++)
-            {
-                value = CheckToggle(value, list[i], options);
-                count = HorizontalSpacing(count, optionsPerLine);
-            }
-            EndHorizontal();
-            return value;
-        }
-
-        private int StartSelection(int optionsCount, float height, out GUILayoutOption[] options)
-        {
-            BeginHorizontalSpace();
-            float width = 1850f / optionsCount;
-            options = new GUILayoutOption[]
-            {
-                Height(height),
-                Width(width),
-            };
-            return 0;
-        }
-
-        private int HorizontalSpacing(int count, int max)
-        {
-            count++;
-            if (count >= max)
-            {
-                count = 0;
-                EndHorizontal();
-                BeginHorizontalSpace();
-            }
-            return count;
-        }
-
-        public void BeginHorizontalSpace(float space = 10)
-        {
-            BeginHorizontal();
-            Space(space);
-        }
-
-        public void EndHorizontalSpace(float space = 10)
-        {
-            Space(space);
-            EndHorizontal();
-        }
-
-        private static readonly EUISoundType SelectionSound = EUISoundType.MenuCheckBox;
-
-        private T CheckToggle<T>(T value, T newValue, params GUILayoutOption[] options)
-        {
-            string listValueString = newValue.ToString();
-            bool selected = listValueString == value.ToString();
-
-            if (Toggle(selected, listValueString, SelectionSound, options))
-            {
-                value = newValue;
-            }
-            return value;
-        }
-
-        public void SelectionGridExpandWidth(Rect menuRect, string[] options, List<string> selectedList, Rect[] optionRects, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
-        {
-            BeginGroup(menuRect);
             for (int i = 0; i < options.Length; i++)
             {
                 string option = options[i];
@@ -483,28 +455,23 @@ namespace SAIN.Editor
 
                 GUIStyle style = StyleHandler(selected, hovering);
 
-                bool toggleActivated = GUI.Button(optionRects[i], option, style);
-                if (toggleActivated && selected)
+                bool toggleActivated = GUI.Toggle(optionRects[i], selected, option, style);
+                if (toggleActivated != selected)
                 {
-                    if (selectedList.Contains(option))
+                    Sounds.PlaySound(EUISoundType.MenuDropdownSelect);
+                    if (selected)
                     {
-                        Sounds.PlaySound(EUISoundType.ButtonClick);
                         selectedList.Remove(option);
                     }
-                }
-                if (toggleActivated && !selected)
-                {
-                    if (!selectedList.Contains(option))
+                    else
                     {
-                        Sounds.PlaySound(EUISoundType.ButtonClick);
                         selectedList.Add(option);
                     }
                 }
             }
-            EndGroup();
         }
 
-        public Rect[] VerticalGridRects(Rect MenuRect, int count, float startWidth)
+        public static Rect[] VerticalGridRects(Rect MenuRect, int count, float startWidth)
         {
             Rect[] rects = new Rect[count];
 
@@ -525,7 +492,7 @@ namespace SAIN.Editor
             return rects;
         }
 
-        public Rect[] HorizontalGridRects(Rect MenuRect, int count, float startHeight)
+        public static Rect[] HorizontalGridRects(Rect MenuRect, int count, float startHeight)
         {
             Rect[] rects = new Rect[count];
 
@@ -546,7 +513,7 @@ namespace SAIN.Editor
             return rects;
         }
 
-        private Rect AnimateHeight(Rect rect, bool selected, float max, out bool hovering, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
+        private static Rect AnimateHeight(Rect rect, bool selected, float max, out bool hovering, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
         {
             Rect detectRect = rect;
             detectRect.height = max;
@@ -555,7 +522,7 @@ namespace SAIN.Editor
             return rect;
         }
 
-        private Rect AnimateWidth(Rect rect, bool selected, float max, out bool hovering, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
+        private static Rect AnimateWidth(Rect rect, bool selected, float max, out bool hovering, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
         {
             Rect detectRect = rect;
             detectRect.width = max;
@@ -564,7 +531,7 @@ namespace SAIN.Editor
             return rect;
         }
 
-        private float Animate(float current, bool mouseHover, bool selected, float max, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
+        private static float Animate(float current, bool mouseHover, bool selected, float max, float min = 15f, float incPerFrame = 3f, float closeMulti = 0.66f)
         {
             if (mouseHover || selected)
             {
@@ -578,14 +545,12 @@ namespace SAIN.Editor
             return current;
         }
 
-        public bool ExpandableMenu(string name, bool value, string description = null, float height = 25f, float infoWidth = 30f, bool beginHoriz = true)
+        public static bool ExpandableMenu(string name, bool value, string description = null, float height = 30f, bool beginHoriz = true)
         {
             if (beginHoriz)
                 BeginHorizontal();
 
-            ButtonsClass.InfoBox(description, height, infoWidth);
-
-            Label(name, Height(height), Width(ExpandMenuWidth));
+            Label(name, description, Height(height), Width(ExpandMenuWidth));
             string text = value ? "Collapse" : "Expand";
 
             bool newvalue = Toggle(value, text, null, Height(height));
@@ -599,25 +564,42 @@ namespace SAIN.Editor
 
             return newvalue;
         }
+        public static bool ExpandableMenuToggle(string name, bool value, string description = null, float height = 30f, bool beginHoriz = true)
+        {
+            if (beginHoriz)
+                BeginHorizontal();
 
-        public int CreateSlider(int value, int min, int max, params GUILayoutOption[] options)
+            bool newvalue = Toggle(value, name, description, null, Height(height));
+            if (newvalue != value)
+            {
+                Sounds.PlaySound(EUISoundType.MenuDropdown);
+            }
+
+            if (beginHoriz)
+                EndHorizontal();
+
+            return newvalue;
+        }
+
+        public static int CreateSlider(int value, int min, int max, params GUILayoutOption[] options)
         {
             value = Mathf.RoundToInt(HorizontalSlider(value, min, max, null, options));
             Backgrounds(value, min, max);
             return value;
         }
 
-        public float CreateSlider(float value, float min, float max, params GUILayoutOption[] options)
+        public static float CreateSlider(float value, float min, float max, params GUILayoutOption[] options)
         {
             value = HorizontalSlider(value, min, max, null, options);
             Backgrounds(value, min, max);
             return value;
         }
 
-        private void Backgrounds(float value, float min, float max)
+        private static void Backgrounds(float value, float min, float max)
         {
+            var LastRect = GUILayoutUtility.GetLastRect();
             float progress = (value - min) / (max - min);
-            TexturesClass.DrawSliderBackGrounds(progress);
+            TexturesClass.DrawSliderBackGrounds(progress, LastRect);
         }
     }
 }

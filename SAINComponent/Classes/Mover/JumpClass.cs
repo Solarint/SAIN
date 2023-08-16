@@ -1,13 +1,6 @@
 ﻿using EFT;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.AI;
 using UnityEngine;
-using BepInEx.Logging;
-using SAIN.Components;
+using UnityEngine.AI;
 
 namespace SAIN.SAINComponent.Classes.Mover
 {
@@ -48,7 +41,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private float JumpOffLedgeTimer = 0f;
         private float NewPathAfterJumpTimer = 0f;
-        bool JumpingOff = false;
+        private bool JumpingOff = false;
 
         private bool LookForJumpableLedges()
         {
@@ -113,7 +106,6 @@ namespace SAIN.SAINComponent.Classes.Mover
                         return true;
                     }
                 }
-
             }
             return false;
         }

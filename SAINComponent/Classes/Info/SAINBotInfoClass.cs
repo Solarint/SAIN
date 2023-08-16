@@ -1,27 +1,13 @@
-﻿using BepInEx.Logging;
-using EFT;
-using SAIN.Preset;
-using SAIN.SAINComponent.Classes.Decision;
-using SAIN.SAINComponent.Classes.Talk;
-using SAIN.SAINComponent.Classes.WeaponFunction;
-using SAIN.SAINComponent.Classes.Mover;
-using SAIN.SAINComponent.SubComponents;
+﻿using EFT;
+using SAIN.Helpers;
 using SAIN.Plugin;
+using SAIN.Preset.BotSettings.SAINSettings;
 using SAIN.Preset.Personalities;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEngine;
-using System;
-using Random = UnityEngine.Random;
-using System.Collections;
-using SAIN.Helpers;
-using SAIN.Preset.BotSettings.SAINSettings;
 using static SAIN.Preset.Personalities.PersonalitySettingsClass;
-using Comfort.Common;
-using static Mono.Security.X509.X520;
-using HarmonyLib;
-using System.Linq;
-using System.Data;
+using Random = UnityEngine.Random;
 
 namespace SAIN.SAINComponent.Classes.Info
 {
@@ -56,11 +42,11 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public ProfileClass Profile { get; private set; }
 
-        static FieldInfo[] EFTSettingsCategories;
-        static FieldInfo[] SAINSettingsCategories;
+        private static FieldInfo[] EFTSettingsCategories;
+        private static FieldInfo[] SAINSettingsCategories;
 
-        static readonly Dictionary<FieldInfo, FieldInfo[]> EFTSettingsFields = new Dictionary<FieldInfo, FieldInfo[]>();
-        static readonly Dictionary<FieldInfo, FieldInfo[]> SAINSettingsFields = new Dictionary<FieldInfo, FieldInfo[]>();
+        private static readonly Dictionary<FieldInfo, FieldInfo[]> EFTSettingsFields = new Dictionary<FieldInfo, FieldInfo[]>();
+        private static readonly Dictionary<FieldInfo, FieldInfo[]> SAINSettingsFields = new Dictionary<FieldInfo, FieldInfo[]>();
 
         public void GetFileSettings()
         {
@@ -68,6 +54,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
             Personality = GetPersonality();
             PersonalitySettingsClass = SAINPlugin.LoadedPreset.PersonalityManager.Personalities[Personality];
+            SearchMoveSpeed = PersonalitySettingsClass.Variables.BaseSearchMoveSpeed.Randomize(0.9f, 1.1f).Round100();
 
             UpdateExtractTime();
             CalcTimeBeforeSearch();
@@ -114,7 +101,7 @@ namespace SAIN.SAINComponent.Classes.Info
                             object sainValue = sainVarField.GetValue(sainCategory);
                             if (SAINPlugin.DebugModeEnabled)
                             {
-                                Logger.LogInfo($"{eftVarField.Name} Default {eftVarField.GetValue(eftCategory)} NewValue: {sainValue}");
+                                // Logger.LogInfo($"{eftVarField.Value} Default {eftVarField.GetValue(eftCategory)} NewValue: {sainValue}");
                             }
 
                             eftVarField.SetValue(eftCategory, sainValue);
@@ -123,7 +110,7 @@ namespace SAIN.SAINComponent.Classes.Info
                 }
                 yield return null;
             }
-            UpdateSettingClass.ManualSettingsUpdate(WildSpawnType, BotDifficulty, BotOwner.Settings.FileSettings);
+            UpdateSettingClass.ManualSettingsUpdate(WildSpawnType, BotDifficulty, BotOwner, FileSettings);
         }
 
         public SAINSettingsClass FileSettings { get; private set; }
@@ -142,7 +129,7 @@ namespace SAIN.SAINComponent.Classes.Info
             HoldGroundDelay = baseTime.Randomize(min, max).Round100();
         }
 
-        private float AggressionMultiplier => (FileSettings.Mind.Aggression * GlobalSAINSettings.Mind.GlobalAggression * PersonalitySettings.SearchAggressionModifier).Round100();
+        private float AggressionMultiplier => (FileSettings.Mind.Aggression * GlobalSAINSettings.Mind.GlobalAggression * PersonalitySettings.AggressionMultiplier).Round100();
 
         public void CalcTimeBeforeSearch()
         {
@@ -172,7 +159,7 @@ namespace SAIN.SAINComponent.Classes.Info
             BotOwner.Settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = forgetTime;
         }
 
-        void UpdateExtractTime()
+        private void UpdateExtractTime()
         {
             float percentage = Random.Range(FileSettings.Mind.MinExtractPercentage, FileSettings.Mind.MaxExtractPercentage);
 
@@ -223,16 +210,6 @@ namespace SAIN.SAINComponent.Classes.Info
             return result;
         }
 
-        private bool CanBePersonality(SAINPersonality personality)
-        {
-            var Personalities = SAINPlugin.LoadedPreset.PersonalityManager.Personalities;
-            if (Personalities == null || !Personalities.ContainsKey(personality))
-            {
-                return false;
-            }
-            return Personalities[personality].CanBePersonality(WildSpawnType, PowerLevel, PlayerLevel);
-        }
-
         public WildSpawnType WildSpawnType => Profile.WildSpawnType;
         public float PowerLevel => Profile.PowerLevel;
         public int PlayerLevel => Profile.PlayerLevel;
@@ -243,8 +220,7 @@ namespace SAIN.SAINComponent.Classes.Info
         public PersonalitySettingsClass PersonalitySettingsClass { get; private set; }
 
         public float PercentageBeforeExtract { get; set; } = -1f;
-
-        private const float SearchRandomize = 0.33f;
+        public float SearchMoveSpeed { get; private set; }
 
         public WeaponInfoClass WeaponInfo { get; private set; }
     }

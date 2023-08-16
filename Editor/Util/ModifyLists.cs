@@ -1,6 +1,5 @@
 ﻿using EFT;
 using EFT.UI;
-using SAIN.Editor.Abstract;
 using SAIN.Helpers;
 using SAIN.Preset;
 using SAIN.Preset.GlobalSettings.Categories;
@@ -10,17 +9,9 @@ using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor.Util
 {
-    public class ModifyLists : EditorAbstract
+    public static class ModifyLists
     {
-        public ModifyLists(SAINEditor editor) : base(editor)
-        {
-        }
-
-        public void ClearCache()
-        {
-        }
-
-        public void AddOrRemove(List<BigBrainConfigClass> list, out bool wasEdited, int optionsPerLine = 4)
+        public static void AddOrRemove(List<BigBrainConfigClass> list, out bool wasEdited, int optionsPerLine = 4)
         {
             wasEdited = false;
             if (list != null)
@@ -39,7 +30,7 @@ namespace SAIN.Editor.Util
             }
         }
 
-        public void AddOrRemove(List<WildSpawnType> list, out bool wasEdited, int optionsPerLine = 4)
+        public static void AddOrRemove(List<WildSpawnType> list, out bool wasEdited, int optionsPerLine = 4)
         {
             wasEdited = false;
             if (list != null)
@@ -58,7 +49,7 @@ namespace SAIN.Editor.Util
             }
         }
 
-        public void AddOrRemove(SettingsContainer container, out bool wasEdited, string search = null, int optionsPerLine = 5)
+        public static void AddOrRemove(SettingsContainer container, out bool wasEdited, string search = null, int optionsPerLine = 5)
         {
             wasEdited = false;
             foreach (var category in container.Categories)
@@ -66,10 +57,10 @@ namespace SAIN.Editor.Util
                 string categoryName = category.CategoryAttributes.Name;
                 string categoryDesciption = category.CategoryAttributes.Description;
 
-                // Display the name of the category. And make it a openable dropdown menu
+                // Display the value of the category. And make it a openable dropdown menu
                 if (string.IsNullOrEmpty(search))
                 {
-                    category.Open = Builder.ExpandableMenu(categoryName, category.Open, categoryDesciption);
+                    category.Open = BuilderClass.ExpandableMenu(categoryName, category.Open, categoryDesciption);
                     if (!category.Open)
                     {
                         continue;
@@ -110,7 +101,7 @@ namespace SAIN.Editor.Util
             }
         }
 
-        private void AddOrRemove<T>(T item, List<T> list, bool value, out bool wasEdited)
+        private static void AddOrRemove<T>(T item, List<T> list, bool value, out bool wasEdited)
         {
             wasEdited = false;
             if (value)
@@ -129,7 +120,7 @@ namespace SAIN.Editor.Util
             }
         }
 
-        public void AddOrRemove(List<BotDifficulty> list, out bool wasEdited, int optionsPerLine = 4)
+        public static void AddOrRemove(List<BotDifficulty> list, out bool wasEdited, int optionsPerLine = 4)
         {
             wasEdited = false;
             int i = StartListEdit(optionsPerLine, out var options);
@@ -145,7 +136,7 @@ namespace SAIN.Editor.Util
             EndListEdit();
         }
 
-        public void AddOrRemove(List<BotType> list, out bool wasEdited, int optionsPerLine = 5)
+        public static void AddOrRemove(List<BotType> list, out bool wasEdited, int optionsPerLine = 5)
         {
             wasEdited = false;
             int i = StartListEdit(optionsPerLine, out var options);
@@ -161,7 +152,18 @@ namespace SAIN.Editor.Util
             EndListEdit();
         }
 
-        private void AddOrRemove<T>(T value, List<T> list, out bool wasEdited, string name = null, string description = null, params GUILayoutOption[] options)
+        public static void AddOrRemove(List<BotType> list, string section, float height, float width)
+        {
+            foreach (var botType in BotTypeDefinitions.BotTypes.Values)
+            {
+                if (botType.Section == section)
+                {
+                    AddOrRemove(botType, list, out bool newEdit, botType.Name, botType.Description, Height(height), Width(width));
+                }
+            }
+        }
+
+        private static void AddOrRemove<T>(T value, List<T> list, out bool wasEdited, string name = null, string description = null, params GUILayoutOption[] options)
         {
             wasEdited = false;
             if (list != null)
@@ -181,38 +183,35 @@ namespace SAIN.Editor.Util
             }
         }
 
-        private int StartListEdit(int optionsPerLine, out GUILayoutOption[] dimensions)
+        private static int StartListEdit(int optionsPerLine, out GUILayoutOption[] dimensions, float gridWidth = 1875f)
         {
             BeginVertical();
             BeginHorizontal();
-            FlexibleSpace();
+            Space(5);
 
-            float width = Mathf.Round(1800 / optionsPerLine * 10) / 10;
-            float height = 22.5f;
+            float width = (gridWidth / optionsPerLine).Round10();
             dimensions = new GUILayoutOption[]
             {
-                Height(height), Width(width),
+                Height(27.5f), Width(width),
             };
             return 0;
         }
 
-        private int ListSpacing(int i, int max)
+        private static int ListSpacing(int i, int max)
         {
             i++;
             if (i >= max)
             {
                 i = 0;
-                FlexibleSpace();
+                Space(5);
                 EndHorizontal();
                 BeginHorizontal();
-                FlexibleSpace();
             }
             return i;
         }
 
-        private void EndListEdit()
+        private static void EndListEdit()
         {
-            FlexibleSpace();
             EndHorizontal();
             EndVertical();
         }

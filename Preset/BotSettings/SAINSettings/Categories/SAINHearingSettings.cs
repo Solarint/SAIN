@@ -12,7 +12,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
             "Max Footstep Audio Distance",
             "The Maximum Range that a bot can hear footsteps, in meters.")]
         [DefaultValue(50f)]
-        [MinMaxRound(5f, 100f, 1f)]
+        [MinMax(5f, 100f, 1f)]
         public float MaxFootstepAudioDistance = 50f;
     }
 }

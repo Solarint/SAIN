@@ -12,13 +12,6 @@ namespace SAIN.Editor
             TabClasses = new Dictionary<EEditorTab, TabClass>
             {
                 {
-                    EEditorTab.None, new TabClass
-                    {
-                        Name = "None",
-                        ToolTip = "",
-                    }
-                },
-                {
                     EEditorTab.Home, new TabClass
                     {
                         Name = "Home",
@@ -59,11 +52,8 @@ namespace SAIN.Editor
             List<string> tooltips = new List<string>();
             foreach (var tab in TabClasses)
             {
-                if (tab.Key != EEditorTab.None)
-                {
-                    names.Add(tab.Value.Name);
-                    tooltips.Add(tab.Value.ToolTip);
-                }
+                names.Add(tab.Value.Name);
+                tooltips.Add(tab.Value.ToolTip);
             }
             Tabs = names.ToArray();
             TabTooltips = tooltips.ToArray();
@@ -72,17 +62,15 @@ namespace SAIN.Editor
         private const float TabMenuHeight = 50f;
         private const float TabMenuVerticalMargin = 5f;
 
-        private static BuilderClass Builder => SAINPlugin.Editor.Builder;
-
         public static EEditorTab TabSelectMenu(float minHeight = 15, float speed = 3, float closeSpeedMulti = 0.66f)
         {
             if (TabMenuRect == null || TabRects == null)
             {
                 TabMenuRect = new Rect(0, ExitRect.height + TabMenuVerticalMargin, MainWindow.width, TabMenuHeight);
-                TabRects = Builder.HorizontalGridRects(TabMenuRect, Tabs.Length, 15f);
+                TabRects = BuilderClass.HorizontalGridRects(TabMenuRect, Tabs.Length, 15f);
             }
 
-            string openTabString = Builder.SelectionGridExpandHeight(TabMenuRect, Tabs, TabClasses[SelectedTab].Name, TabRects, minHeight, speed, closeSpeedMulti, TabTooltips);
+            string openTabString = BuilderClass.SelectionGridExpandHeight(TabMenuRect, Tabs, TabClasses[SelectedTab].Name, TabRects, minHeight, speed, closeSpeedMulti, TabTooltips);
 
             foreach (var tab in TabClasses)
             {
@@ -99,14 +87,14 @@ namespace SAIN.Editor
 
         public static void BeginScrollView()
         {
-            TabClasses[SelectedTab].Scroll = GUILayout.BeginScrollView(TabClasses[SelectedTab].Scroll, GetStyle(Style.scrollView));
-            GUILayout.BeginVertical();
+            TabClasses[SelectedTab].Scroll = SAINLayout.BeginScrollView(TabClasses[SelectedTab].Scroll);
+            BeginVertical();
         }
 
         public static void EndScrollView()
         {
-            GUILayout.EndVertical();
-            GUILayout.EndScrollView();
+            EndVertical();
+            SAINLayout.EndScrollView();
         }
 
         public static bool IsTabSelected(EEditorTab tab)
@@ -114,7 +102,7 @@ namespace SAIN.Editor
             return SelectedTab == tab;
         }
 
-        public static EEditorTab SelectedTab = EEditorTab.None;
+        public static EEditorTab SelectedTab = EEditorTab.Home;
         public static readonly string[] Tabs;
         public static readonly string[] TabTooltips;
         public static readonly Dictionary<EEditorTab, TabClass> TabClasses;
@@ -129,7 +117,6 @@ namespace SAIN.Editor
 
     public enum EEditorTab
     {
-        None,
         Home,
         GlobalSettings,
         BotSettings,

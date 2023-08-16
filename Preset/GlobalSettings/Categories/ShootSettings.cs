@@ -10,21 +10,21 @@ namespace SAIN.Preset.GlobalSettings
             "Global EFT Scatter Multiplier",
             "Higher = more scattering. Modifies EFT's default scatter feature. 1.5 = 1.5x more scatter")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 10f, 100f)]
+        [MinMax(0.1f, 10f, 100f)]
         public float GlobalScatterMultiplier = 1f;
 
         [NameAndDescription(
             "Global SAIN Recoil Multiplier",
             "Higher = more recoil. Modifies SAIN's new recoil scatter feature. 1.5 = 1.5x more scatter from recoil")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 5f, 100f)]
+        [MinMax(0.1f, 5f, 100f)]
         public float GlobalRecoilMultiplier = 1f;
 
         [NameAndDescription(
             "Max Recoil Per Shot",
             "Maximum Impulse force from a single shot for a bot.")]
         [DefaultValue(2f)]
-        [MinMaxRound(0.1f, 10f, 100f)]
+        [MinMax(0.1f, 10f, 100f)]
         [Advanced(AdvancedEnum.IsAdvanced)]
         public float MaxRecoil = 2f;
 
@@ -32,7 +32,7 @@ namespace SAIN.Preset.GlobalSettings
             "Add or Subtract Recoil",
             "Linearly add or subtract from the final recoil result")]
         [DefaultValue(0f)]
-        [MinMaxRound(-5f, 5f, 100f)]
+        [MinMax(-5f, 5f, 100f)]
         [Advanced(AdvancedEnum.IsAdvanced)]
         public float AddRecoil = 0f;
 
@@ -40,7 +40,7 @@ namespace SAIN.Preset.GlobalSettings
             "Recoil Decay p/frame",
             "How much to decay the recoil impulse per frame. 0.8 means 20% of the recoil will be removed per frame.")]
         [DefaultValue(0.8f)]
-        [MinMaxRound(0.1f, 0.99f, 100f)]
+        [MinMax(0.1f, 0.99f, 100f)]
         [Advanced(AdvancedEnum.IsAdvanced)]
         public float RecoilDecay = 0.8f;
 

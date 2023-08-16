@@ -167,7 +167,7 @@ namespace SAIN.SAINComponent.Classes
                 var personalitySettings = SAIN.Info.PersonalitySettings;
                 if (personalitySettings != null)
                 {
-                    baseTime /= personalitySettings.SearchAggressionModifier;
+                    baseTime /= personalitySettings.AggressionMultiplier;
                 }
                 WaitPointTimer = Time.time + baseTime * Random.Range(0.33f, 2.00f);
             }
@@ -211,6 +211,13 @@ namespace SAIN.SAINComponent.Classes
 
         private bool SwitchSearchModes(bool shallSprint)
         {
+            float speed = SAIN.Info.SearchMoveSpeed;
+            float pose = SAIN.Info.PersonalitySettings.Sneaky ? 0.1f : 1f;
+            if (shallSprint)
+            {
+                speed = 1f;
+                pose = 1f;
+            }
             LastState = CurrentState;
             switch (LastState)
             {
@@ -234,8 +241,8 @@ namespace SAIN.SAINComponent.Classes
 
                 case ESearchMove.DirectMove:
 
-                    SAIN.Mover.SetTargetMoveSpeed(1f);
-                    SAIN.Mover.SetTargetPose(1f);
+                    SAIN.Mover.SetTargetMoveSpeed(speed);
+                    SAIN.Mover.SetTargetPose(pose);
 
                     if (BotIsAtPoint(ActiveDestination))
                     {
@@ -250,8 +257,8 @@ namespace SAIN.SAINComponent.Classes
 
                 case ESearchMove.MoveToStartPeek:
 
-                    SAIN.Mover.SetTargetMoveSpeed(1f);
-                    SAIN.Mover.SetTargetPose(1f);
+                    SAIN.Mover.SetTargetMoveSpeed(speed);
+                    SAIN.Mover.SetTargetPose(pose);
 
                     if (BotIsAtPoint(ActiveDestination))
                     {
@@ -269,7 +276,7 @@ namespace SAIN.SAINComponent.Classes
                 case ESearchMove.MoveToEndPeak:
 
                     SAIN.Mover.SetTargetMoveSpeed(0.1f);
-                    SAIN.Mover.SetTargetPose(0.75f);
+                    SAIN.Mover.SetTargetPose((pose * 0.75f).Round100());
 
                     if (BotIsAtPoint(ActiveDestination))
                     {
@@ -287,8 +294,8 @@ namespace SAIN.SAINComponent.Classes
 
                 case ESearchMove.MoveToDangerPoint:
 
-                    SAIN.Mover.SetTargetMoveSpeed(0.5f);
-                    SAIN.Mover.SetTargetPose(1f);
+                    SAIN.Mover.SetTargetMoveSpeed((speed / 2f).Round100());
+                    SAIN.Mover.SetTargetPose(pose);
 
                     Vector3 start = SAIN.Position;
                     Vector3 cornerDir = SearchMovePoint.Corner - start;

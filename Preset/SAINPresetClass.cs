@@ -1,6 +1,8 @@
 ﻿using Aki.Common.Utils;
 using Comfort.Common;
 using Newtonsoft.Json;
+using SAIN.Editor;
+using SAIN.Editor.GUISections;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using SAIN.Preset.GlobalSettings;
@@ -61,7 +63,7 @@ namespace SAIN.Preset
                     PresetHandler.UpdateExistingBots();
                 }
                 success = true;
-                SAINPlugin.Editor.GUITabs.GlobalSettingsWereEdited = false;
+                GUITabs.GlobalSettingsWereEdited = false;
             }
             catch (Exception ex)
             {
@@ -81,7 +83,7 @@ namespace SAIN.Preset
                     PresetHandler.UpdateExistingBots();
                 }
                 success = true;
-                SAINPlugin.Editor.GUITabs.BotPersonalityEditor.PersonalitiesWereEdited = false;
+                BotPersonalityEditor.PersonalitiesWereEdited = false;
             }
             catch (Exception ex)
             {
@@ -101,7 +103,7 @@ namespace SAIN.Preset
                     PresetHandler.UpdateExistingBots();
                 }
                 success = true;
-                SAINPlugin.Editor.GUITabs.BotSelection.BotSettingsWereEdited = false;
+                BotSelectionClass.BotSettingsWereEdited = false;
             }
             catch (Exception ex)
             {
@@ -115,12 +117,23 @@ namespace SAIN.Preset
             bool success = false;
             try
             {
-                SaveObjectToJson(obj, fileName, Folders(subFolder));
+                string[] folders = Folders(subFolder);
+                SaveObjectToJson(obj, fileName, folders);
                 success = true;
+
+                if (SAINPlugin.DebugModeEnabled)
+                {
+                    string debugFolders = string.Empty;
+                    for (int i = 0; i < folders.Length; i++)
+                    {
+                        debugFolders += $"/{folders[i]}";
+                    }
+                    Logger.LogDebug($"Type:[{obj.GetType().Name}] Name: [{fileName}] To: [{debugFolders}]");
+                }
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Could not export Item of Type {obj.GetType().Name}");
+                Logger.LogError($"Failed Export of Type [{obj.GetType().Name}] Name: [{fileName}]");
                 LogExportError(ex);
             }
             return success;
@@ -128,11 +141,22 @@ namespace SAIN.Preset
 
         public bool Import<T>(out T result, string fileName, string subFolder = null)
         {
-            if (Load.LoadJsonFile(out string json, fileName, Folders(subFolder)))
+            string[] folders = Folders(subFolder);
+            if (Load.LoadJsonFile(out string json, fileName, folders))
             {
                 try
                 {
                     result = Load.DeserializeObject<T>(json);
+
+                    if (SAINPlugin.DebugModeEnabled)
+                    {
+                        string debugFolders = string.Empty;
+                        for (int i = 0; i < folders.Length; i++)
+                        {
+                            debugFolders += $"/{folders[i]}";
+                        }
+                        Logger.LogDebug($"Type:[{typeof(T).Name}] Name: [{fileName}] To: [{debugFolders}]");
+                    }
                     return true;
                 }
                 catch (Exception ex)
@@ -177,7 +201,7 @@ namespace SAIN.Preset
 
         private void LogExportError(Exception ex)
         {
-            SAINPlugin.Editor.ExceptionString = ex.ToString();
+            SAINEditor.ExceptionString = ex.ToString();
             Logger.LogError($"Export error: {ex}");
         }
     }

@@ -1,5 +1,4 @@
-﻿using BepInEx.Logging;
-using EFT;
+﻿using EFT;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Mover
@@ -8,7 +7,6 @@ namespace SAIN.SAINComponent.Classes.Mover
     {
         public SAINSteeringClass(SAINComponentClass sain) : base(sain)
         {
-
         }
 
         public void Init()
@@ -210,6 +208,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         }
 
         private bool LookRandom;
+
         public void LookToRandomPosition()
         {
             if (RandomLookTimer < Time.time)

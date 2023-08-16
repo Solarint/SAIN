@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Components;
+using SAIN.Helpers;
 using SAIN.SAINComponent;
 using UnityEngine;
 
@@ -272,6 +273,29 @@ namespace SAIN.SAINComponent.Classes.Decision
                 return false;
             }
         }
+
+        private bool StartAmbush()
+        {
+            bool startCheck = false;
+            if (SAIN.Info.PersonalitySettings.Sneaky)
+            {
+                startCheck = true;
+            }
+            else if (AmbushCheckTimer < Time.time)
+            {
+                AmbushCheckTimer = Time.time + 5f;
+                startCheck = EFTMath.RandomBool(25);
+            }
+
+            if (startCheck)
+            {
+
+            }
+
+            return false;
+        }
+
+        private float AmbushCheckTimer;
 
         private bool StartSearch(SAINEnemyClass enemy)
         {

@@ -1,210 +1,247 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using UnityEngine;
 
 namespace SAIN.Editor.Util
 {
     internal class ApplyToStyle
     {
-        public static void BGAllStates(GUIStyle style, Texture2D normal)
+        public static void BackgroundAllStates(Texture2D normal, params GUIStyle[] styles)
         {
-            BGNormal(style, normal, normal);
-            BGActive(style, normal, normal);
-            BGHover(style, normal, normal);
-            BGFocused(style, normal, normal);
+            BackgroundOn(normal, styles);
+            BackgroundNotOn(normal, styles);
         }
 
-        public static void BGAllStates(Texture2D normal, params GUIStyle[] styles)
+        public static void BackgroundAllStates(Texture2D normal, Texture2D active, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            BackgroundOn(normal, styles);
+            BackgroundNotOn(active, styles);
+        }
+
+        public static void BackgroundNotOn(Texture2D texture, params GUIStyle[] styles)
+        {
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGNormal(style, normal, normal);
-                BGActive(style, normal, normal);
-                BGHover(style, normal, normal);
-                BGFocused(style, normal, normal);
+                Background(texture, styles[i], StyleState.normal, StyleState.hover, StyleState.focused, StyleState.active);
             }
         }
 
-        public static void BGAllStates(Texture2D normal, Texture2D active, params GUIStyle[] styles)
+        public static void BackgroundOn(Texture2D texture, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGNormal(style, normal, active);
-                BGActive(style, normal, active);
-                BGHover(style, normal, active);
-                BGFocused(style, normal, active);
+                Background(texture, styles[i], StyleState.onNormal, StyleState.onHover, StyleState.onFocused, StyleState.onActive);
             }
         }
 
-        public static void BGAllStates(GUIStyle style, GUIStyle style2, Texture2D normal)
+        public static void BackgroundNormal(Texture2D normal, Texture2D onNormal, params GUIStyle[] styles)
         {
-            BGAllStates(style, normal);
-            BGAllStates(style2, normal);
-        }
-
-        public static void BGAllStates(GUIStyle[] styles, Texture2D normal)
-        {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGAllStates(style, normal);
+                Background(normal, styles[i], StyleState.normal);
+                Background(onNormal, styles[i], StyleState.onNormal);
             }
         }
 
-        public static void BGAllStates(List<GUIStyle> styles, Texture2D normal)
+        public static void BackgroundActive(Texture2D active, Texture2D onActive, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGAllStates(style, normal);
+                Background(active, styles[i], StyleState.active);
+                Background(onActive, styles[i], StyleState.onActive);
             }
         }
 
-        public static void ApplyTextColorAllStates(GUIStyle style, Color normal, Color? active = null)
+        public static void BackgroundFocused(Texture2D focused, Texture2D onFocused, params GUIStyle[] styles)
         {
-            active = active ?? normal;
-            var activeVal = active.Value;
-            SetColorNormal(style, normal, activeVal);
-            SetColorActive(style, normal, activeVal);
-            SetColorHover(style, normal, activeVal);
-            SetColorFocused(style, normal, activeVal);
-        }
-
-        public static void ApplyTextColor(GUIStyleState state, Color color)
-        {
-            state.textColor = color;
-        }
-
-        public static void SetColorNormal(GUIStyle style, Color normal, Color active)
-        {
-            ApplyTextColor(style.normal, normal);
-            ApplyTextColor(style.onNormal, active);
-        }
-
-        public static void SetColorActive(GUIStyle style, Color normal, Color active)
-        {
-            ApplyTextColor(style.active, normal);
-            ApplyTextColor(style.onActive, active);
-        }
-
-        public static void SetColorHover(GUIStyle style, Color normal, Color active)
-        {
-            ApplyTextColor(style.hover, normal);
-            ApplyTextColor(style.onHover, active);
-        }
-
-        public static void SetColorFocused(GUIStyle style, Color normal, Color active)
-        {
-            ApplyTextColor(style.focused, normal);
-            ApplyTextColor(style.onFocused, active);
-        }
-
-        public static void BGNormal(GUIStyle style, Texture2D normal, Texture2D on)
-        {
-            style.normal.background = normal;
-            style.onNormal.background = on;
-        }
-
-        public static void BGActive(GUIStyle style, Texture2D normal, Texture2D on)
-        {
-            style.active.background = normal;
-            style.onActive.background = on;
-        }
-
-        public static void BGHover(GUIStyle style, Texture2D normal, Texture2D on)
-        {
-            style.hover.background = normal;
-            style.onHover.background = on;
-        }
-
-        public static void BGFocused(GUIStyle style, Texture2D normal, Texture2D on)
-        {
-            style.focused.background = normal;
-            style.onFocused.background = on;
-        }
-
-        public static void BGNormal(GUIStyle style, GUIStyle style2, Texture2D normal, Texture2D on)
-        {
-            BGNormal(style, normal, on);
-            BGNormal(style2, normal, on);
-        }
-
-        public static void BGActive(GUIStyle style, GUIStyle style2, Texture2D normal, Texture2D on)
-        {
-            BGActive(style, normal, on);
-            BGActive(style2, normal, on);
-        }
-
-        public static void BGHover(GUIStyle style, GUIStyle style2, Texture2D normal, Texture2D on)
-        {
-            BGHover(style, normal, on);
-            BGHover(style2, normal, on);
-        }
-
-        public static void BGFocused(GUIStyle style, GUIStyle style2, Texture2D normal, Texture2D on)
-        {
-            BGFocused(style, normal, on);
-            BGFocused(style2, normal, on);
-        }
-
-        public static void BGNormal(GUIStyle[] styles, Texture2D normal, Texture2D on)
-        {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGNormal(style, normal, on);
+                Background(focused, styles[i], StyleState.focused);
+                Background(onFocused, styles[i], StyleState.onFocused);
             }
         }
 
-        public static void BGActive(GUIStyle[] styles, Texture2D normal, Texture2D on)
+        public static void BackgroundHover(Texture2D hover, Texture2D onHover, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGActive(style, normal, on);
+                Background(hover, styles[i], StyleState.hover);
+                Background(onHover, styles[i], StyleState.onHover);
             }
         }
 
-        public static void BGHover(GUIStyle[] styles, Texture2D normal, Texture2D on)
+        public static void BackgroundNormal(Texture2D normal, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            BackgroundNormal(normal, normal, styles);
+        }
+
+        public static void BackgroundActive(Texture2D active, params GUIStyle[] styles)
+        {
+            BackgroundActive(active, active, styles);
+        }
+
+        public static void BackgroundFocused(Texture2D focused, params GUIStyle[] styles)
+        {
+            BackgroundFocused(focused, focused, styles);
+        }
+
+        public static void BackgroundHover(Texture2D hover, params GUIStyle[] styles)
+        {
+            BackgroundHover(hover, hover, styles);
+        }
+
+        public static void Background(Texture2D texture, GUIStyle style, params StyleState[] states)
+        {
+            if (states.Contains(StyleState.normal))
             {
-                BGHover(style, normal, on);
+                style.normal.background = texture;
+            }
+            if (states.Contains(StyleState.onNormal))
+            {
+                style.onNormal.background = texture;
+            }
+            if (states.Contains(StyleState.active))
+            {
+                style.active.background = texture;
+            }
+            if (states.Contains(StyleState.onActive))
+            {
+                style.onActive.background = texture;
+            }
+            if (states.Contains(StyleState.hover))
+            {
+                style.hover.background = texture;
+            }
+            if (states.Contains(StyleState.onHover))
+            {
+                style.onHover.background = texture;
+            }
+            if (states.Contains(StyleState.focused))
+            {
+                style.focused.background = texture;
+            }
+            if (states.Contains(StyleState.onFocused))
+            {
+                style.onFocused.background = texture;
             }
         }
 
-        public static void BGFocused(GUIStyle[] styles, Texture2D normal, Texture2D on)
+        public static void TextColorAllStates(Color normal, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            TextColorNotOn(normal, styles);
+            TextColorOn(normal, styles);
+        }
+
+        public static void TextColorAllStates(Color normal, Color active, params GUIStyle[] styles)
+        {
+            TextColorNotOn(normal, styles);
+            TextColorOn(active, styles);
+        }
+
+        public static void TextColorNotOn(Color texture, params GUIStyle[] styles)
+        {
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGFocused(style, normal, on);
+                TextColor(texture, styles[i], StyleState.normal, StyleState.hover, StyleState.focused, StyleState.active);
             }
         }
 
-        public static void BGNormal(List<GUIStyle> styles, Texture2D normal, Texture2D on)
+        public static void TextColorOn(Color texture, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGNormal(style, normal, on);
+                TextColor(texture, styles[i], StyleState.onNormal, StyleState.onHover, StyleState.onFocused, StyleState.onActive);
             }
         }
 
-        public static void BGActive(List<GUIStyle> styles, Texture2D normal, Texture2D on)
+        public static void TextColorNormal(Color normal, Color onNormal, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGActive(style, normal, on);
+                TextColor(normal, styles[i], StyleState.normal);
+                TextColor(onNormal, styles[i], StyleState.onNormal);
             }
         }
 
-        public static void BGHover(List<GUIStyle> styles, Texture2D normal, Texture2D on)
+        public static void TextColorActive(Color active, Color onActive, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGHover(style, normal, on);
+                TextColor(active, styles[i], StyleState.active);
+                TextColor(onActive, styles[i], StyleState.onActive);
             }
         }
 
-        public static void BGFocused(List<GUIStyle> styles, Texture2D normal, Texture2D on)
+        public static void TextColorFocused(Color focused, Color onFocused, params GUIStyle[] styles)
         {
-            foreach (var style in styles)
+            for (int i = 0; i < styles.Length; i++)
             {
-                BGFocused(style, normal, on);
+                TextColor(focused, styles[i], StyleState.focused);
+                TextColor(onFocused, styles[i], StyleState.onFocused);
+            }
+        }
+
+        public static void TextColorHover(Color hover, Color onHover, params GUIStyle[] styles)
+        {
+            for (int i = 0; i < styles.Length; i++)
+            {
+                TextColor(hover, styles[i], StyleState.hover);
+                TextColor(onHover, styles[i], StyleState.onHover);
+            }
+        }
+
+        public static void TextColorNormal(Color normal, params GUIStyle[] styles)
+        {
+            TextColorNormal(normal, normal, styles);
+        }
+
+        public static void TextColorActive(Color active, params GUIStyle[] styles)
+        {
+            TextColorActive(active, active, styles);
+        }
+
+        public static void TextColorFocused(Color focused, params GUIStyle[] styles)
+        {
+            TextColorFocused(focused, focused, styles);
+        }
+
+        public static void TextColorHover(Color hover, params GUIStyle[] styles)
+        {
+            TextColorHover(hover, hover, styles);
+        }
+
+        public static void TextColor(Color color, GUIStyle style, params StyleState[] states)
+        {
+            if (states.Contains(StyleState.normal))
+            {
+                style.normal.textColor = color;
+            }
+            if (states.Contains(StyleState.onNormal))
+            {
+                style.onNormal.textColor = color;
+            }
+            if (states.Contains(StyleState.active))
+            {
+                style.active.textColor = color;
+            }
+            if (states.Contains(StyleState.onActive))
+            {
+                style.onActive.textColor = color;
+            }
+            if (states.Contains(StyleState.hover))
+            {
+                style.hover.textColor = color;
+            }
+            if (states.Contains(StyleState.onHover))
+            {
+                style.onHover.textColor = color;
+            }
+            if (states.Contains(StyleState.focused))
+            {
+                style.focused.textColor = color;
+            }
+            if (states.Contains(StyleState.onFocused))
+            {
+                style.onFocused.textColor = color;
             }
         }
     }

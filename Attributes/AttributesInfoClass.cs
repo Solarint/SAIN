@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SAIN.Editor;
+using SAIN.Helpers;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -22,24 +24,24 @@ namespace SAIN.Attributes
             GetInfo();
         }
 
+        public object Clamp(object value)
+        {
+            return MathHelpers.ClampObject(value, Min, Max);
+        }
+
+        private MinMaxAttribute MinMax;
+        private Percentage0to1Attribute Percentage0to1;
+        private PercentageAttribute Percentage;
+        private RoundingValueAttribute RoundingValue;
+
         private void GetInfo()
         {
             var nameDescription = Get<NameAndDescriptionAttribute>();
             Name = nameDescription?.Name ?? Get<NameAttribute>()?.Name ?? Field?.Name ?? Property?.Name;
             Description = nameDescription?.Description ?? Get<DescriptionAttribute>()?.Description;
 
-            Default = Get<DefaultValueAttribute>()?.Value;
-
-            var minMax = Get<MinMaxRoundAttribute>();
-            Min = minMax?.Min ?? Get<MinimumValueAttribute>()?.Min ?? 0f;
-            Max = minMax?.Max ?? Get<MaximumValueAttribute>()?.Max ?? 100f;
-            Rounding = minMax?.Rounding ?? Get<RoundingValueAttribute>()?.Rounding ?? 1f;
-
-            if (Default == null && Min != null && Max != null)
-            {
-                float newDefault = (Max.Value - Min.Value) / 2f;
-                Default = Mathf.Round(newDefault * 100f) / 100f;
-            }
+            SetMinMax();
+            SetDefault();
 
             var advanced = Get<AdvancedAttribute>();
             if (advanced != null)
@@ -63,14 +65,6 @@ namespace SAIN.Attributes
                 PrimaryListType = list.Type;
                 return;
             }
-
-            var array = Get<ArrayAttribute>();
-            if (array != null)
-            {
-                EListType = EListType.Array;
-                PrimaryListType = array.Type;
-                return;
-            }
         }
 
         private T Get<T>() where T : Attribute
@@ -79,19 +73,107 @@ namespace SAIN.Attributes
         }
 
         public FieldInfo Field { get; private set; }
+
         public PropertyInfo Property { get; private set; }
 
         public Type ValueType { get; private set; }
 
+        private void SetNameAndDescription()
+        {
+            var nameDescription = Get<NameAndDescriptionAttribute>();
+            if (nameDescription != null)
+            {
+                Name = nameDescription.Name;
+                Description = nameDescription.Description;
+                return;
+            }
+            var nameAtt = Get<NameAttribute>();
+            if (nameAtt != null)
+            {
+                Name = nameAtt.Name;
+            }
+            else
+            {
+                Name = Field?.Name ?? Property?.Name;
+            }
+            var descAtt = Get<DescriptionAttribute>();
+            if (descAtt != null)
+            {
+                Description = descAtt.Description;
+            }
+        }
+
         public string Name { get; private set; }
+
         public string Description { get; private set; }
 
-        public object Default { get; private set; }
-        public float? Min { get; private set; }
-        public float? Max { get; private set; }
-        public float? Rounding { get; private set; }
+        private void SetDefault()
+        {
+            Default = Get<DefaultValueAttribute>()?.Value ?? Get<DefaultAttribute>()?.Value;
 
-        public bool DoNotShowGUI => AdvancedOptions.Contains(AdvancedEnum.Hidden) || SAINPlugin.Editor.AdvancedBotConfigs == false && AdvancedOptions.Contains(AdvancedEnum.IsAdvanced);
+            if (Default == null)
+            {
+                if (ValueType == typeof(float))
+                {
+                    Default = ((Max - Min) / 2f).Round100();
+                }
+                else if (ValueType == typeof(int))
+                {
+                    Default = Mathf.RoundToInt((Max - Min) / 2f);
+                }
+                else if (ValueType == typeof(bool))
+                {
+                    Default = false;
+                }
+            }
+        }
+
+        public object Default { get; private set; }
+
+        private void SetMinMax()
+        {
+            MinMax = Get<MinMaxAttribute>();
+            if (MinMax != null)
+            {
+                Min = MinMax.Min;
+                Max = MinMax.Max;
+                Rounding = MinMax.Rounding;
+                return;
+            }
+            Percentage = Get<PercentageAttribute>();
+            if (Percentage != null)
+            {
+                Min = Percentage.Min;
+                Max = Percentage.Max;
+                Rounding = Percentage.Rounding;
+                return;
+            }
+            Percentage0to1 = Get<Percentage0to1Attribute>();
+            if (Percentage0to1 != null)
+            {
+                Min = Percentage0to1.Min;
+                Max = Percentage0to1.Max;
+                Rounding = Percentage0to1.Rounding;
+                return;
+            }
+            RoundingValue = Get<RoundingValueAttribute>();
+            if (MinMax != null)
+            {
+                Rounding = MinMax.Rounding;
+                return;
+            }
+            Min = 0f;
+            Max = 100f;
+            Rounding = 10f;
+        }
+
+        public float Min { get; private set; }
+
+        public float Max { get; private set; }
+
+        public float Rounding { get; private set; }
+
+        public bool DoNotShowGUI => AdvancedOptions.Contains(AdvancedEnum.Hidden) || SAINEditor.AdvancedBotConfigs == false && AdvancedOptions.Contains(AdvancedEnum.IsAdvanced);
 
         public AdvancedEnum[] AdvancedOptions { get; private set; } = new AdvancedEnum[0];
 

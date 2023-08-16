@@ -1,14 +1,9 @@
-﻿using SAIN.Editor.Abstract;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SAIN.Editor
 {
-    public class RectLayout : EditorAbstract
+    public static class RectLayout
     {
-        public RectLayout(SAINEditor editor) : base(editor)
-        {
-        }
-
         private static Vector2 OldScale;
 
         public static Vector2 ScaledPivot
@@ -42,10 +37,10 @@ namespace SAIN.Editor
 
         public static Rect MainWindow = new Rect(0, 0, 1920, 1080);
 
-        private static float RectHeight = 25;
-        private static float ExitWidth = 25f;
-        private static float PauseWidth = 120f;
-        private static float SaveAllWidth = 180f;
+        private static float RectHeight = 30;
+        private static float ExitWidth = 35f;
+        private static float PauseWidth = 225f;
+        private static float SaveAllWidth = 175f;
         private static float ExitStartX = MainWindow.width - ExitWidth;
         private static float PauseStartX = ExitStartX - PauseWidth;
         private static float SaveAllStartX = PauseStartX - SaveAllWidth;

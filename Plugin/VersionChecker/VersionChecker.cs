@@ -35,9 +35,9 @@ namespace DrakiaXYZ.VersionChecker
         /// return false if they do not match. 
         /// Optionally add a fake setting to the F12 menu if Config is passed in
         /// </summary>
-        /// <param name="Logger">The ManualLogSource to output an error to</param>
-        /// <param name="Info">The PluginInfo object for the plugin, used to get the plugin name and version</param>
-        /// <param name="Config">A BepinEx ConfigFile object, if provided, a custom message will be added to the F12 menu</param>
+        /// <param value="Logger">The ManualLogSource to output an error to</param>
+        /// <param value="Info">The PluginInfo object for the plugin, used to get the plugin value and version</param>
+        /// <param value="Config">A BepinEx ConfigFile object, if provided, a custom message will be added to the F12 menu</param>
         /// <returns></returns>
         public static bool CheckEftVersion(ManualLogSource Logger, PluginInfo Info, ConfigFile Config = null)
         {

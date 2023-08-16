@@ -28,7 +28,7 @@ namespace SAIN.Preset.GlobalSettings
             //if (brainSettings == null || brainSettings.Count == 0)
             //{
             //result.BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains);
-            //SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
+            //SaveObjectToJson(result, fileName, presetsFolder, Preset.Value);
             //}
 
             SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);

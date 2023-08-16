@@ -19,6 +19,7 @@ namespace SAIN
         ShiftCover,
         RushEnemy,
         MoveToEngage,
+        Ambush,
 
         UnstuckSearch,
         UnstuckMoveToCover,
@@ -115,22 +116,14 @@ namespace SAIN
         Right = 2
     }
 
-    public enum BlindFireSetting
-    {
-        None,
-        Up,
-        Right,
-    }
-
     public enum SAINPersonality
     {
-        Normal,
+        GigaChad,
+        Chad,
         Timmy,
         Coward,
         Rat,
-        SweatLord,
-        Chad,
-        GigaChad,
+        Normal,
         Custom1,
         Custom2,
         Custom3,
@@ -195,12 +188,12 @@ namespace SAIN
         NoEnemy,
     }
 
-    public enum StyleStates
+    public enum StyleState
     {
         normal,
         onNormal,
         active,
-        OnActive,
+        onActive,
         hover,
         onHover,
         focused,

@@ -1,55 +1,45 @@
 ﻿using JetBrains.Annotations;
-using SAIN.Editor.Abstract;
 using System;
 using UnityEngine;
 
 namespace SAIN.Editor.Util
 {
-    public class MouseFunctions : EditorAbstract
+    public static class MouseFunctions
     {
-        public MouseFunctions(SAINEditor editor) : base(editor)
+        public static void Update()
         {
-            MouseDrag = new MouseDragClass(editor);
         }
 
-        public void Update()
+        public static void OnGUI()
         {
-            MouseDrag.Update();
         }
 
-        public void OnGUI()
-        {
-            MouseDrag.OnGUI();
-        }
-
-        public MouseDragClass MouseDrag { get; private set; }
-
-        public bool CheckMouseDrag()
+        public static bool CheckMouseDrag()
         {
             return Event.current.type == EventType.Repaint && CheckMouseDrag(GUILayoutUtility.GetLastRect());
         }
 
-        public bool CheckMouseDrag(Rect rect)
+        public static bool CheckMouseDrag(Rect rect)
         {
-            return MouseDrag.DragRectangle.Overlaps(rect);
+            return MouseDragClass.DragRectangle.Overlaps(rect);
         }
 
-        public bool IsMouseInside()
+        public static bool IsMouseInside()
         {
             return Event.current.type == EventType.Repaint && IsMouseInside(GUILayoutUtility.GetLastRect());
         }
 
-        public bool IsMouseInside(Rect rect)
+        public static bool IsMouseInside(Rect rect)
         {
             return rect.Contains(Event.current.mousePosition);
         }
 
-        public bool IsNearMouse(Vector2 point, float distance = 20f)
+        public static bool IsNearMouse(Vector2 point, float distance = 20f)
         {
             return (MousePos - point).magnitude <= distance;
         }
 
-        public bool IsNearMouse(Rect rect, float distance = 20f)
+        public static bool IsNearMouse(Rect rect, float distance = 20f)
         {
             if (rect.Contains(MousePos))
             {
@@ -63,7 +53,7 @@ namespace SAIN.Editor.Util
         }
 
         [CanBeNull]
-        public Event CurrentMouseEvent
+        public static Event CurrentMouseEvent
         {
             get
             {
@@ -75,46 +65,40 @@ namespace SAIN.Editor.Util
             }
         }
 
-        private Vector2 MousePos => Event.current.mousePosition;
+        private static Vector2 MousePos => Event.current.mousePosition;
     }
 
-    public class MouseDragClass : EditorAbstract
+    public static class MouseDragClass 
     {
-        public MouseDragClass(SAINEditor editor) : base(editor)
-        {
-            FullScreen = new Rect(0, 0, Screen.width, Screen.height);
-        }
+        private static Rect FullScreen = new Rect(0, 0, Screen.width, Screen.height);
+        private static GUIStyle BlankStyle;
 
-        GUIStyle BlankStyle;
+        public static Rect DragRectangle = Rect.zero;
+        private static Rect DrawPosition = new Rect(193, 148, 249 - 193, 148 - 104);
+        public static Color color = Color.white;
+        private readonly static Vector3[] mousePositions = new Vector3[2];
+        private readonly static Vector2[] mousePositions2D = new Vector2[2];
+        private static bool drawRect = false;
 
-        public Rect DragRectangle = Rect.zero;
-        private Rect DrawPosition = new Rect(193, 148, 249 - 193, 148 - 104);
-        public Color color = Color.white;
-        private readonly Vector3[] mousePositions = new Vector3[2];
-        private readonly Vector2[] mousePositions2D = new Vector2[2];
-        private bool drawRect = false;
-
-        public void OnGUI()
+        public static void OnGUI()
         {
             if (BlankStyle == null)
             {
                 BlankStyle = new GUIStyle(GUI.skin.window);
-                ApplyToStyle.BGAllStates(BlankStyle, null);
             }
-            if (Editor.DisplayingWindow && drawRect)
+            if (SAINEditor.DisplayingWindow && drawRect)
             {
                 FullScreen = GUI.Window(999, FullScreen, EmptyWindowFunc, "", BlankStyle);
             }
         }
 
-        Rect FullScreen;
 
-        void EmptyWindowFunc(int i)
+        private static void EmptyWindowFunc(int i)
         {
             DrawRectangle(DrawPosition, 1, color);
         }
 
-        private void DrawRectangle(Rect area, int frameWidth, Color color)
+        private static void DrawRectangle(Rect area, int frameWidth, Color color)
         {
             //Create a one pixel texture with the right color
             var texture = new Texture2D(1, 1);
@@ -133,7 +117,7 @@ namespace SAIN.Editor.Util
             GUI.DrawTexture(lineArea, texture);
         }
 
-        private void Reset()
+        private static void Reset()
         {
             drawRect = false;
             mousePositions[0] = new Vector3();
@@ -141,7 +125,7 @@ namespace SAIN.Editor.Util
             DragRectangle = Rect.zero;
         }
 
-        public void Update()
+        public static void Update()
         {
             if (Event.current.isMouse && Event.current.type == EventType.MouseDrag)
             {

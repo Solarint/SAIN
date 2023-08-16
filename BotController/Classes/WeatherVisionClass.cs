@@ -152,7 +152,7 @@ namespace SAIN.Components.BotController
         }
         private static float CloudsModifier(float Clouds)
         {
-            // Clouds rounding usually scales between -1 and 1, this sets it to scale between 0 and 1
+            // Clouds Rounding usually scales between -1 and 1, this sets it to scale between 0 and 1
             float cloudsScaled = (Clouds + 1f) / 2f;
 
             // Cloudiness Tiers

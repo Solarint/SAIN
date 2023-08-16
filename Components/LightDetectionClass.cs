@@ -142,12 +142,12 @@ namespace SAIN.Components
         }
 
         /// <summary>
-        /// Estimates a search DrawPosition based on the player, flash, and bot positions, and a dispersion rounding.
+        /// Estimates a search DrawPosition based on the player, flash, and bot positions, and a dispersion Rounding.
         /// </summary>
-        /// <param name="playerPos">The DrawPosition of the player.</param>
-        /// <param name="flashPos">The DrawPosition of the flashlight point.</param>
-        /// <param name="botPos">The DrawPosition of the bot.</param>
-        /// <param name="dispersion">What the Distance to enemy is divided by to produce dispersion. Higher is more accurate</param>
+        /// <param value="playerPos">The DrawPosition of the player.</param>
+        /// <param value="flashPos">The DrawPosition of the flashlight point.</param>
+        /// <param value="botPos">The DrawPosition of the bot.</param>
+        /// <param value="dispersion">What the Distance to enemy is divided by to produce dispersion. Higher is more accurate</param>
         /// <returns>The estimated search DrawPosition.</returns>
         private Vector3 EstimateSearchPosition(Vector3 playerPos, Vector3 flashPos, Vector3 botPos, float dispersion)
         {
@@ -168,7 +168,7 @@ namespace SAIN.Components
         /// <summary>
         /// Sets the search timer to the current time plus the given duration.
         /// </summary>
-        /// <param name="duration">The duration to add to the current time.</param>
+        /// <param value="duration">The duration to add to the current time.</param>
         private void SetSearchTimer(float duration)
         {
             SearchTime = Time.time + duration;
@@ -177,7 +177,7 @@ namespace SAIN.Components
         /// <summary>
         /// Sets the RayCastFrequencyTime to the current time plus the given duration.
         /// </summary>
-        /// <param name="duration">The duration to add to the current time.</param>
+        /// <param value="duration">The duration to add to the current time.</param>
         private void SetRayCastTimer(float duration)
         {
             RayCastFrequencyTime = Time.time + duration;
@@ -186,7 +186,7 @@ namespace SAIN.Components
         /// <summary>
         /// Waits for a specified amount of time before setting the FlashLightPoint to Vector3.zero.
         /// </summary>
-        /// <param name="delay">The amount of time to wait before setting the FlashLightPoint.</param>
+        /// <param value="delay">The amount of time to wait before setting the FlashLightPoint.</param>
         /// <returns>An IEnumerator object.</returns>
         private IEnumerator ExpireDetectionPoint(float delay)
         {
@@ -197,7 +197,7 @@ namespace SAIN.Components
         /// <summary>
         /// Waits for a specified delay and then sets the PlayerPosition to Vector3.zero.
         /// </summary>
-        /// <param name="delay">The delay to wait before setting the PlayerPosition.</param>
+        /// <param value="delay">The delay to wait before setting the PlayerPosition.</param>
         /// <returns>An IEnumerator object.</returns>
         private IEnumerator ExpirePlayerPoint(float delay)
         {

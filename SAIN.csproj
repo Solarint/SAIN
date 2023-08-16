@@ -331,7 +331,6 @@
     <Compile Include="Editor\Util\EditorEnum.cs" />
     <Compile Include="Editor\Util\ApplyToStyle.cs" />
     <Compile Include="Editor\Util\ColorsClass.cs" />
-    <Compile Include="Editor\Abstract\EditorAbstract.cs" />
     <Compile Include="Editor\SAINEditor.cs" />
     <Compile Include="Editor\Util\TexturesClass.cs" />
     <Compile Include="Editor\SAINLayout.cs" />
@@ -377,7 +376,7 @@
     <Compile Include="SAINComponent\SubComponents\CoverFinder\CoverFinderComponent.cs" />
     <Compile Include="Editor\Util\BuilderClass.cs" />
     <Compile Include="Editor\Util\RectLayout.cs" />
-    <Compile Include="Editor\Util\EditorStyleClass.cs" />
+    <Compile Include="Editor\Util\StylesClass.cs" />
     <Compile Include="Helpers\AudioHelpers.cs" />
     <Compile Include="Helpers\CoverPointHelpers.cs" />
     <Compile Include="Helpers\DebugGizmos.cs" />

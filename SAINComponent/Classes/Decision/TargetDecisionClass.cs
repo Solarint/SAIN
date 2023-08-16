@@ -45,7 +45,6 @@ namespace SAIN.SAINComponent.Classes.Decision
             }
 
             var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
-            bool shallNotSearch = ShallNotSearch();
 
             //if (StartInvestigate() && !shallNotSearch)
             //{
@@ -55,7 +54,11 @@ namespace SAIN.SAINComponent.Classes.Decision
             {
                 Decision = SoloDecision.RunToCover;
             }
-            else if (StartSearch() && !shallNotSearch)
+            else if (StartAmbush())
+            {
+
+            }
+            else if (!ShallNotSearch() && StartSearch())
             {
                 if (CurrentDecision != SoloDecision.Search)
                 {
@@ -73,6 +76,11 @@ namespace SAIN.SAINComponent.Classes.Decision
             }
 
             return true;
+        }
+
+        private bool StartAmbush()
+        {
+            return false;
         }
 
         private bool StartInvestigate()

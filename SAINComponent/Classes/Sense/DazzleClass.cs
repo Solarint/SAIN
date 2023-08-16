@@ -59,8 +59,8 @@ namespace SAIN.SAINComponent.Classes.Sense
         /// <summary>
         /// Checks if the enemy is within range of the flashlight and applies dazzle and gain sight modifiers if so.
         /// </summary>
-        /// <param name="BotOwner">The BotOwner object.</param>
-        /// <param name="person">The IAIDetails object.</param>
+        /// <param value="BotOwner">The BotOwner object.</param>
+        /// <param value="person">The IAIDetails object.</param>
         public void EnemyWithFlashlight(IAIDetails person)
         {
             Vector3 position = BotOwner.MyHead.position;
@@ -140,8 +140,8 @@ namespace SAIN.SAINComponent.Classes.Sense
         /// <summary>
         /// Checks if the enemy is looking at the BotOwner using a flashlight vision check.
         /// </summary>
-        /// <param name="BotOwner">The BotOwner to check.</param>
-        /// <param name="person">The enemy to check.</param>
+        /// <param value="BotOwner">The BotOwner to check.</param>
+        /// <param value="person">The enemy to check.</param>
         /// <returns>True if the enemy is looking at the BotOwner, false otherwise.</returns>
         private bool FlashLightVisionCheck(IAIDetails person)
         {
@@ -157,8 +157,8 @@ namespace SAIN.SAINComponent.Classes.Sense
         /// <summary>
         /// Checks if the enemy is looking at the BotOwner using a laser vision check.
         /// </summary>
-        /// <param name="bot">The BotOwner to check.</param>
-        /// <param name="person">The enemy to check.</param>
+        /// <param value="bot">The BotOwner to check.</param>
+        /// <param value="person">The enemy to check.</param>
         /// <returns>True if the enemy is looking at the BotOwner, false otherwise.</returns>
         private bool LaserVisionCheck(IAIDetails person)
         {
@@ -174,8 +174,8 @@ namespace SAIN.SAINComponent.Classes.Sense
         /// <summary>
         /// Calculates the dazzle modifier for a given BotOwner and ActiveEnemy.
         /// </summary>
-        /// <param name="___botOwner_0">The BotOwner to calculate the dazzle modifier for.</param>
-        /// <param name="person">The ActiveEnemy Shining the flashlight</param>
+        /// <param value="___botOwner_0">The BotOwner to calculate the dazzle modifier for.</param>
+        /// <param value="person">The ActiveEnemy Shining the flashlight</param>
         /// <returns>The calculated dazzle modifier.</returns>
         private float GetDazzleModifier(IAIDetails person)
         {
@@ -197,7 +197,7 @@ namespace SAIN.SAINComponent.Classes.Sense
         /// <summary>
         /// Calculates the gain sight modifier based on the Distance to the enemy.
         /// </summary>
-        /// <param name="enemyDist">The Distance to the enemy.</param>
+        /// <param value="enemyDist">The Distance to the enemy.</param>
         /// <returns>The gain sight modifier.</returns>
         private float GetGainSightModifier(float enemyDist)
         {

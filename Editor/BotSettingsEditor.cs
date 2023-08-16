@@ -1,5 +1,5 @@
 ﻿using SAIN.Attributes;
-using SAIN.Editor.Abstract;
+using SAIN.Editor.Util;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
@@ -9,18 +9,9 @@ using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor.GUISections
 {
-    public class BotSettingsEditor : EditorAbstract
+    public static class BotSettingsEditor
     {
-        public BotSettingsEditor(SAINEditor editor) : base(editor)
-        {
-        }
-
-        public void ClearCache()
-        {
-            SettingsContainers.ClearCache();
-        }
-
-        public void ShowAllSettingsGUI(object settings, out bool wasEdited)
+        public static void ShowAllSettingsGUI(object settings, out bool wasEdited)
         {
             wasEdited = false;
             BeginVertical();
@@ -32,7 +23,7 @@ namespace SAIN.Editor.GUISections
             {
                 Space(5);
                 container.Scroll = BeginScrollView(container.Scroll);
-                string search = Builder.SearchBox(container);
+                string search = BuilderClass.SearchBox(container);
                 try
                 {
                     Space(5);
@@ -53,10 +44,10 @@ namespace SAIN.Editor.GUISections
             EndVertical();
         }
 
-        public bool CheckIfOpen(SettingsContainer container)
+        public static bool CheckIfOpen(SettingsContainer container)
         {
             BeginHorizontal();
-            container.Open = Builder.ExpandableMenu(container.Name, container.Open, null, 20, 30, false);
+            container.Open = BuilderClass.ExpandableMenu(container.Name, container.Open, null, 30, false);
             if (Button("Clear", "Clear Selected Options in this Menu",
                 EFT.UI.EUISoundType.MenuDropdownSelect,
                 Width(30), Height(30)))
@@ -71,7 +62,7 @@ namespace SAIN.Editor.GUISections
             return container.Open;
         }
 
-        public SettingsContainer SelectSettingsGUI(Type type, string name, out bool wasEdited)
+        public static SettingsContainer SelectSettingsGUI(Type type, string name, out bool wasEdited)
         {
             wasEdited = false;
             var container = SettingsContainers.GetContainer(type, name);
@@ -80,10 +71,10 @@ namespace SAIN.Editor.GUISections
             {
                 Space(5);
 
-                string search = Builder.SearchBox(container);
+                string search = BuilderClass.SearchBox(container);
                 try
                 {
-                    Builder.ModifyLists.AddOrRemove(container, out bool newEdit, search);
+                    ModifyLists.AddOrRemove(container, out bool newEdit, search);
                     if (newEdit)
                     {
                         wasEdited = true;
@@ -98,9 +89,9 @@ namespace SAIN.Editor.GUISections
             return container;
         }
 
-        public bool WasEdited;
+        public static bool WasEdited;
 
-        private void CategoryOpenable(List<Category> categories, object settingsObject, out bool wasEdited, string search = null)
+        private static void CategoryOpenable(List<Category> categories, object settingsObject, out bool wasEdited, string search = null)
         {
             wasEdited = false;
             foreach (var categoryClass in categories)
@@ -112,7 +103,7 @@ namespace SAIN.Editor.GUISections
 
                 if (string.IsNullOrEmpty(search))
                 {
-                    categoryClass.Open = Builder.ExpandableMenu(attInfo.Name, categoryClass.Open, attInfo.Description, EntryConfig.EntryHeight, EntryConfig.InfoWidth, false);
+                    categoryClass.Open = BuilderClass.ExpandableMenu(attInfo.Name, categoryClass.Open, attInfo.Description, EntryConfig.EntryHeight, false);
                 }
                 else
                 {
@@ -120,7 +111,7 @@ namespace SAIN.Editor.GUISections
                 }
 
                 string labelText = $"Options Count: [{categoryClass.OptionsCount}]";
-                string advanced = Editor.AdvancedBotConfigs ?
+                string advanced = SAINEditor.AdvancedBotConfigs ?
                     " Advanced Options are on, so the reason for this section being empty is that the values are hidden because they SHOULD NOT be changed under any circumstance."
                     : " Advanced Options in the Advanced Tab may show more options.";
                 string toolTip = $"The Number of Options available in this section. {advanced}";
@@ -147,7 +138,7 @@ namespace SAIN.Editor.GUISections
             }
         }
 
-        private readonly GUIEntryConfig EntryConfig = new GUIEntryConfig();
+        private static readonly GUIEntryConfig EntryConfig = new GUIEntryConfig();
     }
 }
 
@@ -166,10 +157,49 @@ namespace SAIN.Editor
             return Containers[containerType];
         }
 
-        public static void ClearCache()
+        public static void UpdateCache()
         {
-            ListHelpers.ClearCache(Containers);
+            foreach (var container in Containers.Values) 
+            { 
+                container.UpdateCache(); 
+            }
         }
+    }
+
+    public sealed class SettingsContainer
+    {
+        public SettingsContainer(Type settingsType, string name = null)
+        {
+            Name = name ?? settingsType.Name;
+            foreach (FieldInfo field in settingsType.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            {
+                AttributesInfoClass attributes = new AttributesInfoClass(field);
+                if (!attributes.DoNotShowGUI)
+                {
+                    Categories.Add(new Category(attributes));
+                }
+            }
+        }
+
+        public void UpdateCache()
+        {
+            foreach (var category in Categories)
+            {
+                category.UpdateCache();
+            }
+        }
+
+        public readonly string Name;
+
+        public readonly List<Category> Categories = new List<Category>();
+        public readonly List<Category> SelectedCategories = new List<Category>();
+
+        public string SearchPattern = string.Empty;
+
+        public bool Open = false;
+        public bool SecondOpen = false;
+        public Vector2 Scroll = Vector2.zero;
+        public Vector2 SecondScroll = Vector2.zero;
     }
 
     public sealed class Category
@@ -184,6 +214,11 @@ namespace SAIN.Editor
         {
             CategoryAttributes = attributes;
             GetFields(attributes.ValueType);
+        }
+
+        public void UpdateCache()
+        {
+            GetFields(CategoryAttributes.ValueType);
         }
 
         private void GetFields(Type type)
@@ -208,33 +243,5 @@ namespace SAIN.Editor
         public Vector2 Scroll = Vector2.zero;
 
         public int OptionsCount => FieldAttributes.Count;
-    }
-
-    public sealed class SettingsContainer
-    {
-        public SettingsContainer(Type settingsType, string name = null)
-        {
-            Name = name ?? settingsType.Name;
-            foreach (FieldInfo field in settingsType.GetFields(BindingFlags.Public | BindingFlags.Instance))
-            {
-                AttributesInfoClass attributes = new AttributesInfoClass(field);
-                if (!attributes.DoNotShowGUI)
-                {
-                    Categories.Add(new Category(attributes));
-                }
-            }
-        }
-
-        public readonly string Name;
-
-        public readonly List<Category> Categories = new List<Category>();
-        public readonly List<Category> SelectedCategories = new List<Category>();
-
-        public string SearchPattern = string.Empty;
-
-        public bool Open = false;
-        public bool SecondOpen = false;
-        public Vector2 Scroll = Vector2.zero;
-        public Vector2 SecondScroll = Vector2.zero;
     }
 }

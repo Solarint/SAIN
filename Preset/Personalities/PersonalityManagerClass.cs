@@ -27,15 +27,6 @@ namespace SAIN.Preset.Personalities
             return botTypes;
         }
 
-        private static Dictionary<WildSpawnType, BotType> AddBotType(Dictionary<WildSpawnType, BotType> botTypes, params BotType[] types)
-        {
-            foreach (var type in types)
-            {
-                botTypes.Add(type.WildSpawnType, type);
-            }
-            return botTypes;
-        }
-
         public PersonalityManagerClass(SAINPresetClass preset) : base(preset)
         {
             ImportPersonalities();
@@ -43,8 +34,6 @@ namespace SAIN.Preset.Personalities
 
         private void ImportPersonalities()
         {
-            Personalities = new Dictionary<SAINPersonality, PersonalitySettingsClass>();
-
             foreach (var item in EnumValues.Personalities)
             {
                 if (Preset.Import(out PersonalitySettingsClass personality, item.ToString(), nameof(Personalities)))
@@ -81,98 +70,7 @@ namespace SAIN.Preset.Personalities
 
         private void InitDefaults()
         {
-            var pers = SAINPersonality.Rat;
-            if (!Personalities.ContainsKey(SAINPersonality.Rat))
-            {
-                string name = pers.ToString();
-                string description = "Scum of Tarkov. Rarely Seeks out enemies, and will hide and ambush.";
-                var settings = new PersonalitySettingsClass(pers, name, description)
-                {
-                    Variables =
-                    {
-                        Enabled = true,
-                        RandomChanceIfMeetRequirements = 60,
-                        RandomlyAssignedChance = 30,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
-                        PowerLevelMax = 50f,
-                        SearchAggressionModifier = 0.6f,
-                    }
-                };
-
-                AddAllBotTypes(settings.AllowedBotTypes);
-                Personalities.Add(pers, settings);
-                Preset.Export(settings, pers.ToString(), nameof(Personalities));
-            }
-
-            pers = SAINPersonality.Timmy;
-            if (!Personalities.ContainsKey(pers))
-            {
-                string name = pers.ToString();
-                string description = "A New Player, terrified of everything.";
-
-                var settings = new PersonalitySettingsClass(pers, name, description)
-                {
-                    Variables =
-                    {
-                        Enabled = true,
-                        RandomlyAssignedChance = 50,
-                        PowerLevelMax = 40f,
-                        MaxLevel = 10,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
-                        SearchAggressionModifier = 0.75f,
-                    }
-                };
-
-                AddPMCTypes(settings.AllowedBotTypes);
-                Personalities.Add(pers, settings);
-                Preset.Export(settings, pers.ToString(), nameof(Personalities));
-            }
-
-            pers = SAINPersonality.Coward;
-            if (!Personalities.ContainsKey(pers))
-            {
-                string name = pers.ToString();
-                string description = "A player who is more passive and afraid than usual.";
-                var settings = new PersonalitySettingsClass(pers, name, description)
-                {
-                    Variables =
-                    {
-                        Enabled = true,
-                        RandomlyAssignedChance = 30,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
-                        SearchAggressionModifier = 0.4f,
-                    }
-                };
-                AddAllBotTypes(settings.AllowedBotTypes);
-                Personalities.Add(pers, settings);
-                Preset.Export(settings, pers.ToString(), nameof(Personalities));
-            }
-
-            pers = SAINPersonality.Normal;
-            if (!Personalities.ContainsKey(pers))
-            {
-                string name = pers.ToString();
-                string description = "An Average Tarkov Enjoyer";
-                var settings = new PersonalitySettingsClass(pers, name, description)
-                {
-                    Variables =
-                    {
-                        Enabled = true,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
-                        CanRespondToVoice = true,
-                    }
-                };
-
-                AddAllBotTypes(settings.AllowedBotTypes);
-                Personalities.Add(pers, settings);
-                Preset.Export(settings, pers.ToString(), nameof(Personalities));
-            }
-
-            pers = SAINPersonality.GigaChad;
+            var pers = SAINPersonality.GigaChad;
             if (!Personalities.ContainsKey(pers))
             {
                 string name = pers.ToString();
@@ -198,7 +96,7 @@ namespace SAIN.Preset.Personalities
                         FrequentSprintWhileSearch = true,
                         CanRushEnemyReloadHeal = true,
                         ConstantTaunt = true,
-                        SearchAggressionModifier = 2f,
+                        AggressionMultiplier = 4f,
                     }
                 };
 
@@ -222,8 +120,8 @@ namespace SAIN.Preset.Personalities
                         RandomlyAssignedChance = 3,
                         CanTaunt = true,
                         CanRespondToVoice = true,
-                        TauntFrequency = 8,
-                        TauntMaxDistance = 50f,
+                        TauntFrequency = 10,
+                        TauntMaxDistance = 40f,
                         HoldGroundBaseTime = HoldGroundBaseTime(pers),
                         HoldGroundMaxRandom = 2f,
                         HoldGroundMinRandom = 0.5f,
@@ -232,11 +130,107 @@ namespace SAIN.Preset.Personalities
                         SprintWhileSearch = true,
                         CanRushEnemyReloadHeal = true,
                         FrequentTaunt = true,
-                        SearchAggressionModifier = 4f,
+                        AggressionMultiplier = 2f,
                     }
                 };
 
                 AddPMCTypes(settings.AllowedBotTypes);
+                Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
+            }
+
+            pers = SAINPersonality.Rat;
+            if (!Personalities.ContainsKey(pers))
+            {
+                string name = pers.ToString();
+                string description = "Scum of Tarkov. Rarely Seeks out enemies, and will hide and ambush.";
+                var settings = new PersonalitySettingsClass(pers, name, description)
+                {
+                    Variables =
+                    {
+                        Enabled = true,
+                        RandomChanceIfMeetRequirements = 60,
+                        RandomlyAssignedChance = 30,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers),
+                        PowerLevelMax = 50f,
+                        AggressionMultiplier = 0.6f,
+                        Sneaky = true,
+                        BaseSearchMoveSpeed = 0.2f,
+                    }
+                };
+
+                AddAllBotTypes(settings.AllowedBotTypes);
+                Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
+            }
+
+            pers = SAINPersonality.Timmy;
+            if (!Personalities.ContainsKey(pers))
+            {
+                string name = pers.ToString();
+                string description = "A New Player, terrified of everything.";
+
+                var settings = new PersonalitySettingsClass(pers, name, description)
+                {
+                    Variables =
+                    {
+                        Enabled = true,
+                        RandomlyAssignedChance = 50,
+                        PowerLevelMax = 40f,
+                        MaxLevel = 10,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers),
+                        AggressionMultiplier = 0.75f,
+                        BaseSearchMoveSpeed = 0.65f,
+                    }
+                };
+
+                AddPMCTypes(settings.AllowedBotTypes);
+                Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
+            }
+
+            pers = SAINPersonality.Coward;
+            if (!Personalities.ContainsKey(pers))
+            {
+                string name = pers.ToString();
+                string description = "A player who is more passive and afraid than usual.";
+                var settings = new PersonalitySettingsClass(pers, name, description)
+                {
+                    Variables =
+                    {
+                        Enabled = true,
+                        RandomlyAssignedChance = 30,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers),
+                        AggressionMultiplier = 0.4f,
+                        BaseSearchMoveSpeed = 0.35f,
+                    }
+                };
+                AddAllBotTypes(settings.AllowedBotTypes);
+                Personalities.Add(pers, settings);
+                Preset.Export(settings, pers.ToString(), nameof(Personalities));
+            }
+
+            pers = SAINPersonality.Normal;
+            if (!Personalities.ContainsKey(pers))
+            {
+                string name = pers.ToString();
+                string description = "An Average Tarkov Enjoyer";
+                var settings = new PersonalitySettingsClass(pers, name, description)
+                {
+                    Variables =
+                    {
+                        Enabled = true,
+                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
+                        SearchBaseTime = SearchBaseTime(pers),
+                        CanRespondToVoice = true,
+                        BaseSearchMoveSpeed = 0.8f,
+                    }
+                };
+
+                AddAllBotTypes(settings.AllowedBotTypes);
                 Personalities.Add(pers, settings);
                 Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
@@ -286,6 +280,7 @@ namespace SAIN.Preset.Personalities
             }
         }
 
-        public Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities;
+        public Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities = 
+            new Dictionary<SAINPersonality, PersonalitySettingsClass>();
     }
 }

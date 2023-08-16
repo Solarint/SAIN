@@ -1,6 +1,7 @@
 ﻿using EFT;
 using EFT.UI;
 using SAIN.Editor;
+using SAIN.Editor.Util;
 using SAIN.Helpers;
 using SAIN.Preset;
 using SAIN.Preset.BotSettings.SAINSettings;
@@ -34,14 +35,6 @@ namespace SAIN.Attributes
                 AttributesClasses.Add(name, new AttributesInfoClass(property));
             }
             return AttributesClasses[name];
-        }
-
-        public static void ClearCache()
-        {
-            if (ListHelpers.ClearCache(AttributesClasses))
-            {
-                LabelStyle = null;
-            }
         }
 
         private static readonly Type[] FloatBoolInt =
@@ -80,22 +73,22 @@ namespace SAIN.Attributes
                         }
                         else if (value is List<WildSpawnType> wildList)
                         {
-                            Builder.ModifyLists.AddOrRemove(wildList, out wasEdited);
+                            ModifyLists.AddOrRemove(wildList, out wasEdited);
                             value = wildList;
                         }
                         else if (value is List<BotDifficulty> diffList)
                         {
-                            Builder.ModifyLists.AddOrRemove(diffList, out wasEdited);
+                            ModifyLists.AddOrRemove(diffList, out wasEdited);
                             value = diffList;
                         }
                         else if (value is List<BotType> botList)
                         {
-                            Builder.ModifyLists.AddOrRemove(botList, out wasEdited);
+                            ModifyLists.AddOrRemove(botList, out wasEdited);
                             value = botList;
                         }
                         else if (value is List<BigBrainConfigClass> brainList)
                         {
-                            Builder.ModifyLists.AddOrRemove(brainList, out wasEdited);
+                            ModifyLists.AddOrRemove(brainList, out wasEdited);
                             value = brainList;
                         }
                     }
@@ -114,8 +107,6 @@ namespace SAIN.Attributes
 
             if (showLabel)
             {
-                var labelHeight = Height(entryConfig.EntryHeight);
-                Buttons.InfoBox(attributes.Description, entryConfig.Info);
 
                 if (LabelStyle == null)
                 {
@@ -128,65 +119,41 @@ namespace SAIN.Attributes
                     };
                 }
 
-                Box(new GUIContent(attributes.Name), LabelStyle, labelHeight);
+                Box(new GUIContent(
+                    attributes.Name, 
+                    attributes.Description), 
+                    LabelStyle, 
+                    Height(entryConfig.EntryHeight)
+                    );
             }
 
-            float min = default;
-            float max = default;
+            Space(8);
+
             bool showResult = false;
             object originalValue = value;
-
             if (attributes.ValueType == typeof(bool))
             {
                 showResult = true;
-
                 value = Toggle((bool)value, (bool)value ? "On" : "Off", EUISoundType.MenuCheckBox, entryConfig.Toggle);
             }
             else if (attributes.ValueType == typeof(float))
             {
                 showResult = true;
-
-                if (!MinMaxFloat(out min, out max, attributes))
-                {
-                    min = Mathf.Round(((float)value / 10f) * 10f) / 10f;
-                    max = Mathf.Round(((float)value * 5f) * 10f) / 10f;
-                }
-
-                //Builder.MinValueBox(min, entryConfig.Info);
-
-                float flValue = Builder.CreateSlider((float)value, min, max, entryConfig.Toggle);
-                float rounding = attributes.Rounding == null ? 10f : attributes.Rounding.Value;
-                value = Mathf.Round(flValue * rounding) / rounding;
-
-                //Builder.MaxValueBox(max, entryConfig.Info);
-            }
-            else if (attributes.ValueType == typeof(int))
-            {
-                showResult = true;
-
-                if (!MinMaxInt(out int intMin, out int intMax, attributes))
-                {
-                    min = Mathf.RoundToInt((int)value / 10f);
-                    max = Mathf.RoundToInt((int)value * 5f);
-                }
-                else
-                {
-                    min = intMin;
-                    max = intMax;
-                }
-
-                //Builder.MinValueBox(min, entryConfig.Info);
-
-                float floatvalue = Builder.CreateSlider((int)value, min, max, entryConfig.Toggle);
-                value = Mathf.RoundToInt(floatvalue);
-
-                //Builder.MaxValueBox(max, entryConfig.Info);
+                float flValue = BuilderClass.CreateSlider((float)value, attributes.Min, attributes.Max, entryConfig.Toggle);
+                value = flValue.Round(attributes.Rounding);
             }
             if (showResult && value != null)
             {
+                Space(8);
+
                 string dirtyString = TextField(value.ToString(), null, entryConfig.Result);
-                value = Builder.CleanString(dirtyString, value);
-                value = Clamp(value, min, max, attributes.ValueType);
+                value = BuilderClass.CleanString(dirtyString, value);
+                if (attributes.ValueType != typeof(bool))
+                {
+                    value = attributes.Clamp(value);
+                }
+
+                Space(5);
 
                 if (attributes.Default != null)
                 {
@@ -223,7 +190,7 @@ namespace SAIN.Attributes
                 ListIsOpen.Add(name, false);
             }
             bool isOpen = ListIsOpen[name];
-            isOpen = Builder.ExpandableMenu(name, isOpen, attributes.Description, height, 30f, false);
+            isOpen = BuilderClass.ExpandableMenu(name, isOpen, attributes.Description, height, false);
             ListIsOpen[name] = isOpen;
 
             EndHorizontal();
@@ -232,55 +199,9 @@ namespace SAIN.Attributes
 
         private static readonly Dictionary<string, bool> ListIsOpen = new Dictionary<string, bool>();
 
-        private static object Clamp(object value, float min, float max, Type valueType)
+        private static object Clamp(object value, float min, float max)
         {
-            float floatVal;
-            if (valueType == typeof(float))
-            {
-                floatVal = (float)value;
-                value = Mathf.Clamp(floatVal, min, max);
-            }
-            if (valueType == typeof(int))
-            {
-                int intVal = (int)value;
-                floatVal = intVal;
-                value = Mathf.RoundToInt(Mathf.Clamp(floatVal, min, max));
-            }
-            return value;
-        }
-
-        private static bool MinMaxFloat(out float min, out float max, AttributesInfoClass attributes)
-        {
-            min = default;
-            max = default;
-            if (attributes.Min != null)
-            {
-                min = attributes.Min.Value;
-
-                if (attributes.Max != null)
-                {
-                    max = attributes.Max.Value;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static bool MinMaxInt(out int min, out int max, AttributesInfoClass attributes)
-        {
-            min = default;
-            max = default;
-            if (attributes.Min != null)
-            {
-                min = Mathf.RoundToInt(attributes.Min.Value);
-
-                if (attributes.Max != null)
-                {
-                    max = Mathf.RoundToInt(attributes.Max.Value);
-                    return true;
-                }
-            }
-            return false;
+            return MathHelpers.ClampObject(value, min, max);
         }
 
         public static object EditValue(object value, FieldInfo field, out bool wasEdited, GUIEntryConfig entryConfig = null)
@@ -395,8 +316,5 @@ namespace SAIN.Attributes
             Space(5);
             EndVertical();
         }
-
-        private static ButtonsClass Buttons => SAINPlugin.Editor.Buttons;
-        private static BuilderClass Builder => SAINPlugin.Editor.Builder;
     }
 }

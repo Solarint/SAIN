@@ -9,5 +9,17 @@ namespace SAIN.Preset
         public string Creator;
         public string SAINVersion;
         public string DateCreated;
+
+        public SAINPresetDefinition Clone()
+        {
+            return new SAINPresetDefinition()
+            {
+                Name = Name,
+                Description = Description,
+                Creator = Creator,
+                SAINVersion = SAINVersion,
+                DateCreated = DateCreated
+            };
+        }
     }
 }

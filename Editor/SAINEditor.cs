@@ -4,54 +4,41 @@ using EFT;
 using EFT.Console.Core;
 using EFT.UI;
 using SAIN.Attributes;
-using SAIN.Editor.Util;
 using System;
 using UnityEngine;
 using static SAIN.Editor.RectLayout;
+using static SAIN.Editor.SAINLayout;
 using static SAIN.Editor.Sounds;
 using ColorsClass = SAIN.Editor.Util.ColorsClass;
-using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor
 {
-    public class SAINEditor : IEditorCache
+    public static class SAINEditor
     {
-        public SAINEditor()
+        static SAINEditor()
         {
             ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(ToggleGUI));
             ConsoleScreen.Processor.RegisterCommand("pausegame", new Action(TogglePause));
         }
 
-        public void Init()
+        public static void Init()
         {
             CursorSettings.InitCursor();
-
-            GUITabs = new GUITabs(this);
-            StyleOptions = new EditorStyleClass(this);
-            Builder = new BuilderClass(this);
-            Buttons = new ButtonsClass(this);
-            MouseFunctions = new MouseFunctions(this);
         }
 
-        public GUITabs GUITabs { get; private set; }
-        public MouseFunctions MouseFunctions { get; private set; }
-        public ButtonsClass Buttons { get; private set; }
-        public BuilderClass Builder { get; private set; }
-        public EditorStyleClass StyleOptions { get; private set; }
-
-        public bool GameIsPaused { get; private set; }
-        public bool PauseOnEditorOpen;
-        public bool AdvancedBotConfigs;
+        public static bool GameIsPaused { get; private set; }
+        public static bool PauseOnEditorOpen;
+        public static bool AdvancedBotConfigs;
 
         [ConsoleCommand("Toggle SAIN GUI Editor")]
-        private void ToggleGUI()
+        private static void ToggleGUI()
         {
             DisplayingWindow = !DisplayingWindow;
         }
 
-        private float CheckKeyLimiter;
+        private static float CheckKeyLimiter;
 
-        private void TogglePause()
+        private static void TogglePause()
         {
             Player mainPlayer = Singleton<GameWorld>.Instance?.MainPlayer;
             if (mainPlayer?.HandsAnimator != null)
@@ -76,13 +63,13 @@ namespace SAIN.Editor
             }
         }
 
-        public bool ShiftKeyPressed { get; private set; }
-        public bool CtrlKeyPressed { get; private set; }
-        private bool ToggleKeyPressed;
-        private bool PauseKeyPressed;
-        private bool EscapeKeyPressed;
+        public static bool ShiftKeyPressed;
+        public static bool CtrlKeyPressed;
+        private static bool ToggleKeyPressed;
+        private static bool PauseKeyPressed;
+        private static bool EscapeKeyPressed;
 
-        private void CheckKeys()
+        private static void CheckKeys()
         {
             if (CheckKeyLimiter < Time.time)
             {
@@ -95,7 +82,7 @@ namespace SAIN.Editor
             }
         }
 
-        public void Update()
+        public static void Update()
         {
             if (DisplayingWindow)
             {
@@ -121,46 +108,33 @@ namespace SAIN.Editor
             }
         }
 
-        public void LateUpdate()
+        public static void LateUpdate()
         {
             if (DisplayingWindow) CursorSettings.SetUnlockCursor(0, true);
         }
 
-        public void OnGUI()
+        public static void OnGUI()
         {
             if (DisplayingWindow)
             {
-                CreateCache();
+                if (!CacheCreated)
+                {
+                    CacheCreated = true;
+                    ColorsClass.CreateCache();
+                    TexturesClass.CreateCache();
+                    StylesClass.CreateCache();
+                }
 
                 CursorSettings.SetUnlockCursor(0, true);
                 GUIUtility.ScaleAroundPivot(ScaledPivot, Vector2.zero);
                 MainWindow = GUI.Window(0, MainWindow, MainWindowFunc, "SAIN AI Settings Editor", GetStyle(Style.window));
                 UnityInput.Current.ResetInputAxes();
             }
-            else
-            {
-                ClearCache();
-            }
         }
 
-        public void CreateCache()
-        {
-            ColorsClass.CreateCache();
-            TexturesClass.CreateCache();
-            StyleOptions.CustomStyle.CreateCache();
-        }
+        private static bool CacheCreated;
 
-        public void ClearCache()
-        {
-            ColorsClass.ClearCache();
-            TexturesClass.ClearCache();
-            StyleOptions.CustomStyle.ClearCache();
-
-            AttributesGUI.ClearCache();
-            GUITabs.ClearCache();
-        }
-
-        private void MainWindowFunc(int TWCWindowID)
+        private static void MainWindowFunc(int TWCWindowID)
         {
             GUI.FocusWindow(TWCWindowID);
 
@@ -184,9 +158,9 @@ namespace SAIN.Editor
             if (!string.IsNullOrEmpty(ExceptionString))
             {
                 BeginHorizontal();
-                Builder.Alert(ExceptionString, "EXPORT ERROR",
+                BuilderClass.Alert(ExceptionString, "EXPORT ERROR",
                     40f, 1000, ColorNames.MidRed);
-                Builder.Alert(
+                BuilderClass.Alert(
                     "LogOutput is located in Bepinex folder in SPT install. GitHub Link is available on the SAIN mod Page, right hand side.",
                     "Please Report Issue to SAIN Github along with your LogOutput File",
                     40f, 1000, ColorNames.MidRed);
@@ -198,16 +172,16 @@ namespace SAIN.Editor
             DrawTooltip();
         }
 
-        private void CreateDragBar()
+        private static void CreateDragBar()
         {
             GUI.DrawTexture(DragRect, DragBackgroundTexture, ScaleMode.StretchToFill, true, 0);
             GUI.Box(DragRect, $"SAIN GUI Editor | Preset: {SAINPlugin.LoadedPreset.Info.Name}", GetStyle(Style.dragBar));
             GUI.DragWindow(DragRect);
         }
 
-        public string ExceptionString = string.Empty;
+        public static string ExceptionString = string.Empty;
 
-        private void CreateTopBarOptions()
+        private static void CreateTopBarOptions()
         {
             var style = GetStyle(Style.button);
             if (GUI.Button(SaveAllRect, new GUIContent("Save All Changes", $"Export All Changes to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}"), style))
@@ -227,7 +201,7 @@ namespace SAIN.Editor
             }
         }
 
-        private void DrawTooltip()
+        private static void DrawTooltip()
         {
             string tooltip = GUI.tooltip;
             if (!string.IsNullOrEmpty(tooltip))
@@ -251,16 +225,16 @@ namespace SAIN.Editor
             }
         }
 
-        public bool DisplayingWindow
+        public static bool DisplayingWindow
         {
             get => CursorSettings.DisplayingWindow;
             set { CursorSettings.DisplayingWindow = value; }
         }
 
-        public Rect AdjustmentRect = new Rect(500, 50, 600f, 500f);
+        public static Rect AdjustmentRect = new Rect(500, 50, 600f, 500f);
 
-        public Rect OpenTabRect = new Rect(0, 0, MainWindow.width, 1000f);
+        public static Rect OpenTabRect = new Rect(0, 0, MainWindow.width, 1000f);
 
-        private Texture2D DragBackgroundTexture => TexturesClass.GetTexture(ColorNames.MidGray);
+        private static Texture2D DragBackgroundTexture => TexturesClass.GetTexture(ColorNames.MidGray);
     }
 }

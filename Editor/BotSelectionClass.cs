@@ -1,19 +1,19 @@
-﻿using SAIN.Attributes;
-using SAIN.Editor.Abstract;
+﻿using EFT.UI;
+using SAIN.Attributes;
+using SAIN.Editor.GUISections;
 using SAIN.Editor.Util;
 using SAIN.Preset;
 using SAIN.Preset.BotSettings.SAINSettings;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor
 {
-    public class BotSelectionClass : EditorAbstract
+    public static class BotSelectionClass
     {
-        public BotSelectionClass(SAINEditor editor) : base(editor)
+        static BotSelectionClass()
         {
             List<string> sections = new List<string>();
             foreach (var type in BotTypeDefinitions.BotTypes.Values)
@@ -25,173 +25,70 @@ namespace SAIN.Editor
             }
 
             Sections = sections.ToArray();
+            SectionOpens = new bool[Sections.Length];
         }
 
-        public void ClearCache()
-        {
-        }
+        private static bool[] SectionOpens;
 
-        public void Menu()
+        public static void Menu()
         {
-            OpenFirstMenu = Builder.ExpandableMenu("Bots", OpenFirstMenu, "Select the bots you wish to edit the settings for", 35);
-            if (OpenFirstMenu)
+            BeginHorizontal();
+            FlexibleSpace();
+
+            float sectionWidth = 1850f / Sections.Length;
+            for (int i = 0; i < Sections.Length; i++)
             {
-                float startHeight = 25;
-                SectionRectangle = new Rect(0, startHeight, SectionRectWidth, FinalWindowHeight);
-                BeginArea(SectionRectangle);
+                BeginVertical();
 
-                SelectSection(SectionRectangle);
-
-                EndArea();
-                TypeRectangle = new Rect(TypeRectX, startHeight, TypeRectWidth, FinalWindowHeight);
-                BeginArea(TypeRectangle);
-                FirstMenuScroll = BeginScrollView(FirstMenuScroll);
-
-                SelectType();
-
-                EndScrollView();
-                EndArea();
-                Space(SectionRectangle.height);
-
-                if (Button("Clear", null, Width(150)))
+                var botTypeSectionStyle = new GUIStyle(GetStyle(Style.toggle))
                 {
-                    SelectedSections.Clear();
-                    SelectedWildSpawnTypes.Clear();
+                    alignment = TextAnchor.MiddleLeft,
+                    margin = new RectOffset(5, 5, 0, 0),
+                    border = new RectOffset(5, 5, 0, 0),
+                    fontStyle = FontStyle.Bold
+                };
+
+                string section = Sections[i];
+                SectionOpens[i] = Toggle(SectionOpens[i], new GUIContent(section), botTypeSectionStyle, EUISoundType.MenuDropdown, Height(35), Width(sectionWidth));
+                if (SectionOpens[i])
+                {
+                    ModifyLists.AddOrRemove(SelectedBotTypes, section, 27.5f, sectionWidth);
                 }
+
+                EndVertical();
+            }
+
+            FlexibleSpace();
+            EndHorizontal();
+
+            Space(3f);
+
+            if (Button("Clear", EUISoundType.ButtonBottomBarClick))
+            {
+                SelectedBotTypes.Clear();
             }
 
             Label("Difficulties", "Select which difficulties you wish to modify.", Height(35));
-            Builder.ModifyLists.AddOrRemove(SelectedDifficulties, out bool newEdit);
+            ModifyLists.AddOrRemove(SelectedDifficulties, out bool newEdit);
 
             SelectProperties();
         }
 
-        public bool WasEdited;
+        public static readonly string[] Sections;
 
-        private bool OpenFirstMenu = false;
+        private static readonly List<BotType> SelectedBotTypes = new List<BotType>();
 
-        private float FinalWindowHeight => 300f;
+        public static readonly BotDifficulty[] BotDifficultyOptions = { BotDifficulty.easy, BotDifficulty.normal, BotDifficulty.hard, BotDifficulty.impossible };
+        public static readonly List<BotDifficulty> SelectedDifficulties = new List<BotDifficulty>();
 
-        private float Rect2OptionSpacing = 2f;
-        private float SectionRectX => BothRectGap;
-        private float SectionRectWidth = 150f;
-        private float BothRectGap = 6f;
-        private float TypeRectWidth => RectLayout.MainWindow.width - SectionRectWidth - BothRectGap * 2f;
-        private float TypeRectX => SectionRectX + SectionRectWidth + BothRectGap;
+        public static bool BotSettingsWereEdited;
 
-        private float TypeOptLabelHeight = 18f;
-        private float TypeOptOptionHeight = 19f;
+        private static int offsetWidth = 3;
+        private static int offsetHeight = 3;
 
-        private Rect SectionRectangle;
-        private Rect TypeRectangle;
-
-        private Vector2 FirstMenuScroll = Vector2.zero;
-
-        private Rect RelativeRect(Rect mainRect, Rect insideRect, Rect lastRect)
+        private static void SelectProperties()
         {
-            float X = lastRect.x + insideRect.x + mainRect.x;
-            float Y = lastRect.y + insideRect.y + mainRect.y;
-            return new Rect(X, Y, lastRect.width, lastRect.height);
-        }
-
-        private Rect RelativeRectMainWindow(Rect insideRect, Rect lastRect)
-        {
-            return RelativeRect(RectLayout.MainWindow, insideRect, lastRect);
-        }
-
-        private Rect? RelativeRectLastRectMainWindow(Rect insideRect)
-        {
-            if (Event.current.type != EventType.Repaint)
-            {
-                return null;
-            }
-            return RelativeRectMainWindow(insideRect, GUILayoutUtility.GetLastRect());
-        }
-
-        private Rect[] SectionRects;
-
-        private void SelectSection(Rect window)
-        {
-            if (SectionRects == null)
-            {
-                SectionRects = Builder.VerticalGridRects(window, Sections.Length, 80f);
-            }
-
-            Builder.SelectionGridExpandWidth(window, Sections, SelectedSections, SectionRects, 80f, 5);
-        }
-
-        private void SelectType()
-        {
-            for (int i = 0; i < SelectedSections.Count; i++)
-            {
-                string section = SelectedSections[i];
-                GUIStyle style = new GUIStyle(GetStyle(Style.label))
-                {
-                    fontStyle = FontStyle.Normal,
-                    alignment = TextAnchor.MiddleLeft
-                };
-
-                BeginHorizontal();
-                Space(Rect2OptionSpacing);
-
-                Label(section, style, Height(TypeOptLabelHeight), Width(200f));
-
-                FlexibleSpace();
-                EndHorizontal();
-
-                Space(Rect2OptionSpacing);
-
-                var botTypes = BotTypeDefinitions.BotTypes.Values.ToArray();
-
-                for (int j = 0; j < botTypes.Length; j++)
-                {
-                    BotType type = botTypes[j];
-                    if (type.Section == section)
-                    {
-                        bool typeSelected = SelectedWildSpawnTypes.Contains(type);
-
-                        BeginHorizontal();
-                        Space(Rect2OptionSpacing);
-
-                        bool AddToList = Toggle(typeSelected, new GUIContent(type.Name, type.Description), GetStyle(Style.botTypeGrid), null, Height(TypeOptOptionHeight));
-
-                        // Rect? lastRect = RelativeRectLastRectMainWindow(TypeRectangle);
-                        // if (lastRect != null && CheckDrag(lastRect.Value))
-                        // {
-                        //     AddToList = !Editor.ShiftKeyPressed;
-                        // }
-
-                        if (AddToList && !SelectedWildSpawnTypes.Contains(type))
-                        {
-                            SelectedWildSpawnTypes.Add(type);
-                        }
-                        else if (!AddToList && SelectedWildSpawnTypes.Contains(type))
-                        {
-                            SelectedWildSpawnTypes.Remove(type);
-                        }
-
-                        Space(Rect2OptionSpacing);
-                        EndHorizontal();
-                    }
-                }
-                Space(Rect2OptionSpacing);
-            }
-        }
-
-        public readonly string[] Sections;
-        private readonly List<string> SelectedSections = new List<string>();
-        private readonly List<BotType> SelectedWildSpawnTypes = new List<BotType>();
-        public readonly BotDifficulty[] BotDifficultyOptions = { BotDifficulty.easy, BotDifficulty.normal, BotDifficulty.hard, BotDifficulty.impossible };
-        public readonly List<BotDifficulty> SelectedDifficulties = new List<BotDifficulty>();
-
-        public bool BotSettingsWereEdited;
-
-        private int offsetWidth = 3;
-        private int offsetHeight = 3;
-
-        private void SelectProperties()
-        {
-            if (SelectedWildSpawnTypes.Count == 0)
+            if (SelectedBotTypes.Count == 0)
             {
                 Box("No Bots Selected");
                 return;
@@ -202,15 +99,14 @@ namespace SAIN.Editor
             string toolTip = $"Apply Values set below to selected Bot Type. " +
                 $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/BotSettings folder";
             ;
-            if (Builder.SaveChanges(BotSettingsWereEdited, toolTip, 30f))
+            if (BuilderClass.SaveChanges(BotSettingsWereEdited, toolTip, 35f))
             {
                 SAINPlugin.LoadedPreset.ExportBotSettings();
             }
-            if (Button("Clear All", "Clear all selected bot options", null, Height(30f), Width(200f)))
+            if (Button("Clear All", "Clear all selected bot options", null, Height(35f), Width(200f)))
             {
                 SelectedDifficulties.Clear();
-                SelectedSections.Clear();
-                SelectedWildSpawnTypes.Clear();
+                SelectedBotTypes.Clear();
             }
 
             EndHorizontal();
@@ -224,7 +120,7 @@ namespace SAIN.Editor
                 ResetWidth = 0.05f
             };
 
-            var container = Editor.GUITabs.SettingsEditor.
+            var container = BotSettingsEditor.
                 SelectSettingsGUI(
                 typeof(SAINSettingsClass),
                 "Select Options to Edit", out bool newEdit);
@@ -233,7 +129,7 @@ namespace SAIN.Editor
                 BotSettingsWereEdited = true;
             }
 
-            container.SecondOpen = Builder.ExpandableMenu("Edit Selected Options", container.SecondOpen, null, 30f);
+            container.SecondOpen = BuilderClass.ExpandableMenu("Edit Selected Options", container.SecondOpen, null);
             if (!container.SecondOpen)
             {
                 return;
@@ -245,7 +141,7 @@ namespace SAIN.Editor
             const float BotLabelWidth = 225;
 
             const float Remaining = ScreenWidth - FieldLabelWidth - BotLabelWidth;
-            float TotalHeight = LineHeight * SelectedDifficulties.Count * SelectedWildSpawnTypes.Count;
+            float TotalHeight = LineHeight * SelectedDifficulties.Count * SelectedBotTypes.Count;
 
             var noOffset = new RectOffset(0, 0, 0, 0);
             var boxStyle = new GUIStyle(GetStyle(Style.box))
@@ -287,9 +183,9 @@ namespace SAIN.Editor
                     ApplyColor(boxStyle, fieldAttribute.Name);
                     GUI.Box(UsedfieldGroupLabelRect, new GUIContent(fieldAttribute.Name, fieldAttribute.Description), boxStyle);
 
-                    for (int k = 0; k < SelectedWildSpawnTypes.Count; k++)
+                    for (int k = 0; k < SelectedBotTypes.Count; k++)
                     {
-                        var bot = SelectedWildSpawnTypes[k];
+                        var bot = SelectedBotTypes[k];
 
                         if (SAINPlugin.LoadedPreset.BotSettings.SAINSettings.TryGetValue(bot.WildSpawnType, out var settings))
                         {
@@ -325,7 +221,7 @@ namespace SAIN.Editor
                                     value = AttributesGUI.EditFloatBoolInt(value, fieldAttribute, entryConfig, out newEdit, false, false);
                                     if (newEdit)
                                     {
-                                        WasEdited = true;
+                                        BotSettingsWereEdited = true;
                                     }
 
                                     fieldAttribute.Field.SetValue(categoryValue, value);
@@ -354,10 +250,10 @@ namespace SAIN.Editor
             EndGroup();
         }
 
-        private void ApplyColor(GUIStyle style, string key)
+        private static void ApplyColor(GUIStyle style, string key)
         {
             var texture = TexturesClass.GetRandomGray(key);
-            ApplyToStyle.BGAllStates(style, texture);
+            ApplyToStyle.BackgroundAllStates(texture, style);
         }
     }
 }

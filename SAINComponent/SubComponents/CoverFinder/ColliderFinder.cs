@@ -35,7 +35,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
         /// <summary>
         /// Sorts an array of Colliders based on their Distance from bot's DrawPosition. 
         /// </summary>
-        /// <param name="array">The array of Colliders to be sorted.</param>
+        /// <param value="array">The array of Colliders to be sorted.</param>
         public void SortArrayBotDist(Collider[] array)
         {
             Array.Sort(array, ColliderArrayBotDistComparer);
@@ -44,7 +44,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
         /// <summary>
         /// Sorts an array of Colliders based on their Distance to the enemy.
         /// </summary>
-        /// <param name="array">The array of Colliders to be sorted.</param>
+        /// <param value="array">The array of Colliders to be sorted.</param>
         public void SortArrayEnemyDist(Collider[] array)
         {
             Array.Sort(array, ColliderArrayEnemyDistComparer);
@@ -53,7 +53,7 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
         /// <summary>
         /// Sorts an array of Colliders by their transform optionHeight. 
         /// </summary>
-        /// <param name="array">The array of Colliders to be sorted.</param>
+        /// <param value="array">The array of Colliders to be sorted.</param>
         public void SortArrayHeight(Collider[] array)
         {
             Array.Sort(array, ColliderArrayHeightComparer);

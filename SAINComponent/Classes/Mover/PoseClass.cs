@@ -16,38 +16,12 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public void Update()
         {
-            if (DebugPoseTimer < Time.time)
-            {
-                DebugPoseTimer = Time.time + 1f;
-                //DebugFindOffset();
-            }
-
             FindObjectsInFront();
         }
 
         public void Dispose()
         {
         }
-
-        private void DebugFindOffset()
-        {
-            float lowWeapRootY = BotOwner.WeaponRoot.position.y - BotOwner.Position.y;
-            float playerPose = Player.PoseLevel;
-            if (playerPose == 0f)
-            {
-                Logger.LogInfo($"WeaponRoot at 0 pose: [{lowWeapRootY}]");
-            }
-            else if (playerPose == 1f)
-            {
-                Logger.LogInfo($"WeaponRoot at 1 pose: [{lowWeapRootY}]");
-            }
-            else
-            {
-                Logger.LogDebug($"WeaponRoot at [{playerPose}] pose: [{lowWeapRootY}]");
-            }
-        }
-
-        private float DebugPoseTimer = 0f;
 
         public bool SetPoseToCover()
         {

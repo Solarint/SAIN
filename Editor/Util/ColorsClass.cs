@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using SAIN.Editor.Abstract;
-using SAIN.Helpers;
-using System;
-using System.Collections;
+﻿using SAIN.Helpers;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace SAIN.Editor.Util
@@ -38,11 +33,11 @@ namespace SAIN.Editor.Util
 
         public static Color GetRandomColor(string key)
         {
-            if (!Grays.ContainsKey(key))
+            if (!RandomColors.ContainsKey(key))
             {
-                Grays.Add(key, CreateRandom());
+                RandomColors.Add(key, CreateRandom());
             }
-            return Grays[key];
+            return RandomColors[key];
         }
 
         private static Color CreateRandom()
@@ -53,13 +48,7 @@ namespace SAIN.Editor.Util
 
         private static float Randomize => UnityEngine.Random.Range(0.81f, 1.21f);
 
-        private static readonly Dictionary<string, Color> Grays = new Dictionary<string, Color>();
-
-        public static void ClearCache()
-        {
-            ListHelpers.ClearCache(Grays);
-            ListHelpers.ClearCache(ColorSchemeDictionary);
-        }
+        private static readonly Dictionary<string, Color> RandomColors = new Dictionary<string, Color>();
 
         public static readonly string SchemeName;
 

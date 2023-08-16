@@ -25,17 +25,16 @@ namespace SAIN.Plugin
         {
             LoadPresetOptions();
 
-            if (!Load.LoadObject(out PresetEditorDefaults presetDefaults, Settings, PresetsFolder))
+            if (Load.LoadObject(out PresetEditorDefaults editorDefaults, Settings, PresetsFolder))
             {
-                presetDefaults = new PresetEditorDefaults
-                {
-                    SelectedPreset = DefaultPreset
-                };
+                EditorDefaults = editorDefaults;
             }
-            presetDefaults.DefaultPreset = DefaultPreset;
-            SAINPlugin.Editor.AdvancedBotConfigs = presetDefaults.ShowAdvanced;
+            editorDefaults.DefaultPreset = DefaultPreset;
+            SAINEditor.AdvancedBotConfigs = editorDefaults.ShowAdvanced;
+            SAINPlugin.DebugModeEnabled = editorDefaults.GlobalDebugMode;
+            SAINPlugin.DrawDebugGizmos = editorDefaults.DebugGizmos;
 
-            if (!LoadPresetDefinition(presetDefaults.SelectedPreset, out SAINPresetDefinition presetDefinition))
+            if (!LoadPresetDefinition(editorDefaults.SelectedPreset, out SAINPresetDefinition presetDefinition))
             {
                 if (!LoadPresetDefinition(DefaultPreset, out presetDefinition))
                 {
@@ -91,7 +90,7 @@ namespace SAIN.Plugin
             return hard;
         }
 
-        private static readonly string DefaultPreset = "SAIN Default";
+        public static readonly string DefaultPreset = "SAIN Default";
 
         public static bool LoadPresetDefinition(string presetKey, out SAINPresetDefinition definition)
         {
@@ -108,15 +107,12 @@ namespace SAIN.Plugin
             try
             {
                 LoadedPreset = new SAINPresetClass(def);
-                var defaults = new PresetEditorDefaults
-                {
-                    SelectedPreset = def.Name,
-                    DefaultPreset = DefaultPreset,
-                    ShowAdvanced = SAINPlugin.Editor?.AdvancedBotConfigs == true,
-                    DebugGizmos = SAINPlugin.DrawDebugGizmos,
-                    GlobalDebugMode = SAINPlugin.DebugModeEnabled
-                };
-                SaveObjectToJson(defaults, Settings, PresetsFolder);
+                EditorDefaults.SelectedPreset = def.Name;
+                EditorDefaults.DefaultPreset = DefaultPreset;
+                EditorDefaults.ShowAdvanced = SAINEditor.AdvancedBotConfigs == true;
+                EditorDefaults.DebugGizmos = SAINPlugin.DrawDebugGizmos;
+                EditorDefaults.GlobalDebugMode = SAINPlugin.DebugModeEnabled;
+                SaveObjectToJson(EditorDefaults, Settings, PresetsFolder);
                 UpdateExistingBots();
             }
             catch (Exception ex)
@@ -130,17 +126,16 @@ namespace SAIN.Plugin
             }
         }
 
+        private static PresetEditorDefaults EditorDefaults = new PresetEditorDefaults();
+
         public static void SaveEditorDefaults()
         {
-            var defaults = new PresetEditorDefaults
-            {
-                SelectedPreset = LoadedPreset.Info.Name,
-                DefaultPreset = DefaultPreset,
-                ShowAdvanced = SAINPlugin.Editor.AdvancedBotConfigs,
-                DebugGizmos = SAINPlugin.DrawDebugGizmos,
-                GlobalDebugMode = SAINPlugin.DebugModeEnabled
-            };
-            SaveObjectToJson(defaults, Settings, PresetsFolder);
+            EditorDefaults.SelectedPreset = LoadedPreset.Info.Name;
+            EditorDefaults.DefaultPreset = DefaultPreset;
+            EditorDefaults.ShowAdvanced = SAINEditor.AdvancedBotConfigs;
+            EditorDefaults.DebugGizmos = SAINPlugin.DrawDebugGizmos;
+            EditorDefaults.GlobalDebugMode = SAINPlugin.DebugModeEnabled;
+            SaveObjectToJson(EditorDefaults, Settings, PresetsFolder);
         }
 
         public static void UpdateExistingBots()

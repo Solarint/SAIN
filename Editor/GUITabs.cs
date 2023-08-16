@@ -1,41 +1,19 @@
 ﻿using EFT.UI;
-using SAIN.Editor.Abstract;
 using SAIN.Editor.GUISections;
+using SAIN.Editor.Util;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor
 {
-    public class GUITabs : EditorAbstract
+    public static class GUITabs
     {
-        public GUITabs(SAINEditor editor) : base(editor)
-        {
-            PresetSelection = new PresetSelection(editor);
-            BotSelection = new BotSelectionClass(editor);
-            SettingsEditor = new BotSettingsEditor(editor);
-            BotPersonalityEditor = new BotPersonalityEditor(editor);
-        }
-
-        public void ClearCache()
-        {
-            SettingsEditor.ClearCache();
-            BotSelection.ClearCache();
-        }
-
-        public PresetSelection PresetSelection { get; private set; }
-        public BotSelectionClass BotSelection { get; private set; }
-        public BotPersonalityEditor BotPersonalityEditor { get; private set; }
-        public BotSettingsEditor SettingsEditor { get; private set; }
-
-        public void CreateTabs(EEditorTab selectedTab)
+        public static void CreateTabs(EEditorTab selectedTab)
         {
             EditTabsClass.BeginScrollView();
             switch (selectedTab)
             {
-                case EEditorTab.None:
-                    break;
-
                 case EEditorTab.Home:
                     Home(); break;
 
@@ -56,51 +34,50 @@ namespace SAIN.Editor
             EditTabsClass.EndScrollView();
         }
 
-        public void Home()
+        public static void Home()
         {
             ModDetection.ModDetectionGUI();
             Space(5f);
             PresetSelection.Menu();
         }
 
-        public void GlobalSettings()
+        public static void GlobalSettings()
         {
             string toolTip = $"Apply Values set below to GlobalSettings. " +
                 $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name} folder";
-            if (Builder.SaveChanges(GlobalSettingsWereEdited, toolTip, 35))
+            if (BuilderClass.SaveChanges(GlobalSettingsWereEdited, toolTip, 35))
             {
                 SAINPlugin.LoadedPreset.ExportGlobalSettings();
             }
 
-            SettingsEditor.ShowAllSettingsGUI(SAINPlugin.LoadedPreset.GlobalSettings, out bool newEdit);
+            BotSettingsEditor.ShowAllSettingsGUI(SAINPlugin.LoadedPreset.GlobalSettings, out bool newEdit);
             if (newEdit)
             {
                 GlobalSettingsWereEdited = true;
             }
         }
 
-        public bool GlobalSettingsWereEdited;
+        public static bool GlobalSettingsWereEdited;
 
-        public void BotSettings()
+        public static void BotSettings()
         {
-            BeginArea(Editor.OpenTabRect);
-            BotSelection.Menu();
+            BeginArea(SAINEditor.OpenTabRect);
+            BotSelectionClass.Menu();
             EndArea();
         }
 
-        public void Personality()
+        public static void Personality()
         {
             BotPersonalityEditor.PersonalityMenu();
         }
 
-        public void Advanced()
+        public static void Advanced()
         {
-            bool oldValue = Editor.AdvancedBotConfigs;
-            Editor.AdvancedBotConfigs = Editor.AdvancedBotConfigs.GUIToggle("Advanced Bot Configs", "Edit at your own risk.", EUISoundType.MenuCheckBox, Height(40));
-            if (oldValue != Editor.AdvancedBotConfigs)
+            bool oldValue = SAINEditor.AdvancedBotConfigs;
+            SAINEditor.AdvancedBotConfigs = SAINEditor.AdvancedBotConfigs.GUIToggle("Advanced Bot Configs", "Edit at your own risk.", EUISoundType.MenuCheckBox, Height(40));
+            if (oldValue != SAINEditor.AdvancedBotConfigs)
             {
-                Builder.ModifyLists.ClearCache();
-                SettingsEditor.ClearCache();
+                SettingsContainers.UpdateCache();
                 PresetHandler.SaveEditorDefaults();
             }
 
@@ -118,55 +95,55 @@ namespace SAIN.Editor
                 PresetHandler.SaveEditorDefaults();
             }
 
-            ForceDecisionOpen = Builder.ExpandableMenu("Force SAIN Bot Decisions", ForceDecisionOpen);
+            ForceDecisionOpen = BuilderClass.ExpandableMenu("Force SAIN Bot Decisions", ForceDecisionOpen);
 
             if (ForceDecisionOpen)
             {
                 const int spacing = 5;
                 Space(spacing);
 
-                ForceSoloOpen = Builder.ExpandableMenu("Force Solo Decision", ForceSoloOpen);
+                ForceSoloOpen = BuilderClass.ExpandableMenu("Force Solo Decision", ForceSoloOpen);
                 if (ForceSoloOpen)
                 {
                     if (Button("Reset"))
                         SAINPlugin.ForceSoloDecision = SoloDecision.None;
 
-                    SAINPlugin.ForceSoloDecision = Builder.SelectionGrid(
+                    SAINPlugin.ForceSoloDecision = BuilderClass.SelectionGrid(
                         SAINPlugin.ForceSoloDecision,
                         EnumValues.GetEnum<SoloDecision>());
                 }
 
                 Space(spacing);
 
-                ForceSquadOpen = Builder.ExpandableMenu("Force Squad Decision", ForceSquadOpen);
+                ForceSquadOpen = BuilderClass.ExpandableMenu("Force Squad Decision", ForceSquadOpen);
                 if (ForceSquadOpen)
                 {
                     if (Button("Reset"))
                         SAINPlugin.ForceSquadDecision = SquadDecision.None;
 
                     SAINPlugin.ForceSquadDecision =
-                        Builder.SelectionGrid(SAINPlugin.ForceSquadDecision,
+                        BuilderClass.SelectionGrid(SAINPlugin.ForceSquadDecision,
                         EnumValues.GetEnum<SquadDecision>());
                 }
 
                 Space(spacing);
 
-                ForceSelfOpen = Builder.ExpandableMenu("Force Self Decision", ForceSelfOpen);
+                ForceSelfOpen = BuilderClass.ExpandableMenu("Force Self Decision", ForceSelfOpen);
                 if (ForceSelfOpen)
                 {
                     if (Button("Reset"))
                         SAINPlugin.ForceSelfDecision = SelfDecision.None;
 
-                    SAINPlugin.ForceSelfDecision = Builder.SelectionGrid(
+                    SAINPlugin.ForceSelfDecision = BuilderClass.SelectionGrid(
                         SAINPlugin.ForceSelfDecision,
                         EnumValues.GetEnum<SelfDecision>());
                 }
             }
         }
 
-        private bool ForceDecisionOpen;
-        private bool ForceSoloOpen;
-        private bool ForceSquadOpen;
-        private bool ForceSelfOpen;
+        private static bool ForceDecisionOpen;
+        private static bool ForceSoloOpen;
+        private static bool ForceSquadOpen;
+        private static bool ForceSelfOpen;
     }
 }

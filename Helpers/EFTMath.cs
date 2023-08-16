@@ -13,13 +13,13 @@ namespace SAIN.Helpers
     public static class EFTMath
     {
         /// <summary>
-        /// Calculates the inverse of a rounding using a logistic function.
+        /// Calculates the inverse of a Rounding using a logistic function.
         /// </summary>
-        /// <param name="originalValue">The original rounding to be scaled.</param>
-        /// <param name="k">The scaling factor.</param>
-        /// <param name="x0">The offset rounding.</param>
+        /// <param value="originalValue">The original Rounding to be scaled.</param>
+        /// <param value="k">The scaling factor.</param>
+        /// <param value="x0">The offset Rounding.</param>
         /// <returns>
-        /// The scaled rounding, rounded to 3 decimal places.
+        /// The scaled Rounding, rounded to 3 decimal places.
         /// </returns>
         public static float InverseScaleWithLogisticFunction(float originalValue, float k, float x0 = 20f)
         {
@@ -28,9 +28,9 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Converts a float rounding representing seconds to a string in the format of HH:MM:SS
+        /// Converts a float Rounding representing seconds to a string in the format of HH:MM:SS
         /// </summary>
-        /// <param name="seconds">The float rounding representing seconds</param>
+        /// <param value="seconds">The float Rounding representing seconds</param>
         /// <returns>A string in the format of HH:MM:SS</returns>
         private static string TimeString(float seconds)
         {
@@ -41,8 +41,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Generates a random number between two given numbers, including the given numbers.
         /// </summary>
-        /// <param name="a">The first number.</param>
-        /// <param name="b">The second number.</param>
+        /// <param value="a">The first number.</param>
+        /// <param value="b">The second number.</param>
         /// <returns>A random number between the two given numbers.</returns>
         public static int RandomInclude(int a, int b)
         {
@@ -70,8 +70,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Generates a random float number between two given numbers.
         /// </summary>
-        /// <param name="a">The lower bound of the random number.</param>
-        /// <param name="b">The upper bound of the random number.</param>
+        /// <param value="a">The lower bound of the random number.</param>
+        /// <param value="b">The upper bound of the random number.</param>
         /// <returns>A random float number between two given numbers.</returns>
         public static float Random(float a, float b)
         {
@@ -80,20 +80,20 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Checks if a random number between 0 and 100 is less than the given rounding.
+        /// Checks if a random number between 0 and 100 is less than the given Rounding.
         /// </summary>
-        /// <param name="v">The rounding to compare against.</param>
-        /// <returns>True if the random number is less than the given rounding, false otherwise.</returns>
+        /// <param value="v">The Rounding to compare against.</param>
+        /// <returns>True if the random number is less than the given Rounding, false otherwise.</returns>
         public static bool IsTrue100(float v)
         {
             return Random(0f, 100f) < v;
         }
 
         /// <summary>
-        /// Generates a random boolean rounding based on a given chance in percent.
+        /// Generates a random boolean Rounding based on a given chance in percent.
         /// </summary>
-        /// <param name="chanceInPercent">The chance of the boolean being true, in percent (default is 50).</param>
-        /// <returns>A random boolean rounding.</returns>
+        /// <param value="chanceInPercent">The chance of the boolean being true, in percent (default is 50).</param>
+        /// <returns>A random boolean Rounding.</returns>
         public static bool RandomBool(float chanceInPercent = 50f)
         {
             return IsTrue100(chanceInPercent);
@@ -102,7 +102,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Parses a string to an EEditorTab of type T.
         /// </summary>
-        /// <param name="value">The string to parse.</param>
+        /// <param value="value">The string to parse.</param>
         /// <returns>The EEditorTab of type T.</returns>
         public static T ParseEnum<T>(this string value)
         {
@@ -112,9 +112,9 @@ namespace SAIN.Helpers
         /// <summary>
         /// Generates a random float between the given Max and Max values.
         /// </summary>
-        /// <param name="random">The random number generator.</param>
-        /// <param name="min">The minimum rounding.</param>
-        /// <param name="max">The maximum rounding.</param>
+        /// <param value="random">The random number generator.</param>
+        /// <param value="Min">The minimum Rounding.</param>
+        /// <param value="Max">The maximum Rounding.</param>
         /// <returns>A random float between the given Max and Max values.</returns>
         public static float NextFloat(this System.Random random, int min, int max)
         {
@@ -126,8 +126,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Compares two float values for approximate equality.
         /// </summary>
-        /// <param name="value">The first float rounding to compare.</param>
-        /// <param name="value2">The second float rounding to compare.</param>
+        /// <param value="value">The first float Rounding to compare.</param>
+        /// <param value="value2">The second float Rounding to compare.</param>
         /// <returns>True if the two float values are approximately equal, false otherwise.</returns>
         public static bool ApproxEquals(this float value, float value2)
         {
@@ -137,8 +137,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Compares two double values for approximate equality.
         /// </summary>
-        /// <param name="value">The first double rounding to compare.</param>
-        /// <param name="value2">The second double rounding to compare.</param>
+        /// <param value="value">The first double Rounding to compare.</param>
+        /// <param value="value2">The second double Rounding to compare.</param>
         /// <returns>True if the two double values are approximately equal, false otherwise.</returns>
         public static bool ApproxEquals(this double value, double value2)
         {
@@ -148,8 +148,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Compares two float values with low accuracy approximation.
         /// </summary>
-        /// <param name="value">The first float rounding.</param>
-        /// <param name="value2">The second float rounding.</param>
+        /// <param value="value">The first float Rounding.</param>
+        /// <param value="value2">The second float Rounding.</param>
         /// <returns>True if the difference between the two values is less than 0.001f, false otherwise.</returns>
         public static bool LowAccuracyApprox(this float value, float value2)
         {
@@ -157,90 +157,90 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Checks if the given float rounding is equal to zero.
+        /// Checks if the given float Rounding is equal to zero.
         /// </summary>
-        /// <param name="value">The float rounding to check.</param>
-        /// <returns>True if the rounding is equal to zero, false otherwise.</returns>
+        /// <param value="value">The float Rounding to check.</param>
+        /// <returns>True if the Rounding is equal to zero, false otherwise.</returns>
         public static bool IsZero(this float value)
         {
             return System.Math.Abs(value) < float.Epsilon;
         }
 
         /// <summary>
-        /// Checks if the given double rounding is equal to zero.
+        /// Checks if the given double Rounding is equal to zero.
         /// </summary>
-        /// <param name="value">The double rounding to check.</param>
-        /// <returns>True if the double rounding is equal to zero, false otherwise.</returns>
+        /// <param value="value">The double Rounding to check.</param>
+        /// <returns>True if the double Rounding is equal to zero, false otherwise.</returns>
         public static bool IsZero(this double value)
         {
             return System.Math.Abs(value) < 1.401298464324817E-45;
         }
 
         /// <summary>
-        /// Checks if the given double rounding is positive.
+        /// Checks if the given double Rounding is positive.
         /// </summary>
-        /// <param name="value">The double rounding to check.</param>
-        /// <returns>True if the rounding is positive, false otherwise.</returns>
+        /// <param value="value">The double Rounding to check.</param>
+        /// <returns>True if the Rounding is positive, false otherwise.</returns>
         public static bool Positive(this double value)
         {
             return value >= 1.401298464324817E-45;
         }
 
         /// <summary>
-        /// Checks if the given float rounding is positive.
+        /// Checks if the given float Rounding is positive.
         /// </summary>
-        /// <param name="value">The float rounding to check.</param>
-        /// <returns>True if the rounding is positive, false otherwise.</returns>
+        /// <param value="value">The float Rounding to check.</param>
+        /// <returns>True if the Rounding is positive, false otherwise.</returns>
         public static bool Positive(this float value)
         {
             return value >= float.Epsilon;
         }
 
         /// <summary>
-        /// Checks if the given double rounding is negative.
+        /// Checks if the given double Rounding is negative.
         /// </summary>
-        /// <param name="value">The double rounding to check.</param>
-        /// <returns>True if the rounding is negative, false otherwise.</returns>
+        /// <param value="value">The double Rounding to check.</param>
+        /// <returns>True if the Rounding is negative, false otherwise.</returns>
         public static bool Negative(this double value)
         {
             return value <= -1.401298464324817E-45;
         }
 
         /// <summary>
-        /// Checks if the given float rounding is negative.
+        /// Checks if the given float Rounding is negative.
         /// </summary>
-        /// <param name="value">The float rounding to check.</param>
-        /// <returns>True if the rounding is negative, false otherwise.</returns>
+        /// <param value="value">The float Rounding to check.</param>
+        /// <returns>True if the Rounding is negative, false otherwise.</returns>
         public static bool Negative(this float value)
         {
             return value <= -1E-45f;
         }
 
         /// <summary>
-        /// Checks if a float rounding is zero or negative.
+        /// Checks if a float Rounding is zero or negative.
         /// </summary>
-        /// <param name="value">The float rounding to check.</param>
-        /// <returns>True if the rounding is zero or negative, false otherwise.</returns>
+        /// <param value="value">The float Rounding to check.</param>
+        /// <returns>True if the Rounding is zero or negative, false otherwise.</returns>
         public static bool ZeroOrNegative(this float value)
         {
             return value < float.Epsilon;
         }
 
         /// <summary>
-        /// Checks if a float rounding is greater than -1E-45f.
+        /// Checks if a float Rounding is greater than -1E-45f.
         /// </summary>
-        /// <param name="value">The float rounding to check.</param>
-        /// <returns>True if the float rounding is greater than -1E-45f, false otherwise.</returns>
+        /// <param value="value">The float Rounding to check.</param>
+        /// <returns>True if the float Rounding is greater than -1E-45f, false otherwise.</returns>
         public static bool ZeroOrPositive(this float value)
         {
             return value > -1E-45f;
         }
 
         /// <summary>
-        /// Clamps a double rounding between 0 and 1.
+        /// Clamps a double Rounding between 0 and 1.
         /// </summary>
-        /// <param name="value">The double rounding to clamp.</param>
-        /// <returns>The clamped double rounding.</returns>
+        /// <param value="value">The double Rounding to clamp.</param>
+        /// <returns>The clamped double Rounding.</returns>
         public static double Clamp01(this double value)
         {
             if (value < 0.0)
@@ -255,12 +255,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Clamps a double rounding between two limits.
+        /// Clamps a double Rounding between two limits.
         /// </summary>
-        /// <param name="value">The rounding to clamp.</param>
-        /// <param name="limit1">The first limit.</param>
-        /// <param name="limit2">The second limit.</param>
-        /// <returns>The clamped rounding.</returns>
+        /// <param value="value">The Rounding to clamp.</param>
+        /// <param value="limit1">The first limit.</param>
+        /// <param value="limit2">The second limit.</param>
+        /// <returns>The clamped Rounding.</returns>
         public static double Clamp(this double value, double limit1, double limit2)
         {
             if (limit1 < limit2)
@@ -279,8 +279,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Scales a Rect by a Vector2.
         /// </summary>
-        /// <param name="rect">The Rect to scale.</param>
-        /// <param name="scale">The Vector2 to scale by.</param>
+        /// <param value="rect">The Rect to scale.</param>
+        /// <param value="scale">The Vector2 to scale by.</param>
         /// <returns>A new Rect scaled by the Vector2.</returns>
         public static Rect Scale(this Rect rect, Vector2 scale)
         {
@@ -290,9 +290,9 @@ namespace SAIN.Helpers
         /// <summary>
         /// Gets a random item from a list, excluding a specified item.
         /// </summary>
-        /// <typeparam name="T">The type of the list.</typeparam>
-        /// <param name="list">The list to get the item from.</param>
-        /// <param name="excludedItem">The item to exclude.</param>
+        /// <typeparam value="T">The type of the list.</typeparam>
+        /// <param value="list">The list to get the item from.</param>
+        /// <param value="excludedItem">The item to exclude.</param>
         /// <returns>A random item from the list, excluding the specified item.</returns>
         public static T GetRandomItem<T>(this List<T> list, T excludedItem)
         {
@@ -330,8 +330,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Gets a random item from a list.
         /// </summary>
-        /// <typeparam name="T">The type of the list.</typeparam>
-        /// <param name="list">The list to get the item from.</param>
+        /// <typeparam value="T">The type of the list.</typeparam>
+        /// <param value="list">The list to get the item from.</param>
         /// <returns>A random item from the list.</returns>
         public static T GetRandomItem<T>(this List<T> list)
         {
@@ -346,7 +346,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Calculates the exact length of an AudioClip in seconds.
         /// </summary>
-        /// <param name="clip">The AudioClip to calculate the length of.</param>
+        /// <param value="clip">The AudioClip to calculate the length of.</param>
         /// <returns>The exact length of the AudioClip in seconds.</returns>
         public static double ExactLength(this AudioClip clip)
         {
@@ -356,8 +356,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a Func delegate for a given MethodInfo.
         /// </summary>
-        /// <typeparam name="T">The return type of the Func delegate.</typeparam>
-        /// <param name="methodInfo">The MethodInfo to create the Func delegate for.</param>
+        /// <typeparam value="T">The return type of the Func delegate.</typeparam>
+        /// <param value="methodInfo">The MethodInfo to create the Func delegate for.</param>
         /// <returns>A Func delegate for the given MethodInfo.</returns>
         private static Func<object, T> smethod_0<T>(MethodInfo methodInfo)
         {
@@ -372,8 +372,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a delegate for a method that takes two parameters.
         /// </summary>
-        /// <typeparam name="T">The type of the second parameter.</typeparam>
-        /// <param name="methodInfo">The method info.</param>
+        /// <typeparam value="T">The type of the second parameter.</typeparam>
+        /// <param value="methodInfo">The method info.</param>
         /// <returns>A delegate for the method.</returns>
         private static Action<object, T> smethod_1<T>(MethodInfo methodInfo)
         {
@@ -391,9 +391,9 @@ namespace SAIN.Helpers
         /// <summary>
         /// Returns the last n elements from the given collection.
         /// </summary>
-        /// <typeparam name="T">The type of the elements of the collection.</typeparam>
-        /// <param name="collection">The collection to take elements from.</param>
-        /// <param name="n">The number of elements to take.</param>
+        /// <typeparam value="T">The type of the elements of the collection.</typeparam>
+        /// <param value="collection">The collection to take elements from.</param>
+        /// <param value="n">The number of elements to take.</param>
         /// <returns>The last n elements from the given collection.</returns>
         public static IEnumerable<T> TakeLast<T>(this IEnumerable<T> collection, int n)
         {
@@ -418,13 +418,13 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Creates a Func delegate that can be used to get the rounding of a field from an object.
+        /// Creates a Func delegate that can be used to get the Rounding of a field from an object.
         /// </summary>
-        /// <typeparam name="TOBjectType">The type of the object.</typeparam>
-        /// <typeparam name="TValueType">The type of the rounding.</typeparam>
-        /// <param name="fieldInfo">The field info.</param>
+        /// <typeparam value="TOBjectType">The type of the object.</typeparam>
+        /// <typeparam value="TValueType">The type of the Rounding.</typeparam>
+        /// <param value="fieldInfo">The field info.</param>
         /// <returns>
-        /// A Func delegate that can be used to get the rounding of a field from an object.
+        /// A Func delegate that can be used to get the Rounding of a field from an object.
         /// </returns>
         public static Func<TOBjectType, TValueType> CreateGetter<TOBjectType, TValueType>(FieldInfo fieldInfo)
         {
@@ -436,9 +436,9 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a getter for the specified fieldInfo of the given objectType and returns a Func of type TValueType.
         /// </summary>
-        /// <typeparam name="TValueType">The type of the rounding to be returned.</typeparam>
-        /// <param name="fieldInfo">The fieldInfo of the object.</param>
-        /// <param name="objectType">The type of the object.</param>
+        /// <typeparam value="TValueType">The type of the Rounding to be returned.</typeparam>
+        /// <param value="fieldInfo">The fieldInfo of the object.</param>
+        /// <param value="objectType">The type of the object.</param>
         /// <returns>A Func of type TValueType.</returns>
         public static Func<object, TValueType> CreateGetter<TValueType>(FieldInfo fieldInfo, Type objectType)
         {
@@ -447,12 +447,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Creates a DynamicMethod for getting a field rounding.
+        /// Creates a DynamicMethod for getting a field Rounding.
         /// </summary>
-        /// <param name="fieldInfo">The FieldInfo of the field to get.</param>
-        /// <param name="objectType">The type of the object containing the field.</param>
-        /// <param name="valueType">The type of the field.</param>
-        /// <returns>A DynamicMethod for getting the field rounding.</returns>
+        /// <param value="fieldInfo">The FieldInfo of the field to get.</param>
+        /// <param value="objectType">The type of the object containing the field.</param>
+        /// <param value="valueType">The type of the field.</param>
+        /// <returns>A DynamicMethod for getting the field Rounding.</returns>
         public static DynamicMethod CreateGetterFieldDynamicMethod(FieldInfo fieldInfo, Type objectType, Type valueType)
         {
             DynamicMethod dynamicMethod = new DynamicMethod(fieldInfo.ReflectedType.FullName + ".get_" + fieldInfo.Name, valueType, new Type[]
@@ -474,12 +474,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Gets a list of child transforms with a given name from a given transform.
+        /// Gets a list of child transforms with a given value from a given transform.
         /// </summary>
-        /// <param name="transform">The parent transform.</param>
-        /// <param name="name">The name of the child transforms to search for.</param>
-        /// <param name="onlyActive">Whether to only include IsCurrentEnemy child transforms.</param>
-        /// <returns>A list of child transforms with the given name.</returns>
+        /// <param value="transform">The parent transform.</param>
+        /// <param value="name">The value of the child transforms to search for.</param>
+        /// <param value="onlyActive">Whether to only include IsCurrentEnemy child transforms.</param>
+        /// <returns>A list of child transforms with the given value.</returns>
         public static List<Transform> GetChildsName(Transform transform, string name, bool onlyActive = true)
         {
             List<Transform> list = new List<Transform>();
@@ -505,11 +505,11 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Get a child transform from a parent transform by name and optionally by not containing a string.
+        /// Get a child transform from a parent transform by value and optionally by not containing a string.
         /// </summary>
-        /// <param name="transform">The parent transform.</param>
-        /// <param name="name">The name of the child transform.</param>
-        /// <param name="nocontains">A string that the child transform should not contain.</param>
+        /// <param value="transform">The parent transform.</param>
+        /// <param value="name">The value of the child transform.</param>
+        /// <param value="nocontains">A string that the child transform should not contain.</param>
         /// <returns>
         /// The child transform if found, otherwise null.
         /// </returns>
@@ -536,9 +536,9 @@ namespace SAIN.Helpers
         /// <summary>
         /// Checks if a Vector3 is close to a given x and z coordinate.
         /// </summary>
-        /// <param name="v">The Vector3 to check.</param>
-        /// <param name="x">The x coordinate to check against.</param>
-        /// <param name="z">The z coordinate to check against.</param>
+        /// <param value="v">The Vector3 to check.</param>
+        /// <param value="x">The x coordinate to check against.</param>
+        /// <param value="z">The z coordinate to check against.</param>
         /// <returns>True if the Vector3 is close to the given x and z coordinate, false otherwise.</returns>
         public static bool IsCloseDebug(Vector3 v, float x, float z)
         {
@@ -549,10 +549,10 @@ namespace SAIN.Helpers
         /// <summary>
         /// Checks if a Vector3 is close to a given x, y, and z coordinate.
         /// </summary>
-        /// <param name="v">The Vector3 to check.</param>
-        /// <param name="x">The x coordinate to check against.</param>
-        /// <param name="y">The y coordinate to check against.</param>
-        /// <param name="z">The z coordinate to check against.</param>
+        /// <param value="v">The Vector3 to check.</param>
+        /// <param value="x">The x coordinate to check against.</param>
+        /// <param value="y">The y coordinate to check against.</param>
+        /// <param value="z">The z coordinate to check against.</param>
         /// <returns>True if the Vector3 is close to the given coordinates, false otherwise.</returns>
         public static bool IsCloseDebug(Vector3 v, float x, float y, float z)
         {
@@ -563,8 +563,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a setter for a given FieldInfo.
         /// </summary>
-        /// <param name="field">The FieldInfo to create a setter for.</param>
-        /// <returns>An Action delegate that can be used to set the rounding of the given FieldInfo.</returns>
+        /// <param value="field">The FieldInfo to create a setter for.</param>
+        /// <returns>An Action delegate that can be used to set the Rounding of the given FieldInfo.</returns>
         public static Action<TOBjectType, TValueType> CreateSetter<TOBjectType, TValueType>(FieldInfo field)
         {
             Type typeFromHandle = typeof(TOBjectType);
@@ -575,10 +575,10 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a setter for a given FieldInfo and Type.
         /// </summary>
-        /// <typeparam name="TValueType">The type of the rounding.</typeparam>
-        /// <param name="field">The FieldInfo.</param>
-        /// <param name="objectType">The Type of the object.</param>
-        /// <returns>An Action delegate for setting the rounding.</returns>
+        /// <typeparam value="TValueType">The type of the Rounding.</typeparam>
+        /// <param value="field">The FieldInfo.</param>
+        /// <param value="objectType">The Type of the object.</param>
+        /// <returns>An Action delegate for setting the Rounding.</returns>
         public static Action<object, TValueType> CreateSetter<TValueType>(FieldInfo field, Type objectType)
         {
             Type typeFromHandle = typeof(TValueType);
@@ -586,12 +586,12 @@ namespace SAIN.Helpers
         }
 
         /// <summary>
-        /// Creates a DynamicMethod for setting a field rounding.
+        /// Creates a DynamicMethod for setting a field Rounding.
         /// </summary>
-        /// <param name="field">The field to set.</param>
-        /// <param name="objType">The type of the object containing the field.</param>
-        /// <param name="valueType">The type of the rounding to set.</param>
-        /// <returns>A DynamicMethod for setting the field rounding.</returns>
+        /// <param value="field">The field to set.</param>
+        /// <param value="objType">The type of the object containing the field.</param>
+        /// <param value="valueType">The type of the Rounding to set.</param>
+        /// <returns>A DynamicMethod for setting the field Rounding.</returns>
         private static DynamicMethod smethod_2(FieldInfo field, Type objType, Type valueType)
         {
             DynamicMethod dynamicMethod = new DynamicMethod(field.ReflectedType.FullName + ".set_" + field.Name, null, new Type[]
@@ -618,8 +618,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Generates a random number between Max and Max using the Box-Muller algorithm.
         /// </summary>
-        /// <param name="min">The minimum rounding of the random number.</param>
-        /// <param name="max">The maximum rounding of the random number.</param>
+        /// <param value="Min">The minimum Rounding of the random number.</param>
+        /// <param value="Max">The maximum Rounding of the random number.</param>
         /// <returns>A random number between Max and Max.</returns>
         public static float RandomNormal(float min, float max)
         {
@@ -634,8 +634,8 @@ namespace SAIN.Helpers
         /// <summary>
         /// Generates a random number using the Box-Muller algorithm.
         /// </summary>
-        /// <param name="mean">The mean of the random number.</param>
-        /// <param name="standard_deviation">The standard deviation of the random number.</param>
+        /// <param value="mean">The mean of the random number.</param>
+        /// <param value="standard_deviation">The standard deviation of the random number.</param>
         /// <returns>A random number generated using the Box-Muller algorithm.</returns>
         public static double BoxMuller(double mean, double standard_deviation)
         {
@@ -672,9 +672,9 @@ namespace SAIN.Helpers
         /// <summary>
         /// Removes an item from a queue.
         /// </summary>
-        /// <typeparam name="T">The type of the item to remove.</typeparam>
-        /// <param name="item">The item to remove.</param>
-        /// <param name="q">The queue to remove the item from.</param>
+        /// <typeparam value="T">The type of the item to remove.</typeparam>
+        /// <param value="item">The item to remove.</param>
+        /// <param value="q">The queue to remove the item from.</param>
         /// <returns>True if the item was removed, false otherwise.</returns>
         public static bool RemoveFromQueue<T>(T item, Queue<T> q)
         {
@@ -702,7 +702,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Creates a full screen mesh for a given camera.
         /// </summary>
-        /// <param name="cam">The camera to create the mesh for.</param>
+        /// <param value="cam">The camera to create the mesh for.</param>
         /// <returns>A full screen mesh for the given camera.</returns>
         public static Mesh MakeFullScreenMesh(Camera cam)
         {
@@ -743,7 +743,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Logs the given exception to the debug log.
         /// </summary>
-        /// <param name="exception">The exception to log.</param>
+        /// <param value="exception">The exception to log.</param>
         public static void ProcessException(Exception exception)
         {
             Debug.LogException(exception);
@@ -752,7 +752,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Checks if the given EViewListType should display the child count.
         /// </summary>
-        /// <param name="type">The EViewListType to check.</param>
+        /// <param value="type">The EViewListType to check.</param>
         /// <returns>True if the given EViewListType should display the child count, false otherwise.</returns>
         public static bool IsDisplayChildCount(this EViewListType type)
         {
@@ -762,7 +762,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Checks if the given EViewListType is one of the types that requires updating the child status.
         /// </summary>
-        /// <param name="type">The EViewListType to check.</param>
+        /// <param value="type">The EViewListType to check.</param>
         /// <returns>True if the given type requires updating the child status, false otherwise.</returns>
         public static bool IsUpdateChildStatus(this EViewListType type)
         {
@@ -772,7 +772,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Destroys all children of the given Transform.
         /// </summary>
-        /// <param name="t">The Transform whose children will be destroyed.</param>
+        /// <param value="t">The Transform whose children will be destroyed.</param>
         public static void ClearTransform(this Transform t)
         {
             foreach (object obj in t)
@@ -802,7 +802,7 @@ namespace SAIN.Helpers
         /// <summary>
         /// Checks if the given integer is an odd number.
         /// </summary>
-        /// <param name="value">The integer to check.</param>
+        /// <param value="value">The integer to check.</param>
         /// <returns>True if the given integer is an odd number, false otherwise.</returns>
         public static bool IsOdd(int value)
         {

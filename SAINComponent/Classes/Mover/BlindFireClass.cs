@@ -1,8 +1,5 @@
-using BepInEx.Logging;
 using EFT;
-using SAIN.Components;
 using SAIN.Helpers;
-using SAIN.SAINComponent;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Mover
@@ -59,7 +56,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 ResetBlindFire();
                 BlindFireTimer = Time.time + 0.5f;
             }
-            else if (!SAIN.NoBushESP.NoBushESPActive && SAIN.FriendlyFireClass.ClearShot)
+            else // if (!SAIN.NoBushESP.NoBushESPActive && SAIN.FriendlyFireClass.ClearShot)
             {
                 if (BlindFireTimer < Time.time)
                 {
@@ -78,7 +75,6 @@ namespace SAIN.SAINComponent.Classes.Mover
         public void Dispose()
         {
         }
-
 
         public void ResetBlindFire()
         {

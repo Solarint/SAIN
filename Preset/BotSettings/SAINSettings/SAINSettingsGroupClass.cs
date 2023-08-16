@@ -30,7 +30,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings
         [JsonProperty]
         [NameAndDescription("Difficulty Modifier", "How much to improve this bot type's recoil handling, fire-rate, and full auto burst length, reaction time, general stats that are used in SAIN.")]
         [DefaultValue(0.5f)]
-        [MinMaxRound(0.01f, 1f)]
+        [MinMax(0.01f, 1f)]
         public float DifficultyModifier = 0.5f;
 
         [JsonProperty]

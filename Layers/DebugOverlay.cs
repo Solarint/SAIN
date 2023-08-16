@@ -1,7 +1,5 @@
-﻿using BepInEx.Logging;
-using EFT;
+﻿using EFT;
 using SAIN.SAINComponent;
-using SAIN.SAINComponent.SubComponents.CoverFinder;
 using System;
 using System.Reflection;
 using System.Text;
@@ -14,8 +12,6 @@ namespace SAIN.Layers
         private static readonly int OverlayCount = 11;
 
         private static int Selected = 0;
-
-        private static readonly ManualLogSource Logger = BepInEx.Logging.Logger.CreateLogSource(nameof(DebugOverlay));
 
         public static void Update()
         {
@@ -65,24 +61,6 @@ namespace SAIN.Layers
 
         public static void AddBaseInfo(SAINComponentClass sain, BotOwner botOwner, StringBuilder stringBuilder)
         {
-            if (SAINPlugin.NextDebugOverlay.Value.IsDown())
-            {
-                Selected++;
-            }
-            if (SAINPlugin.PreviousDebugOverlay.Value.IsDown())
-            {
-                Selected--;
-            }
-
-            if (Selected > OverlayCount)
-            {
-                Selected = 0;
-            }
-            if (Selected < 0)
-            {
-                Selected = OverlayCount;
-            }
-
             try
             {
                 var info = sain.Info;
@@ -108,8 +86,37 @@ namespace SAIN.Layers
                 stringBuilder.AppendLine("Aim Info");
                 stringBuilder.AppendLabeledValue("Shoot Modifier", $"{info.WeaponInfo.FinalModifier}", Color.white, Color.yellow, true);
                 AddAimData(botOwner, stringBuilder);
-                return;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+        }
 
+        private static void OldShit(SAINComponentClass sain, BotOwner botOwner, StringBuilder stringBuilder)
+        {
+            if (SAINPlugin.NextDebugOverlay.Value.IsDown())
+            {
+                Selected++;
+            }
+            if (SAINPlugin.PreviousDebugOverlay.Value.IsDown())
+            {
+                Selected--;
+            }
+
+            if (Selected > OverlayCount)
+            {
+                Selected = 0;
+            }
+            if (Selected < 0)
+            {
+                Selected = OverlayCount;
+            }
+
+            try
+            {
+                var info = sain.Info;
+                var decisions = sain.Memory.Decisions;
                 switch (Selected)
                 {
                     case 0:

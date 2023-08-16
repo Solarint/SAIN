@@ -1,5 +1,4 @@
-﻿using SAIN.Editor.Abstract;
-using SAIN.Helpers;
+﻿using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
 using static SAIN.Attributes.AttributesGUI;
@@ -7,23 +6,19 @@ using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor.GUISections
 {
-    public class BotPersonalityEditor : EditorAbstract
+    public static class BotPersonalityEditor
     {
-        public BotPersonalityEditor(SAINEditor editor) : base(editor)
-        {
-        }
-
-        public void ClearCache()
+        public static void ClearCache()
         {
             ListHelpers.ClearCache(OpenPersMenus);
         }
 
-        public void PersonalityMenu()
+        public static void PersonalityMenu()
         {
             string toolTip = $"Apply Values set below to Personalities. " +
                 $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}/Personalities folder";
 
-            if (Builder.SaveChanges(PersonalitiesWereEdited, toolTip, 35))
+            if (BuilderClass.SaveChanges(PersonalitiesWereEdited, toolTip, 35))
             {
                 SAINPlugin.LoadedPreset.ExportPersonalities();
             }
@@ -37,7 +32,7 @@ namespace SAIN.Editor.GUISections
                 {
                     OpenPersMenus.Add(name, false);
                 }
-                OpenPersMenus[name] = Builder.ExpandableMenu(name, OpenPersMenus[name], personality.Description);
+                OpenPersMenus[name] = BuilderClass.ExpandableMenu(name, OpenPersMenus[name], personality.Description);
                 if (OpenPersMenus[name])
                 {
                     EditAllValuesInObj(personality.Variables, out bool newEdit);
@@ -50,9 +45,9 @@ namespace SAIN.Editor.GUISections
             EndScrollView();
         }
 
-        public bool PersonalitiesWereEdited;
+        public static bool PersonalitiesWereEdited;
 
-        private readonly Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
-        private Vector2 PersonScroll = Vector2.zero;
+        private static readonly Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
+        private static Vector2 PersonScroll = Vector2.zero;
     }
 }

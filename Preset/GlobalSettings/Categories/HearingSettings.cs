@@ -10,27 +10,27 @@ namespace SAIN.Preset.GlobalSettings
         [NameAndDescription(
             "Global Gunshot Audible Range Multiplier")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 2, 100f)]
+        [MinMax(0.1f, 2, 100f)]
         public float GlobalGunshotAudioMulti = 1f;
 
         [NameAndDescription(
             "Global Footstep Audible Range Multiplier")]
         [DefaultValue(1f)]
-        [MinMaxRound(0.1f, 2f, 100f)]
+        [MinMax(0.1f, 2f, 100f)]
         public float GlobalFootstepAudioMulti = 1f;
 
         [NameAndDescription(
             "Suppressed Sound Modifier",
             "Audible Gun Range is multiplied by this number when using a suppressor")]
         [DefaultValue(0.6f)]
-        [MinMaxRound(0.1f, 0.95f, 100f)]
+        [MinMax(0.1f, 0.95f, 100f)]
         public float SuppressorModifier = 0.6f;
 
         [NameAndDescription(
             "Subsonic Sound Modifier",
             "Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo")]
         [DefaultValue(0.25f)]
-        [MinMaxRound(0.1f, 0.95f, 100f)]
+        [MinMax(0.1f, 0.95f, 100f)]
         public float SubsonicModifier = 0.25f;
 
         [Dictionary(typeof(Caliber), typeof(float))]

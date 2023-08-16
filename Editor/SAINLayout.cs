@@ -6,8 +6,6 @@ namespace SAIN.Editor
 {
     public static class SAINLayout
     {
-        public static SAINEditor Editor => SAINPlugin.Editor;
-
         public static void Box(GUIContent content, GUIStyle style, params GUILayoutOption[] options)
         {
             GUILayout.Box(content, style, options);
@@ -210,6 +208,18 @@ namespace SAIN.Editor
             return value;
         }
 
+        public static void BeginHorizontalSpace(float space = 10)
+        {
+            BeginHorizontal();
+            Space(space);
+        }
+
+        public static void EndHorizontalSpace(float space = 10)
+        {
+            Space(space);
+            EndHorizontal();
+        }
+
         public static void BeginHorizontal(float indent = 0)
         {
             GUILayout.BeginHorizontal();
@@ -281,7 +291,7 @@ namespace SAIN.Editor
 
         public static void BeginGroup(Rect rect)
         {
-            GUI.BeginGroup(rect, GetStyle(Style.window));
+            GUI.BeginGroup(rect, GetStyle(Style.blankbox));
         }
 
         public static void EndGroup()
@@ -331,7 +341,7 @@ namespace SAIN.Editor
 
         public static GUIStyle GetStyle(Style key)
         {
-            return Editor.StyleOptions.CustomStyle.GetStyle(key);
+            return StylesClass.GetStyle(key);
         }
 
         public static GUILayoutOption Height(float height)

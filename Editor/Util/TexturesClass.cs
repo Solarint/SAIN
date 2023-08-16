@@ -1,5 +1,4 @@
-﻿using SAIN.Editor.Abstract;
-using SAIN.Editor.Util;
+﻿using SAIN.Editor.Util;
 using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,12 +24,6 @@ namespace SAIN.Editor
                     }
                 }
             }
-        }
-
-        public static void ClearCache()
-        {
-            ListHelpers.ClearCache(ColorTextures);
-            ListHelpers.ClearCache(RandomColors);
         }
 
         public static Texture2D GetRandomGray(string key)
@@ -80,17 +73,22 @@ namespace SAIN.Editor
             return texture;
         }
 
-        public static Rect DrawSliderBackGrounds(float progress)
+        public static Rect DrawSliderBackGrounds(float progress, Rect lastRect)
         {
-            Rect lastRect = GUILayoutUtility.GetLastRect();
             float lineHeight = 5f;
             float filledY = lastRect.y + (lastRect.height - lineHeight * 2f) * 0.5f;
             float sliderY = lastRect.y + (lastRect.height - lineHeight) * 0.5f;
             Rect Filled = new Rect(lastRect.x, filledY, lastRect.width * progress, lineHeight * 2f);
             Rect Background = new Rect(lastRect.x, sliderY, lastRect.width, lineHeight);
 
-            GUI.DrawTexture(Background, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, Color.white, 0, 0);
-            GUI.DrawTexture(Filled, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(1f, 0.25f, 0.25f), 0, 0);
+            Filled.y -= 0.5f;
+            Background.y -= 0.5f;
+
+            Rect Thumb = new Rect(Filled.x + Filled.width - 4f, lastRect.y, 12, lastRect.height);
+            GUI.DrawTexture(Background, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, ColorsClass.GetColor(ColorNames.LightGray), 0, 0);
+            GUI.DrawTexture(Filled, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, ColorsClass.GetColor(ColorNames.LightRed), 0, 0);
+            GUI.DrawTexture(Thumb, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, ColorsClass.GetColor(ColorNames.MidGray), 0, 0);
+            // new Color(1f, 0.25f, 0.25f)
             return lastRect;
         }
     }
