@@ -10,21 +10,17 @@ namespace SAIN.Editor
         {
             get
             {
-                float screenWidth = Screen.width;
-                if (LastScreenWidth != screenWidth)
-                {
-                    LastScreenWidth = screenWidth;
-                    ScalingFactor = GetScaling(screenWidth);
-                    OldScale = new Vector2(ScalingFactor, ScalingFactor);
-                }
-                return OldScale;
+                float ScalingFactor = GetScaling(Screen.width);
+                return new Vector2(ScalingFactor, ScalingFactor);
             }
         }
 
+        public static float ConfigScaling = 1f;
+
         public static float LastScreenWidth = 0;
 
-        private const float ReferenceResX = 1920;
-        private const float ReferenceResY = 1080;
+        private static float ReferenceResX => 1920 * ConfigScaling;
+        private static float ReferenceResY => 1080 * ConfigScaling;
 
         public static float GetScaling(float screenWidth)
         {

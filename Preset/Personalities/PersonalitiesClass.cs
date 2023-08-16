@@ -99,20 +99,25 @@ namespace SAIN.Preset.Personalities
 
             [Default(1f)]
             [Advanced(AdvancedEnum.IsAdvanced)]
+            [MinMax(0, 3f, 10)]
             public float HoldGroundBaseTime = 1f;
 
             [Default(0.66f)]
             [Advanced(AdvancedEnum.IsAdvanced)]
+            [MinMax(0.1f, 2f, 10)]
             public float HoldGroundMinRandom = 0.66f;
 
             [Default(1.5f)]
             [Advanced(AdvancedEnum.IsAdvanced)]
+            [MinMax(0.1f, 2f, 10)]
             public float HoldGroundMaxRandom = 1.5f;
 
             [Default(45)]
+            [MinMax(0.1f, 500f)]
             public float SearchBaseTime = 45;
 
             [Default(1f)]
+            [MinMax(0.01f, 5f, 1)]
             public float AggressionMultiplier = 1f;
 
             [Default(false)]

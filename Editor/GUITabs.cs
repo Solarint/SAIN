@@ -95,6 +95,12 @@ namespace SAIN.Editor
                 PresetHandler.SaveEditorDefaults();
             }
 
+            BeginHorizontal();
+            Box("GUI Scaling", Width(200f));
+            RectLayout.ConfigScaling = BuilderClass.CreateSlider(RectLayout.ConfigScaling, 1f, 4f);
+            RectLayout.ConfigScaling = (float)BuilderClass.ResultBox(RectLayout.ConfigScaling, Width(100f));
+            EndHorizontal();
+
             ForceDecisionOpen = BuilderClass.ExpandableMenu("Force SAIN Bot Decisions", ForceDecisionOpen);
 
             if (ForceDecisionOpen)

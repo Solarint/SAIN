@@ -123,10 +123,9 @@ namespace SAIN.Editor.GUISections
         private static string LabeledTextField(string value, string label)
         {
             BeginHorizontal();
-
             Box(label, Width(225f));
+            Space(5);
             value = TextField(value);
-
             EndHorizontal();
             return Regex.Replace(value, @"[^\w \-]", "");
         }

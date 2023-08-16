@@ -155,7 +155,7 @@ namespace SAIN.Editor
             vertical,
         }
 
-        public static bool SaveChanges(bool unSaved, string toolTip, float height = 25)
+        public static bool SaveChanges(bool unSaved, string toolTip, float height = 35)
         {
             BeginHorizontal();
 
