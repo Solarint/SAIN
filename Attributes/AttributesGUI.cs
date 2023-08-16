@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Attributes
 {
@@ -107,19 +108,19 @@ namespace SAIN.Attributes
         {
             if (beginHoriz)
             {
-                Builder.BeginHorizontal();
-                Builder.Space(15);
+                BeginHorizontal();
+                Space(15);
             }
 
             if (showLabel)
             {
-                var labelHeight = Builder.Height(entryConfig.EntryHeight);
+                var labelHeight = Height(entryConfig.EntryHeight);
                 Buttons.InfoBox(attributes.Description, entryConfig.Info);
 
                 if (LabelStyle == null)
                 {
-                    GUIStyle boxstyle = Buttons.GetStyle(Style.box);
-                    LabelStyle = new GUIStyle(Buttons.GetStyle(Style.label))
+                    GUIStyle boxstyle = GetStyle(Style.box);
+                    LabelStyle = new GUIStyle(GetStyle(Style.label))
                     {
                         alignment = TextAnchor.MiddleLeft,
                         margin = boxstyle.margin,
@@ -127,7 +128,7 @@ namespace SAIN.Attributes
                     };
                 }
 
-                Builder.Box(new GUIContent(attributes.Name), LabelStyle, labelHeight);
+                Box(new GUIContent(attributes.Name), LabelStyle, labelHeight);
             }
 
             float min = default;
@@ -139,7 +140,7 @@ namespace SAIN.Attributes
             {
                 showResult = true;
 
-                value = Builder.Toggle((bool)value, (bool)value ? "On" : "Off", EUISoundType.MenuCheckBox, entryConfig.Toggle);
+                value = Toggle((bool)value, (bool)value ? "On" : "Off", EUISoundType.MenuCheckBox, entryConfig.Toggle);
             }
             else if (attributes.ValueType == typeof(float))
             {
@@ -183,25 +184,25 @@ namespace SAIN.Attributes
             }
             if (showResult && value != null)
             {
-                string dirtyString = Builder.TextField(value.ToString(), null, entryConfig.Result);
+                string dirtyString = TextField(value.ToString(), null, entryConfig.Result);
                 value = Builder.CleanString(dirtyString, value);
                 value = Clamp(value, min, max, attributes.ValueType);
 
                 if (attributes.Default != null)
                 {
-                    if (Builder.Button("Reset", "Reset To Default Value", EUISoundType.ButtonClick, entryConfig.Reset))
+                    if (Button("Reset", "Reset To Default Value", EUISoundType.ButtonClick, entryConfig.Reset))
                         value = attributes.Default;
                 }
                 else
                 {
-                    Builder.Box(" ", "No Default Value is assigned to this option.", entryConfig.Reset);
+                    Box(" ", "No Default Value is assigned to this option.", entryConfig.Reset);
                 }
             }
 
             if (beginHoriz)
             {
-                Builder.Space(15);
-                Builder.EndHorizontal();
+                Space(15);
+                EndHorizontal();
             }
             wasEdited = originalValue.ToString() != value.ToString();
             return value;
@@ -214,7 +215,7 @@ namespace SAIN.Attributes
 
         private static bool ExpandableList(AttributesInfoClass attributes, float height)
         {
-            Builder.BeginHorizontal();
+            BeginHorizontal();
 
             string name = attributes.Name;
             if (!ListIsOpen.ContainsKey(name))
@@ -225,7 +226,7 @@ namespace SAIN.Attributes
             isOpen = Builder.ExpandableMenu(name, isOpen, attributes.Description, height, 30f, false);
             ListIsOpen[name] = isOpen;
 
-            Builder.EndHorizontal();
+            EndHorizontal();
             return isOpen;
         }
 
@@ -290,8 +291,8 @@ namespace SAIN.Attributes
         public static void EditAllValuesInObj(object obj, out bool wasEdited, string search = null)
         {
             wasEdited = false;
-            Builder.BeginVertical();
-            Builder.Space(5);
+            BeginVertical();
+            Space(5);
             foreach (var field in obj.GetType().GetFields())
             {
                 var attributes = GetAttributeInfo(field);
@@ -312,15 +313,15 @@ namespace SAIN.Attributes
                 }
             }
 
-            Builder.Space(5);
-            Builder.EndVertical();
+            Space(5);
+            EndVertical();
         }
 
         public static void EditAllValuesInObj(Category category, object categoryObject, out bool wasEdited, string search = null)
         {
             wasEdited = false;
-            Builder.BeginVertical();
-            Builder.Space(5);
+            BeginVertical();
+            Space(5);
             foreach (var fieldAtt in category.FieldAttributes)
             {
                 if (SkipForSearch(fieldAtt, search))
@@ -340,8 +341,8 @@ namespace SAIN.Attributes
                 }
             }
 
-            Builder.Space(5);
-            Builder.EndVertical();
+            Space(5);
+            EndVertical();
         }
 
         public static bool SkipForSearch(AttributesInfoClass attributes, string search)
@@ -358,13 +359,13 @@ namespace SAIN.Attributes
             {
                 return;
             }
-            Builder.BeginVertical();
-            Builder.Space(5);
+            BeginVertical();
+            Space(5);
 
             foreach (SAINSettingsGroupClass setting in settings)
             {
-                Builder.Label($"{setting.Name}");
-                Builder.Space(5);
+                Label($"{setting.Name}");
+                Space(5);
                 foreach (var keyValuePair in setting.Settings)
                 {
                     if (difficulties.Contains(keyValuePair.Key))
@@ -374,8 +375,8 @@ namespace SAIN.Attributes
                             object targetCategoryObject = targetCategory.GetValue(keyValuePair.Value);
                             object value = targetField.GetValue(targetCategoryObject);
 
-                            Builder.BeginHorizontal();
-                            Builder.Label($"{keyValuePair.Key}");
+                            BeginHorizontal();
+                            Label($"{keyValuePair.Key}");
                             object newValue = EditValue(value, targetField, out bool newEdit);
                             if (newEdit)
                             {
@@ -386,13 +387,13 @@ namespace SAIN.Attributes
                                 targetField.SetValue(setting, newValue);
                                 wasEdited = true;
                             }
-                            Builder.EndHorizontal();
+                            EndHorizontal();
                         }
                     }
                 }
             }
-            Builder.Space(5);
-            Builder.EndVertical();
+            Space(5);
+            EndVertical();
         }
 
         private static ButtonsClass Buttons => SAINPlugin.Editor.Buttons;

@@ -116,6 +116,17 @@ namespace SAIN.Helpers
             return targetDirection + offsetDirection.normalized * magnitude;
         }
 
+        public static float SignedAngle(Vector3 from, Vector3 to, bool normalize = false)
+        {
+            if (normalize)
+            {
+                to.Normalize();
+                from.Normalize();
+            }
+            float result = Vector3.SignedAngle(from, to, Vector3.up);
+            return result.Round10();
+        }
+
         public static List<Vector3> NavMeshPointsFromSampledPoint(Vector3 point, Vector3 start, List<Vector3> list, int count = 5, float magnitude = 4f, float sampleDistance = 0.25f, int maxIterations = 15)
         {
             if (list == null)

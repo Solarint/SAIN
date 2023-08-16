@@ -162,8 +162,8 @@ namespace SAIN.Editor
                     {
                         var styleState = (GUIStyleState)stateProperty.GetValue(style);
 
-                        styleState.background = Textures.GetColor(color.Value.Background);
-                        styleState.textColor = Colors.GetColor(color.Value.Text);
+                        styleState.background = TexturesClass.GetTexture(color.Value.Background);
+                        styleState.textColor = ColorsClass.GetColor(color.Value.Text);
 
                         stateProperty.SetValue(style, styleState);
                     }
@@ -181,9 +181,6 @@ namespace SAIN.Editor
             public RectOffset border;
 
             public readonly Dictionary<StyleStates, StyleStateColors> ColorNames;
-
-            private static TexturesClass Textures => SAINPlugin.Editor.TexturesClass;
-            private static ColorsClass Colors => SAINPlugin.Editor.Colors;
         }
 
         public sealed class StyleStateColors
@@ -254,18 +251,18 @@ namespace SAIN.Editor
             ApplyTextColorAllStates(BlankBackgroundStyle,
                 Color.white, Color.white);
 
-            Texture2D TexMidGray = GetTexture(
+            Texture2D TexMidGray = TexturesClass.GetTexture(
                 ColorNames.MidGray);
-            Texture2D TexDarkGray = GetTexture(
+            Texture2D TexDarkGray = TexturesClass.GetTexture(
                 ColorNames.DarkGray);
-            Texture2D TexVeryDarkGray = GetTexture(
+            Texture2D TexVeryDarkGray = TexturesClass.GetTexture(
                 ColorNames.VeryDarkGray);
-            Texture2D TexMidRed = GetTexture(
+            Texture2D TexMidRed = TexturesClass.GetTexture(
                 ColorNames.MidRed);
-            Texture2D TexDarkRed = GetTexture(
+            Texture2D TexDarkRed = TexturesClass.GetTexture(
                 ColorNames.DarkRed);
 
-            Color ColorGold = Editor.Colors.GetColor(ColorNames.Gold);
+            Color ColorGold = ColorsClass.GetColor(ColorNames.Gold);
 
             ApplyTextColorAllStates(ToolTipStyle,
                 Color.white, Color.white);
@@ -402,11 +399,6 @@ namespace SAIN.Editor
             Styles.Add(Style.tooltip, ToolTipStyle);
         }
 
-        private Texture2D GetTexture(ColorNames key)
-        {
-            return Editor.TexturesClass.GetColor(key);
-        }
-
         private void StyleText(Style key, Color color, Color? active = null, TextAnchor? anchor = null, FontStyle? fontStyle = null)
         {
             GUIStyle style = GetStyle(key);
@@ -440,7 +432,7 @@ namespace SAIN.Editor
             StyleText(Style.box, white, white, TextAnchor.MiddleCenter, FontStyle.Bold);
             StyleText(Style.label, white, white, TextAnchor.MiddleLeft, FontStyle.Normal);
 
-            Color ColorGold = Editor.Colors.GetColor(ColorNames.Gold);
+            Color ColorGold = ColorsClass.GetColor(ColorNames.Gold);
             StyleText(Style.list, white, ColorGold, TextAnchor.MiddleLeft, FontStyle.Normal);
             StyleText(Style.button, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);
             StyleText(Style.toggle, white, ColorGold, TextAnchor.MiddleCenter, FontStyle.Bold);

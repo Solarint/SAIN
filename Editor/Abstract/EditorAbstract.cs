@@ -3,14 +3,17 @@ using SAIN.Editor.Util;
 
 namespace SAIN.Editor.Abstract
 {
-    public abstract class EditorAbstract : LayoutAbstract
+    public abstract class EditorAbstract
     {
-        public EditorAbstract(SAINEditor editor) : base(editor) { }
+        public EditorAbstract(SAINEditor editor)
+        {
+            Editor = editor;
+        }
+
+        public readonly SAINEditor Editor;
 
         public BuilderClass Builder => Editor.Builder;
-        public TexturesClass TexturesClass => Editor.TexturesClass;
         public ButtonsClass ButtonsClass => Editor.Buttons;
-        public ColorsClass ColorsClass => Editor.Colors;
         public MouseFunctions MouseFunctions => Editor.MouseFunctions;
 
         public bool CheckDragLayout()

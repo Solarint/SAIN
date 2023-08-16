@@ -157,7 +157,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             }
         }
         public bool CanUseFirstAid => BotOwner.Medecine.FirstAid.ShallStartUse();
-        public bool CanUseSurgery => BotOwner.Medecine.SurgicalKit.ShallStartUse();
+        public bool CanUseSurgery => BotOwner.Medecine.SurgicalKit.ShallStartUse() && !BotOwner.Medecine.FirstAid.IsBleeding;
         public bool CanReload => BotOwner.WeaponManager.IsReady && !BotOwner.WeaponManager.HaveBullets;
 
         private bool StartUseStims()

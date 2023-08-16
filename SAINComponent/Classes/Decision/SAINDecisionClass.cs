@@ -1,13 +1,7 @@
-﻿using BepInEx.Logging;
-using EFT;
-
-using SAIN.Components;
-using SAIN.SAINComponent;
-using System.Collections;
+﻿using EFT;
+using SAIN.SAINComponent.SubComponents.CoverFinder;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-using SAIN.SAINComponent.SubComponents.CoverFinder;
 
 namespace SAIN.SAINComponent.Classes.Decision
 {
@@ -76,25 +70,20 @@ namespace SAIN.SAINComponent.Classes.Decision
         public void ResetDecisions()
         {
             UpdateDecisionProperties(SoloDecision.None, SquadDecision.None, SelfDecision.None);
+            BotOwner.CalcGoal();
         }
 
         private void GetDecision()
         {
-            var soloDecision = SoloDecision.None;
-            var squadDecision = SquadDecision.None;
-            var selfDecision = SelfDecision.None;
-
             if (CheckContinueRetreat())
             {
                 return;
             }
-            else if (SelfActionDecisions.GetDecision(out selfDecision))
-            {
-            }
-            else if (CheckStuckDecision(out soloDecision))
-            {
-            }
-            else if (SquadDecisions.GetDecision(out squadDecision))
+
+            SelfActionDecisions.GetDecision(out SelfDecision selfDecision);
+            SquadDecisions.GetDecision(out SquadDecision squadDecision);
+
+            if (CheckStuckDecision(out SoloDecision soloDecision))
             {
             }
             else if (EnemyDecisions.GetDecision(out soloDecision))
@@ -112,6 +101,19 @@ namespace SAIN.SAINComponent.Classes.Decision
             if (self != SelfDecision.None)
             {
                 solo = SoloDecision.Retreat;
+            }
+
+            if (SAINPlugin.ForceSoloDecision != SoloDecision.None)
+            {
+                solo = SAINPlugin.ForceSoloDecision;
+            }
+            if (SAINPlugin.ForceSquadDecision != SquadDecision.None)
+            {
+                squad = SAINPlugin.ForceSquadDecision;
+            }
+            if (SAINPlugin.ForceSelfDecision != SelfDecision.None)
+            {
+                self = SAINPlugin.ForceSelfDecision;
             }
 
             OldMainDecision = CurrentSoloDecision;

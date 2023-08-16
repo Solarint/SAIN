@@ -1,18 +1,12 @@
 ﻿using EFT;
 using EFT.UI;
-using SAIN.Attributes;
 using SAIN.Editor.Abstract;
 using SAIN.Helpers;
 using SAIN.Preset;
 using SAIN.Preset.GlobalSettings.Categories;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Reflection;
-using System.Windows.Forms;
 using UnityEngine;
-using static Mono.Security.X509.X520;
+using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor.Util
 {
@@ -105,7 +99,7 @@ namespace SAIN.Editor.Util
                     // Send interation count to our spacing function
                     i = ListSpacing(i++, optionsPerLine);
                 }
-                // End this list edit.
+                // PeekEnd this list edit.
                 EndListEdit();
 
                 AddOrRemove(category, container.SelectedCategories, category.SelectedList.Count > 0, out newEdit);
@@ -172,8 +166,7 @@ namespace SAIN.Editor.Util
             wasEdited = false;
             if (list != null)
             {
-                bool toggleValue = Builder.
-                    Toggle(
+                bool toggleValue = Toggle(
                     list.Contains(value),
                     new GUIContent(name ?? value.ToString(), description),
                     GetStyle(Style.selectionList),

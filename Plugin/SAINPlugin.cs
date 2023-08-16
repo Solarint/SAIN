@@ -1,5 +1,4 @@
-﻿using Aki.Reflection.Utils;
-using BepInEx;
+﻿using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using DrakiaXYZ.VersionChecker;
@@ -9,13 +8,10 @@ using SAIN.Helpers;
 using SAIN.Layers;
 using SAIN.Plugin;
 using SAIN.Preset;
-using SAIN.Preset.GlobalSettings.Categories;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using static SAIN.AssemblyInfo;
+using static SAIN.Editor.SAINLayout;
 
 namespace SAIN
 {
@@ -32,6 +28,7 @@ namespace SAIN
 
         // spt 3.6.0 == 25206
         public const int TarkovVersion = 25206;
+
         public const string EscapeFromTarkov = "EscapeFromTarkov.exe";
 
         public const string SAINGUID = "me.sol.sain";
@@ -59,6 +56,10 @@ namespace SAIN
     public class SAINPlugin : BaseUnityPlugin
     {
         public static bool DebugModeEnabled = false;
+        public static bool DrawDebugGizmos = false;
+        public static SoloDecision ForceSoloDecision = SoloDecision.None;
+        public static SquadDecision ForceSquadDecision = SquadDecision.None;
+        public static SelfDecision ForceSelfDecision = SelfDecision.None;
 
         private void Awake()
         {
@@ -133,16 +134,15 @@ namespace SAIN
             new Patches.Shoot.SemiAutoPatch().Enable();
         }
 
-
         public static readonly SAINEditor Editor = new SAINEditor();
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 
         public static SAINBotControllerComponent BotController => GameWorldHandler.SAINBotController;
 
-
         private void Update()
         {
+            DebugGizmos.Update();
             DebugOverlay.Update();
             ModDetection.Update();
             Editor.Update();
@@ -193,20 +193,20 @@ namespace SAIN
 
         public static void ModDetectionGUI()
         {
-            Builder.BeginVertical();
+            BeginVertical();
 
-            Builder.BeginHorizontal();
+            BeginHorizontal();
             IsDetected(LootingBotsLoaded, "Looting Bots");
             IsDetected(RealismLoaded, "Realism Mod");
-            Builder.EndHorizontal();
+            EndHorizontal();
 
-            Builder.EndVertical();
+            EndVertical();
         }
 
         private static void IsDetected(bool value, string name)
         {
-            Builder.Label(name);
-            Builder.Box(value ? "Detected" : "Not Detected");
+            Label(name);
+            Box(value ? "Detected" : "Not Detected");
         }
 
         private static BuilderClass Builder => SAINPlugin.Editor.Builder;

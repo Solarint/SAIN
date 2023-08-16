@@ -2,6 +2,7 @@ using BepInEx.Logging;
 using EFT;
 using SAIN.Components;
 using SAIN.SAINComponent;
+using System.Linq;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Mover
@@ -16,11 +17,18 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
         }
 
+        private static readonly SoloDecision[] DontLean =
+        {
+            SoloDecision.Retreat,
+            SoloDecision.RunToCover,
+            SoloDecision.RunAway,
+        };
+
         public void Update()
         {
             var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
             var enemy = SAIN.Enemy;
-            if (enemy == null || SAIN.Mover.IsSprinting || CurrentDecision == SoloDecision.Retreat || CurrentDecision == SoloDecision.RunAway || CurrentDecision == SoloDecision.RunToCover)
+            if (enemy == null || SAIN.Mover.IsSprinting || DontLean.Contains(CurrentDecision))
             {
                 ResetLean();
                 return;
@@ -38,41 +46,12 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public LeanSetting LeanDirection { get; private set; }
 
-
         private float LeanTimer = 0f;
 
         public void ResetLean()
         {
             LeanDirection = LeanSetting.None;
             SAIN.Mover.FastLean(0f);
-        }
-
-        public void SetLean(float num)
-        {
-            SAIN.Mover.FastLean(num);
-        }
-
-        public float TiltNumber
-        {
-            get
-            {
-                float angle;
-                switch (LeanDirection)
-                {
-                    case LeanSetting.Left:
-                        angle = -5f;
-                        break;
-
-                    case LeanSetting.Right:
-                        angle = 5f;
-                        break;
-
-                    default:
-                        angle = 0f;
-                        break;
-                }
-                return angle;
-            }
         }
 
         public void FindLeanDirectionRayCast(Vector3 targetPos)

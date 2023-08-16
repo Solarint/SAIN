@@ -124,16 +124,7 @@ namespace SAIN.SAINComponent.Classes.Info
                 yield return null;
             }
             UpdateSettingClass.ManualSettingsUpdate(WildSpawnType, BotDifficulty, BotOwner.Settings.FileSettings);
-
-            var mind = BotOwner.Settings.FileSettings.Mind;
-            if (originalForgetTime == -1)
-            {
-                originalForgetTime = mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC;
-            }
-            mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = originalForgetTime / PersonalitySettings.SearchAggressionModifier;
         }
-
-        private float originalForgetTime = 150;
 
         public SAINSettingsClass FileSettings { get; private set; }
 
@@ -144,39 +135,41 @@ namespace SAIN.SAINComponent.Classes.Info
         public void CalcHoldGroundDelay()
         {
             var settings = PersonalitySettings;
+            float baseTime = settings.HoldGroundBaseTime * AggressionMultiplier;
 
-            float baseTime = settings.HoldGroundBaseTime;
-            baseTime *= AggressionMultiplier;
             float min = settings.HoldGroundMinRandom;
             float max = settings.HoldGroundMaxRandom;
-
-            float result = baseTime * Random.Range(min, max);
-            HoldGroundDelay = Mathf.Round(result * 100f) / 100f;
+            HoldGroundDelay = baseTime.Randomize(min, max).Round100();
         }
 
-        private float AggressionMultiplier => FileSettings.Mind.Aggression * GlobalSAINSettings.Mind.GlobalAggression;
+        private float AggressionMultiplier => (FileSettings.Mind.Aggression * GlobalSAINSettings.Mind.GlobalAggression * PersonalitySettings.SearchAggressionModifier).Round100();
 
         public void CalcTimeBeforeSearch()
         {
             float searchTime;
             if (Profile.IsFollower && SAIN.Squad.BotInGroup)
             {
-                searchTime = 6f;
+                searchTime = 5f;
             }
             else
             {
                 searchTime = PersonalitySettings.SearchBaseTime;
             }
 
-            searchTime /= AggressionMultiplier;
-            searchTime *= Random.Range(1f - SearchRandomize, 1f + SearchRandomize);
-            searchTime = Mathf.Round(searchTime * 10f) / 10f;
-            if (searchTime < 0.25f)
+            searchTime = (searchTime.Randomize(0.66f, 1.33f) / AggressionMultiplier).Round10();
+            if (searchTime < 0.2f)
             {
-                searchTime = 0.25f;
+                searchTime = 0.2f;
             }
 
             TimeBeforeSearch = searchTime;
+            float random = 30f.Randomize(0.75f, 1.25f).Round100();
+            float forgetTime = searchTime + random;
+            if (forgetTime < 45f)
+            {
+                forgetTime = 45f.Randomize(0.85f, 1.15f).Round100();
+            }
+            BotOwner.Settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = forgetTime;
         }
 
         void UpdateExtractTime()

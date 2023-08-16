@@ -1,13 +1,9 @@
 ﻿using SAIN.Editor.Abstract;
-using System;
+using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.Helpers.Reflection;
 using static SAIN.Attributes.AttributesGUI;
-using SAIN.Preset.Personalities;
-using SAIN.Helpers;
-using SAIN.Plugin;
-using EFT.UI;
+using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor.GUISections
 {
@@ -32,7 +28,7 @@ namespace SAIN.Editor.GUISections
                 SAINPlugin.LoadedPreset.ExportPersonalities();
             }
 
-            PersonScroll = Builder.BeginScrollView(PersonScroll);
+            PersonScroll = BeginScrollView(PersonScroll);
 
             foreach (var personality in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
             {
@@ -51,7 +47,7 @@ namespace SAIN.Editor.GUISections
                     }
                 }
             }
-            Builder.EndScrollView();
+            EndScrollView();
         }
 
         public bool PersonalitiesWereEdited;

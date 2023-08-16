@@ -4,10 +4,10 @@
     {
         None,
         DirectMove,
-        StartPeekPosition,
+        MoveToStartPeek,
         MoveToEndPeak,
-        DangerPoint,
-        TargetPosition,
+        MoveToDangerPoint,
+        MoveToCorner,
         Wait,
     }
 }

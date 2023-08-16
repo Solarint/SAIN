@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static HarmonyLib.AccessTools;
+using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor
 {
@@ -59,7 +59,6 @@ namespace SAIN.Editor
                     SelectedWildSpawnTypes.Clear();
                 }
             }
-
 
             Label("Difficulties", "Select which difficulties you wish to modify.", Height(35));
             Builder.ModifyLists.AddOrRemove(SelectedDifficulties, out bool newEdit);
@@ -187,8 +186,8 @@ namespace SAIN.Editor
 
         public bool BotSettingsWereEdited;
 
-        int offsetWidth = 3;
-        int offsetHeight = 3;
+        private int offsetWidth = 3;
+        private int offsetHeight = 3;
 
         private void SelectProperties()
         {
@@ -248,15 +247,15 @@ namespace SAIN.Editor
             const float Remaining = ScreenWidth - FieldLabelWidth - BotLabelWidth;
             float TotalHeight = LineHeight * SelectedDifficulties.Count * SelectedWildSpawnTypes.Count;
 
-            var noOffset = new RectOffset(0,0,0,0);
-            var boxStyle = new GUIStyle( GetStyle(Style.box) )
+            var noOffset = new RectOffset(0, 0, 0, 0);
+            var boxStyle = new GUIStyle(GetStyle(Style.box))
             {
                 padding = noOffset,
                 margin = new RectOffset(5, 10, 0, 0),
                 border = new RectOffset(0, 0, 0, 0),
             };
 
-            var blankStyle = new GUIStyle( GetStyle(Style.blankbox) )
+            var blankStyle = new GUIStyle(GetStyle(Style.blankbox))
             {
                 padding = noOffset,
                 margin = new RectOffset(5, 10, 0, 0),

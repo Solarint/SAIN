@@ -28,29 +28,30 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public bool GetDecision(out SoloDecision Decision)
         {
-            var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
             Decision = SoloDecision.None;
-
             if (!BotOwner.Memory.GoalTarget.HaveMainTarget())
             {
                 FoundTargetTimer = -1f;
                 return false;
             }
-            else
+            if (SAIN.CurrentTargetPosition == null)
             {
-                if (FoundTargetTimer < 0f)
-                {
-                    FoundTargetTimer = Time.time;
-                }
+                FoundTargetTimer = -1f;
+                return false;
+            }
+            if (FoundTargetTimer < 0f)
+            {
+                FoundTargetTimer = Time.time;
             }
 
+            var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
             bool shallNotSearch = ShallNotSearch();
 
-            if (StartInvestigate() && !shallNotSearch)
-            {
-                Decision = SoloDecision.Investigate;
-            }
-            else if (BotOwner.Memory.IsUnderFire)
+            //if (StartInvestigate() && !shallNotSearch)
+            //{
+            //    Decision = SoloDecision.Investigate;
+            //}
+            if (BotOwner.Memory.IsUnderFire)
             {
                 Decision = SoloDecision.RunToCover;
             }
@@ -71,7 +72,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 Decision = SoloDecision.WalkToCover;
             }
 
-            return Decision != SoloDecision.None;
+            return true;
         }
 
         private bool StartInvestigate()

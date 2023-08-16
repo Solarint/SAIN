@@ -20,7 +20,7 @@ namespace SAIN.Layers.Combat.Solo
         private void FindTarget()
         {
             Vector3 pos = Search.SearchMovePos();
-            if (Search?.GoToPoint(pos, false) != NavMeshPathStatus.PathInvalid)
+            if (Search?.CalculatePath(pos, false) != NavMeshPathStatus.PathInvalid)
             {
                 TargetPosition = Search.FinalDestination;
             }
@@ -89,7 +89,7 @@ namespace SAIN.Layers.Combat.Solo
                 return;
             }
             CheckShouldSprint();
-            Search.Search(!SprintEnabled, SprintEnabled);
+            Search.Search(SprintEnabled);
             Steer();
         }
 
@@ -109,11 +109,11 @@ namespace SAIN.Layers.Combat.Solo
                 float timeAdd;
                 if (SprintEnabled)
                 {
-                    timeAdd = 1.5f * Random.Range(0.75f, 1.25f);
+                    timeAdd = 1.5f * Random.Range(0.75f, 1.5f);
                 }
                 else
                 {
-                    timeAdd = 3f * Random.Range(0.5f, 2f);
+                    timeAdd = 2f * Random.Range(0.33f, 1.5f);
                 }
                 RandomSprintTimer = Time.time + timeAdd;
                 float chance = persSettings.FrequentSprintWhileSearch ? 40f : 20f;
@@ -132,41 +132,75 @@ namespace SAIN.Layers.Combat.Solo
                 SteerByPriority(true);
                 return;
             }
-            switch (Search.CurrentState)
+            if (SprintEnabled)
             {
-                case ESearchMove.DangerPoint:
-                    SteerByPriority(true);
-                    break;
-
-                case ESearchMove.MoveToEndPeak:
-                    Vector3? danger = Search.SearchMovePoint?.DangerPoint;
-                    if (danger != null)
-                    {
-                        SAIN.Steering.LookToPoint(danger);
-                        break;
-                    }
-                    SteerByPriority(false);
-                    break;
-
-                case ESearchMove.DirectMove:
-                    if (SprintEnabled)
-                    {
-                        LookToMovingDirection();
-                    }
-                    else
-                    {
-                        SteerByPriority(true);
-                    }
-                    break;
-
-                default:
-                    if (!SteerByPriority(false))
-                    {
-                        LookToMovingDirection();
-                    }
-                    break;
+                LookToMovingDirection();
+                return;
+            }
+            if (Search.CurrentState == ESearchMove.MoveToDangerPoint)
+            {
+                float distance = (Search.SearchMovePoint.DangerPoint - SAIN.Position).sqrMagnitude;
+                if (distance > 2f)
+                {
+                    LookToMovingDirection();
+                    return;
+                }
+            }
+            if (SteerByPriority(false) == false)
+            {
+                if (CanSeeDangerOrCorner(out Vector3 point))
+                {
+                    SAIN.Steering.LookToPoint(point + Vector3.up);
+                }
+                else
+                {
+                    SAIN.Steering.LookToRandomPosition();
+                }
             }
         }
+
+        private bool CanSeeDangerOrCorner(out Vector3 point)
+        {
+            point = Vector3.zero;
+            if (Search.SearchMovePoint == null || Search.CurrentState == ESearchMove.MoveToDangerPoint)
+            {
+                _LookPoint = Vector3.zero;
+                return false;
+            }
+            if (CheckSeeTimer < Time.time)
+            {
+                _LookPoint = Vector3.zero;
+                CheckSeeTimer = Time.time + 0.3f;
+                Vector3 start = SAIN.Position;
+
+                _CanSeeDanger = !Vector.Raycast(start,
+                    Search.SearchMovePoint.DangerPoint,
+                    LayerMaskClass.HighPolyWithTerrainMaskAI);
+
+                if (_CanSeeDanger)
+                {
+                    _CanSeeCorner = false;
+                    _LookPoint = Search.SearchMovePoint.DangerPoint;
+                }
+                else
+                {
+                    _CanSeeCorner = !Vector.Raycast(start,
+                        Search.SearchMovePoint.Corner,
+                        LayerMaskClass.HighPolyWithTerrainMaskAI);
+                    if (_CanSeeCorner)
+                    {
+                        _LookPoint = Search.SearchMovePoint.Corner;
+                    }
+                }
+            }
+            point = _LookPoint;
+            return _CanSeeDanger || _CanSeeCorner;
+        }
+
+        private bool _CanSeeCorner;
+        private bool _CanSeeDanger;
+        private Vector3 _LookPoint;
+        private float CheckSeeTimer;
 
         private bool SteerByPriority(bool value) => SAIN.Steering.SteerByPriority(value);
 

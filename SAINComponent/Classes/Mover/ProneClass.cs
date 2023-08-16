@@ -59,7 +59,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                     if (enemy != null)
                     {
                         float distance = (enemy.EnemyPosition - SAIN.Transform.Position).magnitude;
-                        if (distance > 30f)
+                        if (distance > 20f)
                         {
                             if (withShoot)
                             {

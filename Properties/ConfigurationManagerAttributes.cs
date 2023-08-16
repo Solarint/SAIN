@@ -66,7 +66,7 @@ internal sealed class ConfigurationManagerAttributes
     ///     }
     ///     else
     ///     {
-    ///         if (GUILayout.ButtonConfigEntry("Start"))
+    ///         if (GUILayout.ButtonConfigEntry("PeekStart"))
     ///             isEditing = true;
     ///     }
     /// 

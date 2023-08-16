@@ -255,6 +255,7 @@ namespace SAIN.SAINComponent
                     if ((Target.Position.Value - BotOwner.Position).sqrMagnitude < 2f)
                     {
                         Target.Clear();
+                        BotOwner.CalcGoal();
                     }
                     else
                     {
@@ -267,6 +268,7 @@ namespace SAIN.SAINComponent
                     if ((sound.Position - Position).sqrMagnitude < 2f)
                     {
                         sound.IsCome = true;
+                        BotOwner.CalcGoal();
                     }
                     else
                     {

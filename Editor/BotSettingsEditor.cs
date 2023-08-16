@@ -1,12 +1,11 @@
 ﻿using SAIN.Attributes;
 using SAIN.Editor.Abstract;
 using SAIN.Helpers;
-using SAIN.Preset.BotSettings.SAINSettings;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 using UnityEngine;
+using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor.GUISections
 {
@@ -58,8 +57,8 @@ namespace SAIN.Editor.GUISections
         {
             BeginHorizontal();
             container.Open = Builder.ExpandableMenu(container.Name, container.Open, null, 20, 30, false);
-            if (Button("Clear", "Clear Selected Options in this Menu", 
-                EFT.UI.EUISoundType.MenuDropdownSelect, 
+            if (Button("Clear", "Clear Selected Options in this Menu",
+                EFT.UI.EUISoundType.MenuDropdownSelect,
                 Width(30), Height(30)))
             {
                 container.SelectedCategories.Clear();
@@ -119,9 +118,9 @@ namespace SAIN.Editor.GUISections
                 {
                     Label(attInfo.Name, attInfo.Description, Height(EntryConfig.EntryHeight));
                 }
-                
+
                 string labelText = $"Options Count: [{categoryClass.OptionsCount}]";
-                string advanced = Editor.AdvancedOptionsEnabled ?
+                string advanced = Editor.AdvancedBotConfigs ?
                     " Advanced Options are on, so the reason for this section being empty is that the values are hidden because they SHOULD NOT be changed under any circumstance."
                     : " Advanced Options in the Advanced Tab may show more options.";
                 string toolTip = $"The Number of Options available in this section. {advanced}";

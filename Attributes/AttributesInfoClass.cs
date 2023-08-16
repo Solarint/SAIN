@@ -91,7 +91,7 @@ namespace SAIN.Attributes
         public float? Max { get; private set; }
         public float? Rounding { get; private set; }
 
-        public bool DoNotShowGUI => AdvancedOptions.Contains(AdvancedEnum.Hidden) || SAINPlugin.Editor.AdvancedOptionsEnabled == false && AdvancedOptions.Contains(AdvancedEnum.IsAdvanced);
+        public bool DoNotShowGUI => AdvancedOptions.Contains(AdvancedEnum.Hidden) || SAINPlugin.Editor.AdvancedBotConfigs == false && AdvancedOptions.Contains(AdvancedEnum.IsAdvanced);
 
         public AdvancedEnum[] AdvancedOptions { get; private set; } = new AdvancedEnum[0];
 

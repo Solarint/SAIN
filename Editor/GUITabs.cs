@@ -1,16 +1,9 @@
-﻿using EFT.Interactive;
-using EFT.UI;
+﻿using EFT.UI;
 using SAIN.Editor.Abstract;
 using SAIN.Editor.GUISections;
 using SAIN.Helpers;
 using SAIN.Plugin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.UIElements;
+using static SAIN.Editor.SAINLayout;
 
 namespace SAIN.Editor
 {
@@ -102,24 +95,78 @@ namespace SAIN.Editor
 
         public void Advanced()
         {
-            bool wasEnabled = Editor.AdvancedOptionsEnabled;
-
-            Editor.AdvancedOptionsEnabled = Builder.Toggle(Editor.AdvancedOptionsEnabled, 
-                "Advanced Bot Configs", "Edit at your own risk.", 
-                EUISoundType.MenuCheckBox, 
-                Builder.Height(40f));
-
-            if (wasEnabled != Editor.AdvancedOptionsEnabled)
+            bool oldValue = Editor.AdvancedBotConfigs;
+            Editor.AdvancedBotConfigs = Editor.AdvancedBotConfigs.GUIToggle("Advanced Bot Configs", "Edit at your own risk.", EUISoundType.MenuCheckBox, Height(40));
+            if (oldValue != Editor.AdvancedBotConfigs)
             {
                 Builder.ModifyLists.ClearCache();
                 SettingsEditor.ClearCache();
                 PresetHandler.SaveEditorDefaults();
             }
 
-            SAINPlugin.DebugModeEnabled = Builder.Toggle(SAINPlugin.DebugModeEnabled, 
-                "Global Debug Mode", 
-                EUISoundType.MenuCheckBox, 
-                Builder.Height(40f));
+            oldValue = SAINPlugin.DebugModeEnabled;
+            SAINPlugin.DebugModeEnabled = SAINPlugin.DebugModeEnabled.GUIToggle("Global Debug Mode", EUISoundType.MenuCheckBox, Height(40));
+            if (oldValue != SAINPlugin.DebugModeEnabled)
+            {
+                PresetHandler.SaveEditorDefaults();
+            }
+
+            oldValue = SAINPlugin.DrawDebugGizmos;
+            SAINPlugin.DrawDebugGizmos = SAINPlugin.DrawDebugGizmos.GUIToggle("Draw Debug Gizmos", EUISoundType.MenuCheckBox, Height(40));
+            if (oldValue != SAINPlugin.DrawDebugGizmos)
+            {
+                PresetHandler.SaveEditorDefaults();
+            }
+
+            ForceDecisionOpen = Builder.ExpandableMenu("Force SAIN Bot Decisions", ForceDecisionOpen);
+
+            if (ForceDecisionOpen)
+            {
+                const int spacing = 5;
+                Space(spacing);
+
+                ForceSoloOpen = Builder.ExpandableMenu("Force Solo Decision", ForceSoloOpen);
+                if (ForceSoloOpen)
+                {
+                    if (Button("Reset"))
+                        SAINPlugin.ForceSoloDecision = SoloDecision.None;
+
+                    SAINPlugin.ForceSoloDecision = Builder.SelectionGrid(
+                        SAINPlugin.ForceSoloDecision,
+                        EnumValues.GetEnum<SoloDecision>());
+                }
+
+                Space(spacing);
+
+                ForceSquadOpen = Builder.ExpandableMenu("Force Squad Decision", ForceSquadOpen);
+                if (ForceSquadOpen)
+                {
+                    if (Button("Reset"))
+                        SAINPlugin.ForceSquadDecision = SquadDecision.None;
+
+                    SAINPlugin.ForceSquadDecision =
+                        Builder.SelectionGrid(SAINPlugin.ForceSquadDecision,
+                        EnumValues.GetEnum<SquadDecision>());
+                }
+
+                Space(spacing);
+
+                ForceSelfOpen = Builder.ExpandableMenu("Force Self Decision", ForceSelfOpen);
+                if (ForceSelfOpen)
+                {
+                    if (Button("Reset"))
+                        SAINPlugin.ForceSelfDecision = SelfDecision.None;
+
+                    SAINPlugin.ForceSelfDecision = Builder.SelectionGrid(
+                        SAINPlugin.ForceSelfDecision,
+                        EnumValues.GetEnum<SelfDecision>());
+                }
+            }
         }
+
+        private bool ForceDecisionOpen;
+        private bool ForceSoloOpen;
+        private bool ForceSquadOpen;
+        private bool ForceSelfOpen;
     }
 }

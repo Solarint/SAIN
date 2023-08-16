@@ -42,7 +42,6 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
         }
 
-
         public BlindFireClass BlindFire { get; private set; }
         public SideStepClass SideStep { get; private set; }
         public LeanClass Lean { get; private set; }
@@ -66,39 +65,6 @@ namespace SAIN.SAINComponent.Classes.Mover
                 return true;
             }
             return false;
-        }
-
-        public bool GoToPointWay(Vector3 point, float reachDist = -1f, bool crawl = false)
-        {
-            if (CanGoToPoint(point, out Vector3[] Way))
-            {
-                if (reachDist < 0f)
-                {
-                    reachDist = BotOwner.Settings.FileSettings.Move.REACH_DIST;
-                }
-                BotOwner.Mover?.GoToByWay(Way, reachDist, BotOwner.Position);
-                if (crawl)
-                {
-                    Prone.SetProne(true);
-                }
-                BotOwner.DoorOpener.Update();
-                return true;
-            }
-            return false;
-        }
-
-        public bool CanGoToPoint(Vector3 point, out Vector3[] Way)
-        {
-            Way = null;
-            if (NavMesh.SamplePosition(point, out var navHit, 10f, -1))
-            {
-                NavMeshPath Path = new NavMeshPath();
-                if (NavMesh.CalculatePath(SAIN.Transform.Position, navHit.position, -1, Path) && Path.corners.Length > 1)
-                {
-                    Way = Path.corners;
-                }
-            }
-            return Way != null;
         }
 
         public bool CanGoToPoint(Vector3 point, out Vector3 pointToGo, bool mustHaveCompletePath = false, float navSampleRange = 10f)
@@ -139,8 +105,6 @@ namespace SAIN.SAINComponent.Classes.Mover
             BotOwner.Mover?.SetTargetMoveSpeed(speed);
         }
 
-        public float DestMoveSpeed { get; private set; }
-
         public void StopMove()
         {
             BotOwner.Mover?.Stop();
@@ -163,52 +127,12 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool IsSprinting { get; private set; }
 
-        public bool ShiftAwayFromCloseWall(Vector3 target, out Vector3 newPos)
-        {
-            const float closeDist = 0.75f;
-
-            if (CheckTooCloseToWall(target, out var rayHit, closeDist))
-            {
-                var direction = (BotOwner.Position - rayHit.point).normalized * 0.8f;
-                direction.y = 0f;
-                var movePoint = BotOwner.Position + direction;
-                if (NavMesh.SamplePosition(movePoint, out var hit, 0.1f, -1))
-                {
-                    newPos = hit.position;
-                    return true;
-                }
-            }
-            newPos = Vector3.zero;
-            return false;
-        }
-
-        public bool CheckTooCloseToWall(Vector3 target, out RaycastHit rayHit, float checkDist = 0.75f)
-        {
-            Vector3 botPos = BotOwner.Position;
-            Vector3 direction = target - botPos;
-            botPos.y = SAIN.Transform.WeaponRootPosition.y;
-            return Physics.Raycast(BotOwner.Position, direction, out rayHit, checkDist, LayerMaskClass.HighPolyWithTerrainMask);
-        }
-
         public void TryJump()
         {
             if (JumpTimer < Time.time && CanJump)
             {
                 JumpTimer = Time.time + 1f;
                 Player.MovementContext.TryJump();
-            }
-        }
-
-        public void SetBlindFire(BlindFireSetting value)
-        {
-            SetBlindFire((int)value);
-        }
-
-        public void SetBlindFire(int value)
-        {
-            if (Player.MovementContext.BlindFire != value)
-            {
-                Player.MovementContext.SetBlindFire(value);
             }
         }
 

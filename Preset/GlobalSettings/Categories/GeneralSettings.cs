@@ -50,9 +50,5 @@ namespace SAIN.Preset.GlobalSettings
             "Experimental, will kick bot's aiming target if it ends up on the player's head.")]
         [DefaultValue(false)]
         public bool HeadShotProtection = false;
-
-        [DefaultValue(false)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
-        public bool DrawDebugGizmos = false;
     }
 }

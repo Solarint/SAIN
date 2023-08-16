@@ -25,8 +25,6 @@ namespace SAIN.Preset.Personalities
         public string Name;
         public string Description;
 
-        public bool Enabled = false;
-
         public PersonalityVariablesClass Variables = new PersonalityVariablesClass();
 
         public Dictionary<WildSpawnType, BotType> AllowedBotTypes = new Dictionary<WildSpawnType, BotType>();
@@ -99,21 +97,46 @@ namespace SAIN.Preset.Personalities
             [MinMaxRound(0, 250, 1)]
             public float PowerLevelMax = 250;
 
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public float HoldGroundBaseTime = 1f;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public float HoldGroundMinRandom = 0.66f;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public float HoldGroundMaxRandom = 1.5f;
+
             public float SearchBaseTime = 45;
+
             public float SearchAggressionModifier = 1f;
+
             public bool CanJumpCorners = false;
+
             public bool CanTaunt = false;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public bool FrequentTaunt = false;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public bool ConstantTaunt = false;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public bool CanRespondToVoice = false;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public float TauntFrequency = 20f;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public float TauntMaxDistance = 20f;
+
             public bool SprintWhileSearch = false;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public bool FrequentSprintWhileSearch = false;
+
             public bool CanRushEnemyReloadHeal = false;
+
+            [Advanced(AdvancedEnum.IsAdvanced)]
             public bool CanFakeDeathRare = false;
         }
     }

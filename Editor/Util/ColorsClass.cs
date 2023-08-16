@@ -9,13 +9,9 @@ using UnityEngine;
 
 namespace SAIN.Editor.Util
 {
-    public class ColorsClass : EditorAbstract, IEditorCache
+    public static class ColorsClass
     {
-        public ColorsClass(SAINEditor editor) : base(editor)
-        {
-        }
-
-        public void CreateCache()
+        public static void CreateCache()
         {
             if (ColorSchemeDictionary.Count == 0)
             {
@@ -40,7 +36,7 @@ namespace SAIN.Editor.Util
             }
         }
 
-        public Color GetRandomColor(string key)
+        public static Color GetRandomColor(string key)
         {
             if (!Grays.ContainsKey(key))
             {
@@ -49,27 +45,27 @@ namespace SAIN.Editor.Util
             return Grays[key];
         }
 
-        private Color CreateRandom()
+        private static Color CreateRandom()
         {
             float random = UnityEngine.Random.Range(0.3f, 2.00f) * 0.151f;
             return new Color(random * Randomize, random, random);
         }
 
-        private float Randomize => UnityEngine.Random.Range(0.81f, 1.21f);
+        private static float Randomize => UnityEngine.Random.Range(0.81f, 1.21f);
 
-        private readonly Dictionary<string, Color> Grays = new Dictionary<string, Color>();
+        private static readonly Dictionary<string, Color> Grays = new Dictionary<string, Color>();
 
-        public void ClearCache()
+        public static void ClearCache()
         {
             ListHelpers.ClearCache(Grays);
             ListHelpers.ClearCache(ColorSchemeDictionary);
         }
 
-        public readonly string SchemeName;
+        public static readonly string SchemeName;
 
-        public readonly Dictionary<ColorNames, Color> ColorSchemeDictionary = new Dictionary<ColorNames, Color>();
+        public static readonly Dictionary<ColorNames, Color> ColorSchemeDictionary = new Dictionary<ColorNames, Color>();
 
-        public Color GetColor(ColorNames name)
+        public static Color GetColor(ColorNames name)
         {
             if (ColorSchemeDictionary.ContainsKey(name))
             {
@@ -78,7 +74,7 @@ namespace SAIN.Editor.Util
             return Color.green;
         }
 
-        public void AddColor(ColorNames name, Color color)
+        public static void AddColor(ColorNames name, Color color)
         {
             if (!ColorSchemeDictionary.ContainsKey(name))
             {

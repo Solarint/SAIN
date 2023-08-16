@@ -25,69 +25,12 @@ namespace SAIN.SAINComponent.Classes
         {
         }
 
-        private SearchStates CurrentSearchState { get; set; } = SearchStates.None;
-        private NavMeshPathStatus NavMeshPathStatus => SearchPath.status;
-        private NavMeshPath SearchPath { get; set; } = new NavMeshPath();
-        private Vector3 SearchDestination => SearchPathCornersCount == 0 ? Vector3.zero : SearchPath.corners[SearchPathCornersCount - 1];
-        private int SearchPathCornersCount => SearchPath.corners.Length;
-        private Vector3? SearchTarget { get; set; }
-
         public void Init()
         {
         }
 
         public void Update()
         {
-            switch (CurrentSearchState)
-            {
-                case SearchStates.None:
-                    break;
-
-                case SearchStates.FindRoute:
-                    //CalculatePath();
-                    break;
-
-                case SearchStates.RushEnemy:
-                    break;
-
-                case SearchStates.MoveToCorner:
-                    break;
-
-                case SearchStates.CheckCorners:
-                    break;
-
-                case SearchStates.HoldPosition:
-                    break;
-
-                case SearchStates.Wait:
-                    break;
-            }
-        }
-
-        private void CalculatePath()
-        {
-            if (SearchTarget != null)
-            {
-                Vector3 start = SAIN.Position;
-                Vector3 target = SearchTarget.Value;
-
-                SearchPath.ClearCorners();
-                if (NavMesh.CalculatePath(start, target, -1, SearchPath))
-                {
-                    CurrentSearchState = SearchStates.MoveToCorner;
-                }
-            }
-        }
-
-        public void StartSearch(Vector3 destination)
-        {
-            SearchTarget = new Vector3?(destination);
-            CurrentSearchState = SearchStates.FindRoute;
-        }
-
-        public void StopSearch()
-        {
-            CurrentSearchState = SearchStates.None;
         }
 
         public void Dispose()
@@ -97,7 +40,7 @@ namespace SAIN.SAINComponent.Classes
         public MoveDangerPoint SearchMovePoint { get; private set; }
         public Vector3 ActiveDestination { get; private set; }
 
-        public void Search(bool shallLean, bool shallSprint, float reachDist = -1f)
+        public void Search(bool shallSprint, float reachDist = -1f)
         {
             if (reachDist > 0)
             {
@@ -106,7 +49,9 @@ namespace SAIN.SAINComponent.Classes
 
             CheckIfStuck();
 
-            SwitchSearchModes(shallLean, shallSprint);
+            SwitchSearchModes(shallSprint);
+
+            SearchMovePoint?.DrawDebug();
         }
 
         public Vector3 SearchMovePos()
@@ -139,6 +84,7 @@ namespace SAIN.SAINComponent.Classes
                     if ((Target.Position.Value - BotOwner.Position).sqrMagnitude < 2f)
                     {
                         Target.Clear();
+                        BotOwner.CalcGoal();
                     }
                     else
                     {
@@ -151,6 +97,7 @@ namespace SAIN.SAINComponent.Classes
                     if ((sound.Position - BotOwner.Position).sqrMagnitude < 2f)
                     {
                         sound.IsCome = true;
+                        BotOwner.CalcGoal();
                     }
                     else
                     {
@@ -216,13 +163,13 @@ namespace SAIN.SAINComponent.Classes
         {
             if (WaitPointTimer < 0)
             {
-                float baseTime = 5;
+                float baseTime = 3;
                 var personalitySettings = SAIN.Info.PersonalitySettings;
                 if (personalitySettings != null)
                 {
                     baseTime /= personalitySettings.SearchAggressionModifier;
                 }
-                WaitPointTimer = Time.time + baseTime * Random.Range(0.5f, 1.33f);
+                WaitPointTimer = Time.time + baseTime * Random.Range(0.33f, 2.00f);
             }
             if (WaitPointTimer < Time.time)
             {
@@ -251,6 +198,7 @@ namespace SAIN.SAINComponent.Classes
 
         private void MoveToPoint(bool shallSprint)
         {
+            RecalcPathTimer = Time.time + 2;
             if (shallSprint)
             {
                 BotOwner.BotRun.Run(ActiveDestination, false);
@@ -261,7 +209,7 @@ namespace SAIN.SAINComponent.Classes
             }
         }
 
-        private bool SwitchSearchModes(bool shallLean, bool shallSprint)
+        private bool SwitchSearchModes(bool shallSprint)
         {
             LastState = CurrentState;
             switch (LastState)
@@ -273,13 +221,14 @@ namespace SAIN.SAINComponent.Classes
                         ActiveDestination = NextCorner();
                         MoveToPoint(shallSprint);
                         CurrentState = ESearchMove.DirectMove;
+                        NextState = ESearchMove.None;
                     }
                     else
                     {
                         ActiveDestination = SearchMovePoint.StartPeekPosition;
                         MoveToPoint(shallSprint);
-                        CurrentState = ESearchMove.Wait;
-                        NextState = ESearchMove.StartPeekPosition;
+                        CurrentState = ESearchMove.MoveToStartPeek;
+                        NextState = ESearchMove.Wait;
                     }
                     break;
 
@@ -299,7 +248,7 @@ namespace SAIN.SAINComponent.Classes
                     }
                     break;
 
-                case ESearchMove.StartPeekPosition:
+                case ESearchMove.MoveToStartPeek:
 
                     SAIN.Mover.SetTargetMoveSpeed(1f);
                     SAIN.Mover.SetTargetPose(1f);
@@ -308,7 +257,8 @@ namespace SAIN.SAINComponent.Classes
                     {
                         ActiveDestination = SearchMovePoint.EndPeekPosition;
                         MoveToPoint(shallSprint);
-                        CurrentState = ESearchMove.MoveToEndPeak;
+                        CurrentState = ESearchMove.Wait;
+                        NextState = ESearchMove.MoveToEndPeak;
                     }
                     else if (ShallRecalcPath())
                     {
@@ -321,17 +271,13 @@ namespace SAIN.SAINComponent.Classes
                     SAIN.Mover.SetTargetMoveSpeed(0.1f);
                     SAIN.Mover.SetTargetPose(0.75f);
 
-                    if (shallLean)
-                    {
-                        UpdateLean();
-                    }
                     if (BotIsAtPoint(ActiveDestination))
                     {
                         ActiveDestination = SearchMovePoint.DangerPoint;
                         // Player.MovementContext.SetTilt(0f);
                         MoveToPoint(shallSprint);
                         CurrentState = ESearchMove.Wait;
-                        NextState = ESearchMove.DangerPoint;
+                        NextState = ESearchMove.MoveToDangerPoint;
                     }
                     else if (ShallRecalcPath())
                     {
@@ -339,7 +285,7 @@ namespace SAIN.SAINComponent.Classes
                     }
                     break;
 
-                case ESearchMove.DangerPoint:
+                case ESearchMove.MoveToDangerPoint:
 
                     SAIN.Mover.SetTargetMoveSpeed(0.5f);
                     SAIN.Mover.SetTargetPose(1f);
@@ -359,7 +305,7 @@ namespace SAIN.SAINComponent.Classes
                         var TargetPosition = SAIN.CurrentTargetPosition;
                         if (TargetPosition != null)
                         {
-                            GoToPoint(TargetPosition.Value, false);
+                            CalculatePath(TargetPosition.Value, false);
                         }
                     }
                     else if (ShallRecalcPath())
@@ -376,6 +322,7 @@ namespace SAIN.SAINComponent.Classes
                     else
                     {
                         CurrentState = NextState;
+                        NextState = ESearchMove.None;
                     }
                     break;
             }
@@ -395,26 +342,12 @@ namespace SAIN.SAINComponent.Classes
                 var TargetPosition = SAIN.CurrentTargetPosition;
                 if (TargetPosition != null)
                 {
-                    GoToPoint(TargetPosition.Value, false);
+                    CalculatePath(TargetPosition.Value, false);
                 }
             }
             return botIsStuck;
         }
 
-        private void UpdateLean()
-        {
-            if (UpdateLeanTimer < Time.time)
-            {
-                UpdateLeanTimer = Time.time + 0.25f;
-                Vector3 directionToDanger = SearchMovePoint.DangerPoint - BotOwner.Position;
-                Vector3 directionToCorner = SearchMovePoint.Corner - BotOwner.Position;
-                float signAngle = GetSignedAngle(directionToCorner, directionToDanger);
-                var lean = SearchMovePoint.GetDirectionToLean(signAngle);
-                SAIN.Mover.FastLean(lean);
-            }
-        }
-
-        private float UpdateLeanTimer = 0f;
         private float UnstuckMoveTimer = 0f;
 
         private NavMeshPath Path = new NavMeshPath();
@@ -430,7 +363,7 @@ namespace SAIN.SAINComponent.Classes
             NextState = ESearchMove.None;
         }
 
-        public NavMeshPathStatus GoToPoint(Vector3 point, bool MustHavePath = true, float reachDist = 0.5f)
+        public NavMeshPathStatus CalculatePath(Vector3 point, bool MustHavePath = true, float reachDist = 0.5f)
         {
             Vector3 Start = SAIN.Position;
             if ((point - Start).sqrMagnitude <= 0.5f)
@@ -452,7 +385,7 @@ namespace SAIN.SAINComponent.Classes
                     List<Vector3> newCorners = new List<Vector3>();
                     for (int i = 0; i < cornerLength - 1; i++)
                     {
-                        if ((Path.corners[i] - Path.corners[i + 1]).sqrMagnitude > 0.66f)
+                        if ((Path.corners[i] - Path.corners[i + 1]).sqrMagnitude > 1.5f)
                         {
                             newCorners.Add(Path.corners[i]);
                         }
@@ -478,15 +411,7 @@ namespace SAIN.SAINComponent.Classes
                             if (NavMesh.SamplePosition(startPeekPos, out var hit2, 2f, -1)
                                 && NavMesh.SamplePosition(endPeekPos, out var hit3, 2f, -1))
                             {
-                                // CalculateRecoil the signed angle between the corners, value will be negative if its to the left of the startPeekPos.
-                                SearchMovePoint = new MoveDangerPoint
-                                {
-                                    StartPeekPosition = hit2.position,
-                                    EndPeekPosition = hit3.position,
-                                    Corner = A,
-                                    DangerPoint = B,
-                                    SignedAngle = GetSignedAngle(ADirection, BDirection),
-                                };
+                                SearchMovePoint = new MoveDangerPoint(hit2.position, hit3.position, B, A);
                                 break;
                             }
                         }
@@ -495,15 +420,14 @@ namespace SAIN.SAINComponent.Classes
                 return Path.status;
             }
 
-            //DefaultLogger.LogError($"Couldn't Find NavMesh at Point {point}");
             return NavMeshPathStatus.PathInvalid;
         }
 
         private Vector3 GetPeekStartAndEnd(Vector3 blindCorner, Vector3 dangerPoint, Vector3 dirToBlindCorner, Vector3 dirToBlindDest, out Vector3 peekEnd)
         {
-            const float maxMagnitude = 5f;
-            const float minMagnitude = 1f;
-            const float OppositePointMagnitude = 5f;
+            const float maxMagnitude = 6f;
+            const float minMagnitude = 1.5f;
+            const float OppositePointMagnitude = 6f;
 
             Vector3 directionToStart = BotOwner.Position - blindCorner;
 
@@ -551,17 +475,6 @@ namespace SAIN.SAINComponent.Classes
             return PeekStartPosition;
         }
 
-        private bool SampleNav(Vector3 point, out Vector3 result, float dist = 1f)
-        {
-            if (NavMesh.SamplePosition(point, out var hit, dist, -1))
-            {
-                result = hit.position;
-                return true;
-            }
-            result = point;
-            return false;
-        }
-
         private bool CheckForObstacles(Vector3 start, Vector3 direction, out Vector3 result)
         {
             start.y += 0.1f;
@@ -599,7 +512,6 @@ namespace SAIN.SAINComponent.Classes
 
         private float GetSignedAngle(Vector3 dirCenter, Vector3 dirOther, Vector3? axis = null)
         {
-            // CalculateRecoil the signed angle between the corners, rounding will be negative if its to the left of the startPeekPos.
             Vector3 angleAxis = axis ?? Vector3.up;
             return Vector3.SignedAngle(dirCenter, dirOther, angleAxis);
         }

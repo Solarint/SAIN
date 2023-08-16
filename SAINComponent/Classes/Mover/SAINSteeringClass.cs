@@ -59,19 +59,17 @@ namespace SAIN.SAINComponent.Classes.Mover
                 LookToEnemyLastSeenPos();
                 return true;
             }
-            else
+            if (SAIN.Memory.Decisions.Main.Current == SoloDecision.Investigate)
             {
-                if (SAIN.Memory.Decisions.Main.Current == SoloDecision.Search || SAIN.Memory.Decisions.Main.Current == SoloDecision.Investigate)
-                {
-                    LookToMovingDirection();
-                    return false;
-                }
-                if (lookRandomifFalse)
-                {
-                    LookToRandomPosition();
-                }
-                return false;
+                LookToMovingDirection();
+                return true;
             }
+
+            if (lookRandomifFalse)
+            {
+                LookToRandomPosition();
+            }
+            return false;
         }
 
         private bool LookToVisibleSound()

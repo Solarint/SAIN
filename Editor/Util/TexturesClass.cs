@@ -1,21 +1,18 @@
 ﻿using SAIN.Editor.Abstract;
+using SAIN.Editor.Util;
 using SAIN.Helpers;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SAIN.Editor
 {
-    public class TexturesClass : EditorAbstract, IEditorCache
+    public static class TexturesClass
     {
-        public TexturesClass(SAINEditor editor) : base(editor)
-        {
-        }
-
-        public void CreateCache()
+        public static void CreateCache()
         {
             if (ColorTextures.Count == 0)
             {
-                var dictionary = Editor.Colors.ColorSchemeDictionary;
+                var dictionary = ColorsClass.ColorSchemeDictionary;
                 foreach (var color in dictionary)
                 {
                     if (color.Key == ColorNames.Clear)
@@ -30,13 +27,13 @@ namespace SAIN.Editor
             }
         }
 
-        public void ClearCache()
+        public static void ClearCache()
         {
             ListHelpers.ClearCache(ColorTextures);
             ListHelpers.ClearCache(RandomColors);
         }
 
-        public Texture2D GetRandomGray(string key)
+        public static Texture2D GetRandomGray(string key)
         {
             if (!RandomColors.ContainsKey(key))
             {
@@ -46,9 +43,9 @@ namespace SAIN.Editor
             return RandomColors[key];
         }
 
-        private readonly Dictionary<string, Texture2D> RandomColors = new Dictionary<string, Texture2D>();
+        private static readonly Dictionary<string, Texture2D> RandomColors = new Dictionary<string, Texture2D>();
 
-        public Texture2D GetColor(ColorNames name)
+        public static Texture2D GetTexture(ColorNames name)
         {
             if (ColorTextures.ContainsKey(name))
             {
@@ -57,7 +54,7 @@ namespace SAIN.Editor
             return Texture2D.redTexture;
         }
 
-        public Texture2D GetCustom(ColorNames name)
+        public static Texture2D GetCustom(ColorNames name)
         {
             if (CustomTextures.ContainsKey(name))
             {
@@ -66,11 +63,11 @@ namespace SAIN.Editor
             return Texture2D.redTexture;
         }
 
-        public readonly Dictionary<ColorNames, Texture2D> ColorTextures = new Dictionary<ColorNames, Texture2D>();
+        public static readonly Dictionary<ColorNames, Texture2D> ColorTextures = new Dictionary<ColorNames, Texture2D>();
 
-        public readonly Dictionary<ColorNames, Texture2D> CustomTextures = new Dictionary<ColorNames, Texture2D>();
+        public static readonly Dictionary<ColorNames, Texture2D> CustomTextures = new Dictionary<ColorNames, Texture2D>();
 
-        public Texture2D NewTexture(Color color)
+        public static Texture2D NewTexture(Color color)
         {
             Texture2D texture = new Texture2D(2, 2);
             Color[] colorApply = new Color[texture.width * texture.height];
@@ -83,7 +80,7 @@ namespace SAIN.Editor
             return texture;
         }
 
-        public Rect DrawSliderBackGrounds(float progress)
+        public static Rect DrawSliderBackGrounds(float progress)
         {
             Rect lastRect = GUILayoutUtility.GetLastRect();
             float lineHeight = 5f;
@@ -96,25 +93,5 @@ namespace SAIN.Editor
             GUI.DrawTexture(Filled, Texture2D.whiteTexture, ScaleMode.StretchToFill, true, 0, new Color(1f, 0.25f, 0.25f), 0, 0);
             return lastRect;
         }
-    }
-
-    public sealed class Recolor
-    {
-        public Recolor(float r, float g, float b, bool multiply = false)
-        {
-            Multiply = multiply;
-
-            float Min = multiply ? 0f : -1f;
-            float Max = multiply ? 10f : 1f;
-
-            R = Mathf.Clamp(r, Min, Max);
-            G = Mathf.Clamp(g, Min, Max);
-            B = Mathf.Clamp(b, Min, Max);
-        }
-
-        public readonly float R;
-        public readonly float G;
-        public readonly float B;
-        public readonly bool Multiply;
     }
 }

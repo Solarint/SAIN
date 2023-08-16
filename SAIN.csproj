@@ -232,6 +232,7 @@
     <Compile Include="Editor\IEditorCache.cs" />
     <Compile Include="Editor\Util\ModifyLists.cs" />
     <Compile Include="Helpers\ComponentHelpers.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\ListHelpers.cs" />
     <Compile Include="Helpers\UpdateSettingClass.cs" />
     <Compile Include="Layers\DebugOverlay.cs" />
@@ -256,6 +257,7 @@
     <Compile Include="Interfaces.cs" />
     <Compile Include="Editor\PresetSelection.cs" />
     <Compile Include="SAINComponent\Classes\ESearchMove.cs" />
+    <Compile Include="Helpers\SealedClass\PointDirection.cs" />
     <Compile Include="SAINComponent\Classes\SAINBotUnstuckClass.cs" />
     <Compile Include="SAINComponent\Classes\SAINSearchClass.cs" />
     <Compile Include="SAINComponent\GOAP\GOAPTestClassSeekCover.cs" />
@@ -326,14 +328,13 @@
     <Compile Include="BotController\Classes\BotSpawnController.cs" />
     <Compile Include="Editor\BotPersonalityEditor.cs" />
     <Compile Include="Editor\BotSettingsEditor.cs" />
-    <Compile Include="Editor\WindowLayoutCreator.cs" />
     <Compile Include="Editor\Util\EditorEnum.cs" />
     <Compile Include="Editor\Util\ApplyToStyle.cs" />
     <Compile Include="Editor\Util\ColorsClass.cs" />
     <Compile Include="Editor\Abstract\EditorAbstract.cs" />
     <Compile Include="Editor\SAINEditor.cs" />
     <Compile Include="Editor\Util\TexturesClass.cs" />
-    <Compile Include="Editor\Abstract\Layout.cs" />
+    <Compile Include="Editor\SAINLayout.cs" />
     <Compile Include="Editor\Util\MouseFunctions.cs" />
     <Compile Include="Editor\Util\ButtonsClass.cs" />
     <Compile Include="Editor\Util\CursorSettings.cs" />
@@ -369,7 +370,7 @@
     <Compile Include="SAINComponent\Classes\Decision\SAINDecisionClass.cs" />
     <Compile Include="SAINComponent\Classes\Sense\SAINHearingSensorClass.cs" />
     <Compile Include="SAINComponent\Classes\Sense\LastHeardSoundClass.cs" />
-    <Compile Include="SAINComponent\Classes\oldSearchClass.cs" />
+    <Compile Include="SAINComponent\Classes\MoveDangerPoint.cs" />
     <Compile Include="SAINComponent\Classes\Decision\SquadDecisionClass.cs" />
     <Compile Include="SAINComponent\Classes\Talk\SquadLeaderClass.cs" />
     <Compile Include="BotController\Classes\CoverManager.cs" />
