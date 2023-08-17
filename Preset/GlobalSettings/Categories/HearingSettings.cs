@@ -33,11 +33,11 @@ namespace SAIN.Preset.GlobalSettings
         [MinMax(30f, 400f, 1f)]
         [Advanced]
         [Dictionary(typeof(ICaliber), typeof(float))]
-        public Dictionary<ICaliber, float> AudibleRanges = new Dictionary<ICaliber, float>(AudibleRangesDefaults);
+        public Dictionary<ICaliber, float> HearingDistances = new Dictionary<ICaliber, float>(HearingDistancesDefaults);
 
         [JsonIgnore]
         [Advanced(IAdvancedOption.Hidden)]
-        public static readonly Dictionary<ICaliber, float> AudibleRangesDefaults = new Dictionary<ICaliber, float>()
+        public static readonly Dictionary<ICaliber, float> HearingDistancesDefaults = new Dictionary<ICaliber, float>()
         {
             { ICaliber.Caliber9x18PM, 110f },
             { ICaliber.Caliber9x19PARA, 110f },

@@ -77,7 +77,7 @@ namespace SAIN.SAINComponent.Classes.Info
                     break;
             }
 
-            DifficultyModifier = Mathf.Round(modifier * 100f) / 100f;
+            DifficultyModifier = 1f - Mathf.Clamp((Mathf.Round(modifier * 100f) / 100f), 0.01f, 1f);
         }
     }
 }

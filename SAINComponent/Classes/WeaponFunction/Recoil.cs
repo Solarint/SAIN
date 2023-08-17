@@ -53,7 +53,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             return vector;
         }
 
-        private float RecoilMultiplier => Mathf.Round(SAIN.Info.FileSettings.Shoot.RecoilMultiplier * GlobalSAINSettings.Shoot.GlobalRecoilMultiplier * 100f) / 100f;
+        private float RecoilMultiplier => Mathf.Round(SAIN.Info.FileSettings.Shoot.RecoilMultiplier * GlobalSettings.Shoot.GlobalRecoilMultiplier * 100f) / 100f;
 
         float CalcRecoil(float recoilVal)
         {

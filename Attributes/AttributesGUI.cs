@@ -76,9 +76,9 @@ namespace SAIN.Attributes
                                 var dictionary = value as Dictionary<IWeaponClass, float>;
                                 Dictionary<IWeaponClass, float> defaultDictionary = null;
 
-                                if (fieldName == nameof(ShootSettings.WeaponShootability))
+                                if (fieldName == nameof(ShootSettings.WeaponClassShootability))
                                 {
-                                    defaultDictionary = ShootSettings.WeaponShootabilityDefaults;
+                                    defaultDictionary = ShootSettings.WeaponClassShootabilityDefaults;
 
                                 }
                                 else if (fieldName == nameof(ShootSettings.EngagementDistance))
@@ -96,14 +96,14 @@ namespace SAIN.Attributes
                                 var dictionary = value as Dictionary<ICaliber, float>;
                                 Dictionary<ICaliber, float> defaultDictionary = null;
 
-                                if (fieldName == nameof(ShootSettings.AmmoShootability))
+                                if (fieldName == nameof(ShootSettings.AmmoCaliberShootability))
                                 {
-                                    defaultDictionary = ShootSettings.AmmoShootabilityDefaults;
+                                    defaultDictionary = ShootSettings.AmmoCaliberShootabilityDefaults;
 
                                 }
-                                else if (fieldName == nameof(HearingSettings.AudibleRanges))
+                                else if (fieldName == nameof(HearingSettings.HearingDistances))
                                 {
-                                    defaultDictionary = HearingSettings.AudibleRangesDefaults;
+                                    defaultDictionary = HearingSettings.HearingDistancesDefaults;
                                 }
 
                                 if (defaultDictionary != null)

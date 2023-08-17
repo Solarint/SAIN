@@ -73,11 +73,11 @@ namespace SAIN.Preset.GlobalSettings
         [MinMax(0.01f, 1f, 100f)]
         [Advanced]
         [Dictionary(typeof(ICaliber), typeof(float))]
-        public Dictionary<ICaliber, float> AmmoShootability = new Dictionary<ICaliber, float>(AmmoShootabilityDefaults);
+        public Dictionary<ICaliber, float> AmmoCaliberShootability = new Dictionary<ICaliber, float>(AmmoCaliberShootabilityDefaults);
 
         [JsonIgnore]
         [Advanced(IAdvancedOption.Hidden)]
-        public static readonly Dictionary<ICaliber, float> AmmoShootabilityDefaults = new Dictionary<ICaliber, float>()
+        public static readonly Dictionary<ICaliber, float> AmmoCaliberShootabilityDefaults = new Dictionary<ICaliber, float>()
         {
             { ICaliber.Caliber9x18PM, 0.2f },
             { ICaliber.Caliber9x19PARA, 0.25f },
@@ -121,11 +121,11 @@ namespace SAIN.Preset.GlobalSettings
         [MinMax(0.01f, 1f, 100f)]
         [Advanced]
         [Dictionary(typeof(IWeaponClass), typeof(float))]
-        public Dictionary<IWeaponClass, float> WeaponShootability = new Dictionary<IWeaponClass, float>(WeaponShootabilityDefaults);
+        public Dictionary<IWeaponClass, float> WeaponClassShootability = new Dictionary<IWeaponClass, float>(WeaponClassShootabilityDefaults);
 
         [JsonIgnore]
         [Advanced(IAdvancedOption.Hidden)]
-        public static readonly Dictionary<IWeaponClass, float> WeaponShootabilityDefaults = new Dictionary<IWeaponClass, float>()
+        public static readonly Dictionary<IWeaponClass, float> WeaponClassShootabilityDefaults = new Dictionary<IWeaponClass, float>()
         {
             { IWeaponClass.Default, 0.4f },
             { IWeaponClass.assaultCarbine, 0.35f },

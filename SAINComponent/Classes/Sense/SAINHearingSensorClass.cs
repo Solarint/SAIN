@@ -84,7 +84,7 @@ namespace SAIN.SAINComponent.Classes
         {
             float range = power;
 
-            var globalHearing = GlobalSAINSettings.Hearing;
+            var globalHearing = GlobalSettings.Hearing;
             if (type == AISoundType.step)
             {
                 range *= globalHearing.FootstepAudioMultiplier;

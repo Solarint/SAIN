@@ -106,7 +106,7 @@ namespace SAIN.Helpers
         {
             var caliber = EnumValues.ParseCaliber(ammocaliber);
             if (SAINPlugin.LoadedPreset?.GlobalSettings?.Hearing?
-                .AudibleRanges.TryGetValue(caliber, out var range) == true)
+                .HearingDistances.TryGetValue(caliber, out var range) == true)
             {
                 return range;
             }

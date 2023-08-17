@@ -129,7 +129,7 @@ namespace SAIN.SAINComponent.Classes.Info
             HoldGroundDelay = baseTime.Randomize(min, max).Round100();
         }
 
-        private float AggressionMultiplier => (FileSettings.Mind.Aggression * GlobalSAINSettings.Mind.GlobalAggression * PersonalitySettings.AggressionMultiplier).Round100();
+        private float AggressionMultiplier => (FileSettings.Mind.Aggression * GlobalSettings.Mind.GlobalAggression * PersonalitySettings.AggressionMultiplier).Round100();
 
         public void CalcTimeBeforeSearch()
         {

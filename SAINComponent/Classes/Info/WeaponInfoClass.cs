@@ -70,7 +70,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
         private float GetAmmoShootability()
         {
-            if (SAINPlugin.LoadedPreset.GlobalSettings.Shoot.AmmoShootability.TryGetValue(ICaliber, out var ammo))
+            if (ShootSettings.AmmoCaliberShootability.TryGetValue(ICaliber, out var ammo))
             {
                 return ammo;
             }
@@ -79,7 +79,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
         private float GetWeaponShootability()
         {
-            if (SAINPlugin.LoadedPreset.GlobalSettings.Shoot.WeaponShootability.TryGetValue(IWeaponClass, out var weap))
+            if (ShootSettings.WeaponClassShootability.TryGetValue(IWeaponClass, out var weap))
             {
                 return weap;
             }
@@ -161,49 +161,15 @@ namespace SAIN.SAINComponent.Classes.Info
         {
             get
             {
-                float PreferedDist;
-                switch (WeaponClass)
+                if (ICaliber == ICaliber.Caliber9x39)
                 {
-                    case "assaultCarbine":
-                    case "assaultRifle":
-                    case "machinegun":
-                        PreferedDist = 100f;
-                        break;
-
-                    case "smg":
-                        PreferedDist = 40f;
-                        break;
-
-                    case "pistol":
-                        PreferedDist = 30f;
-                        break;
-
-                    case "marksmanRifle":
-                        PreferedDist = 150f;
-                        break;
-
-                    case "sniperRifle":
-                        PreferedDist = 200f;
-                        break;
-
-                    case "shotgun":
-                        PreferedDist = 30f;
-                        break;
-
-                    case "grenadeLauncher":
-                    case "specialWeapon":
-                        PreferedDist = 100f;
-                        break;
-
-                    default:
-                        PreferedDist = 120f;
-                        break;
+                    return 75f;
                 }
-                if (AmmoCaliber == "9x39")
+                if (GlobalSettings.Shoot.EngagementDistance.TryGetValue(IWeaponClass, out float PreferedDist))
                 {
-                    PreferedDist = 75f;
+                    return PreferedDist;
                 }
-                return PreferedDist;
+                return 75f;
             }
         }
 

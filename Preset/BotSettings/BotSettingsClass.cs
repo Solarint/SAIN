@@ -209,12 +209,12 @@ namespace SAIN.Preset.BotSettings
         {
             DefaultDifficultyModifier = new Dictionary<WildSpawnType, float>
             {
-                { WildSpawnType.assault, 0.2f },
-                { WildSpawnType.marksman, 0.2f },
+                { WildSpawnType.assault, 0.35f },
+                { WildSpawnType.marksman, 0.35f },
 
-                { WildSpawnType.crazyAssaultEvent, 0.33f },
-                { WildSpawnType.cursedAssault, 0.33f },
-                { WildSpawnType.assaultGroup, 0.33f },
+                { WildSpawnType.crazyAssaultEvent, 0.35f },
+                { WildSpawnType.cursedAssault, 0.35f },
+                { WildSpawnType.assaultGroup, 0.35f },
 
                 { WildSpawnType.bossBully, 0.75f },
                 { WildSpawnType.bossGluhar, 0.75f },
