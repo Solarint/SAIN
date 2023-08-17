@@ -4,8 +4,6 @@ namespace SAIN.Editor
 {
     public static class RectLayout
     {
-        private static Vector2 OldScale;
-
         public static Vector2 ScaledPivot
         {
             get
@@ -15,12 +13,13 @@ namespace SAIN.Editor
             }
         }
 
-        public static float ConfigScaling = 1f;
+        public static float ConfigScalingWidth = 1f;
+        public static float ConfigScalingHeight = 1f;
 
         public static float LastScreenWidth = 0;
 
-        private static float ReferenceResX => 1920 * ConfigScaling;
-        private static float ReferenceResY => 1080 * ConfigScaling;
+        private static float ReferenceResX => 1920 * ConfigScalingWidth;
+        private static float ReferenceResY => 1080 * ConfigScalingHeight;
 
         public static float GetScaling(float screenWidth)
         {

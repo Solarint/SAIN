@@ -17,6 +17,34 @@ namespace SAIN.Helpers
             return Vector3.zero;
         }
 
+        public static Vector3 RotateHoriz(this Vector3 value, float angle)
+        {
+            Quaternion rotation = Quaternion.Euler(0, angle, 0);
+            Vector3 result = rotation * value;
+            return result;
+        }
+
+        public static float Sqr(this float value)
+        {
+            return value * value;
+        }
+
+        public static float Sqrt(this float value)
+        {
+            return Mathf.Sqrt(value);
+        }
+
+        public static float Scale0to1(this float value, float scalingFactor)
+        {
+            return value.Scale(0, 1f, 1f - scalingFactor, 1f + scalingFactor);
+        }
+
+
+        public static float Scale(this float value, float inputMin, float inputMax, float outputMin, float outputMax)
+        {
+            return outputMin + (outputMax - outputMin) * ((value - inputMin) / (inputMax - inputMin));
+        }
+
         public static bool GUIToggle(this bool value, GUIContent content, EUISoundType? sound = null, params GUILayoutOption[] options)
         {
             bool newvalue = GUILayout.Toggle(value, content, GetStyle(Style.toggle), options);

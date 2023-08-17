@@ -265,7 +265,6 @@
     <Compile Include="SAINComponent\PersonBase\ISAINPerson.cs" />
     <Compile Include="SAINComponent\PersonBase\SAINPersonClass.cs" />
     <Compile Include="SAINComponent\PersonBase\SAINPersonTransformClass.cs" />
-    <Compile Include="SAINComponent\Classes\Info\ShootModifierClass.cs" />
     <Compile Include="SAINComponent\Classes\SAINMemoryClass.cs" />
     <Compile Include="SAINComponent\Classes\Info\ProfileClass.cs" />
     <Compile Include="SAINComponent\PersonBase\PersonBaseClass.cs" />

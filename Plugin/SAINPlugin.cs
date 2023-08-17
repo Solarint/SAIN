@@ -33,7 +33,7 @@ namespace SAIN
 
         public const string SAINGUID = "me.sol.sain";
         public const string SAINName = "SAIN";
-        public const string SAINVersion = "3.5.2";
+        public const string SAINVersion = "3.5.3";
 
         public const string SPTGUID = "com.spt-aki.core";
         public const string SPTVersion = "3.6.0";
@@ -109,7 +109,6 @@ namespace SAIN
             new Patches.Generic.BotGroupAddEnemyPatch().Enable();
             new Patches.Generic.BotMemoryAddEnemyPatch().Enable();
 
-            new Patches.Hearing.InitiateShotPatch().Enable();
             new Patches.Hearing.TryPlayShootSoundPatch().Enable();
             new Patches.Hearing.HearingSensorPatch().Enable();
             new Patches.Hearing.BetterAudioPatch().Enable();

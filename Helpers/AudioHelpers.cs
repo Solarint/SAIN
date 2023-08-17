@@ -1,39 +1,93 @@
-﻿using Comfort.Common;
-using EFT;
+﻿using EFT;
 using EFT.InventoryLogic;
 using EFT.Weather;
+using System.Collections.Generic;
 using UnityEngine;
+using static EFT.Player;
 
 namespace SAIN.Helpers
 {
-    public class GunshotRange
+    public class AudioHelpers
     {
-        public static void OnMakingShot(IWeapon weapon, Player player, BulletClass ammo)
+        public static void TryPlayShootSound(Player player, AISoundType soundType)
         {
+            float range = 135f;
             if (player?.AIData != null)
             {
-                Player.FirearmController firearmController = player.HandsController as Player.FirearmController;
-                string caliber = weapon.WeaponTemplate.ammoCaliber;
+                var firearmController = player.HandsController as FirearmController;
+                if (firearmController != null)
+                {
+                    Weapon weapon = firearmController.Item;
+                    if (weapon != null)
+                    {
+                        string playerWeaponId = $"{player.name}_{weapon.TemplateId}";
+                        if (!Calculations.ContainsKey(playerWeaponId))
+                        {
+                            float speedFactor = CalcVelocityFactor(weapon);
+                            bool subsonic = IsSubsonic(weapon.CurrentAmmoTemplate.InitialSpeed, speedFactor);
+                            float supModifier = GetSuppressorMod(subsonic, soundType);
+                            float muzzleLoudness = GetMuzzleLoudness(weapon.Mods);
+                            float baseAudibleRange = AudibleRange(weapon.Template.ammoCaliber);
 
-                float range = AudibleRange(caliber);
+                            float result = (supModifier * muzzleLoudness * baseAudibleRange).Round10();
+                            Calculations.Add(playerWeaponId, result);
 
-                bool subsonic = IsSubsonic(ammo.InitialSpeed);
-
-                AISoundType soundType;
-
-                if (firearmController != null && firearmController.IsSilenced) soundType = AISoundType.silencedGun;
-                else soundType = AISoundType.gun;
-
-                PlayShootSound(player, range, subsonic, soundType);
+                            if (SAINPlugin.DebugModeEnabled)
+                            {
+                                Logger.LogDebug(
+                                    $"Name: {player.name}  " +
+                                    $"TemplateID {weapon.TemplateId}" +
+                                    $"Result: {result} " +
+                                    $"SpeedFactor: {speedFactor} " +
+                                    $"MuzzleLoudness: {muzzleLoudness} " +
+                                    $"Base Audible Range: {baseAudibleRange} " +
+                                    $"supModifier: {supModifier} " +
+                                    $"Subsonic: {subsonic}");
+                            }
+                        }
+                        range = Calculations[playerWeaponId] * RainSoundModifier();
+                    }
+                }
             }
+            HelpersGClass.PlaySound(player, player.WeaponRoot.position, range, soundType);
         }
 
-        /// <summary>
-        /// Plays a shoot sound for the given player, range, subsonic and sound type, applying modifiers if necessary.
-        /// </summary>
-        private static void PlayShootSound(Player player, float range, bool subsonic, AISoundType soundtype)
+        public static void ClearCache()
         {
-            // Decides if Suppressor modifier should be applied + subsonic
+            Calculations.Clear();
+        }
+
+        private static readonly Dictionary<string, float> Calculations = new Dictionary<string, float>();
+
+        private static float CalcVelocityFactor(Weapon weapon)
+        {
+            return 2f - weapon.SpeedFactor;
+        }
+
+        private static float GetMuzzleLoudness(Mod[] mods)
+        {
+            if (!ModDetection.RealismLoaded)
+            {
+                return 1f;
+            }
+            float loudness = 0f;
+            for (int i = 0; i < mods.Length; i++)
+            {
+                //if the muzzle device has a silencer attached to it then it shouldn't contribute to the loudness stat.
+                if (mods[i].Slots.Length > 0 && mods[i].Slots[0].ContainedItem != null && IsSilencer((Mod)mods[i].Slots[0].ContainedItem))
+                {
+                    continue;
+                }
+                else
+                {
+                    loudness += mods[i].Template.Loudness;
+                }
+            }
+            return (loudness / 200) + 1f;
+        }
+
+        private static float GetSuppressorMod(bool subsonic, AISoundType soundtype)
+        {
             float supmod = 1f;
             bool suppressed = soundtype == AISoundType.silencedGun;
 
@@ -45,48 +99,33 @@ namespace SAIN.Helpers
             {
                 supmod *= SAINPlugin.LoadedPreset.GlobalSettings.Hearing.SuppressorModifier;
             }
-
-            range *= supmod;
-            range *= RainSoundModifier();
-
-            HelpersGClass.PlaySound(player, player.WeaponRoot.position, range, soundtype);
+            return supmod;
         }
 
-        /// <summary>
-        /// Calculates the audible range of a given ammunition caliber.
-        /// </summary>
-        /// <param value="ammocaliber">The ammunition caliber.</param>
-        /// <returns>The audible range of the given ammunition caliber.</returns>
         private static float AudibleRange(string ammocaliber)
         {
-            var Ranges = SAINPlugin.LoadedPreset?.GlobalSettings?.Hearing?.AudibleRanges;
-            if (Ranges != null)
+            var caliber = EnumValues.ParseCaliber(ammocaliber);
+            if (SAINPlugin.LoadedPreset?.GlobalSettings?.Hearing?
+                .AudibleRanges.TryGetValue(caliber, out var range) == true)
             {
-                return Ranges.Get(ammocaliber);
+                return range;
             }
-            else
-            {
-                return 150f;
-            }
+            Logger.LogError(caliber);
+            return 150f;
         }
 
-        /// <summary>
-        /// Checks if the given velocity is subsonic.
-        /// </summary>
-        /// <param value="velocity">The velocity to check.</param>
-        /// <returns>True if the velocity is subsonic, false otherwise.</returns>
-        private static bool IsSubsonic(float velocity)
+        private static bool IsSilencer(Mod mod)
         {
-            if (velocity < 343.2f) return true;
-            else return false;
+            return mod.GetType() == TemplateIdToObjectMappingsClass.TypeTable["550aa4cd4bdc2dd8348b456c"];
         }
 
-        /// <summary>
-        /// Calculates the rain sound modifier based on the current rain Rounding.
-        /// </summary>
-        /// <returns>
-        /// The rain sound modifier.
-        /// </returns>
+        private const float SuperSonic = 343.2f;
+
+        private static bool IsSubsonic(float velocity, float speedFactor)
+        {
+            return velocity * speedFactor <= SuperSonic;
+        }
+
         public static float RainSoundModifier()
         {
             if (WeatherController.Instance?.WeatherCurve == null)
@@ -109,13 +148,6 @@ namespace SAIN.Helpers
             return RainModifier;
         }
 
-        /// <summary>
-        /// Calculates the inverse scaling of a given Rounding between a minimum and maximum Rounding.
-        /// </summary>
-        /// <param value="value">The Rounding to be scaled.</param>
-        /// <param value="Min">The minimum Rounding.</param>
-        /// <param value="Max">The maximum Rounding.</param>
-        /// <returns>The scaled Rounding.</returns>
         public static float InverseScaling(float value, float min, float max)
         {
             // Inverse

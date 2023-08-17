@@ -15,8 +15,8 @@ namespace SAIN.Preset.GlobalSettings
             Values.Clear();
             Values.Add(defaultKey, defaultValue);
 
-            bool isCaliber = typeof(T) == typeof(Caliber);
-            bool isWeapon = typeof(T) == typeof(WeaponClass);
+            bool isCaliber = typeof(T) == typeof(ICaliber);
+            bool isWeapon = typeof(T) == typeof(IWeaponClass);
 
             bool added = false;
             foreach (FieldInfo field in classObject.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public))
@@ -48,7 +48,7 @@ namespace SAIN.Preset.GlobalSettings
                 //BuildMessage("attribute is null", field.LayerName);
                 return;
             }
-            Caliber enumValue = attribute.AmmoCaliber;
+            ICaliber enumValue = attribute.AmmoCaliber;
             if (!Values.ContainsKey(enumValue))
             {
                 Values.Add(enumValue, value);
@@ -67,7 +67,7 @@ namespace SAIN.Preset.GlobalSettings
                 //BuildMessage("attribute is null", field.LayerName);
                 return;
             }
-            WeaponClass enumValue = attribute.WeaponClass;
+            IWeaponClass enumValue = attribute.WeaponClass;
             if (!Values.ContainsKey(enumValue))
             {
                 Values.Add(enumValue, value);

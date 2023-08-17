@@ -32,37 +32,61 @@ namespace SAIN.Editor.GUISections
             }
             EndHorizontal();
 
-            BeginHorizontal();
+            BeginHorizontal(true);
+
             const float InstalledHeight = 30;
             float endHeight = InstalledHeight + LabelHeight;
+
+            const int OptionsPerLine = 4;
+            float width = 1860f / OptionsPerLine;
+            float spacing = 15f / OptionsPerLine - 1;
 
             int presetSpacing = 0;
             for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
             {
                 presetSpacing++;
                 var preset = PresetHandler.PresetOptions[i];
+                bool badVersion = preset.SAINVersion != AssemblyInfo.SAINVersion;
+                float toggleWidth = badVersion ? width - 20f : width;
+
                 bool selected = selectedPreset.Name == preset.Name;
-                if (Toggle(selected, $"{preset.Name} for SAIN {preset.SAINVersion}", preset.Description, null, Height(InstalledHeight)))
+                if (Toggle(selected, 
+                    $"{preset.Name} for SAIN {preset.SAINVersion}", 
+                    preset.Description, 
+                    null, 
+                    Height(InstalledHeight), 
+                    Width(toggleWidth)))
                 {
-                    selectedPreset = preset;
+                    if (!selected)
+                    {
+                        selectedPreset = preset;
+                    }
                 }
-                if (preset.SAINVersion != AssemblyInfo.SAINVersion)
+                if (badVersion)
                 {
                     Box(new GUIContent(
                             "!", 
                             $"Selected Preset was made for SAIN Version {preset.SAINVersion} " +
-                            $"but you are running {AssemblyInfo.SAINVersion}, you may experience issues."), 
-                        alertStyle, Height(InstalledHeight), Width(20));
+                            $"but you are running {AssemblyInfo.SAINVersion}, " +
+                            $"you may experience issues."), 
+                        alertStyle, 
+                        Height(InstalledHeight), 
+                        Width(20));
                 }
-                if (presetSpacing >= 4)
+                if (presetSpacing >= OptionsPerLine)
                 {
                     endHeight += InstalledHeight;
                     presetSpacing = 0;
-                    EndHorizontal();
-                    BeginHorizontal();
+
+                    EndHorizontal(true);
+                    BeginHorizontal(true);
+                }
+                else
+                {
+                    Space(spacing);
                 }
             }
-            EndHorizontal();
+            EndHorizontal(true);
 
             EndVertical();
 

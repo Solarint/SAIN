@@ -1,4 +1,6 @@
 ﻿
+using SAIN.Attributes;
+
 namespace SAIN
 {
     public enum SoloDecision
@@ -45,7 +47,7 @@ namespace SAIN
         Clear,
     }
 
-    public enum WeaponClass
+    public enum IWeaponClass
     {
         Default,
         assaultRifle,
@@ -60,7 +62,7 @@ namespace SAIN
         specialWeapon
     }
 
-    public enum Caliber
+    public enum ICaliber
     {
         Default,
         Caliber9x18PM,

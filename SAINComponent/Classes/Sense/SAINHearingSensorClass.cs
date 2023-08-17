@@ -87,11 +87,11 @@ namespace SAIN.SAINComponent.Classes
             var globalHearing = GlobalSAINSettings.Hearing;
             if (type == AISoundType.step)
             {
-                range *= globalHearing.GlobalFootstepAudioMulti;
+                range *= globalHearing.FootstepAudioMultiplier;
             }
             else
             {
-                range *= globalHearing.GlobalGunshotAudioMulti;
+                range *= globalHearing.GunshotAudioMultiplier;
             }
             range = Mathf.Round(range * 10) / 10;
 

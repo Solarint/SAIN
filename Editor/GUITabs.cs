@@ -1,6 +1,5 @@
 ﻿using EFT.UI;
 using SAIN.Editor.GUISections;
-using SAIN.Editor.Util;
 using SAIN.Helpers;
 using SAIN.Plugin;
 using static SAIN.Editor.SAINLayout;
@@ -73,6 +72,8 @@ namespace SAIN.Editor
 
         public static void Advanced()
         {
+            const int spacing = 4;
+
             bool oldValue = SAINEditor.AdvancedBotConfigs;
             SAINEditor.AdvancedBotConfigs = SAINEditor.AdvancedBotConfigs.GUIToggle("Advanced Bot Configs", "Edit at your own risk.", EUISoundType.MenuCheckBox, Height(40));
             if (oldValue != SAINEditor.AdvancedBotConfigs)
@@ -95,24 +96,39 @@ namespace SAIN.Editor
                 PresetHandler.SaveEditorDefaults();
             }
 
+            Space(spacing);
+
             BeginHorizontal();
-            Box("GUI Scaling", Width(200f));
-            RectLayout.ConfigScaling = BuilderClass.CreateSlider(RectLayout.ConfigScaling, 1f, 4f);
-            RectLayout.ConfigScaling = (float)BuilderClass.ResultBox(RectLayout.ConfigScaling, Width(100f));
+            Box("GUI Scaling Height", Width(200f), Height(30f));
+            RectLayout.ConfigScalingHeight = BuilderClass.CreateSlider(RectLayout.ConfigScalingHeight, 1f, 4f, Height(30f));
+            RectLayout.ConfigScalingHeight = (float)BuilderClass.ResultBox(RectLayout.ConfigScalingHeight, Width(100f), Height(30f));
             EndHorizontal();
+
+            Space(spacing / 2f);
+
+            BeginHorizontal();
+            Box("GUI Scaling Width", Width(200f), Height(30f));
+            RectLayout.ConfigScalingWidth = BuilderClass.CreateSlider(RectLayout.ConfigScalingWidth, 1f, 4f, Height(30f));
+            RectLayout.ConfigScalingWidth = (float)BuilderClass.ResultBox(RectLayout.ConfigScalingWidth, Width(100f), Height(30f));
+            EndHorizontal();
+
+            Space(spacing);
 
             ForceDecisionOpen = BuilderClass.ExpandableMenu("Force SAIN Bot Decisions", ForceDecisionOpen);
 
             if (ForceDecisionOpen)
             {
-                const int spacing = 5;
                 Space(spacing);
 
                 ForceSoloOpen = BuilderClass.ExpandableMenu("Force Solo Decision", ForceSoloOpen);
                 if (ForceSoloOpen)
                 {
+                    Space(spacing / 2f);
+
                     if (Button("Reset"))
                         SAINPlugin.ForceSoloDecision = SoloDecision.None;
+
+                    Space(spacing / 2f);
 
                     SAINPlugin.ForceSoloDecision = BuilderClass.SelectionGrid(
                         SAINPlugin.ForceSoloDecision,
@@ -124,8 +140,12 @@ namespace SAIN.Editor
                 ForceSquadOpen = BuilderClass.ExpandableMenu("Force Squad Decision", ForceSquadOpen);
                 if (ForceSquadOpen)
                 {
+                    Space(spacing / 2f);
+
                     if (Button("Reset"))
                         SAINPlugin.ForceSquadDecision = SquadDecision.None;
+
+                    Space(spacing / 2f);
 
                     SAINPlugin.ForceSquadDecision =
                         BuilderClass.SelectionGrid(SAINPlugin.ForceSquadDecision,
@@ -137,8 +157,12 @@ namespace SAIN.Editor
                 ForceSelfOpen = BuilderClass.ExpandableMenu("Force Self Decision", ForceSelfOpen);
                 if (ForceSelfOpen)
                 {
+                    Space(spacing / 2f);
+
                     if (Button("Reset"))
                         SAINPlugin.ForceSelfDecision = SelfDecision.None;
+
+                    Space(spacing / 2f);
 
                     SAINPlugin.ForceSelfDecision = BuilderClass.SelectionGrid(
                         SAINPlugin.ForceSelfDecision,

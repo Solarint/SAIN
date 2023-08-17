@@ -1,6 +1,5 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
-using EFT.InventoryLogic;
 using HarmonyLib;
 using SAIN.Components.Helpers;
 using SAIN.Helpers;
@@ -30,41 +29,27 @@ namespace SAIN.Patches.Hearing
         }
     }
 
-    public class InitiateShotPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(Player.FirearmController), "InitiateShot");
-        }
-        [PatchPostfix]
-        public static void PatchPostfix(Player.FirearmController __instance, IWeapon weapon, BulletClass ammo)
-        {
-            Player playerInstance = AccessTools.FieldRefAccess<Player.FirearmController, Player>(__instance, "_player");
-            GunshotRange.OnMakingShot(weapon, playerInstance, ammo);
-        }
-    }
-
     public class TryPlayShootSoundPatch : ModulePatch
     {
-        private static PropertyInfo _boolean_0;
+        private static PropertyInfo AIFlareEnabled;
+
         protected override MethodBase GetTargetMethod()
         {
-            _boolean_0 = AccessTools.Property(typeof(AiDataClass), "Boolean_0");
-
+            AIFlareEnabled = AccessTools.Property(typeof(AiDataClass), "Boolean_0");
             return AccessTools.Method(typeof(AiDataClass), "TryPlayShootSound");
         }
+
         [PatchPrefix]
-        public static bool PatchPrefix(AiDataClass __instance, ref float ___float_0)
+        public static bool PatchPrefix(AiDataClass __instance, Player getPlayer, AISoundType soundType, ref float ___float_0)
         {
-            bool flag = ___float_0 < Time.time;
+            AIFlareEnabled.SetValue(__instance, true);
 
-            _boolean_0.SetValue(__instance, true);
-
-            if (flag)
+            // Limits how many sounds are played from each player for the AI
+            if (___float_0 < Time.time)
             {
-                ___float_0 = Time.time + 1f;
+                ___float_0 = Time.time + 0.65f; // default 1f
+                AudioHelpers.TryPlayShootSound(getPlayer, soundType);
             }
-
             return false;
         }
     }
@@ -84,15 +69,12 @@ namespace SAIN.Patches.Hearing
         [PatchPrefix]
         public static void PatchPrefix(string soundName, BaseSoundPlayer __instance)
         {
-            if (SAINPlugin.BotController == null)
+            if (SAINPlugin.BotController != null)
             {
-                return;
+                object playerBridge = _PlayerBridge.GetValue(__instance);
+                Player player = _Player.Invoke(playerBridge, null) as Player;
+                SAINSoundTypeHandler.AISoundPlayer(soundName, player);
             }
-
-            object playerBridge = _PlayerBridge.GetValue(__instance);
-            Player player = _Player.Invoke(playerBridge, null) as Player;
-
-            SAINSoundTypeHandler.AISoundPlayer(soundName, player);
         }
     }
 }

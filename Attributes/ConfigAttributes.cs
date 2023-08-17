@@ -14,22 +14,22 @@ namespace SAIN.Attributes
 
     public sealed class AmmoCaliberAttribute : BaseAttribute
     {
-        public AmmoCaliberAttribute(Caliber ammoCaliber)
+        public AmmoCaliberAttribute(ICaliber ammoCaliber)
         {
             AmmoCaliber = ammoCaliber;
         }
 
-        public readonly Caliber AmmoCaliber;
+        public readonly ICaliber AmmoCaliber;
     }
 
     public sealed class WeaponClassAttribute : BaseAttribute
     {
-        public WeaponClassAttribute(WeaponClass weaponClass)
+        public WeaponClassAttribute(IWeaponClass weaponClass)
         {
             WeaponClass = weaponClass;
         }
 
-        public readonly WeaponClass WeaponClass;
+        public readonly IWeaponClass WeaponClass;
     }
 
     public sealed class DictionaryAttribute : BaseAttribute

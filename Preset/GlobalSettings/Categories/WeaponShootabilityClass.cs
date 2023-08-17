@@ -13,13 +13,13 @@ namespace SAIN.Preset.GlobalSettings
 
         public void UpdateValues()
         {
-            Values = GetValuesFromClass.UpdateValues(WeaponClass.Default, Default, this, Values);
+            Values = GetValuesFromClass.UpdateValues(IWeaponClass.Default, Default, this, Values);
         }
 
         public float Get(string weaponClass)
         {
             float modifier;
-            if (System.Enum.TryParse(weaponClass, out WeaponClass result))
+            if (System.Enum.TryParse(weaponClass, out IWeaponClass result))
             {
                 modifier = Get(result);
             }
@@ -31,7 +31,7 @@ namespace SAIN.Preset.GlobalSettings
             return modifier;
         }
 
-        public float Get(WeaponClass key)
+        public float Get(IWeaponClass key)
         {
             if (Values.Count == 0)
             {
@@ -50,61 +50,61 @@ namespace SAIN.Preset.GlobalSettings
         private const string Description = "Lower is BETTER. How Shootable this weapon type is, affects semi auto firerate and full auto burst length";
 
         [DefaultValue(0.25f)]
-        [WeaponClass(WeaponClass.assaultRifle)]
+        [WeaponClass(IWeaponClass.assaultRifle)]
         [NameAndDescription(nameof(AssaultRifle), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float AssaultRifle = 0.25f;
 
         [DefaultValue(0.3f)]
-        [WeaponClass(WeaponClass.assaultCarbine)]
+        [WeaponClass(IWeaponClass.assaultCarbine)]
         [NameAndDescription(nameof(AssaultCarbine), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float AssaultCarbine = 0.3f;
 
         [DefaultValue(0.25f)]
-        [WeaponClass(WeaponClass.machinegun)]
+        [WeaponClass(IWeaponClass.machinegun)]
         [NameAndDescription(nameof(Machinegun), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float Machinegun = 0.25f;
 
         [DefaultValue(0.2f)]
-        [WeaponClass(WeaponClass.smg)]
+        [WeaponClass(IWeaponClass.smg)]
         [NameAndDescription(nameof(SMG), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float SMG = 0.2f;
 
         [DefaultValue(0.4f)]
-        [WeaponClass(WeaponClass.pistol)]
+        [WeaponClass(IWeaponClass.pistol)]
         [NameAndDescription(nameof(Pistol), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float Pistol = 0.4f;
 
         [DefaultValue(0.5f)]
-        [WeaponClass(WeaponClass.marksmanRifle)]
+        [WeaponClass(IWeaponClass.marksmanRifle)]
         [NameAndDescription(nameof(MarksmanRifle), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float MarksmanRifle = 0.5f;
 
         [DefaultValue(0.75f)]
-        [WeaponClass(WeaponClass.sniperRifle)]
+        [WeaponClass(IWeaponClass.sniperRifle)]
         [NameAndDescription(nameof(SniperRifle), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float SniperRifle = 0.75f;
 
         [DefaultValue(0.5f)]
-        [WeaponClass(WeaponClass.shotgun)]
+        [WeaponClass(IWeaponClass.shotgun)]
         [NameAndDescription(nameof(Shotgun), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float Shotgun = 0.5f;
 
         [DefaultValue(1f)]
-        [WeaponClass(WeaponClass.grenadeLauncher)]
+        [WeaponClass(IWeaponClass.grenadeLauncher)]
         [NameAndDescription(nameof(GrenadeLauncher), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float GrenadeLauncher = 1f;
 
         [DefaultValue(1f)]
-        [WeaponClass(WeaponClass.specialWeapon)]
+        [WeaponClass(IWeaponClass.specialWeapon)]
         [NameAndDescription(nameof(SpecialWeapon), Description)]
         [MinMax(0.01f, 1f, 100f)]
         public float SpecialWeapon = 1;

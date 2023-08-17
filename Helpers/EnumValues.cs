@@ -58,10 +58,36 @@ namespace SAIN.Helpers
         public static T Parse<T>(string value) => (T)Enum.Parse(typeof(T), value);
 
         public static readonly BotDifficulty[] Difficulties = { BotDifficulty.easy, BotDifficulty.normal, BotDifficulty.hard, BotDifficulty.impossible };
-        public static WildSpawnType[] WildSpawnTypes => GetEnum<WildSpawnType>();
-        public static Caliber[] AmmoCalibers => GetEnum<Caliber>();
-        public static WeaponClass[] WeaponClasses => GetEnum<WeaponClass>();
-        public static SAINPersonality[] Personalities => GetEnum<SAINPersonality>();
+        public static readonly WildSpawnType[] WildSpawnTypes = GetEnum<WildSpawnType>();
+
+        public static readonly ICaliber[] AmmoCalibers = GetEnum<ICaliber>();
+        public static readonly IWeaponClass[] WeaponClasses = GetEnum<IWeaponClass>();
+
+        public static readonly SAINPersonality[] Personalities = GetEnum<SAINPersonality>();
+
+        public static readonly SoloDecision[] SoloDecisions = GetEnum<SoloDecision>();
+        public static readonly SquadDecision[] SquadDecisions = GetEnum<SquadDecision>();
+        public static readonly SelfDecision[] SelfDecisions = GetEnum<SelfDecision>();
+
+        public static ICaliber ParseCaliber(string caliber)
+        {
+            if (Enum.TryParse(caliber, out ICaliber result))
+            {
+                return result;
+            }
+            Logger.LogError(caliber);
+            return ICaliber.Default;
+        }
+
+        public static IWeaponClass ParseWeaponClass(string weaponClass)
+        {
+            if (Enum.TryParse(weaponClass, out IWeaponClass result))
+            {
+                return result;
+            }
+            Logger.LogError(weaponClass);
+            return IWeaponClass.Default;
+        }
 
         public static T[] GetEnum<T>()
         {
