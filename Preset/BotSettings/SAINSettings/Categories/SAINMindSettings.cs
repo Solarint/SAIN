@@ -63,16 +63,16 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
             "Chance this bot will flick you off when spotted")]
         [DefaultValue(0f)]
         [MinMax(0f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float CHANCE_FUCK_YOU_ON_CONTACT_100 = 0f;
 
-        [Advanced(AdvancedEnum.Hidden)] public bool SURGE_KIT_ONLY_SAFE_CONTAINER = false;
-        [Advanced(AdvancedEnum.Hidden)] public float SEC_TO_MORE_DIST_TO_RUN = 0f;
-        [Advanced(AdvancedEnum.Hidden)] public float DIST_TO_STOP_RUN_ENEMY = 0f;
-        [Advanced(AdvancedEnum.Hidden)] public bool NO_RUN_AWAY_FOR_SAFE = true;
-        [Advanced(AdvancedEnum.Hidden)] public bool CAN_USE_MEDS = true;
-        [Advanced(AdvancedEnum.Hidden)] public bool CAN_USE_FOOD_DRINK = true;
-        [Advanced(AdvancedEnum.Hidden)] public float GROUP_ANY_PHRASE_DELAY = 5f;
-        [Advanced(AdvancedEnum.Hidden)] public float GROUP_EXACTLY_PHRASE_DELAY = 5f;
+        [Advanced(IAdvancedOption.Hidden)] public bool SURGE_KIT_ONLY_SAFE_CONTAINER = false;
+        [Advanced(IAdvancedOption.Hidden)] public float SEC_TO_MORE_DIST_TO_RUN = 0f;
+        [Advanced(IAdvancedOption.Hidden)] public float DIST_TO_STOP_RUN_ENEMY = 0f;
+        [Advanced(IAdvancedOption.Hidden)] public bool NO_RUN_AWAY_FOR_SAFE = true;
+        [Advanced(IAdvancedOption.Hidden)] public bool CAN_USE_MEDS = true;
+        [Advanced(IAdvancedOption.Hidden)] public bool CAN_USE_FOOD_DRINK = true;
+        [Advanced(IAdvancedOption.Hidden)] public float GROUP_ANY_PHRASE_DELAY = 5f;
+        [Advanced(IAdvancedOption.Hidden)] public float GROUP_EXACTLY_PHRASE_DELAY = 5f;
     }
 }

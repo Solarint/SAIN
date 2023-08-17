@@ -173,9 +173,9 @@ namespace SAIN.Attributes
 
         public float Rounding { get; private set; }
 
-        public bool DoNotShowGUI => AdvancedOptions.Contains(AdvancedEnum.Hidden) || SAINEditor.AdvancedBotConfigs == false && AdvancedOptions.Contains(AdvancedEnum.IsAdvanced);
+        public bool DoNotShowGUI => AdvancedOptions.Contains(IAdvancedOption.Hidden) || SAINEditor.AdvancedBotConfigs == false && AdvancedOptions.Contains(IAdvancedOption.IsAdvanced);
 
-        public AdvancedEnum[] AdvancedOptions { get; private set; } = new AdvancedEnum[0];
+        public IAdvancedOption[] AdvancedOptions { get; private set; } = new IAdvancedOption[0];
 
         public EListType EListType { get; private set; } = EListType.None;
         public Type PrimaryListType { get; private set; }

@@ -178,8 +178,6 @@ namespace SAIN.Editor
                     fontStyle = FontStyle.Bold,
                 };
 
-            Texture2D TexLightGray = TexturesClass.GetTexture(
-                ColorNames.LightGray);
             Texture2D TexMidGray = TexturesClass.GetTexture(
                 ColorNames.MidGray);
             Texture2D TexDarkGray = TexturesClass.GetTexture(
@@ -286,10 +284,11 @@ namespace SAIN.Editor
             GUIStyle selectGridStyle =
                 new GUIStyle(ToggleStyle)
                 {
-                    padding = new RectOffset(10, 10, 3, 3),
-                    border = new RectOffset(10, 10, 3, 3),
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal,
+                    padding = new RectOffset(0, 0, 0, 0),
+                    border = new RectOffset(3, 3, 3, 3),
+                    margin = new RectOffset(0,0,0,0),
+                    alignment = TextAnchor.MiddleCenter,
+                    fontStyle = FontStyle.Bold,
                 };
 
             LabelStyle.margin = BoxStyle.margin;

@@ -23,7 +23,7 @@ namespace SAIN.Editor
             {
                 SoundLimiter = Time.time + 0.1f;
                 Singleton<GUISounds>.Instance.PlayUISound(soundType);
-                if (SAINPlugin.DebugModeEnabled)
+                if (SAINPlugin.GlobalDebugMode)
                 {
                     Logger.LogDebug(soundType);
                 }

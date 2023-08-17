@@ -34,7 +34,7 @@ namespace SAIN.Helpers
             {
                 return null;
             }
-            if (!SAINPlugin.DebugModeEnabled)
+            if (!SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogWarning("Debug Gizmos are on, but Global Debug Mode is off");
                 return null;
@@ -79,7 +79,7 @@ namespace SAIN.Helpers
             {
                 return null;
             }
-            if (!SAINPlugin.DebugModeEnabled)
+            if (!SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogWarning("Debug Gizmos are on, but Global Debug Mode is off");
                 return null;

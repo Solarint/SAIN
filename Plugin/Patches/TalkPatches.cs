@@ -42,7 +42,7 @@ namespace SAIN.Patches.Talk
                 bool fromSAIN = stackTrace.Contains(nameof(SAINComponentClass.Talk)) || stackTrace.Contains(nameof(SAINBotTalkClass));
                 if (!fromSAIN && PatchHelpers.BadTriggers.Contains(@event))
                 {
-                    if (SAINPlugin.DebugModeEnabled)
+                    if (SAINPlugin.GlobalDebugMode)
                     {
                         Logger.LogInfo($"PlayerTalkPatch: Blocked {@event}");
                     }
@@ -51,7 +51,7 @@ namespace SAIN.Patches.Talk
 
                 if (PatchHelpers.CheckTalkEvent(__instance, @event))
                 {
-                    if (SAINPlugin.DebugModeEnabled)
+                    if (SAINPlugin.GlobalDebugMode)
                     {
                         Logger.LogInfo($"PlayerTalkPatch: Allowed {@event}");
                     }
@@ -60,7 +60,7 @@ namespace SAIN.Patches.Talk
                     return true;
                 }
 
-                if (SAINPlugin.DebugModeEnabled)
+                if (SAINPlugin.GlobalDebugMode)
                 {
                     Logger.LogInfo($"PlayerTalkPatch: Blocked {@event}");
                 }

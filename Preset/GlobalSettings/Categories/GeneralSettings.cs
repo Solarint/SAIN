@@ -42,7 +42,7 @@ namespace SAIN.Preset.GlobalSettings
         [NameAndDescription(
             "No Bush ESP Debug")]
         [DefaultValue(false)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public bool NoBushESPDebugMode = false;
 
         [NameAndDescription(

@@ -28,31 +28,31 @@ namespace SAIN.Preset.GlobalSettings
             "at the default value of 0.2, bots will see 0.2 times as far, or 20% of their base vision distance at night-time.")]
         [DefaultValue(0.2f)]
         [MinMax(0.01f, 1f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float NightTimeVisionModifier = 0.2f;
 
         [Name("Dawn Start Hour")]
         [DefaultValue(6f)]
         [MinMax(5f, 8f, 1f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float HourDawnStart = 6f;
 
         [Name("Dawn End Hour")]
         [DefaultValue(8f)]
         [MinMax(6f, 9f, 1f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float HourDawnEnd = 8f;
 
         [Name("Dusk Start Hour")]
         [DefaultValue(20f)]
         [MinMax(19f, 22f, 1f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float HourDuskStart = 20f;
 
         [Name("Dusk End Hour")]
         [DefaultValue(22f)]
         [MinMax(20f, 23f, 1f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float HourDuskEnd = 22f;
     }
 }

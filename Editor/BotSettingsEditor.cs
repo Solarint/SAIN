@@ -1,8 +1,10 @@
-﻿using SAIN.Attributes;
+﻿using EFT.UI;
+using SAIN.Attributes;
 using SAIN.Editor.Util;
 using SAIN.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static SAIN.Editor.SAINLayout;
@@ -11,46 +13,62 @@ namespace SAIN.Editor.GUISections
 {
     public static class BotSettingsEditor
     {
-        public static void ShowAllSettingsGUI(object settings, out bool wasEdited)
-        {
-            wasEdited = false;
-            BeginVertical();
-
-            var container = SettingsContainers.GetContainer(settings.GetType());
-
-            Space(5);
-            if (CheckIfOpen(container))
-            {
-                Space(5);
-                container.Scroll = BeginScrollView(container.Scroll);
-                string search = BuilderClass.SearchBox(container);
-                try
-                {
-                    Space(5);
-                    CategoryOpenable(container.Categories, settings, out bool newEdit, search);
-                    if (newEdit)
-                    {
-                        wasEdited = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError(ex);
-                }
-                EndScrollView();
-            }
-
-            Space(5);
-            EndVertical();
-        }
-
-        public static bool CheckIfOpen(SettingsContainer container)
+        public static void ShowAllSettingsGUI(object settings, out bool wasEdited, string name, string savePath, float height, bool unsavedChanges, out bool Saved)
         {
             BeginHorizontal();
-            container.Open = BuilderClass.ExpandableMenu(container.Name, container.Open, null, 30, false);
+
+            const float spacing = 3f;
+
+            Box(name, Height(height));
+
+            Space(spacing);
+
+            string saveToolTip = $"Apply Values set below to {name}. " +
+                $"Exports edited values to {savePath} folder";
+
+            Saved = Button("Save and Export", saveToolTip, EUISoundType.InsuranceInsured, Height(height));
+
+            const float alertWidth = 250f;
+
+            if (unsavedChanges)
+            {
+                BuilderClass.Alert(
+                    "Click Save to export changes, and send changes to bots if in-game",
+                    "YOU HAVE UNSAVED CHANGES",
+                    height, alertWidth, ColorNames.LightRed);
+            }
+
+            Space(spacing);
+
+            Label("Search", Width(125f), Height(height));
+
+            Space(spacing);
+
+            var container = SettingsContainers.GetContainer(settings.GetType(), name);
+            container.SearchPattern = TextField(container.SearchPattern, null, Width(250), Height(height));
+
+            Space(spacing);
+
+            if (Button("Clear", EUISoundType.MenuContextMenu, Width(80), Height(height)))
+            {
+                container.SearchPattern = string.Empty;
+            }
+
+            EndHorizontal();
+            container.Scroll = BeginScrollView(container.Scroll);
+
+            CategoryOpenable(container.Categories, settings, out wasEdited, container.SearchPattern);
+
+            EndScrollView();
+        }
+
+        public static bool CheckIfOpen(SettingsContainer container, float height = 30f)
+        {
+            BeginHorizontal();
+            container.Open = BuilderClass.ExpandableMenu(container.Name, container.Open, null, height);
             if (Button("Clear", "Clear Selected Options in this Menu",
                 EFT.UI.EUISoundType.MenuDropdownSelect,
-                Width(30), Height(30)))
+                Width(100), Height(height)))
             {
                 container.SelectedCategories.Clear();
                 foreach (var category in container.Categories)
@@ -96,39 +114,32 @@ namespace SAIN.Editor.GUISections
             wasEdited = false;
             foreach (var categoryClass in categories)
             {
+                if (categoryClass.OptionCount() == 0)
+                {
+                    continue;
+                }
                 var attInfo = categoryClass.CategoryAttributes;
                 object categoryObject = categoryClass.Field.GetValue(settingsObject);
 
-                BeginHorizontal();
+                BeginHorizontal(30);
 
+                bool open = true;
                 if (string.IsNullOrEmpty(search))
                 {
-                    categoryClass.Open = BuilderClass.ExpandableMenu(attInfo.Name, categoryClass.Open, attInfo.Description, EntryConfig.EntryHeight, false);
+                    categoryClass.Open = BuilderClass.ExpandableMenu(
+                        attInfo.Name, categoryClass.Open, attInfo.Description, EntryConfig.EntryHeight);
+                    open = categoryClass.Open;
                 }
                 else
                 {
-                    Label(attInfo.Name, attInfo.Description, Height(EntryConfig.EntryHeight));
+                    Box(attInfo.Name, attInfo.Description, Height(EntryConfig.EntryHeight));
                 }
 
-                string labelText = $"Options Count: [{categoryClass.OptionsCount}]";
-                string advanced = SAINEditor.AdvancedBotConfigs ?
-                    " Advanced Options are on, so the reason for this section being empty is that the values are hidden because they SHOULD NOT be changed under any circumstance."
-                    : " Advanced Options in the Advanced Tab may show more options.";
-                string toolTip = $"The Number of Options available in this section. {advanced}";
+                EndHorizontal(30);
 
-                Label(labelText, toolTip, Height(EntryConfig.EntryHeight), Width(150));
-
-                if (Button("Clear", "Clear Selected Options in this Category",
-                    EFT.UI.EUISoundType.MenuDropdownSelect,
-                    Width(30), Height(30)))
+                if (open)
                 {
-                    categoryClass.SelectedList.Clear();
-                }
-
-                EndHorizontal();
-
-                if (categoryClass.Open)
-                {
+                    Space(3);
                     AttributesGUI.EditAllValuesInObj(categoryClass, categoryObject, out bool newEdit, search);
                     if (newEdit)
                     {
@@ -138,7 +149,7 @@ namespace SAIN.Editor.GUISections
             }
         }
 
-        private static readonly GUIEntryConfig EntryConfig = new GUIEntryConfig();
+        private static readonly GUIEntryConfig EntryConfig = new GUIEntryConfig(30f);
     }
 }
 
@@ -156,14 +167,6 @@ namespace SAIN.Editor
             }
             return Containers[containerType];
         }
-
-        public static void UpdateCache()
-        {
-            foreach (var container in Containers.Values) 
-            { 
-                container.UpdateCache(); 
-            }
-        }
     }
 
     public sealed class SettingsContainer
@@ -174,18 +177,10 @@ namespace SAIN.Editor
             foreach (FieldInfo field in settingsType.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
                 AttributesInfoClass attributes = new AttributesInfoClass(field);
-                if (!attributes.DoNotShowGUI)
+                if (!attributes.AdvancedOptions.Contains(IAdvancedOption.Hidden))
                 {
                     Categories.Add(new Category(attributes));
                 }
-            }
-        }
-
-        public void UpdateCache()
-        {
-            foreach (var category in Categories)
-            {
-                category.UpdateCache();
             }
         }
 
@@ -216,17 +211,12 @@ namespace SAIN.Editor
             GetFields(attributes.ValueType);
         }
 
-        public void UpdateCache()
-        {
-            GetFields(CategoryAttributes.ValueType);
-        }
-
         private void GetFields(Type type)
         {
             foreach (FieldInfo subField in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
                 var attInfo = AttributesGUI.GetAttributeInfo(subField);
-                if (!attInfo.DoNotShowGUI)
+                if (!attInfo.AdvancedOptions.Contains(IAdvancedOption.Hidden))
                 {
                     FieldAttributes.Add(attInfo);
                 }
@@ -242,6 +232,17 @@ namespace SAIN.Editor
         public bool Open = false;
         public Vector2 Scroll = Vector2.zero;
 
-        public int OptionsCount => FieldAttributes.Count;
+        public int OptionCount()
+        {
+            int count = 0;
+            foreach (var option in FieldAttributes)
+            {
+                if (!option.DoNotShowGUI)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace SAIN.Components.BotController
                     TimeOfDay = TimeOfDayEnum.Day;
                     timemodifier = 1f;
                 }
-                if (SAINPlugin.DebugModeEnabled)
+                if (SAINPlugin.GlobalDebugMode)
                 {
                     Logger.LogInfo($"Time Vision Modifier: [{timemodifier}] at [{time}] with Config Settings VisionModifier: [{nightSettings.NightTimeVisionModifier}]");
                 }

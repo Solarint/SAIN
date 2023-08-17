@@ -153,15 +153,19 @@ namespace SAIN.Attributes
 
     public sealed class AdvancedAttribute : BaseAttribute
     {
-        public AdvancedAttribute(params AdvancedEnum[] options)
+        public AdvancedAttribute(params IAdvancedOption[] options)
         {
             if (options != null && options.Length > 0)
             {
                 Options = options;
             }
+            else
+            {
+                Options = new IAdvancedOption[] { IAdvancedOption.IsAdvanced };
+            }
         }
 
-        public readonly AdvancedEnum[] Options = new AdvancedEnum[] { AdvancedEnum.IsAdvanced };
+        public readonly IAdvancedOption[] Options;
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
@@ -177,7 +181,7 @@ namespace SAIN.Attributes
         Dictionary,
     }
 
-    public enum AdvancedEnum
+    public enum IAdvancedOption
     {
         None,
         IsAdvanced,

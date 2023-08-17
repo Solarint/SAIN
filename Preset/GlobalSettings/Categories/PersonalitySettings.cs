@@ -15,16 +15,19 @@ namespace SAIN.Preset.GlobalSettings
             if (AllGigaChads)
             {
                 result = SAINPersonality.GigaChad;
+                return true;
             }
             if (AllChads)
             {
                 result = SAINPersonality.Chad;
+                return true;
             }
             if (AllRats)
             {
                 result = SAINPersonality.Rat;
+                return true;
             }
-            return result != SAINPersonality.Normal;
+            return false;
         }
 
         public void Update()

@@ -32,7 +32,7 @@ namespace SAIN.Helpers
                             float result = (supModifier * muzzleLoudness * baseAudibleRange).Round10();
                             Calculations.Add(playerWeaponId, result);
 
-                            if (SAINPlugin.DebugModeEnabled)
+                            if (SAINPlugin.GlobalDebugMode)
                             {
                                 Logger.LogDebug(
                                     $"Name: {player.name}  " +

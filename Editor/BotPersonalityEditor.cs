@@ -23,8 +23,6 @@ namespace SAIN.Editor.GUISections
                 SAINPlugin.LoadedPreset.ExportPersonalities();
             }
 
-            PersonScroll = BeginScrollView(PersonScroll);
-
             foreach (var personality in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
             {
                 string name = personality.Name;
@@ -32,7 +30,11 @@ namespace SAIN.Editor.GUISections
                 {
                     OpenPersMenus.Add(name, false);
                 }
+
+                BeginHorizontal(80f);
                 OpenPersMenus[name] = BuilderClass.ExpandableMenu(name, OpenPersMenus[name], personality.Description);
+                EndHorizontal(80f);
+
                 if (OpenPersMenus[name])
                 {
                     EditAllValuesInObj(personality.Variables, out bool newEdit);
@@ -42,12 +44,10 @@ namespace SAIN.Editor.GUISections
                     }
                 }
             }
-            EndScrollView();
         }
 
         public static bool PersonalitiesWereEdited;
 
         private static readonly Dictionary<string, bool> OpenPersMenus = new Dictionary<string, bool>();
-        private static Vector2 PersonScroll = Vector2.zero;
     }
 }

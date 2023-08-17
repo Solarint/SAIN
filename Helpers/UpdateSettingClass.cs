@@ -109,7 +109,7 @@ namespace SAIN.Helpers
         private static float MultiplySetting(float defaultValue, float multiplier, string name)
         {
             float result = Mathf.Round(defaultValue * multiplier * 100f) / 100f;
-            if (SAINPlugin.DebugModeEnabled)
+            if (SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogInfo($"{name} Default {defaultValue} Multiplier: {multiplier} Result: {result}");
             }

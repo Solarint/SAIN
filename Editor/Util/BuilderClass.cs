@@ -11,15 +11,15 @@ namespace SAIN.Editor
     {
         private static float ExpandMenuWidth => 250f;
 
-        public static string SearchBox(SettingsContainer container, SearchParams config = null)
+        public static string SearchBox(SettingsContainer container, float height = 30, SearchParams config = null)
         {
-            container.SearchPattern = SearchBox(container.SearchPattern, config);
+            container.SearchPattern = SearchBox(container.SearchPattern, height, config);
             return container.SearchPattern;
         }
 
-        public static string SearchBox(string search, SearchParams config = null)
+        public static string SearchBox(string search, float height = 30, SearchParams config = null)
         {
-            config = config ?? new SearchParams();
+            config = config ?? new SearchParams { optionHeight = height };
             config.Start();
 
             Label("Search", config.Label);
@@ -401,9 +401,7 @@ namespace SAIN.Editor
             Texture2D texture;
             if (selected)
             {
-                //Color ColorGold = SAINEditor.Colors.GetTexture(Names.ColorNames.Gold);
                 texture = TexturesClass.GetTexture(ColorNames.DarkRed);
-                //ApplyToStyle.ApplyTextColorAllStates(style, ColorGold);
             }
             else if (hovering)
             {
@@ -545,40 +543,9 @@ namespace SAIN.Editor
             return current;
         }
 
-        public static bool ExpandableMenu(string name, bool value, string description = null, float height = 30f, bool beginHoriz = true)
+        public static bool ExpandableMenu(string name, bool value, string description = null, float height = 35f)
         {
-            if (beginHoriz)
-                BeginHorizontal();
-
-            Label(name, description, Height(height), Width(ExpandMenuWidth));
-            string text = value ? "Collapse" : "Expand";
-
-            bool newvalue = Toggle(value, text, null, Height(height));
-            if (newvalue != value)
-            {
-                Sounds.PlaySound(EUISoundType.MenuDropdown);
-            }
-
-            if (beginHoriz)
-                EndHorizontal();
-
-            return newvalue;
-        }
-        public static bool ExpandableMenuToggle(string name, bool value, string description = null, float height = 30f, bool beginHoriz = true)
-        {
-            if (beginHoriz)
-                BeginHorizontal();
-
-            bool newvalue = Toggle(value, name, description, null, Height(height));
-            if (newvalue != value)
-            {
-                Sounds.PlaySound(EUISoundType.MenuDropdown);
-            }
-
-            if (beginHoriz)
-                EndHorizontal();
-
-            return newvalue;
+            return Toggle(value, new GUIContent(name, description), EUISoundType.MenuDropdown, Height(height));
         }
 
         public static int CreateSlider(int value, int min, int max, params GUILayoutOption[] options)

@@ -121,7 +121,7 @@ namespace SAIN.Preset
                 SaveObjectToJson(obj, fileName, folders);
                 success = true;
 
-                if (SAINPlugin.DebugModeEnabled)
+                if (SAINPlugin.GlobalDebugMode)
                 {
                     string debugFolders = string.Empty;
                     for (int i = 0; i < folders.Length; i++)
@@ -148,7 +148,7 @@ namespace SAIN.Preset
                 {
                     result = Load.DeserializeObject<T>(json);
 
-                    if (SAINPlugin.DebugModeEnabled)
+                    if (SAINPlugin.GlobalDebugMode)
                     {
                         string debugFolders = string.Empty;
                         for (int i = 0; i < folders.Length; i++)

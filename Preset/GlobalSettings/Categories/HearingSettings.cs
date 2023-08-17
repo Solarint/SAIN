@@ -1,56 +1,42 @@
 ﻿using Newtonsoft.Json;
 using SAIN.Attributes;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace SAIN.Preset.GlobalSettings
 {
     public class HearingSettings
     {
-        [NameAndDescription(
-            "Global Gunshot Audible Range Multiplier")]
-        [DefaultValue(1f)]
+        [Name("Global Gunshot Audible Range Multiplier")]
+        [Default(1f)]
         [MinMax(0.1f, 2f, 100f)]
         public float GunshotAudioMultiplier = 1f;
 
-        [NameAndDescription(
-            "Global Footstep Audible Range Multiplier")]
-        [DefaultValue(1f)]
+        [Name("Global Footstep Audible Range Multiplier")]
+        [Default(1f)]
         [MinMax(0.1f, 2f, 100f)]
         public float FootstepAudioMultiplier = 1f;
 
-        [NameAndDescription(
-            "Suppressed Sound Modifier",
-            "Audible Gun Range is multiplied by this number when using a suppressor")]
-        [DefaultValue(0.6f)]
+        [Name("Suppressed Sound Modifier")]
+        [Description("Audible Gun Range is multiplied by this number when using a suppressor")]
+        [Default(0.6f)]
         [MinMax(0.1f, 0.95f, 100f)]
         public float SuppressorModifier = 0.6f;
 
-        [NameAndDescription(
-            "Subsonic Sound Modifier",
-            "Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo")]
-        [DefaultValue(0.25f)]
+        [Name("Subsonic Sound Modifier")]
+        [Description("Audible Gun Range is multiplied by this number when using a suppressor and subsonic ammo")]
+        [Default(0.25f)]
         [MinMax(0.1f, 0.95f, 100f)]
         public float SubsonicModifier = 0.33f;
 
-        [Name(
-            "Ammo Shootability"
-            )]
-        [Attributes.Description(
-            "Lower is BETTER. " +
-            "How Shootable this ammo type is, affects semi auto firerate and full auto burst length." +
-            "Value is scaled but roughly gives a plus or minus 20% to firerate depending on the value set here." +
-            "For Example. 9x19 will shoot about 20% faster fire-rate on semi-auto at 50 meters" +
-            ", and fire 20% longer bursts when on full auto"
-            )]
-        [MinMax(0.01f, 1f, 100f)]
+        [Name("Hearing Distances by Ammo Type")]
+        [Description("How far a bot can hear a gunshot when fired from each specific caliber listed here.")]
+        [MinMax(30f, 400f, 1f)]
         [Advanced]
         [Dictionary(typeof(ICaliber), typeof(float))]
         public Dictionary<ICaliber, float> AudibleRanges = new Dictionary<ICaliber, float>(AudibleRangesDefaults);
 
         [JsonIgnore]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public static readonly Dictionary<ICaliber, float> AudibleRangesDefaults = new Dictionary<ICaliber, float>()
         {
             { ICaliber.Caliber9x18PM, 110f },

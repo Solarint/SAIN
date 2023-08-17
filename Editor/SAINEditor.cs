@@ -4,6 +4,7 @@ using EFT;
 using EFT.Console.Core;
 using EFT.UI;
 using SAIN.Attributes;
+using SAIN.Plugin;
 using System;
 using UnityEngine;
 using static SAIN.Editor.RectLayout;
@@ -27,8 +28,8 @@ namespace SAIN.Editor
         }
 
         public static bool GameIsPaused { get; private set; }
-        public static bool PauseOnEditorOpen;
-        public static bool AdvancedBotConfigs;
+        public static bool PauseOnEditorOpen => PresetHandler.EditorDefaults.PauseOnEditorOpen;
+        public static bool AdvancedBotConfigs => PresetHandler.EditorDefaults.AdvancedBotConfigs;
 
         [ConsoleCommand("Toggle SAIN GUI Editor")]
         private static void ToggleGUI()
@@ -150,9 +151,9 @@ namespace SAIN.Editor
 
             CreateTopBarOptions();
 
-            EEditorTab selectedTab = EditTabsClass.TabSelectMenu(25f, 3f, 0.5f);
+            EEditorTab selectedTab = EditTabsClass.TabSelectMenu(35f, 3f, 0.5f);
 
-            float space = DragRect.height + EditTabsClass.TabMenuRect.height + 5;
+            float space = DragRect.height + EditTabsClass.TabMenuRect.height;
             Space(space);
 
             if (!string.IsNullOrEmpty(ExceptionString))
@@ -181,19 +182,29 @@ namespace SAIN.Editor
 
         public static string ExceptionString = string.Empty;
 
+        private static readonly GUIContent PauseContent = new GUIContent
+                ("Pause When Open", "Automatically Pause the game when this GUI is open while in-game.");
+
+        private static readonly GUIContent SaveContent = new GUIContent
+                ("Save All Changes", $"Export All Changes to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}");
+
         private static void CreateTopBarOptions()
         {
-            var style = GetStyle(Style.button);
-            if (GUI.Button(SaveAllRect, new GUIContent("Save All Changes", $"Export All Changes to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}"), style))
+            var style = GetStyle(Style.toggle);
+            if (GUI.Button(SaveAllRect, SaveContent, GetStyle(Style.button)))
             {
                 PlaySound(EUISoundType.InsuranceInsured);
                 SAINPlugin.LoadedPreset.ExportAll();
             }
-            if (GUI.Toggle(PauseRect, PauseOnEditorOpen, "Pause When Open", style))
+
+            var defaults = PresetHandler.EditorDefaults;
+            bool oldValue = defaults.PauseOnEditorOpen;
+            defaults.PauseOnEditorOpen = GUI.Toggle(PauseRect, PauseOnEditorOpen, PauseContent, GetStyle(Style.toggle));
+            if (oldValue != defaults.PauseOnEditorOpen)
             {
-                PauseOnEditorOpen = !PauseOnEditorOpen;
                 PlaySound(EUISoundType.ButtonClick);
             }
+
             if (GUI.Button(ExitRect, "X", style))
             {
                 PlaySound(EUISoundType.MenuEscape);
@@ -203,25 +214,19 @@ namespace SAIN.Editor
 
         private static void DrawTooltip()
         {
-            string tooltip = GUI.tooltip;
-            if (!string.IsNullOrEmpty(tooltip))
+            if (!string.IsNullOrEmpty(GUI.tooltip))
             {
-                var currentEvent = Event.current;
-
-                const int width = 200;
-
-                var ToolTipStyle = GetStyle(Style.tooltip);
-                var height = ToolTipStyle.CalcHeight(new GUIContent(tooltip), width) + 10;
-
-                var x = currentEvent.mousePosition.x;
-                var y = currentEvent.mousePosition.y + 15;
-
+                const int width = 250;
+                var x = Event.current.mousePosition.x;
+                var y = Event.current.mousePosition.y + 15;
                 if (x > Screen.width / 3)
                 {
                     x -= width;
                 }
 
-                GUI.Box(new Rect(x, y, width, height), tooltip, ToolTipStyle);
+                var ToolTipStyle = GetStyle(Style.tooltip);
+                var height = ToolTipStyle.CalcHeight(new GUIContent(GUI.tooltip), width) + 10;
+                GUI.Box(new Rect(x, y, width, height), GUI.tooltip, ToolTipStyle);
             }
         }
 
@@ -230,8 +235,6 @@ namespace SAIN.Editor
             get => CursorSettings.DisplayingWindow;
             set { CursorSettings.DisplayingWindow = value; }
         }
-
-        public static Rect AdjustmentRect = new Rect(500, 50, 600f, 500f);
 
         public static Rect OpenTabRect = new Rect(0, 0, MainWindow.width, 1000f);
 

@@ -127,7 +127,7 @@ namespace SAIN.Helpers
                 LoadAllFiles(list, "*.json", folders);
             }
 
-            public static List<SAINPresetDefinition> GetPresetOptions(List<SAINPresetDefinition> list)
+            public static void GetPresetOptions(List<SAINPresetDefinition> list)
             {
                 list.Clear();
                 string foldersPath = GetFoldersPath(PresetsFolder);
@@ -143,10 +143,9 @@ namespace SAIN.Helpers
                     }
                     else
                     {
-                        SAIN.Logger.LogError(path);
+                        Logger.LogError(path);
                     }
                 }
-                return list;
             }
 
             public static void LoadAllFiles<T>(List<T> list, string searchPattern = null , params string[] folders)

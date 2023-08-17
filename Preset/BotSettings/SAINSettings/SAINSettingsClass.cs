@@ -9,12 +9,12 @@ namespace SAIN.Preset.BotSettings.SAINSettings
             "Anything related to a bot's Aiming settings used by default EFT Code")]
         public SAINAimingSettings Aiming = new SAINAimingSettings();
 
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         [NameAndDescription("Bot Aiming Settings", 
             "Anything related to a bot's Aiming settings used by default EFT Code")]
         public SAINBossSettings Boss = new SAINBossSettings();
 
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         [NameAndDescription("Bot Change Settings", 
             "Anything related to a bot's Change settings used by default EFT Code")]
         public SAINChangeSettings Change = new SAINChangeSettings();
@@ -23,7 +23,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings
             "Anything related to a bot's Core settings used by default EFT Code")]
         public SAINCoreSettings Core = new SAINCoreSettings();
 
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         [NameAndDescription("Bot Grenade Settings", 
             "Anything related to a bot's Grenade settings used by default EFT Code")]
         public SAINGrenadeSettings Grenade = new SAINGrenadeSettings();
@@ -32,7 +32,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings
             "Anything related to a bot's Hearing settings used by default EFT Code")]
         public SAINHearingSettings Hearing = new SAINHearingSettings();
 
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         [NameAndDescription("Bot Lay Settings", 
             "Anything related to a bot's Lay settings used by default EFT Code")]
         public SAINLaySettings Lay = new SAINLaySettings();

@@ -88,7 +88,7 @@ namespace SAIN.Editor
         {
             string newvalue = GUILayout.TextField(value, GetStyle(Style.textField), options);
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            if (soundPlayed && SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogDebug($"Toggle {sound.Value}");
             }
@@ -99,7 +99,7 @@ namespace SAIN.Editor
         {
             string newvalue = GUILayout.TextArea(value, GetStyle(Style.textField), options);
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            if (soundPlayed && SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogDebug($"Toggle {sound.Value}");
             }
@@ -145,7 +145,7 @@ namespace SAIN.Editor
         {
             bool newvalue = GUILayout.Toggle(value, content, style, options);
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            if (soundPlayed && SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogDebug($"Toggle {sound.Value}");
             }
@@ -182,7 +182,7 @@ namespace SAIN.Editor
             float newvalue = GUILayout.HorizontalSlider(value, min, max, GetStyle(Style.horizontalSlider), GetStyle(Style.horizontalSliderThumb), options);
             sound = sound ?? EUISoundType.MenuEscape;
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugModeEnabled)
+            if (soundPlayed && SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogDebug($"Toggle {sound.Value}");
             }
@@ -314,14 +314,19 @@ namespace SAIN.Editor
             if (value) GUILayout.FlexibleSpace();
         }
 
-        public static Vector2 BeginScrollView(Vector2 scrollPos)
+        public static Vector2 BeginScrollView(Vector2 scrollPos, float width)
         {
-            return GUILayout.BeginScrollView(scrollPos, GetStyle(Style.scrollView));
+            return GUILayout.BeginScrollView(scrollPos, GetStyle(Style.scrollView), GetStyle(Style.verticalScrollbar), Width(width));
+        }
+
+        public static Vector2 BeginScrollView(Vector2 scrollPos, params GUILayoutOption[] options)
+        {
+            return GUILayout.BeginScrollView(scrollPos, GetStyle(Style.scrollView), GetStyle(Style.verticalScrollbar), options);
         }
 
         public static Vector2 BeginScrollView(Rect rect, Vector2 scrollPos, Rect viewRect)
         {
-            return GUI.BeginScrollView(rect, scrollPos, viewRect, GetStyle(Style.horizontalScrollbar), GetStyle(Style.verticalScrollbar));
+            return GUI.BeginScrollView(rect, scrollPos, viewRect, GetStyle(Style.scrollView), GetStyle(Style.verticalScrollbar));
         }
 
         public static void EndScrollView()
@@ -332,11 +337,6 @@ namespace SAIN.Editor
         public static void EndScrollView(bool handleScrollWheel)
         {
             GUI.EndScrollView(handleScrollWheel);
-        }
-
-        public static Vector2 BeginScrollView(Vector2 pos, params GUILayoutOption[] options)
-        {
-            return GUILayout.BeginScrollView(pos, GetStyle(Style.verticalScrollbar), GetStyle(Style.verticalScrollbar), options);
         }
 
         public static GUIStyle GetStyle(Style key)

@@ -2,7 +2,14 @@
 using SAIN.Editor.GUISections;
 using SAIN.Helpers;
 using SAIN.Plugin;
+using static Mono.Security.X509.X520;
+using System.ComponentModel;
 using static SAIN.Editor.SAINLayout;
+using UnityEngine;
+using static EFT.SpeedTree.TreeWind;
+using SAIN.Preset.GlobalSettings;
+using static GClass1711;
+using SAIN.Attributes;
 
 namespace SAIN.Editor
 {
@@ -36,23 +43,28 @@ namespace SAIN.Editor
         public static void Home()
         {
             ModDetection.ModDetectionGUI();
-            Space(5f);
+            Space(15f);
             PresetSelection.Menu();
         }
 
         public static void GlobalSettings()
         {
-            string toolTip = $"Apply Values set below to GlobalSettings. " +
-                $"Exports edited values to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name} folder";
-            if (BuilderClass.SaveChanges(GlobalSettingsWereEdited, toolTip, 35))
-            {
-                SAINPlugin.LoadedPreset.ExportGlobalSettings();
-            }
+            BotSettingsEditor.ShowAllSettingsGUI(
+                SAINPlugin.LoadedPreset.GlobalSettings, 
+                out bool newEdit,
+                "Global Settings", 
+                $"SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}", 
+                35f, 
+                GlobalSettingsWereEdited, 
+                out bool saved);
 
-            BotSettingsEditor.ShowAllSettingsGUI(SAINPlugin.LoadedPreset.GlobalSettings, out bool newEdit);
             if (newEdit)
             {
                 GlobalSettingsWereEdited = true;
+            }
+            if (saved)
+            {
+                SAINPlugin.LoadedPreset.ExportGlobalSettings();
             }
         }
 
@@ -60,9 +72,9 @@ namespace SAIN.Editor
 
         public static void BotSettings()
         {
-            BeginArea(SAINEditor.OpenTabRect);
+            //BeginArea(SAINEditor.OpenTabRect);
             BotSelectionClass.Menu();
-            EndArea();
+            //EndArea();
         }
 
         public static void Personality()
@@ -74,43 +86,16 @@ namespace SAIN.Editor
         {
             const int spacing = 4;
 
-            bool oldValue = SAINEditor.AdvancedBotConfigs;
-            SAINEditor.AdvancedBotConfigs = SAINEditor.AdvancedBotConfigs.GUIToggle("Advanced Bot Configs", "Edit at your own risk.", EUISoundType.MenuCheckBox, Height(40));
-            if (oldValue != SAINEditor.AdvancedBotConfigs)
+            AttributesGUI.EditAllValuesInObj(PresetHandler.EditorDefaults, out bool newEdit);
+            if (newEdit)
             {
-                SettingsContainers.UpdateCache();
-                PresetHandler.SaveEditorDefaults();
+                PresetHandler.ExportEditorDefaults();
             }
 
-            oldValue = SAINPlugin.DebugModeEnabled;
-            SAINPlugin.DebugModeEnabled = SAINPlugin.DebugModeEnabled.GUIToggle("Global Debug Mode", EUISoundType.MenuCheckBox, Height(40));
-            if (oldValue != SAINPlugin.DebugModeEnabled)
+            if (!PresetHandler.EditorDefaults.GlobalDebugMode)
             {
-                PresetHandler.SaveEditorDefaults();
+                return;
             }
-
-            oldValue = SAINPlugin.DrawDebugGizmos;
-            SAINPlugin.DrawDebugGizmos = SAINPlugin.DrawDebugGizmos.GUIToggle("Draw Debug Gizmos", EUISoundType.MenuCheckBox, Height(40));
-            if (oldValue != SAINPlugin.DrawDebugGizmos)
-            {
-                PresetHandler.SaveEditorDefaults();
-            }
-
-            Space(spacing);
-
-            BeginHorizontal();
-            Box("GUI Scaling Height", Width(200f), Height(30f));
-            RectLayout.ConfigScalingHeight = BuilderClass.CreateSlider(RectLayout.ConfigScalingHeight, 1f, 4f, Height(30f));
-            RectLayout.ConfigScalingHeight = (float)BuilderClass.ResultBox(RectLayout.ConfigScalingHeight, Width(100f), Height(30f));
-            EndHorizontal();
-
-            Space(spacing / 2f);
-
-            BeginHorizontal();
-            Box("GUI Scaling Width", Width(200f), Height(30f));
-            RectLayout.ConfigScalingWidth = BuilderClass.CreateSlider(RectLayout.ConfigScalingWidth, 1f, 4f, Height(30f));
-            RectLayout.ConfigScalingWidth = (float)BuilderClass.ResultBox(RectLayout.ConfigScalingWidth, Width(100f), Height(30f));
-            EndHorizontal();
 
             Space(spacing);
 

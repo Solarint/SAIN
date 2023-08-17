@@ -99,7 +99,7 @@ namespace SAIN.SAINComponent.Classes.Info
                         if (eftVarField != null)
                         {
                             object sainValue = sainVarField.GetValue(sainCategory);
-                            if (SAINPlugin.DebugModeEnabled)
+                            if (SAINPlugin.GlobalDebugMode)
                             {
                                 // Logger.LogInfo($"{eftVarField.Value} Default {eftVarField.GetValue(eftCategory)} NewValue: {sainValue}");
                             }
@@ -157,7 +157,10 @@ namespace SAIN.SAINComponent.Classes.Info
                 forgetTime = 45f.Randomize(0.85f, 1.15f).Round100();
             }
             BotOwner.Settings.FileSettings.Mind.TIME_TO_FORGOR_ABOUT_ENEMY_SEC = forgetTime;
+            ForgetEnemyTime = forgetTime;
         }
+
+        public float ForgetEnemyTime;
 
         private void UpdateExtractTime()
         {
@@ -196,18 +199,18 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public SAINPersonality GetPersonality()
         {
-            if (!SAINPlugin.LoadedPreset.GlobalSettings.Personality.CheckForForceAllPers(out SAINPersonality result))
+            if (SAINPlugin.LoadedPreset.GlobalSettings.Personality.CheckForForceAllPers(out SAINPersonality result))
             {
-                foreach (PersonalitySettingsClass setting in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
+                return result;
+            }
+            foreach (PersonalitySettingsClass setting in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
+            {
+                if (setting.CanBePersonality(this))
                 {
-                    if (setting.CanBePersonality(WildSpawnType, PowerLevel, PlayerLevel))
-                    {
-                        result = Personality;
-                        break;
-                    }
+                    return setting.SAINPersonality;
                 }
             }
-            return result;
+            return SAINPersonality.Normal;
         }
 
         public WildSpawnType WildSpawnType => Profile.WildSpawnType;

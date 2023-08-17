@@ -14,7 +14,7 @@ namespace SAIN.Preset.GlobalSettings
         public float MaxDazzleRange = 30f;
 
         [DefaultValue(false)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public bool DebugFlash = false;
 
         [DefaultValue(false)]

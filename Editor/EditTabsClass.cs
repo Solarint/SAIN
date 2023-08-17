@@ -59,15 +59,15 @@ namespace SAIN.Editor
             TabTooltips = tooltips.ToArray();
         }
 
-        private const float TabMenuHeight = 50f;
-        private const float TabMenuVerticalMargin = 5f;
+        private const float TabMenuHeight = 60f;
+        private const float TabMenuVerticalMargin = 2f;
 
-        public static EEditorTab TabSelectMenu(float minHeight = 15, float speed = 3, float closeSpeedMulti = 0.66f)
+        public static EEditorTab TabSelectMenu(float minHeight = 30, float speed = 3, float closeSpeedMulti = 0.66f)
         {
             if (TabMenuRect == null || TabRects == null)
             {
                 TabMenuRect = new Rect(0, ExitRect.height + TabMenuVerticalMargin, MainWindow.width, TabMenuHeight);
-                TabRects = BuilderClass.HorizontalGridRects(TabMenuRect, Tabs.Length, 15f);
+                TabRects = BuilderClass.HorizontalGridRects(TabMenuRect, Tabs.Length, minHeight);
             }
 
             string openTabString = BuilderClass.SelectionGridExpandHeight(TabMenuRect, Tabs, TabClasses[SelectedTab].Name, TabRects, minHeight, speed, closeSpeedMulti, TabTooltips);
@@ -87,7 +87,7 @@ namespace SAIN.Editor
 
         public static void BeginScrollView()
         {
-            TabClasses[SelectedTab].Scroll = SAINLayout.BeginScrollView(TabClasses[SelectedTab].Scroll);
+            TabClasses[SelectedTab].Scroll = SAINLayout.BeginScrollView(TabClasses[SelectedTab].Scroll, MainWindow.width);
             BeginVertical();
         }
 

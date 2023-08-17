@@ -55,8 +55,10 @@ namespace SAIN
     [BepInProcess(EscapeFromTarkov)]
     public class SAINPlugin : BaseUnityPlugin
     {
-        public static bool DebugModeEnabled = false;
-        public static bool DrawDebugGizmos = false;
+        public static bool GlobalDebugMode => EditorDefaults.GlobalDebugMode;
+        public static bool DrawDebugGizmos => EditorDefaults.DrawDebugGizmos;
+        public static PresetEditorDefaults EditorDefaults => PresetHandler.EditorDefaults;
+
         public static SoloDecision ForceSoloDecision = SoloDecision.None;
         public static SquadDecision ForceSquadDecision = SquadDecision.None;
         public static SelfDecision ForceSelfDecision = SelfDecision.None;

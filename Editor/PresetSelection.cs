@@ -11,35 +11,33 @@ namespace SAIN.Editor.GUISections
     {
         public static bool Menu()
         {
-            BeginVertical();
+            const float LabelHeight = 35f;
 
-            const float LabelHeight = 25f;
-            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
-            var alertStyle = GetStyle(Style.alert);
-            if (selectedPreset.SAINVersion != AssemblyInfo.SAINVersion)
-            {
-                Box(new GUIContent(
-                        $"Selected Preset was made for SAIN Version {selectedPreset.SAINVersion} " +
-                        $"but you are running {AssemblyInfo.SAINVersion}, you may experience issues."), 
-                    alertStyle, Height(LabelHeight));
-            }
-            BeginHorizontal();
+            BeginHorizontal(100f);
             Box("Installed Presets", Height(LabelHeight));
             Box("Select an installed preset for SAIN Settings", Height(LabelHeight));
             if (Button("Refresh", "Refresh installed Presets", null, Height(LabelHeight)))
             {
                 PresetHandler.LoadPresetOptions();
             }
-            EndHorizontal();
+            EndHorizontal(100f);
+
+            SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
+            if (selectedPreset.SAINVersion != AssemblyInfo.SAINVersion)
+            {
+                Box(new GUIContent(
+                        $"Selected Preset was made for SAIN Version {selectedPreset.SAINVersion} " +
+                        $"but you are running {AssemblyInfo.SAINVersion}, you may experience issues."),
+                    GetStyle(Style.alert), Height(LabelHeight + 5));
+            }
 
             BeginHorizontal(true);
 
-            const float InstalledHeight = 30;
-            float endHeight = InstalledHeight + LabelHeight;
-
+            const float InstalledHeight = 40;
             const int OptionsPerLine = 4;
             float width = 1860f / OptionsPerLine;
             float spacing = 15f / OptionsPerLine - 1;
+            const float AlertWidth = 25f;
 
             int presetSpacing = 0;
             for (int i = 0; i < PresetHandler.PresetOptions.Count; i++)
@@ -47,7 +45,7 @@ namespace SAIN.Editor.GUISections
                 presetSpacing++;
                 var preset = PresetHandler.PresetOptions[i];
                 bool badVersion = preset.SAINVersion != AssemblyInfo.SAINVersion;
-                float toggleWidth = badVersion ? width - 20f : width;
+                float toggleWidth = badVersion ? width - AlertWidth : width;
 
                 bool selected = selectedPreset.Name == preset.Name;
                 if (Toggle(selected, 
@@ -68,16 +66,14 @@ namespace SAIN.Editor.GUISections
                             "!", 
                             $"Selected Preset was made for SAIN Version {preset.SAINVersion} " +
                             $"but you are running {AssemblyInfo.SAINVersion}, " +
-                            $"you may experience issues."), 
-                        alertStyle, 
+                            $"you may experience issues."),
+                        GetStyle(Style.alert), 
                         Height(InstalledHeight), 
-                        Width(20));
+                        Width(AlertWidth));
                 }
                 if (presetSpacing >= OptionsPerLine)
                 {
-                    endHeight += InstalledHeight;
                     presetSpacing = 0;
-
                     EndHorizontal(true);
                     BeginHorizontal(true);
                 }
@@ -88,11 +84,9 @@ namespace SAIN.Editor.GUISections
             }
             EndHorizontal(true);
 
-            EndVertical();
-
             Space(10);
 
-            OpenNewPresetMenu = BuilderClass.ExpandableMenu("Create New Preset", OpenNewPresetMenu);
+            OpenNewPresetMenu = BuilderClass.ExpandableMenu("Create New Preset", OpenNewPresetMenu, null, 40f);
             if (OpenNewPresetMenu)
             {
                 Space(5);
@@ -109,6 +103,7 @@ namespace SAIN.Editor.GUISections
                 {
                     string optionName = PresetHandler.PresetOptions[i].Name;
                     bool selected = CopyFrom == optionName;
+                    BeginHorizontal(150f);
                     if (Toggle(selected, optionName, EFT.UI.EUISoundType.MenuCheckBox, Height(25)))
                     {
                         if (!selected)
@@ -116,6 +111,7 @@ namespace SAIN.Editor.GUISections
                             CopyFrom = optionName;
                         }
                     }
+                    EndHorizontal(150f);
                 }
 
                 Space(5);
@@ -146,11 +142,13 @@ namespace SAIN.Editor.GUISections
 
         private static string LabeledTextField(string value, string label)
         {
-            BeginHorizontal();
+            BeginHorizontal(25f);
+
             Box(label, Width(225f));
             Space(5);
             value = TextField(value);
-            EndHorizontal();
+
+            EndHorizontal(25f);
             return Regex.Replace(value, @"[^\w \-]", "");
         }
 

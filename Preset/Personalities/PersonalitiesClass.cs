@@ -59,7 +59,7 @@ namespace SAIN.Preset.Personalities
 
         public class PersonalityVariablesClass
         {
-            [Advanced(AdvancedEnum.Hidden)]
+            [Advanced(IAdvancedOption.Hidden)]
             const string PowerLevelDescription = " Power level is a combined number that takes into account armor, the class of that armor, and the weapon class that is currently used by a bot." +
                 " Power Level usually falls within 30 to 120 on average, and almost never goes above 150";
 
@@ -98,26 +98,26 @@ namespace SAIN.Preset.Personalities
             public float PowerLevelMax = 250;
 
             [Default(1f)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             [MinMax(0, 3f, 10)]
             public float HoldGroundBaseTime = 1f;
 
             [Default(0.66f)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             [MinMax(0.1f, 2f, 10)]
             public float HoldGroundMinRandom = 0.66f;
 
             [Default(1.5f)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             [MinMax(0.1f, 2f, 10)]
             public float HoldGroundMaxRandom = 1.5f;
 
-            [Default(45)]
+            [Default(40)]
             [MinMax(0.1f, 500f)]
-            public float SearchBaseTime = 45;
+            public float SearchBaseTime = 40;
 
             [Default(1f)]
-            [MinMax(0.01f, 5f, 1)]
+            [MinMax(0.01f, 5f, 100)]
             public float AggressionMultiplier = 1f;
 
             [Default(false)]
@@ -153,31 +153,31 @@ namespace SAIN.Preset.Personalities
             public float BaseSearchMoveSpeed = 1f;
 
             [Default(false)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             public bool FrequentTaunt = false;
 
             [Default(false)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             public bool ConstantTaunt = false;
 
             [Default(true)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             public bool CanRespondToVoice = true;
 
             [Default(20f)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             [Percentage]
             public float TauntFrequency = 20f;
 
             [Default(20f)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             [Percentage]
             public float TauntMaxDistance = 20f;
 
             [Default(false)]
             public bool SprintWhileSearch = false;
 
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             [Default(false)]
             public bool FrequentSprintWhileSearch = false;
 
@@ -185,7 +185,7 @@ namespace SAIN.Preset.Personalities
             public bool CanRushEnemyReloadHeal = false;
 
             [Default(false)]
-            [Advanced(AdvancedEnum.IsAdvanced)]
+            [Advanced(IAdvancedOption.IsAdvanced)]
             public bool CanFakeDeathRare = false;
         }
     }

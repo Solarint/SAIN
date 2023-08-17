@@ -5,6 +5,7 @@ using SAIN.Editor.Util;
 using SAIN.Helpers;
 using SAIN.Preset;
 using SAIN.Preset.BotSettings.SAINSettings;
+using SAIN.Preset.GlobalSettings;
 using SAIN.Preset.GlobalSettings.Categories;
 using System;
 using System.Collections.Generic;
@@ -67,9 +68,49 @@ namespace SAIN.Attributes
 
                     if ((isDictionary || isList) && ExpandableList(attributes, entryConfig.EntryHeight))
                     {
-                        if (isDictionary)
+                        if (attributes.SecondaryListType == typeof(float))
                         {
-                            EditAllValuesInObj(value, out wasEdited);
+                            string fieldName = attributes.Field?.Name ?? attributes.Property?.Name;
+                            if (attributes.PrimaryListType == typeof(IWeaponClass))
+                            {
+                                var dictionary = value as Dictionary<IWeaponClass, float>;
+                                Dictionary<IWeaponClass, float> defaultDictionary = null;
+
+                                if (fieldName == nameof(ShootSettings.WeaponShootability))
+                                {
+                                    defaultDictionary = ShootSettings.WeaponShootabilityDefaults;
+
+                                }
+                                else if (fieldName == nameof(ShootSettings.EngagementDistance))
+                                {
+                                    defaultDictionary = ShootSettings.EngagementDistanceDefaults;
+                                }
+
+                                if (defaultDictionary != null)
+                                {
+                                    EditDictionary(dictionary, defaultDictionary, attributes, out wasEdited);
+                                }
+                            }
+                            else if (attributes.PrimaryListType == typeof(ICaliber))
+                            {
+                                var dictionary = value as Dictionary<ICaliber, float>;
+                                Dictionary<ICaliber, float> defaultDictionary = null;
+
+                                if (fieldName == nameof(ShootSettings.AmmoShootability))
+                                {
+                                    defaultDictionary = ShootSettings.AmmoShootabilityDefaults;
+
+                                }
+                                else if (fieldName == nameof(HearingSettings.AudibleRanges))
+                                {
+                                    defaultDictionary = HearingSettings.AudibleRangesDefaults;
+                                }
+
+                                if (defaultDictionary != null)
+                                {
+                                    EditDictionary(dictionary, defaultDictionary, attributes, out wasEdited);
+                                }
+                            }
                         }
                         else if (value is List<WildSpawnType> wildList)
                         {
@@ -97,27 +138,30 @@ namespace SAIN.Attributes
             return value;
         }
 
+        private static void CreateLabelStyle()
+        {
+            if (LabelStyle == null)
+            {
+                GUIStyle boxstyle = GetStyle(Style.box);
+                LabelStyle = new GUIStyle(GetStyle(Style.label))
+                {
+                    alignment = TextAnchor.MiddleCenter,
+                    margin = boxstyle.margin,
+                    padding = boxstyle.padding
+                };
+            }
+        }
+
         public static object EditFloatBoolInt(object value, AttributesInfoClass attributes, GUIEntryConfig entryConfig, out bool wasEdited, bool showLabel = true, bool beginHoriz = true)
         {
             if (beginHoriz)
             {
-                BeginHorizontal();
-                Space(15);
+                BeginHorizontal(100f);
             }
 
             if (showLabel)
             {
-
-                if (LabelStyle == null)
-                {
-                    GUIStyle boxstyle = GetStyle(Style.box);
-                    LabelStyle = new GUIStyle(GetStyle(Style.label))
-                    {
-                        alignment = TextAnchor.MiddleLeft,
-                        margin = boxstyle.margin,
-                        padding = boxstyle.padding
-                    };
-                }
+                CreateLabelStyle();
 
                 Box(new GUIContent(
                     attributes.Name, 
@@ -168,21 +212,15 @@ namespace SAIN.Attributes
 
             if (beginHoriz)
             {
-                Space(15);
-                EndHorizontal();
+                EndHorizontal(100f);
             }
             wasEdited = originalValue.ToString() != value.ToString();
             return value;
         }
 
-        private static int RoundObjectToInt(object value)
-        {
-            return Mathf.RoundToInt((float)value);
-        }
-
         private static bool ExpandableList(AttributesInfoClass attributes, float height)
         {
-            BeginHorizontal();
+            BeginHorizontal(100f);
 
             string name = attributes.Name;
             if (!ListIsOpen.ContainsKey(name))
@@ -190,30 +228,75 @@ namespace SAIN.Attributes
                 ListIsOpen.Add(name, false);
             }
             bool isOpen = ListIsOpen[name];
-            isOpen = BuilderClass.ExpandableMenu(name, isOpen, attributes.Description, height, false);
+            isOpen = BuilderClass.ExpandableMenu(name, isOpen, attributes.Description, height);
             ListIsOpen[name] = isOpen;
 
-            EndHorizontal();
+            EndHorizontal(100f);
             return isOpen;
         }
 
         private static readonly Dictionary<string, bool> ListIsOpen = new Dictionary<string, bool>();
-
-        private static object Clamp(object value, float min, float max)
-        {
-            return MathHelpers.ClampObject(value, min, max);
-        }
 
         public static object EditValue(object value, FieldInfo field, out bool wasEdited, GUIEntryConfig entryConfig = null)
         {
             return EditValue(value, GetAttributeInfo(field), out wasEdited, entryConfig);
         }
 
+        public static void EditDictionary<T>(Dictionary<T, float> dictionary, Dictionary<T, float> defaultDictionary, AttributesInfoClass dictionaryAttributes, out bool wasEdited)
+        {
+            BeginVertical(5f);
+
+            float min = dictionaryAttributes.Min;
+            float max = dictionaryAttributes.Max;
+            float rounding = dictionaryAttributes.Rounding;
+
+            List<T> list = new List<T>();
+            foreach (var entry in dictionary)
+            {
+                if (entry.Key.ToString() == "Default")
+                {
+                    continue;
+                }
+                list.Add(entry.Key);
+            }
+
+            CreateLabelStyle();
+
+            wasEdited = false;
+            for (int i = 0; i < list.Count; i++)
+            {
+                BeginHorizontal(150f);
+
+                var item = list[i];
+                float originalValue = dictionary[item];
+                float value = originalValue;
+
+                Box(new GUIContent(item.ToString()), LabelStyle, Height(DefaultEntryConfig.EntryHeight));
+                value = BuilderClass.CreateSlider(value, min, max, DefaultEntryConfig.Toggle).Round(rounding);
+                Box(value.ToString(), DefaultEntryConfig.Result);
+
+                if (Button("Reset", EUISoundType.ButtonClick, DefaultEntryConfig.Reset))
+                {
+                    value = defaultDictionary[item];
+                }
+                if (value != originalValue)
+                {
+                    wasEdited = true;
+                    dictionary[item] = value;
+                }
+
+                EndHorizontal(150f);
+            }
+
+            list.Clear();
+            EndVertical(5f);
+        }
+
         public static void EditAllValuesInObj(object obj, out bool wasEdited, string search = null)
         {
             wasEdited = false;
-            BeginVertical();
-            Space(5);
+            BeginVertical(5f);
+
             foreach (var field in obj.GetType().GetFields())
             {
                 var attributes = GetAttributeInfo(field);
@@ -225,7 +308,7 @@ namespace SAIN.Attributes
                 object newValue = EditValue(value, attributes, out bool newEdit);
                 if (newEdit)
                 {
-                    if (SAINPlugin.DebugModeEnabled)
+                    if (SAINPlugin.GlobalDebugMode)
                     {
                         Logger.LogInfo($"{field.Name} was edited");
                     }
@@ -234,15 +317,14 @@ namespace SAIN.Attributes
                 }
             }
 
-            Space(5);
-            EndVertical();
+            EndVertical(5f);
         }
 
         public static void EditAllValuesInObj(Category category, object categoryObject, out bool wasEdited, string search = null)
         {
+            BeginVertical(5);
+
             wasEdited = false;
-            BeginVertical();
-            Space(5);
             foreach (var fieldAtt in category.FieldAttributes)
             {
                 if (SkipForSearch(fieldAtt, search))
@@ -253,7 +335,7 @@ namespace SAIN.Attributes
                 object newValue = EditValue(value, fieldAtt, out bool newEdit);
                 if (newEdit)
                 {
-                    if (SAINPlugin.DebugModeEnabled)
+                    if (SAINPlugin.GlobalDebugMode)
                     {
                         Logger.LogInfo($"{fieldAtt.Name} was edited");
                     }
@@ -262,14 +344,13 @@ namespace SAIN.Attributes
                 }
             }
 
-            Space(5);
-            EndVertical();
+            EndVertical(5);
         }
 
         public static bool SkipForSearch(AttributesInfoClass attributes, string search)
         {
             return !string.IsNullOrEmpty(search) && 
-                (attributes.Name.ToLower().Contains(search) == false || 
+                (attributes.Name.ToLower().Contains(search) == false && 
                 attributes.Description?.ToLower().Contains(search) == false);
         }
 
@@ -301,7 +382,7 @@ namespace SAIN.Attributes
                             object newValue = EditValue(value, targetField, out bool newEdit);
                             if (newEdit)
                             {
-                                if (SAINPlugin.DebugModeEnabled)
+                                if (SAINPlugin.GlobalDebugMode)
                                 {
                                     Logger.LogInfo($"{targetField.Name} was edited");
                                 }

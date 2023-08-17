@@ -35,7 +35,7 @@ namespace SAIN.Preset.GlobalSettings
             )]
         [Default(1.5f)]
         [MinMax(0.1f, 10f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float MaxRecoil = 1.5f;
 
         [Name(
@@ -46,7 +46,7 @@ namespace SAIN.Preset.GlobalSettings
             )]
         [Default(-1f)]
         [MinMax(-10f, 10f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float AddRecoil = -1f;
 
         [Name(
@@ -57,7 +57,7 @@ namespace SAIN.Preset.GlobalSettings
             )]
         [Default(0.75f)]
         [MinMax(0.1f, 0.99f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float RecoilDecay = 0.75f;
 
         [Name(
@@ -76,7 +76,7 @@ namespace SAIN.Preset.GlobalSettings
         public Dictionary<ICaliber, float> AmmoShootability = new Dictionary<ICaliber, float>(AmmoShootabilityDefaults);
 
         [JsonIgnore]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public static readonly Dictionary<ICaliber, float> AmmoShootabilityDefaults = new Dictionary<ICaliber, float>()
         {
             { ICaliber.Caliber9x18PM, 0.2f },
@@ -124,7 +124,7 @@ namespace SAIN.Preset.GlobalSettings
         public Dictionary<IWeaponClass, float> WeaponShootability = new Dictionary<IWeaponClass, float>(WeaponShootabilityDefaults);
 
         [JsonIgnore]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public static readonly Dictionary<IWeaponClass, float> WeaponShootabilityDefaults = new Dictionary<IWeaponClass, float>()
         {
             { IWeaponClass.Default, 0.4f },
@@ -153,7 +153,7 @@ namespace SAIN.Preset.GlobalSettings
         public Dictionary<IWeaponClass, float> EngagementDistance = new Dictionary<IWeaponClass, float>(EngagementDistanceDefaults);
 
         [JsonIgnore]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public static readonly Dictionary<IWeaponClass, float> EngagementDistanceDefaults = new Dictionary<IWeaponClass, float>()
         {
             { IWeaponClass.Default, 75f },
@@ -170,7 +170,7 @@ namespace SAIN.Preset.GlobalSettings
         };
 
         [JsonIgnore]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         private const string Shootability = "Affects Weapon Shootability Calculations. ";
 
         [Description(Shootability)]

@@ -95,7 +95,7 @@ namespace SAIN.Components
 
         public void OnGUI()
         {
-            if (SAINPlugin.DebugModeEnabled)
+            if (SAINPlugin.GlobalDebugMode)
             {
                 GUIUtility.ScaleAroundPivot(RectLayout.ScaledPivot, Vector2.zero);
                 for (int i = 0; i < BushColliders.Length; i++)

@@ -9,41 +9,27 @@ namespace SAIN.Plugin
 {
     internal class PresetHandler
     {
-        public static Action PresetsUpdated;
-        public static List<SAINPresetDefinition> PresetOptions = new List<SAINPresetDefinition>();
-        public static SAINPresetClass LoadedPreset;
-
-        public static void LoadPresetOptions()
-        {
-            PresetOptions = Load.GetPresetOptions(PresetOptions);
-        }
-
-        public static bool PresetVersionMismatch = false;
+        public const string DefaultPreset = "3 SAIN Hard - Default";
 
         private const string Settings = "Settings";
 
+        public static Action PresetsUpdated;
+
+        public static readonly List<SAINPresetDefinition> PresetOptions = new List<SAINPresetDefinition>();
+        
+        public static SAINPresetClass LoadedPreset;
+
         public static PresetEditorDefaults EditorDefaults;
+
+        public static void LoadPresetOptions()
+        {
+            Load.GetPresetOptions(PresetOptions);
+        }
 
         public static void Init()
         {
+            ImportEditorDefaults();
             LoadPresetOptions();
-
-            if (Load.LoadObject(out PresetEditorDefaults editorDefaults, Settings, PresetsFolder))
-            {
-                EditorDefaults = editorDefaults;
-            }
-            else
-            {
-                EditorDefaults = new PresetEditorDefaults 
-                { 
-                    SelectedPreset = DefaultPreset
-                };
-            }
-
-            EditorDefaults.DefaultPreset = DefaultPreset;
-            SAINEditor.AdvancedBotConfigs = EditorDefaults.ShowAdvanced;
-            SAINPlugin.DebugModeEnabled = EditorDefaults.GlobalDebugMode;
-            SAINPlugin.DrawDebugGizmos = EditorDefaults.DebugGizmos;
 
             if (!LoadPresetDefinition(EditorDefaults.SelectedPreset, 
                 out SAINPresetDefinition presetDefinition))
@@ -56,6 +42,89 @@ namespace SAIN.Plugin
                 }
             }
             InitPresetFromDefinition(presetDefinition);
+        }
+
+        public static bool LoadPresetDefinition(string presetKey, out SAINPresetDefinition definition)
+        {
+            for (int i = 0; i < PresetOptions.Count; i++)
+            {
+                var preset = PresetOptions[i];
+                if (preset.Name == presetKey)
+                {
+                    definition = preset;
+                    return true;
+                }
+            }
+            if (Load.LoadObject(out definition, "Info", PresetsFolder, presetKey))
+            {
+                PresetOptions.Add(definition);
+                return true;
+            }
+            return false;
+        }
+
+        public static void SavePresetDefinition(SAINPresetDefinition definition)
+        {
+            bool newPreset = true;
+            for (int i = 0; i < PresetOptions.Count; i++)
+            {
+                var preset = PresetOptions[i];
+                if (preset.Name == definition.Name)
+                {
+                    newPreset = false;
+                }
+            }
+            if (newPreset)
+            {
+                PresetOptions.Add(definition);
+            }
+
+            SaveObjectToJson(definition, "Info", PresetsFolder, definition.Name);
+        }
+
+        public static void InitPresetFromDefinition(SAINPresetDefinition def)
+        {
+            try
+            {
+                LoadedPreset = new SAINPresetClass(def);
+            }
+            catch (Exception ex)
+            {
+                Sounds.PlaySound(EFT.UI.EUISoundType.ErrorMessage);
+                Logger.LogError(ex);
+
+                LoadPresetDefinition(DefaultPreset, out def);
+                LoadedPreset = new SAINPresetClass(def);
+            }
+            UpdateExistingBots();
+            ExportEditorDefaults();
+        }
+
+        public static void ExportEditorDefaults()
+        {
+            EditorDefaults.SelectedPreset = LoadedPreset.Info.Name;
+            SaveObjectToJson(EditorDefaults, Settings, PresetsFolder);
+        }
+
+        public static void ImportEditorDefaults()
+        {
+            if (Load.LoadObject(out PresetEditorDefaults editorDefaults, Settings, PresetsFolder))
+            {
+                EditorDefaults = editorDefaults;
+            }
+            else
+            {
+                EditorDefaults = new PresetEditorDefaults(DefaultPreset);
+            }
+        }
+
+        public static void UpdateExistingBots()
+        {
+            if (SAINPlugin.BotController?.Bots != null && SAINPlugin.BotController.Bots.Count > 0)
+            {
+                PresetsUpdated();
+                AudioHelpers.ClearCache();
+            }
         }
 
         private static SAINPresetClass CreateDefaultPresets()
@@ -72,7 +141,7 @@ namespace SAIN.Plugin
         {
             var definition = new SAINPresetDefinition
             {
-                Name = "SAIN Easy",
+                Name = "1 SAIN Easy",
                 Description = "The Default Easy SAIN Preset",
                 Creator = "Solarint",
                 SAINVersion = AssemblyInfo.SAINVersion,
@@ -106,7 +175,7 @@ namespace SAIN.Plugin
         {
             var definition = new SAINPresetDefinition
             {
-                Name = "SAIN Normal",
+                Name = "2 SAIN Normal",
                 Description = "The Default Normal SAIN Preset",
                 Creator = "Solarint",
                 SAINVersion = AssemblyInfo.SAINVersion,
@@ -141,7 +210,7 @@ namespace SAIN.Plugin
             var definition = new SAINPresetDefinition
             {
                 Name = DefaultPreset,
-                Description = "The Default Hard SAIN Preset. The way it was designed to be played",
+                Description = "3 The Default Hard SAIN Preset. The way it was designed to be played",
                 Creator = "Solarint",
                 SAINVersion = AssemblyInfo.SAINVersion,
                 DateCreated = DateTime.Now.ToString()
@@ -156,7 +225,7 @@ namespace SAIN.Plugin
         {
             var definition = new SAINPresetDefinition
             {
-                Name = "SAIN Very Hard",
+                Name = "4 SAIN Very Hard",
                 Description = "The Default Very Hard SAIN Preset.",
                 Creator = "Solarint",
                 SAINVersion = AssemblyInfo.SAINVersion,
@@ -189,7 +258,7 @@ namespace SAIN.Plugin
         {
             var definition = new SAINPresetDefinition
             {
-                Name = "SAIN Impossible",
+                Name = "5 SAIN Impossible",
                 Description = "Prepare to Die",
                 Creator = "Solarint",
                 SAINVersion = AssemblyInfo.SAINVersion,
@@ -200,8 +269,8 @@ namespace SAIN.Plugin
             var preset = new SAINPresetClass(definition);
 
             var shoot = preset.GlobalSettings.Shoot;
-            shoot.GlobalRecoilMultiplier = 0.35f;
-            shoot.GlobalScatterMultiplier = 0.2f;
+            shoot.GlobalRecoilMultiplier = 0.15f;
+            shoot.GlobalScatterMultiplier = 0.15f;
 
             var aim = preset.GlobalSettings.Aiming;
             aim.AccuracySpreadMultiGlobal = 0.15f;
@@ -216,76 +285,6 @@ namespace SAIN.Plugin
             preset.ExportGlobalSettings();
 
             return preset;
-        }
-
-        public static readonly string DefaultPreset = "SAIN Hard - Default";
-
-        public static bool LoadPresetDefinition(string presetKey, out SAINPresetDefinition definition)
-        {
-            return Load.LoadObject(out definition, "Info", PresetsFolder, presetKey);
-        }
-
-        public static void SavePresetDefinition(SAINPresetDefinition definition)
-        {
-            bool newPreset = true;
-            for (int i = 0; i < PresetOptions.Count; i++)
-            {
-                var preset = PresetOptions[i];
-                if (preset.Name == definition.Name)
-                {
-                    newPreset = false;
-                }
-            }
-            if (newPreset)
-            {
-                PresetOptions.Add(definition);
-            }
-
-            SaveObjectToJson(definition, "Info", PresetsFolder, definition.Name);
-        }
-
-        public static void InitPresetFromDefinition(SAINPresetDefinition def)
-        {
-            try
-            {
-                LoadedPreset = new SAINPresetClass(def);
-                EditorDefaults.SelectedPreset = def.Name;
-                EditorDefaults.DefaultPreset = DefaultPreset;
-                EditorDefaults.ShowAdvanced = SAINEditor.AdvancedBotConfigs;
-                EditorDefaults.DebugGizmos = SAINPlugin.DrawDebugGizmos;
-                EditorDefaults.GlobalDebugMode = SAINPlugin.DebugModeEnabled;
-                SaveObjectToJson(EditorDefaults, Settings, PresetsFolder);
-                UpdateExistingBots();
-            }
-            catch (Exception ex)
-            {
-                Sounds.PlaySound(EFT.UI.EUISoundType.ErrorMessage);
-                Logger.LogError(ex);
-                LoadPresetDefinition(DefaultPreset, out def);
-                LoadedPreset = new SAINPresetClass(def);
-                SaveEditorDefaults();
-                UpdateExistingBots();
-            }
-        }
-
-
-        public static void SaveEditorDefaults()
-        {
-            EditorDefaults.SelectedPreset = LoadedPreset.Info.Name;
-            EditorDefaults.DefaultPreset = DefaultPreset;
-            EditorDefaults.ShowAdvanced = SAINEditor.AdvancedBotConfigs;
-            EditorDefaults.DebugGizmos = SAINPlugin.DrawDebugGizmos;
-            EditorDefaults.GlobalDebugMode = SAINPlugin.DebugModeEnabled;
-            SaveObjectToJson(EditorDefaults, Settings, PresetsFolder);
-        }
-
-        public static void UpdateExistingBots()
-        {
-            if (SAINPlugin.BotController?.Bots != null && SAINPlugin.BotController.Bots.Count > 0)
-            {
-                PresetsUpdated();
-                AudioHelpers.ClearCache();
-            }
         }
     }
 }

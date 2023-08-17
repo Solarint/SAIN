@@ -80,7 +80,7 @@ namespace SAIN.Preset.GlobalSettings
 
         private static void Log(string message, object key)
         {
-            if (SAINPlugin.DebugModeEnabled)
+            if (SAINPlugin.GlobalDebugMode)
             {
                 Logger.LogWarning($"Key: [{key}] {message}");
             }

@@ -36,40 +36,40 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [NameAndDescription("Aiming Upgrade By Time")]
         [DefaultValue(0.8f)]
         [MinMax(0.1f, 0.95f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced, AdvancedEnum.CopyValueFromEFT)]
+        [Advanced(IAdvancedOption.IsAdvanced, IAdvancedOption.CopyValueFromEFT)]
         public float MAX_AIMING_UPGRADE_BY_TIME = 0.8f;
 
         [NameAndDescription("Max Aim Time")]
         [Description(null)]
         [DefaultValue(2f)]
         [MinMax(0.1f, 5f, 10f)]
-        [Advanced(AdvancedEnum.IsAdvanced, AdvancedEnum.CopyValueFromEFT)]
+        [Advanced(IAdvancedOption.IsAdvanced, IAdvancedOption.CopyValueFromEFT)]
         public float MAX_AIM_TIME = 2f;
 
         [NameAndDescription("Aim Type")]
         [Description(null)]
         [DefaultValue(4)]
         [MinMax(1, 6)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public int AIMING_TYPE = 4;
 
         [NameAndDescription("Friendly Fire Spherecast Size")]
         [Description(null)]
         [DefaultValue(0.15f)]
         [MinMax(0f, 0.5f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float SHPERE_FRIENDY_FIRE_SIZE = 0.15f;
 
         [DefaultValue(1)]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public int RECALC_MUST_TIME = 1;
 
         [DefaultValue(1)]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public int RECALC_MUST_TIME_MIN = 1;
 
         [DefaultValue(2)]
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public int RECALC_MUST_TIME_MAX = 2;
 
         [NameAndDescription(
@@ -77,7 +77,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
             "How much time it takes to recover a bot's aim when they get hit by a bullet")]
         [DefaultValue(0.5f)]
         [MinMax(0.1f, 0.99f, 100f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float BASE_HIT_AFFECTION_DELAY_SEC = 0.5f;
 
         [NameAndDescription(
@@ -85,7 +85,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
             "How much to kick a bot's aim when they get hit by a bullet")]
         [DefaultValue(3f)]
         [MinMax(0f, 25f, 10f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float BASE_HIT_AFFECTION_MIN_ANG = 3f;
 
         [NameAndDescription(
@@ -93,7 +93,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
             "How much to kick a bot's aim when they get hit by a bullet")]
         [DefaultValue(5f)]
         [MinMax(0f, 25f, 10f)]
-        [Advanced(AdvancedEnum.IsAdvanced)]
+        [Advanced(IAdvancedOption.IsAdvanced)]
         public float BASE_HIT_AFFECTION_MAX_ANG = 5f;
     }
 }

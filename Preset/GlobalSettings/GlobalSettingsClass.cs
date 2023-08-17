@@ -66,10 +66,10 @@ namespace SAIN.Preset.GlobalSettings
         [Name("Global Look Settings")]
         public LookSettings Look = new LookSettings();
 
-        //[Advanced(AdvancedEnum.Hidden)]
+        //[Advanced(IAdvancedOption.Hidden)]
         //public BigBrainSettings BigBrain = new BigBrainSettings();
 
-        [Advanced(AdvancedEnum.Hidden)]
+        [Advanced(IAdvancedOption.Hidden)]
         public EFTCoreSettings EFTCoreSettings = new EFTCoreSettings();
     }
 }
