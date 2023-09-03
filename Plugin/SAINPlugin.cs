@@ -33,7 +33,7 @@ namespace SAIN
 
         public const string SAINGUID = "me.sol.sain";
         public const string SAINName = "SAIN";
-        public const string SAINVersion = "3.5.3";
+        public const string SAINVersion = "3.5.4";
 
         public const string SPTGUID = "com.spt-aki.core";
         public const string SPTVersion = "3.6.0";

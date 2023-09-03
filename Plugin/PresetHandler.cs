@@ -10,7 +10,7 @@ namespace SAIN.Plugin
 {
     internal class PresetHandler
     {
-        public const string DefaultPreset = "3 SAIN Hard - Default";
+        public const string DefaultPreset = "Default Hard";
 
         private const string Settings = "Settings";
 
