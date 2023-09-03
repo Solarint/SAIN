@@ -32,11 +32,11 @@ namespace SAIN.Preset.GlobalSettings
         [Description("How far a bot can hear a gunshot when fired from each specific caliber listed here.")]
         [MinMax(30f, 400f, 1f)]
         [Advanced]
-        [Dictionary(typeof(ICaliber), typeof(float))]
+        [DefaultDictionary(nameof(HearingDistancesDefaults))]
         public Dictionary<ICaliber, float> HearingDistances = new Dictionary<ICaliber, float>(HearingDistancesDefaults);
 
         [JsonIgnore]
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public static readonly Dictionary<ICaliber, float> HearingDistancesDefaults = new Dictionary<ICaliber, float>()
         {
             { ICaliber.Caliber9x18PM, 110f },

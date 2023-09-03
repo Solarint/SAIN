@@ -17,17 +17,21 @@ namespace SAIN.Preset
 
     public class BotTypeDefinitions
     {
-        public static Dictionary<WildSpawnType, BotType> BotTypes;
-        public static List<BotType> BotTypesList;
+        public static readonly Dictionary<WildSpawnType, BotType> BotTypes = new Dictionary<WildSpawnType, BotType>();
+        public static readonly List<BotType> BotTypesList = CreateBotTypes();
+        public static readonly List<WildSpawnType> WildSpawnList = new List<WildSpawnType>();
+        public static readonly List<string> BotTypesNames = new List<string>();
 
         static BotTypeDefinitions()
         {
-            BotTypesList = CreateBotTypes();
-            BotTypes = new Dictionary<WildSpawnType, BotType>();
-
             for (int i = 0; i < BotTypesList.Count; i++)
             {
-                BotTypes.Add(BotTypesList[i].WildSpawnType, BotTypesList[i]);
+                var botType = BotTypesList[i];
+                var wildSpawn = botType.WildSpawnType;
+
+                BotTypesNames.Add(botType.Name);
+                WildSpawnList.Add(wildSpawn);
+                BotTypes.Add(wildSpawn, botType);
             }
         }
 

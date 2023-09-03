@@ -11,7 +11,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [NameAndDescription(
             "EFT Scatter Multiplier",
             "Higher = more scattering. Modifies EFT's default scatter feature. 1.5 = 1.5x more scatter")]
-        [DefaultValue(1f)]
+        [Default(1f)]
         [MinMax(0.1f, 10f, 100f)]
         public float ScatterMultiplier = 1f;
     }

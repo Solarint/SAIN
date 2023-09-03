@@ -5,7 +5,8 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
 {
     public class SAINBossSettings
     {
-        [Advanced(IAdvancedOption.Hidden)][DefaultValue(false)]
+        [Hidden]
+        [Default(false)]
         public bool SET_CHEAT_VISIBLE_WHEN_ADD_TO_ENEMY = false;
     }
 }

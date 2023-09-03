@@ -5,23 +5,23 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class CoverSettings
     {
-        [DefaultValue(0.75f)]
+        [Default(0.75f)]
         [MinMax(0.5f, 1.5f, 100f)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Advanced]
         public float CoverMinHeight = 0.75f;
 
-        [DefaultValue(8f)]
+        [Default(8f)]
         [MinMax(0f, 30f, 1f)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Advanced]
         public float CoverMinEnemyDistance = 8f;
 
-        [DefaultValue(0.33f)]
+        [Default(0.33f)]
         [MinMax(0.01f, 1f, 100f)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Advanced]
         public float CoverUpdateFrequency = 0.33f;
 
-        [DefaultValue(false)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Default(false)]
+        [Advanced]
         public bool DebugCoverFinder = false;
     }
 }

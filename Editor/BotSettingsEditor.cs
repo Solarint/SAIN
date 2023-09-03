@@ -114,12 +114,13 @@ namespace SAIN.Editor.GUISections
             wasEdited = false;
             foreach (var categoryClass in categories)
             {
-                if (categoryClass.OptionCount() == 0)
+                if (categoryClass.OptionCount(out int notUsed) == 0)
                 {
                     continue;
                 }
-                var attInfo = categoryClass.CategoryAttributes;
-                object categoryObject = categoryClass.Field.GetValue(settingsObject);
+
+                var attributes = categoryClass.CategoryInfo;
+                object categoryObject = categoryClass.GetValue(settingsObject);
 
                 BeginHorizontal(30);
 
@@ -127,12 +128,12 @@ namespace SAIN.Editor.GUISections
                 if (string.IsNullOrEmpty(search))
                 {
                     categoryClass.Open = BuilderClass.ExpandableMenu(
-                        attInfo.Name, categoryClass.Open, attInfo.Description, EntryConfig.EntryHeight);
+                        attributes.Name, categoryClass.Open, attributes.Description, EntryConfig.EntryHeight);
                     open = categoryClass.Open;
                 }
                 else
                 {
-                    Box(attInfo.Name, attInfo.Description, Height(EntryConfig.EntryHeight));
+                    Box(attributes.Name, attributes.Description, Height(EntryConfig.EntryHeight));
                 }
 
                 EndHorizontal(30);
@@ -177,9 +178,14 @@ namespace SAIN.Editor
             foreach (FieldInfo field in settingsType.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
                 AttributesInfoClass attributes = new AttributesInfoClass(field);
-                if (!attributes.AdvancedOptions.Contains(IAdvancedOption.Hidden))
+                if (!attributes.Hidden)
                 {
-                    Categories.Add(new Category(attributes));
+                    var category = new Category(attributes);
+                    category.OptionCount(out int realCount);
+                    if (realCount > 0)
+                    {
+                        Categories.Add(category);
+                    }
                 }
             }
         }
@@ -199,48 +205,48 @@ namespace SAIN.Editor
 
     public sealed class Category
     {
-        public Category(FieldInfo field)
-        {
-            CategoryAttributes = new AttributesInfoClass(field);
-            GetFields(CategoryAttributes.ValueType);
-        }
-
         public Category(AttributesInfoClass attributes)
         {
-            CategoryAttributes = attributes;
-            GetFields(attributes.ValueType);
-        }
-
-        private void GetFields(Type type)
-        {
-            foreach (FieldInfo subField in type.GetFields(BindingFlags.Public | BindingFlags.Instance))
+            CategoryInfo = attributes;
+            foreach (FieldInfo field in attributes.ValueType.GetFields(BindingFlags.Public | BindingFlags.Instance))
             {
-                var attInfo = AttributesGUI.GetAttributeInfo(subField);
-                if (!attInfo.AdvancedOptions.Contains(IAdvancedOption.Hidden))
+                var attInfo = AttributesGUI.GetAttributeInfo(field);
+                if (attInfo != null && !attInfo.Hidden)
                 {
-                    FieldAttributes.Add(attInfo);
+                    FieldAttributesList.Add(attInfo);
                 }
             }
         }
 
-        public FieldInfo Field => CategoryAttributes.Field;
-        public readonly AttributesInfoClass CategoryAttributes;
+        public object GetValue(object obj)
+        {
+            return CategoryInfo.GetValue(obj);
+        }
 
-        public readonly List<AttributesInfoClass> FieldAttributes = new List<AttributesInfoClass>();
+        public void SetValue(object obj, object value)
+        {
+            CategoryInfo.SetValue(obj, value);
+        }
+
+        public readonly AttributesInfoClass CategoryInfo;
+
+        public readonly List<AttributesInfoClass> FieldAttributesList = new List<AttributesInfoClass>();
         public readonly List<AttributesInfoClass> SelectedList = new List<AttributesInfoClass>();
 
         public bool Open = false;
         public Vector2 Scroll = Vector2.zero;
 
-        public int OptionCount()
+        public int OptionCount(out int realCount)
         {
+            realCount = 0;
             int count = 0;
-            foreach (var option in FieldAttributes)
+            foreach (var option in FieldAttributesList)
             {
                 if (!option.DoNotShowGUI)
                 {
                     count++;
                 }
+                realCount++;
             }
             return count;
         }

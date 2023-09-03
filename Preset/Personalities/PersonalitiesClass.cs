@@ -13,25 +13,24 @@ namespace SAIN.Preset.Personalities
         public PersonalitySettingsClass()
         { }
 
-        public PersonalitySettingsClass(SAINPersonality personality, string name, string description)
+        public PersonalitySettingsClass(IPersonality personality, string name, string description)
         {
             SAINPersonality = personality;
             Name = name;
             Description = description;
         }
 
-        public SAINPersonality SAINPersonality;
+        public IPersonality SAINPersonality;
         public string Name;
         public string Description;
 
         public PersonalityVariablesClass Variables = new PersonalityVariablesClass();
 
-        public Dictionary<WildSpawnType, BotType> AllowedBotTypes = new Dictionary<WildSpawnType, BotType>();
-
         public bool CanBePersonality(SAINBotInfoClass infoClass)
         {
             return CanBePersonality(infoClass.WildSpawnType, infoClass.PowerLevel, infoClass.PlayerLevel);
         }
+
         public bool CanBePersonality(WildSpawnType wildSpawnType, float PowerLevel, int PlayerLevel)
         {
             if (Variables.Enabled == false)
@@ -42,7 +41,14 @@ namespace SAIN.Preset.Personalities
             {
                 return true;
             }
-            if (!AllowedBotTypes.ContainsKey(wildSpawnType))
+
+            if (!BotTypeDefinitions.BotTypes.ContainsKey(wildSpawnType))
+            {
+                return false;
+            }
+
+            string name = BotTypeDefinitions.BotTypes[wildSpawnType].Name;
+            if (!Variables.AllowedTypes.Contains(name))
             {
                 return false;
             }
@@ -59,7 +65,7 @@ namespace SAIN.Preset.Personalities
 
         public class PersonalityVariablesClass
         {
-            [Advanced(IAdvancedOption.Hidden)]
+            [Hidden]
             const string PowerLevelDescription = " Power level is a combined number that takes into account armor, the class of that armor, and the weapon class that is currently used by a bot." +
                 " Power Level usually falls within 30 to 120 on average, and almost never goes above 150";
 
@@ -98,17 +104,17 @@ namespace SAIN.Preset.Personalities
             public float PowerLevelMax = 250;
 
             [Default(1f)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             [MinMax(0, 3f, 10)]
             public float HoldGroundBaseTime = 1f;
 
             [Default(0.66f)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             [MinMax(0.1f, 2f, 10)]
             public float HoldGroundMinRandom = 0.66f;
 
             [Default(1.5f)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             [MinMax(0.1f, 2f, 10)]
             public float HoldGroundMaxRandom = 1.5f;
 
@@ -127,11 +133,11 @@ namespace SAIN.Preset.Personalities
             public bool CanTaunt = false;
 
             [Default(false)]
-            public bool Sneaky = false; 
+            public bool Sneaky = false;
 
             [Default(0.0f)]
             [Percentage0to1]
-            public float SneakySpeed = 0.0f; 
+            public float SneakySpeed = 0.0f;
 
             [Default(0.0f)]
             [Percentage0to1]
@@ -153,31 +159,31 @@ namespace SAIN.Preset.Personalities
             public float BaseSearchMoveSpeed = 1f;
 
             [Default(false)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             public bool FrequentTaunt = false;
 
             [Default(false)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             public bool ConstantTaunt = false;
 
             [Default(true)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             public bool CanRespondToVoice = true;
 
             [Default(20f)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             [Percentage]
             public float TauntFrequency = 20f;
 
             [Default(20f)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             [Percentage]
             public float TauntMaxDistance = 20f;
 
             [Default(false)]
             public bool SprintWhileSearch = false;
 
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             [Default(false)]
             public bool FrequentSprintWhileSearch = false;
 
@@ -185,8 +191,14 @@ namespace SAIN.Preset.Personalities
             public bool CanRushEnemyReloadHeal = false;
 
             [Default(false)]
-            [Advanced(IAdvancedOption.IsAdvanced)]
+            [Advanced]
             public bool CanFakeDeathRare = false;
+
+            [Name("Bots Who Can Use This")]
+            [Description("Setting default on these always results in true")]
+            [DefaultDictionary(nameof(BotTypeDefinitions.BotTypesNames))]
+            [Advanced]
+            public List<string> AllowedTypes = new List<string>();
         }
     }
 }

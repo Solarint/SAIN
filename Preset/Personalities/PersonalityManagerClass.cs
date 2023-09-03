@@ -1,36 +1,23 @@
 ﻿using EFT;
+using SAIN.Editor;
 using SAIN.Helpers;
+using SAIN.Plugin;
+using SAIN.Preset.GlobalSettings;
 using System.Collections.Generic;
+using System.Linq;
+using static SAIN.Helpers.EnumValues;
 
 namespace SAIN.Preset.Personalities
 {
     public class PersonalityManagerClass : BasePreset
     {
-        private static Dictionary<WildSpawnType, BotType> AddAllBotTypes(Dictionary<WildSpawnType, BotType> botTypes)
-        {
-            botTypes.AddRange(BotTypeDefinitions.BotTypes);
-            return botTypes;
-        }
-
-        private static Dictionary<WildSpawnType, BotType> AddPMCTypes(Dictionary<WildSpawnType, BotType> botTypes)
-        {
-            AddWildSpawn(botTypes, EnumValues.WildSpawn.Usec, EnumValues.WildSpawn.Bear);
-            return botTypes;
-        }
-
-        private static Dictionary<WildSpawnType, BotType> AddWildSpawn(Dictionary<WildSpawnType, BotType> botTypes, params WildSpawnType[] types)
-        {
-            foreach (var type in types)
-            {
-                botTypes.Add(type, BotTypeDefinitions.BotTypes[type]);
-            }
-            return botTypes;
-        }
-
         public PersonalityManagerClass(SAINPresetClass preset) : base(preset)
         {
             ImportPersonalities();
         }
+
+
+        public bool VerificationPassed = true;
 
         private void ImportPersonalities()
         {
@@ -43,6 +30,27 @@ namespace SAIN.Preset.Personalities
             }
 
             InitDefaults();
+
+            bool hadToFix = false;
+            foreach (var item in Personalities)
+            {
+                if (item.Value.Variables.AllowedTypes.Count == 0)
+                {
+                    hadToFix = true;
+                    if (item.Key == IPersonality.Chad || item.Key == IPersonality.GigaChad)
+                    {
+                        AddPMCTypes(item.Value.Variables.AllowedTypes);
+                    }
+                    else
+                    {
+                        AddAllBotTypes(item.Value.Variables.AllowedTypes);
+                    }
+                }
+            }
+            if (hadToFix)
+            {
+                Logger.LogWarning("The Preset you are using is out of date, and required manual fixing. Its recommended you create a new one.");
+            }
         }
 
         public void ExportPersonalities()
@@ -70,7 +78,7 @@ namespace SAIN.Preset.Personalities
 
         private void InitDefaults()
         {
-            var pers = SAINPersonality.GigaChad;
+            var pers = IPersonality.GigaChad;
             if (!Personalities.ContainsKey(pers))
             {
                 string name = pers.ToString();
@@ -87,10 +95,10 @@ namespace SAIN.Preset.Personalities
                         CanRespondToVoice = true,
                         TauntFrequency = 8,
                         TauntMaxDistance = 50f,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        HoldGroundMaxRandom = 2f,
-                        HoldGroundMinRandom = 0.25f,
-                        SearchBaseTime = SearchBaseTime(pers),
+                        HoldGroundBaseTime = 2f,
+                        HoldGroundMaxRandom = 1.5f,
+                        HoldGroundMinRandom = 0.65f,
+                        SearchBaseTime = 0.65f,
                         PowerLevelMin = 115f,
                         SprintWhileSearch = true,
                         FrequentSprintWhileSearch = true,
@@ -100,12 +108,12 @@ namespace SAIN.Preset.Personalities
                     }
                 };
 
-                AddPMCTypes(settings.AllowedBotTypes);
+                AddPMCTypes(settings.Variables.AllowedTypes);
                 Personalities.Add(pers, settings);
                 Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
-            pers = SAINPersonality.Chad;
+            pers = IPersonality.Chad;
             if (!Personalities.ContainsKey(pers))
             {
                 string name = pers.ToString();
@@ -122,10 +130,10 @@ namespace SAIN.Preset.Personalities
                         CanRespondToVoice = true,
                         TauntFrequency = 10,
                         TauntMaxDistance = 40f,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        HoldGroundMaxRandom = 2f,
-                        HoldGroundMinRandom = 0.5f,
-                        SearchBaseTime = SearchBaseTime(pers),
+                        HoldGroundBaseTime = 1.5f,
+                        HoldGroundMaxRandom = 1.5f,
+                        HoldGroundMinRandom = 0.65f,
+                        SearchBaseTime = 4f,
                         PowerLevelMin = 85f,
                         SprintWhileSearch = true,
                         CanRushEnemyReloadHeal = true,
@@ -134,12 +142,12 @@ namespace SAIN.Preset.Personalities
                     }
                 };
 
-                AddPMCTypes(settings.AllowedBotTypes);
+                AddPMCTypes(settings.Variables.AllowedTypes);
                 Personalities.Add(pers, settings);
                 Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
-            pers = SAINPersonality.Rat;
+            pers = IPersonality.Rat;
             if (!Personalities.ContainsKey(pers))
             {
                 string name = pers.ToString();
@@ -151,8 +159,8 @@ namespace SAIN.Preset.Personalities
                         Enabled = true,
                         RandomChanceIfMeetRequirements = 60,
                         RandomlyAssignedChance = 30,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
+                        HoldGroundBaseTime = 1f,
+                        SearchBaseTime = 240f,
                         PowerLevelMax = 50f,
                         AggressionMultiplier = 0.6f,
                         Sneaky = true,
@@ -160,12 +168,12 @@ namespace SAIN.Preset.Personalities
                     }
                 };
 
-                AddAllBotTypes(settings.AllowedBotTypes);
+                AddAllBotTypes(settings.Variables.AllowedTypes);
                 Personalities.Add(pers, settings);
                 Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
-            pers = SAINPersonality.Timmy;
+            pers = IPersonality.Timmy;
             if (!Personalities.ContainsKey(pers))
             {
                 string name = pers.ToString();
@@ -179,19 +187,19 @@ namespace SAIN.Preset.Personalities
                         RandomlyAssignedChance = 50,
                         PowerLevelMax = 40f,
                         MaxLevel = 10,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
+                        HoldGroundBaseTime = 0.6f,
+                        SearchBaseTime = 120f,
                         AggressionMultiplier = 0.75f,
                         BaseSearchMoveSpeed = 0.65f,
                     }
                 };
 
-                AddPMCTypes(settings.AllowedBotTypes);
+                AddPMCTypes(settings.Variables.AllowedTypes);
                 Personalities.Add(pers, settings);
                 Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
-            pers = SAINPersonality.Coward;
+            pers = IPersonality.Coward;
             if (!Personalities.ContainsKey(pers))
             {
                 string name = pers.ToString();
@@ -202,18 +210,18 @@ namespace SAIN.Preset.Personalities
                     {
                         Enabled = true,
                         RandomlyAssignedChance = 30,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
+                        HoldGroundBaseTime = 0.33f,
+                        SearchBaseTime = 75f,
                         AggressionMultiplier = 0.4f,
                         BaseSearchMoveSpeed = 0.35f,
                     }
                 };
-                AddAllBotTypes(settings.AllowedBotTypes);
+                AddAllBotTypes(settings.Variables.AllowedTypes);
                 Personalities.Add(pers, settings);
                 Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
 
-            pers = SAINPersonality.Normal;
+            pers = IPersonality.Normal;
             if (!Personalities.ContainsKey(pers))
             {
                 string name = pers.ToString();
@@ -223,64 +231,32 @@ namespace SAIN.Preset.Personalities
                     Variables =
                     {
                         Enabled = true,
-                        HoldGroundBaseTime = HoldGroundBaseTime(pers),
-                        SearchBaseTime = SearchBaseTime(pers),
+                        HoldGroundBaseTime = 0.75f,
+                        SearchBaseTime = 30f,
                         CanRespondToVoice = true,
                         BaseSearchMoveSpeed = 0.8f,
                     }
                 };
 
-                AddAllBotTypes(settings.AllowedBotTypes);
+                AddAllBotTypes(settings.Variables.AllowedTypes);
                 Personalities.Add(pers, settings);
                 Preset.Export(settings, pers.ToString(), nameof(Personalities));
             }
         }
 
-        private static float SearchBaseTime(SAINPersonality pers)
+        private static void AddAllBotTypes(List<string> allowedTypes)
         {
-            switch (pers)
-            {
-                case SAINPersonality.GigaChad:
-                    return 1.5f;
-
-                case SAINPersonality.Chad:
-                    return 5f;
-
-                case SAINPersonality.Timmy:
-                    return 60f;
-
-                case SAINPersonality.Rat:
-                    return 240f;
-
-                case SAINPersonality.Coward:
-                    return 60f;
-
-                default:
-                    return 24f;
-            }
+            allowedTypes.Clear();
+            allowedTypes.AddRange(BotTypeDefinitions.BotTypesNames);
         }
 
-        private static float HoldGroundBaseTime(SAINPersonality pers)
+        private static void AddPMCTypes(List<string> allowedTypes)
         {
-            if (pers == SAINPersonality.Rat || pers == SAINPersonality.Coward || pers == SAINPersonality.Timmy)
-            {
-                return 0.25f;
-            }
-            else if (pers == SAINPersonality.GigaChad)
-            {
-                return 2f;
-            }
-            else if (pers == SAINPersonality.Chad)
-            {
-                return 1.5f;
-            }
-            else
-            {
-                return 1f;
-            }
+            allowedTypes.Add(BotTypeDefinitions.BotTypes[WildSpawn.Usec].Name);
+            allowedTypes.Add(BotTypeDefinitions.BotTypes[WildSpawn.Bear].Name);
         }
 
-        public Dictionary<SAINPersonality, PersonalitySettingsClass> Personalities = 
-            new Dictionary<SAINPersonality, PersonalitySettingsClass>();
+        public Dictionary<IPersonality, PersonalitySettingsClass> Personalities =
+            new Dictionary<IPersonality, PersonalitySettingsClass>();
     }
 }

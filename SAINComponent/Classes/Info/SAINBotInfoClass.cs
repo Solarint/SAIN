@@ -1,6 +1,7 @@
 ﻿using EFT;
 using SAIN.Helpers;
 using SAIN.Plugin;
+using SAIN.Preset;
 using SAIN.Preset.BotSettings.SAINSettings;
 using SAIN.Preset.Personalities;
 using System.Collections;
@@ -99,7 +100,7 @@ namespace SAIN.SAINComponent.Classes.Info
                         if (eftVarField != null)
                         {
                             object sainValue = sainVarField.GetValue(sainCategory);
-                            if (SAINPlugin.GlobalDebugMode)
+                            if (SAINPlugin.DebugMode)
                             {
                                 // Logger.LogInfo($"{eftVarField.Value} Default {eftVarField.GetValue(eftCategory)} NewValue: {sainValue}");
                             }
@@ -143,7 +144,7 @@ namespace SAIN.SAINComponent.Classes.Info
                 searchTime = PersonalitySettings.SearchBaseTime;
             }
 
-            searchTime = (searchTime.Randomize(0.66f, 1.33f) / AggressionMultiplier).Round10();
+            searchTime = (searchTime.Randomize(0.66f, 1.33f) / AggressionMultiplier).Round100();
             if (searchTime < 0.2f)
             {
                 searchTime = 0.2f;
@@ -197,11 +198,15 @@ namespace SAIN.SAINComponent.Classes.Info
             }
         }
 
-        public SAINPersonality GetPersonality()
+        public IPersonality GetPersonality()
         {
-            if (SAINPlugin.LoadedPreset.GlobalSettings.Personality.CheckForForceAllPers(out SAINPersonality result))
+            if (SAINPlugin.LoadedPreset.GlobalSettings.Personality.CheckForForceAllPers(out IPersonality result))
             {
                 return result;
+            }
+            if (!BotTypeDefinitions.BotTypes.ContainsKey(WildSpawnType))
+            {
+                return IPersonality.Chad;
             }
             foreach (PersonalitySettingsClass setting in SAINPlugin.LoadedPreset.PersonalityManager.Personalities.Values)
             {
@@ -210,7 +215,7 @@ namespace SAIN.SAINComponent.Classes.Info
                     return setting.SAINPersonality;
                 }
             }
-            return SAINPersonality.Normal;
+            return IPersonality.Normal;
         }
 
         public WildSpawnType WildSpawnType => Profile.WildSpawnType;
@@ -218,7 +223,7 @@ namespace SAIN.SAINComponent.Classes.Info
         public int PlayerLevel => Profile.PlayerLevel;
         public BotDifficulty BotDifficulty => Profile.BotDifficulty;
 
-        public SAINPersonality Personality { get; private set; }
+        public IPersonality Personality { get; private set; }
         public PersonalityVariablesClass PersonalitySettings => PersonalitySettingsClass?.Variables;
         public PersonalitySettingsClass PersonalitySettingsClass { get; private set; }
 

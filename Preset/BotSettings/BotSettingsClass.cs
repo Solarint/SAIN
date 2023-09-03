@@ -5,7 +5,6 @@ using SAIN.Helpers;
 using SAIN.Preset.BotSettings.SAINSettings;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using static SAIN.Helpers.JsonUtility;
 
@@ -121,7 +120,7 @@ namespace SAIN.Preset.BotSettings
             }
         }
 
-        private bool ShallUseEFTBotDefault(FieldInfo field) => field.GetCustomAttribute<AdvancedAttribute>()?.Options?.Contains(IAdvancedOption.CopyValueFromEFT) == true;
+        private bool ShallUseEFTBotDefault(FieldInfo field) => AttributesGUI.GetAttributeInfo(field)?.CopyValue == true;
 
         public void LoadEFTSettings()
         {
@@ -164,7 +163,7 @@ namespace SAIN.Preset.BotSettings
             {
                 Logger.LogError($"[{type}] does not exist in SAINSettings Dictionary!");
             }
-            return null;
+            return SAINSettings[EnumValues.WildSpawn.Usec].Settings[BotDifficulty.normal];
         }
 
         public object GetEFTSettings(WildSpawnType type, BotDifficulty difficulty)
@@ -185,7 +184,7 @@ namespace SAIN.Preset.BotSettings
             {
                 Logger.LogError($"[{type}] does not exist in EFTSettings Dictionary!");
             }
-            return null;
+            return EFTSettings[EnumValues.WildSpawn.Usec].Settings[BotDifficulty.normal];
         }
 
         public void ExportBotSettings()

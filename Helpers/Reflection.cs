@@ -25,6 +25,25 @@ namespace SAIN.Helpers
             return type.GetFields(flags);
         }
 
+        public static object GetStaticValue(Type type, string name)
+        {
+            if (name == null)
+            {
+                return null;
+            }
+            var field = type.GetField(name, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+            if (field != null)
+            {
+                return field.GetValue(null);
+            }
+            var prop = type.GetProperty(name, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+            if (prop != null)
+            {
+                return prop.GetValue(null);
+            }
+            return null;
+        }
+
         public static FieldInfo FindFieldByName(string name, FieldInfo[] fields)
         {
             foreach (FieldInfo field in fields)

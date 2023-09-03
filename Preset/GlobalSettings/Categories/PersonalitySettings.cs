@@ -1,30 +1,34 @@
 ﻿using Comfort.Common;
 using System.ComponentModel;
+using SAIN.Attributes;
 
 namespace SAIN.Preset.GlobalSettings
 {
     public class PersonalitySettings
     {
-        [DefaultValue(false)] public bool AllGigaChads = false;
-        [DefaultValue(false)] public bool AllChads = false;
-        [DefaultValue(false)] public bool AllRats = false;
+        [Default(false)]
+        public bool AllGigaChads = false;
+        [Default(false)]
+        public bool AllChads = false;
+        [Default(false)]
+        public bool AllRats = false;
 
-        public bool CheckForForceAllPers(out SAINPersonality result)
+        public bool CheckForForceAllPers(out IPersonality result)
         {
-            result = SAINPersonality.Normal;
+            result = IPersonality.Normal;
             if (AllGigaChads)
             {
-                result = SAINPersonality.GigaChad;
+                result = IPersonality.GigaChad;
                 return true;
             }
             if (AllChads)
             {
-                result = SAINPersonality.Chad;
+                result = IPersonality.Chad;
                 return true;
             }
             if (AllRats)
             {
-                result = SAINPersonality.Rat;
+                result = IPersonality.Rat;
                 return true;
             }
             return false;

@@ -247,7 +247,6 @@
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\DefaultBrainsClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\Layer.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\LayerInfoClass.cs" />
-    <Compile Include="Preset\GlobalSettings\GetValuesFromClass.cs" />
     <Compile Include="Preset\SAINPresetDefinition.cs" />
     <Compile Include="SAINComponent\Classes\Decision\DecisionWrapper.cs" />
     <Compile Include="Layers\Extract\LootingBotsIntegration.cs" />
@@ -257,7 +256,6 @@
     <Compile Include="Helpers\SealedClass\PointDirection.cs" />
     <Compile Include="SAINComponent\Classes\SAINBotUnstuckClass.cs" />
     <Compile Include="SAINComponent\Classes\SAINSearchClass.cs" />
-    <Compile Include="SAINComponent\GOAP\GOAPTestClassSeekCover.cs" />
     <Compile Include="SAINComponent\PersonBase\AIInfoClass.cs" />
     <Compile Include="SAINComponent\PersonBase\ISAINPerson.cs" />
     <Compile Include="SAINComponent\PersonBase\SAINPersonClass.cs" />

@@ -27,9 +27,9 @@ namespace SAIN.Preset.GlobalSettings.Categories
         }
 
 
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public List<BigBrainConfigClass> BrainSettings = new List<BigBrainConfigClass>();
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public static readonly List<BigBrainConfigClass> DefaultBrains = new List<BigBrainConfigClass>();
     }
 }

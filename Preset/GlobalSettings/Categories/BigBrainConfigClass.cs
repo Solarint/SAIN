@@ -21,12 +21,12 @@ namespace SAIN.Preset.GlobalSettings.Categories
 
         private readonly string DONOTEDIT = "Do not Edit These";
 
-        [Advanced(IAdvancedOption.Hidden)] public Brain BrainEnum;
-        [Advanced(IAdvancedOption.Hidden)] public string BrainName;
-        [Advanced(IAdvancedOption.Hidden)] public int SquadLayerPriority = 24;
-        [Advanced(IAdvancedOption.Hidden)] public int ExtractLayerPriority = 22;
-        [Advanced(IAdvancedOption.Hidden)] public int CombatSoloLayerPriority = 20;
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden] public Brain BrainEnum;
+        [Hidden] public string BrainName;
+        [Hidden] public int SquadLayerPriority = 24;
+        [Hidden] public int ExtractLayerPriority = 22;
+        [Hidden] public int CombatSoloLayerPriority = 20;
+        [Hidden]
         public List<string> LayersToRemove = new List<string>
             {
                 "Help",

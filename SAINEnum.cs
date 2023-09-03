@@ -118,7 +118,7 @@ namespace SAIN
         Right = 2
     }
 
-    public enum SAINPersonality
+    public enum IPersonality
     {
         GigaChad,
         Chad,

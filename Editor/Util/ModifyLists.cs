@@ -54,8 +54,8 @@ namespace SAIN.Editor.Util
             wasEdited = false;
             foreach (var category in container.Categories)
             {
-                string categoryName = category.CategoryAttributes.Name;
-                string categoryDesciption = category.CategoryAttributes.Description;
+                string categoryName = category.CategoryInfo.Name;
+                string categoryDesciption = category.CategoryInfo.Description;
 
                 // Display the value of the category. And make it a openable dropdown menu
                 if (string.IsNullOrEmpty(search))
@@ -73,7 +73,7 @@ namespace SAIN.Editor.Util
                 bool newEdit;
                 int i = StartListEdit(optionsPerLine, out var options);
                 // Get the fields in this category
-                foreach (var fieldAtt in category.FieldAttributes)
+                foreach (var fieldAtt in category.FieldAttributesList)
                 {
                     // Check if the user is searching
                     if (!string.IsNullOrEmpty(search) && !fieldAtt.Name.ToLower().Contains(search))

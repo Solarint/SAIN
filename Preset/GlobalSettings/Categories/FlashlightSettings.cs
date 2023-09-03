@@ -5,19 +5,19 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class FlashlightSettings
     {
-        [DefaultValue(3f)]
+        [Default(3f)]
         [MinMax(0.25f, 10f, 100f)]
         public float DazzleEffectiveness = 3f;
 
-        [DefaultValue(30f)]
+        [Default(30f)]
         [MinMax(0f, 60f)]
         public float MaxDazzleRange = 30f;
 
-        [DefaultValue(false)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Default(false)]
+        [Advanced]
         public bool DebugFlash = false;
 
-        [DefaultValue(false)]
+        [Default(false)]
         public bool SillyMode = false;
     }
 }

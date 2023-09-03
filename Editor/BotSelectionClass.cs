@@ -169,7 +169,6 @@ namespace SAIN.Editor
             {
                 var category = container.SelectedCategories[i];
 
-                FieldInfo CategoryField = category.Field;
                 for (int j = 0; j < category.SelectedList.Count; j++)
                 {
                     var fieldAttribute = category.SelectedList[j];
@@ -211,8 +210,8 @@ namespace SAIN.Editor
 
                                     BeginHorizontal();
 
-                                    object categoryValue = CategoryField.GetValue(SAINSettings);
-                                    object value = fieldAttribute.Field.GetValue(categoryValue);
+                                    object categoryValue = category.GetValue(SAINSettings);
+                                    object value = fieldAttribute.GetValue(categoryValue);
 
                                     ApplyColor(boxStyle, difficulty.ToString());
                                     Label($"{difficulty}", boxStyle,
@@ -224,7 +223,7 @@ namespace SAIN.Editor
                                         BotSettingsWereEdited = true;
                                     }
 
-                                    fieldAttribute.Field.SetValue(categoryValue, value);
+                                    fieldAttribute.SetValue(categoryValue, value);
 
                                     EndHorizontal();
 

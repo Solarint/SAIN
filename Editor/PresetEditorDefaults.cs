@@ -16,11 +16,11 @@ namespace SAIN.Editor
             DefaultPreset = PresetHandler.DefaultPreset;
         }
 
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public string SelectedPreset;
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public string DefaultPreset;
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public bool PauseOnEditorOpen;
 
         [Name("Advanced Bot Configs")]

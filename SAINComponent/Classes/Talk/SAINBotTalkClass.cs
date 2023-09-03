@@ -110,7 +110,7 @@ namespace SAIN.SAINComponent.Classes.Talk
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, type);
             Player.Say(type, false, 0f, mask);
             PersonalPhraseDict[type].TimeLastSaid = Time.time;
-            if (SAINPlugin.GlobalDebugMode)
+            if (SAINPlugin.DebugMode)
             {
                 Logger.LogDebug(type);
             }

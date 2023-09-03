@@ -14,7 +14,7 @@ namespace SAIN.Preset.GlobalSettings
             "Higher = more scattering. Modifies EFT's default scatter feature. 1.5 = 1.5x more scatter"
             )]
         [Default(1f)]
-        [MinMax(0.1f, 10f, 100f)]
+        [MinMax(0.01f, 10f, 100f)]
         public float GlobalScatterMultiplier = 1f;
 
         [Name(
@@ -35,7 +35,7 @@ namespace SAIN.Preset.GlobalSettings
             )]
         [Default(1.5f)]
         [MinMax(0.1f, 10f, 100f)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Advanced]
         public float MaxRecoil = 1.5f;
 
         [Name(
@@ -46,7 +46,7 @@ namespace SAIN.Preset.GlobalSettings
             )]
         [Default(-1f)]
         [MinMax(-10f, 10f, 100f)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Advanced]
         public float AddRecoil = -1f;
 
         [Name(
@@ -56,8 +56,8 @@ namespace SAIN.Preset.GlobalSettings
             "How much to decay the recoil impulse per frame. 0.75 means 25% of the recoil will be removed per frame."
             )]
         [Default(0.75f)]
-        [MinMax(0.1f, 0.99f, 100f)]
-        [Advanced(IAdvancedOption.IsAdvanced)]
+        [Percentage01to99]
+        [Advanced]
         public float RecoilDecay = 0.75f;
 
         [Name(
@@ -70,13 +70,13 @@ namespace SAIN.Preset.GlobalSettings
             "For Example. 9x19 will shoot about 20% faster fire-rate on semi-auto at 50 meters" +
             ", and fire 20% longer bursts when on full auto"
             )]
-        [MinMax(0.01f, 1f, 100f)]
+        [Percentage0to1(0.01f)]
         [Advanced]
-        [Dictionary(typeof(ICaliber), typeof(float))]
+        [DefaultDictionary(nameof(AmmoCaliberShootabilityDefaults))]
         public Dictionary<ICaliber, float> AmmoCaliberShootability = new Dictionary<ICaliber, float>(AmmoCaliberShootabilityDefaults);
 
         [JsonIgnore]
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public static readonly Dictionary<ICaliber, float> AmmoCaliberShootabilityDefaults = new Dictionary<ICaliber, float>()
         {
             { ICaliber.Caliber9x18PM, 0.2f },
@@ -118,13 +118,13 @@ namespace SAIN.Preset.GlobalSettings
             "For Example. SMGs will shoot about 20% faster fire-rate on semi-auto at 50 meters" +
             ", and fire 20% longer bursts when on full auto"
             )]
-        [MinMax(0.01f, 1f, 100f)]
+        [Percentage0to1(0.01f)]
         [Advanced]
-        [Dictionary(typeof(IWeaponClass), typeof(float))]
+        [DefaultDictionary(nameof(WeaponClassShootabilityDefaults))]
         public Dictionary<IWeaponClass, float> WeaponClassShootability = new Dictionary<IWeaponClass, float>(WeaponClassShootabilityDefaults);
 
         [JsonIgnore]
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public static readonly Dictionary<IWeaponClass, float> WeaponClassShootabilityDefaults = new Dictionary<IWeaponClass, float>()
         {
             { IWeaponClass.Default, 0.4f },
@@ -141,6 +141,39 @@ namespace SAIN.Preset.GlobalSettings
         };
 
         [Name(
+            "Weapon Firerate Wait Time"
+            )]
+        [Description(
+            "HIGHER is BETTER. " +
+            "This is the time to wait inbetween shots for every meter." +
+            "the number is divided by the distance to their target, to get a wait period between shots." +
+            "For Example. With a setting of 100: " +
+            "if a target is 50m away, they will wait 0.5 sec between shots because 50 / 100 is 0.5." +
+            "This number is later modified by the Shootability multiplier, to get a final fire-rate that gets sent to a bot."
+            )]
+        [MinMax(30f, 250f, 1f)]
+        [Advanced]
+        [DefaultDictionary(nameof(WeaponPerMeterDefaults))]
+        public Dictionary<IWeaponClass, float> WeaponPerMeter = new Dictionary<IWeaponClass, float>(WeaponPerMeterDefaults);
+
+        [JsonIgnore]
+        [Hidden]
+        public static readonly Dictionary<IWeaponClass, float> WeaponPerMeterDefaults = new Dictionary<IWeaponClass, float>()
+        {
+            { IWeaponClass.Default, 120f },
+            { IWeaponClass.assaultCarbine, 140 },
+            { IWeaponClass.assaultRifle, 130 },
+            { IWeaponClass.machinegun, 135 },
+            { IWeaponClass.smg, 160 },
+            { IWeaponClass.pistol, 65 },
+            { IWeaponClass.marksmanRifle, 75 },
+            { IWeaponClass.sniperRifle, 50 },
+            { IWeaponClass.shotgun, 60 },
+            { IWeaponClass.grenadeLauncher, 75 },
+            { IWeaponClass.specialWeapon, 80 },
+        };
+
+        [Name(
             "Bot Preferred Shoot Distances"
             )]
         [Description(
@@ -148,12 +181,12 @@ namespace SAIN.Preset.GlobalSettings
             "Bots will try to close the distance if further than this."
             )]
         [MinMax(10f, 250f, 1f)]
-        [Dictionary(typeof(IWeaponClass), typeof(float))]
         [Advanced]
+        [DefaultDictionary(nameof(EngagementDistanceDefaults))]
         public Dictionary<IWeaponClass, float> EngagementDistance = new Dictionary<IWeaponClass, float>(EngagementDistanceDefaults);
 
         [JsonIgnore]
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         public static readonly Dictionary<IWeaponClass, float> EngagementDistanceDefaults = new Dictionary<IWeaponClass, float>()
         {
             { IWeaponClass.Default, 75f },
@@ -170,43 +203,43 @@ namespace SAIN.Preset.GlobalSettings
         };
 
         [JsonIgnore]
-        [Advanced(IAdvancedOption.Hidden)]
+        [Hidden]
         private const string Shootability = "Affects Weapon Shootability Calculations. ";
 
         [Description(Shootability)]
         [Advanced]
         [Default(0.35f)]
-        [Percentage0to1(0.01f, 0.65f)]
+        [Percentage01to99]
         public float WeaponClassScaling = 0.35f;
 
         [Description(Shootability)]
         [Advanced]
         [Default(0.25f)]
-        [Percentage0to1(0.01f, 0.65f)]
+        [Percentage01to99]
         public float RecoilScaling = 0.25f;
 
         [Description(Shootability)]
         [Advanced]
         [Default(0.1f)]
-        [Percentage0to1(0.01f, 0.65f)]
+        [Percentage01to99]
         public float ErgoScaling = 0.1f;
 
         [Description(Shootability)]
         [Advanced]
         [Default(0.25f)]
-        [Percentage0to1(0.01f, 0.65f)]
+        [Percentage01to99]
         public float AmmoCaliberScaling = 0.25f;
 
         [Description(Shootability)]
         [Advanced]
         [Default(0.4f)]
-        [Percentage0to1(0.01f, 0.65f)]
+        [Percentage01to99]
         public float WeaponProficiencyScaling = 0.4f;
 
         [Description(Shootability)]
         [Advanced]
         [Default(0.35f)]
-        [Percentage0to1(0.01f, 0.65f)]
+        [Percentage01to99]
         public float DifficultyScaling = 0.35f;
     }
 }

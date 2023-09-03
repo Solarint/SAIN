@@ -1,59 +1,8 @@
-﻿using System;
-using SAIN.Preset.GlobalSettings;
-using UnityDiagnostics;
-using System.Collections.Generic;
-using AmplifyMotion;
-using static AdvancedLight;
-using System.Windows.Forms;
-using JetBrains.Annotations;
-using UnityEngine;
-using SAIN.Helpers;
+﻿using SAIN.Helpers;
+using System;
 
 namespace SAIN.Attributes
 {
-
-    public sealed class AmmoCaliberAttribute : BaseAttribute
-    {
-        public AmmoCaliberAttribute(ICaliber ammoCaliber)
-        {
-            AmmoCaliber = ammoCaliber;
-        }
-
-        public readonly ICaliber AmmoCaliber;
-    }
-
-    public sealed class WeaponClassAttribute : BaseAttribute
-    {
-        public WeaponClassAttribute(IWeaponClass weaponClass)
-        {
-            WeaponClass = weaponClass;
-        }
-
-        public readonly IWeaponClass WeaponClass;
-    }
-
-    public sealed class DictionaryAttribute : BaseAttribute
-    {
-        public DictionaryAttribute(Type typeA, Type typeB)
-        {
-            TypeA = typeA;
-            TypeB = typeB;
-        }
-
-        public readonly Type TypeA;
-        public readonly Type TypeB;
-    }
-
-    public sealed class ListAttribute : BaseAttribute
-    {
-        public ListAttribute(Type type)
-        {
-            Type = type;
-        }
-
-        public readonly Type Type;
-    }
-
     public sealed class NameAndDescriptionAttribute : BaseAttribute
     {
         public NameAndDescriptionAttribute(string name, string description = null)
@@ -66,14 +15,35 @@ namespace SAIN.Attributes
         public readonly string Description;
     }
 
-    public sealed class NameAttribute : BaseAttribute
+    public abstract class StringAttribute : BaseAttribute
     {
-        public NameAttribute(string name)
+        public StringAttribute(string value)
         {
-            Name = name;
+            Value = value;
         }
 
-        public readonly string Name;
+        public readonly string Value;
+    }
+
+    public sealed class NameAttribute : StringAttribute
+    {
+        public NameAttribute(string name) : base(name)
+        {
+        }
+    }
+
+    public sealed class DescriptionAttribute : StringAttribute
+    {
+        public DescriptionAttribute(string description) : base(description)
+        {
+        }
+    }
+
+    public sealed class SectionAttribute : StringAttribute
+    {
+        public SectionAttribute(string section) : base(section)
+        {
+        }
     }
 
     public sealed class DefaultAttribute : BaseAttribute
@@ -84,16 +54,6 @@ namespace SAIN.Attributes
         }
 
         public readonly object Value;
-    }
-
-    public sealed class DescriptionAttribute : BaseAttribute
-    {
-        public DescriptionAttribute(string description)
-        {
-            Description = description;
-        }
-
-        public readonly string Description;
     }
 
     public sealed class RoundingValueAttribute : BaseAttribute
@@ -108,7 +68,7 @@ namespace SAIN.Attributes
 
     public sealed class MinMaxAttribute : GUIValuesAttribute
     {
-        public MinMaxAttribute(float min, float max, float rounding = 1f) : base(min, max, rounding)
+        public MinMaxAttribute(float min, float max, float rounding = 10f) : base(min, max, rounding)
         {
         }
     }
@@ -122,7 +82,14 @@ namespace SAIN.Attributes
 
     public sealed class Percentage0to1Attribute : GUIValuesAttribute
     {
-        public Percentage0to1Attribute(float min = 0f, float max = 1f, float rounding = 100f) : base (min, max, rounding)
+        public Percentage0to1Attribute(float min = 0f, float max = 1f, float rounding = 100f) : base(min, max, rounding)
+        {
+        }
+    }
+
+    public sealed class Percentage01to99Attribute : GUIValuesAttribute
+    {
+        public Percentage01to99Attribute() : base(0.01f, 0.99f, 100f)
         {
         }
     }
@@ -151,21 +118,49 @@ namespace SAIN.Attributes
         public readonly float Rounding;
     }
 
-    public sealed class AdvancedAttribute : BaseAttribute
+    public sealed class DefaultDictionaryAttribute : StringAttribute
     {
-        public AdvancedAttribute(params IAdvancedOption[] options)
+        public DefaultDictionaryAttribute(string dictionaryName) : base(dictionaryName)
         {
-            if (options != null && options.Length > 0)
-            {
-                Options = options;
-            }
-            else
-            {
-                Options = new IAdvancedOption[] { IAdvancedOption.IsAdvanced };
-            }
+        }
+    }
+
+    public sealed class DefaultListAttribute : StringAttribute
+    {
+        public DefaultListAttribute(string listName) : base(listName)
+        {
+        }
+    }
+
+    public sealed class AdvancedAttribute : BoolAttribute
+    {
+        public AdvancedAttribute() : base(true)
+        {
+        }
+    }
+
+    public sealed class HiddenAttribute : BoolAttribute
+    {
+        public HiddenAttribute() : base(true)
+        {
+        }
+    }
+
+    public sealed class CopyValueAttribute : BoolAttribute
+    {
+        public CopyValueAttribute() : base(true)
+        {
+        }
+    }
+
+    public abstract class BoolAttribute : BaseAttribute
+    {
+        public BoolAttribute(bool value)
+        {
+            Value = value;
         }
 
-        public readonly IAdvancedOption[] Options;
+        public readonly bool Value;
     }
 
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]

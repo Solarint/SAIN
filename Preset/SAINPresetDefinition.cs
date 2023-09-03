@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SAIN.Plugin;
+using System;
 
 namespace SAIN.Preset
 {
@@ -16,10 +17,24 @@ namespace SAIN.Preset
             {
                 Name = Name,
                 Description = Description,
-                Creator = Creator,
+                Creator = "None",
                 SAINVersion = SAINVersion,
-                DateCreated = DateCreated
+                DateCreated = DateTime.Now.ToString()
             };
+        }
+
+        public static SAINPresetClass CreateDefault(string difficulty, string description = null)
+        {
+            var preset = new SAINPresetDefinition
+            {
+                Name = $"Default {difficulty}",
+                Description = description ?? $"The Default {difficulty} SAIN Preset.",
+                Creator = "Solarint",
+                SAINVersion = AssemblyInfo.SAINVersion,
+                DateCreated = DateTime.Now.ToString()
+            };
+            PresetHandler.SavePresetDefinition(preset);
+            return new SAINPresetClass(preset);
         }
     }
 }

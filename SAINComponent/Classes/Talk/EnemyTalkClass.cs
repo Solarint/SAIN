@@ -116,7 +116,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                 BegTimer = Time.time + timeAdd;
 
                 var personality = SAIN.Info.Personality;
-                if (personality == SAINPersonality.Timmy || personality == SAINPersonality.Coward)
+                if (personality == IPersonality.Timmy || personality == IPersonality.Coward)
                 {
                     var health = SAIN.Memory.HealthStatus;
                     if (health != ETagStatus.Healthy)

@@ -99,7 +99,7 @@ namespace SAIN.SAINComponent.Classes
 
         public void DrawDebug()
         {
-            if (SAINPlugin.GlobalDebugMode == false)
+            if (SAINPlugin.DebugMode == false)
             {
                 DisposeDebug();
                 return;

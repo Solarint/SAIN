@@ -18,25 +18,34 @@ namespace SAIN.Attributes
 {
     public class AttributesGUI
     {
-        public static AttributesInfoClass GetAttributeInfo(FieldInfo field)
+        public static AttributesInfoClass GetAttributeInfo(MemberInfo member)
         {
-            string name = field.Name + field.DeclaringType.Name;
-            if (!AttributesClasses.ContainsKey(name))
+            string name = member.Name + member.DeclaringType.Name;
+            AddAttributesToDictionary(name, member);
+            if (AttributesClasses.TryGetValue(name, out var value))
             {
-                AttributesClasses.Add(name, new AttributesInfoClass(field));
+                return value;
             }
-            return AttributesClasses[name];
+            return null;
         }
 
-        public static AttributesInfoClass GetAttributeInfo(PropertyInfo property)
+        private static void AddAttributesToDictionary(string name, MemberInfo member)
         {
-            string name = property.Name + property.DeclaringType.Name;
-            if (!AttributesClasses.ContainsKey(name))
+            if (!AttributesClasses.ContainsKey(name) && !FailedAdds.Contains(name))
             {
-                AttributesClasses.Add(name, new AttributesInfoClass(property));
+                var attributes = new AttributesInfoClass(member);
+                if (attributes.ValueType != null)
+                {
+                    AttributesClasses.Add(name, attributes);
+                }
+                else
+                {
+                    FailedAdds.Add(name);
+                }
             }
-            return AttributesClasses[name];
         }
+
+        private static readonly List<string> FailedAdds = new List<string>();
 
         private static readonly Type[] FloatBoolInt =
         {
@@ -61,77 +70,40 @@ namespace SAIN.Attributes
                 {
                     value = EditFloatBoolInt(value, attributes, entryConfig, out wasEdited);
                 }
-                else
+                else if (ExpandableList(attributes, entryConfig.EntryHeight + 5))
                 {
-                    bool isDictionary = attributes.EListType == EListType.Dictionary;
-                    bool isList = attributes.EListType == EListType.List;
-
-                    if ((isDictionary || isList) && ExpandableList(attributes, entryConfig.EntryHeight))
+                    if (value is Dictionary<ICaliber, float>)
                     {
-                        if (attributes.SecondaryListType == typeof(float))
-                        {
-                            string fieldName = attributes.Field?.Name ?? attributes.Property?.Name;
-                            if (attributes.PrimaryListType == typeof(IWeaponClass))
-                            {
-                                var dictionary = value as Dictionary<IWeaponClass, float>;
-                                Dictionary<IWeaponClass, float> defaultDictionary = null;
-
-                                if (fieldName == nameof(ShootSettings.WeaponClassShootability))
-                                {
-                                    defaultDictionary = ShootSettings.WeaponClassShootabilityDefaults;
-
-                                }
-                                else if (fieldName == nameof(ShootSettings.EngagementDistance))
-                                {
-                                    defaultDictionary = ShootSettings.EngagementDistanceDefaults;
-                                }
-
-                                if (defaultDictionary != null)
-                                {
-                                    EditDictionary(dictionary, defaultDictionary, attributes, out wasEdited);
-                                }
-                            }
-                            else if (attributes.PrimaryListType == typeof(ICaliber))
-                            {
-                                var dictionary = value as Dictionary<ICaliber, float>;
-                                Dictionary<ICaliber, float> defaultDictionary = null;
-
-                                if (fieldName == nameof(ShootSettings.AmmoCaliberShootability))
-                                {
-                                    defaultDictionary = ShootSettings.AmmoCaliberShootabilityDefaults;
-
-                                }
-                                else if (fieldName == nameof(HearingSettings.HearingDistances))
-                                {
-                                    defaultDictionary = HearingSettings.HearingDistancesDefaults;
-                                }
-
-                                if (defaultDictionary != null)
-                                {
-                                    EditDictionary(dictionary, defaultDictionary, attributes, out wasEdited);
-                                }
-                            }
-                        }
-                        else if (value is List<WildSpawnType> wildList)
-                        {
-                            ModifyLists.AddOrRemove(wildList, out wasEdited);
-                            value = wildList;
-                        }
-                        else if (value is List<BotDifficulty> diffList)
-                        {
-                            ModifyLists.AddOrRemove(diffList, out wasEdited);
-                            value = diffList;
-                        }
-                        else if (value is List<BotType> botList)
-                        {
-                            ModifyLists.AddOrRemove(botList, out wasEdited);
-                            value = botList;
-                        }
-                        else if (value is List<BigBrainConfigClass> brainList)
-                        {
-                            ModifyLists.AddOrRemove(brainList, out wasEdited);
-                            value = brainList;
-                        }
+                        EditFloatDictionary<ICaliber>(
+                            value, attributes, out wasEdited);
+                    }
+                    else if (value is Dictionary<IWeaponClass, float>)
+                    {
+                        EditFloatDictionary<IWeaponClass>(
+                            value, attributes, out wasEdited);
+                    }
+                    else if (value is List<WildSpawnType>)
+                    {
+                        ModifyLists.AddOrRemove(
+                            value as List<WildSpawnType>, out wasEdited);
+                    }
+                    else if (value is List<BotDifficulty>)
+                    {
+                        ModifyLists.AddOrRemove(
+                            value as List<BotDifficulty>, out wasEdited);
+                    }
+                    else if (value is List<BotType>)
+                    {
+                        ModifyLists.AddOrRemove(
+                            value as List<BotType>, out wasEdited);
+                    }
+                    else if (value is List<BigBrainConfigClass>)
+                    {
+                        ModifyLists.AddOrRemove(
+                            value as List<BigBrainConfigClass>, out wasEdited);
+                    }
+                    else if (value is List<string>)
+                    {
                     }
                 }
             }
@@ -164,9 +136,9 @@ namespace SAIN.Attributes
                 CreateLabelStyle();
 
                 Box(new GUIContent(
-                    attributes.Name, 
-                    attributes.Description), 
-                    LabelStyle, 
+                    attributes.Name,
+                    attributes.Description),
+                    LabelStyle,
                     Height(entryConfig.EntryHeight)
                     );
             }
@@ -185,6 +157,10 @@ namespace SAIN.Attributes
                 showResult = true;
                 float flValue = BuilderClass.CreateSlider((float)value, attributes.Min, attributes.Max, entryConfig.Toggle);
                 value = flValue.Round(attributes.Rounding);
+            }
+            else if (attributes.ValueType == typeof(int))
+            {
+                Logger.LogError("Int Not Implemented!");
             }
             if (showResult && value != null)
             {
@@ -242,14 +218,25 @@ namespace SAIN.Attributes
             return EditValue(value, GetAttributeInfo(field), out wasEdited, entryConfig);
         }
 
-        public static void EditDictionary<T>(Dictionary<T, float> dictionary, Dictionary<T, float> defaultDictionary, AttributesInfoClass dictionaryAttributes, out bool wasEdited)
+        public static void EditFloatDictionary<T>(object dictValue, AttributesInfoClass attributes, out bool wasEdited) where T : Enum
         {
             BeginVertical(5f);
 
-            float min = dictionaryAttributes.Min;
-            float max = dictionaryAttributes.Max;
-            float rounding = dictionaryAttributes.Rounding;
+            float min = attributes.Min;
+            float max = attributes.Max;
+            float rounding = attributes.Rounding;
 
+            var defaultDictionary = attributes.DefaultDictionary as Dictionary<T, float>;
+            var dictionary = dictValue as Dictionary<T, float>;
+
+            T[] array = EnumValues.GetEnum<T>();
+            if (array != null && array.Length > 0)
+            {
+                for (int i = 0; i < array.Length; i++)
+                {
+                    Logger.LogInfo(array[i]);
+                }
+            }
             List<T> list = new List<T>();
             foreach (var entry in dictionary)
             {
@@ -269,20 +256,20 @@ namespace SAIN.Attributes
 
                 var item = list[i];
                 float originalValue = dictionary[item];
-                float value = originalValue;
+                float floatValue = originalValue;
 
                 Box(new GUIContent(item.ToString()), LabelStyle, Height(DefaultEntryConfig.EntryHeight));
-                value = BuilderClass.CreateSlider(value, min, max, DefaultEntryConfig.Toggle).Round(rounding);
-                Box(value.ToString(), DefaultEntryConfig.Result);
+                floatValue = BuilderClass.CreateSlider(floatValue, min, max, DefaultEntryConfig.Toggle).Round(rounding);
+                Box(floatValue.ToString(), DefaultEntryConfig.Result);
 
                 if (Button("Reset", EUISoundType.ButtonClick, DefaultEntryConfig.Reset))
                 {
-                    value = defaultDictionary[item];
+                    floatValue = defaultDictionary[item];
                 }
-                if (value != originalValue)
+                if (floatValue != originalValue)
                 {
                     wasEdited = true;
-                    dictionary[item] = value;
+                    dictionary[item] = floatValue;
                 }
 
                 EndHorizontal(150f);
@@ -308,7 +295,7 @@ namespace SAIN.Attributes
                 object newValue = EditValue(value, attributes, out bool newEdit);
                 if (newEdit)
                 {
-                    if (SAINPlugin.GlobalDebugMode)
+                    if (SAINPlugin.DebugMode)
                     {
                         Logger.LogInfo($"{field.Name} was edited");
                     }
@@ -325,21 +312,21 @@ namespace SAIN.Attributes
             BeginVertical(5);
 
             wasEdited = false;
-            foreach (var fieldAtt in category.FieldAttributes)
+            foreach (var fieldAtt in category.FieldAttributesList)
             {
                 if (SkipForSearch(fieldAtt, search))
                 {
                     continue;
                 }
-                object value = fieldAtt.Field.GetValue(categoryObject);
+                object value = fieldAtt.GetValue(categoryObject);
                 object newValue = EditValue(value, fieldAtt, out bool newEdit);
                 if (newEdit)
                 {
-                    if (SAINPlugin.GlobalDebugMode)
+                    if (SAINPlugin.DebugMode)
                     {
                         Logger.LogInfo($"{fieldAtt.Name} was edited");
                     }
-                    fieldAtt.Field.SetValue(categoryObject, newValue);
+                    fieldAtt.SetValue(categoryObject, newValue);
                     wasEdited = true;
                 }
             }
@@ -349,8 +336,8 @@ namespace SAIN.Attributes
 
         public static bool SkipForSearch(AttributesInfoClass attributes, string search)
         {
-            return !string.IsNullOrEmpty(search) && 
-                (attributes.Name.ToLower().Contains(search) == false && 
+            return !string.IsNullOrEmpty(search) &&
+                (attributes.Name.ToLower().Contains(search) == false &&
                 attributes.Description?.ToLower().Contains(search) == false);
         }
 
@@ -382,7 +369,7 @@ namespace SAIN.Attributes
                             object newValue = EditValue(value, targetField, out bool newEdit);
                             if (newEdit)
                             {
-                                if (SAINPlugin.GlobalDebugMode)
+                                if (SAINPlugin.DebugMode)
                                 {
                                     Logger.LogInfo($"{targetField.Name} was edited");
                                 }

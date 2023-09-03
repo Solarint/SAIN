@@ -1,27 +1,71 @@
 ﻿using SAIN.Editor;
 using SAIN.Helpers;
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
 
 namespace SAIN.Attributes
 {
     public sealed class AttributesInfoClass
     {
-        public AttributesInfoClass(FieldInfo field)
+        public AttributesInfoClass(MemberInfo member)
         {
-            Field = field;
-            ValueType = field.FieldType;
-            GetInfo();
+            MemberInfo = member;
+            GetInfo(member);
         }
 
-        public AttributesInfoClass(PropertyInfo property)
+        public Type ValueType
         {
-            Property = property;
-            ValueType = property.PropertyType;
-            GetInfo();
+            get
+            {
+                switch (MemberInfo.MemberType)
+                {
+                    case MemberTypes.Field:
+                        return (MemberInfo as FieldInfo).FieldType;
+
+                    case MemberTypes.Property:
+                        return (MemberInfo as PropertyInfo).PropertyType;
+
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        public Type DeclaringType => MemberInfo.DeclaringType;
+
+        public readonly MemberInfo MemberInfo;
+
+        public object GetValue(object obj)
+        {
+            switch (MemberInfo.MemberType)
+            {
+                case MemberTypes.Field:
+                    return (MemberInfo as FieldInfo).GetValue(obj);
+
+                case MemberTypes.Property:
+                    return (MemberInfo as PropertyInfo).GetValue(obj);
+
+                default:
+                    return null;
+            }
+        }
+
+        public void SetValue(object obj, object value)
+        {
+            switch (MemberInfo.MemberType)
+            {
+                case MemberTypes.Field:
+                    (MemberInfo as FieldInfo).SetValue(obj, value);
+                    return;
+
+                case MemberTypes.Property:
+                    (MemberInfo as PropertyInfo).SetValue(obj, value);
+                    return;
+
+                default:
+                    return;
+            }
         }
 
         public object Clamp(object value)
@@ -29,156 +73,67 @@ namespace SAIN.Attributes
             return MathHelpers.ClampObject(value, Min, Max);
         }
 
-        private MinMaxAttribute MinMax;
-        private Percentage0to1Attribute Percentage0to1;
-        private PercentageAttribute Percentage;
-        private RoundingValueAttribute RoundingValue;
-
-        private void GetInfo()
+        private void GetInfo(MemberInfo member)
         {
+            Hidden = Get<HiddenAttribute>() != null;
+            Advanced = Get<AdvancedAttribute>() != null;
+            CopyValue = Get<CopyValueAttribute>() != null;
+
+            if (Hidden)
+            {
+                return;
+            }
+
             var nameDescription = Get<NameAndDescriptionAttribute>();
-            Name = nameDescription?.Name ?? Get<NameAttribute>()?.Name ?? Field?.Name ?? Property?.Name;
-            Description = nameDescription?.Description ?? Get<DescriptionAttribute>()?.Description;
+            Name = nameDescription?.Name ?? Get<NameAttribute>()?.Value ?? member.Name;
+            Description = nameDescription?.Description ?? Get<DescriptionAttribute>()?.Value ?? string.Empty;
 
-            SetMinMax();
-            SetDefault();
+            Default = Get<DefaultAttribute>()?.Value;
 
-            var advanced = Get<AdvancedAttribute>();
-            if (advanced != null)
+            GUIValuesAttribute GUIValues = Get<GUIValuesAttribute>();
+            if (GUIValues != null)
             {
-                AdvancedOptions = advanced.Options;
+                Min = GUIValues.Min;
+                Max = GUIValues.Max;
+                Rounding = GUIValues.Rounding;
             }
 
-            var listObj = Get<DictionaryAttribute>();
-            if (listObj != null)
-            {
-                EListType = EListType.Dictionary;
-                PrimaryListType = listObj.TypeA;
-                SecondaryListType = listObj.TypeB;
-                return;
-            }
-
-            var list = Get<ListAttribute>();
-            if (list != null)
-            {
-                EListType = EListType.List;
-                PrimaryListType = list.Type;
-                return;
-            }
+            DictionaryString = Get<DefaultDictionaryAttribute>()?.Value;
         }
 
         private T Get<T>() where T : Attribute
         {
-            return Field?.GetCustomAttribute<T>() ?? Property?.GetCustomAttribute<T>();
+            return MemberInfo.GetCustomAttribute<T>();
         }
 
-        public FieldInfo Field { get; private set; }
+        public object DefaultDictionary => Reflection.GetStaticValue(DeclaringType, DictionaryString);
+        private string DictionaryString;
 
-        public PropertyInfo Property { get; private set; }
-
-        public Type ValueType { get; private set; }
-
-        private void SetNameAndDescription()
-        {
-            var nameDescription = Get<NameAndDescriptionAttribute>();
-            if (nameDescription != null)
-            {
-                Name = nameDescription.Name;
-                Description = nameDescription.Description;
-                return;
-            }
-            var nameAtt = Get<NameAttribute>();
-            if (nameAtt != null)
-            {
-                Name = nameAtt.Name;
-            }
-            else
-            {
-                Name = Field?.Name ?? Property?.Name;
-            }
-            var descAtt = Get<DescriptionAttribute>();
-            if (descAtt != null)
-            {
-                Description = descAtt.Description;
-            }
-        }
 
         public string Name { get; private set; }
 
+        public string MemberName { get; private set; }
+
         public string Description { get; private set; }
-
-        private void SetDefault()
-        {
-            Default = Get<DefaultValueAttribute>()?.Value ?? Get<DefaultAttribute>()?.Value;
-
-            if (Default == null)
-            {
-                if (ValueType == typeof(float))
-                {
-                    Default = ((Max - Min) / 2f).Round100();
-                }
-                else if (ValueType == typeof(int))
-                {
-                    Default = Mathf.RoundToInt((Max - Min) / 2f);
-                }
-                else if (ValueType == typeof(bool))
-                {
-                    Default = false;
-                }
-            }
-        }
 
         public object Default { get; private set; }
 
-        private void SetMinMax()
-        {
-            MinMax = Get<MinMaxAttribute>();
-            if (MinMax != null)
-            {
-                Min = MinMax.Min;
-                Max = MinMax.Max;
-                Rounding = MinMax.Rounding;
-                return;
-            }
-            Percentage = Get<PercentageAttribute>();
-            if (Percentage != null)
-            {
-                Min = Percentage.Min;
-                Max = Percentage.Max;
-                Rounding = Percentage.Rounding;
-                return;
-            }
-            Percentage0to1 = Get<Percentage0to1Attribute>();
-            if (Percentage0to1 != null)
-            {
-                Min = Percentage0to1.Min;
-                Max = Percentage0to1.Max;
-                Rounding = Percentage0to1.Rounding;
-                return;
-            }
-            RoundingValue = Get<RoundingValueAttribute>();
-            if (MinMax != null)
-            {
-                Rounding = MinMax.Rounding;
-                return;
-            }
-            Min = 0f;
-            Max = 100f;
-            Rounding = 10f;
-        }
+        public float Min { get; private set; } = 0f;
 
-        public float Min { get; private set; }
+        public float Max { get; private set; } = 300f;
 
-        public float Max { get; private set; }
+        public float Rounding { get; private set; } = 10f;
 
-        public float Rounding { get; private set; }
+        public bool Hidden { get; private set; }
 
-        public bool DoNotShowGUI => AdvancedOptions.Contains(IAdvancedOption.Hidden) || SAINEditor.AdvancedBotConfigs == false && AdvancedOptions.Contains(IAdvancedOption.IsAdvanced);
+        public bool Advanced { get; private set; }
 
-        public IAdvancedOption[] AdvancedOptions { get; private set; } = new IAdvancedOption[0];
+        public bool CopyValue { get; private set; }
+
+        public bool DoNotShowGUI => Hidden || Advanced && !SAINEditor.AdvancedBotConfigs;
 
         public EListType EListType { get; private set; } = EListType.None;
-        public Type PrimaryListType { get; private set; }
+        public Type ListType { get; private set; }
         public Type SecondaryListType { get; private set; }
     }
 }
