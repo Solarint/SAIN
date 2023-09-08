@@ -239,8 +239,6 @@
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\Categories\SAINBossSettings.cs" />
-    <Compile Include="Preset\GlobalSettings\Categories\BigBrainConfigClass.cs" />
-    <Compile Include="Preset\GlobalSettings\Categories\BigBrainSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\BotBrains.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\Brain.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\BrainInfoClass.cs" />

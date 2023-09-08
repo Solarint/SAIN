@@ -17,19 +17,11 @@ namespace SAIN.Preset.GlobalSettings
                 result = new GlobalSettingsClass
                 {
                     EFTCoreSettings = EFTCoreSettings.GetCore(),
-                    //BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains)
                 };
                 SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
             }
 
             EFTCoreSettings.UpdateCoreSettings(result.EFTCoreSettings);
-
-            //var brainSettings = result.BigBrain.BrainSettings;
-            //if (brainSettings == null || brainSettings.Count == 0)
-            //{
-            //result.BigBrain = new BigBrainSettings(BigBrainSettings.DefaultBrains);
-            //SaveObjectToJson(result, fileName, presetsFolder, Preset.Value);
-            //}
 
             SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
 
@@ -65,9 +57,6 @@ namespace SAIN.Preset.GlobalSettings
 
         [Name("Global Look Settings")]
         public LookSettings Look = new LookSettings();
-
-        //[Hidden]
-        //public BigBrainSettings BigBrain = new BigBrainSettings();
 
         [Hidden]
         public EFTCoreSettings EFTCoreSettings = new EFTCoreSettings();

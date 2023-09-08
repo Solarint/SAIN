@@ -15,6 +15,11 @@ namespace SAIN.Preset.GlobalSettings
         [Default(true)]
         public bool NoBushESPToggle = true;
 
+        [Name("Enhanced Cover Finding - Experimental")]
+        [Description("CAN REDUCE PERFORMANCE. Improves bot reactions in a fight by decreasing the time it takes to find cover, can help with bots standing still occasionally before running for cover. Comes at the cost of some reduced performance overall.")]
+        [Default(false)]
+        public bool EnhancedCoverFinding = false;
+
         [Name("No Bush ESP Enhanced Raycasts")]
         [Description("Experimental: Increased Accuracy and extra checks")]
         [Default(false)]
@@ -43,7 +48,7 @@ namespace SAIN.Preset.GlobalSettings
         public bool NoBushESPDebugMode = false;
 
         [Name("HeadShot Protection")]
-        [Description("Experimental, will kick bot's aiming target if it ends up on the player's head.")]
+        [Description("Experimental, will move bot's aiming target if it ends up on the player's head. NOT FOOLPROOF. It's more of a strong suggestion rather than a hard limit. If you find you are dying to headshots too frequently still, I recommend increasing your head health with another mod.")]
         [Default(false)]
         public bool HeadShotProtection = false;
     }

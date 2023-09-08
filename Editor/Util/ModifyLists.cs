@@ -11,25 +11,6 @@ namespace SAIN.Editor.Util
 {
     public static class ModifyLists
     {
-        public static void AddOrRemove(List<BigBrainConfigClass> list, out bool wasEdited, int optionsPerLine = 4)
-        {
-            wasEdited = false;
-            if (list != null)
-            {
-                int i = StartListEdit(optionsPerLine, out var options);
-                foreach (BigBrainConfigClass brain in BigBrainSettings.DefaultBrains)
-                {
-                    AddOrRemove(brain, list, out bool newEdit, null, null, options);
-                    if (newEdit)
-                    {
-                        wasEdited = true;
-                    }
-                    i = ListSpacing(i, optionsPerLine);
-                }
-                EndListEdit();
-            }
-        }
-
         public static void AddOrRemove(List<WildSpawnType> list, out bool wasEdited, int optionsPerLine = 4)
         {
             wasEdited = false;

@@ -49,10 +49,18 @@ namespace SAIN.Components.BotController
                 if (AllScavExfils == null)
                 {
                     AllScavExfils = ExfilController.ScavExfiltrationPoints;
+                    if (SAINPlugin.DebugMode)
+                    {
+                        Logger.LogInfo($"Found {AllScavExfils?.Length} possible Scav Exfil Points in this map.");
+                    }
                 }
                 if (AllExfils == null)
                 {
                     AllExfils = ExfilController.ExfiltrationPoints;
+                    if (SAINPlugin.DebugMode)
+                    {
+                        Logger.LogInfo($"Found {AllExfils?.Length} possible Exfil Points in this map.");
+                    }
                 }
             }
             return ExfilController != null;
@@ -99,6 +107,11 @@ namespace SAIN.Components.BotController
                     if (bot.Value.Memory.ExfilPosition == null)
                     {
                         bot.Value.Memory.CannotExfil = true;
+
+                        if (SAINPlugin.DebugMode)
+                        {
+                            Logger.LogInfo($"{bot.Value.BotOwner.name} Could Not find Exfil. Type: {bot.Value.Info.WildSpawnType}");
+                        }
                     }
                 }
                 return ValidExfils.Count > 0 || ValidScavExfils.Count > 0;
@@ -134,7 +147,8 @@ namespace SAIN.Components.BotController
                 {
                     foreach (var ex in AllExfils)
                     {
-                        if (ex != null && ex.isActiveAndEnabled && !ValidExfils.ContainsKey(ex))
+                        // ex.isActiveAndEnabled && 
+                        if (ex != null && !ValidExfils.ContainsKey(ex))
                         {
                             if (ex.TryGetComponent<Collider>(out var collider))
                             {
@@ -142,6 +156,16 @@ namespace SAIN.Components.BotController
                                 {
                                     ValidExfils.Add(ex, Destination);
                                 }
+                                else
+                                {
+                                    if (SAINPlugin.DebugMode)
+                                        Logger.LogWarning($"Could not find valid path to {ex.name}");
+                                }
+                            }
+                            else
+                            {
+                                if (SAINPlugin.DebugMode)
+                                    Logger.LogWarning($"Could not find collider for {ex.name}");
                             }
                         }
                     }

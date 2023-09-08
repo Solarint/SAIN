@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using SAIN.Attributes;
+﻿using SAIN.Attributes;
 
 namespace SAIN.Preset.GlobalSettings
 {

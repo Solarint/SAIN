@@ -1,5 +1,4 @@
-﻿using EFT.InventoryLogic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SAIN.Attributes;
 using System.Collections.Generic;
 
@@ -7,62 +6,40 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class ShootSettings
     {
-        [Name(
-            "Global EFT Scatter Multiplier"
-            )]
-        [Description(
-            "Higher = more scattering. Modifies EFT's default scatter feature. 1.5 = 1.5x more scatter"
-            )]
+        [Name("Global EFT Scatter Multiplier")]
+        [Description("Higher = more scattering. Modifies EFT's default scatter feature. 1.5 = 1.5x more scatter")]
         [Default(1f)]
         [MinMax(0.01f, 10f, 100f)]
         public float GlobalScatterMultiplier = 1f;
 
-        [Name(
-            "Global SAIN Recoil Scatter Multiplier"
-            )]
-        [Description(
-            "Higher = more recoil. Modifies SAIN's new recoil scatter feature. 1.5 = 1.5x more scatter from recoil"
-            )]
+        [Name("Global SAIN Recoil Scatter Multiplier")]
+        [Description("Higher = more recoil. Modifies SAIN's new recoil scatter feature. 1.5 = 1.5x more scatter from recoil")]
         [Default(1f)]
         [MinMax(0.1f, 5f, 100f)]
         public float GlobalRecoilMultiplier = 1f;
 
-        [Name(
-            "Max Recoil Per Shot"
-            )]
-        [Description(
-            "Maximum Impulse force from a single shot for a bot."
-            )]
+        [Name("Max Recoil Per Shot")]
+        [Description("Maximum Impulse force from a single shot for a bot.")]
         [Default(1.5f)]
         [MinMax(0.1f, 10f, 100f)]
         [Advanced]
         public float MaxRecoil = 1.5f;
 
-        [Name(
-            "Add or Subtract Recoil"
-            )]
-        [Description(
-            "Linearly add or subtract from the final recoil result"
-            )]
+        [Name("Add or Subtract Recoil")]
+        [Description("Linearly add or subtract from the final recoil result")]
         [Default(-1f)]
         [MinMax(-10f, 10f, 100f)]
         [Advanced]
         public float AddRecoil = -1f;
 
-        [Name(
-            "Recoil Decay p/frame"
-            )]
-        [Description(
-            "How much to decay the recoil impulse per frame. 0.75 means 25% of the recoil will be removed per frame."
-            )]
+        [Name("Recoil Decay p/frame")]
+        [Description("How much to decay the recoil impulse per frame. 0.75 means 25% of the recoil will be removed per frame.")]
         [Default(0.75f)]
         [Percentage01to99]
         [Advanced]
         public float RecoilDecay = 0.75f;
 
-        [Name(
-            "Ammo Shootability"
-            )]
+        [Name("Ammo Shootability" )]
         [Description(
             "Lower is BETTER. " +
             "How Shootable this ammo type is, affects semi auto firerate and full auto burst length." +
@@ -108,9 +85,7 @@ namespace SAIN.Preset.GlobalSettings
             { ICaliber.Default, 0.5f },
         };
 
-        [Name(
-            "Weapon Shootability"
-            )]
+        [Name("Weapon Shootability")]
         [Description(
             "Lower is BETTER. " +
             "How Shootable this weapon type is, affects semi auto firerate and full auto burst length." +
@@ -140,9 +115,7 @@ namespace SAIN.Preset.GlobalSettings
             { IWeaponClass.specialWeapon, 1f },
         };
 
-        [Name(
-            "Weapon Firerate Wait Time"
-            )]
+        [Name("Weapon Firerate Wait Time")]
         [Description(
             "HIGHER is BETTER. " +
             "This is the time to wait inbetween shots for every meter." +
@@ -173,9 +146,7 @@ namespace SAIN.Preset.GlobalSettings
             { IWeaponClass.specialWeapon, 80 },
         };
 
-        [Name(
-            "Bot Preferred Shoot Distances"
-            )]
+        [Name("Bot Preferred Shoot Distances")]
         [Description(
             "The distances that a bot prefers to shoot a particular weapon class. " +
             "Bots will try to close the distance if further than this."

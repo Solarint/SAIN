@@ -1,5 +1,4 @@
 ﻿using SAIN.Attributes;
-using System.ComponentModel;
 
 namespace SAIN.Preset.GlobalSettings.Categories
 {

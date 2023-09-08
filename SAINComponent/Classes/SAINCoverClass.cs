@@ -31,6 +31,22 @@ namespace SAIN.SAINComponent.Classes
                 return;
             }
 
+            // If the config option is enabled. Let a bot find cover all the time when they have a target or enemy if the enemy is the player.
+            if (GlobalSettings.General.EnhancedCoverFinding && SAIN.CurrentTargetPosition != null)
+            {
+                if (SAIN?.Enemy?.EnemyPlayer?.IsYourPlayer == true)
+                {
+                    ActivateCoverFinder(true);
+                    return;
+                }
+                // No way to check if a GoalTarget is created by a player afaik, so enable it anyways
+                else if (SAIN.Enemy == null)
+                {
+                    ActivateCoverFinder(true);
+                    return;
+                }
+            }
+
             var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
             if (CurrentDecision == SoloDecision.UnstuckMoveToCover || CurrentDecision == SoloDecision.Retreat || CurrentDecision == SoloDecision.RunToCover || CurrentDecision == SoloDecision.WalkToCover)
             {

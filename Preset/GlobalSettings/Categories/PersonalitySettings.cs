@@ -1,6 +1,4 @@
-﻿using Comfort.Common;
-using System.ComponentModel;
-using SAIN.Attributes;
+﻿using SAIN.Attributes;
 
 namespace SAIN.Preset.GlobalSettings
 {
@@ -8,8 +6,10 @@ namespace SAIN.Preset.GlobalSettings
     {
         [Default(false)]
         public bool AllGigaChads = false;
+
         [Default(false)]
         public bool AllChads = false;
+
         [Default(false)]
         public bool AllRats = false;
 

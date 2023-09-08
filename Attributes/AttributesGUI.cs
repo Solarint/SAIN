@@ -97,11 +97,6 @@ namespace SAIN.Attributes
                         ModifyLists.AddOrRemove(
                             value as List<BotType>, out wasEdited);
                     }
-                    else if (value is List<BigBrainConfigClass>)
-                    {
-                        ModifyLists.AddOrRemove(
-                            value as List<BigBrainConfigClass>, out wasEdited);
-                    }
                     else if (value is List<string>)
                     {
                     }
