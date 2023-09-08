@@ -5,8 +5,6 @@ using SAIN.Editor.Util;
 using SAIN.Helpers;
 using SAIN.Preset;
 using SAIN.Preset.BotSettings.SAINSettings;
-using SAIN.Preset.GlobalSettings;
-using SAIN.Preset.GlobalSettings.Categories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
