@@ -89,9 +89,9 @@ namespace SAIN.Preset.Personalities
             public float MaxLevel = 100;
 
             [NameAndDescription("Random Chance If Meets Requirements", "If the bot meets all conditions for this personality, this is the chance the personality will actually be assigned.")]
-            [Default(60)]
+            [Default(50)]
             [MinMax(0, 100, 1)]
-            public float RandomChanceIfMeetRequirements = 60;
+            public float RandomChanceIfMeetRequirements = 50;
 
             [NameAndDescription("Power Level Minimum", "Minimum Power level for a bot to use this personality." + PowerLevelDescription)]
             [Default(0)]

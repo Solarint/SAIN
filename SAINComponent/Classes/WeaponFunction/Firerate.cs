@@ -26,15 +26,6 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
 
         public void Update()
         {
-            var type = BotOwner.WeaponManager.WeaponAIPreset.WeaponAIPresetType;
-            if (type == EWeaponAIPresetType.MainWeaponAuto || type == EWeaponAIPresetType.MainWeaponSingle)
-            {
-            }
-            else
-            {
-
-                //BotOwner.WeaponManager.WeaponAIPreset.HoldTriggerUpTime = new Func<float>(SemiAutoROF);
-            }
         }
 
         public void Dispose()
@@ -72,48 +63,21 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
         {
             get
             {
-                float perMeter;
-                // Higher is faster firerate // Selects a the time for 1 second of wait time for every x meters
-                switch (SAIN.Info.WeaponInfo.WeaponClass)
+                var perMeterDictionary = GlobalSettings?.Shoot?.WeaponPerMeter;
+                var weapInfo = SAIN?.Info?.WeaponInfo;
+
+                if (perMeterDictionary != null && weapInfo != null)
                 {
-                    case "assaultCarbine":
-                    case "assaultRifle":
-                    case "machinegun":
-                        perMeter = 120f;
-                        break;
-
-                    case "smg":
-                        perMeter = 130f;
-                        break;
-
-                    case "pistol":
-                        perMeter = 90f;
-                        break;
-
-                    case "marksmanRifle":
-                        perMeter = 90f;
-                        break;
-
-                    case "sniperRifle":
-                        perMeter = 70f;
-                        // VSS and VAL Exception
-                        if (SAIN.Info.WeaponInfo.AmmoCaliber == "9x39")
-                        {
-                            perMeter = 120f;
-                        }
-                        break;
-
-                    case "shotgun":
-                    case "grenadeLauncher":
-                    case "specialWeapon":
-                        perMeter = 70f;
-                        break;
-
-                    default:
-                        perMeter = 120f;
-                        break;
+                    if (perMeterDictionary.TryGetValue(weapInfo.IWeaponClass, out float perMeter))
+                    {
+                        return perMeter;
+                    }
+                    if (perMeterDictionary.TryGetValue(IWeaponClass.Default, out perMeter))
+                    {
+                        return perMeter;
+                    }
                 }
-                return perMeter;
+                return 80f;
             }
         }
     }

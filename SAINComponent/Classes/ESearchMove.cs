@@ -4,6 +4,7 @@
     {
         None,
         DirectMove,
+        DirectMovePeek,
         MoveToStartPeek,
         MoveToEndPeak,
         MoveToDangerPoint,

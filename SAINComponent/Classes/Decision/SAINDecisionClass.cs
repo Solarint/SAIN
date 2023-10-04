@@ -1,5 +1,6 @@
 ﻿using EFT;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,6 +15,8 @@ namespace SAIN.SAINComponent.Classes.Decision
             GoalTargetDecisions = new TargetDecisionClass(sain);
             SquadDecisions = new SquadDecisionClass(sain);
         }
+
+        public Action<SoloDecision, SquadDecision, SelfDecision, float> NewDecision { get; set; }
 
         public void Init()
         {
@@ -30,19 +33,27 @@ namespace SAIN.SAINComponent.Classes.Decision
                 return;
             }
 
-            if (DecisionTimer < Time.time)
-            {
-                DecisionTimer = Time.time + 0.066f;
+            CheckDecisionFrameCount++;
 
-                if (UpdateEnemyTimer < Time.time)
+            if (CheckDecisionFrameCount >= CheckDecisionFrameTarget)
+            {
+                CheckEnemyFrameCount++;
+                if (CheckEnemyFrameCount >= CheckEnemyFrameTarget)
                 {
-                    UpdateEnemyTimer = Time.time + 0.33f;
+                    CheckEnemyFrameCount = 0;
                     EnemyDistance = SAIN.HasEnemy ? SAIN.Enemy.CheckPathDistance() : EnemyPathDistance.NoEnemy;
                 }
 
+                CheckDecisionFrameCount = 0;
                 GetDecision();
             }
         }
+
+        private const int CheckDecisionFrameTarget = 4;
+        private int CheckDecisionFrameCount = 0;
+
+        private const int CheckEnemyFrameTarget = 2;
+        private int CheckEnemyFrameCount = 0;
 
         public void Dispose()
         {
@@ -51,7 +62,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         public EnemyPathDistance EnemyDistance { get; private set; }
 
         public SoloDecision CurrentSoloDecision { get; private set; }
-        public SoloDecision OldMainDecision { get; private set; }
+        public SoloDecision OldSoloDecision { get; private set; }
 
         public SquadDecision CurrentSquadDecision { get; private set; }
         public SquadDecision OldSquadDecision { get; private set; }
@@ -116,7 +127,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 self = SAINPlugin.ForceSelfDecision;
             }
 
-            OldMainDecision = CurrentSoloDecision;
+            OldSoloDecision = CurrentSoloDecision;
             CurrentSoloDecision = solo;
 
             OldSquadDecision = CurrentSquadDecision;
@@ -125,17 +136,33 @@ namespace SAIN.SAINComponent.Classes.Decision
             OldSelfDecision = CurrentSelfDecision;
             CurrentSelfDecision = self;
 
-            if (CurrentSoloDecision != OldMainDecision)
+            CheckForNewDecisions();
+        }
+
+        private void CheckForNewDecisions()
+        {
+            bool newDecision = false;
+            float newDecisionTime = Time.time;
+
+            if (CurrentSoloDecision != OldSoloDecision)
             {
-                ChangeDecisionTime = Time.time;
+                ChangeDecisionTime = newDecisionTime;
+                newDecision = true;
             }
             if (CurrentSelfDecision != OldSelfDecision)
             {
-                ChangeSelfDecisionTime = Time.time;
+                ChangeSelfDecisionTime = newDecisionTime;
+                newDecision = true;
             }
             if (CurrentSquadDecision != OldSquadDecision)
             {
-                ChangeSquadDecisionTime = Time.time;
+                ChangeSquadDecisionTime = newDecisionTime;
+                newDecision = true;
+            }
+
+            if (newDecision)
+            {
+                NewDecision?.Invoke(CurrentSoloDecision, CurrentSquadDecision, CurrentSelfDecision, newDecisionTime);
             }
         }
 
@@ -199,9 +226,7 @@ namespace SAIN.SAINComponent.Classes.Decision
             return false;
         }
 
-        private float UpdateEnemyTimer = 0f;
         private float BotUnstuckTimerDecision = 0f;
         private float FinalBotUnstuckTimer = 0f;
-        private float DecisionTimer = 0f;
     }
 }

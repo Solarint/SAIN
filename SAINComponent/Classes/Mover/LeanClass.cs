@@ -1,7 +1,4 @@
-using BepInEx.Logging;
 using EFT;
-using SAIN.Components;
-using SAIN.SAINComponent;
 using System.Linq;
 using UnityEngine;
 
@@ -35,7 +32,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             }
             if (LeanTimer < Time.time)
             {
-                LeanTimer = Time.time + 0.5f;
+                LeanTimer = Time.time + 0.35f;
                 FindLeanDirectionRayCast(enemy.EnemyPosition);
             }
         }

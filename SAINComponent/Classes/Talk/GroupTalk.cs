@@ -44,7 +44,7 @@ namespace SAIN.SAINComponent.Classes.Talk
 
             if (TalkTimer < Time.time)
             {
-                TalkTimer = Time.time + 0.1f;
+                TalkTimer = Time.time + 0.2f;
                 FriendIsClose = AreFriendsClose();
                 if (FriendIsClose)
                 {
@@ -165,40 +165,31 @@ namespace SAIN.SAINComponent.Classes.Talk
             SAIN.Talk.Say(trigger, null, true);
         }
 
-        private List<EPhraseTrigger> LootPhrases = new List<EPhraseTrigger> { EPhraseTrigger.LootBody, EPhraseTrigger.LootContainer, EPhraseTrigger.LootGeneric, EPhraseTrigger.LootKey, EPhraseTrigger.LootMoney, EPhraseTrigger.LootNothing, EPhraseTrigger.LootWeapon, EPhraseTrigger.OnLoot };
-
-        private float MemberDistance(BotOwner member)
-        {
-            return (member.Position - BotOwner.Position).magnitude;
-        }
+        private readonly List<EPhraseTrigger> LootPhrases = new List<EPhraseTrigger> { EPhraseTrigger.LootBody, EPhraseTrigger.LootContainer, EPhraseTrigger.LootGeneric, EPhraseTrigger.LootKey, EPhraseTrigger.LootMoney, EPhraseTrigger.LootNothing, EPhraseTrigger.LootWeapon, EPhraseTrigger.OnLoot };
 
         private bool AreFriendsClose()
         {
             foreach (var member in SAIN.Squad.SquadMembers.Keys)
             {
-                if (member != null && !member.IsDead)
+                if (BotIsAlive(member) && (member.Position - BotOwner.Position).magnitude < 20f)
                 {
-                    if (MemberDistance(member) < 20f)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
             return false;
         }
 
+        private bool BotIsAlive(BotOwner bot) => bot?.GetPlayer?.HealthController?.IsAlive == true;
+
         private void AllMembersSay(EPhraseTrigger trigger, ETagStatus mask, float delay = 1.5f, float chance = 100f)
         {
             foreach (var member in BotSquad.SquadMembers.Values)
             {
-                if (member != null && !member.BotOwner.IsDead)
+                if (member?.BotIsAlive == true && SAIN.Squad.LeaderComponent != null && SAIN.Squad.DistanceToSquadLeader <= 20f)
                 {
-                    if (Vector3.Distance(member.Transform.Position, SAIN.Squad.Leader.Position) < 20f)
+                    if (EFTMath.RandomBool(chance))
                     {
-                        if (EFTMath.RandomBool(chance))
-                        {
-                            member.Talk.TalkAfterDelay(trigger, mask, delay);
-                        }
+                        member.Talk.TalkAfterDelay(trigger, mask, delay);
                     }
                 }
             }
@@ -579,8 +570,8 @@ namespace SAIN.SAINComponent.Classes.Talk
             return false;
         }
 
-        public SoloDecision[] SoloDecisions => BotSquad.SquadSoloDecisions;
-        public SquadDecision[] SquadDecisions => BotSquad.SquadDecisions;
+        public List<SoloDecision> SoloDecisions => BotSquad.SquadSoloDecisions;
+        public List<SquadDecision> SquadDecisions => BotSquad.SquadDecisions;
         public SAINBotTalkClass LeaderComponent => SAIN.Squad.LeaderComponent?.Talk;
         private float Randomized => Random.Range(0.75f, 1.25f);
         private SAINSquadClass BotSquad => SAIN.Squad;

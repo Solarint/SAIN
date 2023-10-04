@@ -1,8 +1,6 @@
 ﻿using EFT;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static SAIN.SAINComponent.Classes.EnemyBase;
 
 namespace SAIN.SAINComponent.BaseClasses
 {
@@ -21,11 +19,13 @@ namespace SAIN.SAINComponent.BaseClasses
         }
 
         private readonly SAINPersonClass Person;
-        public bool TransformNull => Person.PlayerNull || DefaultTransform == null;
+        public bool TransformNull => Person.PlayerNull || DefaultTransform == null || Person?.Player?.gameObject == null;
         public BifacialTransform DefaultTransform => Person.IAIDetails.Transform;
         public Vector3 Position => !TransformNull ? DefaultTransform.position : Vector3.zero;
         public Vector3 LookDirection => !TransformNull ? Person.IAIDetails.LookDirection : Vector3.zero;
+
         public Vector3 Direction(Vector3 start) => !TransformNull ? Position - start : Vector3.zero;
+
         public Vector3 WeaponRootPosition => WeaponRoot != null ? WeaponRoot.position : Vector3.zero;
         public BifacialTransform WeaponRoot => Person.Player?.WeaponRoot;
 
@@ -37,7 +37,7 @@ namespace SAIN.SAINComponent.BaseClasses
         public Vector3 Down => -Up;
         public Vector3 Head { get; private set; }
         public Vector3 Chest { get; private set; }
-        public Vector3 Stomach {get; private set; }
+        public Vector3 Stomach { get; private set; }
 
         public Dictionary<BodyPartType, BodyPartClass> MainParts => Person.IAIDetails?.MainParts;
 
@@ -66,6 +66,5 @@ namespace SAIN.SAINComponent.BaseClasses
                 return Position;
             }
         }
-
     }
 }

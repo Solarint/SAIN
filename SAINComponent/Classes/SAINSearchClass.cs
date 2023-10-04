@@ -218,6 +218,12 @@ namespace SAIN.SAINComponent.Classes
                 speed = 1f;
                 pose = 1f;
             }
+
+            if (CurrentState != ESearchMove.None && !shallSprint && (ActiveDestination - SAIN.Position).magnitude < 5f)
+            {
+                speed = (speed * 0.6f).Round100();
+            }
+
             LastState = CurrentState;
             switch (LastState)
             {

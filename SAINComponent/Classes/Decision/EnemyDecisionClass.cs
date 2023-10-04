@@ -3,6 +3,7 @@ using EFT;
 using SAIN.Components;
 using SAIN.Helpers;
 using SAIN.SAINComponent;
+using System;
 using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.Decision
@@ -12,6 +13,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         public EnemyDecisionClass(SAINComponentClass sain) : base(sain)
         {
         }
+
 
         public void Init()
         {
@@ -182,7 +184,16 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         private bool StartDogFightAction(SAINEnemyClass enemy)
         {
-            var pathStatus = enemy.CheckPathDistance();
+            var currentSolo = SAIN.Decision.CurrentSoloDecision;
+            if (Time.time - SAIN.Cover.LastHitTime < 2f 
+                && currentSolo != SoloDecision.RunAway 
+                && currentSolo != SoloDecision.RunToCover
+                && currentSolo != SoloDecision.Retreat
+                && currentSolo != SoloDecision.WalkToCover)
+            {
+                return true;
+            }
+                var pathStatus = enemy.CheckPathDistance();
             return (pathStatus == EnemyPathDistance.VeryClose && SAIN.Enemy.IsVisible) || SAIN.Cover.CoverInUse?.Spotted == true;
         }
 
@@ -227,7 +238,11 @@ namespace SAIN.SAINComponent.Classes.Decision
             {
                 return false;
             }
-            if (BotOwner.Memory.IsUnderFire || Time.time - BotOwner.Memory.UnderFireTime > TimeBeforeSearch)
+            if (BotOwner.Memory.IsUnderFire || Time.time - BotOwner.Memory.UnderFireTime < TimeBeforeSearch * 0.25f)
+            {
+                return false;
+            }
+            if (SAIN.Decision.CurrentSoloDecision == SoloDecision.HoldInCover)
             {
                 return false;
             }
@@ -264,7 +279,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
                 if (CurrentDecision != SoloDecision.WalkToCover && CurrentDecision != SoloDecision.RunToCover)
                 {
-                    StartRunCoverTimer = Time.time + 3f * Random.Range(0.66f, 1.33f);
+                    StartRunCoverTimer = Time.time + 3f * UnityEngine.Random.Range(0.66f, 1.33f);
                 }
                 return true;
             }
@@ -300,6 +315,10 @@ namespace SAIN.SAINComponent.Classes.Decision
         private bool StartSearch(SAINEnemyClass enemy)
         {
             if (enemy.IsVisible == true)
+            {
+                return false;
+            }
+            if (BotOwner.Memory.IsUnderFire || Time.time - BotOwner.Memory.UnderFireTime < TimeBeforeSearch * 0.33f)
             {
                 return false;
             }

@@ -56,32 +56,32 @@ namespace SAIN.Preset.GlobalSettings
         [Hidden]
         public static readonly Dictionary<ICaliber, float> AmmoCaliberShootabilityDefaults = new Dictionary<ICaliber, float>()
         {
-            { ICaliber.Caliber9x18PM, 0.2f },
-            { ICaliber.Caliber9x19PARA, 0.25f },
-            { ICaliber.Caliber46x30, 0.3f },
-            { ICaliber.Caliber9x21, 0.3f },
+            { ICaliber.Caliber9x18PM, 0.225f },
+            { ICaliber.Caliber9x19PARA, 0.275f },
+            { ICaliber.Caliber46x30, 0.325f },
+            { ICaliber.Caliber9x21, 0.325f },
             { ICaliber.Caliber57x28, 0.35f },
-            { ICaliber.Caliber762x25TT, 0.4f },
-            { ICaliber.Caliber1143x23ACP, 0.4f },
+            { ICaliber.Caliber762x25TT, 0.425f },
+            { ICaliber.Caliber1143x23ACP, 0.425f },
             { ICaliber.Caliber9x33R, 0.65f },
-            { ICaliber.Caliber545x39, 0.5f },
-            { ICaliber.Caliber556x45NATO, 0.5f },
-            { ICaliber.Caliber9x39, 0.55f },
-            { ICaliber.Caliber762x35, 0.55f },
-            { ICaliber.Caliber762x39, 0.65f },
-            { ICaliber.Caliber366TKM, 0.65f },
-            { ICaliber.Caliber762x51, 0.7f },
-            { ICaliber.Caliber127x55, 0.75f },
-            { ICaliber.Caliber762x54R, 0.8f },
+            { ICaliber.Caliber545x39, 0.525f },
+            { ICaliber.Caliber556x45NATO, 0.525f },
+            { ICaliber.Caliber9x39, 0.6f },
+            { ICaliber.Caliber762x35, 0.575f },
+            { ICaliber.Caliber762x39, 0.675f },
+            { ICaliber.Caliber366TKM, 0.675f },
+            { ICaliber.Caliber762x51, 0.725f },
+            { ICaliber.Caliber127x55, 0.775f },
+            { ICaliber.Caliber762x54R, 0.85f },
             { ICaliber.Caliber86x70, 1.0f },
-            { ICaliber.Caliber20g, 0.65f },
-            { ICaliber.Caliber12g, 0.7f },
-            { ICaliber.Caliber23x75, 0.75f },
+            { ICaliber.Caliber20g, 0.7f },
+            { ICaliber.Caliber12g, 0.725f },
+            { ICaliber.Caliber23x75, 0.85f },
             { ICaliber.Caliber26x75, 1f },
             { ICaliber.Caliber30x29, 1f },
             { ICaliber.Caliber40x46, 1f },
             { ICaliber.Caliber40mmRU, 1f },
-            { ICaliber.Caliber127x108, 0.25f },
+            { ICaliber.Caliber127x108, 0.5f },
             { ICaliber.Default, 0.5f },
         };
 
@@ -102,11 +102,11 @@ namespace SAIN.Preset.GlobalSettings
         [Hidden]
         public static readonly Dictionary<IWeaponClass, float> WeaponClassShootabilityDefaults = new Dictionary<IWeaponClass, float>()
         {
-            { IWeaponClass.Default, 0.4f },
-            { IWeaponClass.assaultCarbine, 0.35f },
-            { IWeaponClass.assaultRifle, 0.4f },
-            { IWeaponClass.machinegun, 0.3f },
-            { IWeaponClass.smg, 0.2f },
+            { IWeaponClass.Default, 0.425f },
+            { IWeaponClass.assaultCarbine, 0.375f },
+            { IWeaponClass.assaultRifle, 0.425f },
+            { IWeaponClass.machinegun, 0.35f },
+            { IWeaponClass.smg, 0.25f },
             { IWeaponClass.pistol, 0.4f },
             { IWeaponClass.marksmanRifle, 0.75f },
             { IWeaponClass.sniperRifle, 1f },
@@ -179,38 +179,38 @@ namespace SAIN.Preset.GlobalSettings
 
         [Description(Shootability)]
         [Advanced]
-        [Default(0.35f)]
+        [Default(0.3f)]
         [Percentage01to99]
-        public float WeaponClassScaling = 0.35f;
+        public float WeaponClassScaling = 0.3f;
 
         [Description(Shootability)]
         [Advanced]
-        [Default(0.25f)]
+        [Default(0.2f)]
         [Percentage01to99]
-        public float RecoilScaling = 0.25f;
+        public float RecoilScaling = 0.2f;
 
         [Description(Shootability)]
         [Advanced]
-        [Default(0.1f)]
+        [Default(0.08f)]
         [Percentage01to99]
-        public float ErgoScaling = 0.1f;
+        public float ErgoScaling = 0.08f;
 
         [Description(Shootability)]
         [Advanced]
-        [Default(0.25f)]
+        [Default(0.2f)]
         [Percentage01to99]
-        public float AmmoCaliberScaling = 0.25f;
+        public float AmmoCaliberScaling = 0.2f;
 
         [Description(Shootability)]
         [Advanced]
-        [Default(0.4f)]
+        [Default(0.325f)]
         [Percentage01to99]
-        public float WeaponProficiencyScaling = 0.4f;
+        public float WeaponProficiencyScaling = 0.325f;
 
         [Description(Shootability)]
         [Advanced]
-        [Default(0.35f)]
+        [Default(0.3f)]
         [Percentage01to99]
-        public float DifficultyScaling = 0.35f;
+        public float DifficultyScaling = 0.3f;
     }
 }

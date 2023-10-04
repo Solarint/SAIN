@@ -121,6 +121,11 @@ namespace SAIN.Helpers
             core.SNIPE_POWER = 5f;
         }
 
+        public static void UpdateArmorClassCoef(float coef)
+        {
+            EFTFileSettings.Core.ARMOR_CLASS_COEF = coef;
+        }
+
         public static void UpdateCoreSettings(EFTCoreSettings newCore)
         {
             EFTFileSettings.Core = newCore.Core;

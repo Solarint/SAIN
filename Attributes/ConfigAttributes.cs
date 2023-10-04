@@ -68,7 +68,7 @@ namespace SAIN.Attributes
 
     public sealed class MinMaxAttribute : GUIValuesAttribute
     {
-        public MinMaxAttribute(float min, float max, float rounding = 10f) : base(min, max, rounding)
+        public MinMaxAttribute(float min, float max, float rounding = 100f) : base(min, max, rounding)
         {
         }
     }

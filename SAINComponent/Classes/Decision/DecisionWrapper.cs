@@ -44,7 +44,7 @@
             }
 
             public SoloDecision Current => SAIN.Decision.CurrentSoloDecision;
-            public SoloDecision Last => SAIN.Decision.OldMainDecision;
+            public SoloDecision Last => SAIN.Decision.OldSoloDecision;
         }
 
         public class SquadDecisionWrapper : SAINComponentAbstract, ISAINClass

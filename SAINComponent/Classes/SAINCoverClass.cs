@@ -1,12 +1,7 @@
-﻿using BepInEx.Logging;
-using EFT;
-using SAIN.Components;
-using SAIN.Patches.Components;
-using SAIN.SAINComponent;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using EFT;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes
 {
@@ -72,8 +67,9 @@ namespace SAIN.SAINComponent.Classes
             catch { }
         }
 
-        private void OnBeingHit(EBodyPart part, float unused,DamageInfo damage)
+        private void OnBeingHit(EBodyPart part, float unused, DamageInfo damage)
         {
+            LastHitTime = Time.time;
             CoverPoint activePoint = CoverInUse;
             if (activePoint != null && activePoint.CoverStatus == CoverStatus.InCover)
             {
@@ -242,5 +238,7 @@ namespace SAIN.SAINComponent.Classes
         public CoverFinderComponent CoverFinder { get; private set; }
         public CoverPoint CurrentCoverPoint => ClosestPoint;
         public CoverPoint FallBackPoint => CoverFinder.FallBackPoint;
+
+        public float LastHitTime { get; private set; }
     }
 }

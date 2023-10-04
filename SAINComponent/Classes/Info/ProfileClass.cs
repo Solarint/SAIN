@@ -12,6 +12,10 @@ namespace SAIN.SAINComponent.Classes.Info
             IsFollower = EnumValues.WildSpawn.IsFollower(WildSpawnType);
             IsScav = EnumValues.WildSpawn.IsScav(WildSpawnType);
             IsPMC = EnumValues.WildSpawn.IsPMC(WildSpawnType);
+            if (IsPMC && SAINPlugin.DebugMode)
+            {
+                Logger.LogInfo("Found PMC");
+            }
             SetDiffModifier(BotDifficulty);
         }
 

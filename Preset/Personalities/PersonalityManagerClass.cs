@@ -90,7 +90,7 @@ namespace SAIN.Preset.Personalities
                         Enabled = true,
                         CanJumpCorners = true,
                         RandomChanceIfMeetRequirements = 60,
-                        RandomlyAssignedChance = 3,
+                        RandomlyAssignedChance = 5,
                         CanTaunt = true,
                         CanRespondToVoice = true,
                         TauntFrequency = 8,
@@ -125,7 +125,7 @@ namespace SAIN.Preset.Personalities
                         Enabled = true,
                         CanJumpCorners = true,
                         RandomChanceIfMeetRequirements = 60,
-                        RandomlyAssignedChance = 3,
+                        RandomlyAssignedChance = 5,
                         CanTaunt = true,
                         CanRespondToVoice = true,
                         TauntFrequency = 10,
@@ -157,12 +157,12 @@ namespace SAIN.Preset.Personalities
                     Variables =
                     {
                         Enabled = true,
-                        RandomChanceIfMeetRequirements = 60,
-                        RandomlyAssignedChance = 30,
+                        RandomChanceIfMeetRequirements = 50,
+                        RandomlyAssignedChance = 25,
                         HoldGroundBaseTime = 1f,
-                        SearchBaseTime = 240f,
+                        SearchBaseTime = 180f,
                         PowerLevelMax = 50f,
-                        AggressionMultiplier = 0.6f,
+                        AggressionMultiplier = 0.65f,
                         Sneaky = true,
                         BaseSearchMoveSpeed = 0.2f,
                     }
@@ -184,7 +184,7 @@ namespace SAIN.Preset.Personalities
                     Variables =
                     {
                         Enabled = true,
-                        RandomlyAssignedChance = 50,
+                        RandomlyAssignedChance = 25,
                         PowerLevelMax = 40f,
                         MaxLevel = 10,
                         HoldGroundBaseTime = 0.6f,
@@ -209,10 +209,10 @@ namespace SAIN.Preset.Personalities
                     Variables =
                     {
                         Enabled = true,
-                        RandomlyAssignedChance = 30,
+                        RandomlyAssignedChance = 25,
                         HoldGroundBaseTime = 0.33f,
-                        SearchBaseTime = 75f,
-                        AggressionMultiplier = 0.4f,
+                        SearchBaseTime = 65f,
+                        AggressionMultiplier = 0.45f,
                         BaseSearchMoveSpeed = 0.35f,
                     }
                 };

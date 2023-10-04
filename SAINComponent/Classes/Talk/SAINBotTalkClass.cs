@@ -104,7 +104,6 @@ namespace SAIN.SAINComponent.Classes.Talk
         public EnemyTalk EnemyTalk { get; private set; }
         public GroupTalk GroupTalk { get; private set; }
 
-
         private void SendSayCommand(EPhraseTrigger type, ETagStatus mask)
         {
             BotOwner.BotsGroup.GroupTalk.PhraseSad(BotOwner, type);

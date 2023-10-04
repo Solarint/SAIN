@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
+using Comfort.Common;
 using DrakiaXYZ.VersionChecker;
 using SAIN.Components;
 using SAIN.Editor;
@@ -187,6 +188,14 @@ namespace SAIN
             {
                 RealismLoaded = true;
                 Logger.LogInfo($"SAIN: Realism Detected.");
+
+                // If Realism mod is loaded, we need to adjust how powerlevel is calculated to take into account armor class going up to 10 instead of 6
+                // 7 is the default
+                EFTCoreSettings.UpdateArmorClassCoef(4f);
+            }
+            else
+            {
+                EFTCoreSettings.UpdateArmorClassCoef(7f);
             }
         }
 

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace SAIN.Helpers
 {
@@ -16,7 +15,7 @@ namespace SAIN.Helpers
                 Followers = CheckAdd("follower");
             }
 
-            static List<WildSpawnType> CheckAdd(string search)
+            private static List<WildSpawnType> CheckAdd(string search)
             {
                 var list = new List<WildSpawnType>();
                 foreach (WildSpawnType type in GetEnum<WildSpawnType>())
@@ -30,15 +29,15 @@ namespace SAIN.Helpers
             }
 
             public static bool IsFollower(WildSpawnType type) => Followers.Contains(type);
-            public static bool IsBoss(WildSpawnType type) => Bosses.Contains(type);
-            public static bool IsScav(WildSpawnType type) => Scavs.Contains(type);
-            public static bool IsPMC(WildSpawnType type) => PMCs.Contains(type);
 
-            public static WildSpawnType[] PMCs =
+            public static bool IsBoss(WildSpawnType type) => Bosses.Contains(type);
+
+            public static bool IsScav(WildSpawnType type) => Scavs.Contains(type);
+
+            public static bool IsPMC(WildSpawnType type)
             {
-                Usec,
-                Bear
-            };
+                return type.ToString() == "sptUsec" || type.ToString() == "sptBear";
+            }
 
             public static WildSpawnType[] Scavs =
             {

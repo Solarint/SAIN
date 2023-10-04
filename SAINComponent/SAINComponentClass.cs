@@ -157,6 +157,8 @@ namespace SAIN.SAINComponent
             }
         }
 
+        public bool BotIsAlive => Player?.HealthController?.IsAlive == true;
+
         public float DistanceToAimTarget
         {
             get

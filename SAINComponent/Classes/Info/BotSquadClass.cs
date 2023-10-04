@@ -13,40 +13,80 @@ namespace SAIN.SAINComponent.Classes.Info
         {
         }
 
+        public Action<IAIDetails, DamageInfo, float> LeaderKilled { get; set; }
+        public Action<SAINComponentClass, float> NewLeaderFound { get; set; }
+
         public void Init()
         {
         }
 
+        private void LeaderWasKilled(Player player, IAIDetails lastAggressor, DamageInfo lastDamageInfo, EBodyPart lastBodyPart)
+        {
+            if (SAINPlugin.DebugMode)
+            {
+                Logger.LogInfo(
+                    $"Leader Name [{LeaderComponent?.name}] " +
+                    $"was killed for Squad: [{SquadID}] " +
+                    $"by [{lastAggressor?.Profile.Nickname}] " +
+                    $"at Time: [{Time.time}] " +
+                    $"by damage type: [{lastDamageInfo.DamageType}] " +
+                    $"to Body part: [{lastBodyPart}]"
+                    );
+            }
+
+            if (lastAggressor != null)
+            {
+                LeaderKilled?.Invoke(lastAggressor, lastDamageInfo, Time.time);
+            }
+
+            if (LeaderComponent?.BotOwner?.GetPlayer != null)
+            {
+                LeaderComponent.BotOwner.GetPlayer.OnPlayerDead -= LeaderWasKilled;
+            }
+
+            Leader = null;
+            LeaderComponent = null;
+        }
+
+        public bool BotWasInSquad { get; private set; } = false;
+
         public void Update()
         {
-            if (BotInGroup)
+            if (BotInGroup && UpdateMembersTimer < Time.time)
             {
-                if (UpdateMembersTimer < Time.time)
+                UpdateMembersTimer = Time.time + 0.25f;
+
+                UpdateMembers();
+                UpdateVisibleMembers();
+
+                if (!SAIN.HasEnemy && (LeaderComponent == null || LastSquadCount != SquadMembers.Count))
                 {
-                    UpdateMembersTimer = Time.time + 0.25f;
+                    FindSquadLeader();
+                    LastSquadCount = SquadMembers.Count;
+                }
 
-                    UpdateMembers();
-                    UpdateVisibleMembers();
-
-                    if (Leader != null || Leader?.IsDead == true)
-                    {
-                        if (LeaderDieTime == 0f)
-                        {
-                            LeaderDieTime = Time.time;
-                        }
-                        if (TimeSinceLeaderDied > 30f)
-                        {
-                            FindSquadLeader();
-                        }
-                    }
+                if (LeaderComponent?.BotIsAlive == true)
+                {
+                    DistanceToSquadLeader = (SAIN.Position - LeaderComponent.Position).magnitude;
                 }
 
                 if (SquadID == "None" && LeaderComponent != null && !IAmLeader)
                 {
                     SquadID = LeaderComponent.Squad.SquadID;
                 }
+
+                if (!BotWasInSquad && SquadMembers != null && SquadMembers.Count > 0)
+                {
+                    BotWasInSquad = true;
+                }
+            }
+            else if (BotWasInSquad && !BotInGroup)
+            {
+                ClearSquadCache();
             }
         }
+
+        public float DistanceToSquadLeader = 0f;
 
         public void Dispose()
         {
@@ -66,11 +106,10 @@ namespace SAIN.SAINComponent.Classes.Info
             }
         }
 
-        public List<SAINComponentClass> VisibleMembers { get; private set; } = new List<SAINComponentClass>();
+        public readonly List<SAINComponentClass> VisibleMembers = new List<SAINComponentClass>();
 
-        public float TimeSinceLeaderDied => LeaderDieTime == 0f ? 0f : Time.time - LeaderDieTime;
         public float LeaderDieTime { get; private set; } = 0f;
-        private int GroupSize = 0;
+        private int LastSquadCount = 0;
         private float UpdateMembersTimer = 0f;
 
         private void FindSquadLeader()
@@ -107,15 +146,28 @@ namespace SAIN.SAINComponent.Classes.Info
             AddLeader(leadComponent);
         }
 
-        private void AddLeader(SAINComponentClass sain)
+        private void AddLeader(SAINComponentClass leaderComponent)
         {
-            LeaderDieTime = 0f;
-            IAmLeader = sain.ProfileId == BotOwner.ProfileId;
-            LeaderComponent = sain;
-            Leader = sain.BotOwner;
+            IAmLeader = leaderComponent.ProfileId == BotOwner.ProfileId;
+            LeaderComponent = leaderComponent;
+            Leader = leaderComponent.BotOwner;
+
             if (IAmLeader && SquadID == "None")
             {
                 SquadID = Guid.NewGuid().ToString("N");
+            }
+
+            NewLeaderFound?.Invoke(leaderComponent, Time.time);
+            leaderComponent.BotOwner.GetPlayer.OnPlayerDead += LeaderWasKilled;
+
+            if (SAINPlugin.DebugMode)
+            {
+                Logger.LogInfo(
+                    $" Found New Leader. Name [{LeaderComponent?.name}]" +
+                    $" for Squad: [{SquadID}]" +
+                    $" at Time: [{Time.time}]" +
+                    $" Group Size: [{LastSquadCount}]"
+                    );
             }
         }
 
@@ -129,17 +181,21 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public bool BotInGroup => BotOwner.BotsGroup.MembersCount > 1;
 
-        public Dictionary<BotOwner, SAINComponentClass> SquadMembers { get; private set; } = new Dictionary<BotOwner, SAINComponentClass>();
+        public readonly Dictionary<BotOwner, SAINComponentClass> SquadMembers = new Dictionary<BotOwner, SAINComponentClass>();
+        public readonly List<SoloDecision> SquadSoloDecisions = new List<SoloDecision>();
+        public readonly List<SquadDecision> SquadDecisions = new List<SquadDecision>();
 
-        public SoloDecision[] SquadSoloDecisions { get; private set; }
-        public SquadDecision[] SquadDecisions { get; private set; }
+        private void ClearSquadCache()
+        {
+            SquadMembers.Clear();
+            SquadLocations.Clear();
+            SquadSoloDecisions.Clear();
+            SquadDecisions.Clear();
+        }
 
         private void UpdateMembers()
         {
-            var locations = new List<Vector3>();
-            var dictionary = new Dictionary<BotOwner, SAINComponentClass>();
-            var decisions = new List<SoloDecision>();
-            var squadDecisions = new List<SquadDecision>();
+            ClearSquadCache();
 
             if (BotInGroup)
             {
@@ -149,49 +205,24 @@ namespace SAIN.SAINComponent.Classes.Info
                 for (int i = 0; i < count; i++)
                 {
                     var member = group.Member(i);
-                    if (member != null && member.HealthController.IsAlive)
+                    if (member?.HealthController?.IsAlive == true 
+                        && SAINPlugin.BotController.GetBot(member.ProfileId, out var component))
                     {
-                        if (SAINPlugin.BotController.GetBot(member.ProfileId, out var component))
-                        {
-                            dictionary.Add(member, component);
-                            decisions.Add(component.Memory.Decisions.Main.Current);
-                            squadDecisions.Add(component.Decision.CurrentSquadDecision);
-                            locations.Add(member.Position);
-                        }
+                        SquadMembers.Add(member, component);
+                        SquadSoloDecisions.Add(component.Memory.Decisions.Main.Current);
+                        SquadDecisions.Add(component.Decision.CurrentSquadDecision);
+                        SquadLocations.Add(member.Position);
                     }
                 }
             }
 
-            MemberIsFallingBack = decisions.Contains(SoloDecision.Retreat) || decisions.Contains(SoloDecision.RunToCover) || decisions.Contains(SoloDecision.RunAway);
-
-            SquadLocations = locations.ToArray();
-            SquadSoloDecisions = decisions.ToArray();
-            SquadDecisions = squadDecisions.ToArray();
+            MemberIsFallingBack = SquadSoloDecisions.Contains(SoloDecision.Retreat) || SquadSoloDecisions.Contains(SoloDecision.RunToCover) || SquadSoloDecisions.Contains(SoloDecision.RunAway);
 
             SquadPowerLevel = BotOwner.BotsGroup.GroupPower;
-            SquadMembers = dictionary;
-
-            if (Leader != null || Leader?.IsDead == true)
-            {
-                if (LeaderDieTime == 0f)
-                {
-                    LeaderDieTime = Time.time;
-                }
-                if (TimeSinceLeaderDied > 30f)
-                {
-                    FindSquadLeader();
-                }
-                return;
-            }
-            if ((Leader == null || GroupSize != SquadMembers.Count) && TimeSinceLeaderDied == 0f)
-            {
-                GroupSize = SquadMembers.Count;
-                FindSquadLeader();
-            }
         }
 
         public bool MemberIsFallingBack { get; private set; }
 
-        public Vector3[] SquadLocations { get; private set; }
+        public readonly List<Vector3> SquadLocations = new List<Vector3>();
     }
 }
