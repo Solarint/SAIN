@@ -15,9 +15,9 @@ namespace SAIN.Patches.Generic
 {
     internal class BotGroupAddEnemyPatch : ModulePatch
     {
-        protected override MethodBase GetTargetMethod() => typeof(BotGroupClass).GetMethod("AddEnemy");
+        protected override MethodBase GetTargetMethod() => typeof(BotsGroup).GetMethod("AddEnemy");
         [PatchPrefix]
-        public static bool PatchPrefix(IAIDetails person)
+        public static bool PatchPrefix(IPlayer person)
         {
             if (person == null || (person.IsAI && person.AIData?.BotOwner?.GetPlayer == null))
             {
@@ -32,7 +32,7 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod() => typeof(BotMemoryClass).GetMethod("AddEnemy");
         [PatchPrefix]
-        public static bool PatchPrefix(IAIDetails enemy)
+        public static bool PatchPrefix(IPlayer enemy)
         {
             if (enemy == null || (enemy.IsAI && enemy.AIData?.BotOwner?.GetPlayer == null))
             {
@@ -47,11 +47,11 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotControllerClass), "method_4");
+            return AccessTools.Method(typeof(BotsController), "method_4");
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(BotControllerClass __instance, Grenade grenade, Vector3 position, Vector3 force, float mass)
+        public static bool PatchPrefix(BotsController __instance, Grenade grenade, Vector3 position, Vector3 force, float mass)
         {
             Vector3 danger = Vector.DangerPoint(position, force, mass);
             foreach (BotOwner bot in __instance.Bots.BotOwners)
@@ -70,7 +70,7 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotControllerClass), "method_3");
+            return AccessTools.Method(typeof(BotsController), "method_3");
         }
 
         [PatchPrefix]
@@ -84,30 +84,30 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(BotControllerClass).GetMethod("Init", BindingFlags.Instance | BindingFlags.Public);
+            return typeof(BotsController).GetMethod("Init", BindingFlags.Instance | BindingFlags.Public);
         }
 
         [PatchPrefix]
-        public static void PatchPrefix(BotControllerClass __instance)
+        public static void PatchPrefix(BotsController __instance)
         {
             SAINPlugin.BotController.DefaultController = __instance;
         }
     }
 
-    public class GetBotSpawnerClass : ModulePatch
+    public class GetBotSpawner : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotSpawnerClass), "AddPlayer");
+            return AccessTools.Method(typeof(BotSpawner), "AddPlayer");
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(BotSpawnerClass __instance)
+        public static void PatchPostfix(BotSpawner __instance)
         {
             var controller = SAINPlugin.BotController;
-            if (controller != null && controller.BotSpawnerClass == null)
+            if (controller != null && controller.BotSpawner == null)
             {
-                controller.BotSpawnerClass = __instance;
+                controller.BotSpawner = __instance;
             }
         }
     }

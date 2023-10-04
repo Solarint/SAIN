@@ -13,14 +13,14 @@ namespace SAIN.SAINComponent.Classes.Info
         {
         }
 
-        public Action<IAIDetails, DamageInfo, float> LeaderKilled { get; set; }
+        public Action<IPlayer, DamageInfo, float> LeaderKilled { get; set; }
         public Action<SAINComponentClass, float> NewLeaderFound { get; set; }
 
         public void Init()
         {
         }
 
-        private void LeaderWasKilled(Player player, IAIDetails lastAggressor, DamageInfo lastDamageInfo, EBodyPart lastBodyPart)
+        private void LeaderWasKilled(Player player, IPlayer lastAggressor, DamageInfo lastDamageInfo, EBodyPart lastBodyPart)
         {
             if (SAINPlugin.DebugMode)
             {

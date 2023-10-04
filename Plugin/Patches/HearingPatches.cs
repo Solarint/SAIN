@@ -19,9 +19,9 @@ namespace SAIN.Patches.Hearing
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(ref BotOwner ___botOwner_0)
+        public static bool PatchPrefix(ref BotOwner ____botOwner)
         {
-            if (SAINPlugin.BotController.Bots.ContainsKey(___botOwner_0.ProfileId))
+            if (SAINPlugin.BotController.Bots.ContainsKey(____botOwner.ProfileId))
             {
                 return false;
             }
@@ -35,19 +35,19 @@ namespace SAIN.Patches.Hearing
 
         protected override MethodBase GetTargetMethod()
         {
-            AIFlareEnabled = AccessTools.Property(typeof(AiDataClass), "Boolean_0");
-            return AccessTools.Method(typeof(AiDataClass), "TryPlayShootSound");
+            AIFlareEnabled = AccessTools.Property(typeof(AIData), "Boolean_0");
+            return AccessTools.Method(typeof(AIData), "TryPlayShootSound");
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(AiDataClass __instance, Player getPlayer, AISoundType soundType, ref float ___float_0)
+        public static bool PatchPrefix(AIData __instance, Player getPlayer, AISoundType soundType, ref float ____nextShootTime)
         {
             AIFlareEnabled.SetValue(__instance, true);
 
             // Limits how many sounds are played from each player for the AI
-            if (___float_0 < Time.time)
+            if (____nextShootTime < Time.time)
             {
-                ___float_0 = Time.time + 0.65f; // default 1f
+                ____nextShootTime = Time.time + 0.65f; // default 1f
                 AudioHelpers.TryPlayShootSound(getPlayer, soundType);
             }
             return false;

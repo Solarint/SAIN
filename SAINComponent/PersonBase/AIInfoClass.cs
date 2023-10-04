@@ -5,14 +5,14 @@ namespace SAIN.SAINComponent.BaseClasses
 {
     public class AIInfoClass
     {
-        public AIInfoClass(IAIDetails person)
+        public AIInfoClass(IPlayer person)
         {
             Person = person;
             SAIN = BotOwner?.GetComponent<SAINComponentClass>();
         }
 
-        public IAIDetails Person { get; private set; }
-        public AiDataClass AIData => Person?.AIData;
+        public IPlayer Person { get; private set; }
+        public AIData AIData => Person?.AIData;
         public BotOwner BotOwner => Person?.AIData?.BotOwner;
         public SAINComponentClass SAIN { get; private set; }
         public SAINBotInfoClass SAINBotInfo => SAIN?.Info;

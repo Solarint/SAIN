@@ -22,9 +22,9 @@ namespace SAIN.SAINComponent.Classes
         public void Update()
         {
             var Enemy = SAIN.Enemy;
-            if (Enemy?.EnemyIAIDetails != null && Enemy?.IsVisible == true)
+            if (Enemy?.EnemyIPlayer != null && Enemy?.IsVisible == true)
             {
-                FlashLightDazzle.CheckIfDazzleApplied(Enemy.EnemyIAIDetails);
+                FlashLightDazzle.CheckIfDazzleApplied(Enemy.EnemyIPlayer);
             }
         }
 

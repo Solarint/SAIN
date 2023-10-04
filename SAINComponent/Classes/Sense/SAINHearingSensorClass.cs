@@ -16,7 +16,7 @@ namespace SAIN.SAINComponent.Classes
 
         public void Init()
         {
-            Singleton<GClass635>.Instance.OnSoundPlayed += HearSound;
+            Singleton<GClass520>.Instance.OnSoundPlayed += HearSound;
         }
 
         public void Update()
@@ -25,10 +25,10 @@ namespace SAIN.SAINComponent.Classes
 
         public void Dispose()
         {
-            Singleton<GClass635>.Instance.OnSoundPlayed -= HearSound;
+            Singleton<GClass520>.Instance.OnSoundPlayed -= HearSound;
         }
 
-        public void HearSound(IAIDetails player, Vector3 position, float power, AISoundType type)
+        public void HearSound(IPlayer player, Vector3 position, float power, AISoundType type)
         {
             if (BotOwner == null || SAIN == null) return;
 
@@ -38,7 +38,7 @@ namespace SAIN.SAINComponent.Classes
             }
         }
 
-        private void EnemySoundHeard(IAIDetails player, Vector3 position, float power, AISoundType type)
+        private void EnemySoundHeard(IPlayer player, Vector3 position, float power, AISoundType type)
         {
             if (player != null)
             {
@@ -80,7 +80,7 @@ namespace SAIN.SAINComponent.Classes
             }
         }
 
-        private bool CheckSoundHeardAfterModifiers(IAIDetails player, Vector3 position, float power, AISoundType type, out float distance)
+        private bool CheckSoundHeardAfterModifiers(IPlayer player, Vector3 position, float power, AISoundType type, out float distance)
         {
             float range = power;
 
@@ -142,7 +142,7 @@ namespace SAIN.SAINComponent.Classes
             return false;
         }
 
-        private void ReactToSound(IAIDetails person, Vector3 pos, float power, bool wasHeard, AISoundType type)
+        private void ReactToSound(IPlayer person, Vector3 pos, float power, bool wasHeard, AISoundType type)
         {
             if (person != null && person.AIData.IsAI && BotOwner.BotsGroup.Contains(person.AIData.BotOwner))
             {
@@ -182,7 +182,7 @@ namespace SAIN.SAINComponent.Classes
                         try
                         {
                             SAIN.Memory.UnderFireFromPosition = vector;
-                            BotOwner.Memory.SetUnderFire();
+                            BotOwner.Memory.SetUnderFire(person);
                         }
                         catch (System.Exception) { }
 
@@ -302,7 +302,7 @@ namespace SAIN.SAINComponent.Classes
             return EFTMath.Random(0f, 1f) < num3;
         }
 
-        public bool DoIHearSound(IAIDetails enemy, Vector3 position, float power, AISoundType type, out float distance, bool withOcclusionCheck)
+        public bool DoIHearSound(IPlayer enemy, Vector3 position, float power, AISoundType type, out float distance, bool withOcclusionCheck)
         {
             distance = (BotOwner.Transform.position - position).magnitude;
 
@@ -325,7 +325,7 @@ namespace SAIN.SAINComponent.Classes
             return false;
         }
 
-        private bool OcclusionCheck(IAIDetails player, Vector3 position, float power, float distance, AISoundType type, out float occlusion)
+        private bool OcclusionCheck(IPlayer player, Vector3 position, float power, float distance, AISoundType type, out float occlusion)
         {
             // Raise up the vector3's to match head level
             Vector3 botheadpos = BotOwner.MyHead.position;
@@ -378,7 +378,7 @@ namespace SAIN.SAINComponent.Classes
             }
         }
 
-        private float EnvironmentCheck(IAIDetails enemy)
+        private float EnvironmentCheck(IPlayer enemy)
         {
             int botlocation = BotOwner.AIData.EnvironmentId;
             int enemylocation = enemy.AIData.EnvironmentId;

@@ -7,7 +7,7 @@ namespace SAIN.SAINComponent.BaseClasses
 {
     public class SAINPersonClass : PersonBaseClass, ISAINPerson
     {
-        public SAINPersonClass(IAIDetails person) : base(person)
+        public SAINPersonClass(IPlayer person) : base(person)
         {
             Transform = new SAINPersonTransformClass(this);
             Profile = person.Profile;
@@ -27,7 +27,7 @@ namespace SAIN.SAINComponent.BaseClasses
         public string Name => Player?.name;
         public bool IsAI => BotOwner != null;
         public bool IsSAINBot => SAIN != null;
-        public AiDataClass AIData => IAIDetails?.AIData;
+        public AIData AIData => IPlayer?.AIData;
         public BotOwner BotOwner => AIData?.BotOwner;
         public SAINComponentClass SAIN { get; private set; }
         public SAINBotInfoClass SAINBotInfo => SAIN?.Info;

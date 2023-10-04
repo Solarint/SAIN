@@ -59,7 +59,7 @@ namespace SAIN.Layers.Combat.Squad
             bool hasEnemy = SAIN.HasEnemy;
             bool enemyLOS = SAIN.Enemy?.InLineOfSight == true;
             float leadDist = (pos - BotOwner.Position).magnitude;
-            float enemyDist = hasEnemy ? (SAIN.Enemy.EnemyIAIDetails.Position - BotOwner.Position).magnitude : 999f;
+            float enemyDist = hasEnemy ? (SAIN.Enemy.EnemyIPlayer.Position - BotOwner.Position).magnitude : 999f;
 
             bool sprint = hasEnemy && leadDist > 30f && !enemyLOS && enemyDist > 50f;
 

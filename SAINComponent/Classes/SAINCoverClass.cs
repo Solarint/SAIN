@@ -160,7 +160,7 @@ namespace SAIN.SAINComponent.Classes
                 {
                     CheckLimbTimer = Time.time + 0.1f;
                     bool cover = false;
-                    var target = enemy.EnemyIAIDetails.WeaponRoot.position;
+                    var target = enemy.EnemyIPlayer.WeaponRoot.position;
                     if (CheckLimbForCover(BodyPartType.leftLeg, target, 4f) && CheckLimbForCover(BodyPartType.leftArm, target, 4f))
                     {
                         cover = true;

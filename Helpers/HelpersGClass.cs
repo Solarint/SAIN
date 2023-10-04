@@ -6,13 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using EFTCore = GClass563;
-using EFTFileSettings = GClass564;
-using EFTSettingsGroup = GClass566;
-using EFTSoundPlayer = GClass635;
-using EFTStatModifiersClass = GClass561;
-using EFTTime = GClass1292;
-using EFTSearchPoint = GClass273;
+using EFTCore = GClass455;
+using EFTFileSettings = GClass456;
+using EFTSettingsGroup = GClass458;
+using EFTSoundPlayer = GClass520;
+using EFTStatModifiersClass = GClass453;
+using EFTTime = GClass1190;
+using EFTSearchPoint = PlaceForCheck;
 using Aki.Reflection.Patching;
 
 namespace SAIN.Helpers
@@ -35,7 +35,7 @@ namespace SAIN.Helpers
     {
         static HelpersGClass()
         {
-            InventoryControllerProp = AccessTools.Property(typeof(Player), "GClass2659_0");
+            InventoryControllerProp = AccessTools.Property(typeof(Player), "_inventoryController");
             EFTBotSettingsProp = AccessTools.Property(typeof(BotDifficultySettingsClass), "FileSettings");
             RefreshSettingsMethod = AccessTools.Method(typeof(BotDifficultySettingsClass), "method_0");
         }
@@ -60,13 +60,13 @@ namespace SAIN.Helpers
             return (EFTSettingsGroup)SAINPlugin.LoadedPreset.BotSettings.GetEFTSettings(type, difficulty);
         }
 
-        public DateTime UTCNow => EFTTime.UtcNow;
+        public static DateTime UtcNow => EFTTime.UtcNow;
         public static EFTCoreSettings EFTCore => SAINPlugin.LoadedPreset.GlobalSettings.EFTCoreSettings;
         public static float LAY_DOWN_ANG_SHOOT => EFTCore.Core.LAY_DOWN_ANG_SHOOT;
         public static float Gravity => EFTCore.Core.G;
         public static float SMOKE_GRENADE_RADIUS_COEF => EFTCore.Core.SMOKE_GRENADE_RADIUS_COEF;
 
-        public static void PlaySound(IAIDetails player, Vector3 pos, float range, AISoundType soundtype)
+        public static void PlaySound(IPlayer player, Vector3 pos, float range, AISoundType soundtype)
         {
             Singleton<EFTSoundPlayer>.Instance?.PlaySound(player, pos, range, soundtype);
         }

@@ -1,11 +1,8 @@
 ﻿using EFT;
 using SAIN.Preset.BotSettings.SAINSettings;
 using SAIN.Preset.GlobalSettings;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using static MineDirectional;
-using EFTSettingsGroup = GClass566;
+using EFTSettingsGroup = GClass458;
 
 namespace SAIN.Helpers
 {
@@ -117,8 +114,11 @@ namespace SAIN.Helpers
         }
 
         public static float AimMulti(SAINSettingsClass SAINSettings) => Round(SAINSettings.Aiming.AccuracySpreadMulti * GlobalSettings.Aiming.AccuracySpreadMultiGlobal / GlobalSettings.General.GlobalDifficultyModifier);
+
         public static float ScatterMulti(SAINSettingsClass SAINSettings) => Round(SAINSettings.Scattering.ScatterMultiplier * GlobalSettings.Shoot.GlobalScatterMultiplier / GlobalSettings.General.GlobalDifficultyModifier);
+
         public static float VisionSpeedMulti(SAINSettingsClass SAINSettings) => Round(SAINSettings.Look.VisionSpeedModifier * GlobalSettings.Look.GlobalVisionSpeedModifier / GlobalSettings.General.GlobalDifficultyModifier);
+
         public static float VisionDistanceMulti => GlobalSettings.Look.GlobalVisionDistanceMultiplier;
 
         private static float Round(float value)

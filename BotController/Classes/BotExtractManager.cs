@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using SAIN.SAINComponent;
+using SAIN.Helpers;
 
 namespace SAIN.Components.BotController
 {
@@ -316,7 +317,7 @@ namespace SAIN.Components.BotController
         public float EscapeTimeSeconds(GameTimerClass timer)
         {
             DateTime? escapeDateTime = timer.EscapeDateTime;
-            return (float)((escapeDateTime != null) ? (escapeDateTime.Value - GClass1292.UtcNow) : TimeSpan.MaxValue).TotalSeconds;
+            return (float)((escapeDateTime != null) ? (escapeDateTime.Value - HelpersGClass.UtcNow) : TimeSpan.MaxValue).TotalSeconds;
         }
     }
 }

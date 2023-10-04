@@ -20,9 +20,9 @@ namespace SAIN.SAINComponent.BaseClasses
 
         private readonly SAINPersonClass Person;
         public bool TransformNull => Person.PlayerNull || DefaultTransform == null || Person?.Player?.gameObject == null;
-        public BifacialTransform DefaultTransform => Person.IAIDetails.Transform;
+        public BifacialTransform DefaultTransform => Person.IPlayer.Transform;
         public Vector3 Position => !TransformNull ? DefaultTransform.position : Vector3.zero;
-        public Vector3 LookDirection => !TransformNull ? Person.IAIDetails.LookDirection : Vector3.zero;
+        public Vector3 LookDirection => !TransformNull ? Person.IPlayer.LookDirection : Vector3.zero;
 
         public Vector3 Direction(Vector3 start) => !TransformNull ? Position - start : Vector3.zero;
 
@@ -39,9 +39,9 @@ namespace SAIN.SAINComponent.BaseClasses
         public Vector3 Chest { get; private set; }
         public Vector3 Stomach { get; private set; }
 
-        public Dictionary<BodyPartType, BodyPartClass> MainParts => Person.IAIDetails?.MainParts;
+        public Dictionary<BodyPartType, EnemyPart> MainParts => Person.IPlayer?.MainParts;
 
-        public Dictionary<PlayerBoneType, BifacialTransform> AllParts => Person.IAIDetails?.PlayerBones?.BifacialTransforms;
+        public Dictionary<PlayerBoneType, BifacialTransform> AllParts => Person.IPlayer?.PlayerBones?.BifacialTransforms;
 
         public Vector3 PartPosition(BodyPartType part)
         {

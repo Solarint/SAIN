@@ -61,22 +61,22 @@ namespace SAIN.Patches.Shoot
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_0)
+        public static bool PatchPrefix(ref BotOwner ____owner, ref float ___nextFingerUpTime)
         {
-            Weapon weapon = ___botOwner_0.WeaponManager.CurrentWeapon;
+            Weapon weapon = ____owner.WeaponManager.CurrentWeapon;
 
             // Config ToggleOnOff Check, Null aim data check, and Make sure the weapon can actually full auto (probably not necessary)
-            if (___botOwner_0.AimingData == null)
+            if (____owner.AimingData == null)
             {
                 return true;
             }
 
             if (weapon.SelectedFireMode == Weapon.EFireMode.fullauto || weapon.SelectedFireMode == Weapon.EFireMode.burst)
             {
-                float distance = ___botOwner_0.AimingData.LastDist2Target;
-                float scaledDistance = FullAutoBurstLength(___botOwner_0, distance);
+                float distance = ____owner.AimingData.LastDist2Target;
+                float scaledDistance = FullAutoBurstLength(____owner, distance);
 
-                ___float_0 = scaledDistance + Time.time;
+                ___nextFingerUpTime = scaledDistance + Time.time;
 
                 return false;
             }
@@ -85,27 +85,11 @@ namespace SAIN.Patches.Shoot
         }
     }
 
-    public class UpdateFireArmPatch : ModulePatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(GClass363), "UpdateFirearmsController");
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(ref BotOwner ___botOwner_0)
-        {
-            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var component))
-            {
-            }
-        }
-    }
-
     public class SemiAutoPatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass365), "method_1");
+            return AccessTools.Method(typeof(GClass336), "method_1");
         }
 
         [PatchPostfix]

@@ -139,6 +139,6 @@ namespace SAIN.SAINComponent.Classes.Mover
             return num <= Mathf.Abs(lay_DOWN_ANG_SHOOT) && Vector.CanShootToTarget(new ShootPointClass(target, 1f), vector, BotOwner.LookSensor.Mask, true);
         }
 
-        public BotLayClass BotLay => BotOwner.BotLay;
+        public BotLay BotLay => BotOwner.BotLay;
     }
 }

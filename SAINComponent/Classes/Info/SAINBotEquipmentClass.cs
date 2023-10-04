@@ -23,8 +23,8 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public void Init()
         {
-            Inventory = Reflection.GetValue<InventoryClass>(Player, _InventoryProp);
-            InventoryController = HelpersGClass.GetInventoryController(Player);
+            Inventory = Reflection.GetValue<Inventory>(Player, _InventoryProp);
+            // InventoryController = HelpersGClass.GetInventoryController(Player);
         }
 
         public void Update()
@@ -33,8 +33,8 @@ namespace SAIN.SAINComponent.Classes.Info
             {
                 UpdateEquipmentTimer = Time.time + 30f;
 
-                HasEarPiece = Equipment.GetSlot(EquipmentSlot.Earpiece).ContainedItem != null;
-                CheckHelmet();
+                // HasEarPiece = Equipment.GetSlot(EquipmentSlot.Earpiece).ContainedItem != null;
+                // CheckHelmet();
             }
         }
 
@@ -44,7 +44,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public InventoryControllerClass InventoryController { get; private set; }
 
-        public InventoryClass Inventory { get; private set; }
+        public Inventory Inventory { get; private set; }
         public Weapon CurrentWeapon => BotOwner.WeaponManager.CurrentWeapon;
         public Weapon SecondaryWeapon => BotOwner.WeaponManager.SecondWeaponInfo?.weapon;
 

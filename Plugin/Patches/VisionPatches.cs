@@ -33,38 +33,34 @@ namespace SAIN.Patches.Vision
 
     public class VisibleDistancePatch : ModulePatch
     {
-        private static PropertyInfo _LookSensor;
         private static PropertyInfo _clearVisibleDistProperty;
         private static PropertyInfo _visibleDistProperty;
         private static PropertyInfo _HourServerProperty;
 
         protected override MethodBase GetTargetMethod()
         {
-            _LookSensor = AccessTools.Property(typeof(BotOwner), "LookSensor");
-            Type lookType = _LookSensor.PropertyType;
+            _clearVisibleDistProperty = typeof(LookSensor).GetProperty("ClearVisibleDist");
+            _visibleDistProperty = typeof(LookSensor).GetProperty("VisibleDist");
+            _HourServerProperty = typeof(LookSensor).GetProperty("HourServer");
 
-            _clearVisibleDistProperty = lookType.GetProperty("ClearVisibleDist");
-            _visibleDistProperty = lookType.GetProperty("VisibleDist");
-            _HourServerProperty = lookType.GetProperty("HourServer");
-
-            return AccessTools.Method(lookType, "method_2");
+            return AccessTools.Method(typeof(LookSensor), "method_2");
         }
 
         [PatchPrefix]
-        public static bool PatchPrefix(ref BotOwner ___botOwner_0, ref float ___float_3)
+        public static bool PatchPrefix(ref BotOwner ____botOwner, ref float ____nextUpdateVisibleDist)
         {
-            if (___float_3 < Time.time)
+            if (____nextUpdateVisibleDist < Time.time)
             {
                 float timeMod = 1f;
                 float weatherMod = 1f;
 
                 // Checks to make sure a date and time is present
-                if (___botOwner_0.GameDateTime != null)
+                if (____botOwner.GameDateTime != null)
                 {
                     DateTime dateTime = SAINPlugin.BotController.TimeVision.GameDateTime;
                     timeMod = SAINPlugin.BotController.TimeVision.TimeOfDayVisibility;
                     // Modify the Rounding of the "HourServer" property to the hour from the DateTime object
-                    _HourServerProperty.SetValue(___botOwner_0.LookSensor, (int)((short)dateTime.Hour));
+                    _HourServerProperty.SetValue(____botOwner.LookSensor, (int)((short)dateTime.Hour));
                 }
                 if (SAINPlugin.BotController != null)
                 {
@@ -72,7 +68,7 @@ namespace SAIN.Patches.Vision
                     weatherMod = Mathf.Clamp(weatherMod, 0.5f, 1f);
                 }
 
-                float currentVisionDistance = ___botOwner_0.Settings.Current.CurrentVisibleDistance;
+                float currentVisionDistance = ____botOwner.Settings.Current.CurrentVisibleDistance;
 
                 // Sets a minimum cap based on weather conditions to avoid bots having too low of a vision Distance while at peace in bad weather
                 float currentVisionDistanceCapped = Mathf.Clamp(currentVisionDistance * weatherMod, 80f, currentVisionDistance);
@@ -80,13 +76,13 @@ namespace SAIN.Patches.Vision
                 // Applies SeenTime Modifier to the final vision Distance results
                 float finalVisionDistance = currentVisionDistanceCapped * timeMod;
 
-                _clearVisibleDistProperty.SetValue(___botOwner_0.LookSensor, finalVisionDistance);
+                _clearVisibleDistProperty.SetValue(____botOwner.LookSensor, finalVisionDistance);
 
-                finalVisionDistance = ___botOwner_0.NightVision.UpdateVision(finalVisionDistance);
-                finalVisionDistance = ___botOwner_0.BotLight.UpdateLightEnable(finalVisionDistance);
-                _visibleDistProperty.SetValue(___botOwner_0.LookSensor, finalVisionDistance);
+                finalVisionDistance = ____botOwner.NightVision.UpdateVision(finalVisionDistance);
+                finalVisionDistance = ____botOwner.BotLight.UpdateLightEnable(finalVisionDistance);
+                _visibleDistProperty.SetValue(____botOwner.LookSensor, finalVisionDistance);
 
-                ___float_3 = Time.time + (___botOwner_0.FlashGrenade.IsFlashed ? 3 : 20);
+                ____nextUpdateVisibleDist = Time.time + (____botOwner.FlashGrenade.IsFlashed ? 3 : 20);
             }
             return false;
         }
@@ -96,7 +92,7 @@ namespace SAIN.Patches.Vision
     {
         protected override MethodBase GetTargetMethod()
         {
-            return typeof(BotOwner)?.GetMethod("IsEnemyLookingAtMe", BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(IAIDetails) }, null);
+            return typeof(BotOwner)?.GetMethod("IsEnemyLookingAtMe", BindingFlags.Instance | BindingFlags.Public, null, new[] { typeof(IPlayer) }, null);
         }
 
         [PatchPrefix]
@@ -109,24 +105,22 @@ namespace SAIN.Patches.Vision
 
     public class VisionSpeedPatch : ModulePatch
     {
-        private static PropertyInfo _GoalEnemyProp;
         protected override MethodBase GetTargetMethod()
         {
-            _GoalEnemyProp = AccessTools.Property(typeof(BotMemoryClass), "GoalEnemy");
-            return AccessTools.Method(_GoalEnemyProp.PropertyType, "method_7");
+            return AccessTools.Method(typeof(EnemyInfo), "method_5");
         }
 
         [PatchPostfix]
-        public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result, ref BotOwner ___botOwner_0)
+        public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result, EnemyInfo __instance)
         {
             float dist = (BotTransform.position - enemy.position).magnitude;
             float weatherModifier = SAINPlugin.BotController.WeatherVision.WeatherVisibility;
             float inverseWeatherModifier = Mathf.Sqrt(2f - weatherModifier);
 
-            WildSpawnType wildSpawnType = ___botOwner_0.Profile.Info.Settings.Role;
+            WildSpawnType wildSpawnType = __instance.Owner.Profile.Info.Settings.Role;
             if (PresetHandler.LoadedPreset.BotSettings.SAINSettings.TryGetValue(wildSpawnType, out var botType) )
             {
-                BotDifficulty diff = ___botOwner_0.Profile.Info.Settings.BotDifficulty;
+                BotDifficulty diff = __instance.Owner.Profile.Info.Settings.BotDifficulty;
                 __result *= Math.CalcVisSpeed(dist, botType.Settings[diff]);
             }
             if (dist > 20f)
@@ -143,7 +137,7 @@ namespace SAIN.Patches.Vision
         private static MethodInfo _UsingLight;
         protected override MethodBase GetTargetMethod()
         {
-            _UsingLight = AccessTools.PropertySetter(typeof(AiDataClass), "UsingLight");
+            _UsingLight = AccessTools.PropertySetter(typeof(AIData), "UsingLight");
 
             _tacticalModesField = AccessTools.Field(typeof(TacticalComboVisualController), "list_0");
 

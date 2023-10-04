@@ -70,7 +70,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 var myEnemy = SAIN.Enemy;
                 if (myEnemy != null && member.HasEnemy)
                 {
-                    if (myEnemy.EnemyIAIDetails == member.Enemy.EnemyIAIDetails)
+                    if (myEnemy.EnemyIPlayer == member.Enemy.EnemyIPlayer)
                     {
                         if (StartSuppression(member))
                         {

@@ -147,7 +147,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                     etagStatus |= ETagStatus.Aware;
                 }
 
-                switch (SAIN.Enemy.EnemyIAIDetails.Side)
+                switch (SAIN.Enemy.EnemyIPlayer.Side)
                 {
                     case EPlayerSide.Usec:
                         etagStatus |= ETagStatus.Usec;

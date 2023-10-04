@@ -38,7 +38,7 @@ namespace SAIN.Layers.Combat.Squad
                 else
                 {
                     SAIN.Steering.SteerByPriority();
-                    BotOwner.MoveToEnemyData.TryMoveToEnemy(enemy.EnemyIAIDetails.Position);
+                    BotOwner.MoveToEnemyData.TryMoveToEnemy(enemy.EnemyIPlayer.Position);
                 }
             }
         }

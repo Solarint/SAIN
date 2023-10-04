@@ -57,7 +57,7 @@ namespace SAIN.SAINComponent.Classes
         public HeardSound NewestVisibleSound { get; private set; }
         public HeardSound NewestSound { get; private set; }
 
-        public void AddSound(Vector3 position, AISoundType soundType, IAIDetails createdPerson)
+        public void AddSound(Vector3 position, AISoundType soundType, IPlayer createdPerson)
         {
             HeardSound sound = new HeardSound(BotOwner, position, soundType, createdPerson);
             HeardSounds.Add(sound);
@@ -73,7 +73,7 @@ namespace SAIN.SAINComponent.Classes
 
     public class HeardSound
     {
-        public HeardSound(BotOwner bot, Vector3 position, AISoundType soundType, IAIDetails createdPerson)
+        public HeardSound(BotOwner bot, Vector3 position, AISoundType soundType, IPlayer createdPerson)
         {
             Id = Guid.NewGuid().ToString();
             BotOwner = bot;
@@ -101,7 +101,7 @@ namespace SAIN.SAINComponent.Classes
         private BotOwner BotOwner;
 
         public string Id { get; private set; }
-        public IAIDetails PersonCreated { get; private set; }
+        public IPlayer PersonCreated { get; private set; }
         public float TimeSinceCreated => Time.time - TimeCreated;
         public float TimeCreated { get; private set; }
         public bool GunSound { get; private set; }

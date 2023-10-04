@@ -254,7 +254,7 @@ namespace SAIN.SAINComponent.Classes.Decision
                 var pathStatus = enemy.CheckPathDistance();
                 bool SeenRecent = Time.time - enemy.TimeSinceSeen > 3f;
 
-                if (SeenRecent && Vector3.Distance(BotOwner.Position, enemy.EnemyIAIDetails.Position) < 8f)
+                if (SeenRecent && Vector3.Distance(BotOwner.Position, enemy.EnemyIPlayer.Position) < 8f)
                 {
                     return true;
                 }

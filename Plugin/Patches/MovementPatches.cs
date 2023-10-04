@@ -21,9 +21,9 @@ namespace SAIN.Patches.Generic
         }
 
         [PatchPrefix]
-        public static void PatchPrefix(ref BotOwner ___botOwner_0, Door door, ref EInteractionType Etype)
+        public static void PatchPrefix(ref BotOwner ____owner, Door door, ref EInteractionType Etype)
         {
-            if (SAINPlugin.BotController.GetBot(___botOwner_0.ProfileId, out var bot))
+            if (SAINPlugin.BotController.GetBot(____owner.ProfileId, out var bot))
             {
                 if (bot.Enemy == null)
                 {
@@ -39,9 +39,9 @@ namespace SAIN.Patches.Generic
                 {
                     bool enemyClose = Vector3.Distance(bot.Transform.Position, bot.Enemy.EnemyPosition) < 30f;
 
-                    if (enemyClose || ___botOwner_0.Memory.IsUnderFire)
+                    if (enemyClose || ____owner.Memory.IsUnderFire)
                     {
-                        var breakInParameters = door.GetBreakInParameters(___botOwner_0.Position);
+                        var breakInParameters = door.GetBreakInParameters(____owner.Position);
 
                         if (door.BreachSuccessRoll(breakInParameters.InteractionPosition))
                         {

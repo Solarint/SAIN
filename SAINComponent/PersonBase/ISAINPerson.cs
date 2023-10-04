@@ -8,7 +8,7 @@ namespace SAIN.SAINComponent.BaseClasses
     {
         void Update();
         bool PlayerNull { get; }
-        IAIDetails IAIDetails { get; }
+        IPlayer IPlayer { get; }
         Player Player { get; }
         Vector3 Position { get; }
         SAINPersonTransformClass Transform { get; }
@@ -18,7 +18,7 @@ namespace SAIN.SAINComponent.BaseClasses
         string Name { get; }
         bool IsAI { get; }
         bool IsSAINBot { get; }
-        AiDataClass AIData { get; }
+        AIData AIData { get; }
         BotOwner BotOwner { get; }
         SAINComponentClass SAIN { get; }
         SAINBotInfoClass SAINBotInfo { get; }

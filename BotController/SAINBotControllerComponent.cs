@@ -21,8 +21,8 @@ namespace SAIN.Components
         public IBotGame BotGame => Singleton<IBotGame>.Instance;
         public Player MainPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
 
-        public BotControllerClass DefaultController { get; set; }
-        public BotSpawnerClass BotSpawnerClass { get; set; }
+        public BotsController DefaultController { get; set; }
+        public BotSpawner BotSpawner { get; set; }
         public CoverManager CoverManager { get; private set; } = new CoverManager();
         public LineOfSightManager LineOfSightManager { get; private set; } = new LineOfSightManager();
         public BotExtractManager BotExtractManager { get; private set; } = new BotExtractManager();
@@ -45,8 +45,8 @@ namespace SAIN.Components
             PathManager.Awake();
             BotExtractManager.Awake();
 
-            Singleton<GClass635>.Instance.OnGrenadeThrow += GrenadeThrown;
-            Singleton<GClass635>.Instance.OnGrenadeExplosive += GrenadeExplosion;
+            Singleton<GClass520>.Instance.OnGrenadeThrow += GrenadeThrown;
+            Singleton<GClass520>.Instance.OnGrenadeExplosive += GrenadeExplosion;
             AISoundPlayed += SoundPlayed;
             PlayerTalk += PlayerTalked;
         }
@@ -193,7 +193,7 @@ namespace SAIN.Components
                     continue;
                 }
                 var Enemy = bot.Enemy;
-                if (Enemy?.EnemyIAIDetails != null && Enemy.EnemyIAIDetails.ProfileId == player.ProfileId)
+                if (Enemy?.EnemyIPlayer != null && Enemy.EnemyIPlayer.ProfileId == player.ProfileId)
                 {
                     if (Enemy.RealDistance <= range)
                     {
@@ -276,7 +276,7 @@ namespace SAIN.Components
                 float radius = smokeRadius * HelpersGClass.SMOKE_GRENADE_RADIUS_COEF;
                 foreach (var keyValuePair in DefaultController.Groups())
                 {
-                    foreach (BotGroupClass botGroupClass in keyValuePair.Value.GetGroups(true))
+                    foreach (BotsGroup botGroupClass in keyValuePair.Value.GetGroups(true))
                     {
                         botGroupClass.AddSmokePlace(explosionPosition, smokeLifeTime, radius, position);
                     }
@@ -324,8 +324,8 @@ namespace SAIN.Components
 
                 AISoundPlayed -= SoundPlayed;
                 PlayerTalk -= PlayerTalked;
-                Singleton<GClass635>.Instance.OnGrenadeThrow -= GrenadeThrown;
-                Singleton<GClass635>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
+                Singleton<GClass520>.Instance.OnGrenadeThrow -= GrenadeThrown;
+                Singleton<GClass520>.Instance.OnGrenadeExplosive -= GrenadeExplosion;
 
                 if (Bots.Count > 0)
                 {

@@ -92,7 +92,7 @@ namespace SAIN.SAINComponent.Classes.Talk
             }
         }
 
-        private void EnemyDown(IAIDetails person)
+        private void EnemyDown(IPlayer person)
         {
             if (!FriendIsClose)
             {
@@ -133,7 +133,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         private float FirstContactTimer = 0f;
         private const float FirstContactFreq = 5f;
 
-        private void Contact(IAIDetails person, Vector3 enemyPos, Vector3 weaponRootLast, EEnemyPartVisibleType isVisibleOnlyBySense)
+        private void Contact(IPlayer person, Vector3 enemyPos, Vector3 weaponRootLast, EEnemyPartVisibleType isVisibleOnlyBySense)
         {
             if (BotOwner.IsDead || BotOwner.BotState != EBotState.Active)
             {

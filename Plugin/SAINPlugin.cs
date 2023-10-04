@@ -1,7 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
-using Comfort.Common;
 using DrakiaXYZ.VersionChecker;
 using SAIN.Components;
 using SAIN.Editor;
@@ -28,22 +27,22 @@ namespace SAIN
         public const string Culture = "";
 
         // spt 3.6.0 == 25206
-        public const int TarkovVersion = 25206;
+        public const int TarkovVersion = 26282;
 
         public const string EscapeFromTarkov = "EscapeFromTarkov.exe";
 
         public const string SAINGUID = "me.sol.sain";
         public const string SAINName = "SAIN";
-        public const string SAINVersion = "3.5.4";
+        public const string SAINVersion = "3.5.5";
 
         public const string SPTGUID = "com.spt-aki.core";
-        public const string SPTVersion = "3.6.0";
+        public const string SPTVersion = "3.7.0";
 
         public const string WaypointsGUID = "xyz.drakia.waypoints";
-        public const string WaypointsVersion = "1.2.0";
+        public const string WaypointsVersion = "1.3.0";
 
         public const string BigBrainGUID = "xyz.drakia.bigbrain";
-        public const string BigBrainVersion = "0.2.0";
+        public const string BigBrainVersion = "0.3.0";
 
         public const string LootingBots = "me.skwizzy.lootingbots";
         public const string Realism = "RealismMod";
@@ -104,36 +103,222 @@ namespace SAIN
         {
             new UpdateEFTSettingsPatch().Enable();
 
-            new Patches.Generic.KickPatch().Enable();
-            new Patches.Generic.GetBotController().Enable();
-            new Patches.Generic.GetBotSpawnerClass().Enable();
-            new Patches.Generic.GrenadeThrownActionPatch().Enable();
-            new Patches.Generic.GrenadeExplosionActionPatch().Enable();
-            new Patches.Generic.BotGroupAddEnemyPatch().Enable();
-            new Patches.Generic.BotMemoryAddEnemyPatch().Enable();
-
-            new Patches.Hearing.TryPlayShootSoundPatch().Enable();
-            new Patches.Hearing.HearingSensorPatch().Enable();
-            new Patches.Hearing.BetterAudioPatch().Enable();
-
-            new Patches.Talk.PlayerTalkPatch().Enable();
-            new Patches.Talk.TalkDisablePatch1().Enable();
-            new Patches.Talk.TalkDisablePatch2().Enable();
-            new Patches.Talk.TalkDisablePatch3().Enable();
-            new Patches.Talk.TalkDisablePatch4().Enable();
-
-            new Patches.Vision.NoAIESPPatch().Enable();
-            new Patches.Vision.VisionSpeedPatch().Enable();
-            new Patches.Vision.VisibleDistancePatch().Enable();
-            new Patches.Vision.CheckFlashlightPatch().Enable();
-
-            new Patches.Shoot.AimTimePatch().Enable();
-            new Patches.Shoot.AimOffsetPatch().Enable();
-            new Patches.Shoot.RecoilPatch().Enable();
-            new Patches.Shoot.LoseRecoilPatch().Enable();
-            new Patches.Shoot.EndRecoilPatch().Enable();
-            new Patches.Shoot.FullAutoPatch().Enable();
-            new Patches.Shoot.SemiAutoPatch().Enable();
+            try
+            {
+                new Patches.Generic.KickPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Generic.KickPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Generic.GetBotController().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Generic.GetBotSpawner().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Generic.GrenadeThrownActionPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Generic.GrenadeExplosionActionPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Generic.BotGroupAddEnemyPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Generic.BotMemoryAddEnemyPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Hearing.TryPlayShootSoundPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Hearing.HearingSensorPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Hearing.BetterAudioPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Talk.PlayerTalkPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Talk.TalkDisablePatch1().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Talk.TalkDisablePatch2().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Talk.TalkDisablePatch3().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Talk.TalkDisablePatch4().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Vision.NoAIESPPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Vision.VisionSpeedPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Vision.VisibleDistancePatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Vision.CheckFlashlightPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Shoot.AimTimePatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Shoot.AimOffsetPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Shoot.RecoilPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Shoot.LoseRecoilPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Shoot.EndRecoilPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Shoot.FullAutoPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+            try
+            {
+                new Patches.Shoot.SemiAutoPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
         }
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;

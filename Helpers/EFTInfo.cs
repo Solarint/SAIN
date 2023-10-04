@@ -34,19 +34,19 @@ namespace SAIN.Helpers
         {
             return player != null && Compare(player, MainPlayer);
         }
-        public static bool IsPlayerMainPlayer(IAIDetails player)
+        public static bool IsPlayerMainPlayer(IPlayer player)
         {
             return player != null && Compare(player, MainPlayer);
         }
 
         public static Player GetPlayer(SAINComponentClass bot) => GetPlayer(bot?.ProfileId);
         public static Player GetPlayer(BotOwner bot) => GetPlayer(bot?.ProfileId);
-        public static Player GetPlayer(IAIDetails person) => GetPlayer(person?.ProfileId);
+        public static Player GetPlayer(IPlayer person) => GetPlayer(person?.ProfileId);
         public static Player GetPlayer(string profileID) => GameWorld?.GetAlivePlayerByProfileID(profileID);
 
-        public static bool Compare(IAIDetails A, IAIDetails B) => Compare(A?.ProfileId, B?.ProfileId);
-        public static bool Compare(Player A, IAIDetails B) => Compare(A?.ProfileId, B?.ProfileId);
-        public static bool Compare(IAIDetails A, Player B) => Compare(A?.ProfileId, B?.ProfileId);
+        public static bool Compare(IPlayer A, IPlayer B) => Compare(A?.ProfileId, B?.ProfileId);
+        public static bool Compare(Player A, IPlayer B) => Compare(A?.ProfileId, B?.ProfileId);
+        public static bool Compare(IPlayer A, Player B) => Compare(A?.ProfileId, B?.ProfileId);
 
         public static bool Compare(Player A, Player B) => Compare(A?.ProfileId, B?.ProfileId);
         public static bool Compare(Player A, string B) => Compare(A?.ProfileId, B);
@@ -56,7 +56,7 @@ namespace SAIN.Helpers
 
         public static GameWorld GameWorld => Singleton<GameWorld>.Instance;
         public static Player MainPlayer => GameWorld?.MainPlayer;
-        public static List<IAIDetails> AllPlayers => GameWorld?.RegisteredPlayers;
+        public static List<IPlayer> AllPlayers => GameWorld?.RegisteredPlayers;
         public static List<Player> AlivePlayers => GameWorld?.AllAlivePlayersList;
         public static Dictionary<string, Player> AlivePlayersDictionary => GameWorld?.allAlivePlayersByID;
     }
