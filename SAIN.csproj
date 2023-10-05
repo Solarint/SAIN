@@ -220,6 +220,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Properties\.vs\MyFirstPlugin\v16\.suo" />
     <None Include="Properties\.vs\slnx.sqlite" />
     <None Include="Properties\.vs\VSWorkspaceState.json" />

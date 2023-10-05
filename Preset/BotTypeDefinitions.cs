@@ -40,6 +40,7 @@ namespace SAIN.Preset
             return new List<BotType>
             {
             new BotType{ WildSpawnType = WildSpawnType.assault,                 Name = "Scav",                     Section = "Scavs" ,       Description = "Scavs!" },
+            new BotType{ WildSpawnType = WildSpawnType.assaultGroup,                 Name = "Scav Group",                     Section = "Scavs" ,       Description = "Scavs in a Group!" },
             new BotType{ WildSpawnType = WildSpawnType.crazyAssaultEvent,       Name = "Crazy Scav Event",         Section = "Scavs" ,       Description = "Scavs!" },
             new BotType{ WildSpawnType = EnumValues.WildSpawn.Usec,             Name = "Usec",                     Section = "PMCs" ,        Description = "A PMC of the Usec Faction" },
             new BotType{ WildSpawnType = EnumValues.WildSpawn.Bear,             Name = "Bear",                     Section = "PMCs" ,        Description = "A PMC of the Bear Faction" },

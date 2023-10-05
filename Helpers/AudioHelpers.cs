@@ -114,10 +114,17 @@ namespace SAIN.Helpers
             return 150f;
         }
 
-        private static bool IsSilencer(Mod mod)
+        public static bool IsSilencer(Mod mod)
         {
-            return mod.GetType() == TemplateIdToObjectMappingsClass.TypeTable["550aa4cd4bdc2dd8348b456c"];
+            return mod.GetType() == TemplateIdToObjectMappingsClass.TypeTable[SuppressorTypeId];
         }
+
+        public static readonly string SuppressorTypeId = "550aa4cd4bdc2dd8348b456c";
+        public static readonly string CollimatorTypeId = "55818ad54bdc2ddc698b4569";
+        public static readonly string CompactCollimatorTypeId = "55818acf4bdc2dde698b456b";
+        public static readonly string AssaultScopeTypeId = "55818add4bdc2d5b648b456f";
+        public static readonly string OpticScopeTypeId = "55818ae44bdc2dde698b456c";
+        public static readonly string SpecialScopeTypeId = "55818aeb4bdc2ddc698b456a";
 
         private const float SuperSonic = 343.2f;
 

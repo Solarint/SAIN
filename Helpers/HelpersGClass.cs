@@ -35,7 +35,7 @@ namespace SAIN.Helpers
     {
         static HelpersGClass()
         {
-            InventoryControllerProp = AccessTools.Property(typeof(Player), "_inventoryController");
+            InventoryControllerProp = AccessTools.Field(typeof(Player), "_inventoryController");
             EFTBotSettingsProp = AccessTools.Property(typeof(BotDifficultySettingsClass), "FileSettings");
             RefreshSettingsMethod = AccessTools.Method(typeof(BotDifficultySettingsClass), "method_0");
         }
@@ -48,7 +48,7 @@ namespace SAIN.Helpers
         private static readonly MethodInfo RefreshSettingsMethod;
 
         public static readonly PropertyInfo EFTBotSettingsProp;
-        public static readonly PropertyInfo InventoryControllerProp;
+        public static readonly FieldInfo InventoryControllerProp;
 
         public static InventoryControllerClass GetInventoryController(Player player)
         {

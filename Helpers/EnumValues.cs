@@ -42,6 +42,7 @@ namespace SAIN.Helpers
             public static WildSpawnType[] Scavs =
             {
                 WildSpawnType.assault,
+                WildSpawnType.assaultGroup,
                 WildSpawnType.crazyAssaultEvent,
                 WildSpawnType.cursedAssault,
                 WildSpawnType.marksman

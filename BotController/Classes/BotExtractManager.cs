@@ -34,10 +34,10 @@ namespace SAIN.Components.BotController
                             $"Found: [{ValidScavExfils.Count}] ScavExfils and " +
                             $"[{ValidExfils.Count}] PMC Exfils to be used."
                             );
-                        Logger.LogInfo(
-                            $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
-                            $"[{AllScavExfils?.Length}] Total Scav Exfils")
-                            ;
+                        // Logger.LogInfo(
+                        //     $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
+                        //     $"[{AllScavExfils?.Length}] Total Scav Exfils")
+                        //     ;
                     }
                 }
                 if (CheckExfilTimer < Time.time)
@@ -66,7 +66,7 @@ namespace SAIN.Components.BotController
                 if (AllScavExfils == null)
                 {
                     AllScavExfils = ExfilController.ScavExfiltrationPoints;
-                    if (SAINPlugin.DebugMode)
+                    if (SAINPlugin.DebugMode && AllScavExfils != null)
                     {
                         Logger.LogInfo($"Found {AllScavExfils?.Length} possible Scav Exfil Points in this map.");
                     }
@@ -74,7 +74,7 @@ namespace SAIN.Components.BotController
                 if (AllExfils == null)
                 {
                     AllExfils = ExfilController.ExfiltrationPoints;
-                    if (SAINPlugin.DebugMode)
+                    if (SAINPlugin.DebugMode && AllExfils != null)
                     {
                         Logger.LogInfo($"Found {AllExfils?.Length} possible Exfil Points in this map.");
                     }
@@ -99,41 +99,40 @@ namespace SAIN.Components.BotController
                 {
                     if (bot.Value != null && (bot.Value.Info.Profile.IsPMC || bot.Value.Info.Profile.IsScav))
                     {
-                        if (SAINPlugin.DebugMode)
-                        {
-                            Logger.LogInfo($"Looking for Exfil for {bot.Value.name}");
-                        }
                         if (bot.Value.Memory.CannotExfil)
                         {
                             if (bot.Value.Squad.LeaderComponent?.Memory.ExfilPosition != null)
                             {
-                                bot.Value.Memory.ExfilPosition = bot.Value.Squad.LeaderComponent?.Memory.ExfilPosition;
                                 if (SAINPlugin.DebugMode)
                                 {
                                     Logger.LogInfo($"Setting {bot.Value.name} Exfil to Squad Leaders Exfil");
                                 }
-                            }
-                            else
-                            {
-                                if (SAINPlugin.DebugMode)
-                                {
-                                    Logger.LogInfo($"{bot.Value.name} Cannot Exfil!");
-                                }
+                                bot.Value.Memory.ExfilPosition = bot.Value.Squad.LeaderComponent?.Memory.ExfilPosition;
+                                bot.Value.Memory.CannotExfil = false;
                             }
                             continue;
                         }
-                        if (bot.Value.Memory.ExfilPosition == null)
+
+                        if (bot.Value.Memory.ExfilPosition != null)
                         {
-                            FindExfils(bot.Value);
-                            if (bot.Value.Squad.BotInGroup)
-                            {
-                                AssignSquadExfil(bot.Value);
-                            }
-                            else
-                            {
-                                AssignExfil(bot.Value);
-                            }
+                            continue;
                         }
+
+                        if (SAINPlugin.DebugMode)
+                        {
+                            Logger.LogInfo($"Looking for Exfil for {bot.Value.name}");
+                        }
+
+                        FindExfils(bot.Value);
+                        if (bot.Value.Squad.BotInGroup)
+                        {
+                            AssignSquadExfil(bot.Value);
+                        }
+                        else
+                        {
+                            AssignExfil(bot.Value);
+                        }
+
                         if (bot.Value.Memory.ExfilPosition == null)
                         {
                             bot.Value.Memory.CannotExfil = true;
@@ -148,7 +147,7 @@ namespace SAIN.Components.BotController
                     {
                         if (SAINPlugin.DebugMode)
                         {
-                            Logger.LogInfo($"Skipped searching for Exfil for {bot.Value.name}. WildSpawnType: {bot.Value.Info.WildSpawnType}");
+                            // Logger.LogInfo($"Skipped searching for Exfil for {bot.Value.name}. WildSpawnType: {bot.Value.Info.WildSpawnType}");
                         }
                     }
                     else
