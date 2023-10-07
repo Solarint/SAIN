@@ -168,7 +168,7 @@ namespace SAIN.SAINComponent.Classes.Info
             float percentage = Random.Range(FileSettings.Mind.MinExtractPercentage, FileSettings.Mind.MaxExtractPercentage);
 
             var squad = SAIN?.Squad;
-            var members = squad?.SquadMembers;
+            var members = squad?.Members;
             if (squad != null && squad.BotInGroup && members != null && members.Count > 0)
             {
                 if (squad.IAmLeader)

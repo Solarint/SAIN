@@ -231,6 +231,7 @@
     <Compile Include="Attributes\AttributesGUI.cs" />
     <Compile Include="Attributes\AttributesInfoClass.cs" />
     <Compile Include="Attributes\GUIEntryConfig.cs" />
+    <Compile Include="BotController\Classes\BotSquads.cs" />
     <Compile Include="Components\MainPlayer\BaseMainPlayer.cs" />
     <Compile Include="Components\MainPlayer\SAINCamoClass.cs" />
     <Compile Include="Components\MainPlayer\SAINMainPlayerComponent.cs" />

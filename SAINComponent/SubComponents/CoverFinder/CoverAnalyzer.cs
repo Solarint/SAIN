@@ -200,14 +200,14 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
 
         public bool CheckPositionVsOtherBots(Vector3 position)
         {
-            if (SAIN.Squad.SquadLocations == null || SAIN.Squad.SquadMembers == null || SAIN.Squad.SquadMembers.Count < 2)
+            if (SAIN.Squad.SquadLocations == null || SAIN.Squad.Members == null || SAIN.Squad.Members.Count < 2)
             {
                 return true;
             }
 
             const float DistanceToBotCoverThresh = 1f;
 
-            foreach (var member in SAIN.Squad.SquadMembers.Values)
+            foreach (var member in SAIN.Squad.Members.Values)
             {
                 if (member != null && member.BotOwner != BotOwner)
                 {

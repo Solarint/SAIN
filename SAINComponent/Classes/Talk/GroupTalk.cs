@@ -71,7 +71,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         {
             if (Subscribed)
             {
-                BotOwner.BotsGroup.OnMemberRemove -= FriendlyDown;
+                SAIN.Squad.SquadInfo.MemberKilled -= FriendlyDown;
                 BotOwner.BotsGroup.OnReportEnemy -= Contact;
                 BotOwner.DeadBodyWork.OnStartLookToBody -= LootStuff;
                 BotOwner.BotsGroup.OnEnemyRemove -= EnemyDown;
@@ -85,7 +85,7 @@ namespace SAIN.SAINComponent.Classes.Talk
             {
                 Subscribed = true;
 
-                BotOwner.BotsGroup.OnMemberRemove += FriendlyDown;
+                SAIN.Squad.SquadInfo.MemberKilled += FriendlyDown;
                 BotOwner.BotsGroup.OnReportEnemy += Contact;
                 BotOwner.DeadBodyWork.OnStartLookToBody += LootStuff;
                 BotOwner.BotsGroup.OnEnemyRemove += EnemyDown;
@@ -116,7 +116,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         private const float FriendTooClose = 5f;
         private const float EnemyTooClose = 5f;
 
-        private void FriendlyDown(BotOwner bot)
+        private void FriendlyDown(IPlayer player, DamageInfo damage, float time)
         {
             if (BotOwner.IsDead || BotOwner.BotState != EBotState.Active)
             {
@@ -169,9 +169,9 @@ namespace SAIN.SAINComponent.Classes.Talk
 
         private bool AreFriendsClose()
         {
-            foreach (var member in SAIN.Squad.SquadMembers.Keys)
+            foreach (var member in SAIN.Squad.Members.Values)
             {
-                if (BotIsAlive(member) && (member.Position - BotOwner.Position).magnitude < 20f)
+                if (member.Player != null && member.BotIsAlive && (member.Position - BotOwner.Position).magnitude < 20f)
                 {
                     return true;
                 }
@@ -179,11 +179,9 @@ namespace SAIN.SAINComponent.Classes.Talk
             return false;
         }
 
-        private bool BotIsAlive(BotOwner bot) => bot?.GetPlayer?.HealthController?.IsAlive == true;
-
         private void AllMembersSay(EPhraseTrigger trigger, ETagStatus mask, float delay = 1.5f, float chance = 100f)
         {
-            foreach (var member in BotSquad.SquadMembers.Values)
+            foreach (var member in BotSquad.Members.Values)
             {
                 if (member?.BotIsAlive == true && SAIN.Squad.LeaderComponent != null && SAIN.Squad.DistanceToSquadLeader <= 20f)
                 {
@@ -403,7 +401,7 @@ namespace SAIN.SAINComponent.Classes.Talk
                     {
                         Player.HandsController.ShowGesture(gesture);
                     }
-                    if (SAIN.Squad.VisibleMembers.Count / (float)SAIN.Squad.SquadMembers.Count < 0.5f)
+                    if (SAIN.Squad.VisibleMembers.Count / (float)SAIN.Squad.Members.Count < 0.5f)
                     {
                         SAIN.Talk.Say(commandTrigger);
                         AllMembersSay(trigger, ETagStatus.Aware, Random.Range(0.75f, 1.5f), 35f);

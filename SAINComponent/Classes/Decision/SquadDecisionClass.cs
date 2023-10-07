@@ -32,7 +32,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         public bool GetDecision(out SquadDecision Decision)
         {
             Decision = SquadDecision.None;
-            if (!Squad.BotInGroup || Squad.Leader?.IsDead == true)
+            if (!Squad.BotInGroup || Squad.LeaderComponent?.IsDead == true)
             {
                 return false;
             }
@@ -57,7 +57,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         private bool EnemyDecision(out SquadDecision Decision)
         {
             Decision = SquadDecision.None;
-            foreach (var member in SAIN.Squad.SquadMembers.Values)
+            foreach (var member in SAIN.Squad.Members.Values)
             {
                 if (member == null || member.BotOwner == BotOwner || member.BotOwner.IsDead)
                 {

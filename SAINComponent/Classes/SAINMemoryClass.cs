@@ -1,5 +1,6 @@
 ﻿using EFT;
 using SAIN.SAINComponent.Classes.Decision;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +13,8 @@ namespace SAIN.SAINComponent.Classes
             Decisions = new DecisionWrapper(sain);
         }
 
+        public Action<ETagStatus> HealthStatusChanged { get; set; }
+
         public void Init() 
         {
         }
@@ -20,8 +23,14 @@ namespace SAIN.SAINComponent.Classes
         {
             if (UpdateHealthTimer < Time.time)
             {
-                UpdateHealthTimer = Time.time + 0.33f;
+                UpdateHealthTimer = Time.time + 0.5f;
+
+                var oldStatus = HealthStatus;
                 HealthStatus = Player.HealthStatus;
+                if (HealthStatus != oldStatus)
+                {
+                    HealthStatusChanged?.Invoke(HealthStatus);
+                }
             }
         }
 

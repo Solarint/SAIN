@@ -19,7 +19,7 @@ namespace SAIN.SAINComponent.BaseClasses
         }
 
         private readonly SAINPersonClass Person;
-        public bool TransformNull => Person.PlayerNull || DefaultTransform == null || Person?.Player?.gameObject == null;
+        public bool TransformNull => Person == null || Person.PlayerNull || DefaultTransform == null || Person?.Player?.gameObject == null;
         public BifacialTransform DefaultTransform => Person.IPlayer.Transform;
         public Vector3 Position => !TransformNull ? DefaultTransform.position : Vector3.zero;
         public Vector3 LookDirection => !TransformNull ? Person.IPlayer.LookDirection : Vector3.zero;

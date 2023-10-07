@@ -265,9 +265,9 @@ namespace SAIN.Components.BotController
                 }
                 if (bot.Memory.ExfilPosition != null)
                 {
-                    if (squad.SquadMembers != null && squad.SquadMembers.Count > 0)
+                    if (squad.Members != null && squad.Members.Count > 0)
                     {
-                        foreach (var member in squad.SquadMembers)
+                        foreach (var member in squad.Members)
                         {
                             if (member.Value.Memory.ExfilPosition == null && member.Value.ProfileId != bot.ProfileId)
                             {

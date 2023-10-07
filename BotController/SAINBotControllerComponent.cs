@@ -1,6 +1,7 @@
 using BepInEx.Logging;
 using Comfort.Common;
 using EFT;
+using SAIN.BotController.Classes;
 using SAIN.Components.BotController;
 using SAIN.Helpers;
 using SAIN.SAINComponent;
@@ -29,6 +30,7 @@ namespace SAIN.Components
         public TimeClass TimeVision { get; private set; } = new TimeClass();
         public WeatherVisionClass WeatherVision { get; private set; } = new WeatherVisionClass();
         public BotSpawnController BotSpawnController { get; private set; } = new BotSpawnController();
+        public BotSquads BotSquads { get; private set; } = new BotSquads();
 
         public Vector3 MainPlayerPosition { get; private set; }
         private bool ComponentAdded { get; set; }
@@ -44,6 +46,7 @@ namespace SAIN.Components
             CoverManager.Awake();
             PathManager.Awake();
             BotExtractManager.Awake();
+            BotSquads.Awake();
 
             Singleton<GClass520>.Instance.OnGrenadeThrow += GrenadeThrown;
             Singleton<GClass520>.Instance.OnGrenadeExplosive += GrenadeExplosion;
@@ -63,6 +66,7 @@ namespace SAIN.Components
                 return;
             }
 
+            BotSquads.Update();
             BotSpawnController.Update();
             BotExtractManager.Update();
             UpdateMainPlayer();
