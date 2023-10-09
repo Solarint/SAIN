@@ -118,10 +118,9 @@ namespace SAIN.Layers.Combat.Solo.Cover
             }
             else
             {
-                SAIN.Steering.SteerByPriority(false);
-                if (SAIN.Enemy != null)
+                if (!BotOwner.ShootData.Shooting)
                 {
-                    SAIN.Steering.LookToEnemy(SAIN.Enemy);
+                    SAIN.Steering.SteerByPriority(false);
                 }
                 Shoot.Update();
             }

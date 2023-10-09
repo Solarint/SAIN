@@ -47,7 +47,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 return true;
             }
             var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 30f, 2f);
-            if (sound != null)
+            if (sound != null && !BotOwner.ShootData.Shooting)
             {
                 LookToHearPos(sound.Position);
                 return true;

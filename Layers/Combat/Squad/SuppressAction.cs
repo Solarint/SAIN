@@ -37,7 +37,10 @@ namespace SAIN.Layers.Combat.Squad
                 }
                 else
                 {
-                    SAIN.Steering.SteerByPriority();
+                    if (!BotOwner.ShootData.Shooting)
+                    {
+                        SAIN.Steering.SteerByPriority();
+                    }
                     BotOwner.MoveToEnemyData.TryMoveToEnemy(enemy.EnemyIPlayer.Position);
                 }
             }

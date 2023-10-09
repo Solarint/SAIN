@@ -71,12 +71,18 @@ namespace SAIN.BotController.Classes
                     if (defaultMember != null)
                     {
                         var profileId = defaultMember.ProfileId;
-                        if (BotSquadKVP.TryGetValue(profileId, out var squadID) 
-                            && Squads.TryGetValue(squadID, out result))
+                        if (BotController.GetBot(profileId, out var sainComponent))
                         {
                             if (SAINPlugin.DebugMode)
-                                Logger.LogInfo($"Adding bot to squad [{result.GUID}]");
-                            break;
+                                Logger.LogInfo($"Found SAIN Bot for squad");
+
+                            if (sainComponent?.Squad.SquadInfo != null)
+                            {
+                                result = sainComponent.Squad.SquadInfo;
+                                if (SAINPlugin.DebugMode)
+                                    Logger.LogInfo($"Adding bot to squad [{result.GUID}]");
+                                break;
+                            }
                         }
                     }
                 }
@@ -96,14 +102,6 @@ namespace SAIN.BotController.Classes
 
             result.AddMember(sain);
 
-            if (BotSquadKVP.ContainsKey(sain.ProfileId))
-            {
-                BotSquadKVP[sain.ProfileId] = result.Id;
-            }
-            else
-            {
-                BotSquadKVP.Add(sain.ProfileId, result.Id);
-            }
             return result;
         }
     }

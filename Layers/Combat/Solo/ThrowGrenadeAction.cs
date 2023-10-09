@@ -20,22 +20,6 @@ namespace SAIN.Layers.Combat.Solo
                 BotOwner.StopMove();
             }
 
-            ExecuteThrow();
-
-            if (SAIN.Cover.BotIsAtCoverPoint())
-            {
-                return;
-            }
-            else
-            {
-                bool prone = SAIN.Mover.Prone.ShallProne(true);
-                SAIN.Mover.Prone.SetProne(prone);
-            }
-        }
-
-        public void ExecuteThrow()
-        {
-            BotOwner.WeaponManager.Grenades.DoThrow();
             SAIN.Talk.Say(EPhraseTrigger.OnGrenade);
         }
 

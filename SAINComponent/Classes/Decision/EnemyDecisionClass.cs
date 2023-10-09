@@ -42,6 +42,10 @@ namespace SAIN.SAINComponent.Classes.Decision
             {
                 Decision = SoloDecision.DogFight;
             }
+            else if (StartThrowGrenade(enemy))
+            {
+                Decision = SoloDecision.ThrowGrenade;
+            }
             else if (StartMoveToEngage(enemy))
             {
                 Decision = SoloDecision.MoveToEngage;
@@ -83,10 +87,6 @@ namespace SAIN.SAINComponent.Classes.Decision
                     Decision = SoloDecision.RunToCover;
                 }
             }
-            else if (StartThrowNade(enemy))
-            {
-                Decision = SoloDecision.ThrowGrenade;
-            }
             else
             {
                 Decision = SoloDecision.DogFight;
@@ -98,6 +98,26 @@ namespace SAIN.SAINComponent.Classes.Decision
             }
 
             return true;
+        }
+
+        private bool StartThrowGrenade(SAINEnemyClass enemy)
+        {
+            var grenades = BotOwner.WeaponManager.Grenades;
+            if (!grenades.HaveGrenade)
+            {
+                return false;
+            }
+            if (!enemy.IsVisible && enemy.TimeSinceSeen > 4f && enemy.RealDistance < 70f)
+            {
+                if (grenades.ReadyToThrow && grenades.AIGreanageThrowData.IsUpToDate())
+                {
+                    grenades.DoThrow();
+                    return true;
+                }
+                grenades.CanThrowGrenade(enemy.EnemyPosition + Vector3.up);
+                return false;
+            }
+            return false;
         }
 
         private bool StartRushEnemy(SAINEnemyClass enemy)
