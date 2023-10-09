@@ -27,7 +27,7 @@ namespace SAIN.Preset
         {
             var preset = new SAINPresetDefinition
             {
-                Name = $"Default {difficulty}",
+                Name = difficulty,
                 Description = description ?? $"The Default {difficulty} SAIN Preset.",
                 Creator = "Solarint",
                 SAINVersion = AssemblyInfo.SAINVersion,

@@ -4,6 +4,10 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class GeneralSettings
     {
+        [Name("Bot Grenades")]
+        [Default(true)]
+        public bool BotsUseGrenades = true;
+
         [Name("Global Difficulty Modifier")]
         [Description("Higher number = harder bots. Affects bot accuracy, recoil, fire-rate, full auto burst lenght, scatter, reaction-time")]
         [Default(1f)]

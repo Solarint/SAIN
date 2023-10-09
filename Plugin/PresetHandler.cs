@@ -10,7 +10,8 @@ namespace SAIN.Plugin
 {
     internal class PresetHandler
     {
-        public const string DefaultPreset = "Default Hard";
+        public const string DefaultPreset = "3. Default";
+        public const string DefaultPresetDescription = "Bots are difficult but fair, the way SAIN was meant to played.";
 
         private const string Settings = "Settings";
 
@@ -140,7 +141,7 @@ namespace SAIN.Plugin
 
         private static SAINPresetClass CreateEasyPreset()
         {
-            var preset = SAINPresetDefinition.CreateDefault("Easy");
+            var preset = SAINPresetDefinition.CreateDefault("1. Baby Bots", "Bots react slowly and are incredibly inaccurate.");
 
             var global = preset.GlobalSettings;
             global.Shoot.GlobalRecoilMultiplier = 2.5f;
@@ -167,7 +168,7 @@ namespace SAIN.Plugin
 
         private static SAINPresetClass CreateNormalPreset()
         {
-            var preset = SAINPresetDefinition.CreateDefault("Normal");
+            var preset = SAINPresetDefinition.CreateDefault("2. Less Difficult", "Bots react more slowly, and are less accurate than usual.");
 
             var global = preset.GlobalSettings;
             global.Shoot.GlobalRecoilMultiplier = 1.6f;
@@ -193,14 +194,14 @@ namespace SAIN.Plugin
 
         private static SAINPresetClass CreateHardPreset()
         {
-            var preset = SAINPresetDefinition.CreateDefault("Hard");
+            var preset = SAINPresetDefinition.CreateDefault(DefaultPreset, DefaultPresetDescription);
             preset.ExportGlobalSettings();
             return preset;
         }
 
         private static SAINPresetClass CreateVeryHardPreset()
         {
-            var preset = SAINPresetDefinition.CreateDefault("Very Hard");
+            var preset = SAINPresetDefinition.CreateDefault("4. I Like Pain", "Bots react faster, are more accurate, and can see further.");
 
             var global = preset.GlobalSettings;
             global.Shoot.GlobalRecoilMultiplier = 0.66f;
@@ -226,11 +227,11 @@ namespace SAIN.Plugin
 
         private static SAINPresetClass CreateImpossiblePreset()
         {
-            var preset = SAINPresetDefinition.CreateDefault("Impossible", "Prepare To Die");
+            var preset = SAINPresetDefinition.CreateDefault("5. Death Wish", "Prepare To Die. Bots have almost no scatter, get less recoil from their weapon while shooting, are more accurate, and react deadly fast.");
 
             var global = preset.GlobalSettings;
-            global.Shoot.GlobalRecoilMultiplier = 0.15f;
-            global.Shoot.GlobalScatterMultiplier = 0.05f;
+            global.Shoot.GlobalRecoilMultiplier = 0.25f;
+            global.Shoot.GlobalScatterMultiplier = 0.01f;
             global.Aiming.AccuracySpreadMultiGlobal = 0.33f;
             global.General.GlobalDifficultyModifier = 3f;
             global.Look.GlobalVisionDistanceMultiplier = 2.5f;

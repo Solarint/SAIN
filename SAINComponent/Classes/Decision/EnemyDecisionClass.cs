@@ -102,12 +102,22 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         private bool StartThrowGrenade(SAINEnemyClass enemy)
         {
+            if (!GlobalSettings.General.BotsUseGrenades)
+            {
+                var core = BotOwner.Settings.FileSettings.Core;
+                if (core.CanGrenade)
+                {
+                    core.CanGrenade = false;
+                }
+                return false;
+            }
+
             var grenades = BotOwner.WeaponManager.Grenades;
             if (!grenades.HaveGrenade)
             {
                 return false;
             }
-            if (!enemy.IsVisible && enemy.TimeSinceSeen > 4f && enemy.RealDistance < 70f)
+            if (!enemy.IsVisible && enemy.TimeSinceSeen > SAIN.Info.FileSettings.Grenade.TimeSinceSeenBeforeThrow && enemy.RealDistance < 100f)
             {
                 if (grenades.ReadyToThrow && grenades.AIGreanageThrowData.IsUpToDate())
                 {
