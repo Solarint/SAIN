@@ -334,26 +334,24 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public bool LowOnAmmo(float ratio = 0.3f)
         {
-            try
-            {
-                int currentAmmo = BotOwner.WeaponManager.Reload.BulletCount;
-                int maxAmmo = BotOwner.WeaponManager.Reload.MaxBulletCount;
-                return AmmoRatio < ratio;
-            }
-            catch
-            {
-                // I HATE THIS STUPID BUG
-            }
-            return false;
+            return AmmoRatio < ratio;
         }
 
         public float AmmoRatio
         {
             get
             {
-                int currentAmmo = BotOwner.WeaponManager.Reload.BulletCount;
-                int maxAmmo = BotOwner.WeaponManager.Reload.MaxBulletCount;
-                return (float)currentAmmo / maxAmmo;
+                try
+                {
+                    int currentAmmo = BotOwner.WeaponManager.Reload.BulletCount;
+                    int maxAmmo = BotOwner.WeaponManager.Reload.MaxBulletCount;
+                    return (float)currentAmmo / maxAmmo;
+                }
+                catch
+                {
+                    // I HATE THIS STUPID BUG
+                }
+                return 1f;
             }
         }
     }
