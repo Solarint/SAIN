@@ -334,15 +334,17 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public bool LowOnAmmo(float ratio = 0.3f)
         {
-            int currentAmmo = BotOwner.WeaponManager.Reload.BulletCount;
-            int maxAmmo = BotOwner.WeaponManager.Reload.MaxBulletCount;
-
-            if (maxAmmo > 30)
+            try
             {
-
+                int currentAmmo = BotOwner.WeaponManager.Reload.BulletCount;
+                int maxAmmo = BotOwner.WeaponManager.Reload.MaxBulletCount;
+                return AmmoRatio < ratio;
             }
-
-            return AmmoRatio < ratio;
+            catch
+            {
+                // I HATE THIS STUPID BUG
+            }
+            return false;
         }
 
         public float AmmoRatio
