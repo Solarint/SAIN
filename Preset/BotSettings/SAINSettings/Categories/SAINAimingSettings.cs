@@ -25,9 +25,9 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
 
         [Name("Faster CQB Reactions Minimum Speed")]
         [Description("Absolute minimum speed (in seconds) that bot can react and shoot")]
-        [Default(0.2f)]
-        [MinMax(0.05f, 0.5f, 100f)]
-        public float FasterCQBReactionsMinimum = 0.2f;
+        [Default(0.33f)]
+        [MinMax(0.05f, 0.75f, 100f)]
+        public float FasterCQBReactionsMinimum = 0.33f;
 
         [Name("Accuracy Spread Multiplier")]
         [Description("Higher = less accurate. Modifies a bot's base accuracy and spread. 1.5 = 1.5x higher accuracy spread")]

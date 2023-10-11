@@ -9,6 +9,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 using Comfort.Common;
+using SAIN.SAINComponent.Classes;
 
 namespace SAIN.Patches.Vision
 {
@@ -127,6 +128,13 @@ namespace SAIN.Patches.Vision
             {
                 __result *= inverseWeatherModifier;
             }
+
+            // Not Looking Implementation
+            if (__instance?.Person?.IsYourPlayer == true)
+            {
+                __result *= SAINNotLooking.GetVisionSpeedIncrease(__instance.Owner);
+            }
+
             __result = Mathf.Round(__result * 100f) / 100f; ;
         }
     }

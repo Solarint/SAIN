@@ -20,7 +20,10 @@ namespace SAIN.Layers.Combat.Solo
                 BotOwner.StopMove();
             }
 
-            SAIN.Talk.Say(EPhraseTrigger.OnGrenade);
+            if (SAIN.Squad.BotInGroup && SAIN.Talk.GroupTalk.FriendIsClose)
+            {
+                SAIN.Talk.Say(EPhraseTrigger.OnGrenade);
+            }
         }
 
         private float StartTime = 0f;

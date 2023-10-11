@@ -108,7 +108,7 @@ namespace SAIN.SAINComponent.Classes.Talk
             }
         }
 
-        private bool FriendIsClose;
+        public bool FriendIsClose;
 
         private const float LeaderFreq = 1f;
         private const float TalkFreq = 0.5f;

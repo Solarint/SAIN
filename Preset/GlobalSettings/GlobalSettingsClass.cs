@@ -7,6 +7,8 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class GlobalSettingsClass
     {
+        public static readonly GlobalSettingsClass Defaults = new GlobalSettingsClass();
+
         public static GlobalSettingsClass ImportGlobalSettings(SAINPresetDefinition Preset)
         {
             string fileName = FileAndFolderNames[JsonEnum.GlobalSettings];

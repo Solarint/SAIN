@@ -27,6 +27,8 @@ namespace SAIN.Patches.Shoot
             return AccessTools.Method(_aimingDataType, "method_13");
         }
 
+        private static float DebugTimer;
+
         [PatchPrefix]
         public static bool PatchPrefix(ref GClass444 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
@@ -37,6 +39,21 @@ namespace SAIN.Patches.Shoot
 
                 * (___vector3_4
                 + ___botOwner_0.RecoilData.RecoilOffset);
+
+            if (___botOwner_0?.Memory?.GoalEnemy?.Person?.IsYourPlayer == true)
+            {
+                float ExtraSpread = SAINNotLooking.GetSpreadIncrease(___botOwner_0);
+                if (ExtraSpread > 0)
+                {
+                    Vector3 vectorSpread = UnityEngine.Random.insideUnitSphere * ExtraSpread;
+                    finalTarget += vectorSpread;
+                    if (SAINPlugin.DebugMode && DebugTimer < Time.time)
+                    {
+                        DebugTimer = Time.time + 1f;
+                        Logger.LogDebug($"Increasing Spread because Player isn't looking. Magnitude: [{vectorSpread.magnitude}]");
+                    }
+                }
+            }
 
             if (SAINPlugin.LoadedPreset.GlobalSettings.General.HeadShotProtection)
             {

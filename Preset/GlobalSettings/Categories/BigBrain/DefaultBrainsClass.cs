@@ -649,6 +649,7 @@ namespace SAIN.Preset.GlobalSettings.Categories
                     },
                 }
             },
+            /*
             {
                 Brain.BossZryachiy, new BrainInfoClass()
                 {
@@ -683,6 +684,7 @@ namespace SAIN.Preset.GlobalSettings.Categories
                     },
                 }
             },
+            */
             {
                 Brain.ArenaFighter, new BrainInfoClass()
                 {

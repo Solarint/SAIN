@@ -263,6 +263,7 @@
     <Compile Include="SAINComponent\Classes\ESearchMove.cs" />
     <Compile Include="Helpers\SealedClass\PointDirection.cs" />
     <Compile Include="SAINComponent\Classes\SAINBotUnstuckClass.cs" />
+    <Compile Include="SAINComponent\Classes\SAINNotLooking.cs" />
     <Compile Include="SAINComponent\Classes\SAINSearchClass.cs" />
     <Compile Include="SAINComponent\PersonBase\AIInfoClass.cs" />
     <Compile Include="SAINComponent\PersonBase\ISAINPerson.cs" />

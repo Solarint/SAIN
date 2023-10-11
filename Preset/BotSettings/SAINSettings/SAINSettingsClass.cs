@@ -1,10 +1,13 @@
 ﻿using SAIN.Attributes;
 using SAIN.Preset.BotSettings.SAINSettings.Categories;
+using SAIN.Preset.GlobalSettings;
 
 namespace SAIN.Preset.BotSettings.SAINSettings
 {
     public class SAINSettingsClass
     {
+        public static readonly SAINSettingsClass Defaults = new SAINSettingsClass();
+
         [NameAndDescription("Bot Aiming Settings",
             "Anything related to a bot's Aiming settings used by default EFT Code")]
         public SAINAimingSettings Aiming = new SAINAimingSettings();

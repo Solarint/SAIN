@@ -29,7 +29,7 @@ namespace SAIN.Preset.GlobalSettings.Categories
             Brain.BossKojaniy,
             Brain.BossSanitar,
             Brain.Tagilla,
-            Brain.BossZryachiy,
+            //Brain.BossZryachiy,
             Brain.Killa,
             Brain.SectantPriest,
         };
@@ -43,7 +43,7 @@ namespace SAIN.Preset.GlobalSettings.Categories
             Brain.FollowerKojaniy,
             Brain.FollowerSanitar,
             Brain.TagillaFollower,
-            Brain.Fl_Zraychiy,
+            //Brain.Fl_Zraychiy,
             Brain.SectantWarrior,
             Brain.BigPipe,
             Brain.BirdEye,

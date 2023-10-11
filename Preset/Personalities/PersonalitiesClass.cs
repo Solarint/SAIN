@@ -65,6 +65,8 @@ namespace SAIN.Preset.Personalities
 
         public class PersonalityVariablesClass
         {
+            public static readonly PersonalityVariablesClass Defaults = new PersonalityVariablesClass();
+
             [Hidden]
             const string PowerLevelDescription = " Power level is a combined number that takes into account armor, the class of that armor, and the weapon class that is currently used by a bot." +
                 " Power Level usually falls within 30 to 120 on average, and almost never goes above 150";
@@ -137,21 +139,26 @@ namespace SAIN.Preset.Personalities
 
             [Default(0.0f)]
             [Percentage0to1]
+            [Hidden]
             public float SneakySpeed = 0.0f;
 
             [Default(0.0f)]
             [Percentage0to1]
+            [Hidden]
             public float SneakyPose = 0.0f;
 
             [Default(true)]
+            [Hidden]
             public bool CanAmbush = true;
 
             [Default(25f)]
             [Percentage]
+            [Hidden]
             public float AmbushChance = 25f;
 
             [Default(5f)]
             [MinMax(0.5f, 60f, 10)]
+            [Hidden]
             public float CheckAmbushFrequency = 5f;
 
             [Default(1f)]
