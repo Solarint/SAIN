@@ -1,5 +1,7 @@
 ﻿using EFT;
 using UnityEngine;
+using UnityEngine.AI;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace SAIN.SAINComponent.Classes.Mover
 {
@@ -25,50 +27,61 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
             if (LookToAimTarget())
             {
+                SteerPriority = SteerPriority.None;
                 return true;
             }
             if (EnemyVisible())
             {
+                SteerPriority = SteerPriority.Enemy;
                 return true;
             }
             if (Time.time - BotOwner.Memory.LastTimeHit < 1f)
             {
+                SteerPriority = SteerPriority.LastHit;
                 LookToLastHitPos();
                 return true;
             }
             if (BotOwner.Memory.IsUnderFire)
             {
+                SteerPriority = SteerPriority.UnderFire;
                 LookToUnderFirePos();
                 return true;
             }
             if (SAIN.Enemy?.TimeSinceSeen < 2f && SAIN.Enemy.Seen)
             {
-                LookToEnemy(SAIN.Enemy);
+                SteerPriority = SteerPriority.LastSeenEnemy;
+                LookToEnemyLastSeenPos();
                 return true;
             }
             var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 30f, 2f);
-            if (sound != null && !BotOwner.ShootData.Shooting)
+            if (sound != null)
             {
+                SteerPriority = SteerPriority.Hear;
                 LookToHearPos(sound.Position);
                 return true;
             }
             if (SAIN.Enemy?.TimeSinceSeen < 12f && SAIN.Enemy.Seen)
             {
+                SteerPriority = SteerPriority.LastSeenEnemy;
                 LookToEnemyLastSeenPos();
                 return true;
             }
             if (SAIN.Memory.Decisions.Main.Current == SoloDecision.Investigate)
             {
+                SteerPriority = SteerPriority.MoveDirection;
                 LookToMovingDirection();
                 return true;
             }
 
             if (lookRandomifFalse)
             {
+                SteerPriority = SteerPriority.Random;
                 LookToRandomPosition();
             }
             return false;
         }
+
+        public SteerPriority SteerPriority { get; private set; }
 
         private bool LookToVisibleSound()
         {
@@ -128,6 +141,10 @@ namespace SAIN.SAINComponent.Classes.Mover
         public bool LookToAimTarget()
         {
             if (SAIN.Enemy?.IsVisible == true && SAIN.Enemy?.CanShoot == true)
+            {
+                return true;
+            }
+            if (BotOwner.ShootData.Shooting)
             {
                 return true;
             }
@@ -192,13 +209,54 @@ namespace SAIN.SAINComponent.Classes.Mover
                 if (!Physics.Raycast(headPos, direction, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
                     LookToPoint(soundPos);
+                    return;
                 }
+            }
+
+            if (HearPath == null)
+            {
+                HearPath = new NavMeshPath();
+            }
+            if (LastSoundTimer < Time.time || (LastSoundCheckPos - soundPos).magnitude > 1f)
+            {
+                LastSoundTimer = Time.time + 1f;
+                LastSoundCheckPos = soundPos;
+                LastSoundHeardCorner = Vector3.zero;
+
+                HearPath.ClearCorners();
+                if (NavMesh.CalculatePath(SAIN.Position, soundPos, -1, HearPath))
+                {
+                    if (HearPath.corners.Length > 2)
+                    {
+                        for (int i = HearPath.corners.Length - 1; i > 0; i--)
+                        {
+                            Vector3 corner = HearPath.corners[i];
+                            corner.y += 1f;
+                            Vector3 headPos = SAIN.Transform.Head;
+                            Vector3 cornerDir = corner - headPos;
+                            if (!Physics.Raycast(headPos, cornerDir.normalized, cornerDir.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
+                            {
+                                LastSoundHeardCorner = corner;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            if (LastSoundHeardCorner != Vector3.zero)
+            {
+                LookToPoint(LastSoundHeardCorner);
             }
             else
             {
                 LookToPoint(soundPos);
             }
         }
+
+        private float LastSoundTimer;
+        private Vector3 LastSoundCheckPos;
+        private Vector3 LastSoundHeardCorner;
+        private NavMeshPath HearPath;
 
         public void LookToLastHitPos()
         {
@@ -284,5 +342,17 @@ namespace SAIN.SAINComponent.Classes.Mover
         }
 
         private float RandomLookTimer = 0f;
+    }
+
+    public enum SteerPriority
+    {
+        None,
+        Enemy,
+        Hear,
+        LastSeenEnemy,
+        Random,
+        LastHit,
+        UnderFire,
+        MoveDirection
     }
 }
