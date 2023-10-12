@@ -171,7 +171,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         {
             foreach (var member in SAIN.Squad.Members.Values)
             {
-                if (member.Player != null && member.BotIsAlive && (member.Position - BotOwner.Position).magnitude < 20f)
+                if (member.Player != null && member.Player.ProfileId != Player.ProfileId && member.BotIsAlive && (member.Position - BotOwner.Position).magnitude < 20f)
                 {
                     return true;
                 }
@@ -183,7 +183,7 @@ namespace SAIN.SAINComponent.Classes.Talk
         {
             foreach (var member in BotSquad.Members.Values)
             {
-                if (member?.BotIsAlive == true && SAIN.Squad.LeaderComponent != null && SAIN.Squad.DistanceToSquadLeader <= 20f)
+                if (member?.BotIsAlive == true && SAIN.Squad.LeaderComponent != null && !member.Squad.IAmLeader && member.Squad.DistanceToSquadLeader <= 20f)
                 {
                     if (EFTMath.RandomBool(chance))
                     {

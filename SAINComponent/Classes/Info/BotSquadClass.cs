@@ -69,7 +69,7 @@ namespace SAIN.SAINComponent.Classes.Info
             VisibleMembers.Clear();
             foreach (var member in Members.Values)
             {
-                if (member != null && SAIN.Memory.VisiblePlayers.Contains(member.Player))
+                if (member != null && member.ProfileId != SAIN.ProfileId && SAIN.Memory.VisiblePlayers.Contains(member.Player))
                 {
                     VisibleMembers.Add(member);
                 }

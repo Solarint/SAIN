@@ -32,8 +32,9 @@ namespace SAIN.SAINComponent.Classes.Mover
             }
             if (LeanTimer < Time.time)
             {
-                LeanTimer = Time.time + 0.35f;
                 FindLeanDirectionRayCast(enemy.EnemyPosition);
+                float timeAdd = LeanDirection == LeanSetting.None ? 0.25f : 1f;
+                LeanTimer = Time.time + timeAdd;
             }
         }
 
@@ -42,11 +43,13 @@ namespace SAIN.SAINComponent.Classes.Mover
         }
 
         public LeanSetting LeanDirection { get; private set; }
+        public LeanSetting LastLeanDirection { get; private set; }
 
         private float LeanTimer = 0f;
 
         public void ResetLean()
         {
+            LastLeanDirection = LeanDirection;
             LeanDirection = LeanSetting.None;
             SAIN.Mover.FastLean(0f);
         }
@@ -104,6 +107,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 LeftHalfLosPos = null;
             }
             var setting = GetSettingFromResults();
+            LastLeanDirection = LeanDirection;
             LeanDirection = setting;
             SAIN.Mover.FastLean(setting);
         }

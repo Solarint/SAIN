@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UIElements;
 
 namespace SAIN.Components
 {
@@ -273,6 +274,10 @@ namespace SAIN.Components
                 return;
             }
             Player player = EFTInfo.GetPlayer(playerProfileID);
+            if (player == null)
+            {
+                return;
+            }
             Vector3 position = player.Position;
             if (isSmoke)
             {
