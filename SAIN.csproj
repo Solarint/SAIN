@@ -96,6 +96,14 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '3.7.1|x86'">
+    <OutputPath>bin\x86\3.7.1\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\BepInEx\core\0Harmony.dll</HintPath>
@@ -248,6 +256,7 @@
     <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
+    <Compile Include="Plugin\DependencyChecker.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\Categories\SAINBossSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\BotBrains.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\Brain.cs" />
@@ -450,5 +459,8 @@
   </ProjectExtensions>
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "$(ProjectDir)\..\..\BepInEx\plugins\$(TargetName)-$(ConfigurationName).dll"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File $(ProjectDir)\Plugin\VersionChecker\setbuild.ps1</PreBuildEvent>
   </PropertyGroup>
 </Project>

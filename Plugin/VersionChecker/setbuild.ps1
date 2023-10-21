@@ -1,15 +1,14 @@
 # Fetch the version from EscapeFromTarkov.exe
-$tarkovPath = '{0}\..\..\..\EscapeFromTarkov.exe' -f $PSScriptRoot
+$tarkovPath = '{0}\..\..\..\..\EscapeFromTarkov.exe' -f $PSScriptRoot
 $tarkovVersion = (Get-Item -Path $tarkovPath).VersionInfo.FileVersionRaw.Revision
 
 # Update AssemblyVersion
-$assemblyPath = '{0}\..\Properties\AssemblyInfo.cs' -f $PSScriptRoot
-$versionPattern = '^\[assembly: TarkovVersion\(.*\)\]'
-(Get-Content $assemblyPath) | ForEach-Object {
+$pluginSourcePath = '{0}\..\SAINPlugin.cs' -f $PSScriptRoot
+$versionPattern = '^([ \t]+public const int TarkovVersion = )\d+;'
+(Get-Content $pluginSourcePath) | ForEach-Object {
     if ($_ -match $versionPattern){
-    	$versionType = $matches[1]
-        '[assembly: TarkovVersion({0})]' -f $tarkovVersion
+        '{0}{1};' -f $matches[1],$tarkovVersion
     } else {
         $_
     }
-} | Set-Content $assemblyPath
+} | Set-Content $pluginSourcePath
