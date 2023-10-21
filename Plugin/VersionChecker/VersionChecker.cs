@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using System;
@@ -47,6 +48,7 @@ namespace DrakiaXYZ.VersionChecker
             {
                 string errorMessage = $"ERROR: This version of {Info.Metadata.Name} v{Info.Metadata.Version} was built for Tarkov {buildVersion}, but you are running {currentVersion}. Please download the correct plugin version.";
                 Logger.LogError(errorMessage);
+                Chainloader.DependencyErrors.Add(errorMessage);
 
                 if (Config != null)
                 {
