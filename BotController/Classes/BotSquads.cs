@@ -332,7 +332,7 @@ namespace SAIN.BotController.Classes
             if (SAINPlugin.DebugMode)
             {
                 Logger.LogInfo(
-                    $" Found New Leader. Name [{sain.name}]" +
+                    $" Found New Leader. Name [{sain.BotOwner?.Profile?.Nickname}]" +
                     $" for Squad: [{Id}]" +
                     $" at Time: [{Time.time}]" +
                     $" Group Size: [{Members.Count}]"

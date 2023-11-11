@@ -3,6 +3,8 @@ using EFT;
 using HarmonyLib;
 using System.Reflection;
 using System;
+using SAIN.SAINComponent;
+using SAIN.Components.BotController;
 
 namespace SAIN.Patches.Components
 {
@@ -10,20 +12,15 @@ namespace SAIN.Patches.Components
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(BotOwner), "PreActivate");
+            return AccessTools.Method(typeof(BotOwner), "method_10");
         }
 
         [PatchPostfix]
         public static void PatchPostfix(ref BotOwner __instance)
         {
-            if (__instance.IsRole(WildSpawnType.marksman))
-            {
-                return;
-            }
-
             try
             {
-                //SAINPlugin.SAINBotControllerComponent.AddBot(__instance);
+                BotSpawnController.Instance.AddBot(__instance);
             }
             catch (Exception ex)
             {

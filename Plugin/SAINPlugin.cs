@@ -318,7 +318,16 @@ namespace SAIN
             {
                 Logger.LogError(ex);
             }
-        }
+
+            try
+            {
+                new Patches.Components.AddComponentPatch().Enable();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex);
+            }
+}
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 

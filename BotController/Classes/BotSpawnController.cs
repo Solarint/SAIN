@@ -14,7 +14,10 @@ namespace SAIN.Components.BotController
 {
     public class BotSpawnController : SAINControl
     {
-        public BotSpawnController() { }
+        public static BotSpawnController Instance;
+        public BotSpawnController() {
+            Instance = this;
+        }
 
         public Dictionary<string, SAINComponentClass> SAINBotDictionary = new Dictionary<string, SAINComponentClass>();
         private BotSpawner BotSpawner => BotController?.BotSpawner;
@@ -32,7 +35,6 @@ namespace SAIN.Components.BotController
                 if (!Subscribed && !GameEnding)
                 {
                     BotSpawner.OnBotRemoved += RemoveBot;
-                    BotSpawner.OnBotCreated += AddBot;
                     Subscribed = true;
                 }
                 if (Subscribed)
@@ -41,7 +43,6 @@ namespace SAIN.Components.BotController
                     if (status == GameStatus.Stopping || status == GameStatus.Stopped || status == GameStatus.SoftStopping)
                     {
                         BotSpawner.OnBotRemoved -= RemoveBot;
-                        BotSpawner.OnBotCreated -= AddBot;
                         Subscribed = false;
                         GameEnding = true;
                     }

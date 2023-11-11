@@ -18,7 +18,6 @@ namespace SAIN.Layers
         public SAINLayer(BotOwner botOwner, int priority, string layerName) : base(botOwner, priority)
         {
             LayerName = layerName;
-            SAIN = botOwner.GetComponent<SAINComponentClass>();
         }
 
         private readonly string LayerName;
@@ -26,13 +25,29 @@ namespace SAIN.Layers
         public override string GetName() => LayerName;
 
         public SAINBotControllerComponent BotController => SAINPlugin.BotController;
-        public DecisionWrapper Decisions => SAIN.Memory.Decisions;
+        public DecisionWrapper Decisions => SAIN?.Memory?.Decisions;
 
-        public readonly SAINComponentClass SAIN;
+        private SAINComponentClass _SAIN = null;
+        public SAINComponentClass SAIN
+        {
+            get
+            {
+                if (_SAIN == null && BotOwner?.BotState == EBotState.Active)
+                {
+                    _SAIN = BotOwner.GetComponent<SAINComponentClass>();
+                }
+
+                return _SAIN;
+            }
+        }
+        
 
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
-            DebugOverlay.AddBaseInfo(SAIN, BotOwner, stringBuilder);
+            if (SAIN != null)
+            {
+                DebugOverlay.AddBaseInfo(SAIN, BotOwner, stringBuilder);
+            }
         }
     }
 }

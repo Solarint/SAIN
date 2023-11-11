@@ -17,6 +17,8 @@ namespace SAIN.Layers
 
         public override bool IsActive()
         {
+            if (SAIN == null) return false;
+
             if (SAIN.Memory.ExfilPosition == null || !SAIN.Info.FileSettings.Mind.EnableExtracts)
             {
                 return false;
