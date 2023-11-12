@@ -84,11 +84,14 @@ namespace SAIN.Layers.Combat.Solo
 
         public override bool IsActive()
         {
+            if (SAIN == null) return false;
+
             return CurrentDecision != SoloDecision.None;
         }
 
         public override bool IsCurrentActionEnding()
         {
+            if (SAIN == null) return true;
             return CurrentDecision != LastActionDecision;
         }
 

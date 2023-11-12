@@ -36,11 +36,14 @@ namespace SAIN.Layers.Combat.Squad
 
         public override bool IsActive()
         {
+            if (SAIN == null) return false;
+
             return SAIN.Decision.CurrentSquadDecision != SquadDecision.None;
         }
 
         public override bool IsCurrentActionEnding()
         {
+            if (SAIN == null) return true;
             return SquadDecision != LastActionDecision;
         }
 
