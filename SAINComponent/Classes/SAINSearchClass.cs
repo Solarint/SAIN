@@ -199,6 +199,9 @@ namespace SAIN.SAINComponent.Classes
         private void MoveToPoint(bool shallSprint)
         {
             RecalcPathTimer = Time.time + 2;
+
+            SAIN.Mover.Sprint(shallSprint);
+            
             if (shallSprint)
             {
                 BotOwner.BotRun.Run(ActiveDestination, false);

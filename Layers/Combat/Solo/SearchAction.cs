@@ -150,7 +150,7 @@ namespace SAIN.Layers.Combat.Solo
             {
                 if (CanSeeDangerOrCorner(out Vector3 point))
                 {
-                    SAIN.Steering.LookToPoint(point + Vector3.up);
+                    SAIN.Steering.LookToPoint(point);
                 }
                 else
                 {
@@ -162,44 +162,50 @@ namespace SAIN.Layers.Combat.Solo
         private bool CanSeeDangerOrCorner(out Vector3 point)
         {
             point = Vector3.zero;
+            
             if (Search.SearchMovePoint == null || Search.CurrentState == ESearchMove.MoveToDangerPoint)
             {
-                _LookPoint = Vector3.zero;
+                LookPoint = Vector3.zero;
                 return false;
             }
+            
             if (CheckSeeTimer < Time.time)
             {
-                _LookPoint = Vector3.zero;
-                CheckSeeTimer = Time.time + 0.3f;
-                Vector3 start = SAIN.Position;
+                LookPoint = Vector3.zero;
+                CheckSeeTimer = Time.time + 1f * Random.Range(0.66f, 1.33f);
+                var headPosition = SAIN.Transform.Head;
 
-                _CanSeeDanger = !Vector.Raycast(start,
+                var canSeePoint = !Vector.Raycast(headPosition,
                     Search.SearchMovePoint.DangerPoint,
                     LayerMaskClass.HighPolyWithTerrainMaskAI);
 
-                if (_CanSeeDanger)
+                if (canSeePoint)
                 {
-                    _CanSeeCorner = false;
-                    _LookPoint = Search.SearchMovePoint.DangerPoint;
+                    LookPoint = Search.SearchMovePoint.DangerPoint;
                 }
                 else
                 {
-                    _CanSeeCorner = !Vector.Raycast(start,
+                    canSeePoint = !Vector.Raycast(headPosition,
                         Search.SearchMovePoint.Corner,
                         LayerMaskClass.HighPolyWithTerrainMaskAI);
-                    if (_CanSeeCorner)
+                    if (canSeePoint)
                     {
-                        _LookPoint = Search.SearchMovePoint.Corner;
+                        LookPoint = Search.SearchMovePoint.Corner;
                     }
                 }
+                
+                if (LookPoint != Vector3.zero)
+                {
+                    LookPoint.y = 0;
+                    LookPoint += headPosition;
+                }
             }
-            point = _LookPoint;
-            return _CanSeeDanger || _CanSeeCorner;
+            
+            point = LookPoint;
+            return point != Vector3.zero;
         }
 
-        private bool _CanSeeCorner;
-        private bool _CanSeeDanger;
-        private Vector3 _LookPoint;
+        private Vector3 LookPoint;
         private float CheckSeeTimer;
 
         private bool SteerByPriority(bool value) => SAIN.Steering.SteerByPriority(value);
