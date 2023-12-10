@@ -108,6 +108,9 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="aki-singleplayer">
+      <HintPath>..\..\BepInEx\plugins\spt\aki-singleplayer.dll</HintPath>
+    </Reference>
     <Reference Include="Aki.Build, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Aki.Build.dll</HintPath>

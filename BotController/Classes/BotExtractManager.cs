@@ -57,6 +57,11 @@ namespace SAIN.Components.BotController
 
         private bool GetExfilControl()
         {
+            if (Singleton<AbstractGame>.Instance?.GameTimer == null)
+            {
+                return false;
+            }
+
             if (ExfilController == null)
             {
                 ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
@@ -300,23 +305,19 @@ namespace SAIN.Components.BotController
 
         public void CheckTimeRemaining()
         {
-            var GameTime = Singleton<AbstractGame>.Instance?.GameTimer;
-            if (GameTime?.StartDateTime != null && GameTime?.EscapeDateTime != null)
-            {
-                var StartTime = GameTime.StartDateTime.Value;
-                var EscapeTime = GameTime.EscapeDateTime.Value;
-                var Span = EscapeTime - StartTime;
-                TotalRaidTime = (float)Span.TotalSeconds;
-                TimeRemaining = EscapeTimeSeconds(GameTime);
-                float ratio = TimeRemaining / TotalRaidTime;
-                PercentageRemaining = Mathf.Round(ratio * 100f);
-            }
-        }
+            TotalRaidTime = Aki.SinglePlayer.Utils.InRaid.RaidChangesUtil.OriginalEscapeTimeSeconds;
 
-        public float EscapeTimeSeconds(GameTimerClass timer)
-        {
-            DateTime? escapeDateTime = timer.EscapeDateTime;
-            return (float)((escapeDateTime != null) ? (escapeDateTime.Value - HelpersGClass.UtcNow) : TimeSpan.MaxValue).TotalSeconds;
+            //if (Aki.SinglePlayer.Utils.InRaid.RaidTimeUtil.HasRaidStarted())
+            if (Singleton<AbstractGame>.Instance.GameTimer.Started())
+            {
+                TimeRemaining = Aki.SinglePlayer.Utils.InRaid.RaidTimeUtil.GetRemainingRaidSeconds();
+                PercentageRemaining = Aki.SinglePlayer.Utils.InRaid.RaidTimeUtil.GetRaidTimeRemainingFraction() * 100;
+            }
+            else
+            {
+                TimeRemaining = Aki.SinglePlayer.Utils.InRaid.RaidChangesUtil.NewEscapeTimeSeconds;
+                PercentageRemaining = 100f * TimeRemaining / TotalRaidTime;
+            }
         }
     }
 }
