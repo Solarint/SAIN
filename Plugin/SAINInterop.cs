@@ -12,9 +12,10 @@ namespace SAIN.Plugin
 {
     internal static class SAINInterop
     {
-        private static bool _IsSAINLoaded;
         private static bool _SAINLoadedChecked = false;
+        private static bool _SAINInteropInited = false;
 
+        private static bool _IsSAINLoaded;
         private static Type _SAINExternalType;
         private static MethodInfo _ExtractBotMethod;
 
@@ -23,10 +24,11 @@ namespace SAIN.Plugin
          */
         public static bool IsSAINLoaded()
         {
+            // Only check for SAIN once
             if (!_SAINLoadedChecked)
             {
-                _IsSAINLoaded = Chainloader.PluginInfos.ContainsKey("me.sol.sain");
                 _SAINLoadedChecked = true;
+                _IsSAINLoaded = Chainloader.PluginInfos.ContainsKey("me.sol.sain");
             }
 
             return _IsSAINLoaded;
@@ -37,18 +39,24 @@ namespace SAIN.Plugin
          */
         public static bool Init()
         {
-            if (!IsSAINLoaded())
-            {
-                return false;
-            }
+            if (!IsSAINLoaded()) return false;
 
-            if (_SAINExternalType == null)
+            // Only check for the External class once
+            if (!_SAINInteropInited)
             {
+                _SAINInteropInited = true;
+
                 _SAINExternalType = Type.GetType("SAIN.Plugin.External, SAIN");
-                _ExtractBotMethod = AccessTools.Method(_SAINExternalType, "ExtractBot");
+
+                // Only try to get the methods if we have the type
+                if (_SAINExternalType != null)
+                {
+                    _ExtractBotMethod = AccessTools.Method(_SAINExternalType, "ExtractBot");
+                }
             }
 
-            return true;
+            // If we found the External class, atleast some of the methods are (probably) available
+            return (_SAINExternalType != null);
         }
 
         /**
@@ -57,6 +65,7 @@ namespace SAIN.Plugin
         public static bool ExtractBot(BotOwner botOwner)
         {
             if (!Init()) return false;
+            if (_ExtractBotMethod == null) return false;
 
             return (bool)_ExtractBotMethod.Invoke(null, new object[] { botOwner });
         }
