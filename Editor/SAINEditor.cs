@@ -19,7 +19,6 @@ namespace SAIN.Editor
         static SAINEditor()
         {
             ConsoleScreen.Processor.RegisterCommand("saineditor", new Action(ToggleGUI));
-            ConsoleScreen.Processor.RegisterCommand("pausegame", new Action(TogglePause));
         }
 
         public static void Init()
@@ -27,8 +26,6 @@ namespace SAIN.Editor
             CursorSettings.InitCursor();
         }
 
-        public static bool GameIsPaused { get; private set; }
-        public static bool PauseOnEditorOpen => PresetHandler.EditorDefaults.PauseOnEditorOpen;
         public static bool AdvancedBotConfigs => PresetHandler.EditorDefaults.AdvancedBotConfigs;
 
         [ConsoleCommand("Toggle SAIN GUI Editor")]
@@ -38,36 +35,9 @@ namespace SAIN.Editor
         }
 
         private static float CheckKeyLimiter;
-
-        private static void TogglePause()
-        {
-            Player mainPlayer = Singleton<GameWorld>.Instance?.MainPlayer;
-            if (mainPlayer?.HandsAnimator != null)
-            {
-                GameIsPaused = !GameIsPaused;
-                if (GameIsPaused)
-                {
-                    ConsoleScreen.Log("Pausing Game...");
-
-                    Time.timeScale = 0f;
-                    mainPlayer.HandsAnimator.SetAnimationSpeed(0f);
-                }
-                else
-                {
-                    Time.timeScale = 1f;
-                    mainPlayer.HandsAnimator.SetAnimationSpeed(1f);
-                }
-            }
-            else
-            {
-                GameIsPaused = false;
-            }
-        }
-
         public static bool ShiftKeyPressed;
         public static bool CtrlKeyPressed;
         private static bool ToggleKeyPressed;
-        private static bool PauseKeyPressed;
         private static bool EscapeKeyPressed;
 
         private static void CheckKeys()
@@ -78,7 +48,6 @@ namespace SAIN.Editor
                 ShiftKeyPressed = Input.GetKey(KeyCode.LeftShift);
                 CtrlKeyPressed = Input.GetKey(KeyCode.LeftControl);
                 ToggleKeyPressed = Input.GetKeyDown(SAINPlugin.OpenEditorConfigEntry.Value.MainKey);
-                PauseKeyPressed = Input.GetKeyDown(SAINPlugin.PauseConfigEntry.Value.MainKey);
                 EscapeKeyPressed = Input.GetKeyDown(KeyCode.Escape);
             }
         }
@@ -94,10 +63,6 @@ namespace SAIN.Editor
                 CheckKeys();
             }
 
-            if (SAINPlugin.PauseConfigEntry.Value.IsDown())
-            {
-                TogglePause();
-            }
             if ((SAINPlugin.OpenEditorConfigEntry.Value.IsDown() && !DisplayingWindow) || SAINPlugin.OpenEditorButton.Value)
             {
                 if (SAINPlugin.OpenEditorButton.Value)
@@ -182,9 +147,6 @@ namespace SAIN.Editor
 
         public static string ExceptionString = string.Empty;
 
-        private static readonly GUIContent PauseContent = new GUIContent
-                ("Pause When Open", "Automatically Pause the game when this GUI is open while in-game.");
-
         private static readonly GUIContent SaveContent = new GUIContent
                 ("Save All Changes", $"Export All Changes to SAIN/Presets/{SAINPlugin.LoadedPreset.Info.Name}");
 
@@ -196,14 +158,6 @@ namespace SAIN.Editor
             {
                 PlaySound(EUISoundType.InsuranceInsured);
                 SAINPlugin.LoadedPreset.ExportAll();
-            }
-
-            var defaults = PresetHandler.EditorDefaults;
-            bool oldValue = defaults.PauseOnEditorOpen;
-            defaults.PauseOnEditorOpen = GUI.Toggle(PauseRect, PauseOnEditorOpen, PauseContent, GetStyle(Style.toggle));
-            if (oldValue != defaults.PauseOnEditorOpen)
-            {
-                PlaySound(EUISoundType.ButtonClick);
             }
 
             if (GUI.Button(ExitRect, "X", style))

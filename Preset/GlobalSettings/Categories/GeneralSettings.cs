@@ -99,5 +99,10 @@ namespace SAIN.Preset.GlobalSettings
         [Description("Experimental, will move bot's aiming target if it ends up on the player's head. NOT FOOLPROOF. It's more of a strong suggestion rather than a hard limit. If you find you are dying to headshots too frequently still, I recommend increasing your head health with another mod.")]
         [Default(false)]
         public bool HeadShotProtection = false;
+
+        [Name("Disable Talking Patches")]
+        [Description("Disable all SAIN based handling of bot talking. No more squad chatter, no more quiet bots, completely disables SAIN's handling of bot voices")]
+        [Default(false)]
+        public bool DisableBotTalkPatching = false;
     }
 }

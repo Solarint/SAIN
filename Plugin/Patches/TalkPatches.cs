@@ -26,6 +26,12 @@ namespace SAIN.Patches.Talk
         [PatchPrefix]
         public static bool PatchPrefix(ref Player __instance, ref EPhraseTrigger @event, ref ETagStatus mask, ref bool aggressive)
         {
+            // If handling of bots talking is disabled, let the original method run
+            if (SAINPlugin.LoadedPreset.GlobalSettings.General.DisableBotTalkPatching)
+            {
+                return true;
+            }
+
             if (__instance.HealthController?.IsAlive == false)
             {
                 return false;
@@ -84,6 +90,12 @@ namespace SAIN.Patches.Talk
         [PatchPrefix]
         public static bool PatchPrefix(ref BotOwner ___botOwner_0, EPhraseTrigger type, ETagStatus? additionalMask = null)
         {
+            // If handling of bots talking is disabled, let the original method run
+            if (SAINPlugin.LoadedPreset.GlobalSettings.General.DisableBotTalkPatching)
+            {
+                return true;
+            }
+
             if (___botOwner_0.HealthController?.IsAlive == false)
             {
                 return false;
@@ -106,6 +118,12 @@ namespace SAIN.Patches.Talk
         [PatchPrefix]
         public static bool PatchPrefix()
         {
+            // If handling of bots talking is disabled, let the original method run
+            if (SAINPlugin.LoadedPreset.GlobalSettings.General.DisableBotTalkPatching)
+            {
+                return true;
+            }
+
             return false;
         }
     }
@@ -123,6 +141,12 @@ namespace SAIN.Patches.Talk
         [PatchPrefix]
         public static bool PatchPrefix()
         {
+            // If handling of bots talking is disabled, let the original method run
+            if (SAINPlugin.LoadedPreset.GlobalSettings.General.DisableBotTalkPatching)
+            {
+                return true;
+            }
+
             return false;
         }
     }
@@ -140,6 +164,12 @@ namespace SAIN.Patches.Talk
         [PatchPrefix]
         public static bool PatchPrefix()
         {
+            // If handling of bots talking is disabled, let the original method run
+            if (SAINPlugin.LoadedPreset.GlobalSettings.General.DisableBotTalkPatching)
+            {
+                return true;
+            }
+
             return false;
         }
     }

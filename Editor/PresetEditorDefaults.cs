@@ -20,8 +20,6 @@ namespace SAIN.Editor
         public string SelectedPreset;
         [Hidden]
         public string DefaultPreset;
-        [Hidden]
-        public bool PauseOnEditorOpen;
 
         [Name("Advanced Bot Configs")]
         [Default(false)]

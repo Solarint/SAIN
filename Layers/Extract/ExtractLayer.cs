@@ -24,7 +24,7 @@ namespace SAIN.Layers
                 return false;
             }
 
-            return ExtractFromTime() || ExtractFromInjury() || ExtractFromLoot();
+            return ExtractFromTime() || ExtractFromInjury() || ExtractFromLoot() || ExtractFromExternal();
         }
 
         private bool ExtractFromTime()
@@ -73,6 +73,11 @@ namespace SAIN.Layers
         private bool ExtractFromLoot()
         {
             return false;
+        }
+
+        private bool ExtractFromExternal()
+        {
+            return SAIN.Info.ForceExtract;
         }
 
         private bool Logged = false;
