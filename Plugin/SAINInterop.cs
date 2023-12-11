@@ -62,7 +62,7 @@ namespace SAIN.Plugin
         /**
          * Force a bot into the Extract layer if SAIN is loaded. Return true if the bot was set to extract
          */
-        public static bool ExtractBot(BotOwner botOwner)
+        public static bool TryExtractBot(BotOwner botOwner)
         {
             if (!Init()) return false;
             if (_ExtractBotMethod == null) return false;
