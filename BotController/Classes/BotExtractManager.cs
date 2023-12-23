@@ -180,6 +180,12 @@ namespace SAIN.Components.BotController
                 {
                     if (ex != null && ex.isActiveAndEnabled && !ValidScavExfils.ContainsKey(ex))
                     {
+                        if (ex.Status == EExfiltrationStatus.NotPresent)
+                        {
+                            //Logger.LogInfo($"Extraction {ex.Settings.Name} is unavailable");
+                            continue;
+                        }
+
                         if (ex.TryGetComponent<Collider>(out var collider))
                         {
                             if (bot.Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true, 3f))
@@ -199,6 +205,12 @@ namespace SAIN.Components.BotController
                         // ex.isActiveAndEnabled && 
                         if (ex != null && !ValidExfils.ContainsKey(ex))
                         {
+                            if (ex.Status == EExfiltrationStatus.NotPresent)
+                            {
+                                //Logger.LogInfo($"Extraction {ex.Settings.Name} is unavailable");
+                                continue;
+                            }
+
                             if (ex.TryGetComponent<Collider>(out var collider))
                             {
                                 if (bot.Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
@@ -208,13 +220,13 @@ namespace SAIN.Components.BotController
                                 else
                                 {
                                     if (SAINPlugin.DebugMode)
-                                        Logger.LogWarning($"Could not find valid path to {ex.name}");
+                                        Logger.LogWarning($"Could not find valid path to {ex.Settings.Name}");
                                 }
                             }
                             else
                             {
                                 if (SAINPlugin.DebugMode)
-                                    Logger.LogWarning($"Could not find collider for {ex.name}");
+                                    Logger.LogWarning($"Could not find collider for {ex.Settings.Name}");
                             }
                         }
                         else if (ex == null)
