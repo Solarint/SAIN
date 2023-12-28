@@ -7,11 +7,16 @@ using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.SubComponents;
 using SAIN.SAINComponent;
 using Systems.Effects;
+using EFT.Interactive;
+using System.Linq;
+using SAIN.Components.BotController;
 
 namespace SAIN.Layers
 {
     internal class ExtractAction : SAINAction
     {
+        public static float MinDistanceToStartExtract { get; } = 6f;
+
         private static readonly string Name = typeof(ExtractAction).Name;
         public ExtractAction(BotOwner bot) : base(bot, Name)
         {
@@ -87,11 +92,11 @@ namespace SAIN.Layers
 
         private void MoveToExtract(float distance, Vector3 point)
         {
-            if (distance > 12f)
+            if (distance > MinDistanceToStartExtract * 2)
             {
                 ExtractStarted = false;
             }
-            if (distance < 6f)
+            if (distance < MinDistanceToStartExtract)
             {
                 ExtractStarted = true;
             }
@@ -118,10 +123,12 @@ namespace SAIN.Layers
         {
             if (ExtractTimer == -1f)
             {
-                float timer = SAIN.Memory.ExfilPoint.Settings.ExfiltrationTime;
-                ExtractTimer = Time.time + timer;
+                ExtractTimer = BotExtractManager.GetExfilTime(SAIN.Memory.ExfilPoint);
+                float timeRemaining = ExtractTimer - Time.time;
 
-                Logger.LogInfo($"{BotOwner.name} Starting Extract Timer of {timer}");
+                activateExfil(SAIN.Memory.ExfilPoint);
+
+                Logger.LogInfo($"{BotOwner.name} Starting Extract Timer of {timeRemaining}");
             }
 
             if (ExtractTimer < Time.time)
@@ -137,6 +144,33 @@ namespace SAIN.Layers
                 botgame.BotsController.DestroyInfo(player);
                 Object.DestroyImmediate(BotOwner.gameObject);
                 Object.Destroy(BotOwner);
+            }
+        }
+
+        private void activateExfil(ExfiltrationPoint exfil)
+        {
+            /*if (!exfil.Requirements.Any(x => x.Requirement == ERequirementState.TransferItem))
+            {
+                return;
+            }*/
+
+            exfil.OnItemTransferred(SAIN.Player);
+
+            if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
+            {
+                switch (exfil.Settings.ExfiltrationType)
+                {
+                    case EExfiltrationType.Individual:
+                        exfil.SetStatusLogged(EExfiltrationStatus.RegularMode, "Proceed-3");
+                        break;
+                    case EExfiltrationType.SharedTimer:
+                        exfil.SetStatusLogged(EExfiltrationStatus.Countdown, "Proceed-1");
+                        Logger.LogInfo($"bot {SAIN.name} has started the VEX exfil");
+                        break;
+                    case EExfiltrationType.Manual:
+                        exfil.SetStatusLogged(EExfiltrationStatus.AwaitsManualActivation, "Proceed-2");
+                        break;
+                }
             }
         }
 

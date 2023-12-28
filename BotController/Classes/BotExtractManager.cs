@@ -20,30 +20,81 @@ namespace SAIN.Components.BotController
         public ExfiltrationControllerClass ExfilController { get; private set; }
         public float TotalRaidTime { get; private set; }
 
+        private static Dictionary<ExfiltrationPoint, float> exfilActivationTimes = new Dictionary<ExfiltrationPoint, float>();
+
         public void Update()
         {
-            if (GetExfilControl())
+            if (!GetExfilControl())
             {
-                if (CheckExtractTimer < Time.time)
+                if (exfilActivationTimes.Count > 0)
                 {
-                    CheckExtractTimer = Time.time + 5f;
-                    CheckTimeRemaining();
-                    if (DebugCheckExfilTimer < Time.time)
-                    {
-                        DebugCheckExfilTimer = Time.time + 30f;
-                        Logger.LogInfo(
-                            $"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. " +
-                            $"Total Raid Seconds: [{TotalRaidTime}] " +
-                            $"Found: [{ValidScavExfils.Count}] ScavExfils and " +
-                            $"[{ValidExfils.Count}] PMC Exfils to be used."
-                            );
-                        // Logger.LogInfo(
-                        //     $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
-                        //     $"[{AllScavExfils?.Length}] Total Scav Exfils")
-                        //     ;
-                    }
+                    Logger.LogInfo("Clearing exfil times...");
+                }
+
+                exfilActivationTimes.Clear();
+
+                return;
+            }
+
+            if (CheckExtractTimer < Time.time)
+            {
+                CheckExtractTimer = Time.time + 5f;
+                CheckTimeRemaining();
+                if (DebugCheckExfilTimer < Time.time)
+                {
+                    DebugCheckExfilTimer = Time.time + 30f;
+                    Logger.LogInfo(
+                        $"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. " +
+                        $"Total Raid Seconds: [{TotalRaidTime}] " +
+                        $"Found: [{ValidScavExfils.Count}] ScavExfils and " +
+                        $"[{ValidExfils.Count}] PMC Exfils to be used."
+                        );
+                    // Logger.LogInfo(
+                    //     $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
+                    //     $"[{AllScavExfils?.Length}] Total Scav Exfils")
+                    //     ;
                 }
             }
+        }
+
+        public static bool HasExfilBeenActivated(ExfiltrationPoint exfil)
+        {
+            return exfilActivationTimes.ContainsKey(exfil);
+        }
+
+        public static float GetTimeRemainingForExfil(ExfiltrationPoint exfil)
+        {
+            if (!HasExfilBeenActivated(exfil))
+            {
+                return float.MaxValue;
+            }
+
+            return Math.Max(0, exfilActivationTimes[exfil] - Time.time);
+        }
+
+        public static float GetExfilTime(ExfiltrationPoint exfil)
+        {
+            if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
+            {
+                if (exfilActivationTimes.ContainsKey(exfil))
+                {
+                    exfilActivationTimes.Remove(exfil);
+                }
+            }
+
+            if (exfilActivationTimes.ContainsKey(exfil))
+            {
+                return exfilActivationTimes[exfil];
+            }
+
+            float exfilTime = Time.time + exfil.Settings.ExfiltrationTime + 0.5f;
+
+            if (exfil.Settings.ExfiltrationType == EExfiltrationType.SharedTimer)
+            {
+                exfilActivationTimes.Add(exfil, exfilTime);
+            }
+
+            return exfilTime;
         }
 
         private bool GetExfilControl()
@@ -188,8 +239,6 @@ namespace SAIN.Components.BotController
                         // ex.isActiveAndEnabled && 
                         if (ex != null && !ValidExfils.ContainsKey(ex))
                         {
-                            testExfil(ex, bot);
-                            
                             if (ex.TryGetComponent<Collider>(out var collider))
                             {
                                 if (bot.Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
@@ -218,33 +267,6 @@ namespace SAIN.Components.BotController
             }
         }
 
-        private static void testExfil(ExfiltrationPoint exfil, SAINComponentClass bot)
-        {
-            if (!exfil.Requirements.Any(x => x.Requirement == ERequirementState.TransferItem))
-            {
-                return;
-            }
-
-            exfil.OnItemTransferred(bot.Player);
-
-            if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
-            {
-                switch (exfil.Settings.ExfiltrationType)
-                {
-                    case EExfiltrationType.Individual:
-                        exfil.SetStatusLogged(EExfiltrationStatus.RegularMode, "Proceed-3");
-                        break;
-                    case EExfiltrationType.SharedTimer:
-                        exfil.SetStatusLogged(EExfiltrationStatus.Countdown, "Proceed-1");
-                        Logger.LogInfo($"bot {bot.name} has started the VEX exfil");
-                        break;
-                    case EExfiltrationType.Manual:
-                        exfil.SetStatusLogged(EExfiltrationStatus.AwaitsManualActivation, "Proceed-2");
-                        break;
-                }
-            }
-        }
-
         public static void AssignExfil(SAINComponentClass bot)
         {
             if (bot?.Info?.Profile.IsScav == true)
@@ -261,10 +283,16 @@ namespace SAIN.Components.BotController
         {
             if (validExfils.Count > 0)
             {
-                KeyValuePair<T, Vector3> selectedExfil = validExfils
+                IDictionary<T, Vector3> possibleExfils = validExfils
                     .Where(x => CanUseExtract(x.Key))
-                    .PickRandom();
-                
+                    .ToDictionary(x => x.Key, x=> x.Value);
+
+                if (!possibleExfils.Any())
+                {
+                    return null;
+                }
+
+                KeyValuePair<T, Vector3> selectedExfil = possibleExfils.Random();
                 bot.Memory.ExfilPosition = selectedExfil.Value;
 
                 Logger.LogInfo($"bot {bot.name} will extract at {selectedExfil.Key.Settings.Name}");
@@ -295,6 +323,16 @@ namespace SAIN.Components.BotController
             }
 
             if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.Train))
+            {
+                return false;
+            }
+
+            if (GetTimeRemainingForExfil(exfil) < 3)
+            {
+                return false;
+            }
+
+            if (!exfil.Requirements.Any(x => x.Requirement == ERequirementState.TransferItem))
             {
                 return false;
             }
