@@ -118,7 +118,7 @@ namespace SAIN.Layers
         {
             if (ExtractTimer == -1f)
             {
-                float timer = 5f * Random.Range(0.75f, 1.5f);
+                float timer = SAIN.Memory.ExfilPoint.Settings.ExfiltrationTime;
                 ExtractTimer = Time.time + timer;
 
                 Logger.LogInfo($"{BotOwner.name} Starting Extract Timer of {timer}");
@@ -126,7 +126,7 @@ namespace SAIN.Layers
 
             if (ExtractTimer < Time.time)
             {
-                Logger.LogInfo($"{BotOwner.name} Extracted at {point} at {System.DateTime.UtcNow}");
+                Logger.LogInfo($"{BotOwner.name} Extracted at {point} for extract {SAIN.Memory.ExfilPoint.Settings.Name} at {System.DateTime.UtcNow}");
 
                 var botgame = Singleton<IBotGame>.Instance;
                 Player player = SAIN.Player;

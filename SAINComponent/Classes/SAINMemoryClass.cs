@@ -1,4 +1,5 @@
 ﻿using EFT;
+using EFT.Interactive;
 using SAIN.SAINComponent.Classes.Decision;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,7 @@ namespace SAIN.SAINComponent.Classes
         private float UpdateHealthTimer = 0f;
 
         public Vector3? ExfilPosition { get; set; }
+        public ExfiltrationPoint ExfilPoint { get; set; }
         public bool CannotExfil { get; set; }
 
         public bool Healthy => HealthStatus == ETagStatus.Healthy;

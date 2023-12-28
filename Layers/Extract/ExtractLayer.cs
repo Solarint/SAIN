@@ -1,4 +1,5 @@
 ﻿using EFT;
+using SAIN.Components.BotController;
 
 namespace SAIN.Layers
 {
@@ -19,12 +20,23 @@ namespace SAIN.Layers
         {
             if (SAIN == null) return false;
 
-            if (SAIN.Memory.ExfilPosition == null || !SAIN.Info.FileSettings.Mind.EnableExtracts)
+            if (!SAIN.Info.FileSettings.Mind.EnableExtracts)
             {
                 return false;
             }
 
-            return ExtractFromTime() || ExtractFromInjury() || ExtractFromLoot() || ExtractFromExternal();
+            if (!ExtractFromTime() && !ExtractFromInjury() && !ExtractFromLoot() && !ExtractFromExternal())
+            {
+                return false;
+            }
+
+            if (SAIN.Memory.ExfilPosition == null)
+            {
+                BotExtractManager.TryFindExfilForBot(SAIN);
+                return false;
+            }
+
+            return true;
         }
 
         private bool ExtractFromTime()
