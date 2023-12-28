@@ -32,23 +32,24 @@ namespace SAIN.Layers
 
             if (SAIN.Memory.ExfilPosition == null)
             {
-                BotExtractManager.TryFindExfilForBot(SAIN);
+                BotController.BotExtractManager.TryFindExfilForBot(SAIN);
                 return false;
             }
 
-            if (BotExtractManager.GetTimeRemainingForExfil(SAIN.Memory.ExfilPoint) == 0)
+            if (!BotController.BotExtractManager.CanUseExtract(SAIN.Memory.ExfilPoint) && !IsInExtractArea())
             {
-                float distance = (BotOwner.Position - SAIN.Memory.ExfilPosition.Value).sqrMagnitude;
-
-                if (distance > ExtractAction.MinDistanceToStartExtract)
-                {
-                    SAIN.Memory.ExfilPoint = null;
-                    SAIN.Memory.ExfilPosition = null;
-                    return false;
-                }
+                SAIN.Memory.ExfilPoint = null;
+                SAIN.Memory.ExfilPosition = null;
+                return false;
             }
 
             return true;
+        }
+
+        private bool IsInExtractArea()
+        {
+            float distance = (BotOwner.Position - SAIN.Memory.ExfilPosition.Value).sqrMagnitude;
+            return distance < ExtractAction.MinDistanceToStartExtract;
         }
 
         private bool ExtractFromTime()

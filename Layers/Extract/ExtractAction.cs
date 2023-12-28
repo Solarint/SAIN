@@ -123,7 +123,7 @@ namespace SAIN.Layers
         {
             if (ExtractTimer == -1f)
             {
-                ExtractTimer = BotExtractManager.GetExfilTime(SAIN.Memory.ExfilPoint);
+                ExtractTimer = BotController.BotExtractManager.GetExfilTime(SAIN.Memory.ExfilPoint);
                 float timeRemaining = ExtractTimer - Time.time;
 
                 activateExfil(SAIN.Memory.ExfilPoint);

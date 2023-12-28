@@ -20,17 +20,7 @@ namespace SAIN.Components.BotController
         public ExfiltrationControllerClass ExfilController { get; private set; }
         public float TotalRaidTime { get; private set; }
 
-        private static Dictionary<ExfiltrationPoint, float> exfilActivationTimes = new Dictionary<ExfiltrationPoint, float>();
-
-        public void Awake()
-        {
-            Logger.LogInfo("Clearing exfil data...");
-            AllExfils = null;
-            AllScavExfils = null;
-            ValidExfils.Clear();
-            ValidScavExfils.Clear();
-            exfilActivationTimes.Clear();
-        }
+        private Dictionary<ExfiltrationPoint, float> exfilActivationTimes = new Dictionary<ExfiltrationPoint, float>();
 
         public void Update()
         {
@@ -60,7 +50,7 @@ namespace SAIN.Components.BotController
             }
         }
 
-        public static bool HasExfilBeenActivated(ExfiltrationPoint exfil)
+        public bool HasExfilBeenActivated(ExfiltrationPoint exfil)
         {
             if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
             {
@@ -73,7 +63,7 @@ namespace SAIN.Components.BotController
             return exfilActivationTimes.ContainsKey(exfil);
         }
 
-        public static float GetTimeRemainingForExfil(ExfiltrationPoint exfil)
+        public float GetTimeRemainingForExfil(ExfiltrationPoint exfil)
         {
             if (!HasExfilBeenActivated(exfil))
             {
@@ -83,7 +73,7 @@ namespace SAIN.Components.BotController
             return Math.Max(0, exfilActivationTimes[exfil] - Time.time);
         }
 
-        public static float GetExfilTime(ExfiltrationPoint exfil)
+        public float GetExfilTime(ExfiltrationPoint exfil)
         {
             if (HasExfilBeenActivated(exfil))
             {
@@ -134,13 +124,13 @@ namespace SAIN.Components.BotController
         }
 
         private float DebugCheckExfilTimer = 0f;
-        public static ScavExfiltrationPoint[] AllScavExfils { get; private set; }
-        public static Dictionary<ScavExfiltrationPoint, Vector3> ValidScavExfils { get; private set; } = new Dictionary<ScavExfiltrationPoint, Vector3>();
+        public ScavExfiltrationPoint[] AllScavExfils { get; private set; }
+        public Dictionary<ScavExfiltrationPoint, Vector3> ValidScavExfils { get; private set; } = new Dictionary<ScavExfiltrationPoint, Vector3>();
 
-        public static ExfiltrationPoint[] AllExfils { get; private set; }
-        public static Dictionary<ExfiltrationPoint, Vector3> ValidExfils { get; private set; } = new Dictionary<ExfiltrationPoint, Vector3>();
+        public ExfiltrationPoint[] AllExfils { get; private set; }
+        public Dictionary<ExfiltrationPoint, Vector3> ValidExfils { get; private set; } = new Dictionary<ExfiltrationPoint, Vector3>();
 
-        public static bool TryFindExfilForBot(SAINComponentClass bot)
+        public bool TryFindExfilForBot(SAINComponentClass bot)
         {
             if (AllExfils.Length == 0)
             {
@@ -229,7 +219,7 @@ namespace SAIN.Components.BotController
             return false;
         }
 
-        private static bool TryFindExfils(SAINComponentClass bot)
+        private bool TryFindExfils(SAINComponentClass bot)
         {
             if (bot == null)
             {
@@ -294,7 +284,7 @@ namespace SAIN.Components.BotController
             return false;
         }
 
-        public static bool TryAssignExfil(SAINComponentClass bot)
+        public bool TryAssignExfil(SAINComponentClass bot)
         {
             if (bot?.Info?.Profile.IsScav == true)
             {
@@ -308,40 +298,38 @@ namespace SAIN.Components.BotController
             return bot.Memory.ExfilPoint != null;
         }
 
-        private static T selectExfilForBot<T>(SAINComponentClass bot, IDictionary<T, Vector3> validExfils) where T: ExfiltrationPoint
+        private T selectExfilForBot<T>(SAINComponentClass bot, IDictionary<T, Vector3> validExfils) where T: ExfiltrationPoint
         {
-            if (validExfils.Count > 0)
-            {
-                IDictionary<T, Vector3> possibleExfils = validExfils
+            IDictionary<T, Vector3> possibleExfils = validExfils
                     .Where(x => CanUseExtract(x.Key))
-                    .ToDictionary(x => x.Key, x=> x.Value);
+                    .ToDictionary(x => x.Key, x => x.Value);
 
-                if (!possibleExfils.Any())
-                {
-                    return null;
-                }
-
-                KeyValuePair<T, Vector3> selectedExfil = possibleExfils.Random();
-                bot.Memory.ExfilPosition = selectedExfil.Value;
-
-                Logger.LogInfo($"bot {bot.name} will extract at {selectedExfil.Key.Settings.Name}");
-
-                return selectedExfil.Key;
-            }
-            else
+            if (!possibleExfils.Any())
             {
-                if (SAINPlugin.DebugMode)
+                //if (SAINPlugin.DebugMode)
                 {
-                    Logger.LogInfo("Valid PMC Exfils count is 0!");
+                    Logger.LogInfo($"Could not find any possible exfils for bot {bot.name}");
                 }
+
+                return null;
             }
 
-            return null;
+            KeyValuePair<T, Vector3> selectedExfil = possibleExfils.Random();
+            bot.Memory.ExfilPosition = selectedExfil.Value;
+
+            Logger.LogInfo($"bot {bot.name} will extract at {selectedExfil.Key.Settings.Name}");
+
+            return selectedExfil.Key;
         }
 
-        public static bool CanUseExtract(ExfiltrationPoint exfil)
+        public bool CanUseExtract(ExfiltrationPoint exfil)
         {
             if (exfil.Status == EExfiltrationStatus.NotPresent)
+            {
+                return false;
+            }
+
+            if ((exfil.Status == EExfiltrationStatus.UncompleteRequirements) && (!exfil.Requirements.Any(x => x.Requirement == ERequirementState.TransferItem)))
             {
                 return false;
             }
@@ -353,7 +341,7 @@ namespace SAIN.Components.BotController
 
             if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.Train))
             {
-                return false;
+                //return false;
             }
 
             if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.WorldEvent))
@@ -361,21 +349,16 @@ namespace SAIN.Components.BotController
                 //return false;
             }
 
-            if (GetTimeRemainingForExfil(exfil) < 3)
+            if (GetTimeRemainingForExfil(exfil) < 1)
             {
-                Logger.LogInfo("Not enough time remaining for exfil");
-                return false;
-            }
-
-            if (!exfil.Requirements.Any(x => x.Requirement == ERequirementState.TransferItem))
-            {
+                Logger.LogInfo($"Not enough time remaining for exfil {exfil.Settings.Name}");
                 return false;
             }
 
             return true;
         }
 
-        public static bool TryAssignSquadExfil(SAINComponentClass bot)
+        public bool TryAssignSquadExfil(SAINComponentClass bot)
         {
             var squad = bot.Squad;
             if (squad.IAmLeader)
