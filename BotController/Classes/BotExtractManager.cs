@@ -22,17 +22,20 @@ namespace SAIN.Components.BotController
 
         private static Dictionary<ExfiltrationPoint, float> exfilActivationTimes = new Dictionary<ExfiltrationPoint, float>();
 
+        public void Awake()
+        {
+            Logger.LogInfo("Clearing exfil data...");
+            AllExfils = null;
+            AllScavExfils = null;
+            ValidExfils.Clear();
+            ValidScavExfils.Clear();
+            exfilActivationTimes.Clear();
+        }
+
         public void Update()
         {
             if (!GetExfilControl())
             {
-                if (exfilActivationTimes.Count > 0)
-                {
-                    Logger.LogInfo("Clearing exfil times...");
-                }
-
-                exfilActivationTimes.Clear();
-
                 return;
             }
 
@@ -59,6 +62,14 @@ namespace SAIN.Components.BotController
 
         public static bool HasExfilBeenActivated(ExfiltrationPoint exfil)
         {
+            if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
+            {
+                if (exfilActivationTimes.ContainsKey(exfil))
+                {
+                    exfilActivationTimes.Remove(exfil);
+                }
+            }
+
             return exfilActivationTimes.ContainsKey(exfil);
         }
 
@@ -74,15 +85,7 @@ namespace SAIN.Components.BotController
 
         public static float GetExfilTime(ExfiltrationPoint exfil)
         {
-            if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
-            {
-                if (exfilActivationTimes.ContainsKey(exfil))
-                {
-                    exfilActivationTimes.Remove(exfil);
-                }
-            }
-
-            if (exfilActivationTimes.ContainsKey(exfil))
+            if (HasExfilBeenActivated(exfil))
             {
                 return exfilActivationTimes[exfil];
             }
@@ -139,6 +142,12 @@ namespace SAIN.Components.BotController
 
         public static bool TryFindExfilForBot(SAINComponentClass bot)
         {
+            if (AllExfils.Length == 0)
+            {
+                Logger.LogInfo($"Could not select exfil for {bot.name}; none found");
+                return false;
+            }
+
             if (bot != null && (bot.Info.Profile.IsPMC || bot.Info.Profile.IsScav))
             {
                 if (bot.Memory.CannotExfil)
@@ -166,14 +175,26 @@ namespace SAIN.Components.BotController
                     Logger.LogInfo($"Looking for Exfil for {bot.name}");
                 }
 
-                FindExfils(bot);
+                if (!TryFindExfils(bot))
+                {
+                    Logger.LogInfo($"Could not select exfil for {bot.name}; no valid ones found");
+                    return false;
+                }
+
                 if (bot.Squad.BotInGroup)
                 {
-                    AssignSquadExfil(bot);
+                    if (!TryAssignSquadExfil(bot))
+                    {
+                        //return false;
+                    }
                 }
                 else
                 {
-                    AssignExfil(bot);
+                    if (!TryAssignExfil(bot))
+                    {
+                        Logger.LogInfo($"Could not select exfil for {bot.name}; none available");
+                        //return false;
+                    }
                 }
 
                 if (bot.Memory.ExfilPosition == null)
@@ -208,11 +229,11 @@ namespace SAIN.Components.BotController
             return false;
         }
 
-        private static void FindExfils(SAINComponentClass bot)
+        private static bool TryFindExfils(SAINComponentClass bot)
         {
             if (bot == null)
             {
-                return;
+                return false;
             }
             if (bot.Info.Profile.IsScav && AllScavExfils != null)
             {
@@ -229,6 +250,8 @@ namespace SAIN.Components.BotController
                         }
                     }
                 }
+
+                return ValidScavExfils.Count > 0;
             }
             else
             {
@@ -263,11 +286,15 @@ namespace SAIN.Components.BotController
                                 Logger.LogWarning($"Exfil is null in list!");
                         }
                     }
+
+                    return ValidExfils.Count > 0;
                 }
             }
+
+            return false;
         }
 
-        public static void AssignExfil(SAINComponentClass bot)
+        public static bool TryAssignExfil(SAINComponentClass bot)
         {
             if (bot?.Info?.Profile.IsScav == true)
             {
@@ -277,6 +304,8 @@ namespace SAIN.Components.BotController
             {
                 bot.Memory.ExfilPoint = selectExfilForBot(bot, ValidExfils);
             }
+
+            return bot.Memory.ExfilPoint != null;
         }
 
         private static T selectExfilForBot<T>(SAINComponentClass bot, IDictionary<T, Vector3> validExfils) where T: ExfiltrationPoint
@@ -327,8 +356,14 @@ namespace SAIN.Components.BotController
                 return false;
             }
 
+            if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.WorldEvent))
+            {
+                //return false;
+            }
+
             if (GetTimeRemainingForExfil(exfil) < 3)
             {
+                Logger.LogInfo("Not enough time remaining for exfil");
                 return false;
             }
 
@@ -340,14 +375,17 @@ namespace SAIN.Components.BotController
             return true;
         }
 
-        public static void AssignSquadExfil(SAINComponentClass bot)
+        public static bool TryAssignSquadExfil(SAINComponentClass bot)
         {
             var squad = bot.Squad;
             if (squad.IAmLeader)
             {
                 if (bot.Memory.ExfilPosition == null)
                 {
-                    AssignExfil(bot);
+                    if (!TryAssignExfil(bot))
+                    {
+                        return false;
+                    }
                 }
                 if (bot.Memory.ExfilPosition != null)
                 {
@@ -379,6 +417,7 @@ namespace SAIN.Components.BotController
                 bot.Memory.ExfilPosition = squad.LeaderComponent?.Memory.ExfilPosition;
             }
 
+            return bot.Memory.ExfilPoint != null;
         }
 
         private float CheckExtractTimer = 0f;
