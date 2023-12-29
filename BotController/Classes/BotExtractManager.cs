@@ -422,6 +422,8 @@ namespace SAIN.Components.BotController
                                 {
                                     member.Value.Memory.ExfilPosition = bot.Memory.ExfilPosition;
                                 }
+
+                                member.Value.Memory.ExfilPoint = bot.Memory.ExfilPoint;
                             }
                         }
                     }
@@ -433,7 +435,7 @@ namespace SAIN.Components.BotController
                 bot.Memory.ExfilPosition = squad.LeaderComponent?.Memory.ExfilPosition;
             }
 
-            return bot.Memory.ExfilPoint != null;
+            return (bot.Memory.ExfilPosition != null) && (bot.Memory.ExfilPoint != null);
         }
 
         private float CheckExtractTimer = 0f;
