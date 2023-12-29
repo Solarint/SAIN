@@ -1,6 +1,5 @@
 ﻿using EFT;
-using SAIN.Components.BotController;
-using SAIN.Layers.Combat.Solo;
+using UnityEngine.UIElements;
 
 namespace SAIN.Layers
 {
@@ -22,6 +21,11 @@ namespace SAIN.Layers
             if (SAIN == null) return false;
 
             if (!SAIN.Info.FileSettings.Mind.EnableExtracts)
+            {
+                return false;
+            }
+
+            if (!BotController.BotExtractManager.IsBotAllowedToExfil(SAIN))
             {
                 return false;
             }

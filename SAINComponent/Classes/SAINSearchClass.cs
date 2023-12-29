@@ -188,7 +188,7 @@ namespace SAIN.SAINComponent.Classes
         private Vector3 NextCorner()
         {
             int i = Index;
-            if (Path.corners.Length < i)
+            if (Path.corners.Length > i)
             {
                 Index++;
                 return Path.corners[i];
