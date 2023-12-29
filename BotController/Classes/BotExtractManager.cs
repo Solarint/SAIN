@@ -31,40 +31,36 @@ namespace SAIN.Components.BotController
                 return;
             }
 
-            if (CheckExtractTimer < Time.time)
+            if (CheckExtractTimer > Time.time)
             {
-                CheckExtractTimer = Time.time + 5f;
-                CheckTimeRemaining();
-                if (DebugCheckExfilTimer < Time.time)
-                {
-                    DebugCheckExfilTimer = Time.time + 30f;
-                    Logger.LogInfo(
-                        $"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. " +
-                        $"Total Raid Seconds: [{TotalRaidTime}] " +
-                        $"Found: [{ValidScavExfils.Count}] ScavExfils and " +
-                        $"[{ValidExfils.Count}] PMC Exfils to be used."
-                        );
-                    // Logger.LogInfo(
-                    //     $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
-                    //     $"[{AllScavExfils?.Length}] Total Scav Exfils")
-                    //     ;
-                }
+                return;
+            }
 
-                if (Bots == null)
-                {
-                    return;
-                }
+            CheckExtractTimer = Time.time + 5f;
 
-                foreach (string botKey in Bots.Keys)
-                {
-                    TryFindExfils(Bots[botKey]);
-                }
+            CheckTimeRemaining();
+            TryFindExfilsForAllBots();
+
+            if (DebugCheckExfilTimer < Time.time)
+            {
+                DebugCheckExfilTimer = Time.time + 30f;
+                Logger.LogInfo(
+                    $"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. " +
+                    $"Total Raid Seconds: [{TotalRaidTime}] " +
+                    $"Found: [{ValidScavExfils.Count}] ScavExfils and " +
+                    $"[{ValidExfils.Count}] PMC Exfils to be used."
+                    );
+                // Logger.LogInfo(
+                //     $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
+                //     $"[{AllScavExfils?.Length}] Total Scav Exfils")
+                //     ;
             }
         }
 
         public bool HasExfilBeenActivated(ExfiltrationPoint exfil)
         {
-            if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
+            // If all bots who paid for the car extract die, it will no longer leave. Therefore, the common extract time needs to be removed.
+            if ((exfil.Settings.ExfiltrationType == EExfiltrationType.SharedTimer) && (exfil.Status == EExfiltrationStatus.UncompleteRequirements))
             {
                 if (exfilActivationTimes.ContainsKey(exfil))
                 {
@@ -94,6 +90,13 @@ namespace SAIN.Components.BotController
 
             float exfilTime = Time.time + exfil.Settings.ExfiltrationTime + 0.5f;
 
+            // Trains are blacklisted right now, so this is just to protect for future changes
+            if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.Train))
+            {
+                return exfilTime;
+            }
+
+            // Store the exfil time for car extracts so all bots who pay leave at the same time
             if (exfil.Settings.ExfiltrationType == EExfiltrationType.SharedTimer)
             {
                 exfilActivationTimes.Add(exfil, exfilTime);
@@ -147,6 +150,7 @@ namespace SAIN.Components.BotController
 
         public bool TryFindExfilForBot(SAINComponentClass bot)
         {
+            // Only allow this to run every so often to prevent it from spamming the game console and to improve performance
             if (botExfilSearchRetryTime.ContainsKey(bot))
             {
                 if (Time.time < botExfilSearchRetryTime[bot])
@@ -162,81 +166,58 @@ namespace SAIN.Components.BotController
                 return false;
             }
 
-            if (bot != null && (bot.Info.Profile.IsPMC || bot.Info.Profile.IsScav))
-            {
-                if (bot.Memory.CannotExfil)
-                {
-                    if (bot.Squad.LeaderComponent?.Memory.ExfilPosition != null)
-                    {
-                        if (SAINPlugin.DebugMode)
-                        {
-                            Logger.LogInfo($"Setting {bot.name} Exfil to Squad Leaders Exfil");
-                        }
-                        bot.Memory.ExfilPoint = bot.Squad.LeaderComponent?.Memory.ExfilPoint;
-                        bot.Memory.ExfilPosition = bot.Squad.LeaderComponent?.Memory.ExfilPosition;
-                        bot.Memory.CannotExfil = false;
-                    }
-                    return false;
-                }
-
-                if (bot.Memory.ExfilPosition != null)
-                {
-                    return false;
-                }
-
-                if (SAINPlugin.DebugMode)
-                {
-                    Logger.LogInfo($"Looking for Exfil for {bot.name}");
-                }
-
-                if (TryFindExfils(bot))
-                {
-                    if (bot.Squad.BotInGroup)
-                    {
-                        TryAssignSquadExfil(bot);
-                    }
-                    else
-                    {
-                        TryAssignExfil(bot);
-                    }
-                }
-                else
-                {
-                    Logger.LogInfo($"Could not select exfil for {bot.name}; no valid ones found");
-                }
-                
-                if (bot.Memory.ExfilPosition == null)
-                {
-                    //bot.Memory.CannotExfil = true;
-
-                    if (SAINPlugin.DebugMode)
-                    {
-                        Logger.LogInfo($"{bot.BotOwner.name} Could Not find Exfil. Type: {bot.Info.WildSpawnType}");
-                    }
-
-                    ResetExfilSearchTime(bot);
-
-                    return false;
-                }
-
-                return true;
-            }
-            else if (bot != null)
-            {
-                if (SAINPlugin.DebugMode)
-                {
-                    // Logger.LogInfo($"Skipped searching for Exfil for {bot.Value.name}. WildSpawnType: {bot.Value.Info.WildSpawnType}");
-                }
-            }
-            else
+            if (bot == null)
             {
                 if (SAINPlugin.DebugMode)
                 {
                     Logger.LogInfo("Skipped searching for Exfil for unknown bot because they are null");
                 }
+
+                return false;
             }
 
-            return false;
+            // Only PMC's and Scavs are allowed to extract
+            if (!bot.Info.Profile.IsPMC && !bot.Info.Profile.IsScav)
+            {
+                return false;
+            }
+
+            // If an exfil has already been assigned, don't continue searching
+            if ((bot.Memory.ExfilPosition != null) && (bot.Memory.ExfilPoint != null))
+            {
+                return true;
+            }
+
+            if (SAINPlugin.DebugMode)
+            {
+                Logger.LogInfo($"Looking for Exfil for {bot.name}...");
+            }
+
+            if (TryFindExfilsForBot(bot))
+            {
+                bool exfilAssigned = bot.Squad.BotInGroup ? TryAssignSquadExfil(bot) : TryAssignExfilForBot(bot);
+            }
+            else
+            {
+                //if (SAINPlugin.DebugMode)
+                {
+                    Logger.LogInfo($"Could not select exfil for {bot.name}; no valid ones found");
+                }
+            }
+
+            if (bot.Memory.ExfilPosition == null)
+            {
+                if (SAINPlugin.DebugMode)
+                {
+                    Logger.LogInfo($"{bot.BotOwner.name} Could Not find Exfil. Type: {bot.Info.WildSpawnType}");
+                }
+
+                ResetExfilSearchTime(bot);
+
+                return false;
+            }
+
+            return true;
         }
 
         public void ResetExfilSearchTime(SAINComponentClass bot)
@@ -251,72 +232,80 @@ namespace SAIN.Components.BotController
             }
         }
 
-        private bool TryFindExfils(SAINComponentClass bot)
+        private void TryFindExfilsForAllBots()
+        {
+            if (Bots == null)
+            {
+                return;
+            }
+
+            // This should be done regularly because the method checks if bots can path to each available extract
+            foreach (string botKey in Bots.Keys)
+            {
+                TryFindExfilsForBot(Bots[botKey]);
+            }
+        }
+
+        private bool TryFindExfilsForBot(SAINComponentClass bot)
+        {
+            if (bot.Info.Profile.IsScav)
+            {
+                return FindValidExfilsForBot(bot, ValidScavExfils, AllScavExfils) > 0;
+            }
+
+            return FindValidExfilsForBot(bot, ValidExfils, AllExfils) > 0;
+        }
+
+        private int FindValidExfilsForBot<T>(SAINComponentClass bot, IDictionary<T, Vector3> validExfils, T[] allExfils) where T : ExfiltrationPoint
         {
             if (bot == null)
             {
-                return false;
+                return 0;
             }
-            if (bot.Info.Profile.IsScav && AllScavExfils != null)
+
+            if (allExfils == null)
             {
-                foreach (var ex in AllScavExfils)
+                return 0;
+            }
+
+            foreach (var ex in allExfils)
+            {
+                if (ex == null)
                 {
-                    if (ex != null && ex.isActiveAndEnabled && !ValidScavExfils.ContainsKey(ex))
-                    {
-                        if (ex.TryGetComponent<Collider>(out var collider))
-                        {
-                            if (bot.Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true, 3f))
-                            {
-                                ValidScavExfils.Add(ex, Destination);
-                            }
-                        }
-                    }
+                    if (SAINPlugin.DebugMode)
+                        Logger.LogWarning($"Exfil is null in list!");
+
+                    continue;
                 }
 
-                return ValidScavExfils.Count > 0;
-            }
-            else
-            {
-                if (AllExfils != null)
+                if (validExfils.ContainsKey(ex))
                 {
-                    foreach (var ex in AllExfils)
-                    {
-                        // ex.isActiveAndEnabled && 
-                        if (ex != null && !ValidExfils.ContainsKey(ex))
-                        {
-                            if (ex.TryGetComponent<Collider>(out var collider))
-                            {
-                                if (bot.Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
-                                {
-                                    ValidExfils.Add(ex, Destination);
-                                }
-                                else
-                                {
-                                    if (SAINPlugin.DebugMode)
-                                        Logger.LogWarning($"Could not find valid path to {ex.Settings.Name}");
-                                }
-                            }
-                            else
-                            {
-                                if (SAINPlugin.DebugMode)
-                                    Logger.LogWarning($"Could not find collider for {ex.Settings.Name}");
-                            }
-                        }
-                        else if (ex == null)
-                        {
-                            if (SAINPlugin.DebugMode)
-                                Logger.LogWarning($"Exfil is null in list!");
-                        }
-                    }
-
-                    return ValidExfils.Count > 0;
+                    continue;
                 }
+
+                if (!ex.TryGetComponent<Collider>(out var collider))
+                {
+                    if (SAINPlugin.DebugMode)
+                        Logger.LogWarning($"Could not find collider for {ex.Settings.Name}");
+
+                    continue;
+                }
+
+                if (bot.Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
+                {
+                    if (SAINPlugin.DebugMode)
+                        Logger.LogWarning($"Could not find valid path to {ex.Settings.Name}");
+
+                    continue;
+                }
+
+                validExfils.Add(ex, Destination);
             }
 
-            return false;
+            return validExfils.Count;
         }
 
-        public bool TryAssignExfil(SAINComponentClass bot)
+        public bool TryAssignExfilForBot(SAINComponentClass bot)
         {
             if (bot?.Info?.Profile.IsScav == true)
             {
@@ -332,6 +321,8 @@ namespace SAIN.Components.BotController
 
         private T selectExfilForBot<T>(SAINComponentClass bot, IDictionary<T, Vector3> validExfils) where T: ExfiltrationPoint
         {
+            // Check each valid extract to ensure the bot can use it and that it isn't too close. If this method is called when a bot is near an extract, it might be because
+            // it got stuck. 
             IDictionary<T, Vector3> possibleExfils = validExfils
                     .Where(x => CanUseExtract(x.Key))
                     .Where(x => Vector3.Distance(bot.Position, x.Value) > MinDistanceToExtract)
@@ -350,7 +341,10 @@ namespace SAIN.Components.BotController
             KeyValuePair<T, Vector3> selectedExfil = possibleExfils.Random();
             bot.Memory.ExfilPosition = selectedExfil.Value;
 
-            Logger.LogInfo($"bot {bot.name} will extract at {selectedExfil.Key.Settings.Name}");
+            //if (SAINPlugin.DebugMode)
+            {
+                Logger.LogInfo($"bot {bot.name} will extract at {selectedExfil.Key.Settings.Name}");
+            }
 
             return selectedExfil.Key;
         }
@@ -391,7 +385,11 @@ namespace SAIN.Components.BotController
             // If the VEX is just about to leave, don't select it
             if (GetTimeRemainingForExfil(exfil) < 1)
             {
-                Logger.LogInfo($"Not enough time remaining for exfil {exfil.Settings.Name}");
+                //if (SAINPlugin.DebugMode)
+                {
+                    Logger.LogInfo($"Not enough time remaining for exfil {exfil.Settings.Name}");
+                }
+
                 return false;
             }
 
@@ -405,7 +403,7 @@ namespace SAIN.Components.BotController
             {
                 if (bot.Memory.ExfilPosition == null)
                 {
-                    if (!TryAssignExfil(bot))
+                    if (!TryAssignExfilForBot(bot))
                     {
                         return false;
                     }

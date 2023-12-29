@@ -98,6 +98,20 @@ namespace SAIN.Layers
 
         private void MoveToExtract(float distance, Vector3 point)
         {
+            if (BotOwner.Mover == null)
+            {
+                return;
+            }
+
+            if (NoSprint)
+            {
+                BotOwner.Mover.Sprint(false);
+            }
+            else
+            {
+                BotOwner.Mover.Sprint(true);
+            }
+
             if (distance > MinDistanceToStartExtract * 2)
             {
                 ExtractStarted = false;
@@ -107,37 +121,28 @@ namespace SAIN.Layers
                 ExtractStarted = true;
             }
 
-            if (!ExtractStarted)
+            if (ExtractStarted)
             {
-                if (ReCalcPathTimer < Time.time)
+                return;
+            }
+
+            if (ReCalcPathTimer < Time.time)
+            {
+                ExtractTimer = -1f;
+                ReCalcPathTimer = Time.time + 4f;
+
+                NavMeshPathStatus pathStatus = BotOwner.Mover.GoToPoint(point, true, 0.5f, false, false);
+                float distanceToEndOfPath = Vector3.Distance(BotOwner.Position, BotOwner.Mover.CurPathLastPoint);
+                bool reachedEndOfIncompletePath = (pathStatus == NavMeshPathStatus.PathPartial) && (distanceToEndOfPath < BotExtractManager.MinDistanceToExtract);
+
+                // If the path to the extract is invalid or the path is incomplete and the bot reached the end of it, select a new extract
+                if ((pathStatus == NavMeshPathStatus.PathInvalid) || reachedEndOfIncompletePath)
                 {
-                    ExtractTimer = -1f;
-                    ReCalcPathTimer = Time.time + 4f;
+                    // Need to reset the search timer to prevent the bot from immediately selecting (possibly) the same extract
+                    BotController.BotExtractManager.ResetExfilSearchTime(SAIN);
 
-                    if (BotOwner.Mover == null)
-                    {
-                        return;
-                    }
-
-                    if (NoSprint)
-                    {
-                        BotOwner.Mover.Sprint(false);
-                    }
-                    else
-                    {
-                        BotOwner.Mover.Sprint(true);
-                    }
-
-                    NavMeshPathStatus pathStatus = BotOwner.Mover.GoToPoint(point, true, 0.5f, false, false);
-                    float distanceToEndOfPath = Vector3.Distance(BotOwner.Position, BotOwner.Mover.CurPathLastPoint);
-                    bool reachedEndOfIncompletePath = (pathStatus == NavMeshPathStatus.PathPartial) && (distanceToEndOfPath < BotExtractManager.MinDistanceToExtract);
-
-                    if ((pathStatus == NavMeshPathStatus.PathInvalid) || reachedEndOfIncompletePath)
-                    {
-                        BotController.BotExtractManager.ResetExfilSearchTime(SAIN);
-                        SAIN.Memory.ExfilPoint = null;
-                        SAIN.Memory.ExfilPosition = null;
-                    }
+                    SAIN.Memory.ExfilPoint = null;
+                    SAIN.Memory.ExfilPosition = null;
                 }
             }
         }
@@ -147,10 +152,11 @@ namespace SAIN.Layers
             if (ExtractTimer == -1f)
             {
                 ExtractTimer = BotController.BotExtractManager.GetExfilTime(SAIN.Memory.ExfilPoint);
-                float timeRemaining = ExtractTimer - Time.time;
-
+                
+                // Needed to get car extracts working
                 activateExfil(SAIN.Memory.ExfilPoint);
 
+                float timeRemaining = ExtractTimer - Time.time;
                 Logger.LogInfo($"{BotOwner.name} Starting Extract Timer of {timeRemaining}");
             }
 
@@ -172,13 +178,10 @@ namespace SAIN.Layers
 
         private void activateExfil(ExfiltrationPoint exfil)
         {
-            /*if (!exfil.Requirements.Any(x => x.Requirement == ERequirementState.TransferItem))
-            {
-                return;
-            }*/
-
+            // Needed to start the car extract
             exfil.OnItemTransferred(SAIN.Player);
 
+            // Copied from the end of ExfiltrationPoint.Proceed()
             if (exfil.Status == EExfiltrationStatus.UncompleteRequirements)
             {
                 switch (exfil.Settings.ExfiltrationType)
@@ -188,7 +191,12 @@ namespace SAIN.Layers
                         break;
                     case EExfiltrationType.SharedTimer:
                         exfil.SetStatusLogged(EExfiltrationStatus.Countdown, "Proceed-1");
-                        Logger.LogInfo($"bot {SAIN.name} has started the VEX exfil");
+
+                        //if (SAINPlugin.DebugMode)
+                        {
+                            Logger.LogInfo($"bot {SAIN.name} has started the VEX exfil");
+                        }
+
                         break;
                     case EExfiltrationType.Manual:
                         exfil.SetStatusLogged(EExfiltrationStatus.AwaitsManualActivation, "Proceed-2");

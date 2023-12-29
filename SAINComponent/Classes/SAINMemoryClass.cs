@@ -50,7 +50,6 @@ namespace SAIN.SAINComponent.Classes
 
         public Vector3? ExfilPosition { get; set; }
         public ExfiltrationPoint ExfilPoint { get; set; }
-        public bool CannotExfil { get; set; }
 
         public bool Healthy => HealthStatus == ETagStatus.Healthy;
         public bool Injured => HealthStatus == ETagStatus.Injured;
