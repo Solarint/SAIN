@@ -357,31 +357,38 @@ namespace SAIN.Components.BotController
 
         public bool CanUseExtract(ExfiltrationPoint exfil)
         {
+            // Only use the extract if it's available in the raid
+            // NOTE: Extracts unavailable for you are disabled (exfil.isActiveAndEnabled = false), but we can't use that property because all PMC extracts may be disabled if
+            // you're a Scav.
             if (exfil.Status == EExfiltrationStatus.NotPresent)
             {
                 return false;
             }
 
-            if (exfil.Status == EExfiltrationStatus.AwaitsManualActivation)
-            {
-                //return false;
-            }
-
-            if ((exfil.Status == EExfiltrationStatus.UncompleteRequirements) && (exfil.Requirements.Any(x => x.Requirement == ERequirementState.WorldEvent)))
-            {
-                return false;
-            }
-
+            // Having an unfriendly bot follow another one to a coop exfil would be pretty challenging, so let's just disable them entirely
             if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.ScavCooperation))
             {
                 return false;
             }
 
+            // There are no NavMeshObstacles for trains, so bots get stuck on them
+            // NOTE: The exfil Status will be EExfiltrationStatus.UncompleteRequirements until the train arrives. After it arrives, the exfil Status is
+            // EExfiltrationStatus.AwaitsManualActivation. When it leaves, it changes to EExfiltrationStatus.NotPresent.
+            // TODO: Even if NavMeshObstacles are added, how do we get the time when the train will leave?
             if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.Train))
             {
                 return false;
             }
 
+            // These extracts typically require a switch to be activated, which can get complicated. An example is the Medical Elevator extract on Labs. You first need
+            // to turn on the power, then call the elevator, then press the elevator button. However, the ExfiltrationPoint only monitors the final button press inside
+            // the elevator, so there isn't an easy way to check the status of the other switches (without hard-coding the sequence). Therefore, let's just disable these.
+            if ((exfil.Status == EExfiltrationStatus.UncompleteRequirements) && (exfil.Requirements.Any(x => x.Requirement == ERequirementState.WorldEvent)))
+            {
+                return false;
+            }
+
+            // If the VEX is just about to leave, don't select it
             if (GetTimeRemainingForExfil(exfil) < 1)
             {
                 Logger.LogInfo($"Not enough time remaining for exfil {exfil.Settings.Name}");
