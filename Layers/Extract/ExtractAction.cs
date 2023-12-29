@@ -130,8 +130,9 @@ namespace SAIN.Layers
 
                     NavMeshPathStatus pathStatus = BotOwner.Mover.GoToPoint(point, true, 0.5f, false, false);
                     float distanceToEndOfPath = Vector3.Distance(BotOwner.Position, BotOwner.Mover.CurPathLastPoint);
+                    bool reachedEndOfIncompletePath = (pathStatus == NavMeshPathStatus.PathPartial) && (distanceToEndOfPath < BotExtractManager.MinDistanceToExtract);
 
-                    if ((pathStatus == NavMeshPathStatus.PathInvalid) || (distanceToEndOfPath < BotExtractManager.MinDistanceToExtract))
+                    if ((pathStatus == NavMeshPathStatus.PathInvalid) || reachedEndOfIncompletePath)
                     {
                         BotController.BotExtractManager.ResetExfilSearchTime(SAIN);
                         SAIN.Memory.ExfilPoint = null;
