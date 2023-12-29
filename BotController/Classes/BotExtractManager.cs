@@ -17,6 +17,8 @@ namespace SAIN.Components.BotController
     {
         public BotExtractManager() { }
 
+        public static float MinDistanceToExtract { get; private set; } = 10f;
+
         public ExfiltrationControllerClass ExfilController { get; private set; }
         public float TotalRaidTime { get; private set; }
 
@@ -46,6 +48,16 @@ namespace SAIN.Components.BotController
                     //     $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
                     //     $"[{AllScavExfils?.Length}] Total Scav Exfils")
                     //     ;
+                }
+
+                if (Bots == null)
+                {
+                    return;
+                }
+
+                foreach (string botKey in Bots.Keys)
+                {
+                    TryFindExfils(Bots[botKey]);
                 }
             }
         }
@@ -130,11 +142,23 @@ namespace SAIN.Components.BotController
         public ExfiltrationPoint[] AllExfils { get; private set; }
         public Dictionary<ExfiltrationPoint, Vector3> ValidExfils { get; private set; } = new Dictionary<ExfiltrationPoint, Vector3>();
 
+        private float exfilSearchRetryDelay = 10;
+        private Dictionary<SAINComponentClass, float> botExfilSearchRetryTime = new Dictionary<SAINComponentClass, float>();
+
         public bool TryFindExfilForBot(SAINComponentClass bot)
         {
+            if (botExfilSearchRetryTime.ContainsKey(bot))
+            {
+                if (Time.time < botExfilSearchRetryTime[bot])
+                {
+                    return false;
+                }
+            }
+
             if (AllExfils.Length == 0)
             {
-                Logger.LogInfo($"Could not select exfil for {bot.name}; none found");
+                ResetExfilSearchTime(bot);
+
                 return false;
             }
 
@@ -165,36 +189,32 @@ namespace SAIN.Components.BotController
                     Logger.LogInfo($"Looking for Exfil for {bot.name}");
                 }
 
-                if (!TryFindExfils(bot))
+                if (TryFindExfils(bot))
                 {
-                    Logger.LogInfo($"Could not select exfil for {bot.name}; no valid ones found");
-                    return false;
-                }
-
-                if (bot.Squad.BotInGroup)
-                {
-                    if (!TryAssignSquadExfil(bot))
+                    if (bot.Squad.BotInGroup)
                     {
-                        //return false;
+                        TryAssignSquadExfil(bot);
+                    }
+                    else
+                    {
+                        TryAssignExfil(bot);
                     }
                 }
                 else
                 {
-                    if (!TryAssignExfil(bot))
-                    {
-                        Logger.LogInfo($"Could not select exfil for {bot.name}; none available");
-                        //return false;
-                    }
+                    Logger.LogInfo($"Could not select exfil for {bot.name}; no valid ones found");
                 }
-
+                
                 if (bot.Memory.ExfilPosition == null)
                 {
-                    bot.Memory.CannotExfil = true;
+                    //bot.Memory.CannotExfil = true;
 
                     if (SAINPlugin.DebugMode)
                     {
                         Logger.LogInfo($"{bot.BotOwner.name} Could Not find Exfil. Type: {bot.Info.WildSpawnType}");
                     }
+
+                    ResetExfilSearchTime(bot);
 
                     return false;
                 }
@@ -217,6 +237,18 @@ namespace SAIN.Components.BotController
             }
 
             return false;
+        }
+
+        public void ResetExfilSearchTime(SAINComponentClass bot)
+        {
+            if (botExfilSearchRetryTime.ContainsKey(bot))
+            {
+                botExfilSearchRetryTime[bot] = Time.time + exfilSearchRetryDelay;
+            }
+            else
+            {
+                botExfilSearchRetryTime.Add(bot, Time.time + exfilSearchRetryDelay);
+            }
         }
 
         private bool TryFindExfils(SAINComponentClass bot)
@@ -302,13 +334,14 @@ namespace SAIN.Components.BotController
         {
             IDictionary<T, Vector3> possibleExfils = validExfils
                     .Where(x => CanUseExtract(x.Key))
+                    .Where(x => Vector3.Distance(bot.Position, x.Value) > MinDistanceToExtract)
                     .ToDictionary(x => x.Key, x => x.Value);
 
             if (!possibleExfils.Any())
             {
                 //if (SAINPlugin.DebugMode)
                 {
-                    Logger.LogInfo($"Could not find any possible exfils for bot {bot.name}");
+                    Logger.LogInfo($"Could not assign bot {bot.name} to any of {validExfils.Count} valid exfils: " + string.Join(", ", validExfils.Select(x => x.Key.Settings.Name)));
                 }
 
                 return null;
@@ -329,7 +362,12 @@ namespace SAIN.Components.BotController
                 return false;
             }
 
-            if ((exfil.Status == EExfiltrationStatus.UncompleteRequirements) && (!exfil.Requirements.Any(x => x.Requirement == ERequirementState.TransferItem)))
+            if (exfil.Status == EExfiltrationStatus.AwaitsManualActivation)
+            {
+                //return false;
+            }
+
+            if ((exfil.Status == EExfiltrationStatus.UncompleteRequirements) && (exfil.Requirements.Any(x => x.Requirement == ERequirementState.WorldEvent)))
             {
                 return false;
             }
@@ -341,12 +379,7 @@ namespace SAIN.Components.BotController
 
             if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.Train))
             {
-                //return false;
-            }
-
-            if (exfil.Requirements.Any(x => x.Requirement == ERequirementState.WorldEvent))
-            {
-                //return false;
+                return false;
             }
 
             if (GetTimeRemainingForExfil(exfil) < 1)

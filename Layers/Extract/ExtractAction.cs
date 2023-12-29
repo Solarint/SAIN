@@ -10,6 +10,7 @@ using Systems.Effects;
 using EFT.Interactive;
 using System.Linq;
 using SAIN.Components.BotController;
+using UnityEngine.AI;
 
 namespace SAIN.Layers
 {
@@ -48,6 +49,11 @@ namespace SAIN.Layers
             else if (stamina < 0.1f)
             {
                 NoSprint = true;
+            }
+
+            if (!Exfil.HasValue)
+            {
+                return;
             }
 
             Vector3 point = Exfil.Value;
@@ -107,13 +113,29 @@ namespace SAIN.Layers
                 {
                     ExtractTimer = -1f;
                     ReCalcPathTimer = Time.time + 4f;
+
+                    if (BotOwner.Mover == null)
+                    {
+                        return;
+                    }
+
                     if (NoSprint)
                     {
-                        BotOwner.Mover?.GoToPoint(point, true, 0.5f, false, false);
+                        BotOwner.Mover.Sprint(false);
                     }
                     else
                     {
-                        BotOwner.BotRun.Run(point, false);
+                        BotOwner.Mover.Sprint(true);
+                    }
+
+                    NavMeshPathStatus pathStatus = BotOwner.Mover.GoToPoint(point, true, 0.5f, false, false);
+                    float distanceToEndOfPath = Vector3.Distance(BotOwner.Position, BotOwner.Mover.CurPathLastPoint);
+
+                    if ((pathStatus == NavMeshPathStatus.PathInvalid) || (distanceToEndOfPath < BotExtractManager.MinDistanceToExtract))
+                    {
+                        BotController.BotExtractManager.ResetExfilSearchTime(SAIN);
+                        SAIN.Memory.ExfilPoint = null;
+                        SAIN.Memory.ExfilPosition = null;
                     }
                 }
             }

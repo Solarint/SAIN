@@ -1,5 +1,6 @@
 ﻿using EFT;
 using SAIN.Components.BotController;
+using SAIN.Layers.Combat.Solo;
 
 namespace SAIN.Layers
 {
