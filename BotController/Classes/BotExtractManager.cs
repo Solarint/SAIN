@@ -150,17 +150,17 @@ namespace SAIN.Components.BotController
 
         public bool IsFindingAllValidExfilsForAllBots { get; private set; } = false;
 
-        public IEnumerator TryFindAllValidExfilsForAllBots()
+        public IEnumerator EnumerateAllValidExfilsForAllBots()
         {
             if (Bots == null)
             {
                 yield break;
             }
 
-            IsFindingAllValidExfilsForAllBots = true;
-
             try
             {
+                IsFindingAllValidExfilsForAllBots = true;
+
                 foreach (string botKey in Bots.Keys)
                 {
                     yield return TryFindAllValidExfilsForBot(Bots[botKey]);

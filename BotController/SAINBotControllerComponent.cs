@@ -89,8 +89,9 @@ namespace SAIN.Components
 
             if (!BotExtractManager.IsFindingAllValidExfilsForAllBots)
             {
-                // This should be done regularly because the method checks if bots can path to each available extract
-                StartCoroutine(BotExtractManager.TryFindAllValidExfilsForAllBots());
+                // This should be done regularly because the method checks if bots can path to each available extract. However, it needs to be done
+                // in a coroutine minimize the performance impact
+                StartCoroutine(BotExtractManager.EnumerateAllValidExfilsForAllBots());
             }
         }
 
