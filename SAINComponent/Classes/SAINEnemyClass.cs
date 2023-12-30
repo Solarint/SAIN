@@ -107,7 +107,7 @@ namespace SAIN.SAINComponent.Classes
 
             bool visible = false;
             bool canshoot = false;
-            bool usingLight = EnemyPlayer?.AIData?.UsingLight == true && Enemy?.Path != null && Enemy.EnemyTransform?.TransformNull == false && Enemy.Path.EnemyDistance < 50f;
+            bool usingLight = EnemyPlayer?.AIData?.UsingLight == true && Enemy?.Path != null && Enemy?.EnemyTransform?.TransformNull == false && Enemy?.Path?.EnemyDistance < 50f;
 
             if (CheckLosTimer < Time.time)
             {
