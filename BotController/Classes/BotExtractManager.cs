@@ -163,6 +163,11 @@ namespace SAIN.Components.BotController
 
                 foreach (string botKey in Bots.Keys.ToArray())
                 {
+                    if (!Bots.ContainsKey(botKey))
+                    {
+                        continue;
+                    }
+
                     yield return TryFindAllValidExfilsForBot(Bots[botKey]);
                 }
             }
@@ -174,6 +179,11 @@ namespace SAIN.Components.BotController
 
         private bool TryFindAllValidExfilsForBot(SAINComponentClass bot)
         {
+            if (bot.IsDead)
+            {
+                return false;
+            }
+
             if (bot.Info.Profile.IsScav)
             {
                 return CountAllValidExfilsForBot(bot, ValidScavExfils, AllScavExfils) > 0;
