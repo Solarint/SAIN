@@ -161,7 +161,7 @@ namespace SAIN.Components.BotController
             {
                 IsFindingAllValidExfilsForAllBots = true;
 
-                foreach (string botKey in Bots.Keys)
+                foreach (string botKey in Bots.Keys.ToArray())
                 {
                     yield return TryFindAllValidExfilsForBot(Bots[botKey]);
                 }
