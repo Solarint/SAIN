@@ -1,6 +1,7 @@
 ﻿using BepInEx.Logging;
 using EFT;
 using SAIN.Components;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -93,11 +94,18 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public void TryReload()
         {
-            BotOwner.WeaponManager.Reload.TryReload();
-            if (BotOwner.WeaponManager.Reload.NoAmmoForReloadCached)
+            try
             {
-                //System.Console.WriteLine("NoAmmoForReloadCached");
-                BotOwner.WeaponManager.Reload.TryFillMagazines();
+                BotOwner.WeaponManager.Reload.TryReload();
+                if (BotOwner.WeaponManager.Reload.NoAmmoForReloadCached)
+                {
+                    //System.Console.WriteLine("NoAmmoForReloadCached");
+                    BotOwner.WeaponManager.Reload.TryFillMagazines();
+                }
+            }
+            catch (Exception)
+            {
+                // Ignore
             }
         }
 

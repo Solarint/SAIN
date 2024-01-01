@@ -18,7 +18,7 @@ namespace SAIN.Components
             PlayerFlashComponent = LocalPlayer.GetComponent<SAINFlashLightComponent>();
         }
 
-        public void CreateDetectionPoints(Player player)
+        public void CreateDetectionPoints(Player player, bool visibleLight)
         {
             if (player == null || !player.HealthController.IsAlive)
             {
@@ -46,6 +46,7 @@ namespace SAIN.Components
 
             if (Physics.Raycast(playerPosition, rotatedLookDirection, out RaycastHit hit, detectionDistance, LayerMaskClass.HighPolyWithTerrainMask))
             {
+                VisibleLight = visibleLight;
                 FlashLightPoint = hit.point;
                 ExpireDetectionPoint(0.1f);
 
@@ -54,7 +55,14 @@ namespace SAIN.Components
 
                 if (DebugFlash)
                 {
-                    DebugGizmos.Sphere(hit.point, 0.1f, Color.red, true, 0.25f);
+                    if (visibleLight)
+                    {
+                        DebugGizmos.Sphere(hit.point, 0.1f, Color.red, true, 0.25f);
+                    }
+                    else
+                    {
+                        DebugGizmos.Sphere(hit.point, 0.1f, Color.blue, true, 0.25f);
+                    }
                 }
             }
         }
@@ -68,7 +76,13 @@ namespace SAIN.Components
                 return;
             }
 
+            // If this isn't visible light, and the bot doesn't have night vision, ignore it
             BotOwner bot = player.AIData.BotOwner;
+            if (!VisibleLight && !bot.NightVision.UsingNow)
+            {
+                return;
+            }
+
             Vector3 playerPos = PlayerPosition;
             Vector3 flashPos = FlashLightPoint;
 
@@ -207,6 +221,8 @@ namespace SAIN.Components
 
         public static Vector3 PlayerPosition { get; private set; }
         public static Vector3 FlashLightPoint { get; private set; }
+        public static bool VisibleLight { get; private set; }
+        public static bool IRLight { get; private set; }
         public static SAINFlashLightComponent PlayerFlashComponent { get; private set; }
         private static Player LocalPlayer { get; set; }
         protected static ManualLogSource Logger { get; private set; }
