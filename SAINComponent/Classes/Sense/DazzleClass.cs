@@ -9,6 +9,8 @@ namespace SAIN.SAINComponent.Classes.Sense
 {
     public class DazzleClass : SAINBase, ISAINClass
     {
+        TemporaryStatModifiers Modifiers = new TemporaryStatModifiers(1f, 1f, 1f, 1f, 1f);
+
         public DazzleClass(SAINComponentClass owner) : base(owner)
         {
         }
@@ -26,9 +28,23 @@ namespace SAIN.SAINComponent.Classes.Sense
         }
 
 
-        public void CheckIfDazzleApplied(IPlayer person)
+        public void CheckIfDazzleApplied(SAINEnemyClass enemy)
         {
-            var flashlight = SAIN.FlashLight;
+            var person = enemy.EnemyIPlayer;
+            SAINFlashLightComponent flashlight;
+            if (enemy.EnemyPerson.IsSAINBot)
+            {
+                flashlight = enemy.EnemyPerson.SAIN.FlashLight;
+            }
+            else if (EFTInfo.IsEnemyMainPlayer(enemy))
+            {
+                flashlight = SAINPlugin.BotController.MainPlayerLight;
+            }
+            else
+            {
+                return;
+            }
+
             if (flashlight != null)
             {
                 if (flashlight.WhiteLight)
@@ -120,19 +136,18 @@ namespace SAIN.SAINComponent.Classes.Sense
 
         private void ApplyDazzle(float dazzleModif, float gainSightModif)
         {
-            float PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness;
-            float AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness;
-            float ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness;
-            float PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness;
+            // If modifier is already applied, don't re-apply it
+            if (Modifiers.Modifiers.IsApplyed)
+            {
+                return;
+            }
 
-            TemporaryStatModifiers Modifiers = new TemporaryStatModifiers
-                (
-                    PrecicingSpeedCoef,
-                    AccuratySpeedCoef,
-                    gainSightModif,
-                    ScatteringCoef,
-                    PriorityScatteringCoef
-                );
+            Modifiers.Modifiers.PrecicingSpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness;
+            Modifiers.Modifiers.AccuratySpeedCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness;
+            Modifiers.Modifiers.GainSightCoef = gainSightModif;
+            Modifiers.Modifiers.ScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 5f) * Effectiveness * 3;
+            Modifiers.Modifiers.PriorityScatteringCoef = Mathf.Clamp(dazzleModif, 1f, 2.5f) * Effectiveness;
+
 
             BotOwner.Settings.Current.Apply(Modifiers.Modifiers, 0.1f);
         }

@@ -120,7 +120,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         }
 
         private float BusyHandsTimer;
-        private float LastReloadTime;
+        private float NextReloadTime;
 
         private bool CheckContinueSelfAction(out SelfDecision Decision)
         {
@@ -281,7 +281,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         private bool StartBotReload()
         {
             // Only allow reloading every 5 seconds to avoid spamming reload when the weapon data is bad
-            if (LastReloadTime + 5 < Time.time)
+            if (NextReloadTime > Time.time)
             {
                 return false;
             }
@@ -313,7 +313,7 @@ namespace SAIN.SAINComponent.Classes.Decision
 
             if (needToReload)
             {
-                LastReloadTime = Time.time;
+                NextReloadTime = Time.time + 5;
             }
 
             return needToReload;
