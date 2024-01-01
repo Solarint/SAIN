@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using SAIN.SAINComponent;
 using SAIN.Helpers;
+using System.Collections;
 
 namespace SAIN.Components.BotController
 {
@@ -25,15 +26,14 @@ namespace SAIN.Components.BotController
                 return;
             }
 
-            if (CheckExtractTimer > Time.time)
+            if (CheckRaidProgressTimer > Time.time)
             {
                 return;
             }
 
-            CheckExtractTimer = Time.time + 5f;
+            CheckRaidProgressTimer = Time.time + 5f;
 
             CheckTimeRemaining();
-            TryFindAllValidExfilsForAllBots();
 
             if (DebugCheckExfilTimer < Time.time)
             {
@@ -148,22 +148,42 @@ namespace SAIN.Components.BotController
         public ExfiltrationPoint[] AllExfils { get; private set; }
         public Dictionary<ExfiltrationPoint, Vector3> ValidExfils { get; private set; } = new Dictionary<ExfiltrationPoint, Vector3>();
 
-        private void TryFindAllValidExfilsForAllBots()
+        public bool IsFindingAllValidExfilsForAllBots { get; private set; } = false;
+
+        public IEnumerator EnumerateAllValidExfilsForAllBots()
         {
             if (Bots == null)
             {
-                return;
+                yield break;
             }
 
-            // This should be done regularly because the method checks if bots can path to each available extract
-            foreach (string botKey in Bots.Keys)
+            try
             {
-                TryFindAllValidExfilsForBot(Bots[botKey]);
+                IsFindingAllValidExfilsForAllBots = true;
+
+                foreach (string botKey in Bots.Keys.ToArray())
+                {
+                    if (!Bots.ContainsKey(botKey))
+                    {
+                        continue;
+                    }
+
+                    yield return TryFindAllValidExfilsForBot(Bots[botKey]);
+                }
+            }
+            finally
+            {
+                IsFindingAllValidExfilsForAllBots = false;
             }
         }
 
         private bool TryFindAllValidExfilsForBot(SAINComponentClass bot)
         {
+            if (bot.IsDead)
+            {
+                return false;
+            }
+
             if (bot.Info.Profile.IsScav)
             {
                 return CountAllValidExfilsForBot(bot, ValidScavExfils, AllScavExfils) > 0;
@@ -457,7 +477,7 @@ namespace SAIN.Components.BotController
             return (bot.Memory.ExfilPosition != null) && (bot.Memory.ExfilPoint != null);
         }
 
-        private float CheckExtractTimer = 0f;
+        private float CheckRaidProgressTimer = 0f;
         public float TimeRemaining { get; private set; } = 999f;
         public float PercentageRemaining { get; private set; } = 100f;
 
