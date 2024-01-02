@@ -1,10 +1,10 @@
 {
     "name": "SAIN",
-    "version": "2.1.7",
+    "version": "2.1.8",
     "main": "src/mod.js",
     "license": "MIT",
-    "author": "z-Solarint",
-    "akiVersion": "~3.7",
+    "author": "zSolarint",
+    "akiVersion": "~3.7.4",
     "scripts": {
         "setup": "npm i",
         "build": "node ./build.mjs",
