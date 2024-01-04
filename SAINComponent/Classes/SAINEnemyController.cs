@@ -110,6 +110,12 @@ namespace SAIN.SAINComponent.Classes
                 // Check if the dictionary contains a previous SAINEnemy
                 if (Enemies.ContainsKey(id))
                 {
+                    if (ActiveEnemy != Enemies[id])
+                    {
+                        Logger.LogInfo($"{BotOwner.name} has selected enemy {Enemies[id].EnemyPerson.BotOwner.name} as the active enemy");
+                        //Logger.LogInfo($"Enemy ID = {id}; {BotOwner.name} ID = {BotOwner.ProfileId}; {Enemies[id].EnemyPerson.BotOwner.name} ID = {Enemies[id].EnemyPerson.ProfileId}; SAIN ID = {SAIN.ProfileId}");
+                    }
+
                     ActiveEnemy = Enemies[id];
                 }
                 else
@@ -119,14 +125,9 @@ namespace SAIN.SAINComponent.Classes
                     if (botOwner != null && botOwner.TryGetComponent(out SAINComponentClass enemySAIN))
                     {
                         enemySAINPerson = enemySAIN.Person;
+                        ActiveEnemy = new SAINEnemyClass(SAIN, enemySAINPerson);
+                        Enemies.Add(id, ActiveEnemy);
                     }
-                    else
-                    {
-                        enemySAINPerson = new SAINPersonClass(IPlayer);
-                    }
-
-                    ActiveEnemy = new SAINEnemyClass(SAIN, enemySAINPerson);
-                    Enemies.Add(id, ActiveEnemy);
                 }
             }
             else

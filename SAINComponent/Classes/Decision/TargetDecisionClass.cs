@@ -26,10 +26,13 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public float FoundTargetTimer { get; private set; }
 
+        public bool IgnorePlaceTarget = false;
+
         public bool GetDecision(out SoloDecision Decision)
         {
             Decision = SoloDecision.None;
-            if (!BotOwner.Memory.GoalTarget.HaveMainTarget())
+            if (!BotOwner.Memory.GoalTarget.HavePlaceTarget())
+            //if (!BotOwner.Memory.GoalTarget.HaveMainTarget())
             {
                 FoundTargetTimer = -1f;
                 return false;
@@ -42,6 +45,11 @@ namespace SAIN.SAINComponent.Classes.Decision
             if (FoundTargetTimer < 0f)
             {
                 FoundTargetTimer = Time.time;
+            }
+
+            if (IgnorePlaceTarget)
+            {
+                return false;
             }
 
             var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
