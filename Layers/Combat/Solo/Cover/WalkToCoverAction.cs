@@ -134,7 +134,7 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
             if (SAIN.HasEnemy)
             {
-                Logger.LogInfo($"The current enemy of {BotOwner.name} is {SAIN.Enemy.EnemyPerson.BotOwner.name}");
+                Logger.LogInfo($"The current enemy of {BotOwner.name} is {SAIN.Enemy.EnemyPerson.Player.name}");
             }
             else
             {

@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using Comfort.Common;
+using EFT;
 using HarmonyLib;
 using SAIN.SAINComponent;
 using System;
@@ -37,11 +38,17 @@ namespace SAIN.Plugin
             //if (SAINPlugin.DebugMode)
                 Logger.LogInfo($"Forcing {bot.name} to reset its decisions...");
 
-            foreach(IPlayer player in bot.BotsGroup.Enemies.Keys)
+            PropertyInfo enemyLastSeenTimeSenseProperty = AccessTools.Property(typeof(BotSettingsClass), "EnemyLastSeenTimeSense");
+
+            foreach (IPlayer player in bot.BotsGroup.Enemies.Keys)
             {
+                if (player.Id == Singleton<GameWorld>.Instance.MainPlayer.Id)
+                {
+                    //continue;
+                }
+
                 bot.BotsGroup.Enemies[player].Clear();
 
-                PropertyInfo enemyLastSeenTimeSenseProperty = AccessTools.Property(typeof(BotSettingsClass), "EnemyLastSeenTimeSense");
                 if (enemyLastSeenTimeSenseProperty != null)
                 {
                     enemyLastSeenTimeSenseProperty.SetValue(bot.BotsGroup.Enemies[player], 1);

@@ -18,7 +18,7 @@ namespace SAIN.SAINComponent.Classes
             Vision = new SAINEnemyVision(this);
             Path = new SAINEnemyPath(this);
 
-            Logger.LogInfo($"{bot.name} found enemy {person.BotOwner.name}");
+            Logger.LogInfo($"{bot.name} found enemy {person.Player.name}");
         }
 
         public SAINPersonClass EnemyPerson { get; private set; }
