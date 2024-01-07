@@ -110,11 +110,6 @@ namespace SAIN.SAINComponent.Classes
                 // Check if the dictionary contains a previous SAINEnemy
                 if (Enemies.ContainsKey(id))
                 {
-                    if (ActiveEnemy != Enemies[id])
-                    {
-                        Logger.LogInfo($"{BotOwner.name} has selected enemy {Enemies[id].EnemyPerson.Player.name} as the active enemy");
-                    }
-
                     ActiveEnemy = Enemies[id];
                 }
                 else

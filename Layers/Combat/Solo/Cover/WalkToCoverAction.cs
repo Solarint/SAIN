@@ -19,7 +19,6 @@ namespace SAIN.Layers.Combat.Solo.Cover
     {
         public WalkToCoverAction(BotOwner bot) : base(bot, nameof(WalkToCoverAction))
         {
-            
         }
 
         public override void Update()
@@ -131,16 +130,6 @@ namespace SAIN.Layers.Combat.Solo.Cover
         public override void Start()
         {
             SAIN.Mover.Sprint(false);
-
-            if (SAIN.HasEnemy)
-            {
-                Logger.LogInfo($"The current enemy of {BotOwner.name} is {SAIN.Enemy.EnemyPerson.Player.name}");
-            }
-            else
-            {
-                Logger.LogInfo($"The current target of {BotOwner.name} is {SAIN.CurrentTargetPosition.ToString()}");
-            }
-
         }
 
         public override void Stop()

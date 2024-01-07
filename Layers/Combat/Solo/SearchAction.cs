@@ -10,22 +10,11 @@ namespace SAIN.Layers.Combat.Solo
     {
         public SearchAction(BotOwner bot) : base(bot, nameof(SearchAction))
         {
-            
         }
 
         public override void Start()
         {
             FindTarget();
-
-            if (SAIN.HasEnemy)
-            {
-                Logger.LogInfo($"The current enemy of {BotOwner.name} is {SAIN.Enemy.EnemyPerson.Player.name}");
-            }
-            else
-            {
-                Logger.LogInfo($"The current target of {BotOwner.name} is {SAIN.CurrentTargetPosition.ToString()}");
-            }
-
         }
 
         private void FindTarget()
