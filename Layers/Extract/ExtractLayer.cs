@@ -20,7 +20,7 @@ namespace SAIN.Layers
         {
             if (SAIN == null) return false;
 
-            if (!SAIN.Info.FileSettings.Mind.EnableExtracts)
+            if (!SAIN.Info.FileSettings.Mind.EnableExtracts || !SAIN.Info.GlobalSettings.Extract.EnableExtractsGlobal)
             {
                 return false;
             }
