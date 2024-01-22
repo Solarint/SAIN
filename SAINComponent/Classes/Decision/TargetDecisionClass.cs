@@ -26,10 +26,15 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         public float FoundTargetTimer { get; private set; }
 
+        public bool IgnorePlaceTarget { get; set; } = false;
+
         public bool GetDecision(out SoloDecision Decision)
         {
             Decision = SoloDecision.None;
-            if (!BotOwner.Memory.GoalTarget.HaveMainTarget())
+
+            // This was previously "if (!BotOwner.Memory.GoalTarget.HaveMainTarget())", which returns (this.HavePlaceTarget() || this.HaveZeroTarget())
+            // HaveZeroTarget() seems like a way to arbitrarily keep the bot in a combat state, so let's ignore it here
+            if (!BotOwner.Memory.GoalTarget.HavePlaceTarget())
             {
                 FoundTargetTimer = -1f;
                 return false;
@@ -42,6 +47,11 @@ namespace SAIN.SAINComponent.Classes.Decision
             if (FoundTargetTimer < 0f)
             {
                 FoundTargetTimer = Time.time;
+            }
+
+            if (IgnorePlaceTarget)
+            {
+                return false;
             }
 
             var CurrentDecision = SAIN.Memory.Decisions.Main.Current;

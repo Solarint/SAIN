@@ -36,6 +36,8 @@ namespace SAIN.SAINComponent.Classes.Decision
                 return false;
             }
 
+            SAIN.Decision.GoalTargetDecisions.IgnorePlaceTarget = false;
+
             var CurrentDecision = SAIN.Memory.Decisions.Main.Current;
 
             if (StartDogFightAction(enemy))
