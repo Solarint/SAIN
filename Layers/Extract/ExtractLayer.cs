@@ -25,7 +25,7 @@ namespace SAIN.Layers
                 return false;
             }
 
-            if (!BotController.BotExtractManager.IsBotAllowedToExfil(SAIN))
+            if (!Components.BotController.BotExtractManager.IsBotAllowedToExfil(SAIN))
             {
                 return false;
             }
@@ -43,7 +43,7 @@ namespace SAIN.Layers
 
             // If the bot can no longer use its selected extract and isn't already in the extract area, select another one. This typically happens if
             // the bot selects a VEX but the car leaves before the bot reaches it.
-            if (!BotController.BotExtractManager.CanUseExtract(SAIN.Memory.ExfilPoint) && !IsInExtractArea())
+            if (!BotController.BotExtractManager.CanBotsUseExtract(SAIN.Memory.ExfilPoint) && !IsInExtractArea())
             {
                 SAIN.Memory.ExfilPoint = null;
                 SAIN.Memory.ExfilPosition = null;

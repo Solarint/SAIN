@@ -9,6 +9,7 @@ using UnityEngine.AI;
 using SAIN.SAINComponent;
 using SAIN.Helpers;
 using System.Collections;
+using HarmonyLib;
 
 namespace SAIN.Components.BotController
 {
@@ -16,12 +17,11 @@ namespace SAIN.Components.BotController
     {
         public BotExtractManager() { }
 
-        public ExfiltrationControllerClass ExfilController { get; private set; }
         public float TotalRaidTime { get; private set; }
-
+        
         public void Update()
         {
-            if (!GetExfilControl())
+            if (Singleton<AbstractGame>.Instance?.GameTimer == null)
             {
                 return;
             }
@@ -31,57 +31,8 @@ namespace SAIN.Components.BotController
                 return;
             }
 
-            CheckRaidProgressTimer = Time.time + 5f;
-
             CheckTimeRemaining();
-
-            if (DebugCheckExfilTimer < Time.time)
-            {
-                DebugCheckExfilTimer = Time.time + 30f;
-                Logger.LogInfo(
-                    $"Seconds Remaining in Raid: [{TimeRemaining}] Percentage of Raid Remaining: [{PercentageRemaining}]. " +
-                    $"Total Raid Seconds: [{TotalRaidTime}] " +
-                    $"Found: [{ValidScavExfils.Count}] ScavExfils and " +
-                    $"[{ValidExfils.Count}] PMC Exfils to be used."
-                    );
-                // Logger.LogInfo(
-                //     $"Total PMC Exfils on this map: [{AllExfils?.Length}] and " +
-                //     $"[{AllScavExfils?.Length}] Total Scav Exfils")
-                //     ;
-            }
-        }
-
-        private bool GetExfilControl()
-        {
-            if (Singleton<AbstractGame>.Instance?.GameTimer == null)
-            {
-                return false;
-            }
-
-            if (ExfilController == null)
-            {
-                ExfilController = Singleton<GameWorld>.Instance.ExfiltrationController;
-            }
-            else
-            {
-                if (AllScavExfils == null)
-                {
-                    AllScavExfils = ExfilController.ScavExfiltrationPoints;
-                    if (SAINPlugin.DebugMode && AllScavExfils != null)
-                    {
-                        Logger.LogInfo($"Found {AllScavExfils?.Length} possible Scav Exfil Points in this map.");
-                    }
-                }
-                if (AllExfils == null)
-                {
-                    AllExfils = ExfilController.ExfiltrationPoints;
-                    if (SAINPlugin.DebugMode && AllExfils != null)
-                    {
-                        Logger.LogInfo($"Found {AllExfils?.Length} possible Exfil Points in this map.");
-                    }
-                }
-            }
-            return ExfilController != null;
+            CheckRaidProgressTimer = Time.time + 5f;
         }
 
         private Dictionary<ExfiltrationPoint, float> exfilActivationTimes = new Dictionary<ExfiltrationPoint, float>();
@@ -141,106 +92,6 @@ namespace SAIN.Components.BotController
             return exfilTime;
         }
 
-        private float DebugCheckExfilTimer = 0f;
-        public ScavExfiltrationPoint[] AllScavExfils { get; private set; }
-        public Dictionary<ScavExfiltrationPoint, Vector3> ValidScavExfils { get; private set; } = new Dictionary<ScavExfiltrationPoint, Vector3>();
-
-        public ExfiltrationPoint[] AllExfils { get; private set; }
-        public Dictionary<ExfiltrationPoint, Vector3> ValidExfils { get; private set; } = new Dictionary<ExfiltrationPoint, Vector3>();
-
-        public bool IsFindingAllValidExfilsForAllBots { get; private set; } = false;
-
-        public IEnumerator EnumerateAllValidExfilsForAllBots()
-        {
-            if (Bots == null)
-            {
-                yield break;
-            }
-
-            try
-            {
-                IsFindingAllValidExfilsForAllBots = true;
-
-                foreach (string botKey in Bots.Keys.ToArray())
-                {
-                    if (!Bots.ContainsKey(botKey))
-                    {
-                        continue;
-                    }
-
-                    yield return TryFindAllValidExfilsForBot(Bots[botKey]);
-                }
-            }
-            finally
-            {
-                IsFindingAllValidExfilsForAllBots = false;
-            }
-        }
-
-        private bool TryFindAllValidExfilsForBot(SAINComponentClass bot)
-        {
-            if (bot.IsDead)
-            {
-                return false;
-            }
-
-            if (bot.Info.Profile.IsScav)
-            {
-                return CountAllValidExfilsForBot(bot, ValidScavExfils, AllScavExfils) > 0;
-            }
-
-            return CountAllValidExfilsForBot(bot, ValidExfils, AllExfils) > 0;
-        }
-
-        private int CountAllValidExfilsForBot<T>(SAINComponentClass bot, IDictionary<T, Vector3> validExfils, T[] allExfils) where T : ExfiltrationPoint
-        {
-            if (bot == null)
-            {
-                return 0;
-            }
-
-            if (allExfils == null)
-            {
-                return 0;
-            }
-
-            foreach (var ex in allExfils)
-            {
-                if (ex == null)
-                {
-                    if (SAINPlugin.DebugMode)
-                        Logger.LogWarning($"Exfil is null in list!");
-
-                    continue;
-                }
-
-                if (validExfils.ContainsKey(ex))
-                {
-                    continue;
-                }
-
-                if (!ex.TryGetComponent<Collider>(out var collider))
-                {
-                    if (SAINPlugin.DebugMode)
-                        Logger.LogWarning($"Could not find collider for {ex.Settings.Name}");
-
-                    continue;
-                }
-
-                if (!bot.Mover.CanGoToPoint(collider.transform.position, out Vector3 Destination, true))
-                {
-                    if (SAINPlugin.DebugMode)
-                        Logger.LogWarning($"Could not find valid path to {ex.Settings.Name}");
-
-                    continue;
-                }
-
-                validExfils.Add(ex, Destination);
-            }
-
-            return validExfils.Count;
-        }
-
         private float exfilSearchRetryDelay = 10;
         private Dictionary<SAINComponentClass, float> botExfilSearchRetryTime = new Dictionary<SAINComponentClass, float>();
 
@@ -277,13 +128,6 @@ namespace SAIN.Components.BotController
                 }
             }
 
-            if (AllExfils.Length == 0)
-            {
-                ResetExfilSearchTime(bot);
-
-                return false;
-            }
-
             if (!IsBotAllowedToExfil(bot))
             {
                 return false;
@@ -300,34 +144,36 @@ namespace SAIN.Components.BotController
                 Logger.LogInfo($"Looking for Exfil for {bot.name}...");
             }
 
-            if (TryFindAllValidExfilsForBot(bot))
-            {
-                bool exfilAssigned = bot.Squad.BotInGroup ? TryAssignSquadExfil(bot) : TryAssignExfilForBot(bot);
-            }
-            else
+            int validExfils = GameWorldHandler.SAINGameWorld.ExtractFinder.CountValidExfilsForBot(bot);
+            if (validExfils == 0)
             {
                 if (SAINPlugin.DebugMode)
                 {
                     Logger.LogInfo($"Could not select exfil for {bot.name}; no valid ones found");
                 }
+
+                ResetExfilSearchTime(bot);
+                return false;
             }
 
-            if (bot.Memory.ExfilPosition == null)
+            bool exfilAssigned = bot.Squad.BotInGroup ? TryAssignSquadExfil(bot) : TryAssignExfilForBot(bot);
+            if (!exfilAssigned)
             {
                 if (SAINPlugin.DebugMode)
                 {
-                    Logger.LogInfo($"{bot.BotOwner.name} Could Not find Exfil. Type: {bot.Info.WildSpawnType}");
+                    Logger.LogInfo($"{bot.name} could not find exfil. Bot spawn type: {bot.Info.WildSpawnType}");
                 }
 
                 ResetExfilSearchTime(bot);
-
                 return false;
             }
+
+            Logger.LogInfo($"{bot.name} has selected {bot.Memory.ExfilPoint.Settings.Name} for extraction");
 
             return true;
         }
 
-        public bool IsBotAllowedToExfil(SAINComponentClass bot)
+        public static bool IsBotAllowedToExfil(SAINComponentClass bot)
         {
             if (!bot.Info.Profile.IsPMC && !bot.Info.Profile.IsScav)
             {
@@ -337,31 +183,25 @@ namespace SAIN.Components.BotController
             return true;
         }
 
-        public bool TryAssignExfilForBot(SAINComponentClass bot)
+        private bool TryAssignExfilForBot(SAINComponentClass bot)
         {
-            if (bot?.Info?.Profile.IsScav == true)
-            {
-                bot.Memory.ExfilPoint = selectExfilForBot(bot, ValidScavExfils);
-            }
-            if (bot?.Info?.Profile.IsPMC == true)
-            {
-                bot.Memory.ExfilPoint = selectExfilForBot(bot, ValidExfils);
-            }
+            IDictionary<ExfiltrationPoint, Vector3> validExfils = GameWorldHandler.SAINGameWorld.ExtractFinder.GetValidExfilsForBot(bot);
+            bot.Memory.ExfilPoint = selectExfilForBot(bot, validExfils);
 
             return bot.Memory.ExfilPoint != null;
         }
 
         public static float MinDistanceToExtract { get; private set; } = 10f;
 
-        private T selectExfilForBot<T>(SAINComponentClass bot, IDictionary<T, Vector3> validExfils) where T: ExfiltrationPoint
+        private ExfiltrationPoint selectExfilForBot(SAINComponentClass bot, IDictionary<ExfiltrationPoint, Vector3> validExfils)
         {
             // Check each valid extract to ensure the bot can use it and that it isn't too close. If this method is called when a bot is near an extract, it might be because
             // it got stuck. 
-            NavMeshPath Path = new NavMeshPath();
-            IDictionary<T, Vector3> possibleExfils = validExfils
-                    .Where(x => CanUseExtract(x.Key))
+            NavMeshPath path = new NavMeshPath();
+            IDictionary<ExfiltrationPoint, Vector3> possibleExfils = validExfils
+                    .Where(x => CanBotsUseExtract(x.Key))
                     .Where(x => Vector3.Distance(bot.Position, x.Value) > MinDistanceToExtract)
-                    .Where(x => NavMesh.CalculatePath(bot.Position, x.Value, -1, Path) && Path.status == NavMeshPathStatus.PathComplete)
+                    .Where(x => NavMesh.CalculatePath(bot.Position, x.Value, -1, path) && (path.status == NavMeshPathStatus.PathComplete))
                     .ToDictionary(x => x.Key, x => x.Value);
 
             if (!possibleExfils.Any())
@@ -374,7 +214,7 @@ namespace SAIN.Components.BotController
                 return null;
             }
 
-            KeyValuePair<T, Vector3> selectedExfil = possibleExfils.Random();
+            KeyValuePair<ExfiltrationPoint, Vector3> selectedExfil = possibleExfils.Random();
             bot.Memory.ExfilPosition = selectedExfil.Value;
 
             if (SAINPlugin.DebugMode)
@@ -385,7 +225,7 @@ namespace SAIN.Components.BotController
             return selectedExfil.Key;
         }
 
-        public bool CanUseExtract(ExfiltrationPoint exfil)
+        public bool CanBotsUseExtract(ExfiltrationPoint exfil)
         {
             // Only use the extract if it's available in the raid
             // NOTE: Extracts unavailable for you are disabled (exfil.isActiveAndEnabled = false), but we can't use that property because all PMC extracts may be disabled if
@@ -432,7 +272,7 @@ namespace SAIN.Components.BotController
             return true;
         }
 
-        public bool TryAssignSquadExfil(SAINComponentClass bot)
+        private bool TryAssignSquadExfil(SAINComponentClass bot)
         {
             var squad = bot.Squad;
             if (squad.IAmLeader)
@@ -483,7 +323,7 @@ namespace SAIN.Components.BotController
         public float TimeRemaining { get; private set; } = 999f;
         public float PercentageRemaining { get; private set; } = 100f;
 
-        public void CheckTimeRemaining()
+        private void CheckTimeRemaining()
         {
             TotalRaidTime = Aki.SinglePlayer.Utils.InRaid.RaidChangesUtil.OriginalEscapeTimeSeconds;
 

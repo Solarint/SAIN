@@ -36,8 +36,7 @@ namespace SAIN.Components
         public Vector3 MainPlayerPosition { get; private set; }
         private bool ComponentAdded { get; set; }
         private float UpdatePositionTimer { get; set; }
-        private float CheckExtractTimer = 0f;
-
+        
         private void Awake()
         {
             GameWorld.OnDispose += Dispose;
@@ -79,20 +78,6 @@ namespace SAIN.Components
             //PathManager.Update();
             //AddNavObstacles();
             //UpdateObstacles();
-
-            if (CheckExtractTimer > Time.time)
-            {
-                return;
-            }
-
-            CheckExtractTimer = Time.time + 20f;
-
-            if (!BotExtractManager.IsFindingAllValidExfilsForAllBots)
-            {
-                // This should be done regularly because the method checks if bots can path to each extract. However, it needs to be done
-                // in a coroutine to minimize the performance impact
-                StartCoroutine(BotExtractManager.EnumerateAllValidExfilsForAllBots());
-            }
         }
 
         private void PlayerTalked(EPhraseTrigger phrase, ETagStatus mask, Player player)
