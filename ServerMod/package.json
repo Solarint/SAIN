@@ -1,6 +1,6 @@
 {
     "name": "SAIN",
-    "version": "2.1.8",
+    "version": "2.1.9",
     "main": "src/mod.js",
     "license": "MIT",
     "author": "zSolarint",
