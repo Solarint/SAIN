@@ -179,6 +179,8 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
 
         private void FindFallback()
         {
+            CheckResetFallback();
+
             if (CoverPoints.Count > 0 && FallBackPoint == null)
             {
                 float highest = 0f;
@@ -193,6 +195,27 @@ namespace SAIN.SAINComponent.SubComponents.CoverFinder
                     }
                 }
                 FallBackPoint = CoverPoints[highestIndex];
+            }
+        }
+
+        static float FallBackPointResetDistance = 35;
+        static float FallBackPointNextAllowedResetDelayTime = 3f;
+        static float FallBackPointNextAllowedResetTime = 0;
+        
+        private void CheckResetFallback()
+        {
+            if (FallBackPoint == null || Time.time < FallBackPointNextAllowedResetTime)
+            {
+                return;
+            }
+
+            if ((BotOwner.Position - FallBackPoint.Position).magnitude > FallBackPointResetDistance)
+            {
+                if (SAINPlugin.DebugMode)
+                    Logger.LogInfo($"Resetting fallback point for {BotOwner.name}...");
+
+                FallBackPoint = null;
+                FallBackPointNextAllowedResetTime = Time.time + FallBackPointNextAllowedResetDelayTime;
             }
         }
 
