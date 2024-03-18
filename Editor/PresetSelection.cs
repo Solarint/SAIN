@@ -23,11 +23,11 @@ namespace SAIN.Editor.GUISections
             EndHorizontal(100f);
 
             SAINPresetDefinition selectedPreset = SAINPlugin.LoadedPreset.Info;
-            if (selectedPreset.SAINVersion != AssemblyInfo.SAINVersion)
+            if (selectedPreset.SAINVersion != AssemblyInfo.SAINPresetVersion)
             {
                 Box(new GUIContent(
-                        $"Selected Preset was made for SAIN Version {selectedPreset.SAINVersion} " +
-                        $"but you are running {AssemblyInfo.SAINVersion}, you may experience issues."),
+                        $"Selected Preset Version: {selectedPreset.SAINVersion} " +
+                        $"but current SAIN Preset Version is: {AssemblyInfo.SAINPresetVersion}, you may experience issues."),
                     GetStyle(Style.alert), Height(LabelHeight + 5));
             }
 
@@ -44,7 +44,7 @@ namespace SAIN.Editor.GUISections
             {
                 presetSpacing++;
                 var preset = PresetHandler.PresetOptions[i];
-                bool badVersion = preset.SAINVersion != AssemblyInfo.SAINVersion;
+                bool badVersion = preset.SAINVersion != AssemblyInfo.SAINPresetVersion;
                 float toggleWidth = badVersion ? width - AlertWidth : width;
 
                 bool selected = selectedPreset.Name == preset.Name;
@@ -64,8 +64,8 @@ namespace SAIN.Editor.GUISections
                 {
                     Box(new GUIContent(
                             "!", 
-                            $"Selected Preset was made for SAIN Version {preset.SAINVersion} " +
-                            $"but you are running {AssemblyInfo.SAINVersion}, " +
+                            $"Selected Preset Version {preset.SAINVersion} " +
+                            $"but current SAIN Preset Version is: {AssemblyInfo.SAINPresetVersion}, " +
                             $"you may experience issues."),
                         GetStyle(Style.alert), 
                         Height(InstalledHeight), 
@@ -123,7 +123,7 @@ namespace SAIN.Editor.GUISections
                         Name = NewName,
                         Description = NewDescription,
                         Creator = NewCreator,
-                        SAINVersion = AssemblyInfo.SAINVersion,
+                        SAINVersion = AssemblyInfo.SAINPresetVersion,
                         DateCreated = DateTime.Today.ToString()
                     };
                     PresetHandler.PresetOptions.Add(definition);

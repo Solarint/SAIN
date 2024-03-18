@@ -43,15 +43,17 @@ namespace SAIN.Components
             if (FrameCount >= 5)
             {
                 FrameCount = 0;
-                if (WhiteLight)
+                if (Player.IsAI)
                 {
-                    if (Player.IsAI)
+                    _lightDetection.DetectAndInvestigateFlashlight(Player);
+                }
+                if (Player.IsYourPlayer)
+                {
+                    bool visibleLight = (WhiteLight || Laser);
+                    bool irLight = (IRLight || IRLaser);
+                    if (visibleLight || irLight)
                     {
-                        _lightDetection.DetectAndInvestigateFlashlight(Player);
-                    }
-                    if (Player.IsYourPlayer)
-                    {
-                        _lightDetection.CreateDetectionPoints(Player);
+                        _lightDetection.CreateDetectionPoints(Player, visibleLight);
                     }
                 }
             }

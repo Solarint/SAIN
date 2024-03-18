@@ -229,6 +229,7 @@ namespace SAIN.SAINComponent.Classes.Info
 
         public float PercentageBeforeExtract { get; set; } = -1f;
         public float SearchMoveSpeed { get; private set; }
+        public bool ForceExtract { get; set; } = false;
 
         public WeaponInfoClass WeaponInfo { get; private set; }
     }

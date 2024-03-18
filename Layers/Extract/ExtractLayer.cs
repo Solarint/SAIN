@@ -1,4 +1,5 @@
 ﻿using EFT;
+using UnityEngine.UIElements;
 
 namespace SAIN.Layers
 {
@@ -19,12 +20,44 @@ namespace SAIN.Layers
         {
             if (SAIN == null) return false;
 
-            if (SAIN.Memory.ExfilPosition == null || !SAIN.Info.FileSettings.Mind.EnableExtracts)
+            if (!SAIN.Info.FileSettings.Mind.EnableExtracts || !SAIN.Info.GlobalSettings.Extract.EnableExtractsGlobal)
             {
                 return false;
             }
 
-            return ExtractFromTime() || ExtractFromInjury() || ExtractFromLoot();
+            if (!Components.BotController.BotExtractManager.IsBotAllowedToExfil(SAIN))
+            {
+                return false;
+            }
+
+            if (!ExtractFromTime() && !ExtractFromInjury() && !ExtractFromLoot() && !ExtractFromExternal())
+            {
+                return false;
+            }
+
+            if (SAIN.Memory.ExfilPosition == null)
+            {
+                BotController.BotExtractManager.TryFindExfilForBot(SAIN);
+                return false;
+            }
+
+            // If the bot can no longer use its selected extract and isn't already in the extract area, select another one. This typically happens if
+            // the bot selects a VEX but the car leaves before the bot reaches it.
+            if (!BotController.BotExtractManager.CanBotsUseExtract(SAIN.Memory.ExfilPoint) && !IsInExtractArea())
+            {
+                SAIN.Memory.ExfilPoint = null;
+                SAIN.Memory.ExfilPosition = null;
+
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool IsInExtractArea()
+        {
+            float distance = (BotOwner.Position - SAIN.Memory.ExfilPosition.Value).sqrMagnitude;
+            return distance < ExtractAction.MinDistanceToStartExtract;
         }
 
         private bool ExtractFromTime()
@@ -73,6 +106,11 @@ namespace SAIN.Layers
         private bool ExtractFromLoot()
         {
             return false;
+        }
+
+        private bool ExtractFromExternal()
+        {
+            return SAIN.Info.ForceExtract;
         }
 
         private bool Logged = false;

@@ -11,6 +11,10 @@ namespace SAIN.SAINComponent.BaseClasses
         {
             Transform = new SAINPersonTransformClass(this);
             Profile = person.Profile;
+            if (person?.AIData?.BotOwner != null)
+            {
+                SAIN = person.AIData.BotOwner.GetComponent<SAINComponentClass>();
+            }
         }
 
         public void Update()

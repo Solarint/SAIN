@@ -1,7 +1,9 @@
+using Aki.Reflection.Patching;
 using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using DrakiaXYZ.VersionChecker;
+using HarmonyLib;
 using SAIN.Components;
 using SAIN.Editor;
 using SAIN.Helpers;
@@ -9,6 +11,8 @@ using SAIN.Layers;
 using SAIN.Plugin;
 using SAIN.Preset;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using static SAIN.AssemblyInfo;
 using static SAIN.Editor.SAINLayout;
@@ -32,10 +36,11 @@ namespace SAIN
 
         public const string SAINGUID = "me.sol.sain";
         public const string SAINName = "SAIN";
-        public const string SAINVersion = "2.1.5";
+        public const string SAINVersion = "2.1.9";
+        public const string SAINPresetVersion = "2.1.6";
 
         public const string SPTGUID = "com.spt-aki.core";
-        public const string SPTVersion = "3.7.1";
+        public const string SPTVersion = "3.7.4";
 
         public const string WaypointsGUID = "xyz.drakia.waypoints";
         public const string WaypointsVersion = "1.3.1";
@@ -88,246 +93,66 @@ namespace SAIN
 
             OpenEditorButton = Config.Bind(category, "Open Editor", false, "Opens the Editor on press");
             OpenEditorConfigEntry = Config.Bind(category, "Open Editor Shortcut", new KeyboardShortcut(KeyCode.F6), "The keyboard shortcut that toggles editor");
-
-            PauseConfigEntry = Config.Bind(category, "Pause Button", new KeyboardShortcut(KeyCode.Pause), "Pause The Game");
         }
 
         public static ConfigEntry<KeyboardShortcut> NextDebugOverlay { get; private set; }
         public static ConfigEntry<KeyboardShortcut> PreviousDebugOverlay { get; private set; }
         public static ConfigEntry<bool> OpenEditorButton { get; private set; }
         public static ConfigEntry<KeyboardShortcut> OpenEditorConfigEntry { get; private set; }
-        public static ConfigEntry<KeyboardShortcut> PauseConfigEntry { get; private set; }
 
         private void Patches()
         {
-            new UpdateEFTSettingsPatch().Enable();
+            var patches = new List<Type>() {
+                typeof(UpdateEFTSettingsPatch),
+                typeof(Patches.Generic.KickPatch),
+                typeof(Patches.Generic.GetBotController),
+                typeof(Patches.Generic.GetBotSpawner),
+                typeof(Patches.Generic.GrenadeThrownActionPatch),
+                typeof(Patches.Generic.GrenadeExplosionActionPatch),
+                typeof(Patches.Generic.BotGroupAddEnemyPatch),
+                typeof(Patches.Generic.BotMemoryAddEnemyPatch),
+                typeof(Patches.Hearing.TryPlayShootSoundPatch),
+                typeof(Patches.Hearing.HearingSensorPatch),
+                typeof(Patches.Hearing.BetterAudioPatch),
+                typeof(Patches.Talk.PlayerTalkPatch),
+                typeof(Patches.Talk.TalkDisablePatch1),
+                typeof(Patches.Talk.TalkDisablePatch2),
+                typeof(Patches.Talk.TalkDisablePatch3),
+                typeof(Patches.Talk.TalkDisablePatch4),
+                typeof(Patches.Vision.NoAIESPPatch),
+                typeof(Patches.Vision.VisionSpeedPatch),
+                typeof(Patches.Vision.VisibleDistancePatch),
+                typeof(Patches.Vision.CheckFlashlightPatch),
+                typeof(Patches.Shoot.AimTimePatch),
+                typeof(Patches.Shoot.AimOffsetPatch),
+                typeof(Patches.Shoot.RecoilPatch),
+                typeof(Patches.Shoot.LoseRecoilPatch),
+                typeof(Patches.Shoot.EndRecoilPatch),
+                typeof(Patches.Shoot.FullAutoPatch),
+                typeof(Patches.Shoot.SemiAutoPatch),
+                typeof(Patches.Components.AddComponentPatch)
+            };
 
-            try
+            // Reflection go brrrrrrrrrrrrrr
+            MethodInfo enableMethod = AccessTools.Method(typeof(ModulePatch), "Enable");
+            foreach (var patch in patches)
             {
-                new Patches.Generic.KickPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Generic.KickPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Generic.GetBotController().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Generic.GetBotSpawner().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Generic.GrenadeThrownActionPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Generic.GrenadeExplosionActionPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Generic.BotGroupAddEnemyPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Generic.BotMemoryAddEnemyPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Hearing.TryPlayShootSoundPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Hearing.HearingSensorPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Hearing.BetterAudioPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Talk.PlayerTalkPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Talk.TalkDisablePatch1().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Talk.TalkDisablePatch2().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Talk.TalkDisablePatch3().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Talk.TalkDisablePatch4().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Vision.NoAIESPPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Vision.VisionSpeedPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Vision.VisibleDistancePatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Vision.CheckFlashlightPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Shoot.AimTimePatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Shoot.AimOffsetPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Shoot.RecoilPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Shoot.LoseRecoilPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Shoot.EndRecoilPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Shoot.FullAutoPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-            try
-            {
-                new Patches.Shoot.SemiAutoPatch().Enable();
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
+                if (!typeof(ModulePatch).IsAssignableFrom(patch))
+                {
+                    Logger.LogError($"Type {patch.Name} is not a ModulePatch");
+                    continue;
+                }
 
-            try
-            {
-                new Patches.Components.AddComponentPatch().Enable();
+                try
+                {
+                    enableMethod.Invoke(Activator.CreateInstance(patch), null);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex);
+                }
             }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex);
-            }
-}
+        }
 
         public static SAINPresetClass LoadedPreset => PresetHandler.LoadedPreset;
 

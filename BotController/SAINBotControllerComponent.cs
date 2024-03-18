@@ -36,7 +36,7 @@ namespace SAIN.Components
         public Vector3 MainPlayerPosition { get; private set; }
         private bool ComponentAdded { get; set; }
         private float UpdatePositionTimer { get; set; }
-
+        
         private void Awake()
         {
             GameWorld.OnDispose += Dispose;

@@ -188,7 +188,7 @@ namespace SAIN.SAINComponent.Classes
         private Vector3 NextCorner()
         {
             int i = Index;
-            if (Path.corners.Length < i)
+            if (Path.corners.Length > i)
             {
                 Index++;
                 return Path.corners[i];
@@ -199,6 +199,9 @@ namespace SAIN.SAINComponent.Classes
         private void MoveToPoint(bool shallSprint)
         {
             RecalcPathTimer = Time.time + 2;
+
+            SAIN.Mover.Sprint(shallSprint);
+            
             if (shallSprint)
             {
                 BotOwner.BotRun.Run(ActiveDestination, false);

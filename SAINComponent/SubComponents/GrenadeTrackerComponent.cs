@@ -31,6 +31,11 @@ namespace SAIN.SAINComponent.SubComponents
 
         private bool EnemyGrenadeHeard()
         {
+            if (BotOwner == null || BotOwner.IsDead || Grenade == null)
+            {
+                return false;
+            }
+
             return (Grenade.transform.position - BotOwner.Position).sqrMagnitude < 100f;
         }
 

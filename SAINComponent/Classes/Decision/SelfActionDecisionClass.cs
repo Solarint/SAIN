@@ -1,5 +1,6 @@
 ﻿using BepInEx.Logging;
 using EFT;
+using EFT.InventoryLogic;
 using SAIN.Components;
 using SAIN.SAINComponent;
 using UnityEngine;
@@ -119,6 +120,7 @@ namespace SAIN.SAINComponent.Classes.Decision
         }
 
         private float BusyHandsTimer;
+        private float NextReloadTime;
 
         private bool CheckContinueSelfAction(out SelfDecision Decision)
         {
@@ -278,6 +280,12 @@ namespace SAIN.SAINComponent.Classes.Decision
 
         private bool StartBotReload()
         {
+            // Only allow reloading every 5 seconds to avoid spamming reload when the weapon data is bad
+            if (NextReloadTime > Time.time)
+            {
+                return false;
+            }
+
             bool needToReload = false;
             if (CanReload)
             {
@@ -301,6 +309,11 @@ namespace SAIN.SAINComponent.Classes.Decision
                         needToReload = true;
                     }
                 }
+            }
+
+            if (needToReload)
+            {
+                NextReloadTime = Time.time + 5;
             }
 
             return needToReload;
