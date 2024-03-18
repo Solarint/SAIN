@@ -8,6 +8,7 @@ using SAIN.Preset.GlobalSettings.Categories;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static EFT.Player;
@@ -96,7 +97,7 @@ namespace SAIN.SAINComponent.Classes.Info
         public WeaponInfo HolsterWeapon { get; private set; } = new WeaponInfo();
     }
 
-    public class WeaponInfo 
+    public class WeaponInfo
     {
         public void Update(Weapon weapon)
         {
@@ -106,7 +107,11 @@ namespace SAIN.SAINComponent.Classes.Info
 
             WeaponClass = EnumValues.ParseWeaponClass(weapon.Template.weapClass);
 
-            var mods = weapon.Mods;
+            // Another thing to fix later
+            var mods = weapon.Mods.ToArray();
+            // OLD:
+            // var mods = weapon.Mods;
+
             for (int i = 0; i < mods.Length; i++)
             {
                 CheckMod(mods[i]);
@@ -300,8 +305,8 @@ namespace SAIN.SAINComponent.Classes.Info
             {
                 Logger.LogInfo(
                     $" Found GearInfo for [{Player.Profile.Nickname}]:" +
-                    $" Body Armor Class: [{BodyArmorClass}]" + 
-                    $" Helmet Armor Class [{HelmetArmorClass}]" + 
+                    $" Body Armor Class: [{BodyArmorClass}]" +
+                    $" Helmet Armor Class [{HelmetArmorClass}]" +
                     $" Has Heavy Helmet? [{HasHeavyHelmet}]" +
                     $" Has EarPiece? [{HasEarPiece}]" +
                     $" Has Face Shield? [{HasFaceShield}]");

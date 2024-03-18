@@ -182,8 +182,10 @@ namespace SAIN.SAINComponent.Classes.Decision
             {
                 return false;
             }
-            bool CheckTime = timeChangeDec < 5f;
-            bool Moving = BotOwner.Mover?.RealDestPoint != Vector3.one && BotOwner.Mover?.DirDestination.magnitude > 2f;
+
+            bool CheckTime = timeChangeDec < 5f; 
+            bool Moving = BotOwner.Mover?.RealDestPoint != Vector3.one && BotOwner.Mover?.DistDestination > 2f;
+
             return Running && Moving && CheckTime;
         }
 

@@ -2,7 +2,6 @@
 using SAIN.Preset.BotSettings.SAINSettings;
 using SAIN.Preset.GlobalSettings;
 using UnityEngine;
-using EFTSettingsGroup = GClass458;
 
 namespace SAIN.Helpers
 {
@@ -10,26 +9,26 @@ namespace SAIN.Helpers
     {
         public static readonly string[] AimMultiplierNames =
         {
-                nameof(EFTSettingsGroup.Aiming.BASE_SHIEF),
-                nameof(EFTSettingsGroup.Aiming.BOTTOM_COEF)
+                nameof(BotSettingsComponents.Aiming.BASE_SHIEF),
+                nameof(BotSettingsComponents.Aiming.BOTTOM_COEF)
         };
 
         public static readonly string[] ScatterMultiplierNames =
         {
-                nameof(EFTSettingsGroup.Aiming.XZ_COEF),
-                nameof(EFTSettingsGroup.Aiming.XZ_COEF_STATIONARY_BULLET),
-                nameof(EFTSettingsGroup.Aiming.XZ_COEF_STATIONARY_GRENADE),
-                nameof(EFTSettingsGroup.Scattering.MinScatter),
-                nameof(EFTSettingsGroup.Scattering.MaxScatter),
-                nameof(EFTSettingsGroup.Scattering.WorkingScatter)
+                nameof(BotSettingsComponents.Aiming.XZ_COEF),
+                nameof(BotSettingsComponents.Aiming.XZ_COEF_STATIONARY_BULLET),
+                nameof(BotSettingsComponents.Aiming.XZ_COEF_STATIONARY_GRENADE),
+                nameof(BotSettingsComponents.Scattering.MinScatter),
+                nameof(BotSettingsComponents.Scattering.MaxScatter),
+                nameof(BotSettingsComponents.Scattering.WorkingScatter)
         };
 
-        public static string VisibleDistance = nameof(EFTSettingsGroup.Core.VisibleDistance);
-        public static string GainSightCoef = nameof(EFTSettingsGroup.Core.GainSightCoef);
+        public static string VisibleDistance = nameof(BotSettingsComponents.Core.VisibleDistance);
+        public static string GainSightCoef = nameof(BotSettingsComponents.Core.GainSightCoef);
 
         private static GlobalSettingsClass GlobalSettings => SAINPlugin.LoadedPreset.GlobalSettings;
 
-        public static void ManualSettingsUpdate(WildSpawnType WildSpawnType, BotDifficulty botDifficulty, EFTSettingsGroup eftSettings, EFTSettingsGroup defaultSettings = null, SAINSettingsClass sainSettings = null)
+        public static void ManualSettingsUpdate(WildSpawnType WildSpawnType, BotDifficulty botDifficulty, BotSettingsComponents eftSettings, BotSettingsComponents defaultSettings = null, SAINSettingsClass sainSettings = null)
         {
             if (sainSettings == null)
             {

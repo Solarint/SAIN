@@ -11,47 +11,45 @@ namespace SAIN.Components.BotController
 {
     public class WeatherVisionClass
     {
+        public readonly float UpdateWeatherVisibilitySec = 20f;
+
         public WeatherVisionClass()
         {
-
         }
 
         public void Update()
         {
             if (GetNewModifiersTimer < Time.time)
             {
-                GetNewModifiersTimer = Time.time + 20f;
-                WeatherVisibility = Visibility();
+                GetNewModifiersTimer = Time.time + UpdateWeatherVisibilitySec;
+                VisibilityNum = CalcWeatherVisibility();
             }
         }
 
-        public float WeatherVisibility { get; private set; }
+        public float VisibilityNum { get; private set; }
 
         private float GetNewModifiersTimer = 0f;
 
-        private static float Visibility()
+        private static float CalcWeatherVisibility()
         {
             if (WeatherController.Instance?.WeatherCurve == null)
             {
                 return 1f;
             }
 
-            float fog = WeatherController.Instance.WeatherCurve.Fog;
-            float fogmod = FogModifier(fog);
+            IWeatherCurve weatherCurve = WeatherController.Instance.WeatherCurve;
 
-            float rain = WeatherController.Instance.WeatherCurve.Rain;
-            float rainmod = RainModifier(rain);
-
-            float clouds = WeatherController.Instance.WeatherCurve.Cloudiness;
-            float cloudsmod = CloudsModifier(clouds);
+            float fogmod = FogModifier(weatherCurve.Fog);
+            float rainmod = RainModifier(weatherCurve.Rain);
+            float cloudsmod = CloudsModifier(weatherCurve.Cloudiness);
 
             // Combines ModifiersClass
             float weathermodifier = 1f * fogmod * rainmod * cloudsmod;
-
             weathermodifier = Mathf.Clamp(weathermodifier, 0.2f, 1f);
 
             return weathermodifier;
         }
+
         private static float FogModifier(float Fog)
         {
             // Points where fog values actually matter. Anything over 0.018 has little to no effect
@@ -106,6 +104,7 @@ namespace SAIN.Components.BotController
 
             return fogModifier;
         }
+
         private static float RainModifier(float Rain)
         {
             // Rain Tiers
@@ -150,6 +149,7 @@ namespace SAIN.Components.BotController
 
             return rainModifier;
         }
+
         private static float CloudsModifier(float Clouds)
         {
             // Clouds Rounding usually scales between -1 and 1, this sets it to scale between 0 and 1
@@ -180,6 +180,7 @@ namespace SAIN.Components.BotController
 
             return cloudsModifier;
         }
+
         private static float InverseScaling(float value, float min, float max)
         {
             // Inverse

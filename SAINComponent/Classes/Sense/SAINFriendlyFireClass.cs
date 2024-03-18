@@ -59,7 +59,7 @@ namespace SAIN.SAINComponent.Classes
                 }
                 target = BotOwner.AimingData.EndTargetPoint;
             }
-            if (target != null && BotOwner.ShootData?.ChecFriendlyFire(BotOwner.WeaponRoot.position, target.Value) == true)
+            if (target != null && BotOwner.ShootData?.CheckFriendlyFire(BotOwner.WeaponRoot.position, target.Value) == true)
             {
                 friendlyFire = FriendlyFireStatus.FriendlyBlock;
             }

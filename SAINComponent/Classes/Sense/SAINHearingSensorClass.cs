@@ -16,7 +16,7 @@ namespace SAIN.SAINComponent.Classes
 
         public void Init()
         {
-            Singleton<GClass520>.Instance.OnSoundPlayed += HearSound;
+            Singleton<BotEventHandler>.Instance.OnSoundPlayed += HearSound;
         }
 
         public void Update()
@@ -25,7 +25,7 @@ namespace SAIN.SAINComponent.Classes
 
         public void Dispose()
         {
-            Singleton<GClass520>.Instance.OnSoundPlayed -= HearSound;
+            Singleton<BotEventHandler>.Instance.OnSoundPlayed -= HearSound;
         }
 
         public void HearSound(IPlayer player, Vector3 position, float power, AISoundType type)

@@ -115,7 +115,7 @@ namespace SAIN.SAINComponent.Classes
             }
             Vector3 position = this.botOwner_0.GetPlayer.PlayerBones.WeaponRoot.position;
             Vector3 realTargetPoint = this.botOwner_0.AimingData.RealTargetPoint;
-            if (this.botOwner_0.ShootData.ChecFriendlyFire(position, realTargetPoint))
+            if (this.botOwner_0.ShootData.CheckFriendlyFire(position, realTargetPoint))
             {
                 return;
             }

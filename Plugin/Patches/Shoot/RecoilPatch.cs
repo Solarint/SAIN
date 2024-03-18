@@ -1,7 +1,6 @@
 ﻿using Aki.Reflection.Patching;
 using EFT;
 using HarmonyLib;
-
 using System.Reflection;
 using UnityEngine;
 using System;
@@ -15,6 +14,7 @@ using SAIN.SAINComponent.Classes.WeaponFunction;
 using SAIN.SAINComponent.Classes.Mover;
 using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.SubComponents;
+using EFTAimingClass = GClass518;
 
 namespace SAIN.Patches.Shoot
 {
@@ -30,7 +30,7 @@ namespace SAIN.Patches.Shoot
         private static float DebugTimer;
 
         [PatchPrefix]
-        public static bool PatchPrefix(ref GClass444 __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
+        public static bool PatchPrefix(ref EFTAimingClass __instance, ref BotOwner ___botOwner_0, ref Vector3 ___vector3_5, ref Vector3 ___vector3_4, ref float ___float_13)
         {
             // Applies aiming offset, recoil offset, and scatter offsets
             Vector3 finalTarget = __instance.RealTargetPoint

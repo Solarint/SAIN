@@ -182,7 +182,8 @@ namespace SAIN.SAINComponent.Classes.Mover
             if (enemy != null)
             {
                 var player = enemy.EnemyIPlayer as Player;
-                if (enemy.RealDistance < 30f && player.MovementContext.ActualLinearSpeed > 0.33f)
+                // Need to double check that ActualLinearSpeed and ActualLinearVelocity are the same, just renamed
+                if (enemy.RealDistance < 30f && player.MovementContext.ActualLinearVelocity > 0.33f)
                 {
                     LookToEnemy(enemy);
                     return true;

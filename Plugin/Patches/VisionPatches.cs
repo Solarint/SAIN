@@ -65,7 +65,7 @@ namespace SAIN.Patches.Vision
                 }
                 if (SAINPlugin.BotController != null)
                 {
-                    weatherMod = SAINPlugin.BotController.WeatherVision.WeatherVisibility;
+                    weatherMod = SAINPlugin.BotController.WeatherVision.VisibilityNum;
                     weatherMod = Mathf.Clamp(weatherMod, 0.5f, 1f);
                 }
 
@@ -115,7 +115,7 @@ namespace SAIN.Patches.Vision
         public static void PatchPostfix(BifacialTransform BotTransform, BifacialTransform enemy, ref float __result, EnemyInfo __instance)
         {
             float dist = (BotTransform.position - enemy.position).magnitude;
-            float weatherModifier = SAINPlugin.BotController.WeatherVision.WeatherVisibility;
+            float weatherModifier = SAINPlugin.BotController.WeatherVision.VisibilityNum;
             float inverseWeatherModifier = Mathf.Sqrt(2f - weatherModifier);
 
             WildSpawnType wildSpawnType = __instance.Owner.Profile.Info.Settings.Role;

@@ -6,14 +6,18 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using EFTCore = GClass455;
-using EFTFileSettings = GClass456;
+using EFTCore = GClass531;
+using EFTCoreContainer = GClass532;
+using EFTFileSettings = BotSettingsComponents;
 using EFTSettingsGroup = GClass458;
-using EFTSoundPlayer = GClass520;
-using EFTStatModifiersClass = GClass453;
-using EFTTime = GClass1190;
+using EFTStatModifiersClass = GClass529;
+using EFTTime = GClass1296;
 using EFTSearchPoint = PlaceForCheck;
 using Aki.Reflection.Patching;
+
+////////
+// Fixed some GClass References here, but classes were renamed in the deobfuscation, so much of this isn't necessary anymore. Need to clean this up
+////////
 
 namespace SAIN.Helpers
 {
@@ -55,9 +59,9 @@ namespace SAIN.Helpers
             return (InventoryControllerClass)InventoryControllerProp.GetValue(player);
         }
 
-        public static EFTSettingsGroup GetEFTSettings(WildSpawnType type, BotDifficulty difficulty)
+        public static BotSettingsComponents GetEFTSettings(WildSpawnType type, BotDifficulty difficulty)
         {
-            return (EFTSettingsGroup)SAINPlugin.LoadedPreset.BotSettings.GetEFTSettings(type, difficulty);
+            return (BotSettingsComponents)SAINPlugin.LoadedPreset.BotSettings.GetEFTSettings(type, difficulty);
         }
 
         public static DateTime UtcNow => EFTTime.UtcNow;
@@ -68,7 +72,7 @@ namespace SAIN.Helpers
 
         public static void PlaySound(IPlayer player, Vector3 pos, float range, AISoundType soundtype)
         {
-            Singleton<EFTSoundPlayer>.Instance?.PlaySound(player, pos, range, soundtype);
+            Singleton<BotEventHandler>.Instance?.PlaySound(player, pos, range, soundtype);
         }
     }
 
@@ -101,13 +105,13 @@ namespace SAIN.Helpers
             UpdateCoreSettings();
             return new EFTCoreSettings
             {
-                Core = EFTFileSettings.Core,
+                Core = EFTCoreContainer.Core,
             };
         }
 
         public static void UpdateCoreSettings()
         {
-            var core = EFTFileSettings.Core;
+            var core = EFTCoreContainer.Core;
             core.SCAV_GROUPS_TOGETHER = false;
             core.DIST_NOT_TO_GROUP = 50f;
             core.DIST_NOT_TO_GROUP_SQR = 50f * 50f;
@@ -123,12 +127,12 @@ namespace SAIN.Helpers
 
         public static void UpdateArmorClassCoef(float coef)
         {
-            EFTFileSettings.Core.ARMOR_CLASS_COEF = coef;
+            EFTCoreContainer.Core.ARMOR_CLASS_COEF = coef;
         }
 
         public static void UpdateCoreSettings(EFTCoreSettings newCore)
         {
-            EFTFileSettings.Core = newCore.Core;
+            EFTCoreContainer.Core = newCore.Core;
         }
 
         public EFTCore Core;
@@ -146,12 +150,12 @@ namespace SAIN.Helpers
             WildSpawnType = type;
             foreach (BotDifficulty diff in difficulties)
             {
-                Settings.Add(diff, EFTFileSettings.GetSettings(diff, type));
+                Settings.Add(diff, EFTCoreContainer.GetSettings(diff, type));
             }
         }
 
         public string Name;
         public WildSpawnType WildSpawnType;
-        public Dictionary<BotDifficulty, EFTSettingsGroup> Settings = new Dictionary<BotDifficulty, EFTSettingsGroup>();
+        public Dictionary<BotDifficulty, BotSettingsComponents> Settings = new Dictionary<BotDifficulty, BotSettingsComponents>();
     }
 }
