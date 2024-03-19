@@ -72,6 +72,9 @@ namespace SAIN.SAINComponent.Classes.Mover
                         return false;
                     }
                     pointToGo = navHit.position;
+
+                    SAINVaultClass.FindVaultPoint(Player, Path, out SAINVaultPoint vaultPoint);
+
                     return true;
                 }
             }

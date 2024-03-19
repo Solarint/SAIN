@@ -1,5 +1,6 @@
 ﻿using Comfort.Common;
 using EFT;
+using SAIN.SAINComponent.Classes.Mover;
 using UnityEngine;
 
 namespace SAIN.Components
@@ -22,6 +23,11 @@ namespace SAIN.Components
         private void Update()
         {
             CamoClass.Update();
+
+            if (MainPlayer != null)
+            {
+                SAINVaultClass.DebugCheckObstacles(MainPlayer);
+            }
         }
 
         private void OnDestroy()

@@ -10,6 +10,7 @@ using SAIN.Helpers;
 using SAIN.Layers;
 using SAIN.Plugin;
 using SAIN.Preset;
+using SAIN.SAINComponent.Classes.Mover;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -165,6 +166,8 @@ namespace SAIN
             ModDetection.Update();
             SAINEditor.Update();
             GameWorldHandler.Update();
+
+            SAINVaultClass.DebugVaultPointCount();
 
             LoadedPreset.GlobalSettings.Personality.Update();
         }
