@@ -8,6 +8,8 @@ namespace SAIN.Preset.BotSettings.SAINSettings
     {
         public static readonly SAINSettingsClass Defaults = new SAINSettingsClass();
 
+        public bool SAINEnabled { get; set; } = true;
+
         [NameAndDescription("Bot Aiming Settings",
             "Anything related to a bot's Aiming settings used by default EFT Code")]
         public SAINAimingSettings Aiming = new SAINAimingSettings();

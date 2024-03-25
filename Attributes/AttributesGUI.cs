@@ -5,6 +5,7 @@ using SAIN.Editor.Util;
 using SAIN.Helpers;
 using SAIN.Preset;
 using SAIN.Preset.BotSettings.SAINSettings;
+using SAIN.Preset.GlobalSettings.Categories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,10 +96,67 @@ namespace SAIN.Attributes
                         ModifyLists.AddOrRemove(
                             value as List<BotType>, out wasEdited);
                     }
+                    else if (value is List<Brain>)
+                    {
+                        ModifyLists.AddOrRemove(
+                            value as List<Brain>, out wasEdited);
+                    }
                     else if (value is List<string>)
                     {
                     }
                 }
+            }
+            return value;
+        }
+
+        public static object FindListTypeAndEdit(object value, AttributesInfoClass attributes, out bool wasEdited, GUIEntryConfig entryConfig = null)
+        {
+            wasEdited = false;
+            float spacing = 3f;
+
+            if (ExpandableList(attributes, entryConfig.EntryHeight + 5))
+            {
+                if (value is Dictionary<ICaliber, float>)
+                {
+                    EditFloatDictionary<ICaliber>(
+                        value, attributes, out wasEdited);
+                }
+                else if (value is Dictionary<IWeaponClass, float>)
+                {
+                    EditFloatDictionary<IWeaponClass>(
+                        value, attributes, out wasEdited);
+                }
+                else if (value is List<WildSpawnType>)
+                {
+                    ModifyLists.AddOrRemove(
+                        value as List<WildSpawnType>, out wasEdited);
+                }
+                else if (value is List<BotDifficulty>)
+                {
+                    ModifyLists.AddOrRemove(
+                        value as List<BotDifficulty>, out wasEdited);
+                }
+                else if (value is List<BotType>)
+                {
+                    ModifyLists.AddOrRemove(
+                        value as List<BotType>, out wasEdited);
+                }
+                else if (value is List<Brain>)
+                {
+                    ModifyLists.AddOrRemove(
+                        value as List<Brain>, out wasEdited);
+                }
+                else if (value is List<string>)
+                {
+                }
+                else
+                {
+                    spacing = 0f;
+                }
+            }
+            if (spacing != 0f)
+            {
+                Space(spacing);
             }
             return value;
         }

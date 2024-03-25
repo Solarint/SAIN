@@ -121,15 +121,45 @@ namespace SAIN.Editor.Util
         {
             wasEdited = false;
             int i = StartListEdit(optionsPerLine, out var options);
-            foreach (var botType in BotTypeDefinitions.BotTypes.Values)
+
+            List<BotType> botList = BotTypeDefinitions.BotTypesList;
+
+            for (int b = 0; b < botList.Count; b++)
             {
-                AddOrRemove(botType, list, out bool newEdit, botType.Name, botType.Description, options);
+                BotType bot = botList[b];
+
+                AddOrRemove(bot, list, out bool newEdit, bot.Name, bot.Description, options);
+
                 if (newEdit)
                 {
                     wasEdited = true;
                 }
                 i = ListSpacing(i, optionsPerLine);
             }
+
+            EndListEdit();
+        }
+
+        public static void AddOrRemove(List<Brain> list, out bool wasEdited, int optionsPerLine = 5)
+        {
+            wasEdited = false;
+            int i = StartListEdit(optionsPerLine, out var options);
+
+            List<Brain> botList = BotBrains.AllBrainsList;
+
+            for (int b = 0; b < botList.Count; b++)
+            {
+                Brain brain = botList[b];
+
+                AddOrRemove(brain, list, out bool newEdit, null, null, options);
+
+                if (newEdit)
+                {
+                    wasEdited = true;
+                }
+                i = ListSpacing(i, optionsPerLine);
+            }
+
             EndListEdit();
         }
 

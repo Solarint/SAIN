@@ -28,7 +28,7 @@ namespace SAIN
 
         public static void Init()
         {
-            //var bigBrainSetting = SAINPlugin.LoadedPreset.GlobalSettings.BigBrain.BrainSettings;
+            List<Brain> enabledBrains = SAINPlugin.LoadedPreset.GlobalSettings.General.SAINEnabledTypes;
 
             List<string> stringList = new List<string>();
             List<string> LayersToRemove = new List<string>
@@ -41,9 +41,14 @@ namespace SAIN
                 "Request"
             };
 
+            for (int i = 0; i < enabledBrains.Count; i++)
+            {
+                stringList.Add(enabledBrains[i].ToString());
+            }
+
             foreach (var brain in BotBrains.AllBrains)
             {
-                stringList.Add(brain.ToString());
+                //stringList.Add(brain.ToString());
             }
 
             //Logger.LogInfo(stringList.Count);
@@ -55,6 +60,8 @@ namespace SAIN
             BrainManager.AddCustomLayer(typeof(CombatSoloLayer), stringList, 20);
 
             BrainManager.RemoveLayers(LayersToRemove, stringList);
+
+            BigBrainInitialized = true;
         }
 
         public static readonly List<string> SAINLayers = new List<string>
@@ -63,5 +70,7 @@ namespace SAIN
             ExtractLayer.Name,
             CombatSoloLayer.Name,
         };
+
+        public static bool BigBrainInitialized;
     }
 }

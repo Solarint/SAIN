@@ -286,7 +286,7 @@ namespace SAIN.Editor
 
         public static void Space(float value, bool enable = true)
         {
-            if (enable) GUILayout.Space(value);
+            if (enable && value > 0) GUILayout.Space(value);
         }
 
         public static void BeginGroup(Rect rect)

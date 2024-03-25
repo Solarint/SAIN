@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SAIN.Preset.GlobalSettings.Categories
@@ -20,6 +21,8 @@ namespace SAIN.Preset.GlobalSettings.Categories
         }
 
         public static readonly Brain[] AllBrains = Enum.GetValues(typeof(Brain)).Cast<Brain>().ToArray();
+
+        public static readonly List<Brain> AllBrainsList = AllBrains.ToList();
 
         public static readonly Brain[] Bosses =
         {
