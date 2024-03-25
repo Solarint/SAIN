@@ -45,10 +45,8 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool SteerByPriority(bool lookRandomifFalse = true)
         {
-            UpdateSteer();
-
             SteerRandomToggle = lookRandomifFalse;
-
+            UpdateSteer();
             HeardSoundSanityCheck();
 
             switch (CurrentSteerPriority)
