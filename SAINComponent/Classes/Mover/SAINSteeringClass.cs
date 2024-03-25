@@ -1,4 +1,5 @@
 ﻿using EFT;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using static UnityEngine.UI.GridLayoutGroup;
@@ -17,71 +18,149 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public void Update()
         {
+            if (SteerPriorityUpdateTick >= SteerPriorityUpdateFreq)
+            {
+                SteerPriorityUpdateTick = 0;
+                //UpdateSteer();
+            }
+            SteerPriorityUpdateTick++;
+        }
+
+        private int SteerPriorityUpdateTick = 0;
+        private static int SteerPriorityUpdateFreq = 5;
+
+        private SteerPriority UpdateSteer()
+        {
+            LastSteerPriority = CurrentSteerPriority;
+            CurrentSteerPriority = FindSteerPriority();
+            return CurrentSteerPriority;
         }
 
         public void Dispose()
         {
         }
 
+        public bool SteerRandomToggle;
+        private PlaceForCheck LastHeardSound;
+
         public bool SteerByPriority(bool lookRandomifFalse = true)
         {
+            UpdateSteer();
+
+            SteerRandomToggle = lookRandomifFalse;
+
+            HeardSoundSanityCheck();
+
+            switch (CurrentSteerPriority)
+            {
+                case SteerPriority.None: 
+                    break;
+                case SteerPriority.Shooting:
+                    break;
+                case SteerPriority.Enemy: 
+                    break;
+                case SteerPriority.LastHit:
+                    LookToLastHitPos();
+                    break;
+                case SteerPriority.UnderFire:
+                    LookToUnderFirePos();
+                    break;
+                case SteerPriority.LastSeenEnemy:
+                    LookToEnemyLastSeenPos();
+                    break;
+                case SteerPriority.Hear:
+                    if (LastHeardSound != null)
+                    {
+                        LookToHearPos(LastHeardSound.Position);
+                    }
+                    else if (SAINPlugin.DebugMode)
+                    {
+                        Logger.LogError("Cannot look toward null PlaceForCheck.");
+                    }
+                    break;
+                case SteerPriority.LastSeenEnemyLong:
+                    LookToEnemyLastSeenPos();
+                    break;
+                case SteerPriority.MoveDirection:
+                    LookToMovingDirection();
+                    break;
+                case SteerPriority.Random:
+                    LookToRandomPosition();
+                    break;
+            }
+
+            return CurrentSteerPriority != SteerPriority.None && CurrentSteerPriority != SteerPriority.Random;
+        }
+
+        private void HeardSoundSanityCheck()
+        {
+            if (CurrentSteerPriority == SteerPriority.Hear && LastHeardSound == null)
+            {
+                if (SAINPlugin.DebugMode)
+                {
+                    Logger.LogDebug("Bot was told to steer toward something they heard, but the place to check is null.");
+                }
+                UpdateSteer();
+            }
+        }
+
+        // How long a bot will look in the direction they were shot from instead of other places
+        private readonly float Steer_LastHitTime = 1f;
+        // How long a bot will look at where they last saw an enemy instead of something they hear
+        private readonly float Steer_TimeSinceSeen_Short = 2f;
+        // How long a bot will look at where they last saw an enemy if they don't hear any other threats
+        private readonly float Steer_TimeSinceSeen_Long = 12f;
+        // How far a sound can be for them to react by looking toward it.
+        private readonly float Steer_HeardSound_Dist = 30f;
+        // How old a sound can be, in seconds, for them to react by looking toward it.
+        private readonly float Steer_HeardSound_Age = 2f;
+
+        public SteerPriority FindSteerPriority()
+        {
+            // return values are ordered by priority, so the targets get less "important" as they descend down this function.
             if (LookToAimTarget())
             {
-                SteerPriority = SteerPriority.None;
-                return true;
+                return SteerPriority.Shooting;
             }
             if (EnemyVisible())
             {
-                SteerPriority = SteerPriority.Enemy;
-                return true;
+                return SteerPriority.Enemy;
             }
-            if (Time.time - BotOwner.Memory.LastTimeHit < 1f)
+            if (Time.time - BotOwner.Memory.LastTimeHit < Steer_LastHitTime)
             {
-                SteerPriority = SteerPriority.LastHit;
-                LookToLastHitPos();
-                return true;
+                return SteerPriority.LastHit;
             }
             if (BotOwner.Memory.IsUnderFire)
             {
-                SteerPriority = SteerPriority.UnderFire;
-                LookToUnderFirePos();
-                return true;
+                return SteerPriority.UnderFire;
             }
-            if (SAIN.Enemy?.TimeSinceSeen < 2f && SAIN.Enemy.Seen)
+            if (SAIN.Enemy?.TimeSinceSeen < Steer_TimeSinceSeen_Short && SAIN.Enemy.Seen)
             {
-                SteerPriority = SteerPriority.LastSeenEnemy;
-                LookToEnemyLastSeenPos();
-                return true;
+                return SteerPriority.LastSeenEnemy;
             }
-            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 30f, 2f);
-            if (sound != null)
+            LastHeardSound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, Steer_HeardSound_Dist, Steer_HeardSound_Age);
+            if (LastHeardSound != null)
             {
-                SteerPriority = SteerPriority.Hear;
-                LookToHearPos(sound.Position);
-                return true;
+                return SteerPriority.Hear;
             }
-            if (SAIN.Enemy?.TimeSinceSeen < 12f && SAIN.Enemy.Seen)
+            if (SAIN.Enemy?.TimeSinceSeen < Steer_TimeSinceSeen_Long && SAIN.Enemy.Seen)
             {
-                SteerPriority = SteerPriority.LastSeenEnemy;
-                LookToEnemyLastSeenPos();
-                return true;
+                return SteerPriority.LastSeenEnemyLong;
             }
             if (SAIN.Memory.Decisions.Main.Current == SoloDecision.Investigate)
             {
-                SteerPriority = SteerPriority.MoveDirection;
-                LookToMovingDirection();
-                return true;
+                return SteerPriority.MoveDirection;
             }
-
-            if (lookRandomifFalse)
+            if (SteerRandomToggle)
             {
-                SteerPriority = SteerPriority.Random;
-                LookToRandomPosition();
+                return SteerPriority.Random;
             }
-            return false;
+            return SteerPriority.None;
         }
 
-        public SteerPriority SteerPriority { get; private set; }
+
+        public SteerPriority CurrentSteerPriority { get; private set; } = SteerPriority.None;
+        public SteerPriority LastSteerPriority { get; private set; } = SteerPriority.None;
 
         private bool LookToVisibleSound()
         {
@@ -343,14 +422,76 @@ namespace SAIN.SAINComponent.Classes.Mover
         }
 
         private float RandomLookTimer = 0f;
+
+        // Old code, pre refactor on 3/25/2024
+        public bool SteerByPriorityOld(bool lookRandomifFalse = true)
+        {
+            if (LookToAimTarget())
+            {
+                CurrentSteerPriority = SteerPriority.None;
+                return true;
+            }
+            if (EnemyVisible())
+            {
+                CurrentSteerPriority = SteerPriority.Enemy;
+                return true;
+            }
+            if (Time.time - BotOwner.Memory.LastTimeHit < 1f)
+            {
+                CurrentSteerPriority = SteerPriority.LastHit;
+                LookToLastHitPos();
+                return true;
+            }
+            if (BotOwner.Memory.IsUnderFire)
+            {
+                CurrentSteerPriority = SteerPriority.UnderFire;
+                LookToUnderFirePos();
+                return true;
+            }
+            if (SAIN.Enemy?.TimeSinceSeen < 2f && SAIN.Enemy.Seen)
+            {
+                CurrentSteerPriority = SteerPriority.LastSeenEnemy;
+                LookToEnemyLastSeenPos();
+                return true;
+            }
+            var sound = BotOwner.BotsGroup.YoungestFastPlace(BotOwner, 30f, 2f);
+            if (sound != null)
+            {
+                CurrentSteerPriority = SteerPriority.Hear;
+                LookToHearPos(sound.Position);
+                return true;
+            }
+            if (SAIN.Enemy?.TimeSinceSeen < 12f && SAIN.Enemy.Seen)
+            {
+                CurrentSteerPriority = SteerPriority.LastSeenEnemy;
+                LookToEnemyLastSeenPos();
+                return true;
+            }
+            if (SAIN.Memory.Decisions.Main.Current == SoloDecision.Investigate)
+            {
+                CurrentSteerPriority = SteerPriority.MoveDirection;
+                LookToMovingDirection();
+                return true;
+            }
+
+            if (lookRandomifFalse)
+            {
+                CurrentSteerPriority = SteerPriority.Random;
+                LookToRandomPosition();
+            }
+            return false;
+        }
+
     }
 
     public enum SteerPriority
     {
         None,
+        Shooting,
         Enemy,
         Hear,
         LastSeenEnemy,
+        LastSeenEnemyLong,
         Random,
         LastHit,
         UnderFire,

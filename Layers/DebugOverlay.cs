@@ -66,7 +66,7 @@ namespace SAIN.Layers
                 var info = sain.Info;
                 var decisions = sain.Memory.Decisions;
                 stringBuilder.AppendLine($"Name: [{sain.Person.Name}] Personality: [{info.Personality}] Type: [{info.Profile.WildSpawnType}]");
-                stringBuilder.AppendLine($"Steering: [{sain.Steering.SteerPriority}]");
+                stringBuilder.AppendLine($"Steering: [{sain.Steering.CurrentSteerPriority}]");
 
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine("Decisions");
