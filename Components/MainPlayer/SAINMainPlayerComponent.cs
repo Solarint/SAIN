@@ -26,7 +26,7 @@ namespace SAIN.Components
 
             if (MainPlayer != null)
             {
-                SAINVaultClass.DebugCheckObstacles(MainPlayer);
+                //SAINVaultClass.DebugCheckObstacles(MainPlayer);
             }
         }
 

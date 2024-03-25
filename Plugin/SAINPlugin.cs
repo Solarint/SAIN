@@ -41,7 +41,7 @@ namespace SAIN
         public const string SAINPresetVersion = "2.1.6";
 
         public const string SPTGUID = "com.spt-aki.core";
-        public const string SPTVersion = "3.7.4";
+        public const string SPTVersion = "3.8.0";
 
         public const string WaypointsGUID = "xyz.drakia.waypoints";
         public const string WaypointsVersion = "1.3.1";
@@ -54,9 +54,10 @@ namespace SAIN
     }
 
     [BepInPlugin(SAINGUID, SAINName, SAINVersion)]
-    [BepInDependency(SPTGUID, SPTVersion)]
     [BepInDependency(BigBrainGUID, BigBrainVersion)]
-    [BepInDependency(WaypointsGUID, WaypointsVersion)]
+    // For Testing
+    //[BepInDependency(WaypointsGUID, WaypointsVersion)]
+    //[BepInDependency(SPTGUID, SPTVersion)]
     [BepInProcess(EscapeFromTarkov)]
     public class SAINPlugin : BaseUnityPlugin
     {
@@ -104,7 +105,8 @@ namespace SAIN
         private void Patches()
         {
             var patches = new List<Type>() {
-                typeof(UpdateEFTSettingsPatch),
+                // Patch does nothing, commenting out
+                //typeof(UpdateEFTSettingsPatch),
                 typeof(Patches.Generic.KickPatch),
                 typeof(Patches.Generic.GetBotController),
                 typeof(Patches.Generic.GetBotSpawner),

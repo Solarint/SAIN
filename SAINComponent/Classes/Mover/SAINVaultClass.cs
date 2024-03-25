@@ -20,7 +20,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public void Update()
         {
-            TryVaulting();
+            //TryVaulting();
         }
 
         public static void DebugCheckObstacles(Player player)
