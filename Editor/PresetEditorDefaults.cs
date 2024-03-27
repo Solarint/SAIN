@@ -37,5 +37,9 @@ namespace SAIN.Editor
         [Default(1f)]
         [MinMax(1f, 2f, 100f)]
         public float ConfigScaling = 1f;
+
+        [Name("Collect and Export Bot Layer and Brain Info")]
+        [Default(false)]
+        public bool CollectBotLayerBrainInfo = false;
     }
 }

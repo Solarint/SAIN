@@ -82,6 +82,7 @@ namespace SAIN.Preset.GlobalSettings
             { ICaliber.Caliber40x46, 1f },
             { ICaliber.Caliber40mmRU, 1f },
             { ICaliber.Caliber127x108, 0.5f },
+            { ICaliber.Caliber68x51, 0.6f },
             { ICaliber.Default, 0.5f },
         };
 

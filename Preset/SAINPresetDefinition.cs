@@ -18,7 +18,7 @@ namespace SAIN.Preset
                 Name = Name,
                 Description = Description,
                 Creator = "None",
-                SAINVersion = AssemblyInfo.SAINPresetVersion,
+                SAINVersion = AssemblyInfoClass.SAINPresetVersion,
                 DateCreated = DateTime.Now.ToString()
             };
         }
@@ -30,7 +30,7 @@ namespace SAIN.Preset
                 Name = difficulty,
                 Description = description ?? $"The Default {difficulty} SAIN Preset.",
                 Creator = "Solarint",
-                SAINVersion = AssemblyInfo.SAINPresetVersion,
+                SAINVersion = AssemblyInfoClass.SAINPresetVersion,
                 DateCreated = DateTime.Now.ToString()
             };
             PresetHandler.SavePresetDefinition(preset);

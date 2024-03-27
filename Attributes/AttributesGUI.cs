@@ -154,10 +154,9 @@ namespace SAIN.Attributes
                     spacing = 0f;
                 }
             }
-            if (spacing != 0f)
-            {
-                Space(spacing);
-            }
+
+            Space(spacing);
+
             return value;
         }
 

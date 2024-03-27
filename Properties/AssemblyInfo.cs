@@ -1,7 +1,7 @@
 ﻿using DrakiaXYZ.VersionChecker;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using static SAIN.AssemblyInfo;
+using static SAIN.AssemblyInfoClass;
 using SAIN;
 
 [assembly: AssemblyTitle(Title)]
@@ -16,4 +16,4 @@ using SAIN;
 [assembly: Guid("d08f8f91-95cf-4aa5-b7d8-f5d58f2feabb")]
 [assembly: AssemblyVersion(SAINVersion)]
 [assembly: AssemblyFileVersion(SAINVersion)]
-[assembly: VersionChecker(AssemblyInfo.TarkovVersion)]
+[assembly: VersionChecker(AssemblyInfoClass.TarkovVersion)]

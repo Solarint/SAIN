@@ -9,14 +9,32 @@ namespace SAIN.Preset.GlobalSettings
 {
     public class GeneralSettings
     {
-        [Name("SAIN Enabled on Bots")]
+        [Name("SAIN Toggle Options")]
         [Description("Enable or disable SAIN for specific bot types")]
-        [DefaultList(nameof(SAINEnabledTypesDefault))]
-        public List<Brain> SAINEnabledTypes = new List<Brain>(BotBrains.AllBrains);
+        [DefaultDictionary(nameof(SAINEnabledTypesDefault))]
+        public List<Brain> EnabledBrains = new List<Brain>(BotBrains.AllBrainsList);
 
         [JsonIgnore]
         [Hidden]
-        private static List<Brain> SAINEnabledTypesDefault = new List<Brain>(BotBrains.AllBrains);
+        private static List<Brain> SAINEnabledTypesDefault = new List<Brain>(BotBrains.AllBrainsList);
+
+        [Description("Requires Restart. Dont touch unless you know what this is")]
+        [Advanced]
+        [Default(24)]
+        [MinMax(0, 100)]
+        public int SAINCombatSquadLayerPriority = 24;
+
+        [Description("Requires Restart. Dont touch unless you know what this is")]
+        [Advanced]
+        [Default(22)]
+        [MinMax(0, 100)]
+        public int SAINExtractLayerPriority = 22;
+
+        [Description("Requires Restart. Dont touch unless you know what this is")]
+        [Advanced]
+        [Default(20)]
+        [MinMax(0, 100)]
+        public int SAINCombatSoloLayerPriority = 20;
 
         [Name("Bot Grenades")]
         [Default(true)]
@@ -118,42 +136,5 @@ namespace SAIN.Preset.GlobalSettings
         [Description("Disable all SAIN based handling of bot talking. No more squad chatter, no more quiet bots, completely disables SAIN's handling of bot voices")]
         [Default(false)]
         public bool DisableBotTalkPatching = false;
-    }
-
-    public class BotBrainDefinitionInfoClass
-    {
-        static BotBrainDefinitionInfoClass()
-        {
-            BotBrainInfos = new Dictionary<Brain, BotBrainDefinition>();
-            BotBrainInfosList = new List<BotBrainDefinition>();
-
-            List<Brain> allBrains = BotBrains.AllBrainsList;
-            for (int i = 0; i < allBrains.Count; i++)
-            {
-                Brain brain = allBrains[i];
-                BotBrainDefinition brainDef = new BotBrainDefinition(brain);
-
-                BotBrainInfos.Add(brain, brainDef);
-                BotBrainInfosList.Add(brainDef);
-            }
-        }
-
-        public static Dictionary<Brain, BotBrainDefinition> BotBrainInfos;
-        public static List<BotBrainDefinition> BotBrainInfosList;
-
-    }
-
-    public sealed class BotBrainDefinition
-    {
-        public BotBrainDefinition(Brain brain, string name = null, string description = null)
-        {
-            Brain = brain;
-            Name = name ?? brain.ToString();
-            Description = description ?? string.Empty;
-        }
-
-        public string Name;
-        public string Description;
-        public Brain Brain;
     }
 }

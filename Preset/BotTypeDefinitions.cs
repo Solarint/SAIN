@@ -13,25 +13,58 @@ namespace SAIN.Preset
         public string Description;
         public string Section;
         public WildSpawnType WildSpawnType;
+        public string BaseBrain;
     }
 
     public class BotTypeDefinitions
     {
-        public static readonly Dictionary<WildSpawnType, BotType> BotTypes = new Dictionary<WildSpawnType, BotType>();
-        public static readonly List<BotType> BotTypesList = CreateBotTypes();
-        public static readonly List<WildSpawnType> WildSpawnList = new List<WildSpawnType>();
+        public static Dictionary<WildSpawnType, BotType> BotTypes = new Dictionary<WildSpawnType, BotType>();
+        public static List<BotType> BotTypesList;
         public static readonly List<string> BotTypesNames = new List<string>();
 
         static BotTypeDefinitions()
         {
+            ImportBotTypes();
             for (int i = 0; i < BotTypesList.Count; i++)
             {
                 var botType = BotTypesList[i];
                 var wildSpawn = botType.WildSpawnType;
 
                 BotTypesNames.Add(botType.Name);
-                WildSpawnList.Add(wildSpawn);
                 BotTypes.Add(wildSpawn, botType);
+            }
+        }
+
+        private static readonly string FileName = "BotTypes";
+
+        public static void ImportBotTypes()
+        {
+            if (JsonUtility.Load.LoadObject(out List<BotType> botTypes, FileName))
+            {
+                BotTypesList = botTypes;
+            }
+            else
+            {
+                BotTypesList = CreateBotTypes();
+                ExportBotTypes();
+            }
+        }
+
+        public static void ExportBotTypes()
+        {
+            JsonUtility.SaveObjectToJson(BotTypesList, FileName);
+        }
+
+        public static BotType GetBotType(WildSpawnType wildSpawnType)
+        {
+            if (BotTypes.ContainsKey(wildSpawnType))
+            {
+                return BotTypes[wildSpawnType];
+            }
+            else
+            {
+                Logger.LogError($"WildSpawnType {wildSpawnType} does not exist in BotType Dictionary");
+                return BotTypes[WildSpawnType.assault];
             }
         }
 

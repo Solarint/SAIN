@@ -9,6 +9,9 @@ using SAIN.SAINComponent.Classes.WeaponFunction;
 using SAIN.SAINComponent.Classes.Mover;
 using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.SubComponents;
+using SAIN.Preset;
+using static EFT.SpeedTree.TreeWind;
+using SAIN.Preset.GlobalSettings.Categories;
 
 namespace SAIN.Components.BotController
 {
@@ -53,6 +56,28 @@ namespace SAIN.Components.BotController
         private bool GameEnding = false;
         private bool Subscribed = false;
 
+        private void SetBrainInfo(BotOwner botOwner)
+        {
+            if (!SAINPlugin.EditorDefaults.CollectBotLayerBrainInfo)
+            {
+                return;
+            }
+
+            WildSpawnType role = botOwner.Profile.Info.Settings.Role;
+            string brain = botOwner.Brain.BaseBrain.ShortName();
+            BotType botType = BotTypeDefinitions.GetBotType(role);
+            if (botType.BaseBrain.IsNullOrEmpty())
+            {
+                botType.BaseBrain = brain;
+                Logger.LogInfo($"Set {role} BaseBrain to {brain}");
+                BotTypeDefinitions.ExportBotTypes();
+            }
+            else
+            {
+                Logger.LogError($"{role} BaseBrain is already set to {botType.BaseBrain}. Can't set it to {brain}");
+            }
+        }
+
         public void AddBot(BotOwner botOwner)
         {
             try
@@ -66,10 +91,17 @@ namespace SAIN.Components.BotController
                     }
 
                     botOwner.LeaveData.OnLeave += RemoveBot;
-                    var role = settings.Role;
-                    if (ExclusionList.Contains(role))
+                    SetBrainInfo(botOwner);
+
+                    if (ExclusionList.Contains(settings.Role))
                     {
-                        botOwner.GetOrAddComponent<SAINNoBushESP>().Init(botOwner);
+                        AddNoBushESP(botOwner);
+                        return;
+                    }
+
+                    if (!CheckIfSAINEnabled(botOwner))
+                    {
+                        AddNoBushESP(botOwner);
                         return;
                     }
 
@@ -88,6 +120,17 @@ namespace SAIN.Components.BotController
             {
                 Logger.LogError($"Add Component Error: {ex}");
             }
+        }
+
+        public void AddNoBushESP(BotOwner botOwner)
+        {
+            botOwner.GetOrAddComponent<SAINNoBushESP>().Init(botOwner);
+        }
+
+        private bool CheckIfSAINEnabled(BotOwner botOwner)
+        {
+            Brain brain = BotBrains.Parse(botOwner.Brain.BaseBrain.ShortName());
+            return SAINPlugin.LoadedPreset.GlobalSettings.General.EnabledBrains.Contains(brain);
         }
 
         public void RemoveBot(BotOwner botOwner)

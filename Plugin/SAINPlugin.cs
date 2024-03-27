@@ -1,6 +1,5 @@
 using Aki.Reflection.Patching;
 using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using DrakiaXYZ.VersionChecker;
 using HarmonyLib;
@@ -15,44 +14,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static SAIN.AssemblyInfo;
-using static SAIN.Editor.SAINLayout;
+using static SAIN.AssemblyInfoClass;
 
 namespace SAIN
 {
-    public static class AssemblyInfo
-    {
-        public const string Title = SAINName;
-        public const string Description = "Full Revamp of Escape from Tarkov's AI System.";
-        public const string Configuration = SPTVersion;
-        public const string Company = "";
-        public const string Product = SAINName;
-        public const string Copyright = "Copyright © 2023 Solarint";
-        public const string Trademark = "";
-        public const string Culture = "";
-
-        public const int TarkovVersion = 29197;
-
-        public const string EscapeFromTarkov = "EscapeFromTarkov.exe";
-
-        public const string SAINGUID = "me.sol.sain";
-        public const string SAINName = "SAIN";
-        public const string SAINVersion = "2.1.9";
-        public const string SAINPresetVersion = "2.1.6";
-
-        public const string SPTGUID = "com.spt-aki.core";
-        public const string SPTVersion = "3.8.0";
-
-        public const string WaypointsGUID = "xyz.drakia.waypoints";
-        public const string WaypointsVersion = "1.3.1";
-
-        public const string BigBrainGUID = "xyz.drakia.bigbrain";
-        public const string BigBrainVersion = "0.3.1";
-
-        public const string LootingBots = "me.skwizzy.lootingbots";
-        public const string Realism = "RealismMod";
-    }
-
     [BepInPlugin(SAINGUID, SAINName, SAINVersion)]
     [BepInDependency(BigBrainGUID, BigBrainVersion)]
     // For Testing
@@ -172,6 +137,7 @@ namespace SAIN
             SAINVaultClass.DebugVaultPointCount();
 
             LoadedPreset.GlobalSettings.Personality.Update();
+            BigBrainHandler.CheckLayers();
         }
 
         private void Start() => SAINEditor.Init();
@@ -179,68 +145,5 @@ namespace SAIN
         private void LateUpdate() => SAINEditor.LateUpdate();
 
         private void OnGUI() => SAINEditor.OnGUI();
-    }
-
-    public static class ModDetection
-    {
-        static ModDetection()
-        {
-            ModsCheckTimer = Time.time + 5f;
-        }
-
-        public static void Update()
-        {
-            if (!ModsChecked && ModsCheckTimer < Time.time && ModsCheckTimer > 0)
-            {
-                ModsChecked = true;
-                CheckPlugins();
-            }
-        }
-
-        public static bool LootingBotsLoaded { get; private set; }
-        public static bool RealismLoaded { get; private set; }
-
-        public static void CheckPlugins()
-        {
-            if (Chainloader.PluginInfos.ContainsKey(LootingBots))
-            {
-                LootingBotsLoaded = true;
-                Logger.LogInfo($"SAIN: Looting Bots Detected.");
-            }
-            if (Chainloader.PluginInfos.ContainsKey(Realism))
-            {
-                RealismLoaded = true;
-                Logger.LogInfo($"SAIN: Realism Detected.");
-
-                // If Realism mod is loaded, we need to adjust how powerlevel is calculated to take into account armor class going up to 10 instead of 6
-                // 7 is the default
-                EFTCoreSettings.UpdateArmorClassCoef(4f);
-            }
-            else
-            {
-                EFTCoreSettings.UpdateArmorClassCoef(7f);
-            }
-        }
-
-        public static void ModDetectionGUI()
-        {
-            BeginVertical();
-
-            BeginHorizontal();
-            IsDetected(LootingBotsLoaded, "Looting Bots");
-            IsDetected(RealismLoaded, "Realism Mod");
-            EndHorizontal();
-
-            EndVertical();
-        }
-
-        private static void IsDetected(bool value, string name)
-        {
-            Label(name);
-            Box(value ? "Detected" : "Not Detected");
-        }
-
-        private static readonly float ModsCheckTimer = -1f;
-        private static bool ModsChecked = false;
     }
 }

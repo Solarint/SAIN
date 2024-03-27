@@ -266,8 +266,10 @@
     <Compile Include="Layers\DebugOverlay.cs" />
     <Compile Include="Layers\SAINAction.cs" />
     <Compile Include="Layers\SAINLayer.cs" />
+    <Compile Include="Plugin\AssemblyInfoClass.cs" />
     <Compile Include="Plugin\DependencyChecker.cs" />
     <Compile Include="Plugin\External.cs" />
+    <Compile Include="Plugin\ModDetectionClass.cs" />
     <Compile Include="Plugin\SAINInterop.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\Categories\SAINBossSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\BotBrains.cs" />
@@ -276,6 +278,8 @@
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\DefaultBrainsClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\Layer.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\BigBrain\LayerInfoClass.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BotBrainDefinition.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\BotBrainDefinitionInfoClass.cs" />
     <Compile Include="Preset\SAINPresetDefinition.cs" />
     <Compile Include="SAINComponent\Classes\Decision\DecisionWrapper.cs" />
     <Compile Include="Layers\Extract\LootingBotsIntegration.cs" />
@@ -299,7 +303,7 @@
     <Compile Include="Preset\BotSettings\SAINSettings\SAINSettingsGroupClass.cs" />
     <Compile Include="Preset\BotTypeDefinitions.cs" />
     <Compile Include="Helpers\EnumValues.cs" />
-    <Compile Include="Plugin\PresetHandler.cs" />
+    <Compile Include="Plugin\PresetHandlerClass.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\SAINSettingsClass.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\AimSettings.cs" />
     <Compile Include="Attributes\ConfigAttributes.cs" />

@@ -90,7 +90,8 @@ namespace SAIN
         Caliber30x29,
         Caliber40x46,
         Caliber40mmRU,
-        Caliber127x108
+        Caliber127x108,
+        Caliber68x51
     }
 
     public enum CoverStatus
