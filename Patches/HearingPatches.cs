@@ -264,12 +264,12 @@ namespace SAIN.Patches.Hearing
 
 		protected override MethodBase GetTargetMethod()
 		{
-			AIFlareEnabled = AccessTools.Property(typeof(GClass551), "Boolean_0");
-			return AccessTools.Method(typeof(GClass551), "TryPlayShootSound");
+			AIFlareEnabled = AccessTools.Property(typeof(GClass567), "Boolean_0");
+			return AccessTools.Method(typeof(GClass567), "TryPlayShootSound");
 		}
 
 		[PatchPrefix]
-		public static bool PatchPrefix(GClass551 __instance)
+		public static bool PatchPrefix(GClass567 __instance)
 		{
 			//if (__instance.IsAI &&
 			//    SAINPlugin.IsBotExluded(__instance.BotOwner))
