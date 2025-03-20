@@ -141,7 +141,7 @@ namespace SAIN
                 typeof(Patches.Talk.BotTalkPatch),
                 typeof(Patches.Talk.BotTalkManualUpdatePatch),
 
-                typeof(Patches.Vision.DisableLookUpdatePatch),
+                //typeof(Patches.Vision.DisableLookUpdatePatch), // THIS BREAKS EVERYTHING
                 typeof(Patches.Vision.UpdateLightEnablePatch),
                 typeof(Patches.Vision.UpdateLightEnablePatch2),
                 typeof(Patches.Vision.ToggleNightVisionPatch),
