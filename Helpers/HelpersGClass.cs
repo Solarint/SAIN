@@ -23,7 +23,7 @@ namespace SAIN.Helpers
             EFTBotSettingsProp = AccessTools.Property(typeof(BotDifficultySettingsClass), "FileSettings");
             RefreshSettingsMethod = AccessTools.Method(typeof(BotDifficultySettingsClass), "method_0");
             PathControllerField = AccessTools.Field(typeof(BotMover), "_pathController");
-            AimDataType = PatchConstants.EftTypes.Single(x => x.GetProperty("LastSpreadCount") != null && x.GetProperty("LastAimTime") != null);
+            AimDataType = typeof(BotAimingClass);
         }
 
         public static readonly Type AimDataType;
