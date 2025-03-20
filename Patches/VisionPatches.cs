@@ -404,7 +404,7 @@ namespace SAIN.Patches.Vision
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(EnemyInfo), "method_5");
+            return AccessTools.Method(typeof(EnemyInfo), "method_9");
         }
 
         [PatchPostfix]
