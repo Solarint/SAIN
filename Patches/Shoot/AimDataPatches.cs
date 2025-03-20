@@ -437,7 +437,7 @@ namespace SAIN.Patches.Shoot.Aim
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(EnemyInfo), "method_7");
+            return AccessTools.Method(typeof(EnemyInfo), "method_13");
         }
 
         [PatchPrefix]
