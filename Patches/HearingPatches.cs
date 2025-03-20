@@ -150,7 +150,7 @@ namespace SAIN.Patches.Hearing
 
 		private static float calcVolume(Player player)
 		{
-			return player.MovementContext.CovertMovementVolumeBySpeed * player.method_54();
+			return player.MovementContext.CovertMovementVolumeBySpeed * player.method_54(player.MovementContext.ClampedSpeed);
 		}
 	}
 
@@ -177,7 +177,7 @@ namespace SAIN.Patches.Hearing
 					return false;
 				}
 
-				float volume = ____player.MovementContext.CovertMovementVolumeBySpeed * ____player.method_54();
+				float volume = ____player.MovementContext.CovertMovementVolumeBySpeed * ____player.method_54(____player.MovementContext.ClampedSpeed);
 				float baseRange = 60f;
 				SAINBotController.Instance?.BotHearing.PlayAISound(____player.ProfileId, SAINSoundType.Sprint, ____player.Position, baseRange, volume);
 			}
