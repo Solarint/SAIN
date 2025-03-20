@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using DrakiaXYZ.BigBrain.Brains;
+using EFT;
 using System.Collections;
 
 namespace SAIN.Layers.Combat.Solo
@@ -9,7 +10,7 @@ namespace SAIN.Layers.Combat.Solo
         {
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             BotOwner.WeaponManager.Melee.RunToEnemyUpdate();
         }

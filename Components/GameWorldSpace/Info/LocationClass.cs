@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using SeasonController = Class442;
+using SeasonController = Class436;
 
 namespace SAIN.Components
 {

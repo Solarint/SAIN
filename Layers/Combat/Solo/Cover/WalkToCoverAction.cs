@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using DrakiaXYZ.BigBrain.Brains;
+using EFT;
 using SAIN.SAINComponent.Classes.WeaponFunction;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using System.Text;
@@ -19,7 +20,7 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         private float _nextUpdateCoverTime;
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             Bot.Mover.SetTargetMoveSpeed(1f);
             Bot.Mover.SetTargetPose(1f);

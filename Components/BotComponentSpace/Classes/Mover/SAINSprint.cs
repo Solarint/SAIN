@@ -141,7 +141,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         private void startRun(NavMeshPath path, Vector3 point, ESprintUrgency urgency, System.Action callback)
         {
             stopRunCoroutine();
-            BotOwner.AimingData?.LoseTarget();
+            BotOwner.AimingManager.CurrentAiming?.LoseTarget();
             LastRunDestination = point;
             CurrentPath = path;
             _lastUrgency = urgency;
@@ -561,7 +561,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 direction *= 10f;
             }
             Player.CharacterController.SetSteerDirection(direction);
-            BotOwner.AimingData?.Move(Player.Speed);
+            BotOwner.AimingManager.CurrentAiming?.Move(Player.Speed);
 			if (BotOwner.Mover != null)
 			{
 				BotOwner.Mover.IsMoving = true;

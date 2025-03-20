@@ -8,7 +8,7 @@ using SPT.Reflection.Patching;
 using System;
 using System.Reflection;
 using UnityEngine;
-using EFTSettingsLoadClass = GClass583;
+using EFTSettingsLoadClass = GClass598;
 
 namespace SAIN.Patches.Components
 {

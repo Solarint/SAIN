@@ -41,11 +41,11 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass551), "SetEnvironment");
+            return AccessTools.Method(typeof(GClass567), "SetEnvironment");
         }
 
         [PatchPostfix]
-        public static void Patch(GClass551 __instance, IndoorTrigger trigger)
+        public static void Patch(GClass567 __instance, IndoorTrigger trigger)
         {
             SAINBotController.Instance?.PlayerEnviromentChanged(__instance?.Player?.ProfileId, trigger);
         }

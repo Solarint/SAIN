@@ -100,7 +100,7 @@ namespace SAIN.SAINComponent.Classes
                     Bot.Mover.PauseMovement(Random.Range(_pauseMoveDurationMin, _pauseMoveDurationMax));
                 }
                 if (!IsMovementPaused) {
-                    BotOwner.AimingData?.LoseTarget();
+                    BotOwner.AimingManager.CurrentAiming?.LoseTarget();
                     return false;
                 }
             }
@@ -122,7 +122,7 @@ namespace SAIN.SAINComponent.Classes
         public bool IsAiming {
             get
             {
-                return BotOwner?.ShootData?.ShootController?.IsAiming == true || BotOwner?.AimingData?.IsReady == true;
+                return BotOwner?.ShootData?.ShootController?.IsAiming == true || BotOwner?.AimingManager.CurrentAiming?.IsReady == true;
             }
         }
 
@@ -228,7 +228,7 @@ namespace SAIN.SAINComponent.Classes
 
         private bool aimAtTarget(Vector3 target)
         {
-            var aimData = BotOwner.AimingData;
+            var aimData = BotOwner.AimingManager.CurrentAiming;
             //AimStatus aimStatus = Bot.Aim.AimStatus;
             //bool steerComplete = false;
 

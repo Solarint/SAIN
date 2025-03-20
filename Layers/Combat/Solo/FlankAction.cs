@@ -28,7 +28,7 @@ namespace SAIN.Layers.Combat.Solo
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             Enemy enemy = Bot.Enemy;
             if (enemy != null)

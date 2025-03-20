@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using DrakiaXYZ.BigBrain.Brains;
+using EFT;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using System.Collections;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace SAIN.Layers.Combat.Squad
             Bot.Search.ToggleSearch(true, _enemy);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             if (!Bot.Mover.SprintController.Running) {
                 Shoot.CheckAimAndFire();

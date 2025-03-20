@@ -80,8 +80,8 @@ namespace SAIN.SAINComponent
         public float DistanceToAimTarget {
             get
             {
-                if (BotOwner.AimingData != null) {
-                    return BotOwner.AimingData.LastDist2Target;
+                if (BotOwner.AimingManager.CurrentAiming != null) {
+                    return BotOwner.AimingManager.CurrentAiming.LastDist2Target;
                 }
                 return CurrentTarget.CurrentTargetDistance;
             }
@@ -298,7 +298,7 @@ namespace SAIN.SAINComponent
 
                 try {
 					BotOwner.LookSensor.MaxShootDist = float.MaxValue;
-					if (BotOwner.AIData is GClass551 aiData)
+					if (BotOwner.AIData is GClass567 aiData)
 					{
 						aiData.IsNoOffsetShooting = false;
 					}

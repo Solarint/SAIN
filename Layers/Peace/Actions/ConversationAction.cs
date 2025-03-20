@@ -1,4 +1,5 @@
 ﻿using Comfort.Common;
+using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using SAIN.SAINComponent;
 
@@ -20,7 +21,7 @@ namespace SAIN.Layers.Peace
             Toggle(false);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
         }
 

@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using DrakiaXYZ.BigBrain.Brains;
+using EFT;
 using SAIN.Helpers;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using System.Collections;
@@ -13,7 +14,7 @@ namespace SAIN.Layers.Combat.Solo
         {
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             Bot.Mover.SetTargetPose(1f);
             Bot.Mover.SetTargetMoveSpeed(1f);

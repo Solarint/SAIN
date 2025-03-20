@@ -1,4 +1,5 @@
 ﻿using Comfort.Common;
+using DrakiaXYZ.BigBrain.Brains;
 using EFT;
 using EFT.Interactive;
 using SAIN.Components;
@@ -40,7 +41,7 @@ namespace SAIN.Layers
             BotOwner.Mover.MovementResume();
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             float stamina = Bot.Player.Physical.Stamina.NormalValue;
             bool fightingEnemy = isFightingEnemy();

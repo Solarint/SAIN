@@ -14,7 +14,7 @@ namespace SAIN.Layers.Combat.Squad
         {
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             Shoot.CheckAimAndFire();
 

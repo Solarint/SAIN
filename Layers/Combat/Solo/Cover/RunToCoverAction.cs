@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using DrakiaXYZ.BigBrain.Brains;
+using EFT;
 using SAIN.Helpers;
 using SAIN.SAINComponent.Classes.Mover;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
@@ -21,7 +22,7 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         private bool _runFailed;
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             Bot.Mover.SetTargetMoveSpeed(1f);
             Bot.Mover.SetTargetPose(1f);

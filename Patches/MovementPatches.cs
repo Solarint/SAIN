@@ -6,7 +6,7 @@ using SAIN.Preset.GlobalSettings;
 using SPT.Reflection.Patching;
 using System.Reflection;
 using UnityEngine;
-using PathFinderClass = GClass470;
+using PathFinderClass = GClass485;
 
 namespace SAIN.Patches.Movement
 {

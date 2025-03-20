@@ -197,7 +197,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
         public AimStatus AimStatus {
             get
             {
-                object aimStatus = aimStatusField.GetValue(BotOwner.AimingData);
+                object aimStatus = aimStatusField.GetValue(BotOwner.AimingManager.CurrentAiming);
                 if (aimStatus == null) {
                     return AimStatus.NoTarget;
                 }
@@ -243,7 +243,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
 
         private bool canAim()
         {
-            var aimData = BotOwner.AimingData;
+            var aimData = BotOwner.AimingManager.CurrentAiming;
             if (aimData == null) {
                 //return false;
             }
@@ -262,7 +262,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
         private void checkLoseTarget()
         {
             if (!CanAim) {
-                BotOwner.AimingData?.LoseTarget();
+                BotOwner.AimingManager.CurrentAiming?.LoseTarget();
                 return;
             }
         }

@@ -92,7 +92,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             CurrentRecoilOffset += result;
 
             if (SAINPlugin.DebugSettings.Gizmos.DebugDrawRecoilGizmos) {
-                DebugGizmos.Ray(Bot.Transform.WeaponFirePort, dir * BotOwner.AimingData.LastDist2Target, Color.red, BotOwner.AimingData.LastDist2Target, 0.02f, true, 10f);
+                DebugGizmos.Ray(Bot.Transform.WeaponFirePort, dir * BotOwner.AimingManager.CurrentAiming.LastDist2Target, Color.red, BotOwner.AimingManager.CurrentAiming.LastDist2Target, 0.02f, true, 10f);
             }
 
             if (_debugRecoilLogs)

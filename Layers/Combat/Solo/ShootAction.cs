@@ -29,7 +29,7 @@ namespace SAIN.Layers.Combat.Solo
             Toggle(false);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             Bot.Steering.SteerByPriority();
             Shoot.CheckAimAndFire();

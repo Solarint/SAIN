@@ -50,7 +50,7 @@ namespace SAIN.SAINComponent.Classes
                 return checkFriendlyFire(target.Value);
             }
 
-            var aimData = BotOwner?.AimingData;
+            var aimData = BotOwner?.AimingManager.CurrentAiming;
             if (aimData == null)
             {
                 return FriendlyFireStatus.None;

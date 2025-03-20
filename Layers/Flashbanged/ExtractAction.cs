@@ -1,4 +1,5 @@
-﻿using EFT;
+﻿using DrakiaXYZ.BigBrain.Brains;
+using EFT;
 
 namespace SAIN.Layers
 {
@@ -23,7 +24,7 @@ namespace SAIN.Layers
             Toggle(false);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
 
         }

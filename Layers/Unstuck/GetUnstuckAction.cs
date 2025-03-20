@@ -19,7 +19,7 @@ namespace SAIN.Layers.Combat.Run
         {
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData data)
         {
             Bot.Mover.SetTargetPose(1f);
             Bot.Mover.SetTargetMoveSpeed(1f);

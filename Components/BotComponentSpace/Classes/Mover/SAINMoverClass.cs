@@ -116,7 +116,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             }
             // Is the bot currently Moving somewhere?
             if (SprintController.Running ||
-                BotOwner.Mover?.HavePath == true) {
+                BotOwner.Mover?._pathController.HavePath == true) {
                 return;
             }
             // Did the bot jump recently?
@@ -148,7 +148,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             Vector3 position = Bot.Position;
             if ((_prevLinkPos - position).sqrMagnitude > 0f) {
                 Vector3 castPoint = position + Vector3.up * 0.3f;
-                BotOwner.Mover.SetPlayerToNavMesh(position, castPoint);
+                BotOwner.Mover.SetPlayerToNavMesh(castPoint);
                 _prevLinkPos = position;
             }
         }
@@ -174,7 +174,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public Vector3 CurrentMoveDestination { get; private set; }
 
-        public bool Moving => BotOwner.Mover?.IsMoving == true || BotOwner.Mover?.HavePath == true;
+        public bool Moving => BotOwner.Mover?.IsMoving == true || BotOwner.Mover?._pathController.HavePath == true;
 
         public bool GoToPoint(Vector3 point, out bool calculating, float reachDist = -1f, bool crawl = false, bool slowAtEnd = true, bool mustHaveCompletePath = true)
         {

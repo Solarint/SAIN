@@ -7,8 +7,8 @@ using UnityEngine;
 
 // Found in Botowner.Looksensor
 using EnemyTotalCheck = GClass568;
-using EnemyVisionCheck = GClass548;
-using LookAllData = GClass573;
+using EnemyVisionCheck = GClass564;
+using LookAllData = GClass589;
 
 namespace SAIN.SAINComponent.Classes
 {
@@ -52,15 +52,15 @@ namespace SAIN.SAINComponent.Classes
 
         public void UpdateLookData(LookAllData lookData)
         {
-            for (int i = 0; i < lookData.reportsData.Count; i++) {
-                EnemyVisionCheck enemyVision = lookData.reportsData[i];
-                BotOwner.BotsGroup.ReportAboutEnemy(enemyVision.enemy, enemyVision.VisibleOnlyBuSence);
+            for (int i = 0; i < lookData.ReportsData.Count; i++) {
+                EnemyVisionCheck enemyVision = lookData.ReportsData[i];
+                BotOwner.BotsGroup.ReportAboutEnemy(enemyVision.Enemy, enemyVision.VisibleOnlyBySence);
             }
 
-            if (lookData.reportsData.Count > 0)
+            if (lookData.ReportsData.Count > 0)
                 BotOwner.Memory.SetLastTimeSeeEnemy();
 
-            if (lookData.shallRecalcGoal)
+            if (lookData.ShallRecalcGoal)
                 BotOwner.CalcGoal();
 
             lookData.Reset();
@@ -101,8 +101,8 @@ namespace SAIN.SAINComponent.Classes
         private void setNotVis(Enemy enemy)
         {
             foreach (var part in enemy.EnemyInfo.AllActiveParts.Values) {
-                if (part.IsVisible || part.VisibleBySense) {
-                    part.UpdateVision(1000f, false, false, false, BotOwner);
+                if (part.IsVisible || part.VisibleType == EEnemyPartVisibleType.Sence) {
+                    part.UpdateVisibility(BotOwner, false, false, false, Time.deltaTime, 1f);
                 }
             }
             if (enemy.EnemyInfo.IsVisible) {
@@ -117,7 +117,7 @@ namespace SAIN.SAINComponent.Classes
             float timeSince = Time.time - look.LastCheckLookTime;
             if (timeSince >= delay) {
                 look.LastCheckLookTime = Time.time;
-                enemy.EnemyInfo.CheckLookEnemy(lookAll);
+                enemy.EnemyInfo.CheckLookEnemy(lookAll, Time.deltaTime);
                 return true;
             }
             return false;

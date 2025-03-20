@@ -135,12 +135,12 @@ namespace SAIN.Layers
                 }
 
                 if (debug.OverLay_AimInfo) {
-                    if (bot.BotOwner.AimingData != null) {
+                    if (bot.BotOwner.AimingManager.CurrentAiming != null) {
                         stringBuilder.AppendLine($"AimData: Status [{bot.Aim.AimStatus}] " +
                             $"Last Aim Time: [{bot.Aim.LastAimTime}] " +
-                            $"AimingTime [{timeAiming.GetValue(bot.BotOwner.AimingData)}] " +
-                            $"TimeToFnsh: [{TimeToAim.GetValue(bot.BotOwner.AimingData)}]");
-                        stringBuilder.AppendLine($"AimOffsetMagnitude [{((bot.BotOwner.AimingData.RealTargetPoint - bot.BotOwner.AimingData.EndTargetPoint).magnitude).Round100()}] " +
+                            $"AimingTime [{timeAiming.GetValue(bot.BotOwner.AimingManager.CurrentAiming)}] " +
+                            $"TimeToFnsh: [{TimeToAim.GetValue(bot.BotOwner.AimingManager.CurrentAiming)}]");
+                        stringBuilder.AppendLine($"AimOffsetMagnitude [{((bot.BotOwner.AimingManager.CurrentAiming.RealTargetPoint - bot.BotOwner.AimingManager.CurrentAiming.EndTargetPoint).magnitude).Round100()}] " +
                             $"Friendly Fire Status [{bot.FriendlyFire.FriendlyFireStatus}] " +
                             $"No Bush ESP Status: [{bot.NoBushESP.NoBushESPActive}]");
                         stringBuilder.AppendLine();

@@ -4,7 +4,7 @@
     "main": "src/mod.js",
     "license": "MIT",
     "author": "zSolarint",
-    "akiVersion": "~3.8",
+    "sptVersion": "~3.11",
     "scripts": {
         "setup": "npm i",
         "build": "node ./build.mjs",

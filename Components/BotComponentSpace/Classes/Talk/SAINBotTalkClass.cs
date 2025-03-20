@@ -373,7 +373,7 @@ namespace SAIN.SAINComponent.Classes.Talk
             AddPhrase(EPhraseTrigger.Roger, 10, 30f, dictionary);
             AddPhrase(EPhraseTrigger.Negative, 10, 30f, dictionary);
             AddPhrase(EPhraseTrigger.PhraseNone, 1, 1f, dictionary);
-            AddPhrase(EPhraseTrigger.Attention, 25, 30f, dictionary);
+            AddPhrase(EPhraseTrigger.Look, 25, 30f, dictionary);
             AddPhrase(EPhraseTrigger.OnYourOwn, 25, 15f, dictionary);
             AddPhrase(EPhraseTrigger.Repeat, 25, 30f, dictionary);
             AddPhrase(EPhraseTrigger.CoverMe, 25, 45f, dictionary);
