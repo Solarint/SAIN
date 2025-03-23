@@ -9,29 +9,6 @@ using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses
 {
-    public class EnemyEquipmentInfo : EnemyBase, IBotEnemyClass
-    {
-        public EnemyEquipmentInfo(Enemy enemy) : base(enemy)
-        {
-        }
-
-        public void Init()
-        {
-        }
-
-        public void Update()
-        {
-        }
-
-        public void Dispose()
-        {
-        }
-
-        public void OnEnemyKnownChanged(bool value, Enemy enemy)
-        {
-        }
-    }
-
     public class Enemy : BotBase, IBotClass
     {
         public string EnemyName { get; }
@@ -42,7 +19,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
         public bool IsAI => EnemyPlayer.IsAI;
 
         public bool IsCurrentEnemy { get; private set; }
-        public float LastCheckLookTime { get; set; }
         public float RealDistance => EnemyPlayerData.DistanceData.Distance;
         public bool IsSniper { get; private set; }
 
@@ -54,7 +30,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
         public EnemyInfo EnemyInfo { get; }
         public EnemyAim Aim { get; }
         public EnemyHearing Hearing { get; }
-        public EnemyShootClass Shoot { get; }
 
         private EnemyKnownChecker _knownChecker { get; }
         private EnemyActiveThreatChecker _activeThreatChecker { get; }
@@ -85,7 +60,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             KnownPlaces = new EnemyKnownPlaces(this);
             Aim = new EnemyAim(this);
             Hearing = new EnemyHearing(this);
-            Shoot = new EnemyShootClass(this);
 
             updateDistAndDirection(true);
         }
@@ -103,14 +77,16 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             Path.Init();
             Hearing.Init();
             Status.Init();
-            Shoot.Init();
         }
 
         public void Update()
         {
             IsCurrentEnemy = Bot.EnemyController.ActiveEnemy?.EnemyProfileId == EnemyProfileId;
+
             calcFrequencyCoef();
             updateDistAndDirection();
+            updateSniperStatus();
+
             Events.Update();
             _validChecker.Update();
             _knownChecker.Update();
@@ -120,7 +96,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             KnownPlaces.Update();
             Path.Update();
             Status.Update();
-            Shoot.Update();
         }
 
         public void Dispose()
@@ -135,7 +110,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             Path.Dispose();
             Hearing.Dispose();
             Status.Dispose();
-            Shoot.Dispose();
         }
 
         public bool EnemyKnown => Events.OnEnemyKnownChanged.Value;
@@ -148,7 +122,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
         public bool WasValid => _validChecker.WasValid;
 
-        public bool ActiveThreat => _activeThreatChecker.ActiveThreat;
         public float TimeSinceCurrentEnemy => _hasBeenActive ? Time.time - _timeLastActive : float.MaxValue;
 
         public Collider HidingBehindObject {
@@ -292,18 +265,18 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             }
         }
 
-        private float calcMagnitudeDelay()
+        private void updateSniperStatus()
         {
-            float baseTime;
-            if (IsCurrentEnemy)
-                baseTime = IsAI ? ENEMY_DISTANCE_UPDATE_CURRENTENEMY_AI : ENEMY_DISTANCE_UPDATE_CURRENTENEMY;
-            else if (EnemyKnown)
-                baseTime = IsAI ? ENEMY_DISTANCE_UPDATE_ENEMYKNOWN_AI : ENEMY_DISTANCE_UPDATE_ENEMYKNOWN;
-            else
-                baseTime = IsAI ? ENEMY_DISTANCE_UPDATE_UNKNOWN_AI : ENEMY_DISTANCE_UPDATE_UNKNOWN;
-
-            float result = baseTime * UpdateFrequencyCoef;
-            return result;
+            if (IsSniper) {
+                if (!EnemyKnown) {
+                    IsSniper = false;
+                    return;
+                }
+                if (RealDistance < GlobalSettings.Mind.ENEMYSNIPER_DISTANCE_END) {
+                    IsSniper = false;
+                    return;
+                }
+            }
         }
 
         public float UpdateFrequencyCoef { get; private set; }
@@ -340,12 +313,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             return result;
         }
 
-        private const float ENEMY_DISTANCE_UPDATE_CURRENTENEMY = 0.025f;
-        private const float ENEMY_DISTANCE_UPDATE_CURRENTENEMY_AI = 0.15f;
-        private const float ENEMY_DISTANCE_UPDATE_ENEMYKNOWN = 0.2f;
-        private const float ENEMY_DISTANCE_UPDATE_ENEMYKNOWN_AI = 0.5f;
-        private const float ENEMY_DISTANCE_UPDATE_UNKNOWN = 0.5f;
-        private const float ENEMY_DISTANCE_UPDATE_UNKNOWN_AI = 1f;
         private const float ENEMY_UPDATEFREQUENCY_MAX_SCALE = 5f;
         private const float ENEMY_UPDATEFREQUENCY_MAX_DIST = 500f;
         private const float ENEMY_UPDATEFREQUENCY_MIN_DIST = 50f;
@@ -416,7 +383,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
         public float NextCheckFlashLightTime;
 
-        private float _updateCoef = 1f;
         private float _nextUpdateCoefTime;
         private bool _hasBeenActive;
         private Vector3? _centerMass;
@@ -426,7 +392,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
         private const float _checkHidingRayDist = 3f;
         private const float _checkHidingFreq = 1f;
         private float _nextCheckHidingTime;
-        private float _lastUpdateDistanceTime;
         private float _nextReportSightTime;
         private const float _reportSightFreq = 0.5f;
         private float _timeLastActive;

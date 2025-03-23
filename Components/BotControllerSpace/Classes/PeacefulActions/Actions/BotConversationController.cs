@@ -19,8 +19,7 @@ namespace SAIN.Components.BotController.PeacefulActions
 
         public void CheckExecute(BotZoneData data)
         {
-            if (_nextCheckTime < Time.time)
-            {
+            if (_nextCheckTime < Time.time) {
                 _nextCheckTime = Time.time + FIND_COVERSATION_FREQ;
                 findConvoTargetsAndExecute(data);
             }
@@ -42,16 +41,11 @@ namespace SAIN.Components.BotController.PeacefulActions
         private IEnumerator executeConversation(params BotComponent[] bots)
         {
             bool finishedConvo = false;
-            while (!finishedConvo){
-                if (!recheckBots(bots))
-                {
+            while (!finishedConvo) {
+                if (!recheckBots(bots)) {
                     finishedConvo = true;
                     break;
                 }
-
-                // finish code
-                break;
-
                 yield return null;
             }
         }
@@ -66,15 +60,13 @@ namespace SAIN.Components.BotController.PeacefulActions
 
         private void logConvoStart(BotZoneData data)
         {
-            if (SAINPlugin.DebugMode || true)
-            {
+            if (SAINPlugin.DebugMode || true) {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine($"Conversation [{_conversations++}]");
                 stringBuilder.AppendLine($"Selected [{_selectedBots.Count}] Bots");
                 stringBuilder.AppendLine($"Name: [{data.Name}]");
                 stringBuilder.AppendLine($"Time: [{Time.time}]");
-                for (int j = 0; j < _selectedBots.Count; j++)
-                {
+                for (int j = 0; j < _selectedBots.Count; j++) {
                     var selected = _selectedBots[j];
                     stringBuilder.AppendLine($"[{j + 1}] : Selected: [{selected.name}]");
                 }

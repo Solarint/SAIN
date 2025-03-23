@@ -25,8 +25,6 @@ namespace SAIN.Components
 
         public event Action<Grenade, Vector3, string> OnGrenadeThrown;
 
-        public event Action<Vector3, string, bool, float, float> OnGrenadeExploded;
-
         public GrenadeController(SAINBotController controller) : base(controller)
         {
         }

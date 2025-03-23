@@ -53,14 +53,14 @@ namespace SAIN.Attributes
         }
     }
 
-    public sealed class RoundingValueAttribute : BaseAttribute
+    public sealed class DefaultFloatAttribute : BaseAttribute
     {
-        public RoundingValueAttribute(float rounding = 1f)
+        public DefaultFloatAttribute(float defaultVal)
         {
-            Rounding = rounding;
+            Value = defaultVal;
         }
 
-        public readonly float Rounding;
+        public readonly float Value;
     }
 
     public class MinMaxAttribute : GUIValuesAttribute
@@ -139,6 +139,20 @@ namespace SAIN.Attributes
     public sealed class AdvancedAttribute : BoolAttribute
     {
         public AdvancedAttribute() : base(true)
+        {
+        }
+    }
+
+    public sealed class DeveloperOptionAttribute : BoolAttribute
+    {
+        public DeveloperOptionAttribute() : base(true)
+        {
+        }
+    }
+
+    public sealed class SimpleValueAttribute : BoolAttribute
+    {
+        public SimpleValueAttribute() : base(true)
         {
         }
     }

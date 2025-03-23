@@ -4,24 +4,28 @@ using UnityEngine;
 
 namespace SAIN.SAINComponent.Classes.EnemyClasses
 {
-    public class EnemyUpdaterComponent : MonoBehaviour
+    public class EnemyUpdaterClass : BotBase, IBotClass
     {
-        public void Init(BotComponent bot)
+        public EnemyUpdaterClass(BotComponent bot) : base(bot)
         {
-            Bot = bot;
         }
 
-        private BotComponent Bot;
-
-        private void Update()
+        public void Init()
         {
-            if (Bot == null || Bot.EnemyController == null || !Bot.BotActive)
-            {
+            Enemies = Bot.EnemyController.Enemies;
+        }
+
+        public void Update()
+        {
+            if (Bot == null || Bot.EnemyController == null || !Bot.BotActive) {
                 return;
             }
 
-            foreach (var kvp in Enemies)
-            {
+            if (SAINPlugin.ProfilingMode) {
+                UnityEngine.Profiling.Profiler.BeginSample("Enemy Updater");
+            }
+
+            foreach (var kvp in Enemies) {
                 string profileId = kvp.Key;
                 Enemy enemy = kvp.Value;
                 if (!checkValid(profileId, enemy))
@@ -35,26 +39,31 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             }
             removeInvalid();
             removeAllies();
+
+            if (SAINPlugin.ProfilingMode) {
+                UnityEngine.Profiling.Profiler.EndSample();
+            }
         }
 
-        private void LateUpdate()
+        public void LateUpdate()
         {
-            if (Bot == null || Bot.EnemyController == null || !Bot.BotActive)
-            {
+            if (Bot == null || Bot.EnemyController == null || !Bot.BotActive) {
                 return;
             }
 
-            foreach (var kvp in Enemies)
-            {
+            foreach (var kvp in Enemies) {
                 checkValid(kvp.Key, kvp.Value);
             }
             removeInvalid();
         }
 
+        public void Dispose()
+        {
+        }
+
         private bool checkValid(string id, Enemy enemy)
         {
-            if (enemy == null || enemy.CheckValid() == false)
-            {
+            if (enemy == null || enemy.CheckValid() == false) {
                 _invalidIdsToRemove.Add(id);
                 return false;
             }
@@ -63,8 +72,7 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
         private bool checkIfAlly(string id, Enemy enemy)
         {
-            if (Bot.BotOwner.BotsGroup.Allies.Contains(enemy.EnemyPlayer))
-            {
+            if (Bot.BotOwner.BotsGroup.Allies.Contains(enemy.EnemyPlayer)) {
                 if (SAINPlugin.DebugMode)
                     Logger.LogWarning($"{enemy.EnemyPlayer.name} is an ally of {Bot.Player.name} and will be removed from its enemies collection");
 
@@ -77,10 +85,8 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
         private void removeInvalid()
         {
-            if (_invalidIdsToRemove.Count > 0)
-            {
-                foreach (var id in _invalidIdsToRemove)
-                {
+            if (_invalidIdsToRemove.Count > 0) {
+                foreach (var id in _invalidIdsToRemove) {
                     Bot.EnemyController.RemoveEnemy(id);
                 }
                 Logger.LogWarning($"Removed {_invalidIdsToRemove.Count} Invalid Enemies");
@@ -90,10 +96,8 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
         private void removeAllies()
         {
-            if (_allyIdsToRemove.Count > 0)
-            {
-                foreach (var id in _allyIdsToRemove)
-                {
+            if (_allyIdsToRemove.Count > 0) {
+                foreach (var id in _allyIdsToRemove) {
                     Bot.EnemyController.RemoveEnemy(id);
                 }
 
@@ -104,7 +108,7 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             }
         }
 
-        private Dictionary<string, Enemy> Enemies => Bot.EnemyController.Enemies;
+        private Dictionary<string, Enemy> Enemies;
         private readonly List<string> _allyIdsToRemove = new List<string>();
         private readonly List<string> _invalidIdsToRemove = new List<string>();
     }

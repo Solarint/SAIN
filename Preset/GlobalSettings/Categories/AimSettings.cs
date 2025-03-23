@@ -29,86 +29,111 @@ namespace SAIN.Preset.GlobalSettings
         [Category("Scatter Modifiers")]
         [Name("Enemy Move Scatter Sprint Debuff")]
         [Description("How much to divide bot scatter by if their enemy is sprinting. So the lower the number, the worse their aim will be. A value of 1 is disabled")]
-        [MinMax(0.5f, 1f, 100f)]
+        [MinMax(0.25f, 1f, 100f)]
         public float EnemySprintingScatterMulti = 0.66f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Pose Scatter Multiplier")]
+        [Description("Lower is more scatter. If a bot is crouching, reduce their scatter up to X. 1.2 would result in 20% less scatter.")]
         [Advanced]
-        [MinMax(0.5f, 1f, 100f)]
-        public float PoseLevelScatterMulti = 0.8f;
+        [MinMax(1f, 2f, 100f)]
+        public float ScatterMulti_PoseLevel = 1.2f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Prone Scatter Multiplier")]
+        [Description("Lower is more scatter. If a bot is prone, reduce their scatter up to X. 1.3 would result in 30% less scatter.")]
         [Advanced]
-        [MinMax(0.5f, 1f, 100f)]
-        public float ProneScatterMulti = 0.7f;
+        [MinMax(1f, 2f, 100f)]
+        public float ScatterMulti_Prone = 1.3f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Body Part Visibility Scatter Multiplier")]
+        [Description("Lower is more scatter. If all body parts on an enemy are visible, reduce their scatter up to X. 1.25 would result in 25% less scatter.")]
         [Advanced]
-        [MinMax(0.5f, 1f, 100f)]
-        public float PartVisScatterMulti = 0.75f;
+        [MinMax(1f, 2f, 100f)]
+        public float ScatterMulti_PartVis = 1.25f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Magnified Optic - Ideal Range - Max Buff")]
+        [Description("Lower is more scatter. If a target is further than or equal to Optic Ideal Distance, reduce their scatter by X. 1.2 = 20% less scatter")]
         [Advanced]
         [MinMax(1f, 1.5f, 100f)]
         public float OpticFarMulti = 1.2f;
 
         [Category("Scatter Modifiers")]
+        [Name("Magnified Optic - Ideal Range - Distance")]
+        [Description("The distance, in meters, that is considered ideal for a magnified optic, if shooting at a target further than or equal to this, reduce scatter.")]
         [Advanced]
         [MinMax(25f, 150f, 10f)]
         public float OpticFarDistance = 100f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Magnified Optic - Too Close - Max Debuff")]
+        [Description("Lower is more scatter. If a target is closer than or equal to Optic Too Close Distance, increase their scatter by X. 0.8 = 20% more scatter")]
         [Advanced]
         [MinMax(0.5f, 1f, 100f)]
         public float OpticCloseMulti = 0.8f;
 
         [Category("Scatter Modifiers")]
+        [Name("Magnified Optic - Too Close - Distance")]
+        [Description("The distance, in meters, that is considered too close for a magnified optic. " +
+            "If shooting at a target closer than or equal to this, increase scatter.")]
         [Advanced]
         [MinMax(25f, 150f, 10f)]
         public float OpticCloseDistance = 75f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Red-dot / Holo - Out of Range - Max Debuff")]
+        [Description("Lower is more scatter. If a target is further than or equal to Red-dot / Holo - **Out of Range** - Distance, increase their scatter by X. 0.85 = 15% more scatter")]
         [Advanced]
         [MinMax(0.5f, 1f, 100f)]
         public float RedDotFarMulti = 0.85f;
 
         [Category("Scatter Modifiers")]
+        [Name("Red-dot / Holo - Out of Range - Distance")]
+        [Description("The distance, in meters, that is considered **Out of Range** for a Red-dot / Holo. " +
+            "If shooting at a target further than or equal to this, increase scatter by **Red-dot / Holo - Out of Range - Max Debuff.**")]
         [Advanced]
         [MinMax(25f, 150f, 10f)]
         public float RedDotFarDistance = 100f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Red-dot / Holo - Ideal Range - Max Buff")]
+        [Description("Lower is more scatter. If a target is further than or equal to Optic Ideal Distance, reduce their scatter by X. 1.15 = 15% less scatter")]
         [Advanced]
         [MinMax(1f, 1.5f, 100f)]
         public float RedDotCloseMulti = 1.15f;
 
         [Category("Scatter Modifiers")]
+        [Name("Red-dot / Holo - Ideal Range - Distance")]
+        [Description("The distance, in meters, that is considered **Ideal Range** for a Red-dot / Holo. " +
+            "If shooting at a target closer than or equal to this, reduce scatter by **Red-dot / Holo - Ideal Range - Max Buff.**")]
         [Advanced]
         [MinMax(25f, 150f, 10f)]
-        public float RedDotCloseDistance = 65f;
+        public float RedDotCloseDistance = 50f;
 
         [Category("Scatter Modifiers")]
-        [Description("Lower is more scatter")]
+        [Name("Ironsights - Out of Range - Max Debuff")]
+        [Description("Lower is more scatter. If a target is further than or equal to Optic Ideal Distance, reduce their scatter by X. 0.7 = 30% more scatter")]
         [Advanced]
         [MinMax(0.5f, 1f, 100f)]
         public float IronSightFarMulti = 0.7f;
 
         [Category("Scatter Modifiers")]
+        [Name("Ironsights - Out of Range - Distance - Scale Start")]
+        [Description("The distance, in meters, that is considered **Out of Range** for a ironsights. " +
+            "If shooting at a target further than or equal to this, start increasing scatter linearly up to **Ironsights - Out of Range - Distance - Scale End** by **Ironsights - Out of Range - Max Debuff.**")]
         [Advanced]
         [MinMax(25f, 200f, 10f)]
-        public float IronSightScaleDistanceStart = 50f;
+        public float IronSightScaleDistanceStart = 40f;
 
         [Category("Scatter Modifiers")]
+        [Name("Ironsights - Out of Range - Distance - Scale End")]
+        [Description("The distance, in meters, that is considered **Out of Range** for a ironsights. " +
+            "If shooting at a target further than or equal to this, increase scatter by **Ironsights - Out of Range - Max Debuff.**")]
         [Advanced]
         [MinMax(25f, 200f, 10f)]
-        public float IronSightScaleDistanceEnd = 100f;
+        public float IronSightScaleDistanceEnd = 75f;
 
         [Name("Center Mass Point")]
         [Description("The maximum height that bots will target if Always Aim Center Mass is on. " +

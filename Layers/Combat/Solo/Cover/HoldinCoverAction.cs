@@ -1,5 +1,6 @@
 ﻿using EFT;
 using SAIN.Helpers;
+using SAIN.Preset.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using System.Text;
@@ -21,32 +22,40 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         public override void Update(CustomLayer.ActionData ad)
         {
+            this.StartProfilingSample("Update");
             Bot.Steering.SteerByPriority();
             Shoot.CheckAimAndFire();
+            checkPositionAdjustments();
+            this.EndProfilingSample();
+        }
 
+        private void checkPositionAdjustments()
+        {
             CoverPoint coverInUse = CoverInUse;
             if (coverInUse == null) {
                 Bot.Mover.DogFight.DogFightMove(true);
-                return;
             }
-
-            adjustPosition();
-            Bot.Cover.DuckInCover();
-            checkSetProne();
-            checkSetLean();
+            else {
+                adjustMyPosition();
+                Bot.Cover.DuckInCover();
+                checkSetProne();
+                checkSetLean();
+            }
         }
 
-        private void adjustPosition()
+        private void adjustMyPosition()
         {
             if (_nextCheckPosTime < Time.time) {
                 _nextCheckPosTime = Time.time + 1f;
                 Vector3 coverPos = CoverInUse.Position;
-                if (!Bot.Player.IsInPronePose && (coverPos - _position).sqrMagnitude > 0.5f) {
+                if (!Bot.Player.IsInPronePose
+                    && (coverPos - _position).sqrMagnitude > 0.5f) {
                     _position = coverPos;
                     Bot.Mover.GoToPoint(coverPos, out _, 0.5f);
-                    return;
                 }
-                Bot.Mover.StopMove();
+                else {
+                    Bot.Mover.StopMove();
+                }
             }
         }
 
@@ -55,6 +64,9 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         private void checkSetProne()
         {
+            if (!Bot.Info.FileSettings.Move.PRONE_TOGGLE || !GlobalSettingsClass.Instance.Move.PRONE_TOGGLE) {
+                return;
+            }
             if (Bot.Enemy != null
                 && Bot.Player.MovementContext.CanProne
                 && Bot.Player.PoseLevel <= 0.1
@@ -66,13 +78,10 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         private void checkSetLean()
         {
-            if (Bot.Suppression.IsSuppressed) {
-                Bot.Mover.FastLean(LeanSetting.None);
-                CurrentLean = LeanSetting.None;
-                return;
-            }
-
-            if (Bot.Decision.CurrentSelfDecision != ESelfDecision.None) {
+            if (!Bot.Info.FileSettings.Move.LEAN_INCOVER_TOGGLE
+                || !GlobalSettingsClass.Instance.Move.LEAN_INCOVER_TOGGLE
+                || Bot.Suppression.IsSuppressed
+                || Bot.Decision.CurrentSelfDecision != ESelfDecision.None) {
                 Bot.Mover.FastLean(LeanSetting.None);
                 CurrentLean = LeanSetting.None;
                 return;
@@ -168,6 +177,9 @@ namespace SAIN.Layers.Combat.Solo.Cover
             Toggle(true);
             ChangeLeanTimer = Time.time + 2f;
             CoverInUse = Bot.Cover.CoverInUse;
+            if (CoverInUse != null) {
+                _position = CoverInUse.Position;
+            }
         }
 
         public override void Stop()

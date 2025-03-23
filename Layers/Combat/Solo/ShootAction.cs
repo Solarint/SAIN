@@ -5,6 +5,7 @@ using SAIN.SAINComponent.Classes;
 using SAIN.SAINComponent.SubComponents;
 using SAIN.SAINComponent;
 using System.Collections;
+using UnityEngine.Profiling;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -31,8 +32,10 @@ namespace SAIN.Layers.Combat.Solo
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             Bot.Steering.SteerByPriority();
             Shoot.CheckAimAndFire();
+            this.EndProfilingSample();
         }
     }
 }

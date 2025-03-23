@@ -16,6 +16,8 @@ namespace SAIN.Layers.Combat.Squad
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
+            this.EndProfilingSample();
             Shoot.CheckAimAndFire();
 
             Enemy enemy = Bot.Enemy;

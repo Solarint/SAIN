@@ -7,38 +7,126 @@ using SAIN.SAINComponent.Classes.Info;
 using System.Collections.Generic;
 using GClassAIData = GClass567;
 // Try looking for AIDataRequestController GClass???::aidataRequestController_0
+using SAIN.Attributes;
 
 namespace SAIN.Preset.GlobalSettings
 {
     public class PowerCalcSettings : SAINSettingsBase<PowerCalcSettings>, ISAINSettings
     {
+        [Name("PMC Power")]
+        [Description("Add X points to a bot's power level if they are a PMC")]
+        [Category("Bot Type Power Value")]
+        [MinMax(-100, 100, 10)]
         public float PMC_POWER = 20f;
+
+        [Name("Scav Power")]
+        [Description("Add X points to a bot's power level if they are a Scav")]
+        [Category("Bot Type Power Value")]
+        [MinMax(-100, 100, 10)]
         public float SCAV_POWER = -20f;
 
+        [Name("Shotgun Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
         public float SHOTGUN_POWER = 40f;
+
+        [Name("Smg Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
         public float SMG_POWER = 75f;
+
+        [Name("Assault Carbine Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
         public float ASSAULT_CARBINE_POWER = 60f;
+
+        [Name("Assault Rifle Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
         public float ASSAULT_RIFLE_POWER = 45f;
+
+        [Name("Machinegun Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
         public float MG_POWER = 55f;
-        public float SNIPE_POWER = -20f;
+
+        [Name("Sniper Rifle Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
+        public float SNIPE_POWER = -30f;
+
+        [Name("Marksman Rifle Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
         public float MARKSMAN_RIFLE_POWER = 10f;
+
+        [Name("Pistol Power")]
+        [Description("Add X points to a bot's power level if they are using this type of weapon as their primary.")]
+        [Category("Weapon Class Power Value")]
+        [MinMax(-100, 100, 10)]
         public float PISTOL_POWER = -10f;
 
+        [Name("Red Dot / 1x Holo Sight Power")]
+        [Description("Add X points to a bot's power level if they are using this type of attachment on their primary.")]
+        [Category("Attachment Power Value")]
+        [MinMax(-100, 100, 10)]
         public float RED_DOT_POWER = 30f;
-        public float OPTIC_POWER = -10f;
 
-        //public float OPTIC_ZOOM_COEF = 2f;
+        [Name("Magnified Optic Power")]
+        [Description("Add X points to a bot's power level if they are using this type of attachment on their primary.")]
+        [Category("Attachment Power Value")]
+        [MinMax(-100, 100, 10)]
+        public float OPTIC_POWER = -20f;
+
+        [Name("Suppressor Power")]
+        [Description("Add X points to a bot's power level if they are using this type of attachment on their primary.")]
+        [Category("Attachment Power Value")]
+        [MinMax(-100, 100, 10)]
         public float SUPPRESSOR_POWER = 20f;
 
+        [Name("Body Armor Class Power")]
+        [Description("For each AC level, add X to a bot's power level. So if they have level 4 armor, add this value 4 times.")]
+        [Category("Armor Power Value")]
+        [MinMax(-100, 100, 10)]
         public float ARMOR_CLASS_COEF = 30f;
+
+        [Name("Body Armor Class Power - Realism Mod")]
+        [Description("If Realism Mod is loaded, use this AC Power value. " +
+            "For each AC level, add X to a bot's power level. So if they have level 4 armor, add this value 4 times.")]
+        [Category("Armor Power Value")]
+        [MinMax(-100, 100, 10)]
         public float ARMOR_CLASS_COEF_REALISM = 20f;
 
+        [Name("Helmet Class Power")]
+        [Description("If a bot has an armored helmet above class 1, but lower than 5, add X to thier power level.")]
+        [Category("Armor Power Value")]
+        [MinMax(-100, 100, 10)]
         public float HELMET_POWER = 30f;
-        public float HELMET_HEAVY_POWER = 60f;
-        public float FACESHIELD_POWER = 30f;
 
-        //public float ATTACHMENT_POWER = 5f;
-        public float EARPRO_POWER = 30f;
+        [Name("Heavy Helmet Class Power")]
+        [Description("If a bot has an armored helmet above class 4, add X to thier power level.")]
+        [Category("Armor Power Value")]
+        [MinMax(-100, 100, 10)]
+        public float HELMET_HEAVY_POWER = 60f;
+
+        [Name("Faceshield Power")]
+        [Description("If a bot has an armored face shield, add X to thier Power Level.")]
+        [Category("Armor Power Value")]
+        [MinMax(-100, 100, 10)]
+        public float FACESHIELD_POWER = 20f;
+
+        [Name("Headphones Power")]
+        [Description("If a bot has headphones, add X to thier Power Level.")]
+        [Category("Armor Power Value")]
+        [MinMax(-100, 100, 10)]
+        public float EARPRO_POWER = 20f;
 
         public override void Init(List<ISAINSettings> list)
         {
@@ -65,7 +153,7 @@ namespace SAIN.Preset.GlobalSettings
 				aiData.PowerOfEquipment = power;
 			}
 
-			return true;
+            return true;
         }
 
         private float RolePower(WildSpawnType type)

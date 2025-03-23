@@ -243,7 +243,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             return _path[count - 1];
         }
 
-        private static GlobalMoveSettings _moveSettings => SAINPlugin.LoadedPreset.GlobalSettings.Move;
+        private static MoveSettings _moveSettings => SAINPlugin.LoadedPreset.GlobalSettings.Move;
 
         private IEnumerator runPath(ESprintUrgency urgency)
         {
@@ -277,7 +277,9 @@ namespace SAIN.SAINComponent.Classes.Mover
                         //{
                         //    SAINBot.Mover.TryJump();
                         //}
-                        else if (timeSinceNoMove > _moveSettings.BotSprintTryVaultTime) {
+                        else if (Bot.Info.FileSettings.Move.VAULT_TOGGLE
+                            && GlobalSettingsClass.Instance.Move.VAULT_TOGGLE
+                            && timeSinceNoMove > _moveSettings.BotSprintTryVaultTime) {
                             Bot.Mover.TryVault();
                         }
 
@@ -462,7 +464,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         private void trackMovement()
         {
             if (nextCheckPosTime < Time.time) {
-                nextCheckPosTime = Time.time + 0.5f;
+                nextCheckPosTime = Time.time + _moveSettings.BotSprintNotMovingCheckFreq;
                 Vector3 botPos = BotPosition;
                 positionMoving = (botPos - lastCheckPos).sqrMagnitude > _moveSettings.BotSprintNotMovingThreshold;
                 if (positionMoving) {

@@ -26,7 +26,7 @@ namespace SAIN.Preset.GlobalSettings
 
         [Name("Draw Transform Gizmos")]
         public bool DrawTransformGizmos;
-        
+
         [Name("Draw Line of Sight Checks")]
         public bool DrawLineOfSightGizmos;
 
@@ -72,6 +72,10 @@ namespace SAIN.Preset.GlobalSettings
         [Name("Global Debug Mode")]
         public bool GlobalDebugMode;
 
+        [Name("Global Performance Profiling Mode")]
+        [Description("Enables function sampling for Unity Profiling.")]
+        public bool GlobalProfilingToggle;
+
         [Name("Test Bot Sprint Pathfinder")]
         public bool ForceBotsToRunAround;
 
@@ -95,7 +99,7 @@ namespace SAIN.Preset.GlobalSettings
 
         [Name("Debug Hearing Calc Results")]
         public bool DebugHearing = false;
-        
+
         [Name("Debug Extracts")]
         public bool DebugExtract = false;
 

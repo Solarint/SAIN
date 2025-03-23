@@ -49,7 +49,7 @@ namespace SAIN
                 BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), pmcBrain, 80);
                 BrainManager.AddCustomLayer(typeof(ExtractLayer), pmcBrain, settings.SAINExtractLayerPriority);
                 BrainManager.AddCustomLayer(typeof(CombatSquadLayer), pmcBrain, settings.SAINCombatSquadLayerPriority);
-                BrainManager.AddCustomLayer(typeof(CombatSoloLayer), pmcBrain, settings.SAINCombatSoloLayerPriority); 
+                BrainManager.AddCustomLayer(typeof(CombatSoloLayer), pmcBrain, settings.SAINCombatSoloLayerPriority);
 
                 List<string> LayersToRemove = new List<string>
                 {
@@ -60,20 +60,22 @@ namespace SAIN
                     "Pmc",
                     "AssaultHaveEnemy",
                     "Request",
-                    "FightReqNull",
-                    "PeacecReqNull",
+                    //"FightReqNull",
+                    //"PeacecReqNull",
                     "Assault Building",
                     "Enemy Building",
                     "KnightFight",
-                    "PtrlBirdEye"
+                    //"PtrlBirdEye",
+                    "PmcBear",
+                    "PmcUsec",
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, pmcBrain);
             }
 
             private static void handleScavs()
             {
-                if (SAINEnabled.VanillaScavs)
-                {
+                if (_vanillaBotSettings.VanillaScavs) {
                     return;
                 }
 
@@ -94,12 +96,15 @@ namespace SAIN
                     "Hit",
                     "Simple Target",
                     "Pmc",
-                    "FightReqNull",
-                    "PeacecReqNull",
+                    //"FightReqNull",
+                    //"PeacecReqNull",
                     "AssaultHaveEnemy",
                     "Assault Building",
                     "Enemy Building",
+                    "PmcBear",
+                    "PmcUsec",
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, brainList);
             }
 
@@ -124,20 +129,22 @@ namespace SAIN
                     "Pmc",
                     "AssaultHaveEnemy",
                     "Request",
-                    "FightReqNull",
-                    "PeacecReqNull",
+                    //"FightReqNull",
+                    //"PeacecReqNull",
                     "Assault Building",
                     "Enemy Building",
                     "KnightFight",
-                    "PtrlBirdEye"
+                    //"PtrlBirdEye",
+                    "PmcBear",
+                    "PmcUsec",
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, brainList);
             }
 
             private static void handleRogues()
             {
-                if (SAINEnabled.VanillaRogues)
-                {
+                if (_vanillaBotSettings.VanillaRogues) {
                     return;
                 }
 
@@ -161,20 +168,22 @@ namespace SAIN
                     "Pmc",
                     "AssaultHaveEnemy",
                     "Request",
-                    "FightReqNull",
-                    "PeacecReqNull",
+                    //"FightReqNull",
+                    //"PeacecReqNull",
                     "Assault Building",
                     "Enemy Building",
                     "KnightFight",
-                    "PtrlBirdEye"
+                    //"PtrlBirdEye",
+                    "PmcBear",
+                    "PmcUsec",
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, brainList);
             }
 
             private static void handleBloodHounds()
             {
-                if (SAINEnabled.VanillaBloodHounds)
-                {
+                if (_vanillaBotSettings.VanillaBloodHounds) {
                     return;
                 }
 
@@ -198,19 +207,22 @@ namespace SAIN
                     "Pmc",
                     "AssaultHaveEnemy",
                     "Request",
-                    "FightReqNull",
-                    "PeacecReqNull",
+                    //"FightReqNull",
+                    //"PeacecReqNull",
                     "Assault Building",
                     "Enemy Building",
                     "KnightFight",
+                    //"PtrlBirdEye",
+                    "PmcBear",
+                    "PmcUsec",
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, brainList);
             }
 
             private static void handleBosses()
             {
-                if (SAINEnabled.VanillaBosses)
-                {
+                if (_vanillaBotSettings.VanillaBosses) {
                     return;
                 }
 
@@ -237,13 +249,13 @@ namespace SAIN
                     "BirdEyeFight",
                     "BossBoarFight"
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, brainList);
             }
 
             private static void handleFollowers()
             {
-                if (SAINEnabled.VanillaFollowers)
-                {
+                if (_vanillaBotSettings.VanillaFollowers) {
                     return;
                 }
 
@@ -269,13 +281,13 @@ namespace SAIN
                     "KnightFight",
                     "BoarGrenadeDanger"
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, brainList);
             }
 
             private static void handleGoons()
             {
-                if (SAINEnabled.VanillaGoons)
-                {
+                if (_vanillaBotSettings.VanillaGoons) {
                     return;
                 }
 
@@ -284,7 +296,7 @@ namespace SAIN
                 BrainManager.AddCustomLayer(typeof(DebugLayer), brainList, 99);
                 BrainManager.AddCustomLayer(typeof(SAINAvoidThreatLayer), brainList, 80);
                 BrainManager.AddCustomLayer(typeof(CombatSquadLayer), brainList, 64);
-                BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 62); 
+                BrainManager.AddCustomLayer(typeof(CombatSoloLayer), brainList, 62);
 
                 List<string> LayersToRemove = new List<string>
                 {
@@ -302,20 +314,27 @@ namespace SAIN
                     "BirdEyeFight",
                     "Kill logic"
                 };
+                checkExtractEnabled(LayersToRemove);
                 BrainManager.RemoveLayers(LayersToRemove, brainList);
+            }
+
+            private static void checkExtractEnabled(List<string> layersToRemove)
+            {
+                if (GlobalSettingsClass.Instance.General.Extract.SAIN_EXTRACT_TOGGLE) {
+                    layersToRemove.Add("Exfiltration");
+                }
             }
 
             private static List<string> getBrainList(List<Brain> brains)
             {
                 List<string> brainList = new List<string>();
-                for (int i = 0; i < brains.Count; i++)
-                {
+                for (int i = 0; i < brains.Count; i++) {
                     brainList.Add(brains[i].ToString());
                 }
                 return brainList;
             }
 
-            private static VanillaBotSettings SAINEnabled => SAINPlugin.LoadedPreset.GlobalSettings.General.VanillaBots;
+            private static VanillaBotSettings _vanillaBotSettings => SAINPlugin.LoadedPreset.GlobalSettings.General.VanillaBots;
         }
     }
 }

@@ -410,7 +410,6 @@ namespace SAIN.SAINComponent.Classes.Talk
         private float _allTalkDelay = 0f;
         private float _nextGetHitTime;
         private float _timeCanTalk;
-        private float _nextCanTalkTime;
         private float _talkDelayTimer = 0f;
 
         private readonly Dictionary<EPhraseTrigger, PhraseInfo> _phraseDictionary = new Dictionary<EPhraseTrigger, PhraseInfo>();

@@ -21,6 +21,7 @@ namespace SAIN.Layers.Combat.Squad
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             if (!Bot.Mover.SprintController.Running) {
                 Shoot.CheckAimAndFire();
                 if (!Bot.Steering.SteerByPriority(_enemy, false)) {
@@ -32,6 +33,7 @@ namespace SAIN.Layers.Combat.Squad
                 moveToLead(out float nextTime);
                 _nextUpdatePosTime = Time.time + nextTime;
             }
+            this.EndProfilingSample();
         }
 
         private void moveToLead(out float nextUpdateTime)

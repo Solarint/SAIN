@@ -80,7 +80,7 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
 
         [Category("Time to Aim")]
         [Name("Max Aim Time")]
-        [Description("EFT CONFIG SETTING. A cap on how long it will take this bot to finish aiming at a target, and being shooting.")]
+        [Description("EFT CONFIG SETTING. A cap on how long it will take this bot to finish aiming at a target, and begin shooting.")]
         [MinMax(0.01f, 4f, 1000f)]
         [Advanced]
         [CopyValue]

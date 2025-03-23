@@ -219,11 +219,6 @@ namespace SAIN.SAINComponent.Classes.Info
             get
             {
                 return BotOwner?.WeaponManager?.CurrentWeapon;
-                BotWeaponManager weaponManager = BotOwner?.WeaponManager;
-                if (weaponManager.Selector?.IsWeaponReady == true) {
-                    return BotOwner?.WeaponManager?.CurrentWeapon;
-                }
-                return null;
             }
         }
 

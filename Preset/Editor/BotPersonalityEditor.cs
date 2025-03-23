@@ -23,19 +23,19 @@ namespace SAIN.Editor.GUISections
                 SAINPresetClass.ExportAll(SAINPlugin.LoadedPreset);
             }
 
-            var personalities = SAINPresetClass.Instance.PersonalityManager.PersonalityDictionary;
-            if (_options.Count == 0) {
-                _options.AddRange(personalities.Keys);
-            }
-
-            _selected = BuilderClass.SelectionGrid(_selected, 35f, 4, _options);
-            if (_selected == EPersonality.None) {
-                return;
-            }
-
-            if (personalities.TryGetValue(_selected, out var settings)) {
+            _selected = SelectPersonality(_selected, 35f, 4);
+            if (_selected != EPersonality.None &&
+                SAINPresetClass.Instance.PersonalityManager.PersonalityDictionary.TryGetValue(_selected, out var settings)) {
                 EditAllValuesInObj(settings, out bool newEdit, null, null, 1);
+            };
+        }
+
+        public static EPersonality SelectPersonality(EPersonality selected, float height, int optionsPerLine)
+        {
+            if (_options.Count == 0) {
+                _options.AddRange(SAINPresetClass.Instance.PersonalityManager.PersonalityDictionary.Keys);
             }
+            return BuilderClass.SelectionGrid(selected, height, optionsPerLine, _options);
         }
 
         private static EPersonality _selected = EPersonality.None;

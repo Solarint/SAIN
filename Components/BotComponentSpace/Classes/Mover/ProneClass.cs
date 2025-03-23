@@ -1,6 +1,7 @@
 ﻿using EFT;
 using HarmonyLib;
 using SAIN.Helpers;
+using SAIN.Preset.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using System.Reflection;
 using UnityEngine;
@@ -42,16 +43,15 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool ShallProne(bool withShoot, float mindist = 25f)
         {
-            if (Player.MovementContext.CanProne)
-            {
+            if (!Bot.Info.FileSettings.Move.PRONE_TOGGLE || !GlobalSettingsClass.Instance.Move.PRONE_TOGGLE) {
+                return false;
+            }
+            if (Player.MovementContext.CanProne) {
                 var enemy = Bot.Enemy;
-                if (enemy != null)
-                {
+                if (enemy != null) {
                     float distance = (enemy.EnemyPosition - Bot.Position).sqrMagnitude;
-                    if (distance > mindist * mindist)
-                    {
-                        if (withShoot)
-                        {
+                    if (distance > mindist * mindist) {
+                        if (withShoot) {
                             return CanShootFromProne(enemy.EnemyPosition);
                         }
                         return true;
@@ -63,36 +63,33 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool ShallProneHide(float mindist = 10f)
         {
-            if (_nextChangeProneTime > Time.time)
-            {
+            if (!Bot.Info.FileSettings.Move.PRONE_TOGGLE || !GlobalSettingsClass.Instance.Move.PRONE_TOGGLE) {
+                return false;
+            }
+            if (_nextChangeProneTime > Time.time) {
                 return Player.IsInPronePose;
             }
 
-            if (!Player.MovementContext.CanProne)
-            {
+            if (!Player.MovementContext.CanProne) {
                 return false;
             }
 
             Enemy enemy = Bot.Enemy;
-            if (enemy == null)
-            {
+            if (enemy == null) {
                 return false;
             }
 
             Vector3? lastKnownPos = enemy.LastKnownPosition;
-            if (lastKnownPos == null)
-            {
+            if (lastKnownPos == null) {
                 return false;
             }
-            if (Bot.CurrentTargetDistance < mindist)
-            {
+            if (Bot.CurrentTargetDistance < mindist) {
                 return false;
             }
 
             bool isUnderDuress = Bot.Decision.CurrentSelfDecision != ESelfDecision.None || Bot.Suppression.IsHeavySuppressed;
             bool shallProne = isUnderDuress || !checkShootProne(lastKnownPos.Value, enemy);
-            if (shallProne)
-            {
+            if (shallProne) {
                 _nextChangeProneTime = Time.time + 3f;
             }
             return shallProne;
@@ -102,19 +99,16 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private bool checkShootProne(Vector3? lastKnownPos, Enemy enemy)
         {
-            if (_nextCheckShootTime > Time.time)
-            {
+            if (_nextCheckShootTime > Time.time) {
                 return _canshoot;
             }
             _nextCheckShootTime = Time.time + 0.5f;
 
             var blindCorner = enemy.Path.EnemyCorners.EyeLevelPosition(ECornerType.Blind);
-            if (blindCorner != null)
-            {
+            if (blindCorner != null) {
                 _canshoot = CanShootFromProne(blindCorner.Value);
             }
-            else
-            {
+            else {
                 _canshoot = CanShootFromProne(lastKnownPos.Value);
             }
             return _canshoot;
@@ -125,16 +119,13 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool ShallGetUp(float mindist = 30f)
         {
-            if (BotLay.IsLay)
-            {
+            if (BotLay.IsLay) {
                 var enemy = Bot.Enemy;
-                if (enemy == null)
-                {
+                if (enemy == null) {
                     return true;
                 }
                 float distance = (enemy.EnemyPosition - Bot.Transform.Position).magnitude;
-                if (distance > mindist)
-                {
+                if (distance > mindist) {
                     return !IsChestPosVisible(enemy.EnemyHeadPosition);
                 }
             }

@@ -1,8 +1,10 @@
 ﻿using EFT;
 using SAIN.Helpers;
+using SAIN.Preset.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Search;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Random = UnityEngine.Random;
 using DrakiaXYZ.BigBrain.Brains;
 
@@ -41,30 +43,37 @@ namespace SAIN.Layers.Combat.Solo
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             setTargetEnemy();
+            updateSearch();
+            this.EndProfilingSample();
+        }
+
+        private void updateSearch()
+        {
             var enemy = _searchTarget;
-            if (enemy == null) return;
+            if (enemy != null) {
+                bool isBeingStealthy = enemy.Hearing.EnemyHeardFromPeace;
+                if (isBeingStealthy) {
+                    _sprintEnabled = false;
+                }
+                else {
+                    checkShouldSprint();
+                    talk();
+                }
 
-            bool isBeingStealthy = enemy.Hearing.EnemyHeardFromPeace;
-            if (isBeingStealthy) {
-                _sprintEnabled = false;
-            }
-            else {
-                checkShouldSprint();
-                talk();
-            }
+                steer();
 
-            steer();
+                if (_nextUpdateSearchTime < Time.time) {
+                    _nextUpdateSearchTime = Time.time + 0.1f;
+                    Search.Search(_sprintEnabled, enemy);
+                }
 
-            if (_nextUpdateSearchTime < Time.time) {
-                _nextUpdateSearchTime = Time.time + 0.1f;
-                Search.Search(_sprintEnabled, enemy);
-            }
-
-            if (!_sprintEnabled) {
-                Shoot.CheckAimAndFire();
-                if (!isBeingStealthy)
-                    checkWeapon();
+                if (!_sprintEnabled) {
+                    Shoot.CheckAimAndFire();
+                    if (!isBeingStealthy)
+                        checkWeapon();
+                }
             }
         }
 
@@ -164,11 +173,16 @@ namespace SAIN.Layers.Combat.Solo
                 return;
             }
 
+            if (_searchTarget.IsSniper && GlobalSettingsClass.Instance.Mind.ENEMYSNIPER_ALWAYS_SPRINT_SEARCH) {
+                _sprintEnabled = true;
+                return;
+            }
+
             var persSettings = Bot.Info.PersonalitySettings;
             float chance = persSettings.Search.SprintWhileSearchChance;
             if (_sprintTimer < Time.time && chance > 0) {
                 float myPower = Bot.Info.Profile.PowerLevel;
-                if (Bot.Enemy?.EnemyPlayer != null && Bot.Enemy.EnemyPlayer.AIData.PowerOfEquipment < myPower * 0.5f) {
+                if (_searchTarget?.EnemyPlayer != null && _searchTarget.EnemyPlayer.AIData.PowerOfEquipment < myPower * 0.5f) {
                     chance = 100f;
                 }
 

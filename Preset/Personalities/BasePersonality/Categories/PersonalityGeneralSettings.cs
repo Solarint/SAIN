@@ -27,5 +27,13 @@ namespace SAIN.Preset.Personalities
         [Advanced]
         [MinMax(0f, 5f, 100)]
         public float HoldGroundMaxRandom = 1.5f;
+
+        [Name("Suppression Resistance")]
+        [Description("Higher = Less affected by suppression. A Value of 0 means No Resistance. " +
+            "A Value of 1 means Full Resistance. " +
+            "The final resistance number is the mid-point between their personality and bot type resistance. " +
+            "So a value of 0.25 for personality and a value of 0.75 for bot type would result in 0.5")]
+        [MinMax(0.0f, 1f, 100)]
+        public float SuppressionResistance = 0f;
     }
 }

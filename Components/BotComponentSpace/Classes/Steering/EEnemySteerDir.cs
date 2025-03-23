@@ -2,11 +2,16 @@
 {
     public enum EEnemySteerDir
     {
-        None = 0,
-        BlindCorner = 1,
-        LastCorner = 2,
-        LastKnown = 3,
-        Path = 4,
-        VisibleLastKnown = 5,
+        None,
+        LastSeenPos,
+        LastHeardPos,
+        VisibleEnemyPos,
+        BlindCornerPos,
+        LastCornerPos,
+        LastKnownPos,
+        PathNode,
+        VisibleLastKnownPos,
+        NullLastKnown_ERROR,
+        NullEnemy_ERROR,
     }
 }

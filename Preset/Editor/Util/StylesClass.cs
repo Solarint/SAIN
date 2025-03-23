@@ -61,9 +61,9 @@ namespace SAIN.Editor
         {
             GUIStyle LabelStyle =
                 new GUIStyle(GUI.skin.label) {
-                    padding = new RectOffset(5, 5, 0, 0),
-                    margin = new RectOffset(5, 5, 5, 5),
-                    border = new RectOffset(5, 5, 0, 0),
+                    padding = new RectOffset(4, 4, 0, 0),
+                    margin = new RectOffset(4, 4, 4, 4),
+                    border = new RectOffset(4, 4, 0, 0),
                     alignment = TextAnchor.MiddleLeft,
                     fontStyle = FontStyle.Normal
                 };
@@ -188,8 +188,8 @@ namespace SAIN.Editor
 
             GUIStyle ToolTipStyle =
                 new GUIStyle(GUI.skin.box) {
-                    padding = new RectOffset(8, 8, 8, 8),
-                    border = new RectOffset(5, 5, 5, 5),
+                    padding = new RectOffset(4, 4, 4, 4),
+                    border = new RectOffset(4, 4, 4, 4),
                     wordWrap = true,
                     clipping = TextClipping.Clip,
                     alignment = TextAnchor.MiddleLeft,

@@ -413,7 +413,7 @@ namespace SAIN.Patches.Shoot.Aim
 
         private static void updateSettings(SAINPresetClass preset)
         {
-            _aimTurnSpeed = preset.GlobalSettings.Move.AimTurnSpeed;
+            _aimTurnSpeed = preset.GlobalSettings.Steering.AimTurnSpeed;
         }
 
         private static float _aimTurnSpeed = 300f;

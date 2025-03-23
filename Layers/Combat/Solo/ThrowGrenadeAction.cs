@@ -18,10 +18,12 @@ namespace SAIN.Layers.Combat.Solo
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             if (!Stopped && Time.time - StartTime > 1f || Bot.Cover.CheckLimbsForCover()) {
                 Stopped = true;
                 BotOwner.StopMove();
             }
+            this.EndProfilingSample();
         }
 
         private float StartTime = 0f;

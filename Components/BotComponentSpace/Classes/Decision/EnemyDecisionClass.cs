@@ -1,6 +1,5 @@
 ﻿using EFT;
 using SAIN.Preset.GlobalSettings;
-using SAIN.SAINComponent.Classes.Decision.Reasons;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Search;
 using System.Collections.Generic;
@@ -430,6 +429,11 @@ namespace SAIN.SAINComponent.Classes.Decision
                 (!enemy.Seen || enemy.TimeSinceSeen > 3f)) {
                 //reason = "runNow cantSeeEnemy";
                 //return true;
+            }
+
+            if (enemy.IsSniper && GlobalSettings.Mind.ENEMYSNIPER_ALWAYS_SPRINT_COVER) {
+                reason = "EnemySniperRun";
+                return true;
             }
 
             if (StartRunCoverTimer < Time.time) {

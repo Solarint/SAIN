@@ -21,30 +21,28 @@ namespace SAIN.Layers.Combat.Run
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             Bot.Mover.SetTargetPose(1f);
             Bot.Mover.SetTargetMoveSpeed(1f);
             Bot.Steering.LookToMovingDirection();
 
             Vector3? unstuckDestination = null;
             var coverPoints = Bot.Cover.CoverPoints;
-            if (coverPoints.Count > 0)
-            {
-                for (int i = 0; i < coverPoints.Count; i++)
-                {
+            if (coverPoints.Count > 0) {
+                for (int i = 0; i < coverPoints.Count; i++) {
                     var cover = coverPoints[i];
                     NavMeshPath path = new NavMeshPath();
-                    if (NavMesh.CalculatePath(cover.Position, Bot.Position, -1, path))
-                    {
+                    if (NavMesh.CalculatePath(cover.Position, Bot.Position, -1, path)) {
                         unstuckDestination = new Vector3?(path.corners[path.corners.Length - 1]);
                         break;
                     }
                 }
             }
 
-            if (unstuckDestination != null)
-            {
+            if (unstuckDestination != null) {
                 BotOwner.Mover.GoToByWay(new Vector3[] { Bot.Position, unstuckDestination.Value }, -1f);
             }
+            this.EndProfilingSample();
         }
 
         public override void Start()
@@ -58,7 +56,6 @@ namespace SAIN.Layers.Combat.Run
 
         public override void BuildDebugText(StringBuilder stringBuilder)
         {
-
         }
     }
 }

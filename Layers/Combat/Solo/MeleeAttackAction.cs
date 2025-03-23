@@ -12,7 +12,9 @@ namespace SAIN.Layers.Combat.Solo
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             BotOwner.WeaponManager.Melee.RunToEnemyUpdate();
+            this.EndProfilingSample();
         }
 
         public override void Start()

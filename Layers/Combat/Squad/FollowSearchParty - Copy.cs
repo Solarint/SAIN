@@ -20,6 +20,8 @@ namespace SAIN.Layers.Combat.Squad
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
+            this.EndProfilingSample();
         }
 
         public override void Start()
@@ -31,8 +33,6 @@ namespace SAIN.Layers.Combat.Squad
         {
             Toggle(false);
         }
-
-        
     }
 
     internal class SquadHuntAction : CombatAction, ISAINAction

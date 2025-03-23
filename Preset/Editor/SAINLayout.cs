@@ -63,8 +63,7 @@ namespace SAIN.Editor
 
         public static void Label(Rect rect, GUIContent content, GUIStyle style = null)
         {
-            if (style == null)
-            {
+            if (style == null) {
                 style = GetStyle(Style.label);
             }
             GUI.Label(rect, content, style);
@@ -72,8 +71,7 @@ namespace SAIN.Editor
 
         public static void Label(Rect rect, string text, GUIStyle style = null)
         {
-            if (style == null)
-            {
+            if (style == null) {
                 style = GetStyle(Style.label);
             }
             GUI.Label(rect, text, style);
@@ -98,8 +96,7 @@ namespace SAIN.Editor
         {
             string newvalue = GUILayout.TextField(value, GetStyle(Style.textField), options);
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugMode)
-            {
+            if (soundPlayed && SAINPlugin.DebugMode) {
                 Logger.LogDebug($"Toggle {sound.Value}");
             }
             return newvalue;
@@ -109,8 +106,7 @@ namespace SAIN.Editor
         {
             string newvalue = GUILayout.TextArea(value, GetStyle(Style.textField), options);
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugMode)
-            {
+            if (soundPlayed && SAINPlugin.DebugMode) {
                 Logger.LogDebug($"Toggle {sound.Value}");
             }
             return newvalue;
@@ -143,8 +139,7 @@ namespace SAIN.Editor
 
         public static bool Button(GUIContent content, GUIStyle style, EUISoundType? sound, params GUILayoutOption[] options)
         {
-            if (GUILayout.Button(content, style, options))
-            {
+            if (GUILayout.Button(content, style, options)) {
                 CompareValuePlaySound(true, false, sound);
                 return true;
             }
@@ -175,8 +170,7 @@ namespace SAIN.Editor
         {
             bool newvalue = GUILayout.Toggle(value, content, style, options);
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound);
-            if (soundPlayed && SAINPlugin.DebugMode)
-            {
+            if (soundPlayed && SAINPlugin.DebugMode) {
                 Logger.LogDebug($"Toggle {sound.Value}");
             }
             return newvalue;
@@ -184,8 +178,7 @@ namespace SAIN.Editor
 
         private static bool CompareValuePlaySound(object oldValue, object newValue, EUISoundType? sound = null, float volume = 1f)
         {
-            if (oldValue.ToString() != newValue.ToString() && sound != null)
-            {
+            if (oldValue.ToString() != newValue.ToString() && sound != null) {
                 Sounds.PlaySound(sound.Value, volume);
                 return true;
             }
@@ -199,8 +192,7 @@ namespace SAIN.Editor
             sound = sound ?? EUISoundType.ButtonOver;
             progress = Mathf.Clamp(progress, 0.33f, 1f);
             bool soundPlayed = CompareValuePlaySound(value, newvalue, sound, progress);
-            if (soundPlayed && SAINPlugin.DebugMode)
-            {
+            if (soundPlayed && SAINPlugin.DebugMode) {
                 //Logger.LogDebug($"Toggle {sound.Value}");
             }
             return newvalue;
@@ -221,8 +213,7 @@ namespace SAIN.Editor
         public static void BeginHorizontal(float indent = 0)
         {
             GUILayout.BeginHorizontal();
-            if (indent > 0)
-            {
+            if (indent > 0) {
                 GUILayout.Space(indent);
             }
         }
@@ -230,16 +221,14 @@ namespace SAIN.Editor
         public static void BeginHorizontal(bool flexibleSpace)
         {
             GUILayout.BeginHorizontal();
-            if (flexibleSpace)
-            {
+            if (flexibleSpace) {
                 GUILayout.FlexibleSpace();
             }
         }
 
         public static void EndHorizontal(float indent = 0)
         {
-            if (indent > 0)
-            {
+            if (indent > 0) {
                 GUILayout.Space(indent);
             }
             GUILayout.EndHorizontal();
@@ -247,8 +236,7 @@ namespace SAIN.Editor
 
         public static void EndHorizontal(bool flexibleSpace)
         {
-            if (flexibleSpace)
-            {
+            if (flexibleSpace) {
                 GUILayout.FlexibleSpace();
             }
             GUILayout.EndHorizontal();
@@ -257,16 +245,14 @@ namespace SAIN.Editor
         public static void BeginVertical(float indent = 0)
         {
             GUILayout.BeginVertical();
-            if (indent > 0)
-            {
+            if (indent > 0) {
                 GUILayout.Space(indent);
             }
         }
 
         public static void EndVertical(float indent = 0)
         {
-            if (indent > 0)
-            {
+            if (indent > 0) {
                 GUILayout.Space(indent);
             }
             GUILayout.EndVertical();
@@ -356,11 +342,5 @@ namespace SAIN.Editor
         {
             return GUI.Window(id, viewRect, func, title, GetStyle(Style.window));
         }
-
-        public static GUILayoutOption StandardHeight => Height(BaseHeight);
-        public static GUILayoutOption ExtendedHeight => Height(TallHeight);
-
-        private static float BaseHeight = 22.5f;
-        private static float TallHeight = 35f;
     }
 }

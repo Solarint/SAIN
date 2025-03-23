@@ -32,30 +32,40 @@ namespace SAIN.Preset.GlobalSettings
         [Description("When at peace, The Goons will talk to each other and be noisy. Revealing their location.")]
         public bool TalkativeGoons = false;
 
+        [Name("Human Response Chance")]
+        [Description("Percentage chance to respond to a voiceline from a friendly human player.")]
         [Category("Friendly Response")]
         [Percentage]
         public float FriendlyReponseChance = 85f;
 
+        [Name("AI Response Chance")]
+        [Description("Percentage chance to respond to a voiceline from a friendly AI player.")]
         [Category("Friendly Response")]
         [Percentage]
         public float FriendlyReponseChanceAI = 80f;
 
+        [Name("Human Response Max Distance")]
         [Category("Friendly Response")]
         [Percentage]
         public float FriendlyReponseDistance = 65f;
 
+        [Name("AI Response Max Distance")]
         [Category("Friendly Response")]
         [Percentage]
         public float FriendlyReponseDistanceAI = 35f;
 
+        [Name("Response Frequency")]
+        [Description("2 = 1 check every 2 second")]
         [Category("Friendly Response")]
         [MinMax(0.5f, 10f)]
         public float FriendlyResponseFrequencyLimit = 1f;
 
+        [Name("Response Delay Randomization Min")]
         [Category("Friendly Response")]
         [MinMax(0.25f, 3f)]
         public float FriendlyResponseMinRandomDelay = 0.33f;
 
+        [Name("Response Delay Randomization Max")]
         [Category("Friendly Response")]
         [MinMax(0.25f, 3f)]
         public float FriendlyResponseMaxRandomDelay = 0.75f;

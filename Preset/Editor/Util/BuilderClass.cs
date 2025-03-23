@@ -517,10 +517,10 @@ namespace SAIN.Editor
             return current;
         }
 
-        public static bool ExpandableMenu(string name, bool value, string description = null, float height = 35f)
+        public static bool ExpandableMenu(string name, bool value, string description = null, float height = 20f)
         {
             BeginHorizontal();
-            value = Toggle(value, new GUIContent(value ? "-" : "+", value ? "Collapse" : "Expand"), EUISoundType.MenuDropdown, Width(17.5f), Height(height * 0.66f));
+            value = Toggle(value, new GUIContent(value ? "-" : "+", value ? "Collapse" : "Expand"), EUISoundType.MenuDropdown, Width(17.5f), Height(height));
             value = Toggle(value, new GUIContent(name, description), EUISoundType.MenuDropdown, Height(height));
             EndHorizontal();
             return value;

@@ -228,6 +228,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.ProfilerModule">
+      <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.ProfilerModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
@@ -260,6 +263,7 @@
     <None Include="Properties\.vs\VSWorkspaceState.json" />
     <None Include="Properties\NuGet.Config" />
     <None Include="Plugin\VersionChecker\setbuild.ps1" />
+    <None Include="Readme.md" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\BotComponentSpace\BotComponentBase.cs" />
@@ -270,6 +274,7 @@
     <Compile Include="Components\BotComponentSpace\Classes\Doors\DoorData.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\Doors\DoorFinder.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EBackpackStatus.cs" />
+    <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\EnemyEquipmentInfo.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Other\HearingReport.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Path\ECornerType.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Checkers\EnemyActiveThreatChecker.cs" />
@@ -277,8 +282,6 @@
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Other\EnemyEvents.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Checkers\EnemyValidChecker.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Position\EnemyPositionTracker.cs" />
-    <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Shoot\EnemyShootClass.cs" />
-    <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Shoot\EnemyShootTargets.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Vision\EnemyAnglesClass.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Vision\EnemyVisionChecker.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyClasses\Vision\EnemyPartDataClass.cs" />
@@ -298,9 +301,12 @@
     <Compile Include="Components\BotComponentSpace\Classes\Sense\Hearing\HearingDispersionClass.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\Sense\Hearing\HearingInputClass.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\Steering\SteeringController.cs" />
+    <Compile Include="Components\BotComponentSpace\Classes\WeaponFunction\ESuppressionState.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\WeaponFunction\Grenades\BotFlashbangedClass.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\WeaponFunction\Grenades\GrenadeReactionClass.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\WeaponFunction\Grenades\GrenadeThrowDecider.cs" />
+    <Compile Include="Components\BotComponentSpace\Classes\WeaponFunction\SuppressionConfig.cs" />
+    <Compile Include="Components\BotComponentSpace\Classes\WeaponFunction\SuppressionHelpers.cs" />
     <Compile Include="Components\BotComponentSpace\SubComponents\CoverFinder\ColliderData.cs" />
     <Compile Include="Components\BotComponentSpace\SubComponents\CoverFinder\CoverData.cs" />
     <Compile Include="Components\BotComponentSpace\SubComponents\CoverFinder\CoverHitCounts.cs" />
@@ -351,7 +357,7 @@
     <Compile Include="Components\BotComponentSpace\Classes\EnemyControllers\EEnemyListType.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyControllers\EnemyList.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\EnemyControllers\EnemyListsClass.cs" />
-    <Compile Include="Components\BotComponentSpace\Classes\EnemyControllers\EnemyUpdaterComponent.cs" />
+    <Compile Include="Components\BotComponentSpace\Classes\EnemyControllers\EnemyUpdaterClass.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\Medical\BodyPartHitEffectClass.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\Medical\BodyPartStatus.cs" />
     <Compile Include="Components\BotComponentSpace\Classes\Medical\BotMedicalBase.cs" />
@@ -426,7 +432,7 @@
     <Compile Include="Components\PlayerComponentSpace\Classes\Equipment\EquipmentClass.cs" />
     <Compile Include="Components\PlayerComponentSpace\Classes\Equipment\GearInfo.cs" />
     <Compile Include="Components\PlayerComponentSpace\Classes\Equipment\WeaponInfo.cs" />
-    <Compile Include="Components\BotControllerSpace\Classes\BotCoverController.cs" />
+    <Compile Include="Components\BotControllerSpace\Classes\GlobalCoverfinder.cs" />
     <Compile Include="Components\BotControllerSpace\Classes\BotSquads.cs" />
     <Compile Include="Components\BotControllerSpace\Classes\ESquadPersonality.cs" />
     <Compile Include="Components\BotControllerSpace\Classes\ESquadRole.cs" />
@@ -486,7 +492,7 @@
     <Compile Include="Preset\GlobalSettings\Categories\General\DoorSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\General\JokeSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\General\LayerSettings.cs" />
-    <Compile Include="Preset\GlobalSettings\Categories\GlobalMoveSettings.cs" />
+    <Compile Include="Preset\GlobalSettings\Categories\MoveSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\HitEffectSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\ISAINSettings.cs" />
     <Compile Include="Preset\GlobalSettings\Categories\Look\VisionSpeed\ElevationVisionSettings.cs" />
@@ -597,7 +603,6 @@
     <Compile Include="Preset\Personalities\BasePersonality\Categories\PersonalityTalkSettings.cs" />
     <Compile Include="Preset\Personalities\BasePersonality\PersonalityManagerClass.cs" />
     <Compile Include="Preset\SAINPresetClass.cs" />
-    <Compile Include="Preset\GlobalSettings\Categories\PersonalitySettings.cs" />
     <Compile Include="Preset\BotSettings\SAINBotSettingsClass.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\Categories\SAINLookSettings.cs" />
     <Compile Include="Preset\BotSettings\SAINSettings\Categories\SAINAimingSettings.cs" />

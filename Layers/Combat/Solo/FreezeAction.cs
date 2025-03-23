@@ -17,11 +17,13 @@ namespace SAIN.Layers.Combat.Solo
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             Bot.Mover.SetTargetPose(0f);
             if (!Bot.Steering.SteerByPriority(null, false)) {
                 Bot.Steering.LookToLastKnownEnemyPosition(Bot.Enemy);
             }
             Shoot.CheckAimAndFire();
+            this.EndProfilingSample();
         }
 
         public override void Start()

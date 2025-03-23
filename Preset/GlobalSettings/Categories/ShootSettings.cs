@@ -8,6 +8,11 @@ namespace SAIN.Preset.GlobalSettings
     // note for later: Need to find a way to remove the clunky duplicates of the dictionaries here, as its a hold over from a previous system of getting the default values for different config options.
     public class ShootSettings : SAINSettingsBase<ShootSettings>, ISAINSettings
     {
+        [Name("Bots only use Semi Auto")]
+        [Description("If enabled, bots will never be able to use full auto at close/mid range.")]
+        [Category("General")]
+        public bool ONLY_SEMIAUTO_TOGGLE = false;
+
         [Name("Global Recoil Multiplier")]
         [Description("Higher = more recoil. Modifies SAIN's recoil scatter feature. 1.5 = 1.5x more recoilfrom a single gunshot")]
         [Category("Bot Recoil")]

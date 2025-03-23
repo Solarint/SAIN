@@ -30,7 +30,7 @@ namespace SAIN.Layers
         {
             return 
                 Bot.Info.FileSettings.Mind.EnableExtracts &&
-                GlobalSettingsClass.Instance.General.Extract.EnableExtractsGlobal &&
+                GlobalSettingsClass.Instance.General.Extract.SAIN_EXTRACT_TOGGLE &&
                 Components.BotController.BotExtractManager.IsBotAllowedToExfil(Bot);
         }
 

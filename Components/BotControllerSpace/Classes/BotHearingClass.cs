@@ -41,7 +41,7 @@ namespace SAIN.Components.BotControllerSpace.Classes
 
         public void PlayShootSound(string profileId)
         {
-            BotController.StartCoroutine(playShootSoundCoroutine(profileId));
+            BotController?.StartCoroutine(playShootSoundCoroutine(profileId));
         }
 
         private IEnumerator playShootSoundCoroutine(string profileId)

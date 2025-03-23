@@ -8,36 +8,6 @@ namespace SAIN.SAINComponent.Classes
 {
     public class HearingAnalysisClass : BotSubClass<SAINHearingSensorClass>, IBotClass
     {
-        private const float BUNKER_REDUCTION_COEF = 0.2f;
-        private const float BUNKER_ELEV_DIFF_COEF = 0.66f;
-        private const float GUNSHOT_OCCLUSION_MOD = 0.8f;
-        private const float FOOTSTEP_OCCLUSION_MOD = 0.8f;
-        private const float GUNSHOT_ENVIR_MOD = 0.65f;
-        private const float FOOTSTEP_ENVIR_MOD = 0.7f;
-        private const float MIN_ENVIRONMENT_MOD = 0.05f;
-
-        private const float HEAR_MODIFIER_NO_EARS = 0.6f;
-        private const float HEAR_MODIFIER_HEAVY_HELMET = 0.8f;
-        private const float HEAR_MODIFIER_DYING = 0.8f;
-        private const float HEAR_MODIFIER_SPRINT = 0.85f;
-        private const float HEAR_MODIFIER_HEAVYBREATH = 0.65f;
-
-        private const float HEAR_MODIFIER_MIN_CLAMP = 0.1f;
-        private const float HEAR_MODIFIER_MAX_CLAMP = 5f;
-        private const float HEAR_MODIFIER_MAX_AFFECT_DIST = 10f;
-
-        private const float HEAR_CHANCE_MIN_DIST = 0.25f;
-        private const float HEAR_CHANCE_MIN_DIST_HEADPHONES = 1;
-        private const float HEAR_CHANCE_MIDRANGE_COEF = 0.66f;
-        private const float HEAR_CHANCE_MIDRANGE_MINCHANCE_HEADPHONES = 3;
-        private const float HEAR_CHANCE_LONGRANGE_MINCHANCE_HEADPHONES = 1;
-        private const float HEAR_CHANCE_NOTMOVING_VELOCITY = 0.05f;
-        private const float HEAR_CHANCE_NOTMOVING_MINCHANCE = 2;
-        private const float HEAR_CHANCE_NOTMOVING_MINCHANCE_HEADPHONES = 4;
-        private const float HEAR_CHANCE_HEADPHONES_OTHERSOUNDS = 3;
-        private const float HEAR_CHANCE_CURRENTENEMY_MINCHANCE = 2;
-        private const float HEAR_CHANCE_CURRENTENEMY_MINCHANCE_HEADPHONES = 3;
-
         public HearingAnalysisClass(SAINHearingSensorClass hearing) : base(hearing)
         {
         }
@@ -88,9 +58,11 @@ namespace SAIN.SAINComponent.Classes
             mods.EnvironmentModifier = calcEnvironmentMod(sound);
             mods.ConditionModifier = calcConditionMod(sound);
             mods.OcclusionModifier = calcOcclusionMod(sound);
-            mods.FinalModifier = mods.CalcFinalModifier(HEAR_MODIFIER_MIN_CLAMP, HEAR_MODIFIER_MAX_CLAMP) * Bot.Info.Difficulty.HearingDistanceModifier;
+            mods.FinalModifier = mods.CalcFinalModifier(_settings.HEAR_MODIFIER_MIN_CLAMP, _settings.HEAR_MODIFIER_MAX_CLAMP) * Bot.Info.Difficulty.HearingDistanceModifier;
             return mods.FinalModifier;
         }
+
+        private static HearingSettings _settings => GlobalSettingsClass.Instance.Hearing;
 
         private bool checkDistToPlayer(BotSound sound)
         {
@@ -106,12 +78,12 @@ namespace SAIN.SAINComponent.Classes
             bool botinBunker = botLocation.InBunker;
             bool playerinBunker = enemyLocation.InBunker;
             if (botinBunker != playerinBunker) {
-                return BUNKER_REDUCTION_COEF;
+                return _settings.BUNKER_REDUCTION_COEF;
             }
             if (botinBunker) {
                 float diff = Mathf.Abs(botLocation.BunkerDepth - enemyLocation.BunkerDepth);
                 if (diff > 0) {
-                    return BUNKER_ELEV_DIFF_COEF;
+                    return _settings.BUNKER_ELEV_DIFF_COEF;
                 }
             }
             return 1f;
@@ -124,7 +96,7 @@ namespace SAIN.SAINComponent.Classes
             }
 
             bool hasheadPhones = Bot.PlayerComponent.Equipment.GearInfo.HasEarPiece;
-            float closehearing = hasheadPhones ? HEAR_CHANCE_MIN_DIST_HEADPHONES : HEAR_CHANCE_MIN_DIST;
+            float closehearing = hasheadPhones ? _settings.HEAR_CHANCE_MIN_DIST_HEADPHONES : _settings.HEAR_CHANCE_MIN_DIST;
             float distance = sound.Distance;
             if (distance <= closehearing) {
                 return true;
@@ -137,24 +109,24 @@ namespace SAIN.SAINComponent.Classes
 
             float minimumChance = 0f;
             if (hasheadPhones) {
-                if (distance < farhearing * HEAR_CHANCE_MIDRANGE_COEF) {
-                    minimumChance += HEAR_CHANCE_MIDRANGE_MINCHANCE_HEADPHONES;
+                if (distance < farhearing * _settings.HEAR_CHANCE_MIDRANGE_COEF) {
+                    minimumChance += _settings.HEAR_CHANCE_MIDRANGE_MINCHANCE_HEADPHONES;
                 }
                 else {
-                    minimumChance += HEAR_CHANCE_LONGRANGE_MINCHANCE_HEADPHONES;
+                    minimumChance += _settings.HEAR_CHANCE_LONGRANGE_MINCHANCE_HEADPHONES;
                 }
                 if (sound.Info.SoundType != SAINSoundType.FootStep) {
-                    minimumChance += HEAR_CHANCE_HEADPHONES_OTHERSOUNDS;
+                    minimumChance += _settings.HEAR_CHANCE_HEADPHONES_OTHERSOUNDS;
                 }
             }
 
-            if (Bot.PlayerComponent.Transform.VelocityMagnitudeNormal < HEAR_CHANCE_NOTMOVING_VELOCITY) {
-                minimumChance += hasheadPhones ? HEAR_CHANCE_NOTMOVING_MINCHANCE_HEADPHONES : HEAR_CHANCE_NOTMOVING_MINCHANCE;
+            if (Bot.PlayerComponent.Transform.VelocityMagnitudeNormal < _settings.HEAR_CHANCE_NOTMOVING_VELOCITY) {
+                minimumChance += hasheadPhones ? _settings.HEAR_CHANCE_NOTMOVING_MINCHANCE_HEADPHONES : _settings.HEAR_CHANCE_NOTMOVING_MINCHANCE;
             }
 
             if (Bot.HasEnemy &&
                 Bot.Enemy.EnemyProfileId == sound.Info.SourcePlayer.ProfileId) {
-                minimumChance += hasheadPhones ? HEAR_CHANCE_CURRENTENEMY_MINCHANCE_HEADPHONES : HEAR_CHANCE_CURRENTENEMY_MINCHANCE;
+                minimumChance += hasheadPhones ? _settings.HEAR_CHANCE_CURRENTENEMY_MINCHANCE_HEADPHONES : _settings.HEAR_CHANCE_CURRENTENEMY_MINCHANCE;
             }
 
             float num = farhearing - closehearing;
@@ -172,12 +144,29 @@ namespace SAIN.SAINComponent.Classes
 
         private float calcOcclusionMod(BotSound sound)
         {
-            bool isGunshot = sound.Info.IsGunShot;
             if (sound.Enemy.InLineOfSight) {
                 sound.Results.VisibleSource = true;
                 return 1f;
             }
-            return isGunshot ? GUNSHOT_OCCLUSION_MOD : FOOTSTEP_OCCLUSION_MOD;
+            switch (sound.Info.SoundType) {
+                case SAINSoundType.Shot:
+                    return _settings.GUNSHOT_OCCLUSION_MOD;
+
+                case SAINSoundType.SuppressedShot:
+                    return _settings.GUNSHOT_OCCLUSION_MOD_SUPP;
+
+                case SAINSoundType.Sprint:
+                    return _settings.FOOTSTEP_OCCLUSION_MOD_SPRINT;
+
+                case SAINSoundType.FootStep:
+                    if (sound.Enemy?.EnemyPlayer?.IsSprintEnabled == true) {
+                        return _settings.FOOTSTEP_OCCLUSION_MOD_SPRINT;
+                    }
+                    return _settings.FOOTSTEP_OCCLUSION_MOD;
+
+                default:
+                    return _settings.OTHER_OCCLUSION_MOD;
+            }
         }
 
         private float calcEnvironmentMod(BotSound sound)
@@ -185,10 +174,10 @@ namespace SAIN.SAINComponent.Classes
             if (Player.AIData.EnvironmentId == sound.Info.SourcePlayer.Player.AIData.EnvironmentId) {
                 return 1f;
             }
-            float envMod = sound.Info.IsGunShot ? GUNSHOT_ENVIR_MOD : FOOTSTEP_ENVIR_MOD;
+            float envMod = sound.Info.IsGunShot ? _settings.GUNSHOT_ENVIR_MOD : _settings.FOOTSTEP_ENVIR_MOD;
             float bunkerMod = calcBunkerVolumeReduction(sound);
             float result = envMod * bunkerMod;
-            result = Mathf.Clamp(result, MIN_ENVIRONMENT_MOD, 1f);
+            result = Mathf.Clamp(result, _settings.MIN_ENVIRONMENT_MOD, 1f);
             return result;
         }
 
@@ -248,15 +237,18 @@ namespace SAIN.SAINComponent.Classes
 
         private float calcConditionMod(BotSound sound)
         {
-            // this is clumsy, not sure how to extract a modifier that would be clamped to be below the max affect distance, so im just returning 1f.
             var mods = sound.Range.Modifiers;
             float dist = sound.Distance * mods.EnvironmentModifier;
-            float maxAffectDist = HEAR_MODIFIER_MAX_AFFECT_DIST;
-            if (dist <= maxAffectDist) {
-                return 1f;
-            }
+            //float maxAffectDist = HEAR_MODIFIER_MAX_AFFECT_DIST;
+            // if (dist <= maxAffectDist) {
+            //     return 1f;
+            // }
 
             float modifier = 1f;
+            float? currentHearSense = BotOwner?.Settings?.Current?.CurrentHearingSense;
+            if (currentHearSense != null) {
+                modifier *= currentHearSense.Value;
+            }
             if (!sound.Info.IsGunShot) {
                 modifier *= GlobalSettings.Hearing.FootstepAudioMultiplier;
             }
@@ -265,30 +257,31 @@ namespace SAIN.SAINComponent.Classes
             }
             modifier *= Bot.Info.FileSettings.Core.HearingDistanceMulti;
 
-            if (dist * modifier < maxAffectDist)
-                return 1f;
+            //if (dist * modifier < maxAffectDist)
+            //    return 1f;
 
-            if (!sound.Info.IsGunShot && sound.Distance > HEAR_MODIFIER_MAX_AFFECT_DIST) {
+            //  && sound.Distance > HEAR_MODIFIER_MAX_AFFECT_DIST
+            if (sound.Info.SoundType != SAINSoundType.Shot) {
                 if (!Bot.PlayerComponent.Equipment.GearInfo.HasEarPiece) {
-                    modifier *= HEAR_MODIFIER_NO_EARS;
+                    modifier *= _settings.HEAR_MODIFIER_NO_EARS;
                 }
                 if (Bot.PlayerComponent.Equipment.GearInfo.HasHeavyHelmet) {
-                    modifier *= HEAR_MODIFIER_HEAVY_HELMET;
+                    modifier *= _settings.HEAR_MODIFIER_HEAVY_HELMET;
                 }
                 if (Bot.Memory.Health.Dying &&
                     !Bot.Memory.Health.OnPainKillers) {
-                    modifier *= HEAR_MODIFIER_DYING;
+                    modifier *= _settings.HEAR_MODIFIER_DYING;
                 }
                 if (Player.IsSprintEnabled) {
-                    modifier *= HEAR_MODIFIER_SPRINT;
+                    modifier *= _settings.HEAR_MODIFIER_SPRINT;
                 }
                 if (Player.HeavyBreath) {
-                    modifier *= HEAR_MODIFIER_HEAVYBREATH;
+                    modifier *= _settings.HEAR_MODIFIER_HEAVYBREATH;
                 }
             }
 
-            if (dist * modifier < maxAffectDist)
-                return 1f;
+            //if (dist * modifier < maxAffectDist)
+            //    return 1f;
 
             return modifier;
         }

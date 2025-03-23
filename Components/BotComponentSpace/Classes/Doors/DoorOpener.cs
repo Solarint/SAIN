@@ -11,8 +11,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 {
     public class DoorOpener : BotBase, IBotClass
     {
-        public bool Interacting
-        {
+        public bool Interacting {
             get
             {
                 return BotOwner.DoorOpener.Interacting;
@@ -23,8 +22,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             }
         }
 
-        public bool NearDoor
-        {
+        public bool NearDoor {
             get
             {
                 return BotOwner.DoorOpener.NearDoor;
@@ -52,14 +50,11 @@ namespace SAIN.SAINComponent.Classes.Mover
         public void Update()
         {
             DoorFinder.Update();
-            if (BotOwner.Mover.IsMoving || Bot.Mover.SprintController.Running)
-            {
+            if (BotOwner.Mover.IsMoving || Bot.Mover.SprintController.Running) {
                 CheckUseSAINOpener();
             }
-            if (!_debugMode && _debugObjects.Count > 0)
-            {
-                foreach (var obj in _debugObjects.Values)
-                {
+            if (!_debugMode && _debugObjects.Count > 0) {
+                foreach (var obj in _debugObjects.Values) {
                     GameObject.Destroy(obj.link);
                     GameObject.Destroy(obj.midClose);
                     GameObject.Destroy(obj.midOpen);
@@ -75,12 +70,10 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool CheckUseSAINOpener()
         {
-            if (!SAINPlugin.LoadedPreset.GlobalSettings.General.Doors.NewDoorOpening)
-            {
+            if (!SAINPlugin.LoadedPreset.GlobalSettings.General.Doors.NewDoorOpening) {
                 return BotOwner.DoorOpener.Update();
             }
-            if (!Bot.BotActivation.SAINLayersActive)
-            {
+            if (!Bot.BotActivation.SAINLayersActive) {
                 return BotOwner.DoorOpener.Update();
             }
 
@@ -90,22 +83,19 @@ namespace SAIN.SAINComponent.Classes.Mover
         private void checkEndDoorOpening()
         {
             //this.BotOwner.Steering.SetYAngle(0f);
-            if (this._traversingEnd < Time.time || 
-                (_lastInteractedInfo != null && _lastInteractedInfo.Door.DoorState != EDoorState.Interacting))
-            {
+            if (this._traversingEnd < Time.time ||
+                (_lastInteractedInfo != null && _lastInteractedInfo.Door.DoorState != EDoorState.Interacting)) {
                 endDoorInteraction();
             }
         }
 
         public bool FindDoorsToOpen()
         {
-            if (Interacting)
-            {
+            if (Interacting) {
                 checkEndDoorOpening();
                 return true;
             }
-            if (_nextPosibleDoorInteractTime < Time.time)
-            {
+            if (_nextPosibleDoorInteractTime < Time.time) {
                 checkIfLastDoorExpire();
                 _interactingWithDoor = findADoorToOpen();
                 NearDoor = _interactingWithDoor;
@@ -117,11 +107,9 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
             if (_debugMode &&
                 SAINPlugin.DebugSettings.Gizmos.DrawDebugGizmos &&
-                !_debugObjects.ContainsKey(link))
-            {
+                !_debugObjects.ContainsKey(link)) {
                 Vector3 linkPosition = link.transform.position + Vector3.down;
-                var objects = new linkObjects
-                {
+                var objects = new linkObjects {
                     link = DebugGizmos.Line(linkPosition, linkPosition + Vector3.up * 2f, Color.white, 0.2f, false, -1f),
                     midOpen = DebugGizmos.Line(linkPosition, link.MidOpen + Vector3.down, Color.blue, 0.2f, false, -1f),
                     midClose = DebugGizmos.Line(linkPosition, link.MidClose + Vector3.down, Color.green, 0.2f, false, -1f),
@@ -139,22 +127,18 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private bool canInteract(NavMeshDoorLink link)
         {
-            if (!link.ShallInteract())
-            {
+            if (!link.ShallInteract()) {
                 //Logger.LogDebug($"Link {link.Id} shall not interact!");
                 return false;
             }
-            if (!link.Door.enabled || !link.Door.gameObject.activeInHierarchy)
-            {
+            if (!link.Door.enabled || !link.Door.gameObject.activeInHierarchy) {
                 return false;
             }
-            if (checkIfDoorLast(link))
-            {
+            if (checkIfDoorLast(link)) {
                 //Logger.LogDebug($"Link {link.Id} is last!");
                 return false;
             }
-            if (!link.Door.Operatable || !link.Door.enabled)
-            {
+            if (!link.Door.Operatable || !link.Door.enabled) {
                 //Logger.LogDebug($"Link {link.Id} door not operable!");
                 return false;
             }
@@ -164,8 +148,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         private bool findADoorToOpen()
         {
             List<DoorData> list = DoorFinder.InteractionDoors;
-            if (list.Count == 0)
-            {
+            if (list.Count == 0) {
                 return false;
             }
 
@@ -173,15 +156,13 @@ namespace SAIN.SAINComponent.Classes.Mover
 
             findPossibleInteractDoors(list);
             var interactDoors = _possibleInteractDoors;
-            if (interactDoors.Count == 0)
-            {
+            if (interactDoors.Count == 0) {
                 return false;
             }
 
             DoorData selectedDoor = checkWantToOpenAnyDoors(interactDoors) ?? checkWantToCloseAnyDoors(interactDoors);
 
-            if (selectedDoor == null)
-            {
+            if (selectedDoor == null) {
                 return false;
             }
             return interactWithDoor(selectedDoor);
@@ -195,8 +176,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
             //Logger.LogDebug($"Found Door to interact for {BotOwner.name}! ID: {link.Id}");
 
-            switch (door.DoorState)
-            {
+            switch (door.DoorState) {
                 case EDoorState.Shut:
                     data.LastOpenTime = Time.time;
                     //Logger.LogDebug($"{BotOwner.name} opening door...");
@@ -220,8 +200,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
             float highestDot = -1f;
             DoorData selectedDoor = null;
-            foreach (var data in doors)
-            {
+            foreach (var data in doors) {
                 if (!data.DoorInFront)
                     continue;
 
@@ -231,14 +210,12 @@ namespace SAIN.SAINComponent.Classes.Mover
                 if (door.DoorState != EDoorState.Shut)
                     continue;
 
-                if (data.DotProduct > highestDot)
-                {
+                if (data.DotProduct > highestDot) {
                     highestDot = data.DotProduct;
                     selectedDoor = data;
                 }
             }
-            if (selectedDoor != null && selectedDoor.DotProduct > 0f)
-            {
+            if (selectedDoor != null && selectedDoor.DotProduct > 0f) {
                 return selectedDoor;
             }
             return null;
@@ -248,8 +225,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
             //float lowestDot = 0f;
             DoorData selectedDoor = null;
-            foreach (var data in doors)
-            {
+            foreach (var data in doors) {
                 //if (data.DoorInFront)
                 //    continue;
 
@@ -280,8 +256,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             Vector3 botPos = BotOwner.Transform.position;
             Vector3 moveDirection = (targetMovePos - botPos).normalized;
 
-            foreach (var data in list)
-            {
+            foreach (var data in list) {
                 //Logger.LogDebug($"Checking {link.Id}...");
 
                 NavMeshDoorLink link = data.Link;
@@ -297,8 +272,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 drawLink(link);
                 float maxDistance;
 
-                switch (door.DoorState)
-                {
+                switch (door.DoorState) {
                     case EDoorState.Open:
                         maxDistance = 4f;
                         break;
@@ -332,17 +306,14 @@ namespace SAIN.SAINComponent.Classes.Mover
         private void checkIfLastDoorExpire()
         {
             DoorData lastInfo = _lastInteractedInfo;
-            if (_lastInteractedInfo == null)
-            {
+            if (_lastInteractedInfo == null) {
                 return;
             }
-            if (lastInfo.Door.DoorState == EDoorState.Interacting)
-            {
+            if (lastInfo.Door.DoorState == EDoorState.Interacting) {
                 lastInfo.LastInteractTime = Time.time;
                 return;
             }
-            if (lastInfo.LastInteractTime + DOOR_SINGLE_INTERACTION_FREQ < Time.time)
-            {
+            if (lastInfo.LastInteractTime + DOOR_SINGLE_INTERACTION_FREQ < Time.time) {
                 _lastInteractedInfo = null;
             }
         }
@@ -354,12 +325,10 @@ namespace SAIN.SAINComponent.Classes.Mover
         private bool checkIfDoorLast(NavMeshDoorLink link)
         {
             DoorData lastInfo = _lastInteractedInfo;
-            if (lastInfo == null)
-            {
+            if (lastInfo == null) {
                 return false;
             }
-            if (lastInfo.Link.Id != link.Id)
-            {
+            if (lastInfo.Link.Id != link.Id) {
                 return false;
             }
             return lastInfo.CanInteractByTime();
@@ -385,11 +354,9 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
             Player.MovementContext.ResetCanUsePropState();
             var gstruct = Door.Interact(Player, type);
-            if (gstruct.Succeeded)
-            {
+            if (gstruct.Succeeded) {
                 //Logger.LogDebug("Success");
-                switch (type)
-                {
+                switch (type) {
                     case EInteractionType.Breach:
                         Player.vmethod_0(door, gstruct.Value, new Action(endDoorInteraction));
                         break;
@@ -408,8 +375,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             NearDoor = false;
             BreachingDoor = false;
             Interacting = false;
-            if (!Bot.Mover.SprintController.Running)
-            {
+            if (!Bot.Mover.SprintController.Running) {
                 BotOwner.Mover.MovementResume();
                 BotOwner.Mover.SprintPause(-1f);
             }
@@ -417,8 +383,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         public bool ShallPauseSprintForOpening()
         {
-            if (!Interacting)
-            {
+            if (!Interacting) {
                 return false;
             }
 
@@ -431,12 +396,10 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private bool shallKickOpen(Door door, EInteractionType Etype)
         {
-            if (Etype != EInteractionType.Open)
-            {
+            if (Etype != EInteractionType.Open) {
                 return false;
             }
-            if (!wantToKick())
-            {
+            if (!wantToKick()) {
                 return false;
             }
             var breakInParameters = door.GetBreakInParameters(Bot.Position);
@@ -446,23 +409,18 @@ namespace SAIN.SAINComponent.Classes.Mover
         private bool wantToKick()
         {
             var enemy = Bot.Enemy;
-            if (enemy != null)
-            {
-                if (Bot.Info.PersonalitySettings.General.KickOpenAllDoors)
-                {
+            if (enemy != null) {
+                if (Bot.Info.PersonalitySettings.General.KickOpenAllDoors) {
                     return true;
                 }
-                if (BotOwner.Memory.IsUnderFire)
-                {
+                if (BotOwner.Memory.IsUnderFire) {
                     return true;
                 }
                 float timeSinceSeen = enemy.TimeSinceSeen;
-                if (timeSinceSeen < 3f)
-                {
+                if (timeSinceSeen < 3f) {
                     return true;
                 }
-                if (timeSinceSeen < 5f && enemy.InLineOfSight)
-                {
+                if (timeSinceSeen < 5f && enemy.InLineOfSight) {
                     return true;
                 }
             }
@@ -477,14 +435,12 @@ namespace SAIN.SAINComponent.Classes.Mover
             Door door = doorInfo.Door;
             //bool noAnimation = door.interactWithoutAnimation;
             EDoorState snap = door.Snap;
-            if (shallKickOpen(door, Etype) || Etype == EInteractionType.Breach)
-            {
+            if (shallKickOpen(door, Etype) || Etype == EInteractionType.Breach) {
                 //Logger.LogDebug($"{BotOwner.name} Breaching Door {doorInfo.Link.Id}!");
                 BreachingDoor = true;
                 Etype = EInteractionType.Breach;
             }
-            else
-            {
+            else {
                 BreachingDoor = false;
                 //door.interactWithoutAnimation = true;
                 door.Snap = EDoorState.None;
@@ -492,8 +448,7 @@ namespace SAIN.SAINComponent.Classes.Mover
 
             if (Etype == EInteractionType.Breach ||
                 ModDetection.ProjectFikaLoaded ||
-                !GlobalSettingsClass.Instance.General.Doors.NoDoorAnimations)
-            {
+                !GlobalSettingsClass.Instance.General.Doors.NoDoorAnimations) {
                 //Logger.LogDebug($"{BotOwner.name} Executing [{Etype}] door interaction on {doorInfo.Link.Id}");
                 this.BotOwner.Mover.SprintPause(2f);
                 this.BotOwner.Mover.MovementPause(2f);
@@ -508,8 +463,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             //Logger.LogDebug($"{BotOwner.name} Auto Opening Door on {doorInfo.Link.Id}");
 
             EDoorState state = EDoorState.None;
-            switch (Etype)
-            {
+            switch (Etype) {
                 case EInteractionType.Open:
                     state = EDoorState.Open;
                     break;
@@ -530,30 +484,26 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private bool ShallInvertDoorAngle(Door door)
         {
-			if (!GlobalSettingsClass.Instance.General.Doors.InvertDoors)
-			{
-				return false;
-			}
-			var interactionParameters = door.GetInteractionParameters(BotOwner.Position);
-			if (interactionParameters.AnimationId == (door.DoorState is EDoorState.Locked ? (int)door.DoorKeyOpenInteraction : door.CalculateInteractionIndex(BotOwner.Position)))
-			{
-				return false;
-			}
-			return true;
-		}
+            if (!GlobalSettingsClass.Instance.General.Doors.InvertDoors) {
+                return false;
+            }
+            var interactionParameters = door.GetInteractionParameters(BotOwner.Position);
+            if (interactionParameters.AnimationId == (door.DoorState is EDoorState.Locked ? (int)door.DoorKeyOpenInteraction : door.CalculateInteractionIndex(BotOwner.Position))) {
+                return false;
+            }
+            return true;
+        }
 
         // Token: 0x060010AF RID: 4271 RVA: 0x0004CED4 File Offset: 0x0004B0D4
         public bool CheckWantToInteract(DoorData data, Vector3 botPosition)
         {
             NavMeshDoorLink link = data.Link;
             botPosition += Vector3.up;
-            if (Mathf.Abs(botPosition.y - link.Open1.y) >= 0.5f)
-            {
+            if (Mathf.Abs(botPosition.y - link.Open1.y) >= 0.5f) {
                 return false;
             }
 
-            switch (data.Door.DoorState)
-            {
+            switch (data.Door.DoorState) {
                 case EDoorState.Open:
                     return data.DotProduct < 0;
 
@@ -607,6 +557,5 @@ namespace SAIN.SAINComponent.Classes.Mover
         public bool _interactingWithDoor;
         private float _nextPosibleDoorInteractTime;
         private float _traversingEnd;
-        private float _refreshWayPeriod;
     }
 }

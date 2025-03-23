@@ -45,40 +45,7 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             RaycastResults.Add(ERaycastCheck.LineofSight, new RaycastResult());
             RaycastResults.Add(ERaycastCheck.Shoot, new RaycastResult());
             RaycastResults.Add(ERaycastCheck.Vision, new RaycastResult());
-
-            //var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //sphere.GetComponent<Renderer>().material.color = Color.red;
-            //sphere.GetComponent<Collider>().enabled = false;
-            //sphere.name = $"los_line_{_debugCount++}";
-            //sphere.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
-            //_debugLine = sphere;
-            //
-            //_debugLineRenderer = sphere.AddComponent<LineRenderer>();
-            //// Modify the color and width of the line
-            //_debugLineRenderer.material.color = Color.white;
-            //_debugLineRenderer.startWidth = 0.02f;
-            //_debugLineRenderer.endWidth = 0.01f;
         }
-
-        public void UpdateDebugGizmos(Vector3 eyePosition)
-        {
-            _debugLineRenderer.SetPosition(0, eyePosition);
-            if (!LineOfSight) {
-                _debugLineRenderer.material.color = Color.white;
-
-                return;
-            }
-
-            _debugLineRenderer.material.color = Color.red;
-            if (LastSuccessPoint != null) {
-                _debugLine.transform.position = LastSuccessPoint.Value;
-                _debugLineRenderer.SetPosition(1, LastSuccessPoint.Value);
-            }
-        }
-
-        private static int _debugCount = 0;
-        private GameObject _debugLine;
-        private LineRenderer _debugLineRenderer;
 
         private readonly Dictionary<EBodyPartColliderType, BodyPartCollider> _colliderDictionary = new Dictionary<EBodyPartColliderType, BodyPartCollider>();
 
@@ -113,10 +80,6 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
         private BodyPartCollider getCollider()
         {
-            if (_lastSuccessPart != null) {
-                return _lastSuccessPart;
-            }
-
             BodyPartCollider collider = Colliders[_index];
             _index++;
             if (_index > _indexMax) {
@@ -152,7 +115,5 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             }
             return lowest;
         }
-
-        private BodyPartCollider _lastSuccessPart;
     }
 }

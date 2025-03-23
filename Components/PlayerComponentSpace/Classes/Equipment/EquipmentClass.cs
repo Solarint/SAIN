@@ -1,10 +1,13 @@
 ﻿using EFT;
 using EFT.InventoryLogic;
-using SAIN.Components.BotController;
+using HarmonyLib;
 using SAIN.SAINComponent;
 using SAIN.SAINComponent.Classes.Info;
+using SPT.Reflection.Patching;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace SAIN.Components.PlayerComponentSpace.Classes.Equipment
@@ -55,11 +58,83 @@ namespace SAIN.Components.PlayerComponentSpace.Classes.Equipment
 
             if (_nextPlaySoundTime < Time.time) {
                 _nextPlaySoundTime = Time.time + (PlayerComponent.IsAI ? 0.5f : 0.1f);
-                SAINBotController.Instance.BotHearing.PlayAISound(PlayerComponent, weapon.SoundType, PlayerComponent.Transform.WeaponFirePort, weapon.CalculatedAudibleRange, 1f, false);
+                SAINBotController.Instance?.BotHearing.PlayAISound(PlayerComponent, weapon.SoundType, PlayerComponent.Transform.WeaponFirePort, weapon.CalculatedAudibleRange, 1f, false);
             }
             return true;
         }
 
+        public bool BulletFired(EftBulletClass bulletClass)
+        {
+            if (bulletClass == null) {
+                return false;
+            }
+            if (_nextPlaySoundTime < Time.time) {
+                _nextPlaySoundTime = Time.time + (PlayerComponent.IsAI ? 0.5f : 0.1f);
+                var weapon = CurrentWeapon;
+                if (weapon == null) {
+                    return false;
+                }
+                Logger.LogInfo("Bullet Fired");
+                FiredBulletContainer bulletContainer = new FiredBulletContainer(bulletClass, weapon);
+                if (PlayerComponent.IsAI) {
+                    SAINBotController.Instance.BotHearing.PlayAISound(PlayerComponent, weapon.SoundType, PlayerComponent.Transform.WeaponFirePort, weapon.CalculatedAudibleRange, 1f, false);
+                }
+                else {
+                    PlayerComponent.StartCoroutine(bulletFiredCoroutine(bulletContainer));
+                }
+            }
+            return false;
+        }
+
+        private IEnumerator bulletFiredCoroutine(FiredBulletContainer bulletContainer)
+        {
+            float expireTime = Time.time + bulletFiredExpireTime;
+            while (bulletContainer.Bullet.BulletState == EftBulletClass.EBulletState.Flying) {
+                if (expireTime < Time.time) {
+                    yield break;
+                }
+                yield return null;
+            }
+            yield return null;
+        }
+
+        private void findRelevantBots(List<BotComponent> botList, FiredBulletContainer bulletContainer)
+        {
+            var botcontroller = SAINBotController.Instance;
+            if (botcontroller == null) {
+                return;
+            }
+            var bots = botcontroller.Bots;
+            if (bots == null) {
+                return;
+            }
+            Vector3 bulletTravelDir = bulletContainer.Bullet.CurrentDirection;
+            foreach (var bot in bots.Values) {
+            }
+        }
+
+        public class FiredBulletContainer
+        {
+            public FiredBulletContainer(EftBulletClass bulletClass, WeaponInfo weaponInfo)
+            {
+                Bullet = bulletClass;
+                WeaponInfo = weaponInfo;
+            }
+
+            public readonly EftBulletClass Bullet;
+            public readonly WeaponInfo WeaponInfo;
+            public readonly List<BotBulletData> ActiveBots = new List<BotBulletData>();
+        }
+
+        public class BotBulletData
+        {
+            public BotComponent Bot;
+            public bool Active = true;
+            public bool Reacted = false;
+            public float DotProduct = -1;
+        }
+
+        private float bulletFiredExpireTime = 10f;
         private float _nextPlaySoundTime;
 
         public void Update()
@@ -169,5 +244,30 @@ namespace SAIN.Components.PlayerComponentSpace.Classes.Equipment
         private WeaponInfo _currentWeapon;
 
         public Dictionary<EquipmentSlot, WeaponInfo> WeaponInfos { get; } = new Dictionary<EquipmentSlot, WeaponInfo>();
+
+        public class BulletCreatedPatch : ModulePatch
+        {
+            protected override MethodBase GetTargetMethod()
+            {
+                return AccessTools.Method(typeof(ClientFirearmController), "RegisterShot");
+            }
+
+            [PatchPostfix]
+            public static void Patch(EftBulletClass shot)
+            {
+                if (shot == null) {
+                    return;
+                }
+                var gameWorld = GameWorldComponent.Instance;
+                if (gameWorld == null) {
+                    return;
+                }
+                PlayerComponent bulletOwner = gameWorld.PlayerTracker.GetPlayerComponent(shot.PlayerProfileID);
+                if (bulletOwner == null) {
+                    return;
+                }
+                bulletOwner.Equipment.BulletFired(shot);
+            }
+        }
     }
 }

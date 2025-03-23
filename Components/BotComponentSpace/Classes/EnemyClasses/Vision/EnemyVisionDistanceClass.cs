@@ -14,12 +14,10 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
         {
         }
 
-        public float Value
-        {
+        public float Value {
             get
             {
-                if (_nextCalcTime < Time.time)
-                {
+                if (_nextCalcTime < Time.time) {
                     _nextCalcTime = Time.time + _calcFreq;
                     _visionDist = CalcVisionDistance();
                 }
@@ -31,8 +29,7 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
         {
             if (Enemy.Vision.Angles.AngleToEnemy < 30f &&
                 Enemy.KnownPlaces.EnemyDistanceFromLastKnown < 3 &&
-                SAINBotController.Instance.TimeVision.VisibilityPercent > 50f)
-            {
+                SAINBotController.Instance.TimeVision.VisibilityRatio > 0.5f) {
                 return true;
             }
             return false;
@@ -40,8 +37,7 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
         private float CalcVisionDistance()
         {
-            if (isEnemyAlwaysInVisibleDistance())
-            {
+            if (isEnemyAlwaysInVisibleDistance()) {
                 return 1000f;
             }
 
@@ -93,22 +89,18 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             // Reduce Bot Periph Vision
             float angleToEnemy = Enemy.Vision.Angles.AngleToEnemy;
             float maxAngle = Enemy.Vision.Angles.MaxVisionAngle;
-            if (angleToEnemy > maxAngle)
-            {
+            if (angleToEnemy > maxAngle) {
                 return 0f;
             }
 
             float minAngle = 15f;
-            if (angleToEnemy <= minAngle)
-            {
-                if (Bot.PlayerComponent.Equipment.CurrentWeapon?.HasOptic == true)
-                {
+            if (angleToEnemy <= minAngle) {
+                if (Bot.PlayerComponent.Equipment.CurrentWeapon?.HasOptic == true) {
                     return 3f;
                 }
                 return 1.5f;
             }
-            if (Enemy.RealDistance < 10f)
-            {
+            if (Enemy.RealDistance < 10f) {
                 return 1f;
             }
 
@@ -134,16 +126,13 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             bool usingSuppressor = Enemy.EnemyPlayerComponent?.Equipment.CurrentWeapon?.HasSuppressor == true;
 
             float flareMod;
-            if (flareEnabled && !usingSuppressor)
-            {
+            if (flareEnabled && !usingSuppressor) {
                 flareMod = 1.25f;
             }
-            else if (flareEnabled && usingSuppressor)
-            {
+            else if (flareEnabled && usingSuppressor) {
                 flareMod = 1.1f;
             }
-            else
-            {
+            else {
                 flareMod = 1f;
             }
             return flareMod;

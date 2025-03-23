@@ -142,9 +142,9 @@ namespace SAIN.SAINComponent.Classes
                 if (underFire) {
                     BotOwner?.HearingSensor?.OnEnemySounHearded?.Invoke(sound.Results.EstimatedPosition, sound.Distance, sound.Info.SoundType.Convert());
                     Bot.Memory.SetUnderFire(enemy, sound.Results.EstimatedPosition);
+                    enemy.SetEnemyAsSniper(enemy.RealDistance > GlobalSettings.Mind.ENEMYSNIPER_DISTANCE);
                 }
-                Bot.Suppression.AddSuppression(enemy, projDist);
-                enemy.SetEnemyAsSniper(sound.Distance > 100f);
+                Bot.Suppression.CheckAddSuppression(enemy, projDist);
                 enemy.Status.ShotAtMeRecently = true;
                 addPointToSearch(sound);
             }

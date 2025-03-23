@@ -27,8 +27,6 @@ namespace SAIN.BotController.Classes
 
         public event Action<BotComponent, float> NewLeaderFound;
 
-        public event Action<SquadPersonalitySettings> OnSquadPersonalityFound;
-
         public Dictionary<string, BotComponent> Members { get; } = new Dictionary<string, BotComponent>();
         public Dictionary<string, MemberInfo> MemberInfos { get; } = new Dictionary<string, MemberInfo>();
         public string Id { get; private set; } = string.Empty;

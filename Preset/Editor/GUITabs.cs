@@ -77,14 +77,14 @@ namespace SAIN.Editor
                     35f, ColorNames.DarkRed);
             }
             else {
-                BuilderClass.Alert(null, null, 35f, null);
+                BuilderClass.Alert(null, null, 25f, null);
             }
 
             if (Button(
                 "Save and Export",
                 ConfigEditingTracker.GetUnsavedValuesString(),
                 EUISoundType.InsuranceInsured,
-                Height(35f))) {
+                Height(25f))) {
                 SAINPresetClass.ExportAll(SAINPlugin.LoadedPreset);
             }
 

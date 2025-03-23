@@ -62,7 +62,6 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
         private float _checkThrowPos_HeightOffset = 0.25f;
         private float _maxEnemyDistToCheckThrow = 75f;
         private float _friendlyCloseRecheckTime = 3f;
-        private float _announceThrowingNadeChance = 75f;
         private float _sayNeedGrenadeFreq = 10f;
         private float _sayNeedGrenadeChance = 5f;
         private const float THROW_FREQUENCY_RANDOMIZATION_FACTOR = 2f;
@@ -95,8 +94,6 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             reason = "noGoodTarget";
             return false;
         }
-
-        private ThrowWeapItemClass _currentGrenade;
 
         private bool checkCanThrow(out string reason)
         {
@@ -343,7 +340,6 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
         private float _minThrowDistPercent;
         private float _maxPower => BotOwner.WeaponManager.Grenades.MaxPower;
         private float _nextPosibleAttempt;
-        private float _nextGrenadeCheckTime;
 
         private static AIGreandeAng[] _indoorAngles =
         {

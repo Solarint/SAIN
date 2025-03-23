@@ -13,6 +13,9 @@ namespace SAIN.SAINComponent.Classes.Mover
         private const float LEAN_UPDATE_NOT_FOUND_FREQ = 0.25f;
         private const float LEAN_RAYCAST_OFFSET_DIST = 0.66f;
         private const float LEAN_MAX_RAYCAST_DIST = 16f;
+        private const float RESET_LEAN_AFTER_TIME = 1f;
+        private const float MAX_CORNER_DISTANCE_LEAN = 20f;
+        private const float MAX_CORNER_DISTANCE_LEAN_SQR = MAX_CORNER_DISTANCE_LEAN * MAX_CORNER_DISTANCE_LEAN;
 
         public LeanSetting LeanDirection { get; private set; }
         public LeanSetting LastLeanDirection { get; private set; }
@@ -41,75 +44,66 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private void updateLean()
         {
-            if (!checkShallLean())
-            {
+            if (!checkShallLean()) {
                 return;
             }
-            if (LeanTimer < Time.time)
-            {
+            if (_leanTimer < Time.time) {
                 var enemy = Bot.CurrentTarget.CurrentTargetEnemy;
                 findLean(enemy);
                 float timeAdd = LeanDirection == LeanSetting.None ? LEAN_UPDATE_NOT_FOUND_FREQ : LEAN_UPDATE_FOUND_FREQ;
-                LeanTimer = Time.time + timeAdd;
+                _leanTimer = Time.time + timeAdd;
             }
         }
 
         private bool checkShallLean()
         {
-            if (!Bot.SAINLayersActive)
-            {
+            if (!Bot.Info.FileSettings.Move.LEAN_TOGGLE || !GlobalSettingsClass.Instance.Move.LEAN_TOGGLE) {
                 ResetLean();
                 return false;
             }
-            if (Bot.Mover.SprintController.Running || Player.IsSprintEnabled)
-            {
+            if (!Bot.SAINLayersActive) {
                 ResetLean();
                 return false;
             }
-            if (Bot.Enemy?.IsVisible == true && Bot.Decision.CurrentSelfDecision != ESelfDecision.None)
-            {
+            if (Bot.Mover.SprintController.Running || Player.IsSprintEnabled) {
                 ResetLean();
                 return false;
             }
-            if (IsHoldingLean)
-            {
+            if (Bot.Enemy?.IsVisible == true && Bot.Decision.CurrentSelfDecision != ESelfDecision.None) {
+                ResetLean();
+                return false;
+            }
+            if (IsHoldingLean) {
                 return false;
             }
             var CurrentDecision = Bot.Decision.CurrentCombatDecision;
             var enemy = Bot.CurrentTarget.CurrentTargetEnemy;
-            if (enemy == null || Player.IsSprintEnabled || DontLean.Contains(CurrentDecision) || Bot.Suppression.IsHeavySuppressed)
-            {
+            if (enemy == null || Player.IsSprintEnabled || DontLean.Contains(CurrentDecision) || Bot.Suppression.IsHeavySuppressed) {
                 ResetLean();
                 return false;
             }
             if (GlobalSettingsClass.Instance.General.AILimit.LimitAIvsAIGlobal
                 && enemy.IsAI
-                && Bot.CurrentAILimit != AILimitSetting.None)
-            {
+                && Bot.CurrentAILimit != AILimitSetting.None) {
                 ResetLean();
                 return false;
             }
-            if (CurrentDecision == ECombatDecision.HoldInCover)
-            {
+            if (CurrentDecision == ECombatDecision.HoldInCover) {
                 return false;
             }
             return true;
         }
 
-        private const float RESET_LEAN_AFTER_TIME = 1f;
-
         private void findLean(Enemy enemy)
         {
             var lastKnownPlace = enemy.KnownPlaces.LastKnownPlace;
-            if (lastKnownPlace == null)
-            {
+            if (lastKnownPlace == null) {
                 setLean(LeanSetting.None);
                 return;
             }
 
             DirectLineOfSight = CheckOffSetRay(lastKnownPlace.Position, 0f, 0f, out var direct);
-            if (DirectLineOfSight)
-            {
+            if (DirectLineOfSight) {
                 if (Time.time - _timeLastLeaned > RESET_LEAN_AFTER_TIME)
                     setLean(LeanSetting.None);
 
@@ -117,8 +111,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             }
 
             var blindCornerLean = FindLeanFromBlindCornerAngle(enemy, 1f);
-            if (blindCornerLean != LeanSetting.None)
-            {
+            if (blindCornerLean != LeanSetting.None) {
                 setLean(blindCornerLean);
                 return;
             }
@@ -131,23 +124,19 @@ namespace SAIN.SAINComponent.Classes.Mover
         public LeanSetting FindLeanFromBlindCornerAngle(Enemy enemy, float minAngle = -1f)
         {
             var blindCorner = enemy.Path.EnemyCorners.GetCorner(ECornerType.Blind);
-            if (blindCorner == null)
-            {
+            if (blindCorner == null) {
                 return LeanSetting.None;
             }
             float signedAngle = blindCorner.SignedAngleToTarget;
-            if (signedAngle == 0f)
-            {
+            if (signedAngle == 0f) {
                 return LeanSetting.None;
             }
-            if (minAngle > 0f && Mathf.Abs(signedAngle) < minAngle)
-            {
+            if (minAngle > 0f && Mathf.Abs(signedAngle) < minAngle) {
                 return LeanSetting.None;
             }
 
             Vector3 direction = blindCorner.GroundPosition - Bot.Position;
-            if (direction.sqrMagnitude > MAX_CORNER_DISTANCE_LEAN_SQR)
-            {
+            if (direction.sqrMagnitude > MAX_CORNER_DISTANCE_LEAN_SQR) {
                 return LeanSetting.None;
             }
 
@@ -155,17 +144,13 @@ namespace SAIN.SAINComponent.Classes.Mover
             return result;
         }
 
-        private const float MAX_CORNER_DISTANCE_LEAN = 20f;
-        private const float MAX_CORNER_DISTANCE_LEAN_SQR = MAX_CORNER_DISTANCE_LEAN * MAX_CORNER_DISTANCE_LEAN;
-
         private float _stopHoldLeanTime;
 
         public bool IsHoldingLean => _stopHoldLeanTime > Time.time;
 
         public void HoldLean(float duration)
         {
-            if (LeanDirection != LeanSetting.None)
-            {
+            if (LeanDirection != LeanSetting.None) {
                 _stopHoldLeanTime = Time.time + duration;
             }
         }
@@ -174,8 +159,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
         }
 
-
-        private float LeanTimer = 0f;
+        private float _leanTimer = 0f;
 
         public void ResetLean()
         {
@@ -185,8 +169,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         public LeanSetting FindLeanDirectionRayCast(Vector3 targetPos)
         {
             RightLos = CheckOffSetRay(targetPos, 90f, LEAN_RAYCAST_OFFSET_DIST, out var rightOffset);
-            if (!RightLos)
-            {
+            if (!RightLos) {
                 RightLosPos = rightOffset;
                 rightOffset.y = BotOwner.Position.y;
                 float halfDist1 = (rightOffset - BotOwner.Position).magnitude / 2f;
@@ -196,15 +179,13 @@ namespace SAIN.SAINComponent.Classes.Mover
                 else
                     RightHalfLosPos = null;
             }
-            else
-            {
+            else {
                 RightLosPos = null;
                 RightHalfLosPos = null;
             }
 
             LeftLos = CheckOffSetRay(targetPos, -90f, LEAN_RAYCAST_OFFSET_DIST, out var leftOffset);
-            if (!LeftLos)
-            {
+            if (!LeftLos) {
                 LeftLosPos = leftOffset;
                 leftOffset.y = BotOwner.Position.y;
                 float halfDist2 = (leftOffset - BotOwner.Position).magnitude / 2f;
@@ -215,8 +196,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 else
                     LeftHalfLosPos = null;
             }
-            else
-            {
+            else {
                 LeftLosPos = null;
                 LeftHalfLosPos = null;
             }
@@ -239,21 +219,17 @@ namespace SAIN.SAINComponent.Classes.Mover
         {
             LeanSetting setting;
 
-            if (DirectLineOfSight)
-            {
+            if (DirectLineOfSight) {
                 return LeanSetting.None;
             }
 
-            if ((LeftLos || LeftHalfLos) && !RightLos)
-            {
+            if ((LeftLos || LeftHalfLos) && !RightLos) {
                 setting = LeanSetting.Left;
             }
-            else if (!LeftLos && (RightLos || RightHalfLos))
-            {
+            else if (!LeftLos && (RightLos || RightHalfLos)) {
                 setting = LeanSetting.Right;
             }
-            else
-            {
+            else {
                 setting = LeanSetting.None;
             }
 
@@ -265,8 +241,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             Vector3 startPos = BotOwner.Position;
             startPos.y = Bot.Transform.HeadPosition.y;
 
-            if (dist > 0f)
-            {
+            if (dist > 0f) {
                 var dirToEnemy = (targetPos - BotOwner.Position).normalized;
 
                 Quaternion rotation = Quaternion.Euler(0, angle, 0);
@@ -275,13 +250,11 @@ namespace SAIN.SAINComponent.Classes.Mover
 
                 Point = FindOffset(startPos, direction, dist);
 
-                if ((Point - startPos).magnitude < dist / 3f)
-                {
+                if ((Point - startPos).magnitude < dist / 3f) {
                     return true;
                 }
             }
-            else
-            {
+            else {
                 Point = startPos;
             }
 
@@ -292,7 +265,6 @@ namespace SAIN.SAINComponent.Classes.Mover
             return LOS;
         }
 
-
         private bool LineOfSight(Vector3 start, Vector3 target)
         {
             var direction = target - start;
@@ -302,12 +274,10 @@ namespace SAIN.SAINComponent.Classes.Mover
 
         private Vector3 FindOffset(Vector3 start, Vector3 direction, float distance)
         {
-            if (Physics.Raycast(start, direction, out var hit, distance, LayerMaskClass.HighPolyWithTerrainMask))
-            {
+            if (Physics.Raycast(start, direction, out var hit, distance, LayerMaskClass.HighPolyWithTerrainMask)) {
                 return hit.point;
             }
-            else
-            {
+            else {
                 return start + direction.normalized * distance;
             }
         }

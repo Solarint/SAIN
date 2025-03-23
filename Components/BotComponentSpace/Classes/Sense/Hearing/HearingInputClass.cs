@@ -6,7 +6,6 @@ using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
-using static RootMotion.FinalIK.InteractionTrigger;
 
 namespace SAIN.SAINComponent.Classes
 {
@@ -91,10 +90,17 @@ namespace SAIN.SAINComponent.Classes
                     return;
                 }
             }
-            var weather = SAINWeatherClass.Instance;
-            if (weather != null &&
-                PlayerComponent.Player.AIData.EnvironmentId == 0) {
-                power *= weather.RainSoundModifier;
+
+            if (!PlayerComponent.AIData.PlayerLocation.InBunker) {
+                var weather = SAINWeatherClass.Instance;
+                if (weather != null) {
+                    if (PlayerComponent.Player.AIData.EnvironmentId == 0) {
+                        power *= weather.RainSoundModifierOutdoor;
+                    }
+                    else {
+                        power *= weather.RainSoundModifierIndoor;
+                    }
+                }
             }
             float baseRange = power * volume;
             if (!isGunshot &&

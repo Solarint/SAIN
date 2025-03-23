@@ -26,7 +26,8 @@ namespace SAIN.Layers
 
         public override void Update(CustomLayer.ActionData actionData)
         {
-
+            this.StartProfilingSample("Update");
+            this.EndProfilingSample();
         }
     }
 }

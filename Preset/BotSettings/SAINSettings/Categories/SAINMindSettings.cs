@@ -18,9 +18,17 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         [Percentage01to99]
         public float WeaponProficiency = 0.5f;
 
+        [Name("Suppression Resistance")]
+        [Description("Higher = Less affected by suppression. A Value of 0 means No Resistance. " +
+            "A Value of 1 means Full Resistance. " +
+            "The final resistance number is the mid-point between their personality and bot type resistance. " +
+            "So a value of 0.25 for personality and a value of 0.75 for bot type would result in 0.5")]
+        [MinMax(0.0f, 1f, 100)]
+        public float SuppressionResistance = 0f;
+
         [Category("Talk")]
         [Name("Talk Frequency")]
-        [Description("How often this bot can say voicelines.")]
+        [Description("How often to check if a bot wants to talk. Higher = More Delay between Talking.")]
         [MinMax(0f, 30f)]
         public float TalkFrequency = 1f;
 
@@ -34,12 +42,12 @@ namespace SAIN.Preset.BotSettings.SAINSettings.Categories
         public bool SquadTalk = true;
 
         [Category("Talk")]
-        [Name("Squad Talk Frequency")]
+        [Name("Squad Talk Frequency. Higher = More Delay between Talking.")]
         [MinMax(0f, 60f)]
         public float SquadMemberTalkFreq = 3f;
 
         [Category("Talk")]
-        [Name("Squad Leader Talk Frequency")]
+        [Name("Squad Leader Talk Frequency. Higher = More Delay between Talking.")]
         [MinMax(0f, 60f)]
         public float SquadLeadTalkFreq = 3f;
 

@@ -18,7 +18,6 @@ namespace SAIN.Components.PlayerComponentSpace
     {
         public OtherPlayersData OtherPlayersData { get; private set; }
         public BodyPartsClass BodyParts { get; private set; }
-        public PlayerIlluminationClass Illumination { get; private set; }
 
         private void Update()
         {
@@ -29,7 +28,6 @@ namespace SAIN.Components.PlayerComponentSpace
             }
 
             if (!IsAI || Person.ActivationClass.BotActive) {
-                Illumination.Update();
                 drawTransformGizmos();
                 Flashlight.Update();
                 Equipment.Update();
@@ -326,9 +324,6 @@ namespace SAIN.Components.PlayerComponentSpace
                 Flashlight = new FlashLightClass(this);
                 Equipment = new SAINEquipmentClass(this);
                 AIData = new SAINAIData(Equipment.GearInfo, this);
-                Illumination = new PlayerIlluminationClass(this);
-
-                Illumination.Init();
                 OtherPlayersData.Init();
 
                 Person.ActivationClass.OnPlayerActiveChanged += handleCoroutines;
@@ -383,7 +378,6 @@ namespace SAIN.Components.PlayerComponentSpace
             stopCoroutines();
             Person.ActivationClass.OnBotActiveChanged -= handleCoroutines;
             Person.ActivationClass.OnPlayerActiveChanged -= handleCoroutines;
-            Illumination?.Dispose();
             Equipment?.Dispose();
             OtherPlayersData?.Dispose();
             Destroy(this);

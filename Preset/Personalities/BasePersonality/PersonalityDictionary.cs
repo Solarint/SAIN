@@ -1,5 +1,6 @@
 ﻿using EFT;
 using SAIN.Helpers;
+using SAIN.Preset.GlobalSettings;
 using SAIN.SAINComponent.Classes.Info;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,32 +9,54 @@ namespace SAIN.Preset.Personalities
 {
     public class PersonalityDictionary : Dictionary<EPersonality, PersonalitySettingsClass>
     {
+        static PersonalityDictionary()
+        {
+            if (!JsonUtility.Load.LoadObject(out _nicknames, "NicknamePersonalities")) {
+                _nicknames = new NickNames();
+                JsonUtility.SaveObjectToJson(_nicknames, "NicknamePersonalities");
+            }
+        }
+
+        private class NickNames
+        {
+            public string Description = "Names are not case sensitive. Any bot nick name that contains one of the entries here will be forced to use the matching personality.";
+
+            public Dictionary<string, EPersonality> NicknamePersonalityMatches = new Dictionary<string, EPersonality>() {
+                { "steve", EPersonality.Wreckless},
+                { "solarint", EPersonality.GigaChad},
+                { "lvndmark", EPersonality.SnappingTurtle},
+                { "chomp", EPersonality.Chad},
+                { "senko", EPersonality.Chad},
+                { "kaeno", EPersonality.Timmy},
+                { "justnu", EPersonality.Timmy},
+                { "ratthew", EPersonality.Rat},
+                { "choccy", EPersonality.Rat},
+            };
+        }
+
+        private static readonly NickNames _nicknames;
+
         public EPersonality GetPersonality(SAINBotInfoClass infoClass, out PersonalitySettingsClass settings)
         {
-            if (checkForcePersonality(out EPersonality result))
-            {
+            if (checkForcePersonality(out EPersonality result)) {
                 settings = this[result];
                 return result;
             }
 
             result = setNicknamePersonality(infoClass.Profile.NickName);
-            if (result != EPersonality.Normal)
-            {
+            if (result != EPersonality.Normal) {
                 settings = this[result];
                 return result;
             }
 
             result = setBossPersonality(infoClass.Profile.WildSpawnType);
-            if (result != EPersonality.Normal)
-            {
+            if (result != EPersonality.Normal) {
                 settings = this[result];
                 return result;
             }
 
-            foreach (var setting in this)
-            {
-                if (canBotBePersonality(infoClass, setting.Key))
-                {
+            foreach (var setting in this) {
+                if (canBotBePersonality(infoClass, setting.Key)) {
                     settings = setting.Value;
                     return setting.Key;
                 }
@@ -58,10 +81,8 @@ namespace SAIN.Preset.Personalities
 
         private bool checkForcePersonality(out EPersonality personality)
         {
-            foreach (var item in SAINPlugin.LoadedPreset.GlobalSettings.Mind.ForcePersonality)
-            {
-                if (item.Value == true)
-                {
+            foreach (var item in SAINPlugin.LoadedPreset.GlobalSettings.Mind.ForcePersonality) {
+                if (item.Value == true) {
                     personality = item.Key;
                     return true;
                 }
@@ -70,77 +91,45 @@ namespace SAIN.Preset.Personalities
             return false;
         }
 
+        public Dictionary<EPersonality, List<string>> Nickname_Personalities = new Dictionary<EPersonality, List<string>>();
+
         private EPersonality setNicknamePersonality(string nickname)
         {
-            if (nickname.Contains("solarint"))
-            {
-                return EPersonality.GigaChad;
+            if (nickname.IsNullOrEmpty()) {
+                return EPersonality.Normal;
             }
-            if (nickname.Contains("chomp") || nickname.Contains("senko"))
-            {
-                return EPersonality.Chad;
-            }
-            if (nickname.Contains("kaeno") || nickname.Contains("justnu"))
-            {
-                return EPersonality.Timmy;
-            }
-            if (nickname.Contains("ratthew") || nickname.Contains("choccy"))
-            {
-                return EPersonality.Rat;
+            string lowerNick = nickname.ToLower();
+            foreach (KeyValuePair<string, EPersonality> kvp in _nicknames.NicknamePersonalityMatches) {
+                if (lowerNick.Contains(kvp.Key.ToLower())) {
+                    return kvp.Value;
+                }
             }
             return EPersonality.Normal;
         }
 
         private EPersonality setBossPersonality(WildSpawnType wildSpawnType)
         {
-            switch (wildSpawnType)
-            {
-                case WildSpawnType.bossKilla:
-                case WildSpawnType.bossTagilla:
-                case WildSpawnType.bossKolontay:
-                    return EPersonality.Wreckless;
-
-                case WildSpawnType.bossKnight:
-                case WildSpawnType.followerBigPipe:
-                    return EPersonality.GigaChad;
-
-                case WildSpawnType.followerBirdEye:
-                case WildSpawnType.bossGluhar:
-                    return EPersonality.SnappingTurtle;
-
-                case WildSpawnType.bossKojaniy:
-                    return EPersonality.Rat;
-
-                case WildSpawnType.bossBully:
-                case WildSpawnType.bossSanitar:
-                case WildSpawnType.bossBoar:
-                    return EPersonality.Coward;
-
-                default:
-                    return EPersonality.Normal;
+            if (GlobalSettingsClass.Instance.Mind.PERS_BOSSES.TryGetValue(wildSpawnType, out EPersonality bossPersonality)) {
+                return bossPersonality;
             }
+            return EPersonality.Normal;
         }
 
         private bool canBotBePersonality(SAINBotInfoClass infoClass, EPersonality personality)
         {
-            if (!this.TryGetValue(personality, out var settings))
-            {
+            if (!this.TryGetValue(personality, out var settings)) {
                 return false;
             }
             var assignment = settings.Assignment;
-            if (!assignment.Enabled)
-            {
+            if (!assignment.Enabled) {
                 return false;
             }
-            if (checkRandomAssignment(settings))
-            {
+            if (checkRandomAssignment(settings)) {
                 return true;
             }
-            if (meetsRequirements(infoClass, settings))
-            {
+            if (meetsRequirements(infoClass, settings)) {
                 float assignmentChance = getChance(infoClass.Profile.PowerLevel, settings);
-                if (EFTMath.RandomBool(assignmentChance))
-                {
+                if (EFTMath.RandomBool(assignmentChance)) {
                     return true;
                 }
             }
@@ -167,8 +156,7 @@ namespace SAIN.Preset.Personalities
             var assignment = settings.Assignment;
             powerLevel = Mathf.Clamp(powerLevel, 0, 1000);
             float modifier0to1 = (powerLevel - assignment.PowerLevelScaleStart) / (assignment.PowerLevelScaleEnd - assignment.PowerLevelScaleStart);
-            if (assignment.InverseScale)
-            {
+            if (assignment.InverseScale) {
                 modifier0to1 = 1f - modifier0to1;
             }
             float result = assignment.MaxChanceIfMeetRequirements * modifier0to1;

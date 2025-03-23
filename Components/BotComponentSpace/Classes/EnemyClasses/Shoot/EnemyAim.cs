@@ -90,10 +90,10 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             get
             {
                 if (EnemyPlayer.IsInPronePose) {
-                    return _aimSettings.ProneScatterMulti;
+                    return _aimSettings.ScatterMulti_Prone;
                 }
 
-                float min = _aimSettings.PoseLevelScatterMulti;
+                float min = _aimSettings.ScatterMulti_PoseLevel;
                 float max = 1f;
                 float result = Mathf.Lerp(min, max, PoseLevel);
 
@@ -145,7 +145,7 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
 
             float ratio = (float)visCount / (float)totalCount;
 
-            float min = _aimSettings.PartVisScatterMulti;
+            float min = _aimSettings.ScatterMulti_PartVis;
             float max = 1f;
 
             float result = Mathf.Lerp(min, max, ratio);

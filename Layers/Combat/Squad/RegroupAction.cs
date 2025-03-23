@@ -21,6 +21,7 @@ namespace SAIN.Layers.Combat.Squad
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             var SquadLeadPos = Bot.Squad.LeaderComponent?.Position;
             if (SquadLeadPos != null) {
                 Bot.Mover.GoToPoint(SquadLeadPos.Value, out _);
@@ -34,6 +35,7 @@ namespace SAIN.Layers.Combat.Squad
                 Shoot.CheckAimAndFire();
                 Bot.Steering.SteerByPriority();
             }
+            this.EndProfilingSample();
         }
 
         public override void Start()

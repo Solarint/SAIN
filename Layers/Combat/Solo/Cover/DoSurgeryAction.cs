@@ -19,6 +19,14 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
+            checkDoSurgery();
+            handleSteering();
+            this.EndProfilingSample();
+        }
+
+        private void checkDoSurgery()
+        {
             if (Bot.Medical.Surgery.AreaClearForSurgery) {
                 Bot.Mover.PauseMovement(30);
                 Bot.Mover.SprintController.CancelRun();
@@ -35,7 +43,10 @@ namespace SAIN.Layers.Combat.Solo.Cover
                 Bot.Medical.TryCancelHeal();
                 Bot.Mover.DogFight.DogFightMove(false);
             }
+        }
 
+        private void handleSteering()
+        {
             if (!Bot.Steering.SteerByPriority(null, false) &&
                 !Bot.Steering.LookToLastKnownEnemyPosition(Bot.Enemy)) {
                 Bot.Steering.LookToRandomPosition();

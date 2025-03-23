@@ -15,6 +15,7 @@ namespace SAIN.Editor.GUISections
     public static class BotSettingsEditor
     {
         private static readonly StringBuilder _stringBuilder = new StringBuilder();
+
         public static void ShowAllSettingsGUI(object settings, out bool wasEdited, string name, string savePath, float height, out bool Saved)
         {
             BeginHorizontal();
@@ -27,42 +28,38 @@ namespace SAIN.Editor.GUISections
 
             var container = SettingsContainers.GetContainer(settings.GetType(), name);
             container.SearchPattern = TextField(
-                container.SearchPattern, 
-                null, 
-                Width(250), 
+                container.SearchPattern,
+                null,
+                Width(250),
                 Height(height));
 
             if (Button(
-                "Clear", 
-                EUISoundType.MenuContextMenu, 
-                Width(80), 
-                Height(height)))
-            {
+                "Clear",
+                EUISoundType.MenuContextMenu,
+                Width(80),
+                Height(height))) {
                 container.SearchPattern = string.Empty;
             }
 
             Space(10);
 
-            if (ConfigEditingTracker.UnsavedChanges)
-            {
+            if (ConfigEditingTracker.UnsavedChanges) {
                 BuilderClass.Alert(
                     "Click Save to export changes, and send changes to bots if in-game",
                     "YOU HAVE UNSAVED CHANGES!",
                     height, ColorNames.DarkRed);
             }
-            else
-            {
+            else {
                 BuilderClass.Alert(null, null, height, null);
             }
 
             Saved = Button(
                 "Save and Export",
-                ConfigEditingTracker.GetUnsavedValuesString(), 
+                ConfigEditingTracker.GetUnsavedValuesString(),
                 EUISoundType.InsuranceInsured,
                 Height(height));
 
             EndHorizontal();
-
 
             container.Scroll = BeginScrollView(container.Scroll);
 
@@ -77,11 +74,9 @@ namespace SAIN.Editor.GUISections
             container.Open = BuilderClass.ExpandableMenu(container.Name, container.Open, null, height);
             if (Button("Clear", "Clear Selected Options in this Menu",
                 EFT.UI.EUISoundType.MenuDropdownSelect,
-                Width(100), Height(height)))
-            {
+                Width(100), Height(height))) {
                 container.SelectedCategories.Clear();
-                foreach (var category in container.Categories)
-                {
+                foreach (var category in container.Categories) {
                     category.SelectedList.Clear();
                 }
             }
@@ -94,10 +89,8 @@ namespace SAIN.Editor.GUISections
         private static void CategoryOpenable(List<Category> categories, object settingsObject, out bool wasEdited, string search = null)
         {
             wasEdited = false;
-            foreach (var categoryClass in categories)
-            {
-                if (categoryClass.OptionCount(out int notUsed) == 0)
-                {
+            foreach (var categoryClass in categories) {
+                if (categoryClass.OptionCount(out int notUsed) == 0) {
                     continue;
                 }
 
@@ -107,30 +100,26 @@ namespace SAIN.Editor.GUISections
                 BeginHorizontal(30);
 
                 bool open = true;
-                if (string.IsNullOrEmpty(search))
-                {
+                if (string.IsNullOrEmpty(search)) {
                     categoryClass.Open = BuilderClass.ExpandableMenu(
                         attributes.Name, categoryClass.Open, attributes.Description, EntryConfig.EntryHeight);
                     open = categoryClass.Open;
                 }
-                else
-                {
-                    Box(attributes.Name, attributes.Description, Height(EntryConfig.EntryHeight));
+                else {
+                    Box(attributes.Name, attributes.Description, Height(PresetHandler.EditorDefaults.ConfigEntryHeight));
                 }
 
                 EndHorizontal(30);
 
-                if (open)
-                {
+                if (open) {
                     AttributesGUI.EditAllValuesInObj(categoryClass, categoryObject, out bool newEdit, search);
-                    if (newEdit)
-                    {
+                    if (newEdit) {
                         wasEdited = true;
                     }
                 }
             }
         }
 
-        private static readonly GUIEntryConfig EntryConfig = new GUIEntryConfig(30f);
+        private static readonly GUIEntryConfig EntryConfig = new GUIEntryConfig();
     }
 }

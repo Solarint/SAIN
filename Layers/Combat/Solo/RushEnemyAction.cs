@@ -1,7 +1,7 @@
 ﻿using EFT;
 using SAIN.Helpers;
+using SAIN.Preset.GlobalSettings;
 using SAIN.SAINComponent.Classes.EnemyClasses;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using DrakiaXYZ.BigBrain.Brains;
@@ -16,20 +16,25 @@ namespace SAIN.Layers.Combat.Solo
 
         public override void Update(CustomLayer.ActionData actionData)
         {
+            this.StartProfilingSample("Update");
             Bot.Mover.SetTargetPose(1f);
             Bot.Mover.SetTargetMoveSpeed(1f);
+            updateRushBehavior();
+            this.EndProfilingSample();
+        }
+
+        private void updateRushBehavior()
+        {
             if (!checkHasEnemy()) {
                 Bot.Steering.SteerByPriority(null, true);
-                return;
             }
-
-            if (_enemy.InLineOfSight) {
+            else if (_enemy.InLineOfSight) {
                 enemyInSight();
-                return;
             }
-
-            checkUpdateMove();
-            checkJump();
+            else {
+                checkUpdateMove();
+                checkJump();
+            }
         }
 
         public void Toggle(bool value)
@@ -71,6 +76,9 @@ namespace SAIN.Layers.Combat.Solo
 
         private void checkJump()
         {
+            if (!Bot.Info.FileSettings.Move.JUMP_TOGGLE || !GlobalSettingsClass.Instance.Move.JUMP_TOGGLE) {
+                return;
+            }
             if (_shallTryJump && TryJumpTimer < Time.time && Bot.Player.IsSprintEnabled) {
                 //&& Bot.Enemy.Path.PathDistance > 3f
                 var corner = _enemy.Path.EnemyCorners.GroundPosition(ECornerType.Last);
@@ -84,6 +92,9 @@ namespace SAIN.Layers.Combat.Solo
 
         private void checkJumpEnemyInSight()
         {
+            if (!Bot.Info.FileSettings.Move.JUMP_TOGGLE || !GlobalSettingsClass.Instance.Move.JUMP_TOGGLE) {
+                return;
+            }
             if (_shallTryJump) {
                 if (_shallBunnyHop) {
                     Bot.Mover.TryJump();

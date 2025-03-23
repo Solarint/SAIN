@@ -168,21 +168,18 @@ namespace SAIN.Patches.Hearing
             return AccessTools.Method(typeof(MovementContext), "method_1");
         }
 
-		[PatchPrefix]
-		public static bool PatchPrefix(Player ____player, Vector3 motion, MovementContext __instance, ref float ____nextStepNoise)
-		{
-			if (____nextStepNoise < Time.time && ____player.IsSprintEnabled)
-			{
-				____nextStepNoise = Time.time + 0.33f;
+        [PatchPrefix]
+        public static bool PatchPrefix(Player ____player, Vector3 motion, MovementContext __instance, ref float ____nextStepNoise)
+        {
+            if (____nextStepNoise < Time.time && ____player.IsSprintEnabled) {
+                ____nextStepNoise = Time.time + 0.33f;
 
-				if (motion.y < 0.2f && motion.y > -0.2f)
-				{
-					motion.y = 0f;
-				}
-				if (motion.sqrMagnitude < 1E-06f)
-				{
-					return false;
-				}
+                if (motion.y < 0.2f && motion.y > -0.2f) {
+                    motion.y = 0f;
+                }
+                if (motion.sqrMagnitude < 1E-06f) {
+                    return false;
+                }
 
 				float volume = ____player.MovementContext.CovertMovementVolumeBySpeed * ____player.method_55();
 				float baseRange = 60f;
@@ -269,24 +266,24 @@ namespace SAIN.Patches.Hearing
     {
         private static PropertyInfo AIFlareEnabled;
 
-		protected override MethodBase GetTargetMethod()
-		{
-			AIFlareEnabled = AccessTools.Property(typeof(GClass551), "Boolean_0");
-			return AccessTools.Method(typeof(GClass551), "TryPlayShootSound");
-		}
+        protected override MethodBase GetTargetMethod()
+        {
+            AIFlareEnabled = AccessTools.Property(typeof(GClass551), "Boolean_0");
+            return AccessTools.Method(typeof(GClass551), "TryPlayShootSound");
+        }
 
-		[PatchPrefix]
-		public static bool PatchPrefix(GClass551 __instance)
-		{
-			//if (__instance.IsAI &&
-			//    SAINPlugin.IsBotExluded(__instance.BotOwner))
-			//{
-			//    return true;
-			//}
-			AIFlareEnabled.SetValue(__instance, true);
-			return false;
-		}
-	}
+        [PatchPrefix]
+        public static bool PatchPrefix(GClass551 __instance)
+        {
+            //if (__instance.IsAI &&
+            //    SAINPlugin.IsBotExluded(__instance.BotOwner))
+            //{
+            //    return true;
+            //}
+            AIFlareEnabled.SetValue(__instance, true);
+            return false;
+        }
+    }
 
     public class OnMakingShotPatch : ModulePatch
     {
@@ -298,7 +295,11 @@ namespace SAIN.Patches.Hearing
         [PatchPrefix]
         public static void PatchPrefix(Player __instance)
         {
-            SAINBotController.Instance?.BotHearing.PlayShootSound(__instance.ProfileId);
+            var botController = SAINBotController.Instance;
+            if (botController == null) {
+                return;
+            }
+            botController.BotHearing?.PlayShootSound(__instance.ProfileId);
             if (__instance.IsAI && SAINEnableClass.GetSAIN(__instance, out var sain)) {
                 sain.Info.WeaponInfo.Recoil.WeaponShot();
             }
@@ -424,17 +425,16 @@ namespace SAIN.Patches.Hearing
         }
 
         [PatchPrefix]
-		public static void PatchPrefix(Player __instance, ref string soundBank, float ____runSurfaceCheck)
-		{
-			if (soundBank == "Prone"
-				&& __instance.SinceLastStep >= 0.5f
-				&& __instance.CheckSurface(____runSurfaceCheck))
-			{
-				float range = SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_Prone;
-				SAINBotController.Instance?.BotHearing.PlayAISound(__instance.ProfileId, SAINSoundType.Prone, __instance.Position, range, 1f);
-			}
-		}
-	}
+        public static void PatchPrefix(Player __instance, ref string soundBank, float ____runSurfaceCheck)
+        {
+            if (soundBank == "Prone"
+                && __instance.SinceLastStep >= 0.5f
+                && __instance.CheckSurface(____runSurfaceCheck)) {
+                float range = SAINPlugin.LoadedPreset.GlobalSettings.Hearing.BaseSoundRange_Prone;
+                SAINBotController.Instance?.BotHearing.PlayAISound(__instance.ProfileId, SAINSoundType.Prone, __instance.Position, range, 1f);
+            }
+        }
+    }
 
     public class AimSoundPatch : ModulePatch
     {
