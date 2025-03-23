@@ -8,7 +8,8 @@ using SPT.Reflection.Patching;
 using System;
 using System.Reflection;
 using UnityEngine;
-using EFTSettingsLoadClass = GClass583;
+using EFTSettingsLoadClass = GClass598;
+// Look for BotDifficulty GClass598::CheckOnExclude(BotDifficulty,EFT.WildSpawnType)
 
 namespace SAIN.Patches.Components
 {

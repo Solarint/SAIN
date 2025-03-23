@@ -4,6 +4,7 @@ using SAIN.SAINComponent.Classes.EnemyClasses;
 using SAIN.SAINComponent.Classes.Search;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -38,7 +39,7 @@ namespace SAIN.Layers.Combat.Solo
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             setTargetEnemy();
             var enemy = _searchTarget;

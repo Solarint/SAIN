@@ -445,7 +445,7 @@ namespace SAIN.SAINComponent.Classes.Debug
             Vector3? teleportDestination = null;
 
             const float minTeleDist = 1f;
-            if (BotOwner.Mover.HavePath)
+            if (BotOwner.Mover.HasPathAndNoComplete)
             {
                 for (int i = PathController.CurPath.CurIndex; i < PathController.CurPath.Length - 1; i++)
                 {

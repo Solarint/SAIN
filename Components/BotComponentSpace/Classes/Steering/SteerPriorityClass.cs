@@ -30,7 +30,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         public AimStatus AimStatus {
             get
             {
-                object aimStatus = aimStatusField.GetValue(BotOwner.AimingData);
+                object aimStatus = aimStatusField.GetValue(BotOwner.AimingManager.CurrentAiming);
                 if (aimStatus == null) {
                     return AimStatus.NoTarget;
                 }

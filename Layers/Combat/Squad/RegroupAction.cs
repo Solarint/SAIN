@@ -19,7 +19,7 @@ namespace SAIN.Layers.Combat.Squad
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             var SquadLeadPos = Bot.Squad.LeaderComponent?.Position;
             if (SquadLeadPos != null) {

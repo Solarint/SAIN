@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using UnityEngine;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo.Cover
 {
@@ -16,7 +17,7 @@ namespace SAIN.Layers.Combat.Solo.Cover
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             if (Bot.Medical.Surgery.AreaClearForSurgery) {
                 Bot.Mover.PauseMovement(30);

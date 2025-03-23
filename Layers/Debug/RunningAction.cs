@@ -3,6 +3,7 @@ using System.Collections;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AI;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Run
 {
@@ -17,7 +18,7 @@ namespace SAIN.Layers.Combat.Run
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             Bot.Mover.SetTargetPose(1f);
             Bot.Mover.SetTargetMoveSpeed(1f);

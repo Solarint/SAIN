@@ -48,7 +48,8 @@ namespace SAIN.SAINComponent.SubComponents
                 _sentToBot = true;
                 var collisionSound = Grenade.GrenadeSettings.CollisionSound;
                 bool isFrag = collisionSound == GrenadeSettings.CollisionSounds.frag;
-                var trigger = isFrag ? EPhraseTrigger.OnEnemyGrenade : EPhraseTrigger.Attention;
+                // Seen elsewhere: they changed the name of this for some reason (from Attention to Look)
+                var trigger = isFrag ? EPhraseTrigger.OnEnemyGrenade : EPhraseTrigger.Look;
                 Bot.Talk.GroupSay(trigger, ETagStatus.Combat, false, 70);
 
                 Vector3 pos = DangerPoint;

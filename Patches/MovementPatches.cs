@@ -6,7 +6,8 @@ using SAIN.Preset.GlobalSettings;
 using SPT.Reflection.Patching;
 using System.Reflection;
 using UnityEngine;
-using PathFinderClass = GClass470;
+using PathFinderClass = GClass485;
+// Try looking for method_0(UnityEngine.Vector3,System.Boolean,System.Boolean)
 
 namespace SAIN.Patches.Movement
 {

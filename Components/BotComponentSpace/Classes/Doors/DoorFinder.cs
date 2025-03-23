@@ -151,7 +151,7 @@ namespace SAIN.SAINComponent.Classes.Mover
                 findDoorsInRange(DOORS_INTERACTION_DISTANCE, CloseDoors, InteractionDoors);
                 //
                 //Vector3 targetMovePos;
-                //if (BotOwner.Mover.HavePath)
+                //if (BotOwner.Mover.HasPathAndNoComplete)
                 //    targetMovePos = BotOwner.Mover.RealDestPoint;
                 //else if (Bot.Mover.SprintController.Running)
                 //    targetMovePos = Bot.Mover.SprintController.CurrentCornerDestination();

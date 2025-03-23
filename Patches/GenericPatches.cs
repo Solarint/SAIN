@@ -41,12 +41,17 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass551), "SetEnvironment");
+            return AccessTools.Method(typeof(GClass567), "SetEnvironment");
         }
 
         [PatchPostfix]
-        public static void Patch(GClass551 __instance, IndoorTrigger trigger)
+        public static void Patch(GClass567 __instance, IndoorTrigger trigger)
         {
+            // Look for one of the following to find the above GClass:
+            // AIDataRequestController GClass???::aidataRequestController_0
+            // System.Action<EFT.InventoryLogic.Weapon> GClass???::OnStationaryTaken
+            // System.Action<GClass567> GClass???::OnBecomeDrunk
+            // Those probably won't change any time soon.
             SAINBotController.Instance?.PlayerEnviromentChanged(__instance?.Player?.ProfileId, trigger);
         }
     }

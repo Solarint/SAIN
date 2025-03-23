@@ -1,6 +1,7 @@
 ﻿using EFT;
 using System.Collections;
 using UnityEngine;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -10,7 +11,7 @@ namespace SAIN.Layers.Combat.Solo
         {
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             Bot.Mover.SetTargetPose(1f);
             Bot.Mover.SetTargetMoveSpeed(1f);

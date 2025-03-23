@@ -40,7 +40,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
 
             float minTime = 0.1f; // minimum time per shot
             float maxTime = 4f; // maximum time per shot
-            float EnemyDistance = (BotOwner.AimingData.RealTargetPoint - BotOwner.WeaponRoot.position).magnitude;
+            float EnemyDistance = (BotOwner.AimingManager.CurrentAiming.RealTargetPoint - BotOwner.WeaponRoot.position).magnitude;
 
             float rate = EnemyDistance / (PerMeter / weaponInfo.FinalModifier);
             float final = Mathf.Clamp(rate, minTime, maxTime);

@@ -21,7 +21,7 @@ namespace SAIN.Layers.Combat.Squad
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             var enemy = Bot.Enemy;
             if (enemy != null) {

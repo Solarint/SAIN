@@ -3,6 +3,7 @@ using SAIN.Helpers;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -17,7 +18,7 @@ namespace SAIN.Layers.Combat.Solo
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             Bot.Steering.SteerByPriority();
             if (!shallMoveShoot)

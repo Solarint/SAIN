@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
-using SeasonController = Class442;
+using SeasonController = Class436;
+// Look for:
+// GInterface29 Class436::Controller()
+// ESeason GInterface29::Season()
 
 namespace SAIN.Components
 {

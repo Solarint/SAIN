@@ -27,7 +27,7 @@ namespace SAIN.Patches.Shoot.RateOfFire
             {
                 return true;
             }
-            if (____owner.AimingData == null)
+            if (____owner.AimingManager.CurrentAiming == null)
             {
                 return true;
             }
@@ -36,7 +36,7 @@ namespace SAIN.Patches.Shoot.RateOfFire
 
             if (weapon.SelectedFireMode == Weapon.EFireMode.fullauto)
             {
-                float distance = ____owner.AimingData.LastDist2Target;
+                float distance = ____owner.AimingManager.CurrentAiming.LastDist2Target;
                 float scaledDistance = FullAutoBurstLength(____owner, distance);
 
                 ___nextFingerUpTime = scaledDistance + Time.time;

@@ -1,5 +1,6 @@
 ﻿using Audio.Data;
 using Comfort.Common;
+using CommonAssets.Scripts.Audio;
 using EFT;
 using EFT.Interactive;
 using EFT.InventoryLogic;
@@ -150,7 +151,13 @@ namespace SAIN.Patches.Hearing
 
 		private static float calcVolume(Player player)
 		{
-			return player.MovementContext.CovertMovementVolumeBySpeed * player.method_54();
+            // search for the player method that uses:
+            // this.MovementContext.MaxSpeed
+            // this.MovementContext.CharacterMovementSpeed
+            // something about "min speed volume"
+            // as of SPT 3.11 this is method_57() then used by method_55()
+            // it's probably near EFT.Player::PlayStepSound()
+            return player.MovementContext.CovertMovementVolumeBySpeed * player.method_55();
 		}
 	}
 
@@ -177,7 +184,7 @@ namespace SAIN.Patches.Hearing
 					return false;
 				}
 
-				float volume = ____player.MovementContext.CovertMovementVolumeBySpeed * ____player.method_54();
+				float volume = ____player.MovementContext.CovertMovementVolumeBySpeed * ____player.method_55();
 				float baseRange = 60f;
 				SAINBotController.Instance?.BotHearing.PlayAISound(____player.ProfileId, SAINSoundType.Sprint, ____player.Position, baseRange, volume);
 			}

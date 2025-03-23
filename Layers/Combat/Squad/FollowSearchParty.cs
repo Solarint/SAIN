@@ -3,6 +3,7 @@ using SAIN.SAINComponent.Classes.EnemyClasses;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Squad
 {
@@ -18,7 +19,7 @@ namespace SAIN.Layers.Combat.Squad
             Bot.Search.ToggleSearch(true, _enemy);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             if (!Bot.Mover.SprintController.Running) {
                 Shoot.CheckAimAndFire();

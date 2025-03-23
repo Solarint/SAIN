@@ -125,10 +125,10 @@ namespace SAIN.Patches.Shoot.Aim
                 return true;
             }
 
-            Vector3 realTargetPoint = ___botOwner_0.AimingData.RealTargetPoint;
+            Vector3 realTargetPoint = ___botOwner_0.AimingManager.CurrentAiming.RealTargetPoint;
 
             if (bot.IsCheater) {
-                _endTargetPointProp.SetValue(___botOwner_0.AimingData, realTargetPoint);
+                _endTargetPointProp.SetValue(___botOwner_0.AimingManager.CurrentAiming, realTargetPoint);
                 return false;
             }
 
@@ -182,7 +182,7 @@ namespace SAIN.Patches.Shoot.Aim
             //    DebugGizmos.Line(recoilOffset + realTargetPoint, realTargetPoint, Color.red, 0.02f, true, 10f, true);
             //}
 
-            _endTargetPointProp.SetValue(___botOwner_0.AimingData, result);
+            _endTargetPointProp.SetValue(___botOwner_0.AimingManager.CurrentAiming, result);
             return false;
         }
 
@@ -267,7 +267,7 @@ namespace SAIN.Patches.Shoot.Aim
 
             float aimDelay = ___float_10;
             bool moving = ___bool_1;
-            bool panicing = (bool)_PanicingProp.GetValue(___botOwner_0.AimingData);
+            bool panicing = (bool)_PanicingProp.GetValue(___botOwner_0.AimingManager.CurrentAiming);
 
             __result = calculateAim(bot, dist, ang, moving, panicing, aimDelay);
             bot.Aim.LastAimTime = __result;

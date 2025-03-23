@@ -5,6 +5,7 @@ using SAIN.SAINComponent.SubComponents.CoverFinder;
 using System.Collections;
 using System.Text;
 using UnityEngine;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo.Cover
 {
@@ -21,7 +22,7 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         private bool _runFailed;
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             Bot.Mover.SetTargetMoveSpeed(1f);
             Bot.Mover.SetTargetPose(1f);

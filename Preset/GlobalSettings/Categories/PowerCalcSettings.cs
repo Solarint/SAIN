@@ -5,6 +5,8 @@ using SAIN.Components.PlayerComponentSpace;
 using SAIN.Helpers;
 using SAIN.SAINComponent.Classes.Info;
 using System.Collections.Generic;
+using GClassAIData = GClass567;
+// Try looking for AIDataRequestController GClass???::aidataRequestController_0
 
 namespace SAIN.Preset.GlobalSettings
 {
@@ -58,7 +60,7 @@ namespace SAIN.Preset.GlobalSettings
             power += RolePower(playerComponent.Player.Profile.Info.Settings.Role);
             power += ArmorPower(playerComponent.Player);
 
-			if (playerComponent.Player.AIData is GClass551 aiData)
+			if (playerComponent.Player.AIData is GClassAIData aiData)
 			{
 				aiData.PowerOfEquipment = power;
 			}

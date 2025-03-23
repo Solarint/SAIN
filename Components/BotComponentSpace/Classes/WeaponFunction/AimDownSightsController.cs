@@ -98,7 +98,7 @@ namespace SAIN.SAINComponent.Classes.WeaponFunction
             get
             {
                 if (_botAimingClass == null) {
-                    var aimData = BotOwner.AimingData;
+                    var aimData = BotOwner.AimingManager.CurrentAiming;
                     if (aimData != null && aimData is BotAimingClass aimClass) {
                         _botAimingClass = aimClass;
                     }

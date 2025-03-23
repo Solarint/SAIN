@@ -6,8 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using EFTCore = GClass583;
-using EFTStatModifiersClass = GClass580;
+using EFTCore = GClass598;
+using EFTStatModifiersClass = GClass595;
+// EFTCore: Search for: Dictionary<EFT.WildSpawnType,List<BotDifficulty>> GClass???::ExcludedDifficulties
+// EFTSTatModifiers: Search for: PrecicingSpeedCoef
 
 ////////
 // Fixed some GClass References here, but classes were renamed in the deobfuscation, so much of this isn't necessary anymore. Need to clean this up

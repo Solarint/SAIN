@@ -3,7 +3,8 @@ using HarmonyLib;
 using SAIN.Preset.GlobalSettings;
 using System;
 using System.Collections.Generic;
-using FloatFunc = GClass817<float>;
+using FloatFunc = GClass828<float>;
+// Look for EFT.InventoryLogic.Inventory::TotalWeight
 
 namespace SAIN.SAINComponent.Classes
 {

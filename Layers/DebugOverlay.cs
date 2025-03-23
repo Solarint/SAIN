@@ -135,12 +135,12 @@ namespace SAIN.Layers
                 }
 
                 if (debug.OverLay_AimInfo) {
-                    if (bot.BotOwner.AimingData != null) {
+                    if (bot.BotOwner.AimingManager.CurrentAiming != null) {
                         stringBuilder.AppendLine($"AimData: Status [{bot.Aim.AimStatus}] " +
                             $"Last Aim Time: [{bot.Aim.LastAimTime}] " +
-                            $"AimingTime [{timeAiming.GetValue(bot.BotOwner.AimingData)}] " +
-                            $"TimeToFnsh: [{TimeToAim.GetValue(bot.BotOwner.AimingData)}]");
-                        stringBuilder.AppendLine($"AimOffsetMagnitude [{((bot.BotOwner.AimingData.RealTargetPoint - bot.BotOwner.AimingData.EndTargetPoint).magnitude).Round100()}] " +
+                            $"AimingTime [{timeAiming.GetValue(bot.BotOwner.AimingManager.CurrentAiming)}] " +
+                            $"TimeToFnsh: [{TimeToAim.GetValue(bot.BotOwner.AimingManager.CurrentAiming)}]");
+                        stringBuilder.AppendLine($"AimOffsetMagnitude [{((bot.BotOwner.AimingManager.CurrentAiming.RealTargetPoint - bot.BotOwner.AimingManager.CurrentAiming.EndTargetPoint).magnitude).Round100()}] " +
                             $"Friendly Fire Status [{bot.FriendlyFire.FriendlyFireStatus}] " +
                             $"No Bush ESP Status: [{bot.NoBushESP.NoBushESPActive}]");
                         stringBuilder.AppendLine();
@@ -305,10 +305,15 @@ namespace SAIN.Layers
 
         private static float getPercentSpotted(Enemy enemy, out BodyPartType partType)
         {
-            float highestPercent = enemy.EnemyInfo.BodyData().Value?.PercentSpotted(out _) ?? 0f;
+            // 3.10: System.Single EnemyPartData::PercentSpotted(System.Single&)
+            // 3.11: System.Single EnemyPartData::GetVisibilityLevel()
+            // TAHVOHCK: I'm not sure if the range on this should be 0 <= x <= 100 or 0 <= x <= 1
+            // The new method might need a * 100 afterwards. Round100 would imply so. My thought is that if it does
+            // need a * 100 then the AI will never find anyone and it should be obvious.
+            float highestPercent = enemy.EnemyInfo.BodyData().Value?.GetVisibilityLevel() ?? 0f;
             partType = BodyPartType.body;
             foreach (var part in enemy.EnemyInfo.AllActiveParts) {
-                float percent = part.Value.PercentSpotted(out _);
+                float percent = part.Value.GetVisibilityLevel();
                 if (percent > highestPercent) {
                     highestPercent = percent;
                     partType = part.Key.BodyPartType;

@@ -3,6 +3,7 @@ using SAIN.SAINComponent.Classes.EnemyClasses;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Squad
 {
@@ -17,7 +18,7 @@ namespace SAIN.Layers.Combat.Squad
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
         }
 
@@ -45,7 +46,7 @@ namespace SAIN.Layers.Combat.Squad
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
         }
 

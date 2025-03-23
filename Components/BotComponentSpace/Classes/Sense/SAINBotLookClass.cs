@@ -7,8 +7,8 @@ using UnityEngine;
 
 // Found in Botowner.Looksensor
 using EnemyTotalCheck = GClass568;
-using EnemyVisionCheck = GClass548;
-using LookAllData = GClass573;
+using EnemyVisionCheck = GClass564;
+using LookAllData = GClass589;
 
 namespace SAIN.SAINComponent.Classes
 {
@@ -52,15 +52,16 @@ namespace SAIN.SAINComponent.Classes
 
         public void UpdateLookData(LookAllData lookData)
         {
-            for (int i = 0; i < lookData.reportsData.Count; i++) {
-                EnemyVisionCheck enemyVision = lookData.reportsData[i];
-                BotOwner.BotsGroup.ReportAboutEnemy(enemyVision.enemy, enemyVision.VisibleOnlyBuSence);
+            for (int i = 0; i < lookData.ReportsData.Count; i++) {
+                EnemyVisionCheck enemyVision = lookData.ReportsData[i];
+                // TAHVOHCK: They're fixing code typos, apparently...
+                BotOwner.BotsGroup.ReportAboutEnemy(enemyVision.Enemy, enemyVision.VisibleOnlyBySence);
             }
 
-            if (lookData.reportsData.Count > 0)
+            if (lookData.ReportsData.Count > 0)
                 BotOwner.Memory.SetLastTimeSeeEnemy();
 
-            if (lookData.shallRecalcGoal)
+            if (lookData.ShallRecalcGoal)
                 BotOwner.CalcGoal();
 
             lookData.Reset();
@@ -101,8 +102,15 @@ namespace SAIN.SAINComponent.Classes
         private void setNotVis(Enemy enemy)
         {
             foreach (var part in enemy.EnemyInfo.AllActiveParts.Values) {
-                if (part.IsVisible || part.VisibleBySense) {
-                    part.UpdateVision(1000f, false, false, false, BotOwner);
+                // System.Boolean EnemyPartData::VisibleBySense()
+                // has been replaced by
+                // EEnemyPartVisibleType EnemyPartData::VisibleType == EEnemyPartVisibleType.Sence
+                if (part.IsVisible || part.VisibleType == EEnemyPartVisibleType.Sence) {
+                    //part.UpdateVision(1000f, false, false, false, BotOwner);
+                    // New method doesn't use expose (or internally use?) seenCoef. It does expose deltaTime though
+                    // which was previously internally calculated. My assumption is that we want the bot to instantly
+                    // forget about the enemy, so a delta of 0f here should be fine.
+                    part.UpdateVisibility(BotOwner, false, false, false, 0f);
                 }
             }
             if (enemy.EnemyInfo.IsVisible) {
@@ -117,7 +125,8 @@ namespace SAIN.SAINComponent.Classes
             float timeSince = Time.time - look.LastCheckLookTime;
             if (timeSince >= delay) {
                 look.LastCheckLookTime = Time.time;
-                enemy.EnemyInfo.CheckLookEnemy(lookAll);
+                // TAHVOHCK: This takes the time delta now apparently
+                enemy.EnemyInfo.CheckLookEnemy(lookAll, timeSince);
                 return true;
             }
             return false;

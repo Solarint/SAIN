@@ -270,7 +270,8 @@ namespace SAIN.SAINComponent.Classes.Mover
             _possibleInteractDoors.Clear();
 
             Vector3 targetMovePos;
-            if (BotOwner.Mover.HavePath)
+            // This is the same as the old call (and was previously the same backing field)
+            if (BotOwner.Mover.HasPathAndNoComplete)
                 targetMovePos = BotOwner.Mover.RealDestPoint;
             else if (Bot.Mover.SprintController.Running)
                 targetMovePos = Bot.Mover.SprintController.CurrentCornerDestination();
@@ -567,7 +568,7 @@ namespace SAIN.SAINComponent.Classes.Mover
         private bool checkCrossPoint(Vector3 goTo, Vector3 botPosition, DoorData data)
         {
             NavMeshDoorLink link = data.Link;
-			GClass340 gclass;
+			GClass355 gclass;
             switch (link.Door.DoorState)
             {
                 case EDoorState.Open:

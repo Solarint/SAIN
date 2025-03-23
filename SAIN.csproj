@@ -172,6 +172,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Sirenix.Serialization">
+      <HintPath>..\..\EscapeFromTarkov_Data\Managed\Sirenix.Serialization.dll</HintPath>
+    </Reference>
     <Reference Include="spt-common">
       <HintPath>..\..\BepInEx\plugins\spt\spt-common.dll</HintPath>
     </Reference>

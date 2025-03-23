@@ -1,5 +1,6 @@
 ﻿using EFT;
 using System.Collections;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -14,7 +15,7 @@ namespace SAIN.Layers.Combat.Solo
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             Bot.Mover.SetTargetPose(0f);
             if (!Bot.Steering.SteerByPriority(null, false)) {

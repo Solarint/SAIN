@@ -3,6 +3,7 @@ using SAIN.SAINComponent.Classes.WeaponFunction;
 using SAIN.SAINComponent.SubComponents.CoverFinder;
 using System.Text;
 using UnityEngine;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo.Cover
 {
@@ -19,7 +20,7 @@ namespace SAIN.Layers.Combat.Solo.Cover
 
         private float _nextUpdateCoverTime;
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             Bot.Mover.SetTargetMoveSpeed(1f);
             Bot.Mover.SetTargetPose(1f);

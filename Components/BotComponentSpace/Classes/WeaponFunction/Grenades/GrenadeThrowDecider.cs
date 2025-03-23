@@ -2,7 +2,8 @@
 using SAIN.Preset;
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using UnityEngine;
-using GrenadeThrowChecker = GClass541;
+using GrenadeThrowChecker = GClass557;
+// Look for: AIGreanageThrowData GClass???::GetSuicideData(UnityEngine.Vector3,UnityEngine.Vector3)
 
 namespace SAIN.SAINComponent.Classes.WeaponFunction
 {

@@ -2,6 +2,7 @@
 using SAIN.SAINComponent.Classes.EnemyClasses;
 using System.Collections;
 using UnityEngine;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers.Combat.Solo
 {
@@ -18,7 +19,7 @@ namespace SAIN.Layers.Combat.Solo
             ToggleAction(value);
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             Enemy enemy = Bot.Enemy;
             if (enemy == null) {

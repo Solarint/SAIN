@@ -9,6 +9,7 @@ using System.Collections;
 using Systems.Effects;
 using UnityEngine;
 using UnityEngine.AI;
+using DrakiaXYZ.BigBrain.Brains;
 
 namespace SAIN.Layers
 {
@@ -40,7 +41,7 @@ namespace SAIN.Layers
             BotOwner.Mover.MovementResume();
         }
 
-        public override void Update()
+        public override void Update(CustomLayer.ActionData actionData)
         {
             float stamina = Bot.Player.Physical.Stamina.NormalValue;
             bool fightingEnemy = isFightingEnemy();

@@ -216,7 +216,8 @@ namespace SAIN.SAINComponent.Classes
 
             try
             {
-                player.SpawnController(player.method_127());
+                // Player.EmptyHandsController
+                player.SpawnController(player.method_156());
             }
             catch (Exception ex)
             {
@@ -233,7 +234,7 @@ namespace SAIN.SAINComponent.Classes
             else
             {
                 player.ProcessStatus = EProcessStatus.None;
-                player.SetFirstAvailableItem(PlayerOwner.Class1643.class1643_0.method_0);
+                player.SetFirstAvailableItem(PlayerOwner.Class1667.class1667_0.method_0);
             }
 
             player.SetInventoryOpened(false);
