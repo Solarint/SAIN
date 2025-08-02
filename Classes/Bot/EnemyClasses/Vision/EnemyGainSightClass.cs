@@ -12,7 +12,7 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             return CalcModifier(enemy) * CalcRepeatSeenCoef(enemy.KnownPlaces);
         }
 
-        private const float UNDER_FIRE_FROM_ME_COEF = 0.4f;
+        private const float UNDER_FIRE_FROM_ME_COEF = 0.5f;
 
         private const float DIST_SEEN_MIN_COEF = 0.01f;
         private const float DIST_SEEN_MIN_DIST = 1f;
@@ -82,8 +82,9 @@ namespace SAIN.SAINComponent.Classes.EnemyClasses
             float partMod = CalcPartsMod(enemy);
             float gearMod = enemy.EnemyPlayerComponent.AIData.AIGearModifier.StealthModifier(enemy.RealDistance);
 
-            bool flareEnabled = enemy.EnemyPlayer.AIData?.GetFlare == true &&
-                enemy.EnemyPlayerComponent.Equipment.CurrentWeaponInfo.HasSuppressor == false;
+            bool flareEnabled = 
+                enemy.EnemyPlayer.AIData?.GetFlare == true &&
+                enemy.EnemyPlayerComponent.Equipment.CurrentWeaponInfo?.HasSuppressor != true;
 
             bool underFire = enemy.BotOwner.Memory.IsUnderFire && enemy.Bot.Memory.LastUnderFireEnemy == enemy;
 
