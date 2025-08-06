@@ -196,6 +196,7 @@ namespace SAIN.SAINComponent.Classes.Mover
             {
                 TriggerNewMove(path.corners, point, false, ESprintUrgency.None, path);
                 _activePath.SetDestinationReachDistance(reachDist);
+                _activePath.PathStatus = path.status;
                 return true;
             }
             return false;
