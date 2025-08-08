@@ -121,6 +121,51 @@ namespace SAIN.Layers
                 Bot.Mover.ActivePath.RequestStartSprint(SAINComponent.Classes.Mover.ESprintUrgency.High, "extract");
             }
 
+            if (shouldStartExtract(distance))
+            {
+                return;
+            }
+
+            if (ReCalcPathTimer > Time.time)
+            {
+                return;
+            }
+
+            ExtractTimer = -1f;
+            ReCalcPathTimer = Time.time + 4f;
+
+            if (!canMoveToExtract(point))
+            {
+                Bot.Memory.Extract.ExtractStatus = EExtractStatus.None;
+                return;
+            }
+
+            Bot.Memory.Extract.ExtractStatus = EExtractStatus.MovingTo;
+
+            var pathController = Bot.Mover;
+            if (pathController.ActivePath.PathStatus == NavMeshPathStatus.PathComplete)
+            {
+                return;
+            }
+
+            // If the path to the extract is invalid or the path is incomplete and the bot reached the end of it, select a new extract
+            float distanceToEndOfPath = Vector3.Distance(BotOwner.Position, pathController.ActivePath.GetLastCorner().Position);
+            if (distanceToEndOfPath < BotExtractManager.MinDistanceToExtract)
+            {
+                // Need to reset the search timer to prevent the bot from immediately selecting (possibly) the same extract
+                BotManagerComponent.Instance.BotExtractManager.ResetExfilSearchTime(Bot);
+
+                Bot.Memory.Extract.ExfilPoint = null;
+                Bot.Memory.Extract.ExfilPosition = null;
+
+                Bot.Memory.Extract.ExtractStatus = EExtractStatus.None;
+
+                Logger.LogWarning($"{BotOwner.name} reached the end of an incomplete path when trying to find its extract. Searching for a new extract...");
+            }
+        }
+
+        private bool shouldStartExtract(float distance)
+        {
             if (distance > MinDistanceToStartExtract * 2)
             {
                 ExtractStarted = false;
@@ -132,35 +177,37 @@ namespace SAIN.Layers
 
             if (ExtractStarted)
             {
-                return;
+                return true;
             }
 
-            if (ReCalcPathTimer < Time.time)
+            return false;
+        }
+
+        private bool canMoveToExtract(Vector3 point)
+        {
+            if (!Bot.Mover.WalkToPoint(point, false, 0.5f))
             {
-                ExtractTimer = -1f;
-                ReCalcPathTimer = Time.time + 4f;
-
-                if (Bot.Mover.WalkToPoint(point, false, 0.5f))
-                {
-                    Bot.Memory.Extract.ExtractStatus = EExtractStatus.MovingTo;
-                    var pathController = Bot.Mover;
-                    if (pathController?.ActivePath != null)
-                    {
-                        float distanceToEndOfPath = Vector3.Distance(BotOwner.Position, pathController.ActivePath.GetLastCorner().Position);
-                        bool reachedEndOfIncompletePath = (pathController.ActivePath.PathStatus == NavMeshPathStatus.PathPartial) && (distanceToEndOfPath < BotExtractManager.MinDistanceToExtract);
-
-                        // If the path to the extract is invalid or the path is incomplete and the bot reached the end of it, select a new extract
-                        if ((pathController.ActivePath.PathStatus == NavMeshPathStatus.PathInvalid) || reachedEndOfIncompletePath)
-                        {
-                            // Need to reset the search timer to prevent the bot from immediately selecting (possibly) the same extract
-                            BotManagerComponent.Instance.BotExtractManager.ResetExfilSearchTime(Bot);
-
-                            Bot.Memory.Extract.ExfilPoint = null;
-                            Bot.Memory.Extract.ExfilPosition = null;
-                        }
-                    }
-                }
+                return false;
             }
+
+            var pathController = Bot.Mover;
+            if (pathController?.ActivePath == null)
+            {
+                Logger.LogError($"{BotOwner.name} has a null path to its extract");
+
+                return false;
+            }
+
+            // Need to first check if the bot has started moving to extract because there is currently a race condition that sometimes resets PathStatus
+            // to PathInvalid. If the path is invalid and the bot has not already started moving, it might actually be unable to travel there. 
+            if ((Bot.Memory.Extract.ExtractStatus == EExtractStatus.None) && (pathController.ActivePath.PathStatus == NavMeshPathStatus.PathInvalid))
+            {
+                Logger.LogWarning($"{BotOwner.name} has an invalid path to its extract");
+
+                return false;
+            }
+
+            return true;
         }
 
         public void StartExtract(Vector3 point)
