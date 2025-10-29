@@ -20,6 +20,11 @@ namespace SAIN.Patches.Generic.Fixes
         [PatchPrefix]
         public static bool Patch(BotMeleeWeaponData __instance)
         {
+            if (__instance.botOwner_0.AIData.UseZombieSimpleAnimator)
+            {
+                return true;
+            }
+
             if (SAINEnableClass.GetSAIN(__instance.botOwner_0.ProfileId, out BotComponent bot) && bot.SAINLayersActive)
             {
                 Enemy enemy = bot.GoalEnemy;
