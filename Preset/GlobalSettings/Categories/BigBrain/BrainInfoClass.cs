@@ -1,13 +1,12 @@
 ﻿using EFT;
 using System.Collections.Generic;
 
-namespace SAIN.Preset.GlobalSettings.Categories
+namespace SAIN.Preset.GlobalSettings.Categories;
+
+public sealed class BrainInfoClass
 {
-    public sealed class BrainInfoClass
-    {
-        public string Name;
-        public string Description;
-        public Dictionary<Layer, int> Layers = new();
-        public WildSpawnType[] UsedByWildSpawns;
-    }
+    public string Name;
+    public string Description;
+    public Dictionary<Layer, int> Layers = new();
+    public WildSpawnType[] UsedByWildSpawns;
 }

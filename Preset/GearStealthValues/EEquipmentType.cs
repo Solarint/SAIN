@@ -1,12 +1,11 @@
-﻿namespace SAIN.Preset.GearStealthValues
+﻿namespace SAIN.Preset.GearStealthValues;
+
+public enum EEquipmentType
 {
-    public enum EEquipmentType
-    {
-        Headwear,
-        FaceCover,
-        BackPack,
-        EyeWear,
-        ArmorVest,
-        Rig,
-    }
+    Headwear,
+    FaceCover,
+    BackPack,
+    EyeWear,
+    ArmorVest,
+    Rig,
 }

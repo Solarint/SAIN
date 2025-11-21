@@ -1,12 +1,11 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ESoundDispersionType
 {
-    public enum ESoundDispersionType
-    {
-        None,
-        Footstep,
-        HeardShot,
-        HeardSuppressedShot,
-        UnheardShot,
-        UnheardSuppressedShot,
-    }
+    None,
+    Footstep,
+    HeardShot,
+    HeardSuppressedShot,
+    UnheardShot,
+    UnheardSuppressedShot,
 }

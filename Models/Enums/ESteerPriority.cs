@@ -1,18 +1,17 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ESteerPriority
 {
-    public enum ESteerPriority
-    {
-        None,
-        ManualShooting,
-        Aiming,
-        EnemyVisible,
-        HeardThreat,
-        EnemyLastKnownLong,
-        RandomLook,
-        LastHit,
-        UnderFire,
-        MoveDirection,
-        EnemyLastKnown,
-        RunningPath,
-    }
+    None,
+    ManualShooting,
+    Aiming,
+    EnemyVisible,
+    HeardThreat,
+    EnemyLastKnownLong,
+    RandomLook,
+    LastHit,
+    UnderFire,
+    MoveDirection,
+    EnemyLastKnown,
+    RunningPath,
 }

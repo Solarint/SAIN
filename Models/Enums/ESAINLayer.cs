@@ -1,13 +1,12 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ESAINLayer
 {
-    public enum ESAINLayer
-    {
-        None,
-        Combat,
-        Squad,
-        Extract,
-        Run,
-        Peace,
-        AvoidThreat,
-    }
+    None,
+    Combat,
+    Squad,
+    Extract,
+    Run,
+    Peace,
+    AvoidThreat,
 }

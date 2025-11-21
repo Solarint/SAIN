@@ -1,11 +1,10 @@
-﻿namespace SAIN.Components
+﻿namespace SAIN.Components;
+
+public enum DeviceMode
 {
-    public enum DeviceMode
-    {
-        None = 0,
-        WhiteLight = 1,
-        VisibleLaser = 2,
-        IRLight = 3,
-        IRLaser = 4,
-    }
+    None = 0,
+    WhiteLight = 1,
+    VisibleLaser = 2,
+    IRLight = 3,
+    IRLaser = 4,
 }

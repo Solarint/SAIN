@@ -1,11 +1,10 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ESuppressionState
 {
-    public enum ESuppressionState
-    {
-        None,
-        Light,
-        Medium,
-        Heavy,
-        Extreme
-    }
+    None,
+    Light,
+    Medium,
+    Heavy,
+    Extreme
 }

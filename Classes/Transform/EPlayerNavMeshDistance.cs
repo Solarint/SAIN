@@ -1,10 +1,9 @@
-﻿namespace SAIN.Classes.Transform
+﻿namespace SAIN.Classes.Transform;
+
+public enum EPlayerNavMeshDistance
 {
-    public enum EPlayerNavMeshDistance
-    {
-        OnNavMesh,
-        CloseToNavMesh,
-        FarFromNavMesh,
-        OffNavMesh,
-    }
+    OnNavMesh,
+    CloseToNavMesh,
+    FarFromNavMesh,
+    OffNavMesh,
 }

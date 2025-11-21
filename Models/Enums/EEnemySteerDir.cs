@@ -1,17 +1,16 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum EEnemySteerDir
 {
-    public enum EEnemySteerDir
-    {
-        None,
-        LastSeenPos,
-        LastHeardPos,
-        VisibleEnemyPos,
-        BlindCornerPos,
-        LastCornerPos,
-        LastKnownPos,
-        PathNode,
-        VisibleLastKnownPos,
-        NullLastKnown_ERROR,
-        NullEnemy_ERROR,
-    }
+    None,
+    LastSeenPos,
+    LastHeardPos,
+    VisibleEnemyPos,
+    BlindCornerPos,
+    LastCornerPos,
+    LastKnownPos,
+    PathNode,
+    VisibleLastKnownPos,
+    NullLastKnown_ERROR,
+    NullEnemy_ERROR,
 }

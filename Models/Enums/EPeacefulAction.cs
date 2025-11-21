@@ -1,9 +1,8 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum EPeacefulAction
 {
-    public enum EPeacefulAction
-    {
-        None,
-        Gathering,
-        Conversation,
-    }
+    None,
+    Gathering,
+    Conversation,
 }

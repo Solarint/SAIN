@@ -1,10 +1,9 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ECornerType
 {
-    public enum ECornerType
-    {
-        Blind,
-        Last,
-        First,
-        LastKnown,
-    }
+    Blind,
+    Last,
+    First,
+    LastKnown,
 }

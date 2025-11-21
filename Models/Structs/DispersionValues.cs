@@ -1,10 +1,9 @@
-﻿namespace SAIN.Models.Structs
+﻿namespace SAIN.Models.Structs;
+
+public struct DispersionValues
 {
-    public struct DispersionValues
-    {
-        public float MinAngle;
-        public float MaxAngle;
-        public float DistanceModifier;
-        public float VerticalModifier;
-    }
+    public float MinAngle;
+    public float MaxAngle;
+    public float DistanceModifier;
+    public float VerticalModifier;
 }

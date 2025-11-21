@@ -10,9 +10,9 @@ using SPT.Reflection.Patching;
 using System.Reflection;
 using UnityEngine;
 using ExecuteRequestAction = GClass81;
-using FoodAndMedsEquipCallbackType = GInterface185;
-using QuickGrenadeUseCallbackType = GInterface188;
-using SetInHandsMedsStruct = GStruct375<EBodyPart>;
+using FoodAndMedsEquipCallbackType = GInterface203;
+using QuickGrenadeUseCallbackType = GInterface206;
+using SetInHandsMedsStruct = GStruct382<EBodyPart>;
 
 namespace SAIN.Patches.Generic
 {
@@ -288,11 +288,11 @@ namespace SAIN.Patches.Generic
     {
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(GClass589), nameof(GClass589.SetEnvironment));
+            return AccessTools.Method(typeof(GClass591), nameof(GClass591.SetEnvironment));
         }
 
         [PatchPostfix]
-        public static void Patch(GClass589 __instance, IndoorTrigger trigger)
+        public static void Patch(GClass591 __instance, IndoorTrigger trigger)
         {
             BotManagerComponent.Instance?.PlayerEnviromentChanged(__instance?.Player?.ProfileId, trigger);
         }

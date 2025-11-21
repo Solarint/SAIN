@@ -1,11 +1,10 @@
-﻿namespace SAIN.SAINComponent.Classes.Memory
+﻿namespace SAIN.SAINComponent.Classes.Memory;
+
+public enum EExtractStatus
 {
-    public enum EExtractStatus
-    {
-        None = 0,
-        Extracting = 1,
-        MovingTo = 2,
-        Fighting = 3,
-        ExtractingNow = 4,
-    }
+    None = 0,
+    Extracting = 1,
+    MovingTo = 2,
+    Fighting = 3,
+    ExtractingNow = 4,
 }

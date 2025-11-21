@@ -1,82 +1,81 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SAIN.Helpers
+namespace SAIN.Helpers;
+
+public static class MathHelpers
 {
-    public static class MathHelpers
+    public static float ClampObject(object value, float min, float max)
     {
-        public static float ClampObject(object value, float min, float max)
+        if (value != null)
         {
-            if (value != null)
+            Type type = value.GetType();
+            if (type == typeof(float))
             {
-                Type type = value.GetType();
-                if (type == typeof(float))
-                {
-                    return Mathf.Clamp((float)value, min, max);
-                }
-                else if (type == typeof(int))
-                {
-                    return Mathf.Clamp(
-                        Mathf.RoundToInt((float)value),
-                        Mathf.RoundToInt(min),
-                        Mathf.RoundToInt(max));
-                }
-                else
-                {
-                    Logger.LogError($"{type}");
-                }
+                return Mathf.Clamp((float)value, min, max);
+            }
+            else if (type == typeof(int))
+            {
+                return Mathf.Clamp(
+                    Mathf.RoundToInt((float)value),
+                    Mathf.RoundToInt(min),
+                    Mathf.RoundToInt(max));
             }
             else
             {
-                Logger.LogError($"Null!?");
+                Logger.LogError($"{type}");
             }
-            return default;
         }
-
-        public static float FloatClamp(this object value, float min, float max)
+        else
         {
-            if (value != null)
+            Logger.LogError($"Null!?");
+        }
+        return default;
+    }
+
+    public static float FloatClamp(this object value, float min, float max)
+    {
+        if (value != null)
+        {
+            Type type = value.GetType();
+            if (type == typeof(float))
             {
-                Type type = value.GetType();
-                if (type == typeof(float))
-                {
-                    return Mathf.Clamp((float)value, min, max);
-                }
-                else if (type == typeof(int))
-                {
-                    return Mathf.Clamp(
-                        Mathf.RoundToInt((float)value),
-                        Mathf.RoundToInt(min),
-                        Mathf.RoundToInt(max));
-                }
-                else
-                {
-                    Logger.LogError($"{type}");
-                }
+                return Mathf.Clamp((float)value, min, max);
+            }
+            else if (type == typeof(int))
+            {
+                return Mathf.Clamp(
+                    Mathf.RoundToInt((float)value),
+                    Mathf.RoundToInt(min),
+                    Mathf.RoundToInt(max));
             }
             else
             {
+                Logger.LogError($"{type}");
+            }
+        }
+        else
+        {
 #if DEBUG
-                Logger.LogError($"Null!?");
+            Logger.LogError($"Null!?");
 #endif
-            }
-            return default;
         }
+        return default;
+    }
 
-        public static float InverseScaleWithLogisticFunction(float originalValue, float k, float x0 = 20f)
-        {
-            float scaledValue = 1f - 1f / (1f + Mathf.Exp(k * (originalValue - x0)));
-            return scaledValue.Round1000();
-        }
+    public static float InverseScaleWithLogisticFunction(float originalValue, float k, float x0 = 20f)
+    {
+        float scaledValue = 1f - 1f / (1f + Mathf.Exp(k * (originalValue - x0)));
+        return scaledValue.Round1000();
+    }
 
 
-        public static Vector3 VectorClamp
-            (Vector3 vector, float min, float max)
-        {
-            vector.x = Mathf.Clamp(vector.x, -min, max);
-            vector.y = Mathf.Clamp(vector.y, -min, max);
-            vector.z = Mathf.Clamp(vector.z, -min, max);
-            return vector;
-        }
+    public static Vector3 VectorClamp
+        (Vector3 vector, float min, float max)
+    {
+        vector.x = Mathf.Clamp(vector.x, -min, max);
+        vector.y = Mathf.Clamp(vector.y, -min, max);
+        vector.z = Mathf.Clamp(vector.z, -min, max);
+        return vector;
     }
 }

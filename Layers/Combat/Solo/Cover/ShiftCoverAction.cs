@@ -6,131 +6,130 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace SAIN.Layers.Combat.Solo.Cover
+namespace SAIN.Layers.Combat.Solo.Cover;
+
+internal class ShiftCoverAction(BotOwner bot) : BotAction(bot, nameof(ShiftCoverAction)), IBotAction
 {
-    internal class ShiftCoverAction(BotOwner bot) : BotAction(bot, nameof(ShiftCoverAction)), IBotAction
+    public override void Update(CustomLayer.ActionData data)
     {
-        public override void Update(CustomLayer.ActionData data)
+        if (NewPoint == null
+            && FindPointToGo())
         {
-            if (NewPoint == null
-                && FindPointToGo())
-            {
-                Bot.Mover.SetTargetMoveSpeed(GetSpeed());
-                Bot.Mover.SetTargetPose(GetPose());
-            }
-            else if (NewPoint != null && NewPoint.StraightDistanceStatus == CoverStatus.InCover)
-            {
-                Bot.Decision.EnemyDecisions.ShiftCoverComplete = true;
-            }
-            else if (NewPoint != null)
-            {
-                Bot.Mover.SetTargetMoveSpeed(GetSpeed());
-                Bot.Mover.SetTargetPose(GetPose());
-                Bot.Mover.GoToCoverPoint(NewPoint, false);
-            }
-            else
-            {
-                Bot.Decision.EnemyDecisions.ShiftCoverComplete = true;
-            }
+            Bot.Mover.SetTargetMoveSpeed(GetSpeed());
+            Bot.Mover.SetTargetPose(GetPose());
+        }
+        else if (NewPoint != null && NewPoint.StraightDistanceStatus == CoverStatus.InCover)
+        {
+            Bot.Decision.EnemyDecisions.ShiftCoverComplete = true;
+        }
+        else if (NewPoint != null)
+        {
+            Bot.Mover.SetTargetMoveSpeed(GetSpeed());
+            Bot.Mover.SetTargetPose(GetPose());
+            Bot.Mover.GoToCoverPoint(NewPoint, false);
+        }
+        else
+        {
+            Bot.Decision.EnemyDecisions.ShiftCoverComplete = true;
+        }
+    }
+
+    public override void OnSteeringTicked()
+    {
+        Enemy enemy = Bot.GoalEnemy;
+        if (!Shoot.ShootAnyVisibleEnemies(enemy) && !Bot.Suppression.TrySuppressAnyEnemy(enemy, Bot.EnemyController.KnownEnemies))
+        {
+        }
+        Bot.Steering.SteerByPriority(enemy);
+    }
+
+    private float GetSpeed()
+    {
+        var settings = Bot.Info.PersonalitySettings;
+        return Bot.HasEnemy ? settings.Cover.MoveToCoverHasEnemySpeed : settings.Cover.MoveToCoverNoEnemySpeed;
+    }
+
+    private float GetPose()
+    {
+        var settings = Bot.Info.PersonalitySettings;
+        return Bot.HasEnemy ? settings.Cover.MoveToCoverHasEnemyPose : settings.Cover.MoveToCoverNoEnemyPose;
+    }
+
+    private bool FindPointToGo()
+    {
+        if (NewPoint != null)
+        {
+            return true;
         }
 
-        public override void OnSteeringTicked()
+        var coverInUse = Bot.Cover.CoverInUse;
+        if (coverInUse != null)
         {
-            Enemy enemy = Bot.GoalEnemy;
-            if (!Shoot.ShootAnyVisibleEnemies(enemy) && !Bot.Suppression.TrySuppressAnyEnemy(enemy, Bot.EnemyController.KnownEnemies))
+            if (NewPoint == null)
             {
-            }
-            Bot.Steering.SteerByPriority(enemy);
-        }
-
-        private float GetSpeed()
-        {
-            var settings = Bot.Info.PersonalitySettings;
-            return Bot.HasEnemy ? settings.Cover.MoveToCoverHasEnemySpeed : settings.Cover.MoveToCoverNoEnemySpeed;
-        }
-
-        private float GetPose()
-        {
-            var settings = Bot.Info.PersonalitySettings;
-            return Bot.HasEnemy ? settings.Cover.MoveToCoverHasEnemyPose : settings.Cover.MoveToCoverNoEnemyPose;
-        }
-
-        private bool FindPointToGo()
-        {
-            if (NewPoint != null)
-            {
-                return true;
-            }
-
-            var coverInUse = Bot.Cover.CoverInUse;
-            if (coverInUse != null)
-            {
-                if (NewPoint == null)
+                if (!UsedPoints.Contains(coverInUse))
                 {
-                    if (!UsedPoints.Contains(coverInUse))
+                    UsedPoints.Add(coverInUse);
+                }
+
+                List<CoverPoint> coverPoints = Bot.Cover.CoverFinder.CoverPoints;
+
+                for (int i = 0; i < coverPoints.Count; i++)
+                {
+                    CoverPoint shiftCoverTarget = coverPoints[i];
+
+                    if (shiftCoverTarget.CoverHeight > coverInUse.CoverHeight
+                        && !UsedPoints.Contains(shiftCoverTarget))
                     {
-                        UsedPoints.Add(coverInUse);
-                    }
-
-                    List<CoverPoint> coverPoints = Bot.Cover.CoverFinder.CoverPoints;
-
-                    for (int i = 0; i < coverPoints.Count; i++)
-                    {
-                        CoverPoint shiftCoverTarget = coverPoints[i];
-
-                        if (shiftCoverTarget.CoverHeight > coverInUse.CoverHeight
-                            && !UsedPoints.Contains(shiftCoverTarget))
+                        for (int j = 0; j < UsedPoints.Count; j++)
                         {
-                            for (int j = 0; j < UsedPoints.Count; j++)
+                            if ((UsedPoints[j].Position - shiftCoverTarget.Position).sqrMagnitude > 5f
+                                && Bot.Mover.GoToCoverPoint(shiftCoverTarget, false))
                             {
-                                if ((UsedPoints[j].Position - shiftCoverTarget.Position).sqrMagnitude > 5f
-                                    && Bot.Mover.GoToCoverPoint(shiftCoverTarget, false))
-                                {
-                                    NewPoint = shiftCoverTarget;
-                                    return true;
-                                }
+                                NewPoint = shiftCoverTarget;
+                                return true;
                             }
                         }
                     }
                 }
-                if (NewPoint == null)
-                {
-                    Bot.Decision.EnemyDecisions.ShiftCoverComplete = true;
-                }
             }
-            return false;
-        }
-
-        public override void Start()
-        {
-            base.Start();
-            Bot.Decision.EnemyDecisions.ShiftCoverComplete = false;
-        }
-
-        private readonly List<CoverPoint> UsedPoints = new();
-        private CoverPoint NewPoint;
-
-        public override void Stop()
-        {
-            base.Stop();
-            NewPoint = null;
-            UsedPoints.Clear();
-        }
-
-        public override void BuildDebugText(StringBuilder stringBuilder)
-        {
-            stringBuilder.AppendLine("Shift Cover Info");
-            var cover = Bot.Cover;
-            stringBuilder.AppendLabeledValue("CoverFinder State", $"{cover.CurrentCoverFinderState}", Color.white, Color.yellow, true);
-            stringBuilder.AppendLabeledValue("Cover Count", $"{cover.CoverPoints.Count}", Color.white, Color.yellow, true);
-            if (NewPoint != null)
+            if (NewPoint == null)
             {
-                stringBuilder.AppendLine("Cover In Use");
-                stringBuilder.AppendLabeledValue("Status", $"{NewPoint.StraightDistanceStatus}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Height / Value", $"{NewPoint.CoverHeight} {NewPoint.HardData.Value}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Path Length", $"{NewPoint.PathData.PathLength}", Color.white, Color.yellow, true);
-                stringBuilder.AppendLabeledValue("Straight Distance", $"{(NewPoint.Position - Bot.Position).magnitude}", Color.white, Color.yellow, true);
+                Bot.Decision.EnemyDecisions.ShiftCoverComplete = true;
             }
+        }
+        return false;
+    }
+
+    public override void Start()
+    {
+        base.Start();
+        Bot.Decision.EnemyDecisions.ShiftCoverComplete = false;
+    }
+
+    private readonly List<CoverPoint> UsedPoints = new();
+    private CoverPoint NewPoint;
+
+    public override void Stop()
+    {
+        base.Stop();
+        NewPoint = null;
+        UsedPoints.Clear();
+    }
+
+    public override void BuildDebugText(StringBuilder stringBuilder)
+    {
+        stringBuilder.AppendLine("Shift Cover Info");
+        var cover = Bot.Cover;
+        stringBuilder.AppendLabeledValue("CoverFinder State", $"{cover.CurrentCoverFinderState}", Color.white, Color.yellow, true);
+        stringBuilder.AppendLabeledValue("Cover Count", $"{cover.CoverPoints.Count}", Color.white, Color.yellow, true);
+        if (NewPoint != null)
+        {
+            stringBuilder.AppendLine("Cover In Use");
+            stringBuilder.AppendLabeledValue("Status", $"{NewPoint.StraightDistanceStatus}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Height / Value", $"{NewPoint.CoverHeight} {NewPoint.HardData.Value}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Path Length", $"{NewPoint.PathData.PathLength}", Color.white, Color.yellow, true);
+            stringBuilder.AppendLabeledValue("Straight Distance", $"{(NewPoint.Position - Bot.Position).magnitude}", Color.white, Color.yellow, true);
         }
     }
 }

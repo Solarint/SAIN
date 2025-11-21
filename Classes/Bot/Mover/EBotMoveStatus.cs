@@ -1,12 +1,11 @@
-﻿namespace SAIN.SAINComponent.Classes.Mover
+﻿namespace SAIN.SAINComponent.Classes.Mover;
+
+public enum EBotMoveStatus
 {
-    public enum EBotMoveStatus
-    {
-        None,
-        ReadyToMove,
-        Moving,
-        Paused,
-        DoorInteraction,
-        Complete,
-    }
+    None,
+    ReadyToMove,
+    Moving,
+    Paused,
+    DoorInteraction,
+    Complete,
 }

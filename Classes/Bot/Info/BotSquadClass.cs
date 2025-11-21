@@ -4,113 +4,112 @@ using SAIN.Components;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SAIN.SAINComponent.Classes.Info
+namespace SAIN.SAINComponent.Classes.Info;
+
+public class BotSquadContainer : BotComponentClassBase
 {
-    public class BotSquadContainer : BotComponentClassBase
+    public float HUMAN_FRIEND_CLOSE_DISTANCE = 50f;
+    public float HUMAN_FRIEND_CLOSE_DISTANCE_INTERVAL = 1f;
+    public float CHECK_VISIBLE_MEMBERS_INTERVAL = 1f;
+    public float CHECK_VISIBLE_MEMBERS_DISTANCE = 75f;
+
+
+    public BotSquadContainer(BotComponent bot) : base(bot)
     {
-        public float HUMAN_FRIEND_CLOSE_DISTANCE = 50f;
-        public float HUMAN_FRIEND_CLOSE_DISTANCE_INTERVAL = 1f;
-        public float CHECK_VISIBLE_MEMBERS_INTERVAL = 1f;
-        public float CHECK_VISIBLE_MEMBERS_DISTANCE = 75f;
+        TickRequirement = ESAINTickState.OnlyNoSleep;
+        getSquad();
+    }
 
+    public void RemoveFromSquad()
+    {
+        SquadInfo = null;
+        getSquad();
+    }
 
-        public BotSquadContainer(BotComponent bot) : base(bot)
+    private void getSquad()
+    {
+        SquadInfo = BotManagerComponent.Instance.BotSquads.GetSquad(Bot.BotOwner);
+    }
+
+    public Squad SquadInfo { get; private set; }
+
+    public float DistanceToSquadLeader { get; private set; }
+
+    public readonly List<BotComponent> VisibleMembers = new();
+
+    private float _updateMemberTime = 0f;
+
+    public bool IAmLeader => SquadInfo.LeaderId == Bot.ProfileId;
+
+    public BotComponent LeaderComponent => SquadInfo?.LeaderComponent;
+
+    public bool BotInGroup => BotOwner.BotsGroup.MembersCount > 1 || HumanFriendClose;
+
+    public Dictionary<string, BotComponent> Members => SquadInfo?.Members;
+
+    public bool HumanFriendClose
+    {
+        get
         {
-            TickRequirement = ESAINTickState.OnlyNoSleep;
-            getSquad();
-        }
-
-        public void RemoveFromSquad()
-        {
-            SquadInfo = null;
-            getSquad();
-        }
-
-        private void getSquad()
-        {
-            SquadInfo = BotManagerComponent.Instance.BotSquads.GetSquad(Bot.BotOwner);
-        }
-
-        public Squad SquadInfo { get; private set; }
-
-        public float DistanceToSquadLeader { get; private set; }
-
-        public readonly List<BotComponent> VisibleMembers = new();
-
-        private float _updateMemberTime = 0f;
-
-        public bool IAmLeader => SquadInfo.LeaderId == Bot.ProfileId;
-
-        public BotComponent LeaderComponent => SquadInfo?.LeaderComponent;
-
-        public bool BotInGroup => BotOwner.BotsGroup.MembersCount > 1 || HumanFriendClose;
-
-        public Dictionary<string, BotComponent> Members => SquadInfo?.Members;
-
-        public bool HumanFriendClose
-        {
-            get
+            if (_nextCheckhumantime < Time.time)
             {
-                if (_nextCheckhumantime < Time.time)
-                {
-                    _nextCheckhumantime = Time.time + HUMAN_FRIEND_CLOSE_DISTANCE_INTERVAL;
-                    _humanFriendclose = humanFriendClose(HUMAN_FRIEND_CLOSE_DISTANCE);
-                }
-                return _humanFriendclose;
+                _nextCheckhumantime = Time.time + HUMAN_FRIEND_CLOSE_DISTANCE_INTERVAL;
+                _humanFriendclose = humanFriendClose(HUMAN_FRIEND_CLOSE_DISTANCE);
+            }
+            return _humanFriendclose;
+        }
+    }
+
+
+    private bool _humanFriendclose;
+
+    private float _nextCheckhumantime;
+
+    private bool humanFriendClose(float distToCheck)
+    {
+        foreach (var playerComponent in GameWorldComponent.Instance.PlayerTracker.AlivePlayersDictionary.Values)
+        {
+            if (playerComponent != null &&
+                !playerComponent.IsAI &&
+                Bot?.EnemyController?.IsPlayerAnEnemy(playerComponent.ProfileId) == false &&
+                playerComponent.GetDistanceToPlayer(Bot.ProfileId) < distToCheck)
+            {
+                return true;
             }
         }
+        return false;
+    }
 
-
-        private bool _humanFriendclose;
-
-        private float _nextCheckhumantime;
-
-        private bool humanFriendClose(float distToCheck)
+    public override void ManualUpdate()
+    {
+        if (BotOwner.BotsGroup.MembersCount > 1 &&
+            SquadInfo != null &&
+            _updateMemberTime < Time.time)
         {
-            foreach (var playerComponent in GameWorldComponent.Instance.PlayerTracker.AlivePlayersDictionary.Values)
+            _updateMemberTime = Time.time + CHECK_VISIBLE_MEMBERS_INTERVAL;
+
+            checkVisibleMembers();
+
+            if (!IAmLeader && LeaderComponent != null)
             {
-                if (playerComponent != null &&
-                    !playerComponent.IsAI &&
-                    Bot?.EnemyController?.IsPlayerAnEnemy(playerComponent.ProfileId) == false &&
-                    playerComponent.GetDistanceToPlayer(Bot.ProfileId) < distToCheck)
-                {
-                    return true;
-                }
+                DistanceToSquadLeader = (Bot.Position - LeaderComponent.Position).magnitude;
             }
-            return false;
         }
+        base.ManualUpdate();
+    }
 
-        public override void ManualUpdate()
+    private void checkVisibleMembers()
+    {
+        VisibleMembers.Clear();
+        Vector3 eyePos = Bot.Transform.EyePosition;
+        foreach (var member in Members.Values)
         {
-            if (BotOwner.BotsGroup.MembersCount > 1 &&
-                SquadInfo != null &&
-                _updateMemberTime < Time.time)
+            if (member != null && member.GetDistanceToPlayer(Bot.ProfileId) <= CHECK_VISIBLE_MEMBERS_DISTANCE)
             {
-                _updateMemberTime = Time.time + CHECK_VISIBLE_MEMBERS_INTERVAL;
-
-                checkVisibleMembers();
-
-                if (!IAmLeader && LeaderComponent != null)
+                Vector3 direction = member.Transform.BodyPosition - eyePos;
+                if (!Physics.Raycast(eyePos, direction.normalized, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
                 {
-                    DistanceToSquadLeader = (Bot.Position - LeaderComponent.Position).magnitude;
-                }
-            }
-            base.ManualUpdate();
-        }
-
-        private void checkVisibleMembers()
-        {
-            VisibleMembers.Clear();
-            Vector3 eyePos = Bot.Transform.EyePosition;
-            foreach (var member in Members.Values)
-            {
-                if (member != null && member.GetDistanceToPlayer(Bot.ProfileId) <= CHECK_VISIBLE_MEMBERS_DISTANCE)
-                {
-                    Vector3 direction = member.Transform.BodyPosition - eyePos;
-                    if (!Physics.Raycast(eyePos, direction.normalized, direction.magnitude, LayerMaskClass.HighPolyWithTerrainMask))
-                    {
-                        VisibleMembers.Add(member);
-                    }
+                    VisibleMembers.Add(member);
                 }
             }
         }

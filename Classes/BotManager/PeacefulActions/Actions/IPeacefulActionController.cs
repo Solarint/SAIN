@@ -1,29 +1,28 @@
 ﻿using SAIN.Models.Enums;
 using System.Collections.Generic;
 
-namespace SAIN.Components.BotController.PeacefulActions
+namespace SAIN.Components.BotController.PeacefulActions;
+
+public interface IPeacefulActionController
 {
-    public interface IPeacefulActionController
-    {
-        bool Active { get; }
+    bool Active { get; }
 
-        int Count { get; }
+    int Count { get; }
 
-        EPeacefulAction Action { get; }
+    EPeacefulAction Action { get; }
 
-        void CheckExecute(BotZoneData data);
+    void CheckExecute(BotZoneData data);
 
-        List<IPeacefulActionExecutor> ActiveActions { get; }
-    }
+    List<IPeacefulActionExecutor> ActiveActions { get; }
+}
 
-    public interface IBotPeacefulAction
-    {
-        bool Complete { get; }
+public interface IBotPeacefulAction
+{
+    bool Complete { get; }
 
-        void Update();
+    void Update();
 
-        void Start();
+    void Start();
 
-        void Stop();
-    }
+    void Stop();
 }

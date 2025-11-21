@@ -1,9 +1,8 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ERaycastPart
 {
-    public enum ERaycastPart
-    {
-        Head,
-        Body,
-        RandomPart,
-    }
+    Head,
+    Body,
+    RandomPart,
 }

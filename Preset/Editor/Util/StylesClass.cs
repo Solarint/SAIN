@@ -5,438 +5,437 @@ using UnityEngine;
 using static SAIN.Editor.Util.ApplyToStyle;
 using Color = UnityEngine.Color;
 
-namespace SAIN.Editor
+namespace SAIN.Editor;
+
+public static class StylesClass
 {
-    public static class StylesClass
+    public static void CreateCache()
     {
-        public static void CreateCache()
+        if (Styles.Count == 0)
         {
-            if (Styles.Count == 0)
+            CreateStyles();
+        }
+    }
+
+    private static readonly Dictionary<Style, GUIStyle> Styles = new();
+
+    public static GUIStyle GetStyle(Style key)
+    {
+        if (!Styles.ContainsKey(key))
+        {
+            Styles.Add(key, new GUIStyle(GUI.skin.box));
+        }
+        return Styles[key];
+    }
+
+    public static GUIStyle GetFontStyleDynamic(Style key, bool active)
+    {
+        if (!DynamicStyles.ContainsKey(key))
+        {
+            var originalStyle = GetStyle(key);
+            var normalStyle = new GUIStyle(originalStyle)
             {
-                CreateStyles();
-            }
+                fontStyle = FontStyle.Normal,
+                alignment = TextAnchor.MiddleCenter
+            };
+            var activeStyle = new GUIStyle(originalStyle)
+            {
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleCenter
+            };
+
+            var gold = ColorsClass.GetColor(ColorNames.Gold);
+            TextColorAllStates(Color.white, normalStyle);
+            TextColorAllStates(gold, activeStyle);
+
+            DynamicStyles.Add(key,
+                new DynamicStyle
+                {
+                    Normal = normalStyle,
+                    Active = activeStyle
+                }
+            );
         }
 
-        private static readonly Dictionary<Style, GUIStyle> Styles = new();
+        DynamicStyle dynamicStyle = DynamicStyles[key];
+        return active ? dynamicStyle.Active : dynamicStyle.Normal;
+    }
 
-        public static GUIStyle GetStyle(Style key)
-        {
-            if (!Styles.ContainsKey(key))
+    private static readonly Dictionary<Style, DynamicStyle> DynamicStyles = new();
+
+    private static void CreateStyles()
+    {
+        GUIStyle LabelStyle =
+            new(GUI.skin.label)
             {
-                Styles.Add(key, new GUIStyle(GUI.skin.box));
-            }
-            return Styles[key];
-        }
+                padding = new RectOffset(4, 4, 0, 0),
+                margin = new RectOffset(4, 4, 4, 4),
+                border = new RectOffset(4, 4, 0, 0),
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal
+            };
 
-        public static GUIStyle GetFontStyleDynamic(Style key, bool active)
-        {
-            if (!DynamicStyles.ContainsKey(key))
+        GUIStyle ButtonStyle =
+            new(GUI.skin.button)
             {
-                var originalStyle = GetStyle(key);
-                var normalStyle = new GUIStyle(originalStyle)
-                {
-                    fontStyle = FontStyle.Normal,
-                    alignment = TextAnchor.MiddleCenter
-                };
-                var activeStyle = new GUIStyle(originalStyle)
-                {
-                    fontStyle = FontStyle.Bold,
-                    alignment = TextAnchor.MiddleCenter
-                };
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal
+            };
 
-                var gold = ColorsClass.GetColor(ColorNames.Gold);
-                TextColorAllStates(Color.white, normalStyle);
-                TextColorAllStates(gold, activeStyle);
+        GUIStyle BoxStyle =
+            new(GUI.skin.box)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal
+            };
 
-                DynamicStyles.Add(key,
-                    new DynamicStyle
-                    {
-                        Normal = normalStyle,
-                        Active = activeStyle
-                    }
-                );
-            }
+        GUIStyle ToggleStyle =
+            new(GUI.skin.toggle)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal,
+            };
 
-            DynamicStyle dynamicStyle = DynamicStyles[key];
-            return active ? dynamicStyle.Active : dynamicStyle.Normal;
-        }
+        GUIStyle TextAreaStyle =
+            new(GUI.skin.textArea)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal,
+            };
 
-        private static readonly Dictionary<Style, DynamicStyle> DynamicStyles = new();
+        GUIStyle TextFieldStyle =
+            new(GUI.skin.textField)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal,
+            };
 
-        private static void CreateStyles()
-        {
-            GUIStyle LabelStyle =
-                new(GUI.skin.label)
-                {
-                    padding = new RectOffset(4, 4, 0, 0),
-                    margin = new RectOffset(4, 4, 4, 4),
-                    border = new RectOffset(4, 4, 0, 0),
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal
-                };
+        GUIStyle ScrollViewStyle =
+            new(GUI.skin.scrollView)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+            };
 
-            GUIStyle ButtonStyle =
-                new(GUI.skin.button)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal
-                };
+        GUIStyle WindowStyle =
+            new(GUI.skin.window);
 
-            GUIStyle BoxStyle =
-                new(GUI.skin.box)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal
-                };
+        GUIStyle VerticalScrollbarDownButtonStyle =
+            new(GUI.skin.verticalScrollbarDownButton);
 
-            GUIStyle ToggleStyle =
-                new(GUI.skin.toggle)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal,
-                };
+        GUIStyle VerticalScrollbarStyle =
+            new(GUI.skin.verticalScrollbar);
 
-            GUIStyle TextAreaStyle =
-                new(GUI.skin.textArea)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal,
-                };
+        GUIStyle VerticalScrollbarThumbStyle =
+            new(GUI.skin.verticalScrollbarThumb);
 
-            GUIStyle TextFieldStyle =
-                new(GUI.skin.textField)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal,
-                };
+        GUIStyle VerticalScrollbarUpButtonStyle =
+            new(GUI.skin.verticalScrollbarUpButton);
 
-            GUIStyle ScrollViewStyle =
-                new(GUI.skin.scrollView)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                };
+        GUIStyle HorizontalSliderStyle =
+            new(GUI.skin.horizontalSlider)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal
+            };
 
-            GUIStyle WindowStyle =
-                new(GUI.skin.window);
+        GUIStyle HorizontalSliderThumbStyle =
+            new(GUI.skin.horizontalSliderThumb)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal
+            };
 
-            GUIStyle VerticalScrollbarDownButtonStyle =
-                new(GUI.skin.verticalScrollbarDownButton);
+        GUIStyle VerticalSliderStyle =
+            new(GUI.skin.verticalSlider);
 
-            GUIStyle VerticalScrollbarStyle =
-                new(GUI.skin.verticalScrollbar);
+        GUIStyle VerticalSliderThumbStyle =
+            new(GUI.skin.verticalSliderThumb);
 
-            GUIStyle VerticalScrollbarThumbStyle =
-                new(GUI.skin.verticalScrollbarThumb);
+        GUIStyle ListStyle =
+            new(GUI.skin.toggle)
+            {
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal
+            };
 
-            GUIStyle VerticalScrollbarUpButtonStyle =
-                new(GUI.skin.verticalScrollbarUpButton);
+        GUIStyle ToolTipStyle =
+            new(GUI.skin.box)
+            {
+                padding = new RectOffset(4, 4, 4, 4),
+                border = new RectOffset(4, 4, 4, 4),
+                wordWrap = true,
+                clipping = TextClipping.Clip,
+                alignment = TextAnchor.MiddleLeft,
+                fontStyle = FontStyle.Normal,
+            };
 
-            GUIStyle HorizontalSliderStyle =
-                new(GUI.skin.horizontalSlider)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal
-                };
-
-            GUIStyle HorizontalSliderThumbStyle =
-                new(GUI.skin.horizontalSliderThumb)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal
-                };
-
-            GUIStyle VerticalSliderStyle =
-                new(GUI.skin.verticalSlider);
-
-            GUIStyle VerticalSliderThumbStyle =
-                new(GUI.skin.verticalSliderThumb);
-
-            GUIStyle ListStyle =
-                new(GUI.skin.toggle)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal
-                };
-
-            GUIStyle ToolTipStyle =
-                new(GUI.skin.box)
-                {
-                    padding = new RectOffset(4, 4, 4, 4),
-                    border = new RectOffset(4, 4, 4, 4),
-                    wordWrap = true,
-                    clipping = TextClipping.Clip,
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal,
-                };
-
-            GUIStyle BlankBackgroundStyle =
-                new(LabelStyle)
-                {
-                    alignment = TextAnchor.MiddleLeft,
-                    fontStyle = FontStyle.Normal
-                };
-
-            GUIStyle AlertStyle =
-                new(GUI.skin.box)
-                {
-                    padding = LabelStyle.padding,
-                    margin = LabelStyle.margin,
-                    border = LabelStyle.border,
-                    overflow = LabelStyle.overflow,
-                    contentOffset = LabelStyle.contentOffset,
-                    alignment = TextAnchor.MiddleCenter,
-                    fontStyle = FontStyle.Bold,
-                };
-
-            Texture2D TexMidGray = TexturesClass.GetTexture(
-                EGraynessLevel.Mid);
-            Texture2D TexDarkGray = TexturesClass.GetTexture(
-                EGraynessLevel.Dark);
-            Texture2D TexVeryDarkGray = TexturesClass.GetTexture(
-                EGraynessLevel.VeryDark);
-            Texture2D TexMidRed = TexturesClass.GetTexture(
-                ColorNames.MidRed);
-            Texture2D TexDarkRed = TexturesClass.GetTexture(
-                ColorNames.DarkRed);
-
-            Color ColorGold = ColorsClass.GetColor(ColorNames.Gold);
-            Color fadedWhite = new(0.9f, 0.9f, 0.9f, 0.9f);
-
-            TextColorAllStates(fadedWhite, ColorGold,
-                WindowStyle,
-                ListStyle,
-                ButtonStyle,
-                ToggleStyle,
-                TextFieldStyle,
-                TextAreaStyle,
-                AlertStyle
-                );
-
-            TextColorHover(Color.white,
-                WindowStyle,
-                ListStyle,
-                ButtonStyle,
-                ToggleStyle,
-                TextFieldStyle,
-                TextAreaStyle,
-                AlertStyle
-                );
-
-            BackgroundAllStates(null, BlankBackgroundStyle);
-
-            TextColorAllStates(
-                fadedWhite,
-                BlankBackgroundStyle,
-                ToolTipStyle,
-                BoxStyle,
-                LabelStyle
-                );
-
-            TextColorHover(
-                Color.white,
-                BlankBackgroundStyle,
-                ToolTipStyle,
-                BoxStyle,
-                LabelStyle
-                );
-
-            BackgroundAllStates(
-                TexMidRed,
-                AlertStyle
-                );
-
-            BackgroundAllStates(
-                TexMidGray, TexDarkRed,
-                ListStyle
-                );
-
-            GUIStyle[] ToggleStyles =
-                [
-                    ToggleStyle,
-                    ButtonStyle,
-                ];
-
-            BackgroundNormal(
-                TexMidGray, TexDarkRed,
-                ToggleStyles
-                );
-
-            BackgroundActive(
-                TexMidRed, TexDarkRed,
-                ToggleStyles
-                );
-
-            BackgroundHover(
-                TexMidRed, TexDarkRed,
-                ToggleStyles
-                );
-
-            BackgroundFocused(
-                TexMidRed, TexDarkRed,
-                ToggleStyles
-                );
-
-            BackgroundAllStates(
-                TexDarkGray, TexMidGray,
-                TextFieldStyle,
-                TextAreaStyle
-                );
-
-            BackgroundAllStates(
-                null,
-                HorizontalSliderStyle,
-                HorizontalSliderThumbStyle,
-                ScrollViewStyle
-                );
-
-            BackgroundAllStates(
-                TexVeryDarkGray,
-                WindowStyle
-                );
-
-            BackgroundAllStates(
-                TexDarkGray,
-                VerticalScrollbarStyle,
-                VerticalScrollbarUpButtonStyle,
-                VerticalScrollbarDownButtonStyle,
-                BoxStyle,
-                LabelStyle,
-                ToolTipStyle
-                );
-
-            BackgroundHover(TexturesClass.GetTexture(EGraynessLevel.DarkMid),
-                VerticalScrollbarStyle,
-                VerticalScrollbarUpButtonStyle,
-                VerticalScrollbarDownButtonStyle,
-                BoxStyle,
-                LabelStyle,
-                ToolTipStyle);
-
-            BackgroundAllStates(
-                TexDarkRed,
-                VerticalScrollbarThumbStyle
-                );
-
-            GUIStyle selectGridStyle =
-                new(ToggleStyle)
-                {
-                    alignment = TextAnchor.MiddleCenter,
-                    fontStyle = FontStyle.Normal,
-                };
-
-            LabelStyle.margin = BoxStyle.margin;
-            LabelStyle.padding = BoxStyle.margin;
-
-            GUIStyle dragBarStyle =
-                new(BlankBackgroundStyle)
-                {
-                    alignment = TextAnchor.MiddleLeft,
-                    padding = new RectOffset(10, 10, 3, 3)
-                };
-
-            GUIStyle botTypeGridStyle =
-                new(ToggleStyle)
-                {
-                    fontStyle = FontStyle.Normal,
-                    alignment = TextAnchor.MiddleLeft
-                };
-
-            GUIStyle SelectionListStyle =
-                new(ToggleStyle)
-                {
-                    fontStyle = FontStyle.Normal,
-                    alignment = TextAnchor.MiddleLeft
-                };
-
-            GUIStyle botTypeSectionStyle = new(ToggleStyle)
+        GUIStyle BlankBackgroundStyle =
+            new(LabelStyle)
             {
                 alignment = TextAnchor.MiddleLeft,
                 fontStyle = FontStyle.Normal
             };
 
-            Styles.Add(Style.botTypeSection, botTypeSectionStyle);
-            Styles.Add(Style.scrollView, ScrollViewStyle);
-            Styles.Add(Style.selectionList, SelectionListStyle);
-            Styles.Add(Style.alert, AlertStyle);
-            Styles.Add(Style.botTypeGrid, botTypeGridStyle);
-            Styles.Add(Style.dragBar, dragBarStyle);
-            Styles.Add(Style.selectionGrid, selectGridStyle);
-            Styles.Add(Style.horizontalSliderThumb, HorizontalSliderThumbStyle);
-            Styles.Add(Style.button, ButtonStyle);
-            Styles.Add(Style.box, BoxStyle);
-            Styles.Add(Style.toggle, ToggleStyle);
-            Styles.Add(Style.textField, TextFieldStyle);
-            Styles.Add(Style.textArea, TextAreaStyle);
-            Styles.Add(Style.window, WindowStyle);
-            Styles.Add(Style.verticalScrollbarUpButton, VerticalScrollbarUpButtonStyle);
-            Styles.Add(Style.verticalScrollbarThumb, VerticalScrollbarThumbStyle);
-            Styles.Add(Style.verticalScrollbar, VerticalScrollbarStyle);
-            Styles.Add(Style.verticalScrollbarDownButton, VerticalScrollbarDownButtonStyle);
-            Styles.Add(Style.horizontalSlider, HorizontalSliderStyle);
-            Styles.Add(Style.label, LabelStyle);
-            Styles.Add(Style.list, ListStyle);
-            Styles.Add(Style.verticalSlider, VerticalSliderStyle);
-            Styles.Add(Style.verticalSliderThumb, VerticalSliderThumbStyle);
-            Styles.Add(Style.blankbox, BlankBackgroundStyle);
-            Styles.Add(Style.tooltip, ToolTipStyle);
-
-            foreach (var style in EnumValues.GetEnum<Style>())
+        GUIStyle AlertStyle =
+            new(GUI.skin.box)
             {
-                if (!Styles.ContainsKey(style))
-                {
-                    //Logger.LogWarning(style);
-                }
+                padding = LabelStyle.padding,
+                margin = LabelStyle.margin,
+                border = LabelStyle.border,
+                overflow = LabelStyle.overflow,
+                contentOffset = LabelStyle.contentOffset,
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold,
+            };
+
+        Texture2D TexMidGray = TexturesClass.GetTexture(
+            EGraynessLevel.Mid);
+        Texture2D TexDarkGray = TexturesClass.GetTexture(
+            EGraynessLevel.Dark);
+        Texture2D TexVeryDarkGray = TexturesClass.GetTexture(
+            EGraynessLevel.VeryDark);
+        Texture2D TexMidRed = TexturesClass.GetTexture(
+            ColorNames.MidRed);
+        Texture2D TexDarkRed = TexturesClass.GetTexture(
+            ColorNames.DarkRed);
+
+        Color ColorGold = ColorsClass.GetColor(ColorNames.Gold);
+        Color fadedWhite = new(0.9f, 0.9f, 0.9f, 0.9f);
+
+        TextColorAllStates(fadedWhite, ColorGold,
+            WindowStyle,
+            ListStyle,
+            ButtonStyle,
+            ToggleStyle,
+            TextFieldStyle,
+            TextAreaStyle,
+            AlertStyle
+            );
+
+        TextColorHover(Color.white,
+            WindowStyle,
+            ListStyle,
+            ButtonStyle,
+            ToggleStyle,
+            TextFieldStyle,
+            TextAreaStyle,
+            AlertStyle
+            );
+
+        BackgroundAllStates(null, BlankBackgroundStyle);
+
+        TextColorAllStates(
+            fadedWhite,
+            BlankBackgroundStyle,
+            ToolTipStyle,
+            BoxStyle,
+            LabelStyle
+            );
+
+        TextColorHover(
+            Color.white,
+            BlankBackgroundStyle,
+            ToolTipStyle,
+            BoxStyle,
+            LabelStyle
+            );
+
+        BackgroundAllStates(
+            TexMidRed,
+            AlertStyle
+            );
+
+        BackgroundAllStates(
+            TexMidGray, TexDarkRed,
+            ListStyle
+            );
+
+        GUIStyle[] ToggleStyles =
+            [
+                ToggleStyle,
+                ButtonStyle,
+            ];
+
+        BackgroundNormal(
+            TexMidGray, TexDarkRed,
+            ToggleStyles
+            );
+
+        BackgroundActive(
+            TexMidRed, TexDarkRed,
+            ToggleStyles
+            );
+
+        BackgroundHover(
+            TexMidRed, TexDarkRed,
+            ToggleStyles
+            );
+
+        BackgroundFocused(
+            TexMidRed, TexDarkRed,
+            ToggleStyles
+            );
+
+        BackgroundAllStates(
+            TexDarkGray, TexMidGray,
+            TextFieldStyle,
+            TextAreaStyle
+            );
+
+        BackgroundAllStates(
+            null,
+            HorizontalSliderStyle,
+            HorizontalSliderThumbStyle,
+            ScrollViewStyle
+            );
+
+        BackgroundAllStates(
+            TexVeryDarkGray,
+            WindowStyle
+            );
+
+        BackgroundAllStates(
+            TexDarkGray,
+            VerticalScrollbarStyle,
+            VerticalScrollbarUpButtonStyle,
+            VerticalScrollbarDownButtonStyle,
+            BoxStyle,
+            LabelStyle,
+            ToolTipStyle
+            );
+
+        BackgroundHover(TexturesClass.GetTexture(EGraynessLevel.DarkMid),
+            VerticalScrollbarStyle,
+            VerticalScrollbarUpButtonStyle,
+            VerticalScrollbarDownButtonStyle,
+            BoxStyle,
+            LabelStyle,
+            ToolTipStyle);
+
+        BackgroundAllStates(
+            TexDarkRed,
+            VerticalScrollbarThumbStyle
+            );
+
+        GUIStyle selectGridStyle =
+            new(ToggleStyle)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Normal,
+            };
+
+        LabelStyle.margin = BoxStyle.margin;
+        LabelStyle.padding = BoxStyle.margin;
+
+        GUIStyle dragBarStyle =
+            new(BlankBackgroundStyle)
+            {
+                alignment = TextAnchor.MiddleLeft,
+                padding = new RectOffset(10, 10, 3, 3)
+            };
+
+        GUIStyle botTypeGridStyle =
+            new(ToggleStyle)
+            {
+                fontStyle = FontStyle.Normal,
+                alignment = TextAnchor.MiddleLeft
+            };
+
+        GUIStyle SelectionListStyle =
+            new(ToggleStyle)
+            {
+                fontStyle = FontStyle.Normal,
+                alignment = TextAnchor.MiddleLeft
+            };
+
+        GUIStyle botTypeSectionStyle = new(ToggleStyle)
+        {
+            alignment = TextAnchor.MiddleLeft,
+            fontStyle = FontStyle.Normal
+        };
+
+        Styles.Add(Style.botTypeSection, botTypeSectionStyle);
+        Styles.Add(Style.scrollView, ScrollViewStyle);
+        Styles.Add(Style.selectionList, SelectionListStyle);
+        Styles.Add(Style.alert, AlertStyle);
+        Styles.Add(Style.botTypeGrid, botTypeGridStyle);
+        Styles.Add(Style.dragBar, dragBarStyle);
+        Styles.Add(Style.selectionGrid, selectGridStyle);
+        Styles.Add(Style.horizontalSliderThumb, HorizontalSliderThumbStyle);
+        Styles.Add(Style.button, ButtonStyle);
+        Styles.Add(Style.box, BoxStyle);
+        Styles.Add(Style.toggle, ToggleStyle);
+        Styles.Add(Style.textField, TextFieldStyle);
+        Styles.Add(Style.textArea, TextAreaStyle);
+        Styles.Add(Style.window, WindowStyle);
+        Styles.Add(Style.verticalScrollbarUpButton, VerticalScrollbarUpButtonStyle);
+        Styles.Add(Style.verticalScrollbarThumb, VerticalScrollbarThumbStyle);
+        Styles.Add(Style.verticalScrollbar, VerticalScrollbarStyle);
+        Styles.Add(Style.verticalScrollbarDownButton, VerticalScrollbarDownButtonStyle);
+        Styles.Add(Style.horizontalSlider, HorizontalSliderStyle);
+        Styles.Add(Style.label, LabelStyle);
+        Styles.Add(Style.list, ListStyle);
+        Styles.Add(Style.verticalSlider, VerticalSliderStyle);
+        Styles.Add(Style.verticalSliderThumb, VerticalSliderThumbStyle);
+        Styles.Add(Style.blankbox, BlankBackgroundStyle);
+        Styles.Add(Style.tooltip, ToolTipStyle);
+
+        foreach (var style in EnumValues.GetEnum<Style>())
+        {
+            if (!Styles.ContainsKey(style))
+            {
+                //Logger.LogWarning(style);
             }
         }
+    }
 
-        private sealed class DynamicStyle
-        {
-            public GUIStyle Normal;
-            public GUIStyle Active;
-        }
+    private sealed class DynamicStyle
+    {
+        public GUIStyle Normal;
+        public GUIStyle Active;
     }
 }

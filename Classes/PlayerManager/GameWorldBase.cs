@@ -1,11 +1,10 @@
-﻿namespace SAIN.Components
+﻿namespace SAIN.Components;
+
+public abstract class GameWorldBase
 {
-    public abstract class GameWorldBase
+    protected GameWorldComponent GameWorld { get; }
+    public GameWorldBase(GameWorldComponent component)
     {
-        protected GameWorldComponent GameWorld { get; }
-        public GameWorldBase(GameWorldComponent component)
-        {
-            GameWorld = component;
-        }
+        GameWorld = component;
     }
 }

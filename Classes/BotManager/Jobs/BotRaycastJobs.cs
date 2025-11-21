@@ -1,3 +1,1 @@
-﻿namespace SAIN.Components
-{
-}
+﻿namespace SAIN.Components;

@@ -1,9 +1,8 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ERaycastCheck
 {
-    public enum ERaycastCheck
-    {
-        LineofSight,
-        Shoot,
-        Vision,
-    }
+    LineofSight,
+    Shoot,
+    Vision,
 }

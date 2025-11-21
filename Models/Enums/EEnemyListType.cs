@@ -1,10 +1,9 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum EEnemyListType
 {
-    public enum EEnemyListType
-    {
-        ActiveThreats,
-        Visible,
-        InLineOfSight,
-        Known,
-    }
+    ActiveThreats,
+    Visible,
+    InLineOfSight,
+    Known,
 }

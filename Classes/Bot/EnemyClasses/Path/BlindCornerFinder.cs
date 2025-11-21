@@ -5,6 +5,4 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-namespace SAIN.SAINComponent.Classes.EnemyClasses
-{
-}
+namespace SAIN.SAINComponent.Classes.EnemyClasses;

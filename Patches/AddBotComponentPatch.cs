@@ -8,144 +8,143 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace SAIN.Patches.Components
+namespace SAIN.Patches.Components;
+
+internal class AddBotComponentPatch : ModulePatch
 {
-    internal class AddBotComponentPatch : ModulePatch
+    protected override MethodBase GetTargetMethod()
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotOwner), nameof(BotOwner.PreActivate));
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(ref BotOwner __instance)
-        {
-            try
-            {
-                BotSpawnController.Instance.AddBot(__instance);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError($" SAIN Add Bot Error: {ex}");
-            }
-        }
+        return AccessTools.Method(typeof(BotOwner), nameof(BotOwner.PreActivate));
     }
 
-    internal class ActivateBotComponentPatch : ModulePatch
+    [PatchPostfix]
+    public static void PatchPostfix(ref BotOwner __instance)
     {
-        protected override MethodBase GetTargetMethod()
+        try
         {
-            return AccessTools.Method(typeof(BotOwner), nameof(BotOwner.method_10));
+            BotSpawnController.Instance.AddBot(__instance);
         }
-
-        [PatchPostfix]
-        public static void PatchPostfix(ref BotOwner __instance)
+        catch (Exception ex)
         {
-            __instance.GetComponent<BotComponent>()?.Activate(__instance);
+            Logger.LogError($" SAIN Add Bot Error: {ex}");
         }
     }
+}
 
-    internal class AddGameWorldPatch : ModulePatch
+internal class ActivateBotComponentPatch : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(GameWorldUnityTickListener), nameof(GameWorldUnityTickListener.Create));
-        }
-
-        [PatchPostfix]
-        public static void PatchPostfix(GameObject gameObject, GameWorld gameWorld)
-        {
-            if (gameWorld is HideoutGameWorld)
-                return;
-
-            try
-            {
-                if (GameWorldComponent.Instance != null)
-                {
-                    Logger.LogWarning($"Old SAIN Gameworld is not null! Destroying...");
-                    GameWorldComponent.Instance.DestroyComponent();
-                }
-                GameWorldComponent gameWorldComponent = gameWorld.gameObject.AddComponent<GameWorldComponent>();
-                BotManagerComponent botController = gameWorld.gameObject.AddComponent<BotManagerComponent>();
-                gameWorldComponent.Init(gameWorld, botController);
-                botController.Activate(gameWorldComponent);
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError($" SAIN Init Gameworld Error: {ex}");
-            }
-        }
+        return AccessTools.Method(typeof(BotOwner), nameof(BotOwner.method_10));
     }
 
-    internal class WorldTickPatch : ModulePatch
+    [PatchPostfix]
+    public static void PatchPostfix(ref BotOwner __instance)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(GameWorld), nameof(GameWorld.DoWorldTick));
-        }
+        __instance.GetComponent<BotComponent>()?.Activate(__instance);
+    }
+}
 
-        [PatchPostfix]
-        public static void Patch(GameWorld __instance, float dt)
-        {
-            GameWorldComponent.Instance?.WorldTick(dt);
-        }
+internal class AddGameWorldPatch : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(GameWorldUnityTickListener), nameof(GameWorldUnityTickListener.Create));
     }
 
-    internal class GetBotController : ModulePatch
+    [PatchPostfix]
+    public static void PatchPostfix(GameObject gameObject, GameWorld gameWorld)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsController), nameof(BotsController.Init));
-        }
+        if (gameWorld is HideoutGameWorld)
+            return;
 
-        [PatchPostfix]
-        public static void Patch(BotsController __instance)
+        try
         {
-            GameWorldComponent gameWorld = GameWorldComponent.Instance;
-            if (gameWorld == null)
+            if (GameWorldComponent.Instance != null)
             {
-                Logger.LogError("gameWorld Null");
-                return;
+                Logger.LogWarning($"Old SAIN Gameworld is not null! Destroying...");
+                GameWorldComponent.Instance.DestroyComponent();
             }
-            gameWorld.Activate(__instance);
+            GameWorldComponent gameWorldComponent = gameWorld.gameObject.AddComponent<GameWorldComponent>();
+            BotManagerComponent botController = gameWorld.gameObject.AddComponent<BotManagerComponent>();
+            gameWorldComponent.Init(gameWorld, botController);
+            botController.Activate(gameWorldComponent);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError($" SAIN Init Gameworld Error: {ex}");
         }
     }
+}
 
-    /// <summary>
-    /// Bot update is handled by sain's gameworld component, disable it here if that exists.
-    /// </summary>
-    internal class DisableBotUpdateByUnityPatch : ModulePatch
+internal class WorldTickPatch : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(BotsController), nameof(BotsController.method_0));
-        }
-
-        [PatchPrefix]
-        public static bool Patch()
-        {
-            if (GameWorldComponent.Instance == null)
-            {
-                return true;
-            }
-            return false;
-        }
+        return AccessTools.Method(typeof(GameWorld), nameof(GameWorld.DoWorldTick));
     }
 
-    internal class PlayerLateUpdatePatch : ModulePatch
+    [PatchPostfix]
+    public static void Patch(GameWorld __instance, float dt)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return AccessTools.Method(typeof(Player), nameof(Player.LateUpdate));
-        }
+        GameWorldComponent.Instance?.WorldTick(dt);
+    }
+}
 
-        [PatchPostfix]
-        public static void Patch(Player __instance)
+internal class GetBotController : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(BotsController), nameof(BotsController.Init));
+    }
+
+    [PatchPostfix]
+    public static void Patch(BotsController __instance)
+    {
+        GameWorldComponent gameWorld = GameWorldComponent.Instance;
+        if (gameWorld == null)
         {
-            if (GameWorldComponent.TryGetPlayerComponent(__instance, out PlayerComponent playerComponent))
-            {
-                playerComponent.ManualLateUpdate();
-            }
+            Logger.LogError("gameWorld Null");
+            return;
+        }
+        gameWorld.Activate(__instance);
+    }
+}
+
+/// <summary>
+/// Bot update is handled by sain's gameworld component, disable it here if that exists.
+/// </summary>
+internal class DisableBotUpdateByUnityPatch : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(BotsController), nameof(BotsController.method_0));
+    }
+
+    [PatchPrefix]
+    public static bool Patch()
+    {
+        if (GameWorldComponent.Instance == null)
+        {
+            return true;
+        }
+        return false;
+    }
+}
+
+internal class PlayerLateUpdatePatch : ModulePatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return AccessTools.Method(typeof(Player), nameof(Player.LateUpdate));
+    }
+
+    [PatchPostfix]
+    public static void Patch(Player __instance)
+    {
+        if (GameWorldComponent.TryGetPlayerComponent(__instance, out PlayerComponent playerComponent))
+        {
+            playerComponent.ManualLateUpdate();
         }
     }
 }

@@ -1,10 +1,9 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ESearchMove
 {
-    public enum ESearchMove
-    {
-        None,
-        DirectMove,
-        Wait,
-        Advance,
-    }
+    None,
+    DirectMove,
+    Wait,
+    Advance,
 }

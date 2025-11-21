@@ -13,123 +13,122 @@ using EFT;
 using Comfort.Common;
 using UnityEngine.Experimental.AI;
 
-namespace SAIN.Types.Jobs
-{
-    public interface ISainJob
-    {
-        public void Start();
+namespace SAIN.Types.Jobs;
 
-        public void Stop();
+public interface ISainJob
+{
+    public void Start();
+
+    public void Stop();
+}
+
+public abstract class SainJobTemplate(string InName, MonoBehaviour InOwner, bool InLooping = true, float InLoopInterval = 1.0f / 30.0f) : ISainJob
+{
+    protected readonly string Name = InName;
+    protected readonly bool Looping = InLooping;
+    protected readonly float LoopInterval = InLoopInterval;
+    protected readonly MonoBehaviour Owner = InOwner;
+
+    public bool Active => Coroutine != null;
+
+    protected Coroutine Coroutine;
+
+    protected virtual IEnumerator Loop()
+    {
+#if DEBUG
+        Logger.LogDebug($"Starting Job: [{Name}]");
+#endif
+        WaitForSeconds Wait = new(LoopInterval);
+        while (LoopCondition())
+        {
+            if (!CanProceed())
+            {
+                yield return Wait;
+                continue;
+            }
+            yield return PrimaryFunction();
+            yield return Wait;
+        }
+#if DEBUG
+        Logger.LogDebug($"Job Ended [{Name}]");
+#endif
     }
 
-    public abstract class SainJobTemplate(string InName, MonoBehaviour InOwner, bool InLooping = true, float InLoopInterval = 1.0f / 30.0f) : ISainJob
+    protected virtual IEnumerator PrimaryFunction()
     {
-        protected readonly string Name = InName;
-        protected readonly bool Looping = InLooping;
-        protected readonly float LoopInterval = InLoopInterval;
-        protected readonly MonoBehaviour Owner = InOwner;
+        yield return null;
+    }
 
-        public bool Active => Coroutine != null;
+    protected virtual bool LoopCondition()
+    {
+        return true;
+    }
 
-        protected Coroutine Coroutine;
+    protected virtual bool CanProceed()
+    {
+        return true;
+    }
 
-        protected virtual IEnumerator Loop()
+    public virtual void Start()
+    {
+        if (!Active)
         {
+            if (Owner == null)
+            {
 #if DEBUG
-            Logger.LogDebug($"Starting Job: [{Name}]");
+                Logger.LogError("Owner Null. Cannot Start.");
 #endif
-            WaitForSeconds Wait = new(LoopInterval);
-            while (LoopCondition())
-            {
-                if (!CanProceed())
-                {
-                    yield return Wait;
-                    continue;
-                }
-                yield return PrimaryFunction();
-                yield return Wait;
             }
+            else
+            {
+                Coroutine = Owner.StartCoroutine(Loop());
+            }
+        }
+    }
+
+    public virtual void Stop()
+    {
+        if (Active)
+        {
+            if (Owner == null)
+            {
 #if DEBUG
-            Logger.LogDebug($"Job Ended [{Name}]");
+                Logger.LogError("Owner Null. Cannot Stop Coroutine.");
 #endif
-        }
-
-        protected virtual IEnumerator PrimaryFunction()
-        {
-            yield return null;
-        }
-
-        protected virtual bool LoopCondition()
-        {
-            return true;
-        }
-
-        protected virtual bool CanProceed()
-        {
-            return true;
-        }
-
-        public virtual void Start()
-        {
-            if (!Active)
+            }
+            else
             {
-                if (Owner == null)
-                {
-#if DEBUG
-                    Logger.LogError("Owner Null. Cannot Start.");
-#endif
-                }
-                else
-                {
-                    Coroutine = Owner.StartCoroutine(Loop());
-                }
+                Owner.StopCoroutine(Coroutine);
             }
         }
+    }
 
-        public virtual void Stop()
+    protected static GameWorld GameWorld => Singleton<GameWorld>.Instance;
+    protected static IBotGame BotGame => Singleton<IBotGame>.Instance;
+    protected static GameWorldComponent SAINGameWorld => GameWorldComponent.Instance;
+    protected static BotManagerComponent SAINBotController => BotManagerComponent.Instance;
+    protected static Dictionary<string, PlayerComponent> AlivePlayers => GameWorldComponent.Instance?.PlayerTracker?.AlivePlayersDictionary;
+    protected static List<IPlayer> DeadPlayers => GameWorldComponent.Instance?.PlayerTracker?.DeadPlayers;
+    protected static Dictionary<string, BotComponent> AliveBots => BotSpawnController.Instance?.BotDictionary;
+
+    protected static bool GameActive {
+        get
         {
-            if (Active)
-            {
-                if (Owner == null)
-                {
-#if DEBUG
-                    Logger.LogError("Owner Null. Cannot Stop Coroutine.");
-#endif
-                }
-                else
-                {
-                    Owner.StopCoroutine(Coroutine);
-                }
-            }
+            return GameStatus switch {
+                GameStatus.Running or GameStatus.Runned or GameStatus.Starting or GameStatus.Started => true,
+                _ => false,
+            };
         }
+    }
 
-        protected static GameWorld GameWorld => Singleton<GameWorld>.Instance;
-        protected static IBotGame BotGame => Singleton<IBotGame>.Instance;
-        protected static GameWorldComponent SAINGameWorld => GameWorldComponent.Instance;
-        protected static BotManagerComponent SAINBotController => BotManagerComponent.Instance;
-        protected static Dictionary<string, PlayerComponent> AlivePlayers => GameWorldComponent.Instance?.PlayerTracker?.AlivePlayersDictionary;
-        protected static List<IPlayer> DeadPlayers => GameWorldComponent.Instance?.PlayerTracker?.DeadPlayers;
-        protected static Dictionary<string, BotComponent> AliveBots => BotSpawnController.Instance?.BotDictionary;
-
-        protected static bool GameActive {
-            get
+    protected static GameStatus GameStatus {
+        get
+        {
+            if (BotGame == null)
             {
-                return GameStatus switch {
-                    GameStatus.Running or GameStatus.Runned or GameStatus.Starting or GameStatus.Started => true,
-                    _ => false,
-                };
+                return GameStatus.Stopped;
             }
-        }
-
-        protected static GameStatus GameStatus {
-            get
-            {
-                if (BotGame == null)
-                {
-                    return GameStatus.Stopped;
-                }
-                return BotGame.Status;
-            }
+            return BotGame.Status;
         }
     }
 }

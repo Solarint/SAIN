@@ -5,84 +5,83 @@ using SAIN.Preset.GlobalSettings.Categories;
 using SAIN.Preset.Personalities;
 using static SAIN.Helpers.JsonUtility;
 
-namespace SAIN.Preset.GlobalSettings
+namespace SAIN.Preset.GlobalSettings;
+
+public class GlobalSettingsClass : SettingsGroupBase<GlobalSettingsClass>
 {
-    public class GlobalSettingsClass : SettingsGroupBase<GlobalSettingsClass>
+    [Hidden]
+    [JsonIgnore]
+    public static GlobalSettingsClass Instance;
+
+    public GlobalSettingsClass()
     {
-        [Hidden]
-        [JsonIgnore]
-        public static GlobalSettingsClass Instance;
+        Instance = this;
+    }
 
-        public GlobalSettingsClass()
+    public static GlobalSettingsClass ImportGlobalSettings(SAINPresetDefinition Preset)
+    {
+        string fileName = FileAndFolderNames[JsonEnum.GlobalSettings];
+        string presetsFolder = FileAndFolderNames[JsonEnum.Presets];
+
+        if (!Load.LoadObject(out GlobalSettingsClass result, fileName, presetsFolder, Preset.Name))
         {
-            Instance = this;
+            result = new GlobalSettingsClass();
+            SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
         }
+        return result;
+    }
 
-        public static GlobalSettingsClass ImportGlobalSettings(SAINPresetDefinition Preset)
-        {
-            string fileName = FileAndFolderNames[JsonEnum.GlobalSettings];
-            string presetsFolder = FileAndFolderNames[JsonEnum.Presets];
+    public override void Init()
+    {
+        InitList();
+        CreateDefaults();
+        Update();
+    }
 
-            if (!Load.LoadObject(out GlobalSettingsClass result, fileName, presetsFolder, Preset.Name))
-            {
-                result = new GlobalSettingsClass();
-                SaveObjectToJson(result, fileName, presetsFolder, Preset.Name);
-            }
-            return result;
-        }
+    public DifficultySettings Difficulty = new();
 
-        public override void Init()
-        {
-            InitList();
-            CreateDefaults();
-            Update();
-        }
+    public GeneralSettings General = new();
 
-        public DifficultySettings Difficulty = new();
+    public AimSettings Aiming = new();
 
-        public GeneralSettings General = new();
+    public HearingSettings Hearing = new();
 
-        public AimSettings Aiming = new();
+    public LocationSettingsClass Location = new();
 
-        public HearingSettings Hearing = new();
+    public LookSettings Look = new();
 
-        public LocationSettingsClass Location = new();
+    public MindSettings Mind = new();
 
-        public LookSettings Look = new();
+    public MoveSettings Move = new();
 
-        public MindSettings Mind = new();
+    public SteeringSettings Steering = new();
 
-        public MoveSettings Move = new();
+    public ShootSettings Shoot = new();
 
-        public SteeringSettings Steering = new();
+    public TalkSettings Talk = new();
 
-        public ShootSettings Shoot = new();
+    [Name("Squad Talk")]
+    public SquadTalkSettings SquadTalk = new();
 
-        public TalkSettings Talk = new();
+    [Name("Power Level Calculation")]
+    public PowerCalcSettings PowerCalc = new();
 
-        [Name("Squad Talk")]
-        public SquadTalkSettings SquadTalk = new();
+    public override void InitList()
+    {
+        SettingsList.Clear();
 
-        [Name("Power Level Calculation")]
-        public PowerCalcSettings PowerCalc = new();
-
-        public override void InitList()
-        {
-            SettingsList.Clear();
-
-            Difficulty.Init(SettingsList);
-            General.Init(SettingsList);
-            Aiming.Init(SettingsList);
-            Hearing.Init(SettingsList);
-            Location.Init(SettingsList);
-            Look.Init(SettingsList);
-            Mind.Init(SettingsList);
-            Move.Init(SettingsList);
-            Shoot.Init(SettingsList);
-            Talk.Init(SettingsList);
-            SquadTalk.Init(SettingsList);
-            PowerCalc.Init(SettingsList);
-            Steering.Init(SettingsList);
-        }
+        Difficulty.Init(SettingsList);
+        General.Init(SettingsList);
+        Aiming.Init(SettingsList);
+        Hearing.Init(SettingsList);
+        Location.Init(SettingsList);
+        Look.Init(SettingsList);
+        Mind.Init(SettingsList);
+        Move.Init(SettingsList);
+        Shoot.Init(SettingsList);
+        Talk.Init(SettingsList);
+        SquadTalk.Init(SettingsList);
+        PowerCalc.Init(SettingsList);
+        Steering.Init(SettingsList);
     }
 }

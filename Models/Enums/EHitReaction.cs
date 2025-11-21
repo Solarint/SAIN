@@ -1,11 +1,10 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum EHitReaction
 {
-    public enum EHitReaction
-    {
-        None,
-        Head,
-        Center,
-        Legs,
-        Arms,
-    }
+    None,
+    Head,
+    Center,
+    Legs,
+    Arms,
 }

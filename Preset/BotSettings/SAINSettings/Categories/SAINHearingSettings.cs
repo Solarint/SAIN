@@ -1,8 +1,7 @@
 ﻿using SAIN.Preset.GlobalSettings;
 
-namespace SAIN.Preset.BotSettings.SAINSettings.Categories
+namespace SAIN.Preset.BotSettings.SAINSettings.Categories;
+
+public class SAINHearingSettings : SAINSettingsBase<SAINHearingSettings>, ISAINSettings
 {
-    public class SAINHearingSettings : SAINSettingsBase<SAINHearingSettings>, ISAINSettings
-    {
-    }
 }

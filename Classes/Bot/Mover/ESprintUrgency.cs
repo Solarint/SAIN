@@ -9,13 +9,12 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SAIN.SAINComponent.Classes.Mover
+namespace SAIN.SAINComponent.Classes.Mover;
+
+public enum ESprintUrgency
 {
-    public enum ESprintUrgency
-    {
-        None = 0,
-        Low = 1,
-        Middle = 2,
-        High = 3,
-    }
+    None = 0,
+    Low = 1,
+    Middle = 2,
+    High = 3,
 }

@@ -1,13 +1,12 @@
-﻿namespace SAIN.SAINComponent.Classes.Mover
+﻿namespace SAIN.SAINComponent.Classes.Mover;
+
+public enum EBotSprintStatus
 {
-    public enum EBotSprintStatus
-    {
-        None,
-        CantSprint,
-        Canceling,
-        Pausing,
-        Turning,
-        NoStamina,
-        Running,
-    }
+    None,
+    CantSprint,
+    Canceling,
+    Pausing,
+    Turning,
+    NoStamina,
+    Running,
 }

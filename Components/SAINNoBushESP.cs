@@ -7,191 +7,190 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace SAIN.Components
+namespace SAIN.Components;
+
+public class PropertyNames
 {
-    public class PropertyNames
+    public static string PlayerSpirit = "PlayerSpiritAura";
+    public static string Memory = "Memory";
+    public static string GoalEnemy = "GoalEnemy";
+    public static string ShootData = "ShootData";
+    public static string CanShootByState = "CanShootByState";
+    public static string IsVisible = "IsVisible";
+}
+
+public class SAINNoBushESP : MonoBehaviour
+{
+    static SAINNoBushESP()
     {
-        public static string PlayerSpirit = "PlayerSpiritAura";
-        public static string Memory = "Memory";
-        public static string GoalEnemy = "GoalEnemy";
-        public static string ShootData = "ShootData";
-        public static string CanShootByState = "CanShootByState";
-        public static string IsVisible = "IsVisible";
+        Type botType = typeof(BotOwner);
+
+        Type memoryType = AccessTools.Field(
+            botType, PropertyNames.Memory).FieldType;
+
+        GoalEnemyProp = AccessTools.Property(
+            memoryType, PropertyNames.GoalEnemy);
+
+        IsVisibleProp = AccessTools.Property(
+            GoalEnemyProp.PropertyType, PropertyNames.IsVisible);
+
+        Type shootDataType = AccessTools.Property(
+            botType, PropertyNames.ShootData).PropertyType;
+
+        CanShootByState = AccessTools.PropertySetter(
+            shootDataType, PropertyNames.CanShootByState);
     }
 
-    public class SAINNoBushESP : MonoBehaviour
+    private static readonly PropertyInfo GoalEnemyProp;
+    private static readonly PropertyInfo IsVisibleProp;
+    private static readonly MethodInfo CanShootByState;
+
+    private BotOwner BotOwner;
+    private BotComponent SAIN;
+
+    public void Init(BotOwner botOwner, BotComponent sain = null)
     {
-        static SAINNoBushESP()
+        if (NoBushMask == 0)
         {
-            Type botType = typeof(BotOwner);
+            NoBushMask = LayerMaskClass.HighPolyWithTerrainMaskAI | (1 << LayerMask.NameToLayer(PropertyNames.PlayerSpirit));
+        }
+        BotOwner = botOwner;
+        SAIN = sain;
+    }
 
-            Type memoryType = AccessTools.Field(
-                botType, PropertyNames.Memory).FieldType;
+    private static NoBushESPSettings Settings => SAINPlugin.LoadedPreset.GlobalSettings.Look.NoBushESP;
+    private static bool UserToggle => Settings.NoBushESPToggle;
+    private static bool EnhancedChecks => Settings.NoBushESPEnhanced;
+    private static float EnhancedRatio => Settings.NoBushESPEnhancedRatio;
+    private static float Frequency => Settings.NoBushESPFrequency;
+    private static bool DebugMode => Settings.NoBushESPDebugMode;
 
-            GoalEnemyProp = AccessTools.Property(
-                memoryType, PropertyNames.GoalEnemy);
-
-            IsVisibleProp = AccessTools.Property(
-                GoalEnemyProp.PropertyType, PropertyNames.IsVisible);
-
-            Type shootDataType = AccessTools.Property(
-                botType, PropertyNames.ShootData).PropertyType;
-
-            CanShootByState = AccessTools.PropertySetter(
-                shootDataType, PropertyNames.CanShootByState);
+    public void Update()
+    {
+        if (BotOwner == null || !UserToggle)
+        {
+            NoBushESPActive = false;
+            return;
         }
 
-        private static readonly PropertyInfo GoalEnemyProp;
-        private static readonly PropertyInfo IsVisibleProp;
-        private static readonly MethodInfo CanShootByState;
-
-        private BotOwner BotOwner;
-        private BotComponent SAIN;
-
-        public void Init(BotOwner botOwner, BotComponent sain = null)
+        if (NoBushTimer < Time.time)
         {
-            if (NoBushMask == 0)
-            {
-                NoBushMask = LayerMaskClass.HighPolyWithTerrainMaskAI | (1 << LayerMask.NameToLayer(PropertyNames.PlayerSpirit));
-            }
-            BotOwner = botOwner;
-            SAIN = sain;
+            NoBushTimer = Time.time + Frequency;
+            bool active = NoBushESPCheck();
+            SetCanShoot(active);
         }
+    }
 
-        private static NoBushESPSettings Settings => SAINPlugin.LoadedPreset.GlobalSettings.Look.NoBushESP;
-        private static bool UserToggle => Settings.NoBushESPToggle;
-        private static bool EnhancedChecks => Settings.NoBushESPEnhanced;
-        private static float EnhancedRatio => Settings.NoBushESPEnhancedRatio;
-        private static float Frequency => Settings.NoBushESPFrequency;
-        private static bool DebugMode => Settings.NoBushESPDebugMode;
+    public bool NoBushESPActive { get; private set; } = false;
 
-        public void Update()
+    private float NoBushTimer = 0f;
+    private Vector3 HeadPosition => BotOwner.LookSensor.HeadPoint;
+
+    public bool NoBushESPCheck()
+    {
+        Enemy sainEnemy = SAIN?.GoalEnemy;
+        var enemy = sainEnemy?.EnemyInfo ?? BotOwner?.Memory?.GoalEnemy;
+        if (enemy != null && (enemy.IsVisible || enemy.CanShoot))
         {
-            if (BotOwner == null || !UserToggle)
+            IPlayer person = enemy.Person;
+            if (person != null && !person.IsAI)
             {
-                NoBushESPActive = false;
-                return;
-            }
-
-            if (NoBushTimer < Time.time)
-            {
-                NoBushTimer = Time.time + Frequency;
-                bool active = NoBushESPCheck();
-                SetCanShoot(active);
-            }
-        }
-
-        public bool NoBushESPActive { get; private set; } = false;
-
-        private float NoBushTimer = 0f;
-        private Vector3 HeadPosition => BotOwner.LookSensor._headPoint;
-
-        public bool NoBushESPCheck()
-        {
-            Enemy sainEnemy = SAIN?.GoalEnemy;
-            var enemy = sainEnemy?.EnemyInfo ?? BotOwner?.Memory?.GoalEnemy;
-            if (enemy != null && (enemy.IsVisible || enemy.CanShoot))
-            {
-                IPlayer person = enemy.Person;
-                if (person != null && !person.IsAI)
+                if (EnhancedChecks)
                 {
-                    if (EnhancedChecks)
-                    {
-                        return NoBushESPCheckEnhanced(person);
-                    }
-                    else
-                    {
-                        return NoBushESPCheck(person);
-                    }
+                    return NoBushESPCheckEnhanced(person);
+                }
+                else
+                {
+                    return NoBushESPCheck(person);
                 }
             }
-            return false;
         }
+        return false;
+    }
 
-        public bool NoBushESPCheck(IPlayer player)
-        {
-            Vector3 partPos = player.MainParts[BodyPartType.body].Position;
-            return RayCast(partPos, HeadPosition);
-        }
+    public bool NoBushESPCheck(IPlayer player)
+    {
+        Vector3 partPos = player.MainParts[BodyPartType.body].Position;
+        return RayCast(partPos, HeadPosition);
+    }
 
-        public bool NoBushESPCheckEnhanced(IPlayer player)
+    public bool NoBushESPCheckEnhanced(IPlayer player)
+    {
+        int hitCount = 0;
+        int partCount = player.MainParts.Count;
+        Vector3 start = HeadPosition;
+        foreach (var part in player.MainParts)
         {
-            int hitCount = 0;
-            int partCount = player.MainParts.Count;
-            Vector3 start = HeadPosition;
-            foreach (var part in player.MainParts)
+            if (RayCast(part.Value.Position, start))
             {
-                if (RayCast(part.Value.Position, start))
-                {
-                    hitCount++;
-                }
+                hitCount++;
             }
-            float ratio = (float)hitCount / partCount;
-            bool active = ratio >= EnhancedRatio;
-            if (active && DebugMode)
-            {
-                Logger.LogDebug($"Enhanced Active: [{ratio}] visible from hit count: [{hitCount}] / [{partCount}]. Config Value: [{EnhancedRatio}]");
-            }
-            return active;
         }
-
-        private static bool RayCast(Vector3 end, Vector3 start)
+        float ratio = (float)hitCount / partCount;
+        bool active = ratio >= EnhancedRatio;
+        if (active && DebugMode)
         {
-            Vector3 direction = end - start;
-            if (Physics.Raycast(start, direction.normalized, out var hit, direction.magnitude, NoBushMask))
+            Logger.LogDebug($"Enhanced Active: [{ratio}] visible from hit count: [{hitCount}] / [{partCount}]. Config Value: [{EnhancedRatio}]");
+        }
+        return active;
+    }
+
+    private static bool RayCast(Vector3 end, Vector3 start)
+    {
+        Vector3 direction = end - start;
+        if (Physics.Raycast(start, direction.normalized, out var hit, direction.magnitude, NoBushMask))
+        {
+            GameObject hitObject = hit.transform?.parent?.gameObject;
+            if (hitObject != null)
             {
-                GameObject hitObject = hit.transform?.parent?.gameObject;
-                if (hitObject != null)
+                string hitName = hitObject?.name?.ToLower();
+                foreach (string exclusion in ExclusionList)
                 {
-                    string hitName = hitObject?.name?.ToLower();
-                    foreach (string exclusion in ExclusionList)
+                    if (hitName.Contains(exclusion))
                     {
-                        if (hitName.Contains(exclusion))
+                        if (DebugMode)
                         {
-                            if (DebugMode)
-                            {
-                                Logger.LogDebug(exclusion);
-                            }
-                            return true;
+                            Logger.LogDebug(exclusion);
                         }
-                    }
-                }
-            }
-            return false;
-        }
-
-        public void SetCanShoot(bool blockShoot)
-        {
-            NoBushESPActive = blockShoot;
-            if (blockShoot)
-            {
-                var enemy = BotOwner?.Memory?.GoalEnemy;
-                if (enemy != null)
-                {
-                    if (DebugMode)
-                    {
-                        Logger.LogDebug("No Bush ESP active");
-                    }
-
-                    enemy.SetCanShoot(false);
-                    enemy.SetVisible(false);
-
-                    if (BotOwner.AimingManager.CurrentAiming is BotAimingClass aimData && aimData.AimStatus_0 != AimStatus.NoTarget)
-                    {
-                        aimData.AimStatus_0 = AimStatus.NoTarget;
-                    }
-
-                    var vision = SAIN?.EnemyController.GetEnemy(enemy.ProfileId, false)?.Vision;
-                    if (vision != null)
-                    {
-                        bool forceOff = true;
-                        vision.UpdateVisibleState(Time.time, forceOff);
+                        return true;
                     }
                 }
             }
         }
-
-        private static LayerMask NoBushMask = 0;
-        private static readonly List<string> ExclusionList = new() { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider", "timber", "spruce", "bush", "metal", "wood", "grass" };
+        return false;
     }
+
+    public void SetCanShoot(bool blockShoot)
+    {
+        NoBushESPActive = blockShoot;
+        if (blockShoot)
+        {
+            var enemy = BotOwner?.Memory?.GoalEnemy;
+            if (enemy != null)
+            {
+                if (DebugMode)
+                {
+                    Logger.LogDebug("No Bush ESP active");
+                }
+
+                enemy.SetCanShoot(false);
+                enemy.SetVisible(false);
+
+                if (BotOwner.AimingManager.CurrentAiming is BotAimingClass aimData && aimData.AimStatus_0 != AimStatus.NoTarget)
+                {
+                    aimData.AimStatus_0 = AimStatus.NoTarget;
+                }
+
+                var vision = SAIN?.EnemyController.GetEnemy(enemy.ProfileId, false)?.Vision;
+                if (vision != null)
+                {
+                    bool forceOff = true;
+                    vision.UpdateVisibleState(Time.time, forceOff);
+                }
+            }
+        }
+    }
+
+    private static LayerMask NoBushMask = 0;
+    private static readonly List<string> ExclusionList = new() { "filbert", "fibert", "tree", "pine", "plant", "birch", "collider", "timber", "spruce", "bush", "metal", "wood", "grass" };
 }

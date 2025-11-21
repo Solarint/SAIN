@@ -1,11 +1,10 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ECoverFinderStatus
 {
-    public enum ECoverFinderStatus
-    {
-        None = 0,
-        Idle = 1,
-        SearchingColliders = 1,
-        RecheckingPointsWithLimit = 2,
-        RecheckingPoints = 3,
-    }
+    None = 0,
+    Idle = 1,
+    SearchingColliders = 1,
+    RecheckingPointsWithLimit = 2,
+    RecheckingPoints = 3,
 }

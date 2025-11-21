@@ -1,11 +1,10 @@
-﻿namespace SAIN.SAINComponent.Classes.Memory
+﻿namespace SAIN.SAINComponent.Classes.Memory;
+
+public enum EExtractReason
 {
-    public enum EExtractReason
-    {
-        None = 0,
-        Injured = 1,
-        Time = 2,
-        Loot = 3,
-        External = 4,
-    }
+    None = 0,
+    Injured = 1,
+    Time = 2,
+    Loot = 3,
+    External = 4,
 }

@@ -4,104 +4,103 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace SAIN.Helpers
+namespace SAIN.Helpers;
+
+internal class ComponentHelpers
 {
-    internal class ComponentHelpers
+    public static T AddOrDestroyComponent<T, K>(T component, K condition) where T : Component where K : Component
     {
-        public static T AddOrDestroyComponent<T, K>(T component, K condition) where T : Component where K : Component
+        if (component == null && condition != null)
         {
-            if (component == null && condition != null)
-            {
-                component = GetOrAddComponent<T, K>(condition);
-            }
-            else if (component != null && condition == null)
-            {
-                DestroyComponent(component);
-            }
-            return component;
+            component = GetOrAddComponent<T, K>(condition);
+        }
+        else if (component != null && condition == null)
+        {
+            DestroyComponent(component);
+        }
+        return component;
+    }
+
+    public static void DestroyComponent<T>(T component) where T : Component
+    {
+        if (component == null)
+        {
+            //LogDebug("Component is already null, no need to dispose");
+            return;
         }
 
-        public static void DestroyComponent<T>(T component) where T : Component
+        try
         {
-            if (component == null)
+            if (TryGetDisposeMethod<T>(out var disposeMethod))
             {
-                //LogDebug("Component is already null, no need to dispose");
-                return;
+                disposeMethod.Invoke(component, null);
             }
+        }
+        catch (Exception ex)
+        {
+            LogError(ex, "Dispose");
+        }
 
+        if (component != null)
+        {
             try
             {
-                if (TryGetDisposeMethod<T>(out var disposeMethod))
-                {
-                    disposeMethod.Invoke(component, null);
-                }
+                UnityEngine.Object.Destroy(component);
             }
             catch (Exception ex)
             {
-                LogError(ex, "Dispose");
-            }
-
-            if (component != null)
-            {
-                try
-                {
-                    UnityEngine.Object.Destroy(component);
-                }
-                catch (Exception ex)
-                {
-                    LogError(ex, "Destroy");
-                }
+                LogError(ex, "Destroy");
             }
         }
+    }
 
-        private static bool TryGetDisposeMethod<T>(out MethodInfo methodInfo)
+    private static bool TryGetDisposeMethod<T>(out MethodInfo methodInfo)
+    {
+        methodInfo = null;
+        Type type = typeof(T);
+        if (!NoDisposeMethods.Contains(type.Name) && !DisposeMethods.ContainsKey(type))
         {
-            methodInfo = null;
-            Type type = typeof(T);
-            if (!NoDisposeMethods.Contains(type.Name) && !DisposeMethods.ContainsKey(type))
+            methodInfo = type.GetMethod("Dispose");
+            if (methodInfo != null)
             {
-                methodInfo = type.GetMethod("Dispose");
-                if (methodInfo != null)
-                {
-                    LogDebug($"Caching Dispose Method {type.Name}");
-                    DisposeMethods.Add(type, methodInfo);
-                }
-                else
-                {
-                    NoDisposeMethods.Add(type.Name);
-                }
+                LogDebug($"Caching Dispose Method {type.Name}");
+                DisposeMethods.Add(type, methodInfo);
             }
-            else if (DisposeMethods.ContainsKey(type))
+            else
             {
-                methodInfo = DisposeMethods[type];
+                NoDisposeMethods.Add(type.Name);
             }
-            return methodInfo != null;
         }
-
-        private static readonly List<string> NoDisposeMethods = new();
-
-        private static void LogError(Exception ex, string message)
+        else if (DisposeMethods.ContainsKey(type))
         {
-            Logger.LogError($"{message} Error");
-            Logger.LogError(ex);
+            methodInfo = DisposeMethods[type];
         }
-        private static void LogDebug(string message)
-        {
+        return methodInfo != null;
+    }
+
+    private static readonly List<string> NoDisposeMethods = new();
+
+    private static void LogError(Exception ex, string message)
+    {
+        Logger.LogError($"{message} Error");
+        Logger.LogError(ex);
+    }
+    private static void LogDebug(string message)
+    {
 #if DEBUG
-            Logger.LogDebug(message);
+        Logger.LogDebug(message);
 #endif
-        }
+    }
 
-        public static void ClearCache()
-        {
-            ListHelpers.ClearCache(DisposeMethods);
-        }
+    public static void ClearCache()
+    {
+        ListHelpers.ClearCache(DisposeMethods);
+    }
 
-        private static readonly Dictionary<Type, MethodInfo> DisposeMethods = new();
+    private static readonly Dictionary<Type, MethodInfo> DisposeMethods = new();
 
-        public static T GetOrAddComponent<T, K>(K original) where T : Component where K : Component
-        {
-            return original.GetComponent<T>() ?? original.gameObject.AddComponent<T>();
-        }
+    public static T GetOrAddComponent<T, K>(K original) where T : Component where K : Component
+    {
+        return original.GetComponent<T>() ?? original.gameObject.AddComponent<T>();
     }
 }

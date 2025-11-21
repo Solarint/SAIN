@@ -1,9 +1,8 @@
-﻿namespace SAIN.Models.Structs
+﻿namespace SAIN.Models.Structs;
+
+public struct SAINHardCoverData
 {
-    public struct SAINHardCoverData
-    {
-        public int Id;
-        public float Height;
-        public float Value;
-    }
+    public int Id;
+    public float Height;
+    public float Value;
 }

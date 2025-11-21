@@ -1,14 +1,13 @@
-﻿namespace SAIN.Plugin
+﻿namespace SAIN.Plugin;
+
+public enum SAINDifficulty
 {
-    public enum SAINDifficulty
-    {
-        none,
-        easy,
-        lesshard,
-        hard,
-        harderpmcs,
-        veryhard,
-        deathwish,
-        custom,
-    }
+    none,
+    easy,
+    lesshard,
+    hard,
+    harderpmcs,
+    veryhard,
+    deathwish,
+    custom,
 }

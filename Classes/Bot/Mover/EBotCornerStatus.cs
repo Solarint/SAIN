@@ -1,9 +1,8 @@
-﻿namespace SAIN.SAINComponent.Classes.Mover
+﻿namespace SAIN.SAINComponent.Classes.Mover;
+
+public enum EBotCornerStatus
 {
-    public enum EBotCornerStatus
-    {
-        Awaiting,
-        Active,
-        Used,
-    }
+    Awaiting,
+    Active,
+    Used,
 }

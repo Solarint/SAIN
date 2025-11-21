@@ -1,30 +1,29 @@
 ﻿using UnityEngine;
 
-namespace SAIN.Components.PlayerComponentSpace.Classes
+namespace SAIN.Components.PlayerComponentSpace.Classes;
+
+public class PlayerAISoundPlayer : AIDataBase
 {
-    public class PlayerAISoundPlayer : AIDataBase
+    public bool SoundMakerStarted { get; private set; }
+
+    public PlayerAISoundPlayer(SAINAIData aidata) : base(aidata)
     {
-        public bool SoundMakerStarted { get; private set; }
+        SoundMakerStarted = false;
+        _startPlaySoundsTime = Time.time + 1.0f;
+    }
 
-        public PlayerAISoundPlayer(SAINAIData aidata) : base(aidata)
+    private float _startPlaySoundsTime;
+
+    public bool ShallPlayAISound()
+    {
+        if (!SoundMakerStarted)
         {
-            SoundMakerStarted = false;
-            _startPlaySoundsTime = Time.time + 1.0f;
-        }
-
-        private float _startPlaySoundsTime;
-
-        public bool ShallPlayAISound()
-        {
-            if (!SoundMakerStarted)
+            if (_startPlaySoundsTime > Time.time)
             {
-                if (_startPlaySoundsTime > Time.time)
-                {
-                    return false;
-                }
-                SoundMakerStarted = true;
+                return false;
             }
-            return true;
+            SoundMakerStarted = true;
         }
+        return true;
     }
 }

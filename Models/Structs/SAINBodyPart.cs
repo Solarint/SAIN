@@ -2,26 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SAIN.Models.Structs
+namespace SAIN.Models.Structs;
+
+public struct SAINBodyPart
 {
-    public struct SAINBodyPart
-    {
-        public readonly EBodyPart Type;
-        public readonly BifacialTransform Transform;
-        public readonly List<BodyPartCollider> Colliders;
+    public readonly EBodyPart Type;
+    public readonly BifacialTransform Transform;
+    public readonly List<BodyPartCollider> Colliders;
 
-        public SAINBodyPart(EBodyPart bodyPart, BifacialTransform transform, List<BodyPartCollider> colliders)
-        {
-            Type = bodyPart;
-            Transform = transform;
-            Colliders = colliders;
-        }
-    }
-
-    public struct SAINBodyPartRaycast
+    public SAINBodyPart(EBodyPart bodyPart, BifacialTransform transform, List<BodyPartCollider> colliders)
     {
-        public EBodyPart PartType;
-        public EBodyPartColliderType ColliderType;
-        public Vector3 CastPoint;
+        Type = bodyPart;
+        Transform = transform;
+        Colliders = colliders;
     }
+}
+
+public struct SAINBodyPartRaycast
+{
+    public EBodyPart PartType;
+    public EBodyPartColliderType ColliderType;
+    public Vector3 CastPoint;
 }

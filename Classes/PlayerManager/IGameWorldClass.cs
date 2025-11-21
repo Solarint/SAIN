@@ -1,11 +1,10 @@
-﻿namespace SAIN.Components
+﻿namespace SAIN.Components;
+
+public interface IGameWorldClass
 {
-    public interface IGameWorldClass
-    {
-        void Init();
+    void Init();
 
-        void ManualUpdate(float currentTime, float deltaTime);
+    void ManualUpdate(float currentTime, float deltaTime);
 
-        void Dispose();
-    }
+    void Dispose();
 }

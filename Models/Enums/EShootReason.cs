@@ -1,11 +1,10 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum EShootReason
 {
-    public enum EShootReason
-    {
-        None = 0,
-        SquadSuppressing = 1,
-        Blindfire = 2,
-        WalkToCoverSuppress = 3,
-        Suppress = 4,
-    }
+    None = 0,
+    SquadSuppressing = 1,
+    Blindfire = 2,
+    WalkToCoverSuppress = 3,
+    Suppress = 4,
 }

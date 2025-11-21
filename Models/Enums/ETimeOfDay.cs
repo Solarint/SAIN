@@ -1,10 +1,9 @@
-﻿namespace SAIN.Models.Enums
+﻿namespace SAIN.Models.Enums;
+
+public enum ETimeOfDay
 {
-    public enum ETimeOfDay
-    {
-        Night,
-        Day,
-        Dusk,
-        Dawn
-    }
+    Night,
+    Day,
+    Dusk,
+    Dawn
 }
